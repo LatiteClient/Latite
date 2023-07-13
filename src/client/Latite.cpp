@@ -17,7 +17,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (mmgrBuf) ModuleManager;
     Latite::get().initialize(dll);
     Logger::setup();
-    Logger::log("Initializing Latite Client {}", "test");
+    Logger::info("Initializing Latite Client {}", "test");
 
     return 0ul;
 }
@@ -29,6 +29,11 @@ BOOL WINAPI DllMain(
 {
     if (fdwReason == DLL_PROCESS_ATTACH) {
         CloseHandle(CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(startThread), hinstDLL, 0, nullptr));
+    }
+    else if (fdwReason == DLL_PROCESS_DETACH) {
+        // Remove singletons
+        Latite::get().getModuleManager().~ModuleManager();
+        Latite::get().~Latite();
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
 }

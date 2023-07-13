@@ -4,5 +4,5 @@
 
 class ModuleManager : public FeatureManager<Module> {
 public:
-
+	~ModuleManager() = default;
 };
