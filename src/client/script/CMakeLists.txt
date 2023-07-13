@@ -1,1 +1,0 @@
-target_sources(Latite PRIVATE ScriptManager.h JsScript.h)
