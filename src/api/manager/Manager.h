@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <memory>
 
 template <typename T>
 class Manager {
@@ -7,7 +8,7 @@ public:
 	Manager() = default;
 	~Manager() = default;
 
-	void forEach(std::function<void>(std::shared_ptr<T> item) callback) {
+	void forEach(std::function<void(std::shared_ptr<T> item)> callback) {
 		for (auto& it : items) {
 			callback(it);
 		}

@@ -7,6 +7,7 @@
 #include <fstream>
 #include <filesystem>
 #include <string_view>
+#include <memory>
 
 // COM
 #include <d2d1.h>
