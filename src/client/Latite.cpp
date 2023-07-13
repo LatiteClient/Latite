@@ -3,14 +3,22 @@
 
 #include "Latite.h"
 #include "pch.h"
+#include "util/Logger.h"
+
+#include "module/ModuleManager.h"
 
 using namespace std;
 
 alignas(Latite) char latiteBuf[sizeof(Latite)] = {};
+alignas(ModuleManager) char mmgrBuf[sizeof(ModuleManager)] = {};
 
 DWORD __stdcall startThread(HINSTANCE dll) {
     new (latiteBuf) Latite;
+    new (mmgrBuf) ModuleManager;
     Latite::get().initialize(dll);
+    Logger::setup();
+    Logger::log("Initializing Latite Client {}", "test");
+
     return 0ul;
 }
 
@@ -30,12 +38,23 @@ Latite& Latite::get() noexcept
     return *std::launder(reinterpret_cast<Latite*>(latiteBuf));
 }
 
+ModuleManager& Latite::getModuleManager() noexcept
+{
+    return *std::launder(reinterpret_cast<ModuleManager*>(mmgrBuf));
+}
+
 void Latite::doEject() noexcept
 {
     FreeLibrary(this->dllInst);
+    onUnload();
 }
 
 void Latite::initialize(HINSTANCE hInst)
 {
     this->dllInst = hInst;
+}
+
+void Latite::onUnload()
+{
+    // Save config and everything
 }

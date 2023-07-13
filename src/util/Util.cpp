@@ -15,7 +15,8 @@ std::wstring util::getRoamingPath()
 
 std::wstring util::getLatitePath()
 {
-	getRoamingPath() + L"\\Latite";
+	// TODO: Rename to Latite
+	getRoamingPath() + L"\\LatiteRecode";
 	return std::wstring();
 }
 

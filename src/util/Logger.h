@@ -2,5 +2,6 @@
 #include <string_view>
 
 namespace Logger {
-	extern void log(std::string_view fmt, ... args);
+	extern void setup();
+	extern void log(std::string_view fmt, ...);
 }

@@ -13,17 +13,16 @@ project ("LatiteRecode")
 
 # Include sub-projects.
 add_subdirectory ("src")
-file (GLOB SOURCES "src/client/Latite.cpp" "util/Util.cpp" "util/Logger.cpp")
+file (GLOB SOURCES "util/Util.cpp" "util/Logger.cpp" "src/client/Latite.cpp" )
 
 include_directories("src")
 
-add_library(Latite SHARED ${SOURCES} "src/sdk/common/world/Minecraft.h" "src/sdk/common/world/Level.h" "src/sdk/server/ServerInstance.h" "src/api/manager/Manager.h" "src/client/module/ModuleManager.h" "src/client/module/Module.h")
+add_library(Latite SHARED ${SOURCES} "src/sdk/common/world/Minecraft.h" "src/sdk/common/world/Level.h" "src/sdk/server/ServerInstance.h" "src/api/manager/Manager.h" "src/client/module/ModuleManager.h" "src/client/module/Module.h" "src/api/manager/FeatureManager.h" "src/sdk/client/win/winrt/HidControllerWinRT.h" "src/client/command/Command.h" "src/client/script/ScriptManager.h" "src/client/script/JsScript.h")
 
 target_precompile_headers(Latite
   PUBLIC
     src/pch.h
 )
 
-if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET Latite PROPERTY CXX_STANDARD 20)
-endif()
+set_property(TARGET Latite PROPERTY CXX_STANDARD 20)
+set (CMAKE_CXX_STANDARD 20)
