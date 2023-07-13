@@ -17,7 +17,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (mmgrBuf) ModuleManager;
     Latite::get().initialize(dll);
     Logger::setup();
-    Logger::info("Initializing Latite Client {}", "test");
+    Logger::info("Initializing Latite Client {}");
 
     return 0ul;
 }

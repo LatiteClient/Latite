@@ -13,18 +13,21 @@ namespace Logger {
 
     extern void logInternal(Level level, std::string str);
 
+    // TODO: Actual logging using std::format and constexpr
     template<typename... Args>
-    extern inline void info(std::string_view fmt, Args&&... args) {
-        logInternal(Level::Info, std::format(fmt, std::forward<Args>(args)...));
+    extern constexpr inline void info(std::string fmt, Args&&... args) {
+        logInternal(Level::Info, fmt);
 	}
 
     template<typename... Args>
-    extern inline void warn(std::string_view fmt, Args&&... args) {
-        logInternal(Level::Warn, std::format(fmt, std::forward<Args>(args)...));
+    extern constexpr inline void warn(std::string fmt, Args&&... args) {
+       // std::string fm = std::format(fmt, std::forward<Args>(args)...);
+        logInternal(Level::Warn, fmt);
     }
 
     template<typename... Args>
-    extern inline void fatal(std::string_view fmt, Args&&... args) {
-        logInternal(Level::Fatal, std::format(fmt, std::forward<Args>(args)...));
+    extern constexpr inline void fatal(std::string fmt, Args&&... args) {
+       // std::string fm = std::format(fmt, std::forward<Args>(args)...);
+        logInternal(Level::Fatal, fmt);
     }
 }
