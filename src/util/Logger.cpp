@@ -4,27 +4,35 @@
 
 void Logger::setup()
 {
-	std::wstring path = util::getLatitePath();
+	auto path = util::getLatitePath();
 	std::filesystem::create_directory(path);
+	std::filesystem::create_directory(path / "Logs");
 }
 
-void Logger::log(std::string_view fmt, ... args)
+void Logger::logInternal(Level level, std::string str)
 {
-	std::wstring path = util::getLatitePath();
-	std::wstring logFolder = path + L"\\Logs";
+    std::string prefix = "";
+    switch (level) {
+    case Level::Info:
+        prefix = "INFO";
+        break;
+    case Level::Warn:
+        prefix = "WARN";
+        break;
+    case Level::Fatal:
+        prefix = "FATAL";
+        break;
+    }
 
-    va_list args;
-    va_start(args, fmt);
-
-    std::string formatted = std::vformat(fmt, args);
-
-    va_end(args);
+    str = "[" + prefix + "] " + str + "\n";
+    auto path = util::getLatitePath();
+    auto logPath = path / "Logs" / "log.txt";
 
     std::ofstream ofs;
-    ofs.open(fmt, std::ios::app);
+    ofs.open(logPath, std::ios::app);
 
     if (!ofs.fail()) {
-        ofs << formatted;
+        ofs << str;
     }
-    OutputDebugStringA(formatted.c_str());
+    OutputDebugStringA(str.c_str());
 }
