@@ -12,12 +12,13 @@ endif()
 project ("LatiteRecode")
 
 # Include sub-projects.
-add_subdirectory ("src")
 file (GLOB SOURCES "util/Util.cpp" "util/Logger.cpp" "src/client/Latite.cpp" )
 
-include_directories("src")
+add_library(Latite SHARED ${SOURCES} "src/sdk/common/world/Minecraft.h" "src/sdk/common/world/Level.h" "src/sdk/server/ServerInstance.h" "src/api/manager/Manager.h" "src/client/module/ModuleManager.h" "src/client/module/Module.h" "src/api/manager/FeatureManager.h" "src/sdk/client/win/winrt/HidControllerWinRT.h" "src/client/command/Command.h" "src/client/script/ScriptManager.h")
 
-add_library(Latite SHARED ${SOURCES} "src/sdk/common/world/Minecraft.h" "src/sdk/common/world/Level.h" "src/sdk/server/ServerInstance.h" "src/api/manager/Manager.h" "src/client/module/ModuleManager.h" "src/client/module/Module.h" "src/api/manager/FeatureManager.h" "src/sdk/client/win/winrt/HidControllerWinRT.h" "src/client/command/Command.h" "src/client/script/ScriptManager.h" "src/client/script/JsScript.h")
+add_subdirectory ("src")
+
+include_directories("src")
 
 target_precompile_headers(Latite
   PUBLIC
