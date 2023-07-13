@@ -13,9 +13,11 @@ project ("LatiteRecode")
 
 # Include sub-projects.
 add_subdirectory ("src")
-file (GLOB SOURCES "src/**.cpp")
+file (GLOB SOURCES "src/latite/Latite.cpp" "util/Util.cpp" "util/Logger.cpp")
 
-add_library(Latite SHARED ${SOURCES})
+include_directories("src")
+
+add_library(Latite SHARED ${SOURCES} "src/sdk/common/world/Minecraft.h" "src/sdk/common/world/Level.h" "src/sdk/server/ServerInstance.h" "src/api/manager/Manager.h" "src/sdk/client/module/ModuleManager.h" "src/sdk/client/module/Module.h")
 
 target_precompile_headers(Latite
   PUBLIC
