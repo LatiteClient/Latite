@@ -39,3 +39,7 @@ std::string util::wstrToStr(std::wstring const& ws)
 	delete[] buf;
 	return r;
 }
+
+uintptr_t util::ScanSignature(const char* signature) {
+	memory::ScanSignature(signature, "Minecraft.Windows.exe");
+}
