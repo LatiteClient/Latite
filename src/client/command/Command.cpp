@@ -9,3 +9,7 @@ Command::Command(std::string const& name, std::string const& description, std::s
 		this->aliases.push_back(a);
 	}
 }
+
+void Command::message(std::string str, bool error)
+{
+}
