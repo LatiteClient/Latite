@@ -17,7 +17,6 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -41,8 +40,8 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -53,27 +52,32 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="Shared" >
+  <ImportGroup Label="Shared">
   </ImportGroup>
-    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    </ImportGroup>
-    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    </ImportGroup>
-    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    </ImportGroup>
-    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    </ImportGroup>
-
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)src;$(ProjectDir)deps\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)deps\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)src;$(ProjectDir)deps\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)deps\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -108,10 +112,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>src/pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>MinHook.lib;d2d1.lib;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ProjectDir)out\debug\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -120,18 +129,92 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_HAS_STATIC_RTTI=0;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>src/pch.h</PrecompiledHeaderFile>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>MinHook.lib;d2d1.lib;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ProjectDir)out\release\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
-
-  <ItemGroup></ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="deps\include\chakra\ChakraCommon.h" />
+    <ClInclude Include="deps\include\chakra\ChakraCommonWindows.h" />
+    <ClInclude Include="deps\include\chakra\ChakraCore.h" />
+    <ClInclude Include="deps\include\chakra\ChakraCoreWindows.h" />
+    <ClInclude Include="deps\include\chakra\ChakraDebug.h" />
+    <ClInclude Include="deps\include\MinHook.h" />
+    <ClInclude Include="src\api\feature\Feature.h" />
+    <ClInclude Include="src\api\manager\FeatureManager.h" />
+    <ClInclude Include="src\api\manager\Manager.h" />
+    <ClInclude Include="src\api\memory\memory.h" />
+    <ClInclude Include="src\api\scanner\Scanner.h" />
+    <ClInclude Include="src\client\command\Command.h" />
+    <ClInclude Include="src\client\command\CommandManager.h" />
+    <ClInclude Include="src\client\hook\Hook.h" />
+    <ClInclude Include="src\client\hook\impl\GeneralHooks.h" />
+    <ClInclude Include="src\client\Latite.h" />
+    <ClInclude Include="src\client\misc\ClientMessageSink.h" />
+    <ClInclude Include="src\client\module\Module.h" />
+    <ClInclude Include="src\client\module\ModuleManager.h" />
+    <ClInclude Include="src\client\script\JsScript.h" />
+    <ClInclude Include="src\client\script\ScriptManager.h" />
+    <ClInclude Include="src\pch.h" />
+    <ClInclude Include="src\sdk\common\client\game\ClientInstance.h" />
+    <ClInclude Include="src\sdk\common\client\game\MinecraftGame.h" />
+    <ClInclude Include="src\sdk\common\client\player\LocalPlayer.h" />
+    <ClInclude Include="src\sdk\common\client\win\winrt\HidControllerWinRT.h" />
+    <ClInclude Include="src\sdk\common\server\ServerInstance.h" />
+    <ClInclude Include="src\sdk\common\world\actor\Actor.h" />
+    <ClInclude Include="src\sdk\common\world\actor\Mob.h" />
+    <ClInclude Include="src\sdk\common\world\actor\player\Player.h" />
+    <ClInclude Include="src\sdk\common\world\level\Level.h" />
+    <ClInclude Include="src\sdk\common\world\Minecraft.h" />
+    <ClInclude Include="src\util\ChakraUtil.h" />
+    <ClInclude Include="src\util\Logger.h" />
+    <ClInclude Include="src\util\Util.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="CMakeLists.txt" />
+    <Text Include="src\api\CMakeLists.txt" />
+    <Text Include="src\api\feature\CMakeLists.txt" />
+    <Text Include="src\api\manager\CMakeLists.txt" />
+    <Text Include="src\api\memory\CMakeLists.txt" />
+    <Text Include="src\api\scanner\CMakeLists.txt" />
+    <Text Include="src\client\CMakeLists.txt" />
+    <Text Include="src\client\command\CMakeLists.txt" />
+    <Text Include="src\client\command\impl\CMakeLists.txt" />
+    <Text Include="src\client\hook\CMakeLists.txt" />
+    <Text Include="src\client\misc\CMakeLists.txt" />
+    <Text Include="src\client\module\CMakeLists.txt" />
+    <Text Include="src\client\script\client\CMakeLists.txt" />
+    <Text Include="src\client\script\CMakeLists.txt" />
+    <Text Include="src\CMakeLists.txt" />
+    <Text Include="src\util\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\api\memory\memory.cpp" />
+    <ClCompile Include="src\api\scanner\Scanner.cpp" />
+    <ClCompile Include="src\client\command\Command.cpp" />
+    <ClCompile Include="src\client\command\CommandManager.cpp" />
+    <ClCompile Include="src\client\hook\Hook.cpp" />
+    <ClCompile Include="src\client\Latite.cpp" />
+    <ClCompile Include="src\client\misc\ClientMessageSink.cpp" />
+    <ClCompile Include="src\util\Logger.cpp" />
+    <ClCompile Include="src\util\Util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CMakePresets.json" />
+    <None Include="CppProperties.json" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
