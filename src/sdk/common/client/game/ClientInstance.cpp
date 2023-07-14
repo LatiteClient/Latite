@@ -9,7 +9,7 @@ sdk::ClientInstance* sdk::ClientInstance::get()
         uintptr_t evalPtr = *reinterpret_cast<uintptr_t*>(sig);
         if (!evalPtr) return nullptr;
         evalPtr = *reinterpret_cast<uintptr_t*>(evalPtr + 0x58);
-        uintptr_t evalPtr = *reinterpret_cast<uintptr_t*>(sig);
+        evalPtr = *reinterpret_cast<uintptr_t*>(sig);
         inst = *reinterpret_cast<ClientInstance**>(evalPtr);
     }
     return inst;

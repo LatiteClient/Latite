@@ -117,6 +117,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(ProjectDir)out\debug\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ModuleOutputFile>Latite</ModuleOutputFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,6 +140,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeaderOutputFile>$(ProjectDir)out\release\$(TargetName).pch</PrecompiledHeaderOutputFile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ModuleOutputFile>Latite</ModuleOutputFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -216,6 +218,7 @@
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MultiProcessorCompilation>
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MultiProcessorCompilation>
     </ClCompile>
+    <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp" />
     <ClCompile Include="src\util\Logger.cpp" />
     <ClCompile Include="src\util\Util.cpp" />
   </ItemGroup>

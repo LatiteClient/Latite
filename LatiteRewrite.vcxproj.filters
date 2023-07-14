@@ -170,6 +170,9 @@
     <ClCompile Include="src\pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CMakePresets.json" />

@@ -41,5 +41,5 @@ std::string util::wstrToStr(std::wstring const& ws)
 }
 
 uintptr_t util::findSignature(const char* signature) {
-	return memory::ScanSignature(signature, "Minecraft.Windows.exe");
+	return memory::findSignature(signature, "Minecraft.Windows.exe");
 }
