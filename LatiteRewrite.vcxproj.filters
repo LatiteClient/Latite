@@ -120,6 +120,18 @@
     <ClInclude Include="src\sdk\common\client\win\winrt\HidControllerWinRT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\sdk\common\entity\EntityContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\LMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\world\level\Dimension.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -171,6 +183,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

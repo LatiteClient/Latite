@@ -182,14 +182,18 @@
     <ClInclude Include="src\sdk\common\client\game\MinecraftGame.h" />
     <ClInclude Include="src\sdk\common\client\player\LocalPlayer.h" />
     <ClInclude Include="src\sdk\common\client\win\winrt\HidControllerWinRT.h" />
+    <ClInclude Include="src\sdk\common\entity\EntityContext.h" />
     <ClInclude Include="src\sdk\common\server\ServerInstance.h" />
     <ClInclude Include="src\sdk\common\world\actor\Actor.h" />
     <ClInclude Include="src\sdk\common\world\actor\Mob.h" />
     <ClInclude Include="src\sdk\common\world\actor\player\Player.h" />
+    <ClInclude Include="src\sdk\common\world\level\Dimension.h" />
     <ClInclude Include="src\sdk\common\world\level\Level.h" />
     <ClInclude Include="src\sdk\common\world\Minecraft.h" />
+    <ClInclude Include="src\sdk\util.h" />
     <ClInclude Include="src\util\ChakraUtil.h" />
     <ClInclude Include="src\util\Logger.h" />
+    <ClInclude Include="src\util\LMath.h" />
     <ClInclude Include="src\util\Util.h" />
   </ItemGroup>
   <ItemGroup>
@@ -223,6 +227,7 @@
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp" />
+    <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp" />
     <ClCompile Include="src\util\Logger.cpp" />
     <ClCompile Include="src\util\Util.cpp" />
   </ItemGroup>

@@ -1,9 +1,9 @@
 #pragma once
-
-#include <Actor.h>
+#include "Actor.h"
 
 namespace sdk {
 	class Mob : public Actor {
+	public:
 
 	};
 }

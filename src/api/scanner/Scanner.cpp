@@ -1,7 +1,7 @@
 #include "Scanner.h"
 #include "pch.h"
 
-uintptr_t memory::findSignature(const char* signature, LPCSTR module) {
+uintptr_t memory::findSignature(const char* signature, const char* module) {
 	static auto pattern_to_byte = [](const char* pattern) {
 		auto bytes = std::vector<std::optional<uint8_t>>{};
 		auto start = const_cast<char*>(pattern);

@@ -1,5 +1,5 @@
 #pragma once
-#include "util/util.h"
+#include "sdk/util.h"
 
 namespace sdk {
 	class ClientInstance {
@@ -10,5 +10,8 @@ namespace sdk {
 		CLASS_FIELD(class LevelRenderer*, levelRenderer, 0xE0);
 
 		static ClientInstance* get();
+		class LocalPlayer* getLocalPlayer();
+	private:
+		static ClientInstance* instance;
 	};
 }

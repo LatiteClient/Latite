@@ -10,6 +10,7 @@ public:
 	~ClientMessageSink() = default;
 
 	void doPrint(int numMessages);
+	void push(std::string const& message);
 
 private:
 	std::mutex sinkLock;

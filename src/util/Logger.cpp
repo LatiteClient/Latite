@@ -1,6 +1,8 @@
 #include "Logger.h"
 #include "util/Util.h"
 #include "pch.h"
+#include "client/Latite.h"
+#include "client/misc/ClientMessageSink.h"
 
 void Logger::setup()
 {
@@ -47,4 +49,8 @@ void Logger::logInternal(Level level, std::string str)
         ofs << str;
     }
     OutputDebugStringA(str.c_str());
+
+#if LATITE_DEBUG
+    Latite::get().getClientMessageSink().push(str);
+#endif
 }

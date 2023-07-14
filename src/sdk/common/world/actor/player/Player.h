@@ -1,9 +1,9 @@
 #pragma once
-
-#include <Mob.h>
+#include "sdk/common/world/actor/Mob.h"
 
 namespace sdk {
 	class Player : public Mob {
-
+	public:
+		void displayClientMessage(std::string const& message);
 	};
 }

@@ -10,6 +10,6 @@ Command::Command(std::string const& name, std::string const& description, std::s
 	}
 }
 
-void Command::message(std::string str, bool error)
+void Command::message(std::string const& str, bool error)
 {
 }

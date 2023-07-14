@@ -13,7 +13,7 @@ public:
 	[[nodiscard]] std::vector<std::string> getAliases() { return aliases; }
 
 	// TODO: implement chat messages
-	virtual void message(std::string str, bool error = false);
+	virtual void message(std::string const& str, bool error = false);
 	
 	[[nodiscard]] std::string desc() override { return description; };
 	[[nodiscard]] std::string name() override { return cmdName; };
