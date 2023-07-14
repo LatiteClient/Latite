@@ -1,1 +1,4 @@
-target_sources(Latite PRIVATE "src/api/scanner/Scanner.h" )
+add_subdirectory(feature)
+add_subdirectory(manager)
+add_subdirectory(memory)
+add_subdirectory(scanner)
