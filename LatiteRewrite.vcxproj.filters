@@ -167,6 +167,9 @@
     <ClCompile Include="src\client\misc\ClientMessageSink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CMakePresets.json" />

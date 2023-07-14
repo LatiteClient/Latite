@@ -9,6 +9,8 @@
 #include "command/CommandManager.h"
 #include "misc/ClientMessageSink.h"
 
+#include "sdk/common/client/game/ClientInstance.h"
+
 using namespace std;
 
 alignas(Latite) char latiteBuf[sizeof(Latite)] = {};
@@ -24,6 +26,12 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     Latite::get().initialize(dll);
     Logger::setup();
+
+    Logger::info("Waiting for game to load..");
+
+    while (!sdk::ClientInstance::get()) {
+    }
+
     Logger::info("Initialized Latite Client");
 
     return 0ul;

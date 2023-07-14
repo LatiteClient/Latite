@@ -11,6 +11,18 @@ void Logger::setup()
 
 void Logger::logInternal(Level level, std::string str)
 {
+    std::time_t t = std::time(0);   // get time now
+    std::tm now;
+    localtime_s(&now, &t);
+
+    auto tmh = now.tm_hour + 1;
+    auto tmm = now.tm_min + 1;
+    std::string hr = std::to_string(tmh) + (tmh > 10 ? std::string("") : std::string("0"));
+    std::string mn = std::to_string(tmm) + (tmm > 10 ? std::string("") : std::string("0"));
+
+    std::stringstream time;
+    time << "[" << (now.tm_mon + 1) << "-" << now.tm_mday << ", " << hr << ":" << mn << "]";
+
     std::string prefix = "";
     switch (level) {
     case Level::Info:
@@ -24,7 +36,7 @@ void Logger::logInternal(Level level, std::string str)
         break;
     }
 
-    str = "[" + prefix + "] " + str + "\n";
+    str = time.str() + " [" + prefix + "] " + str + "\n";
     auto path = util::getLatitePath();
     auto logPath = path / "Logs" / "log.txt";
 

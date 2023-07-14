@@ -4,5 +4,7 @@
 
 class GeneralHooks : public HookGroup {
 public:
-	GeneralHooks()
+	GeneralHooks() : HookGroup("General") {
+
+	}
 };

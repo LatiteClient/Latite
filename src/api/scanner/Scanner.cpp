@@ -1,7 +1,7 @@
 #include "Scanner.h"
 #include "pch.h"
 
-uintptr_t memory::scanSignature(const char* signature, LPCSTR module) {
+uintptr_t memory::findSignature(const char* signature, LPCSTR module) {
 	static auto pattern_to_byte = [](const char* pattern) {
 		auto bytes = std::vector<std::optional<uint8_t>>{};
 		auto start = const_cast<char*>(pattern);
@@ -15,7 +15,7 @@ uintptr_t memory::scanSignature(const char* signature, LPCSTR module) {
 					++current;
 				bytes.push_back(std::nullopt);
 			}
-			else bytes.push_back((uint8_t)strtoul(current, &current, 16));
+			else bytes.push_back(static_cast<uint8_t>(strtoul(current, &current, 16)));
 		}
 		return bytes;
 	};
@@ -36,6 +36,6 @@ uintptr_t memory::scanSignature(const char* signature, LPCSTR module) {
 			return !opt.has_value() || *opt == byte;
 		});
 
-	auto ret = it != end ? (uintptr_t)it : 0u;
+	auto ret = it != end ? reinterpret_cast<uintptr_t>(it) : 0u;
 	return ret;
 }

@@ -1,6 +1,7 @@
 #include "Hook.h"
 #include "util/logger.h"
 #include "pch.h"
+#include "MinHook.h"
 
 Hook::Hook(uintptr_t target, void* detour, const char* hookName, bool tableSwap) {
 
@@ -15,7 +16,13 @@ Hook::Hook(uintptr_t target, void* detour, const char* hookName, bool tableSwap)
 	}
 }
 
-HookGroup::HookGroup(std::string const& groupName) : groupName(groupName)
+HookGroup::HookGroup(std::string const& groupName) 
+#ifdef LATITE_DEBUG
+	: groupName(groupName)
+#else
+	// hopefully the name gets optimized away
+	: groupName("")
+#endif
 {
 }
 
