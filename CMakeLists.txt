@@ -13,15 +13,18 @@ project ("LatiteRecode")
 
 # Include sub-projects.
 add_subdirectory ("src")
+
 file (GLOB SOURCES "src/util/Util.cpp" "src/util/Logger.cpp" "src/client/Latite.cpp" )
 
 include_directories("src")
 include_directories("deps/include")
+include_directories("src/api")
 
-add_library(Latite SHARED ${SOURCES} "src/sdk/common/world/Minecraft.h" "src/sdk/common/world/level/Level.h" "src/sdk/common/server/ServerInstance.h" "src/api/manager/Manager.h" "src/client/module/ModuleManager.h" "src/client/module/Module.h" "src/api/manager/FeatureManager.h" "src/sdk/common/client/win/winrt/HidControllerWinRT.h" "src/client/command/Command.h" "src/client/script/ScriptManager.h" "src/client/script/JsScript.h" "src/client/hook/Hook.h" "src/client/hook/Hook.cpp" "src/client/hook/impl/GeneralHooks.h")
+add_library(Latite SHARED ${SOURCES} "src/sdk/common/world/Minecraft.h" "src/sdk/common/world/level/Level.h" "src/sdk/common/server/ServerInstance.h" "src/api/manager/Manager.h" "src/client/module/ModuleManager.h" "src/client/module/Module.h" "src/api/manager/FeatureManager.h" "src/sdk/common/client/win/winrt/HidControllerWinRT.h" "src/client/command/Command.h" "src/client/script/ScriptManager.h" "src/client/script/JsScript.h" "src/client/hook/Hook.h" "src/client/hook/Hook.cpp" "src/client/hook/impl/GeneralHooks.h" "src/api/scanner/Scanner.h")
 add_subdirectory ("deps")
 
-target_link_libraries(Latite "deps/bin/MinHook.x64.lib")
+
+target_link_libraries(Latite "deps/bin/MinHook.x64")
 
 if (MSVC)
 	# There is a bug in visual studio that prevents intellisense from realizing

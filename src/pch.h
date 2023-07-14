@@ -8,6 +8,9 @@
 #include <filesystem>
 #include <string_view>
 #include <memory>
+#include <future> 
+#include <execution>
+#include <optional>
 
 // COM
 #include <d2d1.h>
