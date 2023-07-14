@@ -6,18 +6,25 @@
 #include "util/Logger.h"
 
 #include "module/ModuleManager.h"
+#include "command/CommandManager.h"
+#include "misc/ClientMessageSink.h"
 
 using namespace std;
 
 alignas(Latite) char latiteBuf[sizeof(Latite)] = {};
 alignas(ModuleManager) char mmgrBuf[sizeof(ModuleManager)] = {};
+alignas(ClientMessageSink) char messageSinkBuf[sizeof(ClientMessageSink)] = {};
+alignas(CommandManager) char commandMgrBuf[sizeof(CommandManager)] = {};
 
 DWORD __stdcall startThread(HINSTANCE dll) {
     new (latiteBuf) Latite;
     new (mmgrBuf) ModuleManager;
+    new (messageSinkBuf) ClientMessageSink;
+    new (commandMgrBuf) CommandManager;
+
     Latite::get().initialize(dll);
     Logger::setup();
-    Logger::info("Initializing Latite Client {}", "test");
+    Logger::info("Initialized Latite Client");
 
     return 0ul;
 }
@@ -32,7 +39,8 @@ BOOL WINAPI DllMain(
     }
     else if (fdwReason == DLL_PROCESS_DETACH) {
         // Remove singletons
-        Latite::get().getModuleManager().~ModuleManager();
+        Latite::getModuleManager().~ModuleManager();
+        Latite::getClientMessageSink().~ClientMessageSink();
         Latite::get().~Latite();
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
@@ -46,6 +54,17 @@ Latite& Latite::get() noexcept
 ModuleManager& Latite::getModuleManager() noexcept
 {
     return *std::launder(reinterpret_cast<ModuleManager*>(mmgrBuf));
+}
+
+CommandManager& Latite::getCommandManager() noexcept
+{
+    return *std::launder(reinterpret_cast<CommandManager*>(commandMgrBuf));
+}
+
+ClientMessageSink& Latite::getClientMessageSink() noexcept
+{
+    return *std::launder(reinterpret_cast<ClientMessageSink*>(messageSinkBuf));
+    // TODO: insert return statement here
 }
 
 void Latite::doEject() noexcept

@@ -8,6 +8,8 @@ public:
 	FeatureManager() = default;
 	~FeatureManager() = default;
 
+	virtual void init() = 0;
+
 protected:
 	static_assert(std::is_convertible<T*, Feature*>::value, "T must inherit Feature as public");
 };
