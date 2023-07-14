@@ -1,0 +1,1 @@
+target_sources(Latite PUBLIC "deps/include/MinHook.h")
