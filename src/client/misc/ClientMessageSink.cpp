@@ -1,5 +1,6 @@
 #include "ClientMessageSink.h"
 #include "util/Logger.h"
+#include "pch.h"
 
 void ClientMessageSink::doPrint(int numMessages)
 {

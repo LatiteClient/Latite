@@ -1,4 +1,5 @@
 #include "memory.h"
+#include "pch.h"
 
 uintptr_t memory::instructionToAddress(uintptr_t addy, size_t lenOperation)
 {

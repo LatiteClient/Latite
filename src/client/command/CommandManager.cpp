@@ -1,5 +1,6 @@
 #include "CommandManager.h"
 #include "util/logger.h"
+#include "pch.h"
 
 void CommandManager::init()
 {

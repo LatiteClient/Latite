@@ -1,6 +1,5 @@
 #include "Scanner.h"
-
-
+#include "pch.h"
 
 uintptr_t memory::ScanSignature(const char* signature, LPCSTR module) {
 	static auto pattern_to_byte = [](const char* pattern) {
