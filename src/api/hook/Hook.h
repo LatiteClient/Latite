@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
 #include <cstdint>
+#include "MinHook.h"
+#include <vector>
+#include <memory>
 
 using func_ptr_t = void*;
 
