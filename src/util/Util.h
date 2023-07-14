@@ -2,7 +2,7 @@
 
 #include <string>
 #include <filesystem>
-#include "Scanner.h"
+#include "scanner/Scanner.h"
 
 namespace util {
 	extern std::filesystem::path getRoamingPath();
