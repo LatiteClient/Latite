@@ -20,6 +20,7 @@ add_subdirectory ("src")
 add_subdirectory ("deps")
 
 target_link_libraries(Latite PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/deps/lib/MinHook.lib")
+# todo: add dxguid.lib, d2d1.lib, and stuff
 include_directories("src/api")
 
 target_precompile_headers(Latite

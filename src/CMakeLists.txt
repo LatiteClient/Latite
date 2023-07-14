@@ -6,3 +6,4 @@
 
 # TODO: Add tests and install targets if needed.
 add_subdirectory(api)
+add_subdirectory(util)
