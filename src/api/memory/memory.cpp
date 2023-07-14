@@ -17,3 +17,9 @@ int memory::instructionToOffset(uintptr_t addy, size_t lenOperation)
 	int offset = *reinterpret_cast<int*>(out + lenOperation);
 	return offset;
 }
+
+template<typename TRet, typename... TArgs>
+TRet memory::callVirtual(void* thisptr, size_t index, TArgs... argList)
+{
+	return (*static_cast<TRet(void*, decltype(argList)...)**>(thisptr))[index](thisptr, argList...);
+}
