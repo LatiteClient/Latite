@@ -10,7 +10,7 @@ project ("LatiteRecode")
 
 # Include sub-projects.
 
-file (GLOB SOURCES "src/util/Util.cpp" "src/util/Logger.cpp" "src/client/Latite.cpp" )
+file (GLOB SOURCES "src/util/Util.cpp" "src/util/Logger.cpp" "src/client/Latite.cpp" "src/client/command/CommandManager.h" )
 
 include_directories("src" "." "deps/include")
 
