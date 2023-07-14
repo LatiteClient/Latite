@@ -18,8 +18,10 @@ file (GLOB SOURCES "src/util/Util.cpp" "src/util/Logger.cpp" "src/client/Latite.
 include_directories("src")
 include_directories("deps/include")
 
-add_library(Latite SHARED ${SOURCES} "src/sdk/common/world/actor/Actor.h" "src/sdk/common/world/actor/Mob.h" "src/sdk/common/world/actor/player/Player.h" "src/sdk/common/client/player/LocalPlayer.h" "src/sdk/common/world/Minecraft.h" "src/sdk/common/world/level/Level.h" "src/sdk/common/server/ServerInstance.h" "src/api/manager/Manager.h" "src/client/module/ModuleManager.h" "src/client/module/Module.h" "src/api/manager/FeatureManager.h" "src/sdk/common/client/win/winrt/HidControllerWinRT.h" "src/client/command/Command.h" "src/client/script/ScriptManager.h" "src/client/script/JsScript.h" "src/api/hook/Hook.h" "src/sdk/common/client/game/ClientInstance.h" "src/sdk/common/client/game/MinecraftGame.h")
+add_library(Latite SHARED ${SOURCES} "src/sdk/common/world/Minecraft.h" "src/sdk/common/world/level/Level.h" "src/sdk/common/server/ServerInstance.h" "src/api/manager/Manager.h" "src/client/module/ModuleManager.h" "src/client/module/Module.h" "src/api/manager/FeatureManager.h" "src/sdk/common/client/win/winrt/HidControllerWinRT.h" "src/client/command/Command.h" "src/client/script/ScriptManager.h" "src/client/script/JsScript.h" "src/client/hook/Hook.h" "src/client/hook/Hook.cpp" "src/client/hook/impl/GeneralHooks.h")
 add_subdirectory ("deps")
+
+target_link_libraries(Latite "deps/bin/MinHook.x64.lib")
 
 if (MSVC)
 	# There is a bug in visual studio that prevents intellisense from realizing

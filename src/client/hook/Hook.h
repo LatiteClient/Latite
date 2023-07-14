@@ -4,6 +4,7 @@
 #include "MinHook.h"
 #include <vector>
 #include <memory>
+#include <exception>
 
 using func_ptr_t = void*;
 
@@ -24,11 +25,11 @@ public:
 	}
 
 	template <typename Func>
-	Func getOFunc();
+	Func oFunc();
 };
 
 template<typename Func>
-inline Func Hook::getOFunc()
+inline Func Hook::oFunc()
 {
 	if (this->tableSwapHook) {
 		return static_cast<Func>(this->funcPtr);
@@ -38,14 +39,14 @@ inline Func Hook::getOFunc()
 
 class HookGroup
 {
-	const char* groupName;
+	std::string groupName;
 public:
 	std::vector<std::shared_ptr<Hook>> hooks;
 	bool shouldVtableHook = false;
 
-	HookGroup(const char* groupName = "Unnamed Hook Group");
+	HookGroup(std::string const& groupName = "Unnamed Hook Group");
 
-	~HookGroup();
+	~HookGroup() = default;
 
 	std::shared_ptr<Hook> addHook(uintptr_t ptr, func_ptr_t detour, const char* name = "Unnamed Hook");
 };
