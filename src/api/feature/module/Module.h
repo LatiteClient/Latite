@@ -1,7 +1,8 @@
 #pragma once
 #include "api/feature/Feature.h"
+#include "api/feature/setting/SettingGroup.h"
 
-class Module : public Feature {
+class Module : public Feature, public SettingGroup {
 public:
 	explicit Module(std::string const& name, std::string const& description, 
 		std::string const& displayName) : modName(name), description(description) {

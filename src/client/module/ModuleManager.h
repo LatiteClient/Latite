@@ -1,6 +1,6 @@
 #pragma once
 #include "api/manager/FeatureManager.h"
-#include "Module.h"
+#include "api/feature/module/Module.h"
 
 class ModuleManager : public FeatureManager<Module> {
 public:

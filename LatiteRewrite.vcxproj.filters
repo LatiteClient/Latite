@@ -60,7 +60,7 @@
     <ClInclude Include="src\api\memory\memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\api\scanner\Scanner.h">
+    <ClInclude Include="src\api\scanner\scanner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\command\Command.h">
@@ -78,7 +78,7 @@
     <ClInclude Include="src\client\misc\ClientMessageSink.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\client\module\Module.h">
+    <ClInclude Include="src\api\feature\module\Module.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\module\ModuleManager.h">
@@ -132,6 +132,18 @@
     <ClInclude Include="src\sdk\util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\sdk\common\network\RakNetConnector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\api\memory\signature\signature.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\api\feature\setting\Setting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\api\feature\setting\SettingGroup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -164,7 +176,7 @@
     <ClCompile Include="src\api\memory\memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\api\scanner\Scanner.cpp">
+    <ClCompile Include="src\api\scanner\scanner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\command\Command.cpp">
@@ -186,6 +198,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\api\memory\signature\signature.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\hook\impl\GeneralHooks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -111,7 +111,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LATITE_DEBUG;_NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -163,17 +163,20 @@
     <ClInclude Include="deps\include\chakra\ChakraDebug.h" />
     <ClInclude Include="deps\include\MinHook.h" />
     <ClInclude Include="src\api\feature\Feature.h" />
+    <ClInclude Include="src\api\feature\setting\Setting.h" />
+    <ClInclude Include="src\api\feature\setting\SettingGroup.h" />
     <ClInclude Include="src\api\manager\FeatureManager.h" />
     <ClInclude Include="src\api\manager\Manager.h" />
     <ClInclude Include="src\api\memory\memory.h" />
-    <ClInclude Include="src\api\scanner\Scanner.h" />
+    <ClInclude Include="src\api\memory\signature\signature.h" />
+    <ClInclude Include="src\api\scanner\scanner.h" />
     <ClInclude Include="src\client\command\Command.h" />
     <ClInclude Include="src\client\command\CommandManager.h" />
     <ClInclude Include="src\client\hook\Hook.h" />
     <ClInclude Include="src\client\hook\impl\GeneralHooks.h" />
     <ClInclude Include="src\client\Latite.h" />
     <ClInclude Include="src\client\misc\ClientMessageSink.h" />
-    <ClInclude Include="src\client\module\Module.h" />
+    <ClInclude Include="src\api\feature\module\Module.h" />
     <ClInclude Include="src\client\module\ModuleManager.h" />
     <ClInclude Include="src\client\script\JsScript.h" />
     <ClInclude Include="src\client\script\ScriptManager.h" />
@@ -183,6 +186,7 @@
     <ClInclude Include="src\sdk\common\client\player\LocalPlayer.h" />
     <ClInclude Include="src\sdk\common\client\win\winrt\HidControllerWinRT.h" />
     <ClInclude Include="src\sdk\common\entity\EntityContext.h" />
+    <ClInclude Include="src\sdk\common\network\RakNetConnector.h" />
     <ClInclude Include="src\sdk\common\server\ServerInstance.h" />
     <ClInclude Include="src\sdk\common\world\actor\Actor.h" />
     <ClInclude Include="src\sdk\common\world\actor\Mob.h" />
@@ -216,10 +220,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\api\memory\memory.cpp" />
-    <ClCompile Include="src\api\scanner\Scanner.cpp" />
+    <ClCompile Include="src\api\memory\signature\signature.cpp" />
+    <ClCompile Include="src\api\scanner\scanner.cpp" />
     <ClCompile Include="src\client\command\Command.cpp" />
     <ClCompile Include="src\client\command\CommandManager.cpp" />
     <ClCompile Include="src\client\hook\Hook.cpp" />
+    <ClCompile Include="src\client\hook\impl\GeneralHooks.cpp" />
     <ClCompile Include="src\client\Latite.cpp" />
     <ClCompile Include="src\client\misc\ClientMessageSink.cpp" />
     <ClCompile Include="src\pch.cpp">
