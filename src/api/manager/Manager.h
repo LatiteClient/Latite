@@ -6,7 +6,7 @@ template <typename T>
 class Manager {
 public:
 	Manager() = default;
-	~Manager() = default;
+	virtual ~Manager() = default;
 
 	void forEach(std::function<void(std::shared_ptr<T> item)> callback) {
 		for (auto& it : items) {

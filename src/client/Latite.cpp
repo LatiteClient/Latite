@@ -40,7 +40,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 BOOL WINAPI DllMain(
     HINSTANCE hinstDLL,  // handle to DLL module
     DWORD fdwReason,     // reason for calling function
-    LPVOID lpvReserved)  // reserved
+    LPVOID)  // reserved
 {
     if (fdwReason == DLL_PROCESS_ATTACH) {
         CloseHandle(CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(startThread), hinstDLL, 0, nullptr));

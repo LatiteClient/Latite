@@ -7,7 +7,7 @@ public:
 	inline static std::string prefix = ".";
 
 	CommandManager() = default;
-	~CommandManager() = default;
+	virtual ~CommandManager() = default;
 
 	void init();
 	bool runCommand(std::string const& line);

@@ -5,7 +5,7 @@
 class Module : public Feature, public SettingGroup {
 public:
 	explicit Module(std::string const& name, std::string const& description, 
-		std::string const& displayName) : modName(name), description(description) {
+		std::string const& displayName) : modName(name), description(description), displayName(displayName) {
 	}
 
 	[[nodiscard]] std::string name() override { return modName; }

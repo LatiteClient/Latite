@@ -6,6 +6,7 @@
 class Command : public Feature {
 public:
 	Command(std::string const& name, std::string const& description, std::string const& usage, std::vector<std::string> aliases = {});
+	~Command() = default;
 
 	virtual bool execute(std::string const label, std::vector<std::string> args) = 0;
 
@@ -17,7 +18,6 @@ public:
 	
 	[[nodiscard]] std::string desc() override { return description; };
 	[[nodiscard]] std::string name() override { return cmdName; };
-
 
 protected:
 	std::string cmdName, description, usage;

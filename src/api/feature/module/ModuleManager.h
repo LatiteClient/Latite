@@ -4,5 +4,5 @@
 
 class IModuleManager : public FeatureManager<Module> {
 public:
-	~IModuleManager() = default;
+	virtual ~IModuleManager() = default;
 };

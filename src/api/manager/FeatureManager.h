@@ -6,7 +6,7 @@ template <typename T>
 class FeatureManager : public Manager<T> {
 public:
 	FeatureManager() = default;
-	~FeatureManager() = default;
+	virtual ~FeatureManager() = default;
 
 	virtual void init() = 0;
 

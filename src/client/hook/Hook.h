@@ -17,7 +17,7 @@ private:
 	uintptr_t target;
 
 public:
-	Hook(uintptr_t target, void* detour, const char* hookName = "A Hook", bool tableSwap = false);
+	Hook(uintptr_t target, void* detour, std::string const& funcName = "A Hook", bool tableSwap = false);
 	~Hook() = default;
 
 	void enable() {

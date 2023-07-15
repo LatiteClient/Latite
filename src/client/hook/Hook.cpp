@@ -3,7 +3,8 @@
 #include "pch.h"
 #include "MinHook.h"
 
-Hook::Hook(uintptr_t target, void* detour, const char* hookName, bool tableSwap) {
+Hook::Hook(uintptr_t target, void* detour, std::string const& hookName, bool tableSwap)
+	: funcName(hookName) {
 
 	if (tableSwap) {
 		// TODO: implement table swap hook
