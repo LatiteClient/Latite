@@ -81,7 +81,7 @@
     <ClInclude Include="src\api\feature\module\Module.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\client\module\ModuleManager.h">
+    <ClInclude Include="src\api\feature\module\ModuleManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\script\JsScript.h">
@@ -144,6 +144,9 @@
     <ClInclude Include="src\api\feature\setting\SettingGroup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\module\ModuleManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -204,6 +207,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\hook\impl\GeneralHooks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\module\ModuleManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

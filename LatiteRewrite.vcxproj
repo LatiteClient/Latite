@@ -177,6 +177,7 @@
     <ClInclude Include="src\client\Latite.h" />
     <ClInclude Include="src\client\misc\ClientMessageSink.h" />
     <ClInclude Include="src\api\feature\module\Module.h" />
+    <ClInclude Include="src\api\feature\module\ModuleManager.h" />
     <ClInclude Include="src\client\module\ModuleManager.h" />
     <ClInclude Include="src\client\script\JsScript.h" />
     <ClInclude Include="src\client\script\ScriptManager.h" />
@@ -228,6 +229,7 @@
     <ClCompile Include="src\client\hook\impl\GeneralHooks.cpp" />
     <ClCompile Include="src\client\Latite.cpp" />
     <ClCompile Include="src\client\misc\ClientMessageSink.cpp" />
+    <ClCompile Include="src\client\module\ModuleManager.cpp" />
     <ClCompile Include="src\pch.cpp">
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MultiProcessorCompilation>
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MultiProcessorCompilation>

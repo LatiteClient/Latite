@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <string>
 #include <functional>
-#include <errors.h>
+#include <stdexcept>
 
 namespace memory {
 	class signature_store {

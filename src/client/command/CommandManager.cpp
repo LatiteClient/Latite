@@ -1,5 +1,7 @@
 #include "CommandManager.h"
 #include "util/logger.h"
+#include "client/latite.h"
+#include "client/misc/ClientMessageSink.h"
 #include "pch.h"
 
 void CommandManager::init()
@@ -71,6 +73,7 @@ bool CommandManager::runCommand(std::string const& line)
 						bool result = cmd->execute(newArgs[0], args);
 						if (!result) {
 							// TODO: Send message
+							//Latite::get().getClientMessageSink().push()
 							//ClientMessageNF(TextFormat::Format(TextFormat::RED) << "Usage: " << prefix << newArgs[0] << " " << cmd->usage);
 						}
 						return result;

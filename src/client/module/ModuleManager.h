@@ -1,10 +1,7 @@
 #pragma once
-#include "api/manager/FeatureManager.h"
-#include "api/feature/module/Module.h"
+#include "api/feature/module/ModuleManager.h"
 
-class ModuleManager : public FeatureManager<Module> {
+class ModuleManager : public IModuleManager {
 public:
-	~ModuleManager() = default;
-
-	virtual void init() {};
+	void init() override;
 };
