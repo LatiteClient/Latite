@@ -14,5 +14,5 @@ uintptr_t memory::signature_store::deref(int offset)
 
 void memory::signature_store::resolve()
 {
-	memory::findSignature(this->str.c_str(), )
+	memory::findSignature(this->str.c_str(), hMod);
 }

@@ -7,7 +7,7 @@
 namespace memory {
 	class signature_store {
 	public:
-		inline static HMODULE hMod = 0;
+		inline static const char* hMod = 0;
 	private:
 		std::string str;
 		std::function<void(uintptr_t res)> onResolve;
@@ -19,7 +19,7 @@ namespace memory {
 	public:
 		signature_store(std::string str, decltype(onResolve) onResolve) : str(str), onResolve(onResolve) {
 			if (!hMod) {
-				throw std::runtime_error("hModule is not initialized");
+				throw std::runtime_error("hMod is unspecified");
 			}
 		};
 		void resolve();
