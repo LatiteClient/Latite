@@ -1,6 +1,7 @@
 #pragma once
 #include <string_view>
 #include <format>
+#include <filesystem>
 
 namespace Logger {
     enum class Level {
@@ -11,6 +12,7 @@ namespace Logger {
 
 	extern void setup();
 
+    extern std::filesystem::path getLogPath();
     extern void logInternal(Level level, std::string str);
 
     template<typename... Args>

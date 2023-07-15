@@ -9,6 +9,7 @@ void Logger::setup()
 	auto path = util::getLatitePath();
 	std::filesystem::create_directory(path);
 	std::filesystem::create_directory(path / "Logs");
+    std::filesystem::remove(path / "Logs" / "log.txt");
 }
 
 void Logger::logInternal(Level level, std::string str)
@@ -19,11 +20,13 @@ void Logger::logInternal(Level level, std::string str)
 
     auto tmh = now.tm_hour + 1;
     auto tmm = now.tm_min + 1;
-    std::string hr = std::to_string(tmh) + (tmh > 10 ? std::string("") : std::string("0"));
-    std::string mn = std::to_string(tmm) + (tmm > 10 ? std::string("") : std::string("0"));
+    auto tms = now.tm_sec;
+    std::string hr = (tmh > 9 ? std::string("") : std::string("0")) + std::to_string(tmh);
+    std::string mn = (tmm > 9 ? std::string("") : std::string("0")) + std::to_string(tmm);
+    std::string sn = (tms > 9 ? std::string("") : std::string("0")) + std::to_string(tms);
 
     std::stringstream time;
-    time << "[" << (now.tm_mon + 1) << "-" << now.tm_mday << ", " << hr << ":" << mn << "]";
+    time << "[" << (now.tm_mon + 1) << "-" << now.tm_mday << "-" << (now.tm_year + 1900) << ", " << hr << ":" << mn << ":" << sn << "]";
 
     std::string prefix = "";
     switch (level) {
