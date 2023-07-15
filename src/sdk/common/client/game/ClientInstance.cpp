@@ -2,6 +2,8 @@
 #include "util/util.h"
 #include "api/memory/memory.h"
 
+sdk::ClientInstance* sdk::ClientInstance::instance = nullptr;
+
 sdk::ClientInstance* sdk::ClientInstance::get()
 {
     if (!instance) {
