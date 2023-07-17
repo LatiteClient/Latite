@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <memory>
+#include <mutex>
 
 template <typename T>
 class Manager {
@@ -24,5 +25,6 @@ public:
 	}
 
 protected:
+	std::mutex mutex;
 	std::vector<std::shared_ptr<T>> items = {};
 };

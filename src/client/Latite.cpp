@@ -8,29 +8,37 @@
 #include "module/ModuleManager.h"
 #include "command/CommandManager.h"
 #include "misc/ClientMessageSink.h"
+#include "hook/Hooks.h"
 
 #include "sdk/common/client/game/ClientInstance.h"
 
 using namespace std;
 
-alignas(Latite) char latiteBuf[sizeof(Latite)] = {};
-alignas(ModuleManager) char mmgrBuf[sizeof(ModuleManager)] = {};
-alignas(ClientMessageSink) char messageSinkBuf[sizeof(ClientMessageSink)] = {};
-alignas(CommandManager) char commandMgrBuf[sizeof(CommandManager)] = {};
+namespace {
+    alignas(Latite) char latiteBuf[sizeof(Latite)] = {};
+    alignas(ModuleManager) char mmgrBuf[sizeof(ModuleManager)] = {};
+    alignas(ClientMessageSink) char messageSinkBuf[sizeof(ClientMessageSink)] = {};
+    alignas(CommandManager) char commandMgrBuf[sizeof(CommandManager)] = {};
+    alignas(SettingGroup) char mainSettingGroup[sizeof(SettingGroup)] = {};
+    alignas(LatiteHooks) char hooks[sizeof(LatiteHooks)] = {};
+}
 
 DWORD __stdcall startThread(HINSTANCE dll) {
     new (latiteBuf) Latite;
     new (mmgrBuf) ModuleManager;
     new (messageSinkBuf) ClientMessageSink;
     new (commandMgrBuf) CommandManager;
+    new (mainSettingGroup) SettingGroup("global");
+    new (hooks) LatiteHooks();
 
-    Latite::get().initialize(dll);
     Logger::setup();
 
     Logger::info("Waiting for game to load..");
 
     while (!sdk::ClientInstance::get()) {
     }
+
+    Latite::get().initialize(dll);
 
     Logger::info("Initialized Latite Client");
 
@@ -46,10 +54,6 @@ BOOL WINAPI DllMain(
         CloseHandle(CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(startThread), hinstDLL, 0, nullptr));
     }
     else if (fdwReason == DLL_PROCESS_DETACH) {
-        // Remove singletons
-        Latite::getModuleManager().~ModuleManager();
-        Latite::getClientMessageSink().~ClientMessageSink();
-        Latite::get().~Latite();
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
 }
@@ -72,11 +76,30 @@ CommandManager& Latite::getCommandManager() noexcept
 ClientMessageSink& Latite::getClientMessageSink() noexcept
 {
     return *std::launder(reinterpret_cast<ClientMessageSink*>(messageSinkBuf));
-    // TODO: insert return statement here
+}
+
+SettingGroup& Latite::getSettings() noexcept
+{
+    return *std::launder(reinterpret_cast<SettingGroup*>(mainSettingGroup));
+}
+
+LatiteHooks& Latite::getHooks() noexcept
+{
+    return *std::launder(reinterpret_cast<LatiteHooks*>(hooks));
 }
 
 void Latite::doEject() noexcept
 {
+    Latite::get().getHooks().uninit();
+
+    // Remove singletons
+    Latite::getModuleManager().~ModuleManager();
+    Latite::getClientMessageSink().~ClientMessageSink();
+    Latite::getCommandManager().~CommandManager();
+    Latite::getSettings().~SettingGroup();
+    Latite::getHooks().~LatiteHooks();
+    Latite::get().~Latite();
+
     FreeLibrary(this->dllInst);
     onUnload();
 }
@@ -84,6 +107,14 @@ void Latite::doEject() noexcept
 void Latite::initialize(HINSTANCE hInst)
 {
     this->dllInst = hInst;
+    getCommandManager().init();
+    Logger::info("Initialized CommandManager");
+    getModuleManager().init();
+    Logger::info("Initialized ModuleManager");
+    getHooks().init();
+    Logger::info("Initialized Hooks");
+    getHooks().enable();
+    Logger::info("Enabled Hooks");
 }
 
 void Latite::onUnload()

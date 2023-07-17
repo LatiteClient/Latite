@@ -1,12 +1,13 @@
 #include "Scanner.h"
 #include "pch.h"
+#include "util/util.h"
 
-uintptr_t memory::findSignature(const char* signature, const char* module) {
-	static auto pattern_to_byte = [](const char* pattern) {
+uintptr_t memory::findSignature(std::string_view signature, const char* module) {
+	static auto pattern_to_byte = [](std::string_view pattern) {
 		auto bytes = std::vector<std::optional<uint8_t>>{};
-		auto start = const_cast<char*>(pattern);
-		auto end = const_cast<char*>(pattern) + strlen(pattern);
-		bytes.reserve(strlen(pattern) / 2);
+		auto start = const_cast<char*>(pattern.data());
+		auto end = const_cast<char*>(pattern.data()) + pattern.size();
+		bytes.reserve(pattern.size() / 2);
 
 		for (auto current = start; current < end; ++current) {
 			if (*current == '?') {

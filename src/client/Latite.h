@@ -4,12 +4,14 @@
 #define NOMINMAX
 #include <Windows.h>
 
-class Latite {
+class Latite final {
 public:
-	static Latite& get() noexcept;
-	static class ModuleManager& getModuleManager() noexcept;
-	static class CommandManager& getCommandManager() noexcept;
-	static class ClientMessageSink& getClientMessageSink() noexcept;
+	[[nodiscard]] static Latite& get() noexcept;
+	[[nodiscard]] static class ModuleManager& getModuleManager() noexcept;
+	[[nodiscard]] static class CommandManager& getCommandManager() noexcept;
+	[[nodiscard]] static class ClientMessageSink& getClientMessageSink() noexcept;
+	[[nodiscard]] static class SettingGroup& getSettings() noexcept;
+	[[nodiscard]] static class LatiteHooks& getHooks() noexcept;
 
 	void doEject() noexcept;
 	void initialize(HINSTANCE hInst);

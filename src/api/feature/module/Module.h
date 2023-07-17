@@ -5,8 +5,10 @@
 class Module : public Feature, public SettingGroup {
 public:
 	explicit Module(std::string const& name, std::string const& description, 
-		std::string const& displayName) : modName(name), description(description), displayName(displayName) {
+		std::string const& displayName) : SettingGroup(name), modName(name), description(description), displayName(displayName) {
 	}
+
+	virtual ~Module() = default;
 
 	[[nodiscard]] std::string name() override { return modName; }
 	[[nodiscard]] std::string desc() override { return description; }

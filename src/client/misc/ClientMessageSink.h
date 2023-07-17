@@ -12,6 +12,9 @@ public:
 	void doPrint(int numMessages);
 	void push(std::string const& message);
 
+	// ONLY call this if it's in the game thread.
+	void display(std::string const& message);
+
 private:
 	std::mutex sinkLock;
 	std::vector<std::string> messages;

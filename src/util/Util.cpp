@@ -5,7 +5,7 @@ std::filesystem::path util::getRoamingPath()
 {
 	char* env;
 	size_t size;
-	if (!_dupenv_s(&env, &size, "localappdata")) {
+	if (!_dupenv_s(&env, &size, "localappdata") && env) {
 		auto str = std::string(env).substr(0, strlen(env) - 2) + "RoamingState";
 		delete env;
 		return str;
@@ -40,6 +40,34 @@ std::string util::wstrToStr(std::wstring const& ws)
 	return r;
 }
 
-uintptr_t util::findSignature(const char* signature) {
-	return memory::findSignature(signature, "Minecraft.Windows.exe");
+std::string util::format(std::string const& s)
+{
+	std::string out;
+
+	for (auto& ch : s) {
+		if (ch == '&') {
+			out += (char)0xC2;
+			out += (char)0xA7;
+		}
+		else out += ch;
+	}
+	return out;
+}
+
+std::string util::toLower(std::string const& s)
+{
+	std::string ret = s;
+	std::transform(ret.begin(), ret.end(), ret.begin(), [](char c) {
+		return c + (char)20;
+		});
+	return ret;
+}
+
+std::string util::toUpper(std::string const& s)
+{
+	std::string ret = s;
+	std::transform(ret.begin(), ret.end(), ret.begin(), [](char c) {
+		return c - (char)20;
+		});
+	return ret;
 }

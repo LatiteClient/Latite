@@ -46,7 +46,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -135,7 +135,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_HAS_STATIC_RTTI=0;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -147,7 +147,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -161,7 +161,10 @@
     <ClInclude Include="deps\include\chakra\ChakraCore.h" />
     <ClInclude Include="deps\include\chakra\ChakraCoreWindows.h" />
     <ClInclude Include="deps\include\chakra\ChakraDebug.h" />
+    <ClInclude Include="deps\include\json\json.hpp" />
     <ClInclude Include="deps\include\MinHook.h" />
+    <ClInclude Include="src\api\feature\command\Command.h" />
+    <ClInclude Include="src\api\feature\command\CommandManager.h" />
     <ClInclude Include="src\api\feature\Feature.h" />
     <ClInclude Include="src\api\feature\setting\Setting.h" />
     <ClInclude Include="src\api\feature\setting\SettingGroup.h" />
@@ -172,7 +175,13 @@
     <ClInclude Include="src\api\scanner\scanner.h" />
     <ClInclude Include="src\client\command\Command.h" />
     <ClInclude Include="src\client\command\CommandManager.h" />
+    <ClInclude Include="src\api\config\Config.h" />
+    <ClInclude Include="src\api\config\ConfigManager.h" />
+    <ClInclude Include="src\client\command\impl\EjectCommand.h" />
+    <ClInclude Include="src\client\command\impl\HelpCommand.h" />
+    <ClInclude Include="src\client\command\impl\TestCommand.h" />
     <ClInclude Include="src\client\hook\Hook.h" />
+    <ClInclude Include="src\client\hook\Hooks.h" />
     <ClInclude Include="src\client\hook\impl\GeneralHooks.h" />
     <ClInclude Include="src\client\Latite.h" />
     <ClInclude Include="src\client\misc\ClientMessageSink.h" />
@@ -195,8 +204,10 @@
     <ClInclude Include="src\sdk\common\world\level\Dimension.h" />
     <ClInclude Include="src\sdk\common\world\level\Level.h" />
     <ClInclude Include="src\sdk\common\world\Minecraft.h" />
+    <ClInclude Include="src\sdk\common\world\Timer.h" />
     <ClInclude Include="src\sdk\util.h" />
     <ClInclude Include="src\util\ChakraUtil.h" />
+    <ClInclude Include="src\util\Json.h" />
     <ClInclude Include="src\util\Logger.h" />
     <ClInclude Include="src\util\LMath.h" />
     <ClInclude Include="src\util\Util.h" />
@@ -225,7 +236,12 @@
     <ClCompile Include="src\api\scanner\scanner.cpp" />
     <ClCompile Include="src\client\command\Command.cpp" />
     <ClCompile Include="src\client\command\CommandManager.cpp" />
+    <ClCompile Include="src\api\config\Config.cpp" />
+    <ClCompile Include="src\client\command\impl\EjectCommand.cpp" />
+    <ClCompile Include="src\client\command\impl\HelpCommand.cpp" />
+    <ClCompile Include="src\client\command\impl\TestCommand.cpp" />
     <ClCompile Include="src\client\hook\Hook.cpp" />
+    <ClCompile Include="src\client\hook\Hooks.cpp" />
     <ClCompile Include="src\client\hook\impl\GeneralHooks.cpp" />
     <ClCompile Include="src\client\Latite.cpp" />
     <ClCompile Include="src\client\misc\ClientMessageSink.cpp" />
@@ -236,6 +252,7 @@
     </ClCompile>
     <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp" />
+    <ClCompile Include="src\sdk\common\world\Minecraft.cpp" />
     <ClCompile Include="src\util\Logger.cpp" />
     <ClCompile Include="src\util\Util.cpp" />
   </ItemGroup>
