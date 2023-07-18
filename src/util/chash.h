@@ -10,8 +10,7 @@ namespace util {
 	}
 }
 
-constexpr std::uint32_t operator"" _hash(char const* s, std::size_t count)
-{
+constexpr std::uint32_t operator"" _hash(char const* s, std::size_t count) {
 	return util::detail::fnv1a_32(s, count);
 }
 

@@ -12,8 +12,7 @@
 std::shared_ptr<Hook> Level_tickHook;
 std::shared_ptr<Hook> ChatScreenController_sendChatMesageHook;
 
-void GenericHooks::Level_tick(sdk::Level* level)
-{
+void GenericHooks::Level_tick(sdk::Level* level) {
 	if (level == sdk::ClientInstance::get()->minecraft->getLevel()) {
 		// Clientside level
 		// dispatch clientside tick event..
@@ -25,8 +24,7 @@ void GenericHooks::Level_tick(sdk::Level* level)
 	return Level_tickHook->oFunc<decltype(&Level_tick)>()(level);
 }
 
-void* GenericHooks::ChatScreenController_sendChatMessage(void* controller, std::string const& message)
-{
+void* GenericHooks::ChatScreenController_sendChatMessage(void* controller, std::string const& message) {
 	if (message.starts_with(CommandManager::prefix)) {
 		Latite::get().getCommandManager().runCommand(message);
 		return 0;

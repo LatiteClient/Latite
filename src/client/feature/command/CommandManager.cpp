@@ -21,8 +21,7 @@ CommandManager::CommandManager() {
 	this->items.push_back(std::make_shared<ToggleCommand>());
 }
 
-bool CommandManager::runCommand(std::string const& line)
-{
+bool CommandManager::runCommand(std::string const& line) {
 	if (line.substr(0, prefix.size()) != prefix) {
 		return false;
 	}

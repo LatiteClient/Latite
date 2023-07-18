@@ -5,12 +5,10 @@
 #include <fstream>
 using nlohmann::json;
 
-Config::Config(std::filesystem::path path) : path(path)
-{
+Config::Config(std::filesystem::path path) : path(path) {
 }
 
-std::optional<errno_t> Config::load()
-{
+std::optional<errno_t> Config::load() {
 	std::ifstream ifs;
 	ifs.open(path);
 	if (ifs.fail()) {
@@ -41,8 +39,7 @@ std::optional<errno_t> Config::load()
 	return std::nullopt;
 }
 
-void Config::addGroup(nlohmann::json obj)
-{
+void Config::addGroup(nlohmann::json obj) {
 	if (obj["name"].is_string()) {
 		auto group = std::make_shared<SettingGroup>(obj["name"].get<std::string>());
 		// ...
@@ -57,8 +54,7 @@ void Config::addGroup(nlohmann::json obj)
 	}
 }
 
-void Config::addSetting(std::shared_ptr<SettingGroup> group, nlohmann::json& obj)
-{
+void Config::addSetting(std::shared_ptr<SettingGroup> group, nlohmann::json& obj) {
 	auto set = std::make_shared<Setting>(obj["name"].get<std::string>(), "", (Setting::Type)obj["type"].get<int>());
 	auto jVal = obj["value"];
 	switch (set->type) {

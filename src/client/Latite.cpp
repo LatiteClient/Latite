@@ -118,8 +118,7 @@ void Latite::queueEject() noexcept
     CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)FreeLibraryAndExitThread, dllInst, 0, nullptr);
 }
 
-void Latite::initialize(HINSTANCE hInst)
-{
+void Latite::initialize(HINSTANCE hInst) {
     this->dllInst = hInst;
     getHooks().init();
     Logger::info("Initialized Hooks");
