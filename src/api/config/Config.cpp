@@ -78,7 +78,12 @@ void Config::addSetting(std::shared_ptr<SettingGroup> group, nlohmann::json& obj
 	group->addSetting(set);
 }
 
-std::vector<std::shared_ptr<SettingGroup>> Config::getOutput()
-{
+void Config::save(std::vector<std::shared_ptr<SettingGroup>> groups) {
+}
+
+void Config::saveGroup(std::shared_ptr<SettingGroup> group) {
+}
+
+std::vector<std::shared_ptr<SettingGroup>> Config::getOutput() {
 	return out;
 }

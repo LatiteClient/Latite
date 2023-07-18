@@ -3,5 +3,6 @@
 
 class ModuleManager : public IModuleManager {
 public:
-	void init() override;
+	ModuleManager();
+	~ModuleManager() = default;
 };

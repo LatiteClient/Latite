@@ -6,10 +6,8 @@ class CommandManager final : public ICommandManager {
 public:
 	inline static std::string prefix = ".";
 
-	CommandManager() = default;
+	CommandManager();
 	virtual ~CommandManager() = default;
-
-	void init() override;
 
 	bool runCommand(std::string const& line);
 };

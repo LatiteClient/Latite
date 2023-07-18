@@ -8,15 +8,17 @@
 // Commands
 #include "impl/TestCommand.h"
 #include "impl/HelpCommand.h"
+#include "impl/EjectCommand.h"
+#include "impl/ToggleCommand.h"
 //
 
-void CommandManager::init()
-{
-	// add commands here
-	this->mutex.lock();
+CommandManager::CommandManager() {
+#if LATITE_DEBUG
 	this->items.push_back(std::make_shared<TestCommand>());
+#endif
 	this->items.push_back(std::make_shared<HelpCommand>());
-	this->mutex.unlock();
+	this->items.push_back(std::make_shared<EjectCommand>());
+	this->items.push_back(std::make_shared<ToggleCommand>());
 }
 
 bool CommandManager::runCommand(std::string const& line)

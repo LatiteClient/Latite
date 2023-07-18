@@ -120,7 +120,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ModuleOutputFile>Latite</ModuleOutputFile>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -163,6 +163,8 @@
     <ClInclude Include="deps\include\chakra\ChakraDebug.h" />
     <ClInclude Include="deps\include\json\json.hpp" />
     <ClInclude Include="deps\include\MinHook.h" />
+    <ClInclude Include="src\api\eventing\Event.h" />
+    <ClInclude Include="src\api\eventing\EventManager.h" />
     <ClInclude Include="src\api\feature\command\Command.h" />
     <ClInclude Include="src\api\feature\command\CommandManager.h" />
     <ClInclude Include="src\api\feature\Feature.h" />
@@ -173,13 +175,17 @@
     <ClInclude Include="src\api\memory\memory.h" />
     <ClInclude Include="src\api\memory\signature\signature.h" />
     <ClInclude Include="src\api\scanner\scanner.h" />
-    <ClInclude Include="src\client\command\Command.h" />
-    <ClInclude Include="src\client\command\CommandManager.h" />
+    <ClInclude Include="src\client\feature\command\Command.h" />
+    <ClInclude Include="src\client\feature\command\CommandManager.h" />
     <ClInclude Include="src\api\config\Config.h" />
     <ClInclude Include="src\api\config\ConfigManager.h" />
-    <ClInclude Include="src\client\command\impl\EjectCommand.h" />
-    <ClInclude Include="src\client\command\impl\HelpCommand.h" />
-    <ClInclude Include="src\client\command\impl\TestCommand.h" />
+    <ClInclude Include="src\client\feature\command\impl\EjectCommand.h" />
+    <ClInclude Include="src\client\feature\command\impl\HelpCommand.h" />
+    <ClInclude Include="src\client\feature\command\impl\TestCommand.h" />
+    <ClInclude Include="src\client\event\Eventing.h" />
+    <ClInclude Include="src\client\event\impl\TickEvent.h" />
+    <ClInclude Include="src\client\feature\command\impl\ToggleCommand.h" />
+    <ClInclude Include="src\client\feature\module\Module.h" />
     <ClInclude Include="src\client\hook\Hook.h" />
     <ClInclude Include="src\client\hook\Hooks.h" />
     <ClInclude Include="src\client\hook\impl\GeneralHooks.h" />
@@ -187,7 +193,8 @@
     <ClInclude Include="src\client\misc\ClientMessageSink.h" />
     <ClInclude Include="src\api\feature\module\Module.h" />
     <ClInclude Include="src\api\feature\module\ModuleManager.h" />
-    <ClInclude Include="src\client\module\ModuleManager.h" />
+    <ClInclude Include="src\client\feature\module\impl\TestModule.h" />
+    <ClInclude Include="src\client\feature\module\ModuleManager.h" />
     <ClInclude Include="src\client\script\JsScript.h" />
     <ClInclude Include="src\client\script\ScriptManager.h" />
     <ClInclude Include="src\pch.h" />
@@ -207,6 +214,7 @@
     <ClInclude Include="src\sdk\common\world\Timer.h" />
     <ClInclude Include="src\sdk\util.h" />
     <ClInclude Include="src\util\ChakraUtil.h" />
+    <ClInclude Include="src\util\chash.h" />
     <ClInclude Include="src\util\Json.h" />
     <ClInclude Include="src\util\Logger.h" />
     <ClInclude Include="src\util\LMath.h" />
@@ -220,32 +228,36 @@
     <Text Include="src\api\memory\CMakeLists.txt" />
     <Text Include="src\api\scanner\CMakeLists.txt" />
     <Text Include="src\client\CMakeLists.txt" />
-    <Text Include="src\client\command\CMakeLists.txt" />
-    <Text Include="src\client\command\impl\CMakeLists.txt" />
+    <Text Include="src\client\feature\command\CMakeLists.txt" />
+    <Text Include="src\client\feature\command\impl\CMakeLists.txt" />
     <Text Include="src\client\hook\CMakeLists.txt" />
     <Text Include="src\client\misc\CMakeLists.txt" />
-    <Text Include="src\client\module\CMakeLists.txt" />
+    <Text Include="src\client\feature\module\CMakeLists.txt" />
     <Text Include="src\client\script\client\CMakeLists.txt" />
     <Text Include="src\client\script\CMakeLists.txt" />
     <Text Include="src\CMakeLists.txt" />
     <Text Include="src\util\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\api\eventing\EventManager.cpp" />
     <ClCompile Include="src\api\memory\memory.cpp" />
     <ClCompile Include="src\api\memory\signature\signature.cpp" />
     <ClCompile Include="src\api\scanner\scanner.cpp" />
-    <ClCompile Include="src\client\command\Command.cpp" />
-    <ClCompile Include="src\client\command\CommandManager.cpp" />
+    <ClCompile Include="src\client\feature\command\Command.cpp" />
+    <ClCompile Include="src\client\feature\command\CommandManager.cpp" />
     <ClCompile Include="src\api\config\Config.cpp" />
-    <ClCompile Include="src\client\command\impl\EjectCommand.cpp" />
-    <ClCompile Include="src\client\command\impl\HelpCommand.cpp" />
-    <ClCompile Include="src\client\command\impl\TestCommand.cpp" />
+    <ClCompile Include="src\client\feature\command\impl\EjectCommand.cpp" />
+    <ClCompile Include="src\client\feature\command\impl\HelpCommand.cpp" />
+    <ClCompile Include="src\client\feature\command\impl\TestCommand.cpp" />
+    <ClCompile Include="src\client\event\Eventing.cpp" />
+    <ClCompile Include="src\client\feature\command\impl\ToggleCommand.cpp" />
     <ClCompile Include="src\client\hook\Hook.cpp" />
     <ClCompile Include="src\client\hook\Hooks.cpp" />
     <ClCompile Include="src\client\hook\impl\GeneralHooks.cpp" />
     <ClCompile Include="src\client\Latite.cpp" />
     <ClCompile Include="src\client\misc\ClientMessageSink.cpp" />
-    <ClCompile Include="src\client\module\ModuleManager.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\TestModule.cpp" />
+    <ClCompile Include="src\client\feature\module\ModuleManager.cpp" />
     <ClCompile Include="src\pch.cpp">
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MultiProcessorCompilation>
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MultiProcessorCompilation>

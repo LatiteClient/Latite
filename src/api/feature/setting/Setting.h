@@ -7,6 +7,7 @@ struct BoolValue {
 
 	BoolValue() { value = false; }
 	BoolValue(bool b) : value(b) {}
+	operator decltype(value)(){ return value; }
 };
 
 struct FloatValue {
@@ -14,6 +15,7 @@ struct FloatValue {
 
 	FloatValue() { value = 0.f; }
 	FloatValue(float f) : value(f) {}
+	operator decltype(value)() { return value; }
 };
 
 struct IntValue {
@@ -21,6 +23,7 @@ struct IntValue {
 
 	IntValue() { value = 0; }
 	IntValue(int i) : value(i) {}
+	operator decltype(value)() { return value; }
 };
 
 class Setting : public Feature {

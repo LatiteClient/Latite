@@ -5,10 +5,11 @@
 #include "pch.h"
 #include "util/Logger.h"
 
-#include "module/ModuleManager.h"
-#include "command/CommandManager.h"
+#include "feature/module/ModuleManager.h"
+#include "feature/command/CommandManager.h"
 #include "misc/ClientMessageSink.h"
 #include "hook/Hooks.h"
+#include "event/Eventing.h"
 
 #include "sdk/common/client/game/ClientInstance.h"
 
@@ -21,6 +22,7 @@ namespace {
     alignas(CommandManager) char commandMgrBuf[sizeof(CommandManager)] = {};
     alignas(SettingGroup) char mainSettingGroup[sizeof(SettingGroup)] = {};
     alignas(LatiteHooks) char hooks[sizeof(LatiteHooks)] = {};
+    alignas(Eventing) char eventing[sizeof(Eventing)] = {};
 }
 
 DWORD __stdcall startThread(HINSTANCE dll) {
@@ -51,9 +53,19 @@ BOOL WINAPI DllMain(
     LPVOID)  // reserved
 {
     if (fdwReason == DLL_PROCESS_ATTACH) {
-        CloseHandle(CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(startThread), hinstDLL, 0, nullptr));
+        CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)startThread, hinstDLL, 0, nullptr));
     }
     else if (fdwReason == DLL_PROCESS_DETACH) {
+        // Remove singletons
+        Latite::get().getHooks().disable();
+
+        Latite::getModuleManager().~ModuleManager();
+        Latite::getClientMessageSink().~ClientMessageSink();
+        Latite::getCommandManager().~CommandManager();
+        Latite::getSettings().~SettingGroup();
+        Latite::getHooks().~LatiteHooks();
+        Latite::getEventing().~Eventing();
+        Latite::get().~Latite();
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
 }
@@ -88,36 +100,29 @@ LatiteHooks& Latite::getHooks() noexcept
     return *std::launder(reinterpret_cast<LatiteHooks*>(hooks));
 }
 
+Eventing& Latite::getEventing() noexcept
+{
+    return *std::launder(reinterpret_cast<Eventing*>(eventing));
+}
+
 void Latite::doEject() noexcept
 {
     Latite::get().getHooks().uninit();
 
-    // Remove singletons
-    Latite::getModuleManager().~ModuleManager();
-    Latite::getClientMessageSink().~ClientMessageSink();
-    Latite::getCommandManager().~CommandManager();
-    Latite::getSettings().~SettingGroup();
-    Latite::getHooks().~LatiteHooks();
-    Latite::get().~Latite();
-
     FreeLibrary(this->dllInst);
-    onUnload();
+}
+
+void Latite::queueEject() noexcept
+{
+    this->shouldEject = true;
+    CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)FreeLibraryAndExitThread, dllInst, 0, nullptr);
 }
 
 void Latite::initialize(HINSTANCE hInst)
 {
     this->dllInst = hInst;
-    getCommandManager().init();
-    Logger::info("Initialized CommandManager");
-    getModuleManager().init();
-    Logger::info("Initialized ModuleManager");
     getHooks().init();
     Logger::info("Initialized Hooks");
     getHooks().enable();
     Logger::info("Enabled Hooks");
-}
-
-void Latite::onUnload()
-{
-    // Save config and everything
 }

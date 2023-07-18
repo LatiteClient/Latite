@@ -3,7 +3,9 @@
 #include "sdk/common/world/Minecraft.h"
 #include "client/Latite.h"
 #include "client/misc/ClientMessageSink.h"
-#include "client/command/commandmanager.h"
+#include "client/feature/command/commandmanager.h"
+#include "client/event/Eventing.h"
+#include "client/event/impl/TickEvent.h"
 
 #include "api/memory/memory.h"
 
@@ -15,16 +17,19 @@ void GenericHooks::Level_tick(sdk::Level* level)
 	if (level == sdk::ClientInstance::get()->minecraft->getLevel()) {
 		// Clientside level
 		// dispatch clientside tick event..
+		TickEvent ev(level);
+		Latite::get().getEventing().dispatchEvent(ev);
 		Latite::get().getClientMessageSink().doPrint(100);
 	}
+
 	return Level_tickHook->oFunc<decltype(&Level_tick)>()(level);
 }
 
-void GenericHooks::ChatScreenController_sendChatMessage(void* controller, std::string message)
+void* GenericHooks::ChatScreenController_sendChatMessage(void* controller, std::string const& message)
 {
 	if (message.starts_with(CommandManager::prefix)) {
 		Latite::get().getCommandManager().runCommand(message);
-		return;
+		return 0;
 	}
 	return ChatScreenController_sendChatMesageHook->oFunc<decltype(&ChatScreenController_sendChatMessage)>()(controller, message);
 }

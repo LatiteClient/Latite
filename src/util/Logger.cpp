@@ -41,7 +41,8 @@ void Logger::logInternal(Level level, std::string str)
         break;
     }
 
-    str = time.str() + " [" + prefix + "] " + str + "\n";
+    std::string pref = time.str() + " [" + prefix + "] ";
+    std::string mstr = pref + str + "\n";
     auto path = util::getLatitePath();
     auto logPath = path / "Logs" / "log.txt";
 
@@ -49,11 +50,11 @@ void Logger::logInternal(Level level, std::string str)
     ofs.open(logPath, std::ios::app);
 
     if (!ofs.fail()) {
-        ofs << str;
+        ofs << mstr;
     }
-    OutputDebugStringA(str.c_str());
+    OutputDebugStringA(mstr.c_str());
 
 #if LATITE_DEBUG
-    Latite::get().getClientMessageSink().push(str);
+    Latite::get().getClientMessageSink().push(util::format("&7" + pref + "&r" + str));
 #endif
 }
