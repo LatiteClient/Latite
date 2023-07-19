@@ -12,4 +12,6 @@ public:
 	void listen(Listener listener) {
 		Eventing::get().listen<Event>(this, (EventListenerFunc)listener);
 	}
+
+	void loadConfig(SettingGroup& resolvedGroup) override;
 };

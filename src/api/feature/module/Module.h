@@ -1,15 +1,18 @@
 #pragma once
 #include "api/feature/Feature.h"
 #include "api/feature/setting/SettingGroup.h"
-#include "api/eventing/Event.h"
 
-class IModule : public Feature, public SettingGroup {
+class IModule : public Listener, public Feature {
 public:
+	std::shared_ptr<SettingGroup> settings;
+
 	explicit IModule(std::string const& name, std::string const& description, 
-		std::string const& displayName) : SettingGroup(name), modName(name), description(description), displayName(displayName) {
+		std::string const& displayName) : modName(name), description(description), displayName(displayName) {
 		auto set = std::make_shared<Setting>("enabled", "", Setting::Type::Bool);
 		set->value = &enabled;
-		addSetting(set);
+
+		settings = std::make_shared<SettingGroup>(name);
+		settings->addSetting(set);
 	}
 
 	virtual ~IModule() = default;
@@ -18,6 +21,10 @@ public:
 
 	[[nodiscard]] bool isEnabled() { return std::get<BoolValue>(enabled); };
 	void setEnabled(bool b) { std::get<BoolValue>(enabled) = b; }
+
+	bool shouldListen() { return isEnabled(); }
+
+	virtual void loadConfig(SettingGroup& resolvedGroup) = 0;
 
 	[[nodiscard]] std::string name() override { return modName; }
 	[[nodiscard]] std::string desc() override { return description; }

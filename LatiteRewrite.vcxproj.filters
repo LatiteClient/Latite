@@ -204,6 +204,15 @@
     <ClInclude Include="src\client\feature\command\impl\ToggleCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\config\ConfigManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\api\eventing\Listenable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\event\impl\RenderGameEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -297,6 +306,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\command\impl\ToggleCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\config\ConfigManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\Module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

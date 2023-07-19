@@ -1,6 +1,12 @@
 #pragma once
 #include <cstdint>
 #include <iostream>
+#include <array>
+#include <cstddef>
+#include <cstring>
+#include <sstream>
+#include <string>
+#include <utility>
 
 namespace util {
 	namespace detail {

@@ -8,4 +8,6 @@ public:
 
 	IConfigManager() {}
 	virtual ~IConfigManager() = default;
+protected:
+	std::shared_ptr<Config> loadedConfig;
 };

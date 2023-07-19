@@ -6,7 +6,7 @@ EjectCommand::EjectCommand() : Command("eject", "Removes Latite from the game.",
 }
 
 bool EjectCommand::execute(std::string const label, std::vector<std::string> args) {
-	message("Unloading the client..");
+	message("Unloaded the client.");
 	Latite::get().queueEject();
 	return true;
 }

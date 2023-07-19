@@ -1,6 +1,7 @@
 #pragma once
 #include "api/manager/Manager.h"
 #include "api/feature/module/Module.h"
+#include "Listenable.h"
 #include "Event.h"
 
 class IEventManager {
@@ -10,17 +11,17 @@ public:
 		static_assert(std::is_convertible<T*, Event*>::value, "type is not an Event");
 		for (auto& pair : listeners) {
 			if (pair.first == T::hash) {
-				if (pair.second.feature->isEnabled()) {
-					(pair.second.feature->*pair.second.fptr)(ev);
+				if (pair.second.listener->shouldListen()) {
+					(pair.second.listener->*pair.second.fptr)(ev);
 				}
 			}
 		}
 	}
 
 	template <typename T>
-	void listen(IModule* ptr, EventListenerFunc listener) {
+	void listen(Listener* ptr, EventListenerFunc listener) {
 		static_assert(std::is_convertible<T*, Event*>::value, "type is not an Event");
-		listeners.push_back({ T::hash, EventListener{ (EventListenerFunc)listener, ptr } });
+		listeners.push_back({ T::hash, EventListener{ listener, ptr } });
 	}
 
 	//virtual void init() = 0;

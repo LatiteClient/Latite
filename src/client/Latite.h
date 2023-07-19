@@ -3,12 +3,15 @@
 #define NOGDI
 #define NOMINMAX
 #include <Windows.h>
+#include <string_view>
+#include "api/eventing/Listenable.h"
 
-class Latite final {
+class Latite final : public Listener {
 public:
 	static Latite& get() noexcept;
 	[[nodiscard]] static class ModuleManager& getModuleManager() noexcept;
 	[[nodiscard]] static class CommandManager& getCommandManager() noexcept;
+	[[nodiscard]] static class ConfigManager& getConfigManager() noexcept;
 	[[nodiscard]] static class ClientMessageSink& getClientMessageSink() noexcept;
 	[[nodiscard]] static class SettingGroup& getSettings() noexcept;
 	[[nodiscard]] static class LatiteHooks& getHooks() noexcept;
@@ -17,12 +20,19 @@ public:
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);
 
+	void onUpdate(class Event& ev);
+	void loadConfig(class SettingGroup& resolvedGroup);
+
 	Latite() = default;
 	~Latite() = default;
+
+	static constexpr std::string_view version = "v2.0.0";
 private:
 
 	void doEject() noexcept;
+	void threadsafeInit();
 
 	bool shouldEject = false;
+	bool hasInit = false;
 	HINSTANCE dllInst;
 };

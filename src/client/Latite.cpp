@@ -7,11 +7,14 @@
 
 #include "feature/module/ModuleManager.h"
 #include "feature/command/CommandManager.h"
+#include "config/ConfigManager.h"
 #include "misc/ClientMessageSink.h"
 #include "hook/Hooks.h"
 #include "event/Eventing.h"
+#include "event/impl/RenderGameEvent.h"
 
 #include "sdk/common/client/game/ClientInstance.h"
+#include <winrt/windows.ui.viewmanagement.h>
 
 using namespace std;
 
@@ -20,17 +23,20 @@ namespace {
     alignas(ModuleManager) char mmgrBuf[sizeof(ModuleManager)] = {};
     alignas(ClientMessageSink) char messageSinkBuf[sizeof(ClientMessageSink)] = {};
     alignas(CommandManager) char commandMgrBuf[sizeof(CommandManager)] = {};
+    alignas(ConfigManager) char configMgrBuf[sizeof(ConfigManager)] = {};
     alignas(SettingGroup) char mainSettingGroup[sizeof(SettingGroup)] = {};
     alignas(LatiteHooks) char hooks[sizeof(LatiteHooks)] = {};
     alignas(Eventing) char eventing[sizeof(Eventing)] = {};
 }
 
 DWORD __stdcall startThread(HINSTANCE dll) {
+    new (eventing) Eventing();
     new (latiteBuf) Latite;
     new (mmgrBuf) ModuleManager;
     new (messageSinkBuf) ClientMessageSink;
     new (commandMgrBuf) CommandManager;
     new (mainSettingGroup) SettingGroup("global");
+    new (configMgrBuf) ConfigManager();
     new (hooks) LatiteHooks();
 
     Logger::setup();
@@ -42,8 +48,14 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     Latite::get().initialize(dll);
 
-    Logger::info("Initialized Latite Client");
+    if (!Latite::getConfigManager().loadMaster()) {
+        Logger::fatal("Could not load master config!");
+    }
+    else {
+        Logger::info("Loaded master config");
+    }
 
+    Logger::info("Initialized Latite Client");
     return 0ul;
 }
 
@@ -57,7 +69,12 @@ BOOL WINAPI DllMain(
     }
     else if (fdwReason == DLL_PROCESS_DETACH) {
         // Remove singletons
-        Latite::get().getHooks().disable();
+        Latite::getHooks().disable();
+
+        // Wait for hooks to disable
+        std::this_thread::sleep_for(200ms);
+
+        Latite::getConfigManager().saveCurrentConfig();
 
         Latite::getModuleManager().~ModuleManager();
         Latite::getClientMessageSink().~ClientMessageSink();
@@ -83,6 +100,11 @@ ModuleManager& Latite::getModuleManager() noexcept
 CommandManager& Latite::getCommandManager() noexcept
 {
     return *std::launder(reinterpret_cast<CommandManager*>(commandMgrBuf));
+}
+
+ConfigManager& Latite::getConfigManager() noexcept
+{
+    return *std::launder(reinterpret_cast<ConfigManager*>(configMgrBuf));
 }
 
 ClientMessageSink& Latite::getClientMessageSink() noexcept
@@ -114,6 +136,8 @@ void Latite::doEject() noexcept
 
 void Latite::queueEject() noexcept
 {
+    auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
+    app.Title(L"");
     this->shouldEject = true;
     CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)FreeLibraryAndExitThread, dllInst, 0, nullptr);
 }
@@ -124,4 +148,24 @@ void Latite::initialize(HINSTANCE hInst) {
     Logger::info("Initialized Hooks");
     getHooks().enable();
     Logger::info("Enabled Hooks");
+
+    // TODO: use UpdateEvent
+    Latite::getEventing().listen<RenderGameEvent>(this, (EventListenerFunc) & Latite::onUpdate);
+}
+
+void Latite::threadsafeInit() {
+    auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
+    std::string vstr(this->version);
+    auto ws = util::strToWstr("Latite Client " + vstr);
+    app.Title(ws);
+}
+
+void Latite::onUpdate(Event&) {
+    if (!hasInit) {
+        threadsafeInit();
+        hasInit = true;
+    }
+}
+
+void Latite::loadConfig(SettingGroup& resolvedGroup) {
 }

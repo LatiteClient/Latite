@@ -165,6 +165,7 @@
     <ClInclude Include="deps\include\MinHook.h" />
     <ClInclude Include="src\api\eventing\Event.h" />
     <ClInclude Include="src\api\eventing\EventManager.h" />
+    <ClInclude Include="src\api\eventing\Listenable.h" />
     <ClInclude Include="src\api\feature\command\Command.h" />
     <ClInclude Include="src\api\feature\command\CommandManager.h" />
     <ClInclude Include="src\api\feature\Feature.h" />
@@ -175,6 +176,8 @@
     <ClInclude Include="src\api\memory\memory.h" />
     <ClInclude Include="src\api\memory\signature\signature.h" />
     <ClInclude Include="src\api\scanner\scanner.h" />
+    <ClInclude Include="src\client\config\ConfigManager.h" />
+    <ClInclude Include="src\client\event\impl\RenderGameEvent.h" />
     <ClInclude Include="src\client\feature\command\Command.h" />
     <ClInclude Include="src\client\feature\command\CommandManager.h" />
     <ClInclude Include="src\api\config\Config.h" />
@@ -243,6 +246,7 @@
     <ClCompile Include="src\api\memory\memory.cpp" />
     <ClCompile Include="src\api\memory\signature\signature.cpp" />
     <ClCompile Include="src\api\scanner\scanner.cpp" />
+    <ClCompile Include="src\client\config\ConfigManager.cpp" />
     <ClCompile Include="src\client\feature\command\Command.cpp" />
     <ClCompile Include="src\client\feature\command\CommandManager.cpp" />
     <ClCompile Include="src\api\config\Config.cpp" />
@@ -251,6 +255,7 @@
     <ClCompile Include="src\client\feature\command\impl\TestCommand.cpp" />
     <ClCompile Include="src\client\event\Eventing.cpp" />
     <ClCompile Include="src\client\feature\command\impl\ToggleCommand.cpp" />
+    <ClCompile Include="src\client\feature\module\Module.cpp" />
     <ClCompile Include="src\client\hook\Hook.cpp" />
     <ClCompile Include="src\client\hook\Hooks.cpp" />
     <ClCompile Include="src\client\hook\impl\GeneralHooks.cpp" />

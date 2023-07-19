@@ -1,5 +1,5 @@
 #pragma once
-#include "api/feature/module/Module.h"
+#include "Listenable.h"
 
 class Event {
 public:
@@ -20,12 +20,11 @@ public:
 	}
 };
 
-class IModule;
-using EventListenerFunc = void(IModule::*)(Event&);
+using EventListenerFunc = void(Listener::*)(Event&);
 
 struct EventListener {
-	EventListener(EventListenerFunc fp, IModule* ptr) : fptr(fp), feature(ptr) {}
+	constexpr EventListener(EventListenerFunc fp, Listener* ptr) : fptr(fp), listener(ptr) {}
 
 	EventListenerFunc fptr;
-	class IModule* feature;
+	class Listener* listener;
 };

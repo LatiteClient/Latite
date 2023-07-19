@@ -9,7 +9,7 @@ void Logger::setup()
 	auto path = util::getLatitePath();
 	std::filesystem::create_directory(path);
 	std::filesystem::create_directory(path / "Logs");
-    std::filesystem::remove(path / "Logs" / "log.txt");
+    std::filesystem::remove(path / "Logs" / "latest.log");
 }
 
 void Logger::logInternal(Level level, std::string str)
@@ -44,7 +44,7 @@ void Logger::logInternal(Level level, std::string str)
     std::string pref = time.str() + " [" + prefix + "] ";
     std::string mstr = pref + str + "\n";
     auto path = util::getLatitePath();
-    auto logPath = path / "Logs" / "log.txt";
+    auto logPath = path / "Logs" / "latest.log";
 
     std::ofstream ofs;
     ofs.open(logPath, std::ios::app);

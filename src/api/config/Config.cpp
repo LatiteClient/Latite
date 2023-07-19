@@ -1,8 +1,7 @@
 #include "Config.h"
-
-#include "util/logger.h"
-
 #include <fstream>
+#include "json/json.hpp"
+
 using nlohmann::json;
 
 Config::Config(std::filesystem::path path) : path(path) {
@@ -27,13 +26,13 @@ std::optional<errno_t> Config::load() {
 	try {
 		obj = json::parse(ifs);
 	}
-	catch (json::parse_error& e) {
+	catch (json::parse_error&) {
 		return 0;
 	}
 
 	if (obj["settings"].is_array()) {
-		for (auto& obj : obj["settings"]) {
-			addGroup(obj);
+		for (auto& objc : obj["settings"]) {
+			addGroup(objc);
 		}
 	}
 	return std::nullopt;
@@ -46,7 +45,7 @@ void Config::addGroup(nlohmann::json obj) {
 		if (obj["settings"].is_array()) {
 			for (auto& set : obj["settings"]) {
 				if (set["type"].is_number()) {
-					addSetting(group, set);
+					addSetting(*group.get(), set);
 				}
 			}
 		}
@@ -54,7 +53,7 @@ void Config::addGroup(nlohmann::json obj) {
 	}
 }
 
-void Config::addSetting(std::shared_ptr<SettingGroup> group, nlohmann::json& obj) {
+void Config::addSetting(SettingGroup& group, nlohmann::json& obj) {
 	auto set = std::make_shared<Setting>(obj["name"].get<std::string>(), "", (Setting::Type)obj["type"].get<int>());
 	auto jVal = obj["value"];
 	switch (set->type) {
@@ -71,15 +70,57 @@ void Config::addSetting(std::shared_ptr<SettingGroup> group, nlohmann::json& obj
 		return;
 		break;
 	}
-	group->addSetting(set);
+	group.addSetting(set);
 }
 
-void Config::save(std::vector<std::shared_ptr<SettingGroup>> groups) {
+std::optional<errno_t> Config::save(std::vector<SettingGroup*> list) {
+	json jout;
+	jout["settings"] = json::array();
+	for (auto& grp : list) {
+		json js = json::object();
+		saveGroup(*grp, js);
+		jout["settings"].push_back(js);
+	}
+
+	std::ofstream ofs;
+	ofs.open(this->path);
+	if (!ofs.fail()) {
+		ofs << std::setw(4) << jout;
+		return std::nullopt;
+	}
+	return errno;
 }
 
-void Config::saveGroup(std::shared_ptr<SettingGroup> group) {
+void Config::saveGroup(SettingGroup& group, json& j) {
+
+	j["name"] = group.name();
+	j["settings"] = json::array();
+	group.forEach([&](std::shared_ptr<Setting> set) {
+		json jset;
+		saveSetting(set, jset);
+		j["settings"].push_back(jset);
+		});
 }
 
-std::vector<std::shared_ptr<SettingGroup>> Config::getOutput() {
+void Config::saveSetting(std::shared_ptr<Setting> set, nlohmann::json& jout) {
+	jout["name"] = set->name();
+	jout["type"] = set->type;
+	auto val = *set->value;
+	switch (set->type) {
+	case Setting::Type::Bool:
+		jout["value"] = std::get<BoolValue>(val).value;
+		break;
+	case Setting::Type::Float:
+		jout["value"] = std::get<FloatValue>(val).value;
+		break;
+	case Setting::Type::Int:
+		jout["value"] = std::get<IntValue>(val).value;
+		break;
+	default:
+		break;
+	}
+}
+
+std::vector<std::shared_ptr<SettingGroup>> Config::getOutput() noexcept {
 	return out;
 }

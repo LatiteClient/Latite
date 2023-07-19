@@ -11,7 +11,6 @@ TestModule::TestModule() : Module("TestModule", "Module for testing new things."
 
 void TestModule::onTick(Event& ev) {
 	auto even = reinterpret_cast<TickEvent&>(ev);
-	auto lvl = even.getLevel();
 	Logger::info("TestModule onTick");
 }
 
