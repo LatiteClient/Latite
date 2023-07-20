@@ -3,6 +3,7 @@
 
 #include "Latite.h"
 #include "pch.h"
+#include "util/util.h"
 #include "util/Logger.h"
 
 #include "feature/module/ModuleManager.h"
@@ -13,10 +14,16 @@
 #include "event/Eventing.h"
 #include "event/impl/RenderGameEvent.h"
 
-#include "client/signature/storage.h"
+#include "sdk/signature/storage.h"
 
 #include "sdk/common/client/game/ClientInstance.h"
 #include <winrt/windows.ui.viewmanagement.h>
+#include <winrt/Windows.ApplicationModel.Core.h>
+#include <winrt/windows.ui.popups.h>
+#include <winrt/base.h>
+#include <winrt/Windows.Foundation.h>
+
+#include "misc/AuthWindow.h"
 
 using namespace std;
 
@@ -32,25 +39,67 @@ namespace {
 }
 
 DWORD __stdcall startThread(HINSTANCE dll) {
-    Logger::setup();
-
+    // Needed for Logger
+    new (messageSinkBuf) ClientMessageSink;
     new (eventing) Eventing();
     new (latiteBuf) Latite;
+
+    Logger::setup();
+
+    winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
+    winrt::Windows::ApplicationModel::PackageVersion version = package.Id().Version();
+    
+    std::string gameVersion = "";
+    {
+        std::string rev = std::to_string(version.Build);
+        std::string rem = rev.substr(0, rev.size() - 2); // remove 2 digits from end
+
+        int ps = std::stoi(rem);
+        std::stringstream ss;
+        ss << version.Major << "." << version.Minor << "." << ps;// hacky
+        gameVersion = ss.str();
+    }
+#if LATITE_DEBUG
+    Logger::info("Resolving signatures..");
+#endif
+
+
+    int sigCount = 0;
+    int deadCount = 0;
+    // TODO: game version -> array
+    std::unordered_map<std::string, std::vector<SigImpl*>> versMap = { { "1.20.12", {&Signatures::Misc::clientInstance, &Signatures::Keyboard_feed, &Signatures::LevelRenderer_renderLevel,
+        &Signatures::Offset::LevelRendererPlayer_fovX, &Signatures::Offset::LevelRendererPlayer_origin, &Signatures::Offset::MinecraftGame_cursorGrabbed,
+        &Signatures::Options_getGamma }}, { "1.18.12", {} } };
+
+
+    std::vector<SigImpl*> sigList = {};
+
+    if (versMap.contains(gameVersion)) {
+        sigList = versMap[gameVersion];
+    }
+    else {
+        std::stringstream ss;
+        ss << "Latite Client does not support your version: " << gameVersion << ". Latite only supports the following versions:\n\n";
+
+        for (auto& key : versMap) {
+            ss << key.first << "\n";
+        }
+        ss << "\nContinue at your own risk of crashing.";
+
+        MessageBoxA(NULL, ss.str().c_str(), "Warning", MB_ICONINFORMATION | MB_OK);
+    }
+
+
     new (mmgrBuf) ModuleManager;
-    new (messageSinkBuf) ClientMessageSink;
     new (commandMgrBuf) CommandManager;
     new (mainSettingGroup) SettingGroup("global");
     new (configMgrBuf) ConfigManager();
     new (hooks) LatiteHooks();
 
+    AuthWindow wnd{ Latite::get().dllInst };
 
-#if LATITE_DEBUG
-    Logger::info("Resolving signatures..");
-#endif
-
-    int sigCount = 0;
-    int deadCount = 0;
-    std::vector<SigImpl*> sigList = { &Signatures::Misc::clientInstance, &Signatures::Keyboard_feed, &Signatures::LevelRenderer_renderLevel };
+    wnd.show();
+    wnd.runMessagePump();
 
     for (auto& entry : sigList) {
         if (!entry->resolve()) {

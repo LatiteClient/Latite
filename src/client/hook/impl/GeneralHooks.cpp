@@ -1,6 +1,7 @@
 #include "GeneralHooks.h"
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/world/Minecraft.h"
+#include "sdk/signature/storage.h"
 #include "client/Latite.h"
 #include "client/misc/ClientMessageSink.h"
 #include "client/feature/command/commandmanager.h"
@@ -8,7 +9,7 @@
 #include "client/event/impl/TickEvent.h"
 #include "client/event/impl/RenderGameEvent.h"
 #include "client/event/impl/KeyUpdateEvent.h"
-#include "client/signature/storage.h"
+#include "client/event/impl/ChatEvent.h"
 
 #include "api/memory/memory.h"
 
@@ -31,11 +32,15 @@ void GenericHooks::Level_tick(sdk::Level* level) {
 	return Level_tickHook->oFunc<decltype(&Level_tick)>()(level);
 }
 
-void* GenericHooks::ChatScreenController_sendChatMessage(void* controller, std::string const& message) {
+void* GenericHooks::ChatScreenController_sendChatMessage(void* controller, std::string& message) {
 	if (message.starts_with(CommandManager::prefix)) {
 		Latite::get().getCommandManager().runCommand(message);
 		return 0;
 	}
+
+	ChatEvent ev{ message };
+	Eventing::get().dispatchEvent(ev);
+
 	return ChatScreenController_sendChatMesageHook->oFunc<decltype(&ChatScreenController_sendChatMessage)>()(controller, message);
 }
 

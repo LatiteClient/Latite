@@ -1,4 +1,6 @@
 #pragma once
+#include <cstdint>
+
 namespace util {
     template <typename TreatAs, typename Pointer>
     extern TreatAs& directAccess(Pointer ptr, size_t offset) {

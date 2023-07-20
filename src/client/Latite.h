@@ -27,6 +27,7 @@ public:
 	~Latite() = default;
 
 	static constexpr std::string_view version = "v2.0.0";
+	HINSTANCE dllInst;
 private:
 
 	void doEject() noexcept;
@@ -34,5 +35,4 @@ private:
 
 	bool shouldEject = false;
 	bool hasInit = false;
-	HINSTANCE dllInst;
 };

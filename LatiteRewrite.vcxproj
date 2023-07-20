@@ -5,6 +5,14 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseLegacy|Win32">
+      <Configuration>ReleaseLegacy</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseLegacy|x64">
+      <Configuration>ReleaseLegacy</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -39,6 +47,13 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLegacy|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -46,6 +61,13 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLegacy|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
@@ -63,10 +85,16 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLegacy|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLegacy|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -76,6 +104,10 @@
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)src;$(ProjectDir)deps\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)deps\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLegacy|x64'">
     <IncludePath>$(ProjectDir)src;$(ProjectDir)deps\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)deps\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -92,6 +124,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLegacy|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -125,7 +173,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MinHook.lib;d2d1.lib;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dxgi.lib;;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -151,7 +199,33 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MinHook.lib;d2d1.lib;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dxgi.lib;;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLegacy|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <PrecompiledHeaderOutputFile>$(ProjectDir)out\release\$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <ModuleOutputFile>$(TargetName)</ModuleOutputFile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dxgi.lib;;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -177,6 +251,8 @@
     <ClInclude Include="src\api\memory\signature\signature.h" />
     <ClInclude Include="src\api\scanner\scanner.h" />
     <ClInclude Include="src\client\config\ConfigManager.h" />
+    <ClInclude Include="src\client\event\impl\ChatEvent.h" />
+    <ClInclude Include="src\client\event\impl\GammaEvent.h" />
     <ClInclude Include="src\client\event\impl\KeyUpdateEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderGameEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderLevelEvent.h" />
@@ -190,13 +266,17 @@
     <ClInclude Include="src\client\event\Eventing.h" />
     <ClInclude Include="src\client\event\impl\TickEvent.h" />
     <ClInclude Include="src\client\feature\command\impl\ToggleCommand.h" />
+    <ClInclude Include="src\client\feature\module\impl\Fullbright.h" />
     <ClInclude Include="src\client\feature\module\impl\Zoom.h" />
     <ClInclude Include="src\client\feature\module\Module.h" />
     <ClInclude Include="src\client\hook\Hook.h" />
     <ClInclude Include="src\client\hook\Hooks.h" />
+    <ClInclude Include="src\client\hook\impl\DXHooks.h" />
     <ClInclude Include="src\client\hook\impl\GeneralHooks.h" />
     <ClInclude Include="src\client\hook\impl\LevelRendererHooks.h" />
+    <ClInclude Include="src\client\hook\impl\OptionHooks.h" />
     <ClInclude Include="src\client\Latite.h" />
+    <ClInclude Include="src\client\misc\AuthWindow.h" />
     <ClInclude Include="src\client\misc\ClientMessageSink.h" />
     <ClInclude Include="src\api\feature\module\Module.h" />
     <ClInclude Include="src\api\feature\module\ModuleManager.h" />
@@ -204,7 +284,7 @@
     <ClInclude Include="src\client\feature\module\ModuleManager.h" />
     <ClInclude Include="src\client\script\JsScript.h" />
     <ClInclude Include="src\client\script\ScriptManager.h" />
-    <ClInclude Include="src\client\signature\storage.h" />
+    <ClInclude Include="src\sdk\signature\storage.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\sdk\common\client\game\ClientInstance.h" />
     <ClInclude Include="src\sdk\common\client\game\MinecraftGame.h" />
@@ -222,9 +302,12 @@
     <ClInclude Include="src\sdk\common\world\level\Level.h" />
     <ClInclude Include="src\sdk\common\world\Minecraft.h" />
     <ClInclude Include="src\sdk\common\world\Timer.h" />
+    <ClInclude Include="src\sdk\signature\storage_1_18_12.h" />
+    <ClInclude Include="src\sdk\signature\storage_latest.h" />
     <ClInclude Include="src\sdk\util.h" />
     <ClInclude Include="src\util\ChakraUtil.h" />
     <ClInclude Include="src\util\chash.h" />
+    <ClInclude Include="src\util\DxUtil.h" />
     <ClInclude Include="src\util\Json.h" />
     <ClInclude Include="src\util\Logger.h" />
     <ClInclude Include="src\util\LMath.h" />
@@ -262,23 +345,31 @@
     <ClCompile Include="src\client\feature\command\impl\TestCommand.cpp" />
     <ClCompile Include="src\client\event\Eventing.cpp" />
     <ClCompile Include="src\client\feature\command\impl\ToggleCommand.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\Fullbright.cpp" />
     <ClCompile Include="src\client\feature\module\impl\Zoom.cpp" />
     <ClCompile Include="src\client\feature\module\Module.cpp" />
     <ClCompile Include="src\client\hook\Hook.cpp" />
     <ClCompile Include="src\client\hook\Hooks.cpp" />
+    <ClCompile Include="src\client\hook\impl\DXHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\GeneralHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\LevelRendererHooks.cpp" />
+    <ClCompile Include="src\client\hook\impl\OptionHooks.cpp" />
     <ClCompile Include="src\client\Latite.cpp" />
+    <ClCompile Include="src\client\misc\AuthWindow.cpp" />
     <ClCompile Include="src\client\misc\ClientMessageSink.cpp" />
     <ClCompile Include="src\client\feature\module\impl\TestModule.cpp" />
     <ClCompile Include="src\client\feature\module\ModuleManager.cpp" />
     <ClCompile Include="src\pch.cpp">
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MultiProcessorCompilation>
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MultiProcessorCompilation>
+      <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='ReleaseLegacy|x64'">false</MultiProcessorCompilation>
     </ClCompile>
     <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp" />
+    <ClCompile Include="src\sdk\common\client\game\MinecraftGame.cpp" />
+    <ClCompile Include="src\sdk\common\client\renderer\LevelRendererPlayer.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp" />
     <ClCompile Include="src\sdk\common\world\Minecraft.cpp" />
+    <ClCompile Include="src\util\DxUtil.cpp" />
     <ClCompile Include="src\util\Logger.cpp" />
     <ClCompile Include="src\util\Util.cpp" />
   </ItemGroup>

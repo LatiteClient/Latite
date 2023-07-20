@@ -1,6 +1,6 @@
 #include "MinecraftGame.h"
-#include "client/signature/storage.h"
+#include "sdk/signature/storage.h"
 
-bool sdk::MinecraftGame::isMouseGrabbed() {
+bool sdk::MinecraftGame::isCursorGrabbed() {
     return util::directAccess<bool>(this, Signatures::Offset::MinecraftGame_cursorGrabbed.result);
 }

@@ -4,8 +4,8 @@
 namespace sdk {
 	class LevelRendererPlayer {
 	public:
-		CLASS_FIELD(Vec3, origin, 0x208);
-		CLASS_FIELD(float, fovX, 0xD90);
-		CLASS_FIELD(float, fovY, 0xDA4);
+		Vec3& getOrigin();
+		float& getFovX();
+		float& getFovY();
 	};
 }

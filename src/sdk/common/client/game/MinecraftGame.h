@@ -4,6 +4,6 @@
 namespace sdk {
 	class MinecraftGame {
 	public:
-		bool isMouseGrabbed();
+		bool isCursorGrabbed();
 	};
 }

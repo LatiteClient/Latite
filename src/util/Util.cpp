@@ -1,6 +1,18 @@
 #include "Util.h"
 #include "pch.h"
 
+std::filesystem::path util::getRootPath()
+{
+	char* env;
+	size_t size;
+	if (!_dupenv_s(&env, &size, "localappdata") && env) {
+		auto str = std::string(env).substr(0, strlen(env) - 2);
+		delete env;
+		return str;
+	}
+	return std::wstring();
+}
+
 std::filesystem::path util::getRoamingPath()
 {
 	char* env;
@@ -69,5 +81,25 @@ std::string util::toUpper(std::string const& s)
 	std::transform(ret.begin(), ret.end(), ret.begin(), [](char c) {
 		return c - (char)20;
 		});
+	return ret;
+}
+
+std::vector<std::string> util::splitString(std::string const& s, char delim) {
+	std::vector<std::string> ret = {};
+	std::string word = "";
+
+	for (size_t i = 0; i < s.size(); i++) {
+		if (s[i] == delim) {
+			ret.push_back(word);
+			word = "";
+			continue;
+		}
+		word += s[i];
+	}
+
+	if (word.size() > 0) {
+		ret.push_back(word);
+	}
+
 	return ret;
 }

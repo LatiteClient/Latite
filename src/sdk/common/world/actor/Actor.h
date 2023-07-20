@@ -1,6 +1,7 @@
 #pragma once
 #include "sdk/util.h"
 #include "sdk/common/entity/EntityContext.h"
+#include <memory>
 
 namespace sdk {
 	class Actor {

@@ -13,7 +13,7 @@
 #include <winrt/windows.ui.popups.h>
 #include <winrt/Windows.ApplicationModel.Core.h>
 #include <winrt/windows.ui.viewmanagement.h>
-
+#include <winrt/windows.ui.core.h>
 
 TestCommand::TestCommand() : Command("test", "A command for testing", "[...]", {"tc"})
 {
@@ -42,7 +42,6 @@ bool TestCommand::execute(std::string const label, std::vector<std::string> args
 	auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
 	app.Title(L"");
 	
-
 	message("test");
 	message("test", true);
 	return true;

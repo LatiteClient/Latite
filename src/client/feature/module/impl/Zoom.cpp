@@ -19,8 +19,8 @@ void Zoom::onRenderLevel(Event& evGeneric) {
 	float lr = std::lerp(activeModifier, modifyTo, alpha * 0.2f);
 	activeModifier = lr;
 
-	float& fx = ev.getLevelRenderer()->levelRendererPlayer->fovX;
-	float& fy = ev.getLevelRenderer()->levelRendererPlayer->fovY;
+	float& fx = ev.getLevelRenderer()->levelRendererPlayer->getFovX();
+	float& fy = ev.getLevelRenderer()->levelRendererPlayer->getFovY();
 
 	fx *= activeModifier;
 	fy *= activeModifier;
@@ -28,6 +28,7 @@ void Zoom::onRenderLevel(Event& evGeneric) {
 
 void Zoom::onKeyUpdate(Event& evGeneric) {
 	auto ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
+	if (ev.inUI()) return;
 	if (ev.getKey() == std::get<KeyValue>(this->zoomKey)) {
 		this->shouldZoom = ev.isDown();
 	}
