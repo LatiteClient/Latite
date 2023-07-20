@@ -1,6 +1,7 @@
 #include "Hooks.h"
 
 #include "impl/GeneralHooks.h"
+#include "impl/LevelRendererHooks.h"
 #include "MinHook.h"
 
 void LatiteHooks::init()
@@ -9,6 +10,7 @@ void LatiteHooks::init()
 
 	this->mutex.lock();
 	this->items.push_back(std::make_shared<GenericHooks>());
+	this->items.push_back(std::make_shared<LevelRendererHooks>());
 	this->mutex.unlock();
 }
 

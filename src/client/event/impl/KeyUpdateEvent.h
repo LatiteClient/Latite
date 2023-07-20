@@ -1,0 +1,16 @@
+#pragma once
+#include "api/eventing/Event.h"
+#include "util/chash.h"
+
+class KeyUpdateEvent : public Event {
+public:
+	static const uint32_t hash = TOHASH(KeyUpdateEvent);
+
+	[[nodiscard]] int getKey() { return key; }
+	[[nodiscard]] int isDown() { return down; }
+
+	KeyUpdateEvent(int key, bool down) : key(key), down(down) {}
+private:
+	bool down;
+	int key;
+};

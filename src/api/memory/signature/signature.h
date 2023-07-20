@@ -7,21 +7,30 @@
 namespace memory {
 	class signature_store {
 	public:
-		inline static const char* hMod = 0;
-	private:
-		std::string str;
-		std::function<void(uintptr_t res)> onResolve;
-		uintptr_t result = 0;
-		uintptr_t scanResult = 0;
+		const char* mod = "";
 
 		uintptr_t ref(int offset);
 		uintptr_t deref(int offset);
+
+		uintptr_t result = 0;
+		uintptr_t scan_result = 0;
+
+		std::string_view name;
+		std::string_view signature;
+	protected:
+		std::function<uintptr_t(signature_store& store, uintptr_t res)> on_resolve;
 	public:
-		signature_store(std::string str, decltype(onResolve) onResolve) : str(str), onResolve(onResolve) {
-			if (!hMod) {
-				throw std::runtime_error("hMod is unspecified");
+		signature_store(const char* mod, decltype(on_resolve) onResolve, std::string_view sig, std::string_view name) :
+#ifdef API_NAMES
+			name(name),
+#endif
+			signature(sig),
+			on_resolve(onResolve),
+			mod(mod){
+			if (!mod) {
+				throw std::runtime_error("mod is unspecified");
 			}
 		};
-		void resolve();
+		bool resolve();
 	};
 }

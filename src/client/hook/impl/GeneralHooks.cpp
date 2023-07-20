@@ -7,12 +7,17 @@
 #include "client/event/Eventing.h"
 #include "client/event/impl/TickEvent.h"
 #include "client/event/impl/RenderGameEvent.h"
+#include "client/event/impl/KeyUpdateEvent.h"
+#include "client/signature/storage.h"
 
 #include "api/memory/memory.h"
 
-std::shared_ptr<Hook> Level_tickHook;
-std::shared_ptr<Hook> ChatScreenController_sendChatMesageHook;
-std::shared_ptr<Hook> GameRenderer_renderCurrentFrameHook;
+namespace {
+	std::shared_ptr<Hook> Level_tickHook;
+	std::shared_ptr<Hook> ChatScreenController_sendChatMesageHook;
+	std::shared_ptr<Hook> GameRenderer_renderCurrentFrameHook;
+	std::shared_ptr<Hook> Keyboard_feedHook;
+}
 
 void GenericHooks::Level_tick(sdk::Level* level) {
 	if (level == sdk::ClientInstance::get()->minecraft->getLevel()) {
@@ -34,11 +39,16 @@ void* GenericHooks::ChatScreenController_sendChatMessage(void* controller, std::
 	return ChatScreenController_sendChatMesageHook->oFunc<decltype(&ChatScreenController_sendChatMessage)>()(controller, message);
 }
 
-int GenericHooks::GameRenderer_renderCurrentFrame(void* rend)
-{
+int GenericHooks::GameRenderer_renderCurrentFrame(void* rend) {
 	RenderGameEvent ev{};
 	Eventing::get().dispatchEvent(ev);
 	return GameRenderer_renderCurrentFrameHook->oFunc<decltype(&GameRenderer_renderCurrentFrame)>()(rend);
+}
+
+void GenericHooks::Keyboard_feed(int key, bool isDown) {
+	KeyUpdateEvent ev{key, isDown};
+	Eventing::get().dispatchEvent(ev);
+	return Keyboard_feedHook->oFunc<decltype(&Keyboard_feed)>()(key, isDown);
 }
 
 GenericHooks::GenericHooks() : HookGroup("General") {
@@ -50,4 +60,6 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 
 	GameRenderer_renderCurrentFrameHook = addHook(memory::instructionToAddress(util::findSignature("e8 ? ? ? ? 90 48 8d 8d ? ? ? ? e8 ? ? ? ? 90 48 8d 8d ? ? ? ? e8 ? ? ? ? 48 8b 86"), 1),
 		GameRenderer_renderCurrentFrame, "GameRenderer::_renderCurrentFrame");
+
+	Keyboard_feedHook = addHook(Signatures::Keyboard_feed.result, Keyboard_feed, "Keyboard::feed");
 }

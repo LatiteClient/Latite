@@ -1,4 +1,8 @@
 #pragma once
+#ifdef RGB
+#undef RGB
+#endif
+
 struct Vec2 final {
 	float x, y;
 

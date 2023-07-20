@@ -5,7 +5,7 @@
 
 #define FUNC_HELPER(x)  void(Feature::*)(x&)
 
-TestModule::TestModule() : Module("TestModule", "Module for testing new things.", "TestModule") {
+TestModule::TestModule() : Module("TestModule", "TestModule", "Module for testing new things.") {
 	this->listen<TickEvent>(&TestModule::onTick);
 }
 

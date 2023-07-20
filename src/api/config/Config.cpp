@@ -54,12 +54,13 @@ void Config::addGroup(nlohmann::json obj) {
 }
 
 void Config::addSetting(SettingGroup& group, nlohmann::json& obj) {
-	auto set = std::make_shared<Setting>(obj["name"].get<std::string>(), "", (Setting::Type)obj["type"].get<int>());
+	auto set = std::make_shared<Setting>(obj["name"].get<std::string>(), "", "", (Setting::Type)obj["type"].get<int>());
 	auto jVal = obj["value"];
 	switch (set->type) {
 	case Setting::Type::Bool:
 		set->resolvedValue = BoolValue(jVal.get<bool>());
 		break;
+	case Setting::Type::Key:
 	case Setting::Type::Int:
 		set->resolvedValue = IntValue(jVal.get<int>());
 		break;
@@ -115,6 +116,9 @@ void Config::saveSetting(std::shared_ptr<Setting> set, nlohmann::json& jout) {
 		break;
 	case Setting::Type::Int:
 		jout["value"] = std::get<IntValue>(val).value;
+		break;
+	case Setting::Type::Key:
+		jout["value"] = std::get<KeyValue>(val).value;
 		break;
 	default:
 		break;

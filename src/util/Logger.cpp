@@ -18,8 +18,8 @@ void Logger::logInternal(Level level, std::string str)
     std::tm now;
     localtime_s(&now, &t);
 
-    auto tmh = now.tm_hour + 1;
-    auto tmm = now.tm_min + 1;
+    auto tmh = now.tm_hour;
+    auto tmm = now.tm_min;
     auto tms = now.tm_sec;
     std::string hr = (tmh > 9 ? std::string("") : std::string("0")) + std::to_string(tmh);
     std::string mn = (tmm > 9 ? std::string("") : std::string("0")) + std::to_string(tmm);

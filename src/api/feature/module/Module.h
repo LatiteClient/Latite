@@ -8,12 +8,23 @@ public:
 
 	explicit IModule(std::string const& name, std::string const& description, 
 		std::string const& displayName) : modName(name), description(description), displayName(displayName) {
-		auto set = std::make_shared<Setting>("enabled", "", Setting::Type::Bool);
-		set->value = &enabled;
+			{
+				auto set = std::make_shared<Setting>("enabled", "Enabled", "Whether the module is on or not", Setting::Type::Bool);
+				set->value = &enabled;
 
-		settings = std::make_shared<SettingGroup>(name);
-		settings->addSetting(set);
+				settings = std::make_shared<SettingGroup>(name);
+				settings->addSetting(set);
+			}
+			{
+				auto set = std::make_shared<Setting>("key", "Key", "The keybind of the module", Setting::Type::Key);
+				set->value = &key;
+
+				settings = std::make_shared<SettingGroup>(name);
+				settings->addSetting(set);
+			}
 	}
+	IModule(IModule&) = delete;
+	IModule(IModule&&) = delete;
 
 	virtual ~IModule() = default;
 	virtual void onEnable() {};
@@ -32,4 +43,5 @@ public:
 protected:
 	std::string modName, description, displayName;
 	Setting::Value enabled = BoolValue(false);
+	Setting::Value key = KeyValue(0);
 };

@@ -18,8 +18,5 @@ namespace util {
 		return memory::findSignature(signature, "Minecraft.Windows.exe");
 	}
 
-	template <typename TreatAs, typename Pointer>
-	extern TreatAs& directAccess(Pointer ptr, size_t offset) {
-		return *reinterpret_cast<TreatAs*>(reinterpret_cast<uintptr_t>(ptr) + offset);
-	}
+
 }

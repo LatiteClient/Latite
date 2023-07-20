@@ -13,6 +13,8 @@
 #include "event/Eventing.h"
 #include "event/impl/RenderGameEvent.h"
 
+#include "client/signature/storage.h"
+
 #include "sdk/common/client/game/ClientInstance.h"
 #include <winrt/windows.ui.viewmanagement.h>
 
@@ -30,6 +32,8 @@ namespace {
 }
 
 DWORD __stdcall startThread(HINSTANCE dll) {
+    Logger::setup();
+
     new (eventing) Eventing();
     new (latiteBuf) Latite;
     new (mmgrBuf) ModuleManager;
@@ -39,7 +43,27 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (configMgrBuf) ConfigManager();
     new (hooks) LatiteHooks();
 
-    Logger::setup();
+
+#if LATITE_DEBUG
+    Logger::info("Resolving signatures..");
+#endif
+
+    int sigCount = 0;
+    int deadCount = 0;
+    std::vector<SigImpl*> sigList = { &Signatures::Misc::clientInstance, &Signatures::Keyboard_feed, &Signatures::LevelRenderer_renderLevel };
+
+    for (auto& entry : sigList) {
+        if (!entry->resolve()) {
+            Logger::warn("Signature {} failed to resolve! Pattern: {}", entry->name, entry->signature);
+            deadCount++;
+        }
+        else {
+            sigCount++;
+        }
+    }
+#if LATITE_DEBUG
+    Logger::info("Resolved {} signatures ({} dead)", sigCount, deadCount);
+#endif
 
     Logger::info("Waiting for game to load..");
 
@@ -167,5 +191,5 @@ void Latite::onUpdate(Event&) {
     }
 }
 
-void Latite::loadConfig(SettingGroup& resolvedGroup) {
+void Latite::loadConfig(SettingGroup&) {
 }
