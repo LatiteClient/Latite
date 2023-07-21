@@ -24,6 +24,7 @@
 #include <winrt/Windows.Foundation.h>
 
 #include "misc/AuthWindow.h"
+#include "render/Renderer.h"
 
 using namespace std;
 
@@ -36,6 +37,7 @@ namespace {
     alignas(SettingGroup) char mainSettingGroup[sizeof(SettingGroup)] = {};
     alignas(LatiteHooks) char hooks[sizeof(LatiteHooks)] = {};
     alignas(Eventing) char eventing[sizeof(Eventing)] = {};
+    alignas(Renderer) char rendererBuf[sizeof(Renderer)] = {};
 }
 
 DWORD __stdcall startThread(HINSTANCE dll) {
@@ -66,13 +68,14 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     int sigCount = 0;
     int deadCount = 0;
+
     // TODO: game version -> array
     std::unordered_map<std::string, std::vector<SigImpl*>> versMap = { { "1.20.12", {&Signatures::Misc::clientInstance, &Signatures::Keyboard_feed, &Signatures::LevelRenderer_renderLevel,
         &Signatures::Offset::LevelRendererPlayer_fovX, &Signatures::Offset::LevelRendererPlayer_origin, &Signatures::Offset::MinecraftGame_cursorGrabbed,
         &Signatures::Options_getGamma }}, { "1.18.12", {} } };
 
 
-    std::vector<SigImpl*> sigList = {};
+    std::vector<SigImpl*> sigList = versMap.begin()->second;
 
     if (versMap.contains(gameVersion)) {
         sigList = versMap[gameVersion];
@@ -95,6 +98,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (mainSettingGroup) SettingGroup("global");
     new (configMgrBuf) ConfigManager();
     new (hooks) LatiteHooks();
+    new (rendererBuf) Renderer();
 
     AuthWindow wnd{ Latite::get().dllInst };
 
@@ -198,6 +202,11 @@ LatiteHooks& Latite::getHooks() noexcept
 Eventing& Latite::getEventing() noexcept
 {
     return *std::launder(reinterpret_cast<Eventing*>(eventing));
+}
+
+Renderer& Latite::getRenderer() noexcept
+{
+    return *std::launder(reinterpret_cast<Renderer*>(rendererBuf));
 }
 
 void Latite::doEject() noexcept

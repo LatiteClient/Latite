@@ -16,6 +16,7 @@ public:
 	[[nodiscard]] static class SettingGroup& getSettings() noexcept;
 	[[nodiscard]] static class LatiteHooks& getHooks() noexcept;
 	[[nodiscard]] static class Eventing& getEventing() noexcept;
+	[[nodiscard]] static class Renderer& getRenderer() noexcept;
 
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);

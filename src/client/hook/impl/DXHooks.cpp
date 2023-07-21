@@ -1,14 +1,17 @@
 #include "DXHooks.h"
 #include "util/DXUtil.h"
 #include "client/Latite.h"
+#include "client/render/Renderer.h"
 
 namespace {
 	std::shared_ptr<Hook> PresentHook;
 	std::shared_ptr<Hook> ResizeBuffersHook;
-	std::shared_ptr<Hook> ExecuteCommandListsHook;
 }
 
 HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInterval, UINT Flags) {
+	if (!Latite::getRenderer().hasInit())
+		Latite::getRenderer().init(chain);
+	if (Latite::getRenderer().isRequestingCommandQueue())
 	return PresentHook->oFunc<decltype(&SwapChain_Present)>()(chain, SyncInterval, Flags);
 }
 
@@ -16,12 +19,21 @@ HRESULT __stdcall DXHooks::SwapChain_ResizeBuffers(IDXGISwapChain* chain, UINT B
 	return ResizeBuffersHook->oFunc<decltype(&SwapChain_ResizeBuffers)>()(chain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 }
 
+HRESULT __stdcall DXHooks::CommandQueue_ExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists)
+{
+	auto lock = Latite::getRenderer().lock();
+	g_Renderer.setCommandQueue(queue);
+	return CommandQueue_ExceuteCommandListsHook->getOFunc<decltype(&CommandQueue_ExecuteCommandLists)>()(queue, NumCommandLists, ppCommandLists);
+}
+
 DXHooks::DXHooks() : HookGroup("DirectX") {
 	ComPtr<IDXGIFactory1> factory;
 	ComPtr<IDXGISwapChain> swapChain;
 	ComPtr<IDXGIAdapter> adapter;
 	ComPtr<ID3D11Device> device;
+	ComPtr<ID3D12Device> device12;
 	ComPtr<ID3D11DeviceContext> dctx;
+	ComPtr<ID3D12CommandQueue> cqueue;
 
 	ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&factory)));
 	ThrowIfFailed(factory->EnumAdapters(0, adapter.GetAddressOf()));
@@ -63,6 +75,21 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 		&swapChainDesc, swapChain.GetAddressOf(), device.GetAddressOf(), &featureLevel, dctx.GetAddressOf()));
 
 	uintptr_t* vftable = *reinterpret_cast<uintptr_t**>(swapChain.Get());
+
+	{
+
+		//DX12 only
+		// 
+		// dummy device
+		if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&device12)))) {
+
+			D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+			queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+
+			ThrowIfFailed(device12->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cqueue)));
+		}
+	}
 
 	DestroyWindow(hWnd);
 	UnregisterClass(L"dummywnd", Latite::get().dllInst);
