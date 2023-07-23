@@ -1,6 +1,5 @@
 ﻿#pragma once
 #define WIN32_LEAN_AND_MEAN
-#define NOGDI
 #define NOMINMAX
 #include <Windows.h>
 #include <string_view>
@@ -17,11 +16,15 @@ public:
 	[[nodiscard]] static class LatiteHooks& getHooks() noexcept;
 	[[nodiscard]] static class Eventing& getEventing() noexcept;
 	[[nodiscard]] static class Renderer& getRenderer() noexcept;
+	[[nodiscard]] static class ScreenManager& getScreenManager() noexcept;
+	[[nodiscard]] static class Assets& getAssets() noexcept;
 
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);
 
 	void onUpdate(class Event& ev);
+	void onKey(class Event& ev);
+	void onRendererInit(class Event& ev);
 	void loadConfig(class SettingGroup& resolvedGroup);
 
 	Latite() = default;

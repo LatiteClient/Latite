@@ -29,8 +29,7 @@ public:
 };
 
 template<typename Func>
-inline Func Hook::oFunc()
-{
+inline Func Hook::oFunc()  {
 	if (this->tableSwapHook) {
 		return static_cast<Func>(this->funcPtr);
 	}

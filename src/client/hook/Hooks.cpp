@@ -6,8 +6,7 @@
 #include "impl/DXHooks.h"
 #include "MinHook.h"
 
-void LatiteHooks::init()
-{
+void LatiteHooks::init() {
 	MH_Initialize();
 
 	this->mutex.lock();
@@ -18,17 +17,14 @@ void LatiteHooks::init()
 	this->mutex.unlock();
 }
 
-void LatiteHooks::uninit()
-{
+void LatiteHooks::uninit() {
 	MH_Uninitialize();
 }
 
-void LatiteHooks::enable()
-{
+void LatiteHooks::enable() {
 	MH_EnableHook(MH_ALL_HOOKS);
 }
 
-void LatiteHooks::disable()
-{
+void LatiteHooks::disable() {
 	MH_DisableHook(MH_ALL_HOOKS);
 }

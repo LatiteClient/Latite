@@ -4,7 +4,7 @@
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/client/game/MinecraftGame.h"
 
-class KeyUpdateEvent : public Event {
+class KeyUpdateEvent : public Cancellable {
 public:
 	static const uint32_t hash = TOHASH(KeyUpdateEvent);
 

@@ -39,7 +39,7 @@ void* GenericHooks::ChatScreenController_sendChatMessage(void* controller, std::
 	}
 
 	ChatEvent ev{ message };
-	Eventing::get().dispatchEvent(ev);
+	if (Eventing::get().dispatchEvent(ev)) return nullptr;
 
 	return ChatScreenController_sendChatMesageHook->oFunc<decltype(&ChatScreenController_sendChatMessage)>()(controller, message);
 }
@@ -52,18 +52,19 @@ int GenericHooks::GameRenderer_renderCurrentFrame(void* rend) {
 
 void GenericHooks::Keyboard_feed(int key, bool isDown) {
 	KeyUpdateEvent ev{key, isDown};
-	Eventing::get().dispatchEvent(ev);
+	if (Eventing::get().dispatchEvent(ev)) return;
+
 	return Keyboard_feedHook->oFunc<decltype(&Keyboard_feed)>()(key, isDown);
 }
 
 GenericHooks::GenericHooks() : HookGroup("General") {
-	Level_tickHook = addHook(util::findSignature("48 89 5c 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8b ec 48 83 ec ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 45 ? 48 8b f9"),
+	Level_tickHook = addHook(Signatures::Level_tick.result,
 		Level_tick, "Level::tick");
 
-	ChatScreenController_sendChatMesageHook = addHook(memory::instructionToAddress(util::findSignature("e8 ? ? ? ? 3c ? 75 ? 48 8b 8f"), 1),
+	ChatScreenController_sendChatMesageHook = addHook(Signatures::ChatScreenController_sendChatMessage.result,
 		ChatScreenController_sendChatMessage, "ChatScreenController::sendChatMessage");
 
-	GameRenderer_renderCurrentFrameHook = addHook(memory::instructionToAddress(util::findSignature("e8 ? ? ? ? 90 48 8d 8d ? ? ? ? e8 ? ? ? ? 90 48 8d 8d ? ? ? ? e8 ? ? ? ? 48 8b 86"), 1),
+	GameRenderer_renderCurrentFrameHook = addHook(Signatures::GameRenderer__renderCurrentFrame.result,
 		GameRenderer_renderCurrentFrame, "GameRenderer::_renderCurrentFrame");
 
 	Keyboard_feedHook = addHook(Signatures::Keyboard_feed.result, Keyboard_feed, "Keyboard::feed");

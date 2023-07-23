@@ -8,8 +8,8 @@ public:
 	explicit Module(std::string const& name, std::string const& displayName, std::string const& description) : IModule(name, description, displayName) {}
 
 	template <typename Event, typename Listener>
-	void listen(Listener listener) {
-		Eventing::get().listen<Event>(this, (EventListenerFunc)listener);
+	void listen(Listener listener, bool callWhenInactive = false, int priority = 0) {
+		Eventing::get().listen<Event>(this, (EventListenerFunc)listener, priority, callWhenInactive);
 	}
 
 	void loadConfig(SettingGroup& resolvedGroup) override;

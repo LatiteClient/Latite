@@ -7,16 +7,14 @@
 
 /*
 Command::Command(std::string const& name, std::string const& description, std::string const& usage, std::vector<std::string> aliases)
-	: cmdName(name), description(description), usage(usage)
-{
+	: cmdName(name), description(description), usage(usage) {
 	this->aliases = { name };
 	for (auto& a : aliases) {
 		this->aliases.push_back(a);
 	}
 }*/
 
-void Command::message(std::string const& str, bool error)
-{
+void Command::message(std::string const& str, bool error) {
 	std::string fin = "";
 	if (!error) {
 		fin = util::format("[&uLatite&r] " + str);

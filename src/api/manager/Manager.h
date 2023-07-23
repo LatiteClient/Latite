@@ -7,6 +7,9 @@ template <typename T>
 class Manager {
 public:
 	Manager() = default;
+	Manager(Manager&) = delete;
+	Manager(Manager&&) = delete;
+	
 	virtual ~Manager() = default;
 
 	void forEach(std::function<void(std::shared_ptr<T> item)> callback) {

@@ -169,11 +169,12 @@
       <ModuleOutputFile>Latite</ModuleOutputFile>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dxgi.lib;;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -199,7 +200,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dxgi.lib;;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -225,7 +226,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dxgi.lib;;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -252,10 +253,13 @@
     <ClInclude Include="src\api\scanner\scanner.h" />
     <ClInclude Include="src\client\config\ConfigManager.h" />
     <ClInclude Include="src\client\event\impl\ChatEvent.h" />
+    <ClInclude Include="src\client\event\impl\RendererCleanupEvent.h" />
+    <ClInclude Include="src\client\event\impl\RendererInitEvent.h" />
     <ClInclude Include="src\client\event\impl\GammaEvent.h" />
     <ClInclude Include="src\client\event\impl\KeyUpdateEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderGameEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderLevelEvent.h" />
+    <ClInclude Include="src\client\event\impl\RenderOverlayEvent.h" />
     <ClInclude Include="src\client\feature\command\Command.h" />
     <ClInclude Include="src\client\feature\command\CommandManager.h" />
     <ClInclude Include="src\api\config\Config.h" />
@@ -267,6 +271,7 @@
     <ClInclude Include="src\client\event\impl\TickEvent.h" />
     <ClInclude Include="src\client\feature\command\impl\ToggleCommand.h" />
     <ClInclude Include="src\client\feature\module\impl\Fullbright.h" />
+    <ClInclude Include="src\client\feature\module\impl\MotionBlur.h" />
     <ClInclude Include="src\client\feature\module\impl\Zoom.h" />
     <ClInclude Include="src\client\feature\module\Module.h" />
     <ClInclude Include="src\client\hook\Hook.h" />
@@ -282,6 +287,12 @@
     <ClInclude Include="src\api\feature\module\ModuleManager.h" />
     <ClInclude Include="src\client\feature\module\impl\TestModule.h" />
     <ClInclude Include="src\client\feature\module\ModuleManager.h" />
+    <ClInclude Include="src\client\render\Assets.h" />
+    <ClInclude Include="src\client\render\asset\Asset.h" />
+    <ClInclude Include="src\client\render\Renderer.h" />
+    <ClInclude Include="src\client\screen\impl\ClickGUI.h" />
+    <ClInclude Include="src\client\screen\Screen.h" />
+    <ClInclude Include="src\client\screen\ScreenManager.h" />
     <ClInclude Include="src\client\script\JsScript.h" />
     <ClInclude Include="src\client\script\ScriptManager.h" />
     <ClInclude Include="src\sdk\signature\storage.h" />
@@ -304,9 +315,11 @@
     <ClInclude Include="src\sdk\common\world\Timer.h" />
     <ClInclude Include="src\sdk\signature\storage_1_18_12.h" />
     <ClInclude Include="src\sdk\signature\storage_latest.h" />
-    <ClInclude Include="src\sdk\util.h" />
+    <ClInclude Include="src\sdk\Util.h" />
+    <ClInclude Include="src\sdk\Version.h" />
     <ClInclude Include="src\util\ChakraUtil.h" />
     <ClInclude Include="src\util\chash.h" />
+    <ClInclude Include="src\util\DxContext.h" />
     <ClInclude Include="src\util\DxUtil.h" />
     <ClInclude Include="src\util\Json.h" />
     <ClInclude Include="src\util\Logger.h" />
@@ -346,6 +359,7 @@
     <ClCompile Include="src\client\event\Eventing.cpp" />
     <ClCompile Include="src\client\feature\command\impl\ToggleCommand.cpp" />
     <ClCompile Include="src\client\feature\module\impl\Fullbright.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\MotionBlur.cpp" />
     <ClCompile Include="src\client\feature\module\impl\Zoom.cpp" />
     <ClCompile Include="src\client\feature\module\Module.cpp" />
     <ClCompile Include="src\client\hook\Hook.cpp" />
@@ -359,6 +373,11 @@
     <ClCompile Include="src\client\misc\ClientMessageSink.cpp" />
     <ClCompile Include="src\client\feature\module\impl\TestModule.cpp" />
     <ClCompile Include="src\client\feature\module\ModuleManager.cpp" />
+    <ClCompile Include="src\client\render\Assets.cpp" />
+    <ClCompile Include="src\client\render\asset\Asset.cpp" />
+    <ClCompile Include="src\client\render\Renderer.cpp" />
+    <ClCompile Include="src\client\screen\impl\ClickGUI.cpp" />
+    <ClCompile Include="src\client\screen\ScreenManager.cpp" />
     <ClCompile Include="src\pch.cpp">
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MultiProcessorCompilation>
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MultiProcessorCompilation>
@@ -369,6 +388,7 @@
     <ClCompile Include="src\sdk\common\client\renderer\LevelRendererPlayer.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp" />
     <ClCompile Include="src\sdk\common\world\Minecraft.cpp" />
+    <ClCompile Include="src\util\DxContext.cpp" />
     <ClCompile Include="src\util\DxUtil.cpp" />
     <ClCompile Include="src\util\Logger.cpp" />
     <ClCompile Include="src\util\Util.cpp" />

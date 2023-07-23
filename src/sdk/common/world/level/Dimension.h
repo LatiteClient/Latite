@@ -1,5 +1,6 @@
 #pragma once
 #include "sdk/util.h"
+#include <string>
 
 namespace sdk {
 	class Dimension {

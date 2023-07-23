@@ -10,7 +10,7 @@ Zoom::Zoom() : Module("Zoom", "Zoom", "Zooms like OptiFine") {
 }
 
 void Zoom::onRenderLevel(Event& evGeneric) {
-	auto ev = reinterpret_cast<RenderLevelEvent&>(evGeneric);
+	auto& ev = reinterpret_cast<RenderLevelEvent&>(evGeneric);
 
 	modifyTo = shouldZoom ? std::get<FloatValue>(modifier).value : 1.f;
 
@@ -27,7 +27,7 @@ void Zoom::onRenderLevel(Event& evGeneric) {
 }
 
 void Zoom::onKeyUpdate(Event& evGeneric) {
-	auto ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
+	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
 	if (ev.inUI()) return;
 	if (ev.getKey() == std::get<KeyValue>(this->zoomKey)) {
 		this->shouldZoom = ev.isDown();

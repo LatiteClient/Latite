@@ -6,6 +6,6 @@ Fullbright::Fullbright() : Module("Fullbright", "Fullbright", "Lights up your wo
 }
 
 void Fullbright::onGamma(Event& genericEv) {
-	auto ev = reinterpret_cast<GammaEvent&>(genericEv);
+	auto& ev = reinterpret_cast<GammaEvent&>(genericEv);
 	ev.getGamma() = std::get<FloatValue>(this->gamma);
 }

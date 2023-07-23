@@ -6,24 +6,30 @@
 namespace {
 	std::shared_ptr<Hook> PresentHook;
 	std::shared_ptr<Hook> ResizeBuffersHook;
+	std::shared_ptr<Hook> ExecuteCommandListsHook;
 }
 
 HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInterval, UINT Flags) {
-	if (!Latite::getRenderer().hasInit())
+	if (!Latite::getRenderer().hasInitialized())
 		Latite::getRenderer().init(chain);
-	if (Latite::getRenderer().isRequestingCommandQueue())
+
+	if (Latite::getRenderer().hasInitialized()) {
+		auto lock = Latite::getRenderer().lock();
+		Latite::getRenderer().render();
+	}
+
 	return PresentHook->oFunc<decltype(&SwapChain_Present)>()(chain, SyncInterval, Flags);
 }
 
 HRESULT __stdcall DXHooks::SwapChain_ResizeBuffers(IDXGISwapChain* chain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags) {
+	Latite::getRenderer().reinit();
 	return ResizeBuffersHook->oFunc<decltype(&SwapChain_ResizeBuffers)>()(chain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 }
 
-HRESULT __stdcall DXHooks::CommandQueue_ExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists)
-{
+HRESULT __stdcall DXHooks::CommandQueue_ExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists) {
 	auto lock = Latite::getRenderer().lock();
-	g_Renderer.setCommandQueue(queue);
-	return CommandQueue_ExceuteCommandListsHook->getOFunc<decltype(&CommandQueue_ExecuteCommandLists)>()(queue, NumCommandLists, ppCommandLists);
+	Latite::getRenderer().setCommandQueue(queue);
+	return ExecuteCommandListsHook->oFunc<decltype(&CommandQueue_ExecuteCommandLists)>()(queue, NumCommandLists, ppCommandLists);
 }
 
 DXHooks::DXHooks() : HookGroup("DirectX") {
@@ -38,7 +44,7 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 	ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&factory)));
 	ThrowIfFailed(factory->EnumAdapters(0, adapter.GetAddressOf()));
 
-	D3D_FEATURE_LEVEL lvl[] = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
+	D3D_FEATURE_LEVEL lvl[] = { D3D_FEATURE_LEVEL_11_0 };
 
 
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
@@ -68,13 +74,14 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.Windowed = TRUE;
 	
-	*lvl = D3D_FEATURE_LEVEL_11_1;
+	*lvl = D3D_FEATURE_LEVEL_11_0;
 
 	D3D_FEATURE_LEVEL featureLevel;
 	ThrowIfFailed(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, lvl, 1, D3D11_SDK_VERSION,
 		&swapChainDesc, swapChain.GetAddressOf(), device.GetAddressOf(), &featureLevel, dctx.GetAddressOf()));
 
 	uintptr_t* vftable = *reinterpret_cast<uintptr_t**>(swapChain.Get());
+	uintptr_t* cqueueVftable = nullptr;
 
 	{
 
@@ -88,6 +95,7 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
 			ThrowIfFailed(device12->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cqueue)));
+			cqueueVftable = *reinterpret_cast<uintptr_t**>(cqueue.Get());
 		}
 	}
 
@@ -96,4 +104,5 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 
 	PresentHook = addHook(vftable[8], SwapChain_Present, "IDXGISwapChain::Present");
 	ResizeBuffersHook = addHook(vftable[13], SwapChain_ResizeBuffers, "IDXGISwapChain::ResizeBuffers");
+	if (cqueueVftable) ExecuteCommandListsHook = addHook(cqueueVftable[10], CommandQueue_ExecuteCommandLists, "ID3D12CommandQueue::executeCommandLists");
 }

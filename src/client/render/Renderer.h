@@ -11,10 +11,12 @@ public:
 	~Renderer();
 
 	bool init(IDXGISwapChain* chain);
-	bool hasInit() { return hasInit; };
+	bool hasInitialized() { return hasInit; };
 	HRESULT reinit();
 	std::shared_lock<std::shared_mutex> lock();
+	void render();
 private:
+	std::wstring fontFamily = L"Segoe UI";
 	void releaseAllResources();
 
 	bool hasInit = false;
@@ -39,11 +41,15 @@ private:
 	ComPtr<ID2D1DeviceContext> d2dCtx;
 	ComPtr<IDWriteFactory> dWriteFactory;
 	ComPtr<IWICImagingFactory> wicFactory;
-	ComPtr<ID2D1SolidColorBrush> solidBrush;
 
-	ComPtr<IDWriteTextFormat> segoeUI;
-	ComPtr<IDWriteTextFormat> segoeUISemilight;
-	ComPtr<IDWriteTextFormat> segoeUILight;
+	ComPtr<ID2D1SolidColorBrush> solidBrush;
+	ComPtr<ID2D1Effect> shadowEffect;
+	ComPtr<ID2D1Effect> affineTransformEffect;
+	ComPtr<ID2D1Effect> blurEffect;
+
+	ComPtr<IDWriteTextFormat> font;
+	ComPtr<IDWriteTextFormat> fontSemilight;
+	ComPtr<IDWriteTextFormat> fontLight;
 
 	std::vector<ID3D12Resource*> d3d12Targets = {  };
 	std::vector<ID3D11Resource*> d3d11Targets = {};
@@ -60,21 +66,17 @@ public:
 		Light
 	};
 
-	HRESULT createDeviceIndependentResources();
-	HRESULT createDeviceDependentResources();
+	void createDeviceIndependentResources();
+	void createDeviceDependentResources();
 
 	void releaseDeviceIndependentResources();
 	void releaseDeviceResources();
 
-	void setDevice11(ID3D11Device* dev) noexcept {
+	void setDevice11(ID3D11Device* dev) {
 		gameDevice11 = dev;
 	}
 
-	void setGame11On12(ID3D11On12Device* dev) noexcept {
-		d3d11On12Device = dev;
-	}
-
-	void setDevice12(ID3D12Device* dev) noexcept {
+	void setDevice12(ID3D12Device* dev) {
 		gameDevice12 = dev;
 	}
 
@@ -82,23 +84,27 @@ public:
 		commandQueue = queue;
 	}
 
-	void setCommandQueue(ID3D12CommandQueue* queue) {
-		commandQueue = queue;
-	}
-
 	void setSwapChain(IDXGISwapChain* chain) noexcept {
 		gameSwapChain = chain;
+	}
+
+	[[nodiscard]] std::wstring getFontFamily() {
+		return this->fontFamily;
+	}
+
+	void setFontFamily(std::wstring ws) {
+		this->fontFamily = ws;
 	}
 
 
 	[[nodiscard]] IDWriteTextFormat* getTextFormat(FontSelection selection) {
 		switch (selection) {
 		case FontSelection::Regular:
-			return segoeUI.Get();
+			return font.Get();
 		case FontSelection::Semilight:
-			return segoeUISemilight.Get();
+			return fontSemilight.Get();
 		case FontSelection::Light:
-			return segoeUILight.Get();
+			return fontLight.Get();
 		default:
 			return nullptr;
 		}
@@ -118,6 +124,43 @@ public:
 
 	[[nodiscard]] IDWriteFactory* getDWriteFactory() {
 		return dWriteFactory.Get();
+	}
+
+	[[nodiscard]] ID2D1Bitmap1* copyCurrentBitmap() {
+		auto idx = swapChain4->GetCurrentBackBufferIndex();
+		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
+		ID2D1Bitmap1* newBitmap;
+
+		D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
+		D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
+
+		HRESULT hr = d2dCtx->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_NONE, pixelFormat), &newBitmap);
+		if (SUCCEEDED(hr)) {
+			newBitmap->CopyFromBitmap(nullptr, myBitmap, nullptr);
+		}
+		return newBitmap;
+	}
+
+	[[nodiscard]] ID2D1Effect*& getShadowEffect() {
+		return *shadowEffect.GetAddressOf();
+	}
+
+	[[nodiscard]] ID2D1Effect*& getAffineTransformEffect() {
+		return *affineTransformEffect.GetAddressOf();
+	}
+
+	[[nodiscard]] ID2D1Effect*& getBlurEffect() {
+		return *blurEffect.GetAddressOf();
+	}
+
+	[[nodiscard]] ID2D1Bitmap1* getBitmap()
+	{
+		auto buf = swapChain4->GetCurrentBackBufferIndex();
+		return this->renderTargets[buf];
+	}
+
+	[[nodiscard]] IWICImagingFactory* getImagingFactory() {
+		return this->wicFactory.Get();
 	}
 
 };

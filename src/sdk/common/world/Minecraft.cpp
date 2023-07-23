@@ -1,7 +1,6 @@
 #include "Minecraft.h"
 
-sdk::Level* sdk::Minecraft::getLevel()
-{
+sdk::Level* sdk::Minecraft::getLevel() {
 	if (gameSession) {
 		auto v2 = gameSession->level;
 		if (v2)

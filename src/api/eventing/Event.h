@@ -3,9 +3,14 @@
 
 class Event {
 public:
+	Event(Event&) = delete;
+	Event(Event&&) = delete;
+	Event() {}
+
 	[[nodiscard]] bool isCancellable() { return cancellable; }
 protected:
 	bool cancellable = false;
+private:
 };
 
 class Cancellable : public Event {
@@ -18,13 +23,19 @@ public:
 	void setCancelled(bool b) {
 		cancel = b;
 	}
+
+	[[nodiscard]] bool isCancelled() {
+		return cancel;
+	}
 };
 
 using EventListenerFunc = void(Listener::*)(Event&);
 
 struct EventListener {
-	constexpr EventListener(EventListenerFunc fp, Listener* ptr) : fptr(fp), listener(ptr) {}
+	constexpr EventListener(EventListenerFunc fp, Listener* ptr, bool callWhileInactive, int priority) : fptr(fp), listener(ptr), callWhileInactive(callWhileInactive), priority(priority) {}
 
 	EventListenerFunc fptr;
 	class Listener* listener;
+	int priority = 0;
+	bool callWhileInactive;
 };

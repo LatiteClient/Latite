@@ -5,6 +5,6 @@
 namespace sdk {
 	class LevelRenderer {
 	public:
-		CLASS_FIELD(LevelRendererPlayer*, levelRendererPlayer, 0x2F8);
+		MVCLASS_FIELD(LevelRendererPlayer*, levelRendererPlayer, 0x2F8, 0x288);
 	};
 }

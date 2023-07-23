@@ -1,5 +1,9 @@
 #include "Renderer.h"
 #include "util/Logger.h"
+#include "client/event/Eventing.h"
+#include "client/event/impl/RenderOverlayEvent.h"
+#include "client/event/impl/RendererCleanupEvent.h"
+#include "client/event/impl/RendererInitEvent.h"
 
 Renderer::~Renderer() {
     // ...
@@ -30,6 +34,8 @@ bool Renderer::init(IDXGISwapChain* chain) {
 			return false;
 		}
 	}
+
+	createDeviceIndependentResources();
 
 #if LATITE_DEBUG
 	if (gameDevice12) {
@@ -121,20 +127,167 @@ bool Renderer::init(IDXGISwapChain* chain) {
 	hasInit = true;
 	firstInit = true;
 
+	RendererInitEvent ev{};
+	Eventing::get().dispatchEvent(ev);
+
     return true;
 }
 
 HRESULT Renderer::reinit() {
+	releaseAllResources();
     hasInit = false;
-
-    return E_NOTIMPL;
+    return S_OK;
 }
 
-std::shared_lock<std::shared_mutex> Renderer::lock()
-{
+std::shared_lock<std::shared_mutex> Renderer::lock() {
 	return std::shared_lock<std::shared_mutex>(mutex);
 }
 
+void Renderer::render() {
+	auto idx = swapChain4->GetCurrentBackBufferIndex();
+	if (gameDevice12) {
+		d3d11On12Device->AcquireWrappedResources(&d3d11Targets[idx], 1);
+	}
+	d2dCtx->SetTarget(renderTargets[idx]);
+	d2dCtx->BeginDraw();
+	d2dCtx->SetTransform(D2D1::Matrix3x2F::Identity());
+
+	RenderOverlayEvent ev{ d2dCtx.Get() };
+	Eventing::get().dispatchEvent(ev);
+
+	auto hr = d2dCtx->EndDraw();
+
+	if (gameDevice12) {
+		d3d11On12Device->ReleaseWrappedResources(&d3d11Targets[idx], 1);
+	}
+
+	d3dCtx->Flush();
+}
+
 void Renderer::releaseAllResources() {
-	// NOTE: release Dxgidevice, swapchainv4 (I think?)
+	RendererCleanupEvent ev{};
+	Eventing::get().dispatchEvent(ev);
+
+	if (d2dCtx) d2dCtx->SetTarget(nullptr);
+
+	bool isDX12 = gameDevice12;
+	if (isDX12) {
+		ID3D11RenderTargetView* nullViews[] = { nullptr, nullptr, nullptr };
+		if (d3dCtx)
+			d3dCtx->OMSetRenderTargets(3, nullViews, nullptr);
+	}
+	else {
+		ID3D11RenderTargetView* nullViews[] = { nullptr };
+		if (d3dCtx)
+			d3dCtx->OMSetRenderTargets(1, nullViews, nullptr);
+	}
+
+	gameDevice11 = nullptr;
+
+	for (auto& i : renderTargets) {
+		SafeRelease(&i);
+	}
+	renderTargets.clear();
+
+	if (isDX12) {
+		for (auto& i : d3d12Targets) {
+			SafeRelease(&i);
+		}
+		d3d12Targets.clear();
+	}
+
+	if (isDX12) gameDevice12 = nullptr;
+	SafeRelease(&swapChain4);
+	SafeRelease(&d3dDevice);
+	d2dDevice = nullptr;
+	d2dCtx = nullptr;
+
+	for (auto& i : d3d11Targets) {
+		SafeRelease(&i);
+	}
+	d3d11Targets.clear();
+
+	releaseDeviceResources();
+
+	if (d3dCtx) {
+		d3dCtx->Flush();
+	}
+
+	dxgiDevice = nullptr;
+	SafeRelease(&swapChain4);
+
+	d3d11On12Device = nullptr;
+	d3dCtx = nullptr;
+
+	for (auto& mb : this->motionBlurBitmaps) {
+		SafeRelease(&mb);
+	}
+
+	this->motionBlurBitmaps.clear();
+
+	releaseDeviceIndependentResources();
+}
+
+void Renderer::createDeviceIndependentResources() {
+	ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(dWriteFactory.GetAddressOf())));
+	ThrowIfFailed(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory3), (void**)d2dFactory.GetAddressOf()));
+	float fontSize = 10.f;
+
+	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily.c_str(),
+		nullptr,
+		DWRITE_FONT_WEIGHT_NORMAL,
+		DWRITE_FONT_STYLE_NORMAL,
+		DWRITE_FONT_STRETCH_NORMAL,
+		fontSize,
+		L"en-us",
+		this->font.GetAddressOf()));
+
+	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily.c_str(),
+		nullptr,
+		DWRITE_FONT_WEIGHT_SEMI_LIGHT,
+		DWRITE_FONT_STYLE_NORMAL,
+		DWRITE_FONT_STRETCH_NORMAL,
+		fontSize,
+		L"en-us",
+		this->fontSemilight.GetAddressOf()));
+
+	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily.c_str(),
+		nullptr,
+		DWRITE_FONT_WEIGHT_LIGHT,
+		DWRITE_FONT_STYLE_NORMAL,
+		DWRITE_FONT_STRETCH_NORMAL,
+		fontSize,
+		L"en-us",
+		this->fontLight.GetAddressOf()));
+
+	//ThrowIfFailed(CoInitialize(nullptr));
+
+	ThrowIfFailed(CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, __uuidof(IWICImagingFactory), reinterpret_cast<void**>(this->wicFactory.GetAddressOf())));
+}
+
+void Renderer::createDeviceDependentResources() {
+	D2D1_COLOR_F col = { 1.f, 0.f, 0.f, 1.f };
+	ThrowIfFailed(d2dCtx->CreateSolidColorBrush(col, solidBrush.GetAddressOf()));
+	ThrowIfFailed(d2dCtx->CreateEffect(CLSID_D2D1Shadow, this->shadowEffect.GetAddressOf()));
+	ThrowIfFailed(d2dCtx->CreateEffect(CLSID_D2D12DAffineTransform, this->affineTransformEffect.GetAddressOf()));
+	ThrowIfFailed(d2dCtx->CreateEffect(CLSID_D2D1GaussianBlur, this->blurEffect.GetAddressOf()));
+}
+
+void Renderer::releaseDeviceIndependentResources() {
+	//CoUninitialize();
+	dWriteFactory = nullptr;
+	wicFactory = nullptr;
+	d2dFactory = nullptr;
+	font = nullptr;
+	fontLight = nullptr;
+	fontSemilight = nullptr;
+}
+
+void Renderer::releaseDeviceResources() {
+	solidBrush = nullptr;
+	shadowEffect = nullptr;
+	affineTransformEffect = nullptr;
+	affineTransformEffect = nullptr;
+	shadowEffect = nullptr;
+	blurEffect = nullptr;
 }

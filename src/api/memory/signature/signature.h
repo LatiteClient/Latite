@@ -20,7 +20,12 @@ namespace memory {
 	protected:
 		std::function<uintptr_t(signature_store& store, uintptr_t res)> on_resolve;
 	public:
-		signature_store(const char* mod, decltype(on_resolve) onResolve, std::string_view sig, std::string_view name) :
+		signature_store(const char* mod, decltype(on_resolve) onResolve, std::string_view sig,
+			std::string_view
+#ifdef API_NAMES
+			name
+#endif
+		) :
 #ifdef API_NAMES
 			name(name),
 #endif
@@ -28,7 +33,7 @@ namespace memory {
 			on_resolve(onResolve),
 			mod(mod){
 			if (!mod) {
-				throw std::runtime_error("mod is unspecified");
+				//throw std::runtime_error("mod is unspecified");
 			}
 		};
 		bool resolve();

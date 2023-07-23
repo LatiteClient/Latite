@@ -1,8 +1,7 @@
 #include "memory.h"
 #include "pch.h"
 
-uintptr_t memory::instructionToAddress(uintptr_t addy, size_t lenOperation)
-{
+uintptr_t memory::instructionToAddress(uintptr_t addy, size_t lenOperation) {
 	if (addy == 0) return 0;
 	uintptr_t out = (uintptr_t)addy;
 	int offset = *reinterpret_cast<int*>(out + lenOperation);
@@ -10,8 +9,7 @@ uintptr_t memory::instructionToAddress(uintptr_t addy, size_t lenOperation)
 	return out;
 }
 
-int memory::instructionToOffset(uintptr_t addy, size_t lenOperation)
-{
+int memory::instructionToOffset(uintptr_t addy, size_t lenOperation) {
 	if (addy == 0) return 0;
 	uintptr_t out = (uintptr_t)addy;
 	int offset = *reinterpret_cast<int*>(out + lenOperation);

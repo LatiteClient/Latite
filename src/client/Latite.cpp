@@ -13,6 +13,8 @@
 #include "hook/Hooks.h"
 #include "event/Eventing.h"
 #include "event/impl/RenderGameEvent.h"
+#include "event/impl/KeyUpdateEvent.h"
+#include "event/impl/RendererInitEvent.h"
 
 #include "sdk/signature/storage.h"
 
@@ -25,6 +27,10 @@
 
 #include "misc/AuthWindow.h"
 #include "render/Renderer.h"
+#include "screen/ScreenManager.h"
+#include "render/Assets.h"
+
+int sdk::internalVers = sdk::VLATEST;
 
 using namespace std;
 
@@ -38,7 +44,14 @@ namespace {
     alignas(LatiteHooks) char hooks[sizeof(LatiteHooks)] = {};
     alignas(Eventing) char eventing[sizeof(Eventing)] = {};
     alignas(Renderer) char rendererBuf[sizeof(Renderer)] = {};
+    alignas(ScreenManager) char scnMgrBuf[sizeof(ScreenManager)] = {};
+    alignas(Assets) char assetsBuf[sizeof(Assets)] = {};
 }
+
+#define MVSIG(...) ([]() -> std::pair<SigImpl*, SigImpl*> {\
+if (sdk::internalVers == sdk::VLATEST) return {&Signatures::__VA_ARGS__, &Signatures::__VA_ARGS__};\
+else { return {&Signatures_1_18_12::__VA_ARGS__, &Signatures::__VA_ARGS__}; }\
+})()
 
 DWORD __stdcall startThread(HINSTANCE dll) {
     // Needed for Logger
@@ -46,7 +59,15 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (eventing) Eventing();
     new (latiteBuf) Latite;
 
+    std::filesystem::create_directory(util::getLatitePath());
+    std::filesystem::create_directory(util::getLatitePath() / "Assets");
     Logger::setup();
+
+    Logger::info("Loading assets");
+    // ... init assets
+
+    //
+
 
     winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
     winrt::Windows::ApplicationModel::PackageVersion version = package.Id().Version();
@@ -69,22 +90,22 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int sigCount = 0;
     int deadCount = 0;
 
-    // TODO: game version -> array
-    std::unordered_map<std::string, std::vector<SigImpl*>> versMap = { { "1.20.12", {&Signatures::Misc::clientInstance, &Signatures::Keyboard_feed, &Signatures::LevelRenderer_renderLevel,
-        &Signatures::Offset::LevelRendererPlayer_fovX, &Signatures::Offset::LevelRendererPlayer_origin, &Signatures::Offset::MinecraftGame_cursorGrabbed,
-        &Signatures::Options_getGamma }}, { "1.18.12", {} } };
+    std::unordered_map<std::string, sdk::Version> versNumMap = {
+        { "1.20.12", sdk::VLATEST },
+        { "1.20.10", sdk::VLATEST },
+        { "1.18.12", sdk::V1_18_12 },
+        { "1.18.10", sdk::V1_18_12 }
+    };
 
-
-    std::vector<SigImpl*> sigList = versMap.begin()->second;
-
-    if (versMap.contains(gameVersion)) {
-        sigList = versMap[gameVersion];
+    if (versNumMap.contains(gameVersion)) {
+        auto vers =  versNumMap[gameVersion];
+        sdk::internalVers = vers;
     }
     else {
         std::stringstream ss;
         ss << "Latite Client does not support your version: " << gameVersion << ". Latite only supports the following versions:\n\n";
 
-        for (auto& key : versMap) {
+        for (auto& key : versNumMap) {
             ss << key.first << "\n";
         }
         ss << "\nContinue at your own risk of crashing.";
@@ -92,13 +113,29 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MessageBoxA(NULL, ss.str().c_str(), "Warning", MB_ICONINFORMATION | MB_OK);
     }
 
-
+    std::vector<std::pair<SigImpl*, SigImpl*>> sigList = {
+        MVSIG(Misc::clientInstance),
+        MVSIG(Keyboard_feed),
+        MVSIG(LevelRenderer_renderLevel),
+        MVSIG(Offset::LevelRendererPlayer_fovX),
+        MVSIG(Offset::LevelRendererPlayer_origin),
+        MVSIG(Offset::MinecraftGame_cursorGrabbed),
+        MVSIG(Options_getGamma),
+        MVSIG(ClientInstance_grabCursor),
+        MVSIG(ClientInstance_releaseCursor),
+        MVSIG(Level_tick),
+        MVSIG(ChatScreenController_sendChatMessage),
+        MVSIG(GameRenderer__renderCurrentFrame),
+            };
+    
     new (mmgrBuf) ModuleManager;
     new (commandMgrBuf) CommandManager;
     new (mainSettingGroup) SettingGroup("global");
     new (configMgrBuf) ConfigManager();
     new (hooks) LatiteHooks();
     new (rendererBuf) Renderer();
+    new (assetsBuf) Assets();
+    new (scnMgrBuf) ScreenManager();
 
     AuthWindow wnd{ Latite::get().dllInst };
 
@@ -106,11 +143,15 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     wnd.runMessagePump();
 
     for (auto& entry : sigList) {
-        if (!entry->resolve()) {
-            Logger::warn("Signature {} failed to resolve! Pattern: {}", entry->name, entry->signature);
+        if (!entry.first->mod) continue;
+        auto res = entry.first->resolve();
+        if (!res) {
+            Logger::warn("Signature {} failed to resolve! Pattern: {}", entry.first->name, entry.first->signature);
             deadCount++;
         }
         else {
+            entry.second->result = entry.first->result;
+            entry.second->scan_result = entry.first->scan_result;
             sigCount++;
         }
     }
@@ -159,69 +200,69 @@ BOOL WINAPI DllMain(
         Latite::getSettings().~SettingGroup();
         Latite::getHooks().~LatiteHooks();
         Latite::getEventing().~Eventing();
+        Latite::getRenderer().~Renderer();
+        Latite::getAssets().~Assets();
+        Latite::getScreenManager().~ScreenManager();
         Latite::get().~Latite();
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
 }
 
-Latite& Latite::get() noexcept
-{
+Latite& Latite::get() noexcept {
     return *std::launder(reinterpret_cast<Latite*>(latiteBuf));
 }
 
-ModuleManager& Latite::getModuleManager() noexcept
-{
+ModuleManager& Latite::getModuleManager() noexcept {
     return *std::launder(reinterpret_cast<ModuleManager*>(mmgrBuf));
 }
 
-CommandManager& Latite::getCommandManager() noexcept
-{
+CommandManager& Latite::getCommandManager() noexcept {
     return *std::launder(reinterpret_cast<CommandManager*>(commandMgrBuf));
 }
 
-ConfigManager& Latite::getConfigManager() noexcept
-{
+ConfigManager& Latite::getConfigManager() noexcept {
     return *std::launder(reinterpret_cast<ConfigManager*>(configMgrBuf));
 }
 
-ClientMessageSink& Latite::getClientMessageSink() noexcept
-{
+ClientMessageSink& Latite::getClientMessageSink() noexcept {
     return *std::launder(reinterpret_cast<ClientMessageSink*>(messageSinkBuf));
 }
 
-SettingGroup& Latite::getSettings() noexcept
-{
+SettingGroup& Latite::getSettings() noexcept {
     return *std::launder(reinterpret_cast<SettingGroup*>(mainSettingGroup));
 }
 
-LatiteHooks& Latite::getHooks() noexcept
-{
+LatiteHooks& Latite::getHooks() noexcept {
     return *std::launder(reinterpret_cast<LatiteHooks*>(hooks));
 }
 
-Eventing& Latite::getEventing() noexcept
-{
+Eventing& Latite::getEventing() noexcept {
     return *std::launder(reinterpret_cast<Eventing*>(eventing));
 }
 
-Renderer& Latite::getRenderer() noexcept
-{
+Renderer& Latite::getRenderer() noexcept {
     return *std::launder(reinterpret_cast<Renderer*>(rendererBuf));
 }
 
-void Latite::doEject() noexcept
-{
+ScreenManager& Latite::getScreenManager() noexcept {
+    return *std::launder(reinterpret_cast<ScreenManager*>(scnMgrBuf));
+}
+
+Assets& Latite::getAssets() noexcept {
+    return *std::launder(reinterpret_cast<Assets*>(assetsBuf));
+}
+
+void Latite::doEject() noexcept {
     Latite::get().getHooks().uninit();
 
     FreeLibrary(this->dllInst);
 }
 
-void Latite::queueEject() noexcept
-{
+void Latite::queueEject() noexcept {
     auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     app.Title(L"");
     this->shouldEject = true;
-    CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)FreeLibraryAndExitThread, dllInst, 0, nullptr);
+    CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)FreeLibraryAndExitThread, dllInst, 0, nullptr));
 }
 
 void Latite::initialize(HINSTANCE hInst) {
@@ -232,7 +273,9 @@ void Latite::initialize(HINSTANCE hInst) {
     Logger::info("Enabled Hooks");
 
     // TODO: use UpdateEvent
-    Latite::getEventing().listen<RenderGameEvent>(this, (EventListenerFunc) & Latite::onUpdate);
+    Latite::getEventing().listen<RenderGameEvent>(this, (EventListenerFunc)&Latite::onUpdate, 1);
+    Latite::getEventing().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Latite::onKey, 1);
+    Latite::getEventing().listen<RendererInitEvent>(this, (EventListenerFunc)&Latite::onRendererInit, 1);
 }
 
 void Latite::threadsafeInit() {
@@ -247,6 +290,29 @@ void Latite::onUpdate(Event&) {
         threadsafeInit();
         hasInit = true;
     }
+}
+
+void Latite::onKey(Event& evGeneric) {
+    auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
+    if (ev.getKey() == VK_END && ev.isDown()) {
+        this->queueEject();
+        Logger::info("Uninject key pressed");
+
+        return;
+    }
+
+    if (ev.getKey() == 'M' && ev.isDown()) {
+        if (!ev.inUI() || Latite::getScreenManager().getActiveScreen()) {
+            Latite::getScreenManager().tryToggleScreen("ClickGUI");
+            ev.setCancelled(true);
+            return;
+        }
+    }
+}
+
+void Latite::onRendererInit(Event& ev) {
+    getAssets().unloadAll(); // should be safe even if we didn't load resources yet
+    getAssets().loadAll();
 }
 
 void Latite::loadConfig(SettingGroup&) {

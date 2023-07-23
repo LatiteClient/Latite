@@ -8,18 +8,17 @@ public:
 
 	explicit IModule(std::string const& name, std::string const& description, 
 		std::string const& displayName) : modName(name), description(description), displayName(displayName) {
-			{
+		settings = std::make_shared<SettingGroup>(name);
+		{
 				auto set = std::make_shared<Setting>("enabled", "Enabled", "Whether the module is on or not", Setting::Type::Bool);
 				set->value = &enabled;
 
-				settings = std::make_shared<SettingGroup>(name);
 				settings->addSetting(set);
 			}
 			{
 				auto set = std::make_shared<Setting>("key", "Key", "The keybind of the module", Setting::Type::Key);
 				set->value = &key;
 
-				settings = std::make_shared<SettingGroup>(name);
 				settings->addSetting(set);
 			}
 	}
