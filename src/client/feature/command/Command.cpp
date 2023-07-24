@@ -17,10 +17,10 @@ Command::Command(std::string const& name, std::string const& description, std::s
 void Command::message(std::string const& str, bool error) {
 	std::string fin = "";
 	if (!error) {
-		fin = util::format("[&uLatite&r] " + str);
+		fin = util::Format("[&uLatite&r] " + str);
 	}
 	else {
-		fin = util::format("&c" + str);
+		fin = util::Format("&c" + str);
 	}
 	Latite::get().getClientMessageSink().display(fin);
 }

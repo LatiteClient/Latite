@@ -285,7 +285,7 @@ void Latite::initialize(HINSTANCE hInst) {
 void Latite::threadsafeInit() {
     auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     std::string vstr(this->version);
-    auto ws = util::strToWstr("Latite Client " + vstr);
+    auto ws = util::StrToWStr("Latite Client " + vstr);
     app.Title(ws);
 }
 

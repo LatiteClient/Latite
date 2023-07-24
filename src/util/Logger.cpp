@@ -52,6 +52,6 @@ void Logger::LogInternal(Level level, std::string str) {
     OutputDebugStringA(mstr.c_str());
 
 #if LATITE_DEBUG
-    Latite::get().getClientMessageSink().push(util::format("&7" + pref + "&r" + str));
+    Latite::get().getClientMessageSink().push(util::Format("&7" + pref + "&r" + str));
 #endif
 }

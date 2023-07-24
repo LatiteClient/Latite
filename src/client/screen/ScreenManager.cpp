@@ -11,7 +11,7 @@ ScreenManager::ScreenManager() {
 
 bool ScreenManager::showScreen(std::string const& screenName) {
 	for (auto& screen : items) {
-		if (util::toLower(screenName) == util::toLower(screen->getName())) {
+		if (util::ToLower(screenName) == util::ToLower(screen->getName())) {
 			this->activeScreen = screen;
 			this->activeScreen->setActive(true);
 			return true;

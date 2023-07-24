@@ -84,13 +84,13 @@ bool CommandManager::runCommand(std::string const& line) {
 						bool result = cmd->execute(newArgs[0], args);
 						if (!result) {
 							// TODO: Send message
-							Latite::get().getClientMessageSink().push(util::format("&cUsage: " + prefix + newArgs[0] + " " + cmd->getUsage()));
+							Latite::get().getClientMessageSink().push(util::Format("&cUsage: " + prefix + newArgs[0] + " " + cmd->getUsage()));
 						}
 						return result;
 					}
 					catch (std::exception& e) {
 						Logger::Warn("An unhandled exception occured while running this command: {}", e.what());
-						Latite::get().getClientMessageSink().push(util::format(std::string("&cAn unhandled exception occured while running this command: ") + e.what()));
+						Latite::get().getClientMessageSink().push(util::Format(std::string("&cAn unhandled exception occured while running this command: ") + e.what()));
 						return false;
 					}
 				}
@@ -101,6 +101,6 @@ bool CommandManager::runCommand(std::string const& line) {
 		return false;
 	}
 
-	Latite::get().getClientMessageSink().push(util::format("&cUnknown command: " + (newArgs.empty() ? "" : newArgs[0]) + "."));
+	Latite::get().getClientMessageSink().push(util::Format("&cUnknown command: " + (newArgs.empty() ? "" : newArgs[0]) + "."));
 	return false;
 }

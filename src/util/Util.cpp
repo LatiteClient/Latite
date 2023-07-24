@@ -28,7 +28,7 @@ std::filesystem::path util::GetLatitePath() {
 	return GetRoamingPath()/"LatiteRecode";
 }
 
-std::wstring util::strToWstr(std::string const& s) {
+std::wstring util::StrToWStr(std::string const& s) {
 	int slength = static_cast<int>(s.length()) + 1;
 	int len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
 	wchar_t* buf = new wchar_t[len];
@@ -38,7 +38,7 @@ std::wstring util::strToWstr(std::string const& s) {
 	return r;
 }
 
-std::string util::wstrToStr(std::wstring const& ws) {
+std::string util::WStrToStr(std::wstring const& ws) {
 	int len = WideCharToMultiByte(CP_ACP, 0, ws.c_str(), static_cast<int>(ws.size() + 1), 0, 0, 0, 0);
 	char* buf = new char[len];
 	WideCharToMultiByte(CP_ACP, 0, ws.c_str(), static_cast<int>(ws.size() + 1), buf, len, 0, 0);
@@ -47,7 +47,7 @@ std::string util::wstrToStr(std::wstring const& ws) {
 	return r;
 }
 
-std::string util::format(std::string const& s) {
+std::string util::Format(std::string const& s) {
 	std::string out;
 
 	for (auto& ch : s) {
@@ -60,7 +60,7 @@ std::string util::format(std::string const& s) {
 	return out;
 }
 
-std::string util::toLower(std::string const& s) {
+std::string util::ToLower(std::string const& s) {
 	std::string ret = s;
 	std::transform(ret.begin(), ret.end(), ret.begin(), [](char c) {
 		return c + (char)20;
@@ -68,7 +68,7 @@ std::string util::toLower(std::string const& s) {
 	return ret;
 }
 
-std::string util::toUpper(std::string const& s) {
+std::string util::ToUpper(std::string const& s) {
 	std::string ret = s;
 	std::transform(ret.begin(), ret.end(), ret.begin(), [](char c) {
 		return c - (char)20;
@@ -76,7 +76,7 @@ std::string util::toUpper(std::string const& s) {
 	return ret;
 }
 
-std::vector<std::string> util::splitString(std::string const& s, char delim) {
+std::vector<std::string> util::SplitString(std::string const& s, char delim) {
 	std::vector<std::string> ret = {};
 	std::string word = "";
 

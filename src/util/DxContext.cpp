@@ -89,7 +89,7 @@ void DXContext::setFont(Renderer::FontSelection font)  {
 
 void DXContext::drawText(RectF const& rc, std::string const& text, d2d::Color const& color, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment)  {
 	brush->SetColor(color.get());
-	auto ws = util::strToWstr(text);
+	auto ws = util::StrToWStr(text);
 	IDWriteTextLayout* layout;
 	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
 		currentFormat, rc.getWidth(), rc.getHeight(),
