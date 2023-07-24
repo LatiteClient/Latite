@@ -21,7 +21,7 @@ struct AABB final {
 	constexpr AABB(Vec3 lower, Vec3 higher) : lower(lower), higher(higher) {}
 };
 
-struct Color final {
+struct Color {
 	float r, g, b, a;
 
 	constexpr Color(float r, float g, float b, float a = 1.f) : r(r), g(g), b(b), a(a) {}

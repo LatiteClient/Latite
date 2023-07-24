@@ -3,12 +3,13 @@
 #include <fstream>
 #include <functional>
 #include <string>
+#include "chakra/ChakraCore.h"
 
 class JsScript final {
 public:
-	//JsContextRef ctx;
-	//JsSourceContext sCtx = 1;
-	//JsRuntimeHandle runtime;
+	JsContextRef ctx;
+	JsSourceContext sCtx = 1;
+	JsRuntimeHandle runtime;
 	std::string runError = "";
 
 	std::wstring indexPath;
@@ -16,7 +17,7 @@ public:
 	std::wifstream indexStream;
 	std::wstring loadedScript;
 
-	//std::vector<JsValueRef> ownedEvents;
+	std::vector<JsValueRef> ownedEvents;
 	//std::vector<std::shared_ptr<JsLibrary>> libraries;
 
 	struct ScriptDefinedData {
@@ -25,4 +26,6 @@ public:
 		std::wstring author;
 		std::wstring description;
 	} data;
+
+	JsScript(std::wstring const& indexPath);
 };

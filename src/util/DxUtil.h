@@ -33,19 +33,19 @@ template <class T> void SafeRelease(T** ppT) {
 		*ppT = NULL;
 	}
 }
+using OColor = Color;
 
 namespace d2d {
-	class Color {
+
+	class Color : public ::Color {
 	public:
-		float r, g, b, a;
+		Color(float r, float g, float b, float a = 1.f) : ::Color(r, g, b, a) {};
 
-		Color(float r, float g, float b, float a = 1.f) : r(r), g(g), b(b), a(a) {};
+		Color() : ::Color(0.f, 0.f, 0.f, 1.f) {};
 
-		Color() : r(0.f), g(0.f), b(0.f), a(1.f) {};
+		Color(D2D1::ColorF col) : ::Color(col.r, col.g, col.b, col.a) {}
 
-		Color(D2D1::ColorF col) : r(col.r), g(col.g), b(col.b), a(col.a) {}
-
-		Color(D2D1::ColorF::Enum e) {
+		Color(D2D1::ColorF::Enum e) : ::Color(0.f, 0.f, 0.f, 0.f) {
 			D2D1::ColorF col = D2D1::ColorF(e);
 			a = col.a;
 			r = col.r;

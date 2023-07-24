@@ -20,8 +20,7 @@ bool ScreenManager::showScreen(std::string const& screenName) {
 	return false;
 }
 
-bool ScreenManager::tryToggleScreen(std::string const& screenName)
-{
+bool ScreenManager::tryToggleScreen(std::string const& screenName) {
 	if (!this->activeScreen) {
 		return showScreen(screenName);
 	}

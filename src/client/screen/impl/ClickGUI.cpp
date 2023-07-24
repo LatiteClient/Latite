@@ -84,12 +84,12 @@ void ClickGUI::onRender(Event&) {
 
 	// Shadow effect stuff
 	auto shadowEffect = Latite::getRenderer().getShadowEffect();
-	shadowEffect->SetValue(D2D1_SHADOW_PROP_COLOR, D2D1::Vector4F(0.f, 0.f, 0.f, 0.1f));
+	//shadowEffect->SetValue(D2D1_SHADOW_PROP_COLOR, D2D1::Vector4F(0.f, 0.f, 0.f, 0.1f));
 	auto affineTransformEffect = Latite::getRenderer().getAffineTransformEffect();
 
-	D2D1::Matrix3x2F mat = D2D1::Matrix3x2F::Translation(10.f * adaptedScale, 10.f * adaptedScale);
-	affineTransformEffect->SetInputEffect(0, shadowEffect);
-	affineTransformEffect->SetValue(D2D1_2DAFFINETRANSFORM_PROP_TRANSFORM_MATRIX, mat);
+	//D2D1::Matrix3x2F mat = D2D1::Matrix3x2F::Translation(10.f * adaptedScale, 5.f * adaptedScale);
+	//affineTransformEffect->SetInputEffect(0, shadowEffect);
+	//affineTransformEffect->SetValue(D2D1_2DAFFINETRANSFORM_PROP_TRANSFORM_MATRIX, mat);
 	// Shadow effect bitmap
 	auto myBitmap = rend.getBitmap();
 	//
@@ -130,7 +130,7 @@ void ClickGUI::onRender(Event&) {
 
 		// Latite Text
 		dc.setFont(FontSelection::Light);
-		dc.drawText({ logoRect.right + 9.f * adaptedScale, logoRect.top + 3.f, logoRect.right + 500.f, logoRect.top + 50.f * adaptedScale }, "Latite Client", d2d::Color(1.f, 1.f, 1.f, 1.f), 25.f * adaptedScale, DWRITE_TEXT_ALIGNMENT_LEADING);
+		dc.drawText({ logoRect.right + 9.f * adaptedScale, logoRect.top + 3.f * adaptedScale, logoRect.right + 500.f, logoRect.top + 50.f * adaptedScale }, "Latite Client", d2d::Color(1.f, 1.f, 1.f, 1.f), 25.f * adaptedScale, DWRITE_TEXT_ALIGNMENT_LEADING);
 	}
 	// Search Bar + tabs 
 	RectF searchRect{};

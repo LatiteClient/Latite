@@ -1,6 +1,8 @@
 #pragma once
 #include "chakra/ChakraCore.h"
 #include "util.h"
+#include "DxUtil.h"
+#include "LMath.h"
 
 // this is needed because we can't "link" ChakraCore with this DLL, as the path wouldn't be specified
 #define FUNC(name) using _Type_ ## name = decltype(&name); inline static _Type_ ## name  name = (_Type_ ## name)Chakra::pass(#name)
@@ -56,10 +58,10 @@ public:
 	static JsValueRef GetTrue();
 	static JsValueRef GetFalse();
 	static JsValueRef GetNull();
-	//static RectF GetRectFromJs(JsValueRef obj);
-	//static Vec2 GetVec2FromJs(JsValueRef obj);
-	//static Vec3 GetVec3FromJs(JsValueRef obj);
-	//static mc::Color GetColorFromJs(JsValueRef obj);
+	static d2d::Rect GetRectFromJs(JsValueRef obj);
+	static Vec2 GetVec2FromJs(JsValueRef obj);
+	static Vec3 GetVec3FromJs(JsValueRef obj);
+	static d2d::Color GetColorFromJs(JsValueRef obj);
 };
 
 class JS {
