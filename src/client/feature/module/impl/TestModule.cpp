@@ -11,6 +11,6 @@ TestModule::TestModule() : Module("TestModule", "TestModule", "Module for testin
 
 void TestModule::onTick(Event&) {
 	//auto& even = reinterpret_cast<TickEvent&>(ev);
-	Logger::info("TestModule onTick");
+	Logger::Info("TestModule onTick");
 }
 

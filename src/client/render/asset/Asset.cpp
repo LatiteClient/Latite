@@ -5,7 +5,7 @@ Asset::Asset(std::wstring const& relPath) : relPath(relPath) {
 }
 
 void Asset::load(IWICImagingFactory* factory, ID2D1DeviceContext* dc) {
-	auto path = util::getLatitePath() / "Assets" / relPath;
+	auto path = util::GetLatitePath() / "Assets" / relPath;
 
 	ComPtr<IWICBitmapDecoder> pDecoder = NULL;
 

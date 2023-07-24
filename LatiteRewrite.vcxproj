@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -308,7 +308,7 @@
     <ClInclude Include="src\sdk\common\client\renderer\LevelRenderer.h" />
     <ClInclude Include="src\sdk\common\client\renderer\LevelRendererPlayer.h" />
     <ClInclude Include="src\sdk\common\client\win\winrt\HidControllerWinRT.h" />
-    <ClInclude Include="src\sdk\common\entity\EntityContext.h" />
+    <ClInclude Include="src\sdk\common\client\win\entity\EntityContext.h" />
     <ClInclude Include="src\sdk\common\network\RakNetConnector.h" />
     <ClInclude Include="src\sdk\common\server\ServerInstance.h" />
     <ClInclude Include="src\sdk\common\world\actor\Actor.h" />
@@ -384,6 +384,7 @@
     <ClCompile Include="src\client\render\Renderer.cpp" />
     <ClCompile Include="src\client\screen\impl\ClickGUI.cpp" />
     <ClCompile Include="src\client\screen\ScreenManager.cpp" />
+    <ClCompile Include="src\client\script\JsScript.cpp" />
     <ClCompile Include="src\pch.cpp">
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MultiProcessorCompilation>
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MultiProcessorCompilation>
@@ -394,6 +395,7 @@
     <ClCompile Include="src\sdk\common\client\renderer\LevelRendererPlayer.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp" />
     <ClCompile Include="src\sdk\common\world\Minecraft.cpp" />
+    <ClCompile Include="src\util\ChakraUtil.cpp" />
     <ClCompile Include="src\util\DxContext.cpp" />
     <ClCompile Include="src\util\DxUtil.cpp" />
     <ClCompile Include="src\util\Logger.cpp" />

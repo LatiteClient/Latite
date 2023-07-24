@@ -60,11 +60,11 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (eventing) Eventing();
     new (latiteBuf) Latite;
 
-    std::filesystem::create_directory(util::getLatitePath());
-    std::filesystem::create_directory(util::getLatitePath() / "Assets");
-    Logger::setup();
+    std::filesystem::create_directory(util::GetLatitePath());
+    std::filesystem::create_directory(util::GetLatitePath() / "Assets");
+    Logger::Setup();
 
-    Logger::info("Loading assets");
+    Logger::Info("Loading assets");
     // ... init assets
 
     //
@@ -84,7 +84,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         gameVersion = ss.str();
     }
 #if LATITE_DEBUG
-    Logger::info("Resolving signatures..");
+    Logger::Info("Resolving signatures..");
 #endif
 
 
@@ -149,7 +149,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         if (!entry.first->mod) continue;
         auto res = entry.first->resolve();
         if (!res) {
-            Logger::warn("Signature {} failed to resolve! Pattern: {}", entry.first->name, entry.first->signature);
+            Logger::Warn("Signature {} failed to resolve! Pattern: {}", entry.first->name, entry.first->signature);
             deadCount++;
         }
         else {
@@ -159,10 +159,10 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         }
     }
 #if LATITE_DEBUG
-    Logger::info("Resolved {} signatures ({} dead)", sigCount, deadCount);
+    Logger::Info("Resolved {} signatures ({} dead)", sigCount, deadCount);
 #endif
 
-    Logger::info("Waiting for game to load..");
+    Logger::Info("Waiting for game to load..");
 
     while (!sdk::ClientInstance::get()) {
     }
@@ -170,13 +170,13 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     Latite::get().initialize(dll);
 
     if (!Latite::getConfigManager().loadMaster()) {
-        Logger::fatal("Could not load master config!");
+        Logger::Fatal("Could not load master config!");
     }
     else {
-        Logger::info("Loaded master config");
+        Logger::Info("Loaded master config");
     }
 
-    Logger::info("Initialized Latite Client");
+    Logger::Info("Initialized Latite Client");
     return 0ul;
 }
 
@@ -271,9 +271,9 @@ void Latite::queueEject() noexcept {
 void Latite::initialize(HINSTANCE hInst) {
     this->dllInst = hInst;
     getHooks().init();
-    Logger::info("Initialized Hooks");
+    Logger::Info("Initialized Hooks");
     getHooks().enable();
-    Logger::info("Enabled Hooks");
+    Logger::Info("Enabled Hooks");
 
     // TODO: use UpdateEvent
     Latite::getEventing().listen<RenderGameEvent>(this, (EventListenerFunc)&Latite::onUpdate, 1);
@@ -300,7 +300,7 @@ void Latite::onKey(Event& evGeneric) {
     auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
     if (ev.getKey() == VK_END && ev.isDown()) {
         this->queueEject();
-        Logger::info("Uninject key pressed");
+        Logger::Info("Uninject key pressed");
 
         return;
     }

@@ -13,7 +13,7 @@ public:
 	inline static HMODULE mod = 0;
 
 	static FARPROC pass(const char* name) {
-		if (!mod) mod = LoadLibraryW((util::getLatitePath()/"Assets"/"ChakraCore.dll").wstring().c_str());
+		if (!mod) mod = LoadLibraryW((util::GetLatitePath()/"Assets"/"ChakraCore.dll").wstring().c_str());
 		if (!mod) {
 			MessageBoxA(NULL, "Assets\\ChakraCore.dll could not be found!", "Error", MB_ICONERROR | MB_OK);
 			exit(1);
@@ -37,31 +37,42 @@ public:
 		}
 	};
 
+	// Off-naming convention, but i'm not renaming everything
+
 	static void SetPropertyString(JsValueRef ref, std::wstring name, std::wstring value, bool strict = false);
 	static void SetPropertyNumber(JsValueRef ref, std::wstring name, double value, bool strict = false);
 	static void SetPropertyBool(JsValueRef ref, std::wstring name, bool value, bool strict = false);
 	static void DefineFunc(JsValueRef obj, JsNativeFunction func, std::wstring name, void* state = nullptr);
 	static std::wstring GetTypeName(JsValueType type);
 
+	static JsValueRef MakeString(std::wstring const& ws);
+	static JsValueRef MakeInt(int num);
+	static JsValueRef MakeDouble(double num);
+
 	static std::wstring GetStringProperty(JsValueRef ref, std::wstring name);
 	static bool GetBoolProperty(JsValueRef ref, std::wstring name);
 	static double GetNumberProperty(JsValueRef ref, std::wstring name);
-	static std::wstring ToString(JsValueRef ref);
-	static std::wstring GetString(JsValueRef ref);
 	static double GetNumber(JsValueRef ref);
+	static int GetIntProperty(JsValueRef ref, std::wstring name);
+	static int GetInt(JsValueRef ref);
 	static bool GetBool(JsValueRef ref);
-	static Result VerifyParameters(std::initializer_list<ParamContainer> params);
-	static Result VerifyArgCount(unsigned short has, unsigned short expected, bool autoThrow = true);
-	static void ThrowError(std::wstring message);
-	static void Release(JsValueRef ref);
-	static JsValueRef GetUndefined();
-	static JsValueRef GetTrue();
-	static JsValueRef GetFalse();
-	static JsValueRef GetNull();
+	static std::wstring GetString(JsValueRef ref);
+
 	static d2d::Rect GetRectFromJs(JsValueRef obj);
 	static Vec2 GetVec2FromJs(JsValueRef obj);
 	static Vec3 GetVec3FromJs(JsValueRef obj);
 	static d2d::Color GetColorFromJs(JsValueRef obj);
+
+	static JsValueRef GetUndefined();
+	static JsValueRef GetTrue();
+	static JsValueRef GetFalse();
+	static JsValueRef GetNull();
+
+	static std::wstring ToString(JsValueRef ref);
+	static Result VerifyParameters(std::initializer_list<ParamContainer> params, bool autoThrow = true);
+	static Result VerifyArgCount(unsigned short has, unsigned short expected, bool autoThrow = true);
+	static void ThrowError(std::wstring message);
+	static void Release(JsValueRef ref);
 };
 
 class JS {

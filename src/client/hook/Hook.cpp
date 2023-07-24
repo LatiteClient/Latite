@@ -16,7 +16,7 @@ Hook::Hook(uintptr_t target, void* detour, std::string const& hookName, bool tab
 
 	MH_STATUS res = MH_CreateHook(reinterpret_cast<LPVOID>(target), detour, &this->funcPtr);
 	if (res != MH_OK) {
-		Logger::warn("Creation of hook {} failed with status {}", this->funcName, MH_StatusToString(res));
+		Logger::Warn("Creation of hook {} failed with status {}", this->funcName, MH_StatusToString(res));
 	}
 }
 

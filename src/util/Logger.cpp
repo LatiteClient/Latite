@@ -4,13 +4,13 @@
 #include "client/Latite.h"
 #include "client/misc/ClientMessageSink.h"
 
-void Logger::setup() {
-	auto path = util::getLatitePath();
+void Logger::Setup() {
+	auto path = util::GetLatitePath();
 	std::filesystem::create_directory(path / "Logs");
     std::filesystem::remove(path / "Logs" / "latest.log");
 }
 
-void Logger::logInternal(Level level, std::string str) {
+void Logger::LogInternal(Level level, std::string str) {
     std::time_t t = std::time(0);   // get time now
     std::tm now;
     localtime_s(&now, &t);
@@ -40,7 +40,7 @@ void Logger::logInternal(Level level, std::string str) {
 
     std::string pref = time.str() + " [" + prefix + "] ";
     std::string mstr = pref + str + "\n";
-    auto path = util::getLatitePath();
+    auto path = util::GetLatitePath();
     auto logPath = path / "Logs" / "latest.log";
 
     std::ofstream ofs;

@@ -1,7 +1,7 @@
 #include "Util.h"
 #include "pch.h"
 
-std::filesystem::path util::getRootPath() {
+std::filesystem::path util::GetRootPath() {
 	char* env;
 	size_t size;
 	if (!_dupenv_s(&env, &size, "localappdata") && env) {
@@ -12,7 +12,7 @@ std::filesystem::path util::getRootPath() {
 	return std::wstring();
 }
 
-std::filesystem::path util::getRoamingPath() {
+std::filesystem::path util::GetRoamingPath() {
 	char* env;
 	size_t size;
 	if (!_dupenv_s(&env, &size, "localappdata") && env) {
@@ -23,9 +23,9 @@ std::filesystem::path util::getRoamingPath() {
 	return std::wstring();
 }
 
-std::filesystem::path util::getLatitePath() {
+std::filesystem::path util::GetLatitePath() {
 	// TODO: Rename to Latite
-	return getRoamingPath()/"LatiteRecode";
+	return GetRoamingPath()/"LatiteRecode";
 }
 
 std::wstring util::strToWstr(std::string const& s) {

@@ -114,6 +114,25 @@ double Chakra::GetNumber(JsValueRef ref) {
 	return db;
 }
 
+int Chakra::GetIntProperty(JsValueRef ref, std::wstring name) {
+	JsPropertyIdRef nameId;
+	JS::JsGetPropertyIdFromName(name.c_str(), &nameId);
+
+	JsValueRef val;
+	JS::JsGetProperty(ref, nameId, &val);
+
+	int b;
+	JS::JsNumberToInt(val, &b);
+	Release(val);
+	return b;
+}
+
+int Chakra::GetInt(JsValueRef ref) {
+	int num;
+	JS::JsNumberToInt(ref, &num);
+	return num;
+}
+
 bool Chakra::GetBool(JsValueRef ref) {
 	bool b;
 	JS::JsBooleanToBool(ref, &b);
@@ -147,10 +166,10 @@ d2d::Color Chakra::GetColorFromJs(JsValueRef obj) {
 	JsValueRef two;
 	JsValueRef three;
 
-	JS::JsDoubleToNumber(0.0, &zero);
-	JS::JsDoubleToNumber(1.0, &one);
-	JS::JsDoubleToNumber(2.0, &two);
-	JS::JsDoubleToNumber(3.0, &three);
+	JS::JsIntToNumber(0, &zero);
+	JS::JsIntToNumber(1, &one);
+	JS::JsIntToNumber(2, &two);
+	JS::JsIntToNumber(3, &three);
 
 	JsValueRef z;
 	JsValueRef o;
@@ -180,7 +199,7 @@ d2d::Color Chakra::GetColorFromJs(JsValueRef obj) {
 	return col;
 }
 
-Chakra::Result Chakra::VerifyParameters(std::initializer_list<ParamContainer> params) {
+Chakra::Result Chakra::VerifyParameters(std::initializer_list<ParamContainer> params, bool autoThrow) {
 	size_t count = 0;
 	for (auto const& param : params) {
 		count++;
@@ -188,6 +207,10 @@ Chakra::Result Chakra::VerifyParameters(std::initializer_list<ParamContainer> pa
 		JS::JsGetValueType(param.val, &trueType);
 		if (trueType != param.type) {
 			std::wstring wstr = L"Parameter " + std::to_wstring(count) + L" must be of correct type (has " + Chakra::GetTypeName(trueType) + L", needs " + Chakra::GetTypeName(param.type) + L")";
+			if (autoThrow) {
+				ThrowError(wstr);
+			}
+
 			return { false,wstr };
 		}
 	}
@@ -222,7 +245,7 @@ JsValueRef Chakra::GetUndefined() {
 
 Chakra::Result Chakra::VerifyArgCount(unsigned short has, unsigned short expected, bool autoThrow) {
 	if (has != expected) {
-		auto ws = L"Argument count must be " + std::to_wstring(expected - 1);
+		auto ws = L"Function does not take " + std::to_wstring(expected - 1) + L" arguments";
 		if (autoThrow) Chakra::ThrowError(ws);
 		return { false, ws };
 	}
@@ -266,4 +289,23 @@ std::wstring Chakra::GetTypeName(JsValueType type) {
 	default:
 		return L"<other type>";
 	}
+}
+
+JsValueRef Chakra::MakeString(std::wstring const& ws) {
+	JsValueRef str;
+	JS::JsCreateStringUtf16(reinterpret_cast<const uint16_t*>(ws.c_str()), ws.size(), &str);
+	return str;
+}
+
+JsValueRef Chakra::MakeInt(int num) {
+	JsValueRef val;
+	JS::JsIntToNumber(num, &val);
+	return val;
+}
+
+JsValueRef Chakra::MakeDouble(double num)
+{
+	JsValueRef val;
+	JS::JsDoubleToNumber(num, &val);
+	return val;
 }

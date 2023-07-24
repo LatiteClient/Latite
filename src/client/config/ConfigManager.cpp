@@ -5,7 +5,7 @@
 #include "client/feature/module/ModuleManager.h"
 
 ConfigManager::ConfigManager() {
-	auto folder = util::getLatitePath() / "Configs";
+	auto folder = util::GetLatitePath() / "Configs";
 	std::filesystem::create_directory(folder);
 	auto path = folder / "default.json";
 	masterConfig = std::make_shared<Config>(path);
@@ -32,7 +32,7 @@ bool ConfigManager::load(std::shared_ptr<Config> cfg) {
 		else {
 			auto mod = Latite::getModuleManager().find(item->name());
 			if (!mod) {
-				Logger::warn("Could not find {} as module in config", item->name());
+				Logger::Warn("Could not find {} as module in config", item->name());
 			}
 			else {
 				mod->loadConfig(*item.get());

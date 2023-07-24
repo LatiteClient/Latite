@@ -10,26 +10,26 @@ namespace Logger {
         Fatal
     };
 
-	extern void setup();
+	extern void Setup();
 
-    extern std::filesystem::path getLogPath();
-    extern void logInternal(Level level, std::string str);
+    extern std::filesystem::path GetLogPath();
+    extern void LogInternal(Level level, std::string str);
 
     template<typename... Args>
-    extern inline void info(std::string_view fmt, Args&&... args) {
+    extern inline void Info(std::string_view fmt, Args&&... args) {
         std::string fm = std::vformat(fmt, std::make_format_args(args...));
-        logInternal(Level::Info, fm);
+        LogInternal(Level::Info, fm);
 	}
 
     template<typename... Args>
-    extern inline void warn(std::string_view fmt, Args&&... args) {
+    extern inline void Warn(std::string_view fmt, Args&&... args) {
         std::string fm = std::vformat(fmt, std::make_format_args(args...));
-        logInternal(Level::Warn, fm);
+        LogInternal(Level::Warn, fm);
     }
 
     template<typename... Args>
-    extern inline void fatal(std::string_view fmt, Args&&... args) {
+    extern inline void Fatal(std::string_view fmt, Args&&... args) {
         std::string fm = std::vformat(fmt, std::make_format_args(args...));
-        logInternal(Level::Fatal, fm);
+        LogInternal(Level::Fatal, fm);
     }
 }

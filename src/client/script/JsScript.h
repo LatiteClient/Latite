@@ -28,4 +28,15 @@ public:
 	} data;
 
 	JsScript(std::wstring const& indexPath);
+	bool load();
+	
+	void loadPrototypes();
+	void loadScriptObjects();
+	void fetchScriptData();
+	void unload();
+	void handleAsyncOperations();
+
+	JsErrorCode runScript();
+
+	~JsScript() { if (runtime != JS_INVALID_RUNTIME_HANDLE) unload(); }
 };

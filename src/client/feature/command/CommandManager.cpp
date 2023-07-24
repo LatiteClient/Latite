@@ -89,7 +89,7 @@ bool CommandManager::runCommand(std::string const& line) {
 						return result;
 					}
 					catch (std::exception& e) {
-						Logger::warn("An unhandled exception occured while running this command: {}", e.what());
+						Logger::Warn("An unhandled exception occured while running this command: {}", e.what());
 						Latite::get().getClientMessageSink().push(util::format(std::string("&cAn unhandled exception occured while running this command: ") + e.what()));
 						return false;
 					}

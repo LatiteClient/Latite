@@ -18,13 +18,13 @@ bool Renderer::init(IDXGISwapChain* chain) {
 	if (!gameDevice11.Get() || !gameDevice12.Get()) {
 		if (FAILED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12)))) {
 			ThrowIfFailed(chain->GetDevice(IID_PPV_ARGS(&gameDevice11)));
-			Logger::info("Using DX11");
+			Logger::Info("Using DX11");
 			d3dDevice = gameDevice11.Get();
 			d3dDevice->GetImmediateContext(d3dCtx.GetAddressOf());
 			bufferCount = 1;
 		}
 		else {
-			Logger::info("Using DX12");
+			Logger::Info("Using DX12");
 			bufferCount = 3;
 		}
 	}
