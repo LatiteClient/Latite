@@ -4,6 +4,8 @@
 
 Assets::Assets() {
 	allAssets.push_back(&this->latiteLogo);
+	allAssets.push_back(&this->searchIcon);
+	allAssets.push_back(&this->arrowIcon);
 }
 
 void Assets::loadAll() {

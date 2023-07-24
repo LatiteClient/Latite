@@ -22,6 +22,10 @@ public:
 		}
 		return nullptr;
 	}
+
+	[[nodiscard]] size_t size() {
+		return this->items.size();
+	}
 protected:
 	static_assert(std::is_convertible<T*, Feature*>::value, "T must inherit Feature as public");
 };

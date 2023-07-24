@@ -9,7 +9,7 @@ TestModule::TestModule() : Module("TestModule", "TestModule", "Module for testin
 	this->listen<TickEvent>(&TestModule::onTick);
 }
 
-void TestModule::onTick(Event& ev) {
+void TestModule::onTick(Event&) {
 	//auto& even = reinterpret_cast<TickEvent&>(ev);
 	Logger::info("TestModule onTick");
 }

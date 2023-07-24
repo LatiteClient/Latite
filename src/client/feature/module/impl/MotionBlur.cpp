@@ -22,7 +22,7 @@ void MotionBlur::onRender(Event& genericEv) {
 	mbBitmap = Latite::getRenderer().copyCurrentBitmap();
 }
 
-void MotionBlur::onCleanup(Event& genericEv) {
+void MotionBlur::onCleanup(Event&) {
 	//auto& ev = reinterpret_cast<RendererCleanupEvent&>(genericEv);
 	if (mbBitmap) {
 		SafeRelease(&mbBitmap);

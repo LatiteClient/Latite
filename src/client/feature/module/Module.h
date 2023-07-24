@@ -5,7 +5,8 @@
 
 class Module : public IModule {
 public:
-	explicit Module(std::string const& name, std::string const& displayName, std::string const& description) : IModule(name, description, displayName) {}
+	explicit Module(std::string const& name, std::string const& displayName, std::string const& description,
+		bool visible = true) : IModule(name, description, displayName, visible) {}
 
 	template <typename Event, typename Listener>
 	void listen(Listener listener, bool callWhenInactive = false, int priority = 0) {

@@ -10,6 +10,7 @@
 #include "client/event/impl/RenderGameEvent.h"
 #include "client/event/impl/KeyUpdateEvent.h"
 #include "client/event/impl/ChatEvent.h"
+#include "client/event/impl/ClickEvent.h"
 
 #include "api/memory/memory.h"
 
@@ -18,6 +19,7 @@ namespace {
 	std::shared_ptr<Hook> ChatScreenController_sendChatMesageHook;
 	std::shared_ptr<Hook> GameRenderer_renderCurrentFrameHook;
 	std::shared_ptr<Hook> Keyboard_feedHook;
+	std::shared_ptr<Hook> OnClickHook;
 }
 
 void GenericHooks::Level_tick(sdk::Level* level) {
@@ -57,6 +59,12 @@ void GenericHooks::Keyboard_feed(int key, bool isDown) {
 	return Keyboard_feedHook->oFunc<decltype(&Keyboard_feed)>()(key, isDown);
 }
 
+void GenericHooks::onClick(ClickMap* map, char clickType, char isDownWheelDelta, uintptr_t a4, int16_t a5, int16_t a6, int16_t a7, char a8) {
+	ClickEvent ev{ clickType, isDownWheelDelta };
+	if (Eventing::get().dispatchEvent(ev)) return;
+	return OnClickHook->oFunc<decltype(&onClick)>()(map, clickType, isDownWheelDelta, a4, a5, a6, a7, a8);
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	Level_tickHook = addHook(Signatures::Level_tick.result,
 		Level_tick, "Level::tick");
@@ -68,4 +76,6 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 		GameRenderer_renderCurrentFrame, "GameRenderer::_renderCurrentFrame");
 
 	Keyboard_feedHook = addHook(Signatures::Keyboard_feed.result, Keyboard_feed, "Keyboard::feed");
+
+	OnClickHook = addHook(Signatures::onClick.result, onClick, "onClick");
 }

@@ -8,7 +8,9 @@ public:
 	Assets(Assets&) = delete;
 	Assets(Assets&&) = delete;
 
-	Asset latiteLogo{L"logo.png"};
+	Asset latiteLogo{ L"logo.png" };
+	Asset searchIcon{ L"searchicon.png" };
+	Asset arrowIcon{ L"arrow.png" };
 
 	void loadAll();
 	void unloadAll();

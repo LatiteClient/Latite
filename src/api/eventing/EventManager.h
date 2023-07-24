@@ -14,7 +14,7 @@ public:
 
 		std::sort(listeners.begin(), listeners.end(), [](std::pair<uint32_t, EventListener> const& left,
 			std::pair<uint32_t, EventListener> const& right) {
-				return right.second.priority > left.second.priority;
+				return left.second.priority > right.second.priority;
 			});
 
 		for (auto& pair : listeners) {

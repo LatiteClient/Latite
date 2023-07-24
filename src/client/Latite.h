@@ -25,6 +25,7 @@ public:
 	void onUpdate(class Event& ev);
 	void onKey(class Event& ev);
 	void onRendererInit(class Event& ev);
+	void onFocusLost(class Event& ev);
 	void loadConfig(class SettingGroup& resolvedGroup);
 
 	Latite() = default;

@@ -253,6 +253,8 @@
     <ClInclude Include="src\api\scanner\scanner.h" />
     <ClInclude Include="src\client\config\ConfigManager.h" />
     <ClInclude Include="src\client\event\impl\ChatEvent.h" />
+    <ClInclude Include="src\client\event\impl\ClickEvent.h" />
+    <ClInclude Include="src\client\event\impl\FocusLostEvent.h" />
     <ClInclude Include="src\client\event\impl\RendererCleanupEvent.h" />
     <ClInclude Include="src\client\event\impl\RendererInitEvent.h" />
     <ClInclude Include="src\client\event\impl\GammaEvent.h" />
@@ -276,6 +278,7 @@
     <ClInclude Include="src\client\feature\module\Module.h" />
     <ClInclude Include="src\client\hook\Hook.h" />
     <ClInclude Include="src\client\hook\Hooks.h" />
+    <ClInclude Include="src\client\hook\impl\AppPlatformHooks.h" />
     <ClInclude Include="src\client\hook\impl\DXHooks.h" />
     <ClInclude Include="src\client\hook\impl\GeneralHooks.h" />
     <ClInclude Include="src\client\hook\impl\LevelRendererHooks.h" />
@@ -295,6 +298,8 @@
     <ClInclude Include="src\client\screen\ScreenManager.h" />
     <ClInclude Include="src\client\script\JsScript.h" />
     <ClInclude Include="src\client\script\ScriptManager.h" />
+    <ClInclude Include="src\sdk\deps\Application\AppPlatform.h" />
+    <ClInclude Include="src\sdk\misc\ClickMap.h" />
     <ClInclude Include="src\sdk\signature\storage.h" />
     <ClInclude Include="src\pch.h" />
     <ClInclude Include="src\sdk\common\client\game\ClientInstance.h" />
@@ -364,6 +369,7 @@
     <ClCompile Include="src\client\feature\module\Module.cpp" />
     <ClCompile Include="src\client\hook\Hook.cpp" />
     <ClCompile Include="src\client\hook\Hooks.cpp" />
+    <ClCompile Include="src\client\hook\impl\AppPlatformHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\DXHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\GeneralHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\LevelRendererHooks.cpp" />

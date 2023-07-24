@@ -141,6 +141,13 @@ public:
 		return newBitmap;
 	}
 
+	[[nodiscard]] void copyCurrentBitmap(ID2D1Bitmap1*& bmp) {
+		auto idx = swapChain4->GetCurrentBackBufferIndex();
+		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
+		[[maybe_unused]] auto hResult = bmp->CopyFromBitmap(nullptr, myBitmap, nullptr);
+		[[maybe_unused]] int test = 32;
+	}
+
 	[[nodiscard]] ID2D1Effect*& getShadowEffect() {
 		return *shadowEffect.GetAddressOf();
 	}
@@ -153,8 +160,7 @@ public:
 		return *blurEffect.GetAddressOf();
 	}
 
-	[[nodiscard]] ID2D1Bitmap1* getBitmap()
-	{
+	[[nodiscard]] ID2D1Bitmap1* getBitmap() {
 		auto buf = swapChain4->GetCurrentBackBufferIndex();
 		return this->renderTargets[buf];
 	}

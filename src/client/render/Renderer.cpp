@@ -155,7 +155,7 @@ void Renderer::render() {
 	RenderOverlayEvent ev{ d2dCtx.Get() };
 	Eventing::get().dispatchEvent(ev);
 
-	auto hr = d2dCtx->EndDraw();
+	d2dCtx->EndDraw();
 
 	if (gameDevice12) {
 		d3d11On12Device->ReleaseWrappedResources(&d3d11Targets[idx], 1);

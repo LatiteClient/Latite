@@ -15,6 +15,7 @@
 #include "event/impl/RenderGameEvent.h"
 #include "event/impl/KeyUpdateEvent.h"
 #include "event/impl/RendererInitEvent.h"
+#include "event/impl/FocusLostEvent.h"
 
 #include "sdk/signature/storage.h"
 
@@ -126,6 +127,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Level_tick),
         MVSIG(ChatScreenController_sendChatMessage),
         MVSIG(GameRenderer__renderCurrentFrame),
+        MVSIG(onClick),
+        MVSIG(AppPlatform__fireAppFocusLost),
             };
     
     new (mmgrBuf) ModuleManager;
@@ -133,9 +136,9 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (mainSettingGroup) SettingGroup("global");
     new (configMgrBuf) ConfigManager();
     new (hooks) LatiteHooks();
+    new (scnMgrBuf) ScreenManager(); // needs to be before renderer
     new (rendererBuf) Renderer();
     new (assetsBuf) Assets();
-    new (scnMgrBuf) ScreenManager();
 
     AuthWindow wnd{ Latite::get().dllInst };
 
@@ -276,6 +279,7 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getEventing().listen<RenderGameEvent>(this, (EventListenerFunc)&Latite::onUpdate, 1);
     Latite::getEventing().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Latite::onKey, 1);
     Latite::getEventing().listen<RendererInitEvent>(this, (EventListenerFunc)&Latite::onRendererInit, 1);
+    Latite::getEventing().listen<FocusLostEvent>(this, (EventListenerFunc)&Latite::onFocusLost, 1);
 }
 
 void Latite::threadsafeInit() {
@@ -301,7 +305,14 @@ void Latite::onKey(Event& evGeneric) {
         return;
     }
 
-    if (ev.getKey() == 'M' && ev.isDown()) {
+    if (ev.isDown() && ev.getKey() == VK_ESCAPE && Latite::getScreenManager().getActiveScreen()) {
+        Latite::getScreenManager().exitCurrentScreen();
+        ev.setCancelled(true);
+        return;
+    }
+
+    if ((ev.getKey() == 'M') && ev.isDown()) {
+        
         if (!ev.inUI() || Latite::getScreenManager().getActiveScreen()) {
             Latite::getScreenManager().tryToggleScreen("ClickGUI");
             ev.setCancelled(true);
@@ -310,9 +321,14 @@ void Latite::onKey(Event& evGeneric) {
     }
 }
 
-void Latite::onRendererInit(Event& ev) {
+void Latite::onRendererInit(Event&) {
     getAssets().unloadAll(); // should be safe even if we didn't load resources yet
     getAssets().loadAll();
+}
+
+void Latite::onFocusLost(Event& evGeneric) {
+    auto& ev = reinterpret_cast<FocusLostEvent&>(evGeneric);
+    if (Latite::getScreenManager().getActiveScreen()) ev.setCancelled(true);
 }
 
 void Latite::loadConfig(SettingGroup&) {
