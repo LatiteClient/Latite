@@ -10,6 +10,7 @@
 #include "impl/HelpCommand.h"
 #include "impl/EjectCommand.h"
 #include "impl/ToggleCommand.h"
+#include "impl/ScriptCommand.h"
 //
 
 CommandManager::CommandManager() {
@@ -19,6 +20,7 @@ CommandManager::CommandManager() {
 	this->items.push_back(std::make_shared<HelpCommand>());
 	this->items.push_back(std::make_shared<EjectCommand>());
 	this->items.push_back(std::make_shared<ToggleCommand>());
+	this->items.push_back(std::make_shared<ScriptCommand>());
 }
 
 bool CommandManager::runCommand(std::string const& line) {

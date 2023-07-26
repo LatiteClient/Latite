@@ -157,7 +157,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>LATITE_DEBUG;_NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
@@ -252,6 +252,7 @@
     <ClInclude Include="src\api\memory\signature\signature.h" />
     <ClInclude Include="src\api\scanner\scanner.h" />
     <ClInclude Include="src\client\config\ConfigManager.h" />
+    <ClInclude Include="src\client\event\impl\AppSuspendedEvent.h" />
     <ClInclude Include="src\client\event\impl\ChatEvent.h" />
     <ClInclude Include="src\client\event\impl\ClickEvent.h" />
     <ClInclude Include="src\client\event\impl\FocusLostEvent.h" />
@@ -268,6 +269,7 @@
     <ClInclude Include="src\api\config\ConfigManager.h" />
     <ClInclude Include="src\client\feature\command\impl\EjectCommand.h" />
     <ClInclude Include="src\client\feature\command\impl\HelpCommand.h" />
+    <ClInclude Include="src\client\feature\command\impl\ScriptCommand.h" />
     <ClInclude Include="src\client\feature\command\impl\TestCommand.h" />
     <ClInclude Include="src\client\event\Eventing.h" />
     <ClInclude Include="src\client\event\impl\TickEvent.h" />
@@ -282,6 +284,7 @@
     <ClInclude Include="src\client\hook\impl\DXHooks.h" />
     <ClInclude Include="src\client\hook\impl\GeneralHooks.h" />
     <ClInclude Include="src\client\hook\impl\LevelRendererHooks.h" />
+    <ClInclude Include="src\client\hook\impl\MinecraftGameHooks.h" />
     <ClInclude Include="src\client\hook\impl\OptionHooks.h" />
     <ClInclude Include="src\client\Latite.h" />
     <ClInclude Include="src\client\misc\AuthWindow.h" />
@@ -296,7 +299,13 @@
     <ClInclude Include="src\client\screen\impl\ClickGUI.h" />
     <ClInclude Include="src\client\screen\Screen.h" />
     <ClInclude Include="src\client\screen\ScreenManager.h" />
+    <ClInclude Include="src\client\script\event\ScriptListener.h" />
     <ClInclude Include="src\client\script\JsScript.h" />
+    <ClInclude Include="src\client\script\lib\JsLibrary.h" />
+    <ClInclude Include="src\client\script\lib\libraries\Filesystem.h" />
+    <ClInclude Include="src\client\script\lib\libraries\Network.h" />
+    <ClInclude Include="src\client\script\objects\ClientScriptingObject.h" />
+    <ClInclude Include="src\client\script\ScriptingObject.h" />
     <ClInclude Include="src\client\script\ScriptManager.h" />
     <ClInclude Include="src\sdk\deps\Application\AppPlatform.h" />
     <ClInclude Include="src\sdk\misc\ClickMap.h" />
@@ -308,7 +317,7 @@
     <ClInclude Include="src\sdk\common\client\renderer\LevelRenderer.h" />
     <ClInclude Include="src\sdk\common\client\renderer\LevelRendererPlayer.h" />
     <ClInclude Include="src\sdk\common\client\win\winrt\HidControllerWinRT.h" />
-    <ClInclude Include="src\sdk\common\client\win\entity\EntityContext.h" />
+    <ClInclude Include="src\sdk\common\entity\EntityContext.h" />
     <ClInclude Include="src\sdk\common\network\RakNetConnector.h" />
     <ClInclude Include="src\sdk\common\server\ServerInstance.h" />
     <ClInclude Include="src\sdk\common\world\actor\Actor.h" />
@@ -344,7 +353,7 @@
     <Text Include="src\client\hook\CMakeLists.txt" />
     <Text Include="src\client\misc\CMakeLists.txt" />
     <Text Include="src\client\feature\module\CMakeLists.txt" />
-    <Text Include="src\client\script\client\CMakeLists.txt" />
+    <Text Include="src\client\script\objects\CMakeLists.txt" />
     <Text Include="src\client\script\CMakeLists.txt" />
     <Text Include="src\CMakeLists.txt" />
     <Text Include="src\util\CMakeLists.txt" />
@@ -360,6 +369,7 @@
     <ClCompile Include="src\api\config\Config.cpp" />
     <ClCompile Include="src\client\feature\command\impl\EjectCommand.cpp" />
     <ClCompile Include="src\client\feature\command\impl\HelpCommand.cpp" />
+    <ClCompile Include="src\client\feature\command\impl\ScriptCommand.cpp" />
     <ClCompile Include="src\client\feature\command\impl\TestCommand.cpp" />
     <ClCompile Include="src\client\event\Eventing.cpp" />
     <ClCompile Include="src\client\feature\command\impl\ToggleCommand.cpp" />
@@ -373,6 +383,7 @@
     <ClCompile Include="src\client\hook\impl\DXHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\GeneralHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\LevelRendererHooks.cpp" />
+    <ClCompile Include="src\client\hook\impl\MinecraftGameHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\OptionHooks.cpp" />
     <ClCompile Include="src\client\Latite.cpp" />
     <ClCompile Include="src\client\misc\AuthWindow.cpp" />
@@ -384,7 +395,14 @@
     <ClCompile Include="src\client\render\Renderer.cpp" />
     <ClCompile Include="src\client\screen\impl\ClickGUI.cpp" />
     <ClCompile Include="src\client\screen\ScreenManager.cpp" />
+    <ClCompile Include="src\client\script\event\ScriptListener.cpp" />
     <ClCompile Include="src\client\script\JsScript.cpp" />
+    <ClCompile Include="src\client\script\lib\JsLibrary.cpp" />
+    <ClCompile Include="src\client\script\lib\libraries\Filesystem.cpp" />
+    <ClCompile Include="src\client\script\lib\libraries\Network.cpp" />
+    <ClCompile Include="src\client\script\objects\ClientScriptingObject.cpp" />
+    <ClCompile Include="src\client\script\ScriptingObject.cpp" />
+    <ClCompile Include="src\client\script\ScriptManager.cpp" />
     <ClCompile Include="src\pch.cpp">
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MultiProcessorCompilation>
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MultiProcessorCompilation>
@@ -394,6 +412,7 @@
     <ClCompile Include="src\sdk\common\client\game\MinecraftGame.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\LevelRendererPlayer.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp" />
+    <ClCompile Include="src\sdk\common\world\level\Level.cpp" />
     <ClCompile Include="src\sdk\common\world\Minecraft.cpp" />
     <ClCompile Include="src\util\ChakraUtil.cpp" />
     <ClCompile Include="src\util\DxContext.cpp" />

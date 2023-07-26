@@ -7,6 +7,7 @@
 #include "client/event/impl/ClickEvent.h"
 #include "client/render/Renderer.h"
 #include "client/Latite.h"
+#include "client/feature/module/Module.h"
 #include "client/feature/module/ModuleManager.h"
 #include "util/Util.h"
 #include "util/DxContext.h"
@@ -30,8 +31,11 @@ void ClickGUI::onRender(Event&) {
 	sdk::ClientInstance::get()->releaseCursor();
 	dc.ctx->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
+	Vec2& cursorPos = sdk::ClientInstance::get()->cursorPos;
+
 	for (size_t i = 0; i < justClicked.size(); i++) {
-		justClicked[i] = this->lastMouseButtons[i] != this->mouseButtons[i] && this->mouseButtons[i];
+		justClicked[i] = this->mouseButtons[i];
+		this->mouseButtons[i] = false;
 	}
 
 	RECT desktopSize;
@@ -84,12 +88,12 @@ void ClickGUI::onRender(Event&) {
 
 	// Shadow effect stuff
 	auto shadowEffect = Latite::getRenderer().getShadowEffect();
-	//shadowEffect->SetValue(D2D1_SHADOW_PROP_COLOR, D2D1::Vector4F(0.f, 0.f, 0.f, 0.1f));
+	shadowEffect->SetValue(D2D1_SHADOW_PROP_COLOR, D2D1::Vector4F(0.f, 0.f, 0.f, 0.1f));
 	auto affineTransformEffect = Latite::getRenderer().getAffineTransformEffect();
 
-	//D2D1::Matrix3x2F mat = D2D1::Matrix3x2F::Translation(10.f * adaptedScale, 5.f * adaptedScale);
-	//affineTransformEffect->SetInputEffect(0, shadowEffect);
-	//affineTransformEffect->SetValue(D2D1_2DAFFINETRANSFORM_PROP_TRANSFORM_MATRIX, mat);
+	D2D1::Matrix3x2F mat = D2D1::Matrix3x2F::Translation(10.f * adaptedScale, 5.f * adaptedScale);
+	affineTransformEffect->SetInputEffect(0, shadowEffect);
+	affineTransformEffect->SetValue(D2D1_2DAFFINETRANSFORM_PROP_TRANSFORM_MATRIX, mat);
 	// Shadow effect bitmap
 	auto myBitmap = rend.getBitmap();
 	//
@@ -101,9 +105,9 @@ void ClickGUI::onRender(Event&) {
 	dc.setFont(FontSelection::Semilight);
 	//dc.drawText({ 0, 0, 200, 30 }, "Hello world!", D2D1::ColorF::White, 30.f, DWRITE_TEXT_ALIGNMENT_CENTER);
 
-	float offX = 0.01689 * rect.getWidth();
-	float offY = 0.03191 * rect.getHeight();
-	float imgSize = 0.05338 * rect.getWidth();
+	float offX = 0.01689f * rect.getWidth();
+	float offY = 0.03191f * rect.getHeight();
+	float imgSize = 0.05338f * rect.getWidth();
 
 	D2D1_RECT_F logoRect = { rect.left + offX, rect.top + offY, rect.left + offX + imgSize, rect.top + offY + imgSize };
 
@@ -142,7 +146,7 @@ void ClickGUI::onRender(Event&) {
 
 		float searchWidth = guiWidth * 0.25f;
 		float searchHeight = 0.0425f * rect.getHeight();
-		float searchRound = searchHeight * 0.416;
+		float searchRound = searchHeight * 0.416f;
 
 		searchRect = { logoRect.left, logoRect.bottom + gaps, logoRect.left + searchWidth, logoRect.bottom + gaps + searchHeight };
 		auto searchCol = d2d::Color::RGB(0x70, 0x70, 0x70).asAlpha(0.28f);
@@ -173,7 +177,7 @@ void ClickGUI::onRender(Event&) {
 			shadowEffect->SetInput(0, shadowBitmap.Get());
 			compositeEffect->SetInputEffect(0, affineTransformEffect);
 			compositeEffect->SetInput(1, shadowBitmap.Get());
-
+https://duckduckgo.com/?t=chrome&atb=v387-4va&atb=v387-4va
 			{
 				std::string searchStr = "";
 				if (this->tab == SETTINGS) {
@@ -187,27 +191,31 @@ void ClickGUI::onRender(Event&) {
 		}
 
 		{
+
 			// all, game, hud, etc buttons
-			std::vector<std::pair<std::string, ClickGUI::ModTab>> modTabs = { {"All", ALL }, {"Game", GAME}, {"HUD", HUD}, {"Script", SCRIPT} };
+			static std::vector<std::tuple<std::string, ClickGUI::ModTab, d2d::Color>> modTabs = { {"All", ALL, searchCol }, {"Game", GAME, searchCol}, {"HUD", HUD, searchCol }, { "Script", SCRIPT, searchCol } };
 
 			float nodeWidth = guiWidth * 0.083f;
 
 			RectF nodeRect = { searchRect.right + gaps, searchRect.top, searchRect.right + gaps + nodeWidth, searchRect.bottom };
 
-
 			for (auto& pair : modTabs) {
+				bool contains = shouldSelect(nodeRect, cursorPos);
+				std::get<2>(pair) = util::LerpColorState(std::get<2>(pair), searchCol + 0.2f, searchCol, contains);
+
+				if (justClicked[0] && contains) this->modTab = std::get<1>(pair);
+
 				dc.ctx->SetTarget(shadowBitmap.Get());
 				D2D1_ROUNDED_RECT rr;
 				rr.radiusX = searchRound;
 				rr.radiusY = searchRound;
 				rr.rect = nodeRect.get();
 				auto solidBrush = rend.getSolidBrush();
-				solidBrush->SetColor(searchCol.get());
+				solidBrush->SetColor(std::get<2>(pair).get());
 				dc.ctx->FillRoundedRectangle(rr, rend.getSolidBrush());
 
-				dc.drawText(nodeRect, pair.first, {1.f, 1.f, 1.f, 0.8f}, nodeRect.getHeight() / 2.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+				dc.drawText(nodeRect, std::get<0>(pair), {1.f, 1.f, 1.f, 0.8f}, nodeRect.getHeight() / 2.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 				dc.ctx->SetTarget(myBitmap);
-
 
 				auto oWidth = nodeRect.getWidth() + gaps;
 				nodeRect.left += oWidth;
@@ -251,11 +259,14 @@ void ClickGUI::onRender(Event&) {
 
 		std::sort(mods.begin(), mods.end(), ModContainer::compare); // Sort modules
 
+		//std::array<float, 3> 
+
 		for (auto& mod : mods) {
 			mod.shouldRender = true;
 
-			//if (modTab == GAME && mod.mod->getCategory() == ModCategory::Hud) mod.shouldRender = false; // Game Tab
-			//if (modTab == HUD && mod.mod->getCategory() == ModCategory::Game) mod.shouldRender = false; // Hud Tab
+			if (modTab == GAME && mod.mod->getCategory() == IModule::HUD) mod.shouldRender = false; // Game Tab
+			if (modTab == HUD && mod.mod->getCategory() == IModule::GAME) mod.shouldRender = false; // Hud Tab
+			if (modTab == SCRIPT && mod.mod->getCategory() != IModule::SCRIPT) mod.shouldRender = false; // Hud Tab
 		}
 
 		int i = 0;
@@ -274,7 +285,7 @@ void ClickGUI::onRender(Event&) {
 				RectF rc = { modRect.left + (modRect.getHeight() * 0.4f),
 					modRect.top + (modRect.getHeight() * 0.4f), modRect.left + modRect.getHeight() * 0.70f, modRect.bottom - modRect.getHeight() * 0.4f };
 
-				if (this->shouldSelect(rc, sdk::ClientInstance::get()->cursorPos)) {
+				if (this->shouldSelect(rc, cursorPos)) {
 					if (justClicked[0])
 						mod.isExtended = !mod.isExtended;
 				}
@@ -302,7 +313,7 @@ void ClickGUI::onRender(Event&) {
 				RectF toggleRect = { modRect.right - togglePad - toggleWidth, modRect.top + togglePad,
 				modRect.right - togglePad, modRect.bottom - togglePad };
 
-				if (this->shouldSelect(toggleRect, sdk::ClientInstance::get()->cursorPos)) {
+				if (this->shouldSelect(toggleRect, cursorPos)) {
 					if (justClicked[0])
 					mod.mod->setEnabled(!mod.mod->isEnabled());
 				}
@@ -362,7 +373,8 @@ void ClickGUI::onKey(Event& evGeneric) {
 void ClickGUI::onClick(Event& evGeneric) {
 	auto& ev = reinterpret_cast<ClickEvent&>(evGeneric);
 	if (ev.getMouseButton() < 4) {
-		this->mouseButtons[ev.getMouseButton() - 1] = ev.isDown();
+		if (ev.isDown())
+			this->mouseButtons[ev.getMouseButton() - 1] = ev.isDown();
 	}
 	if (ev.getMouseButton() > 0) {
 		ev.setCancelled(true);

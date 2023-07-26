@@ -63,4 +63,8 @@ public:
 	inline static SigImpl AppPlatform__fireAppFocusLost{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? 48 8b 8f ? ? ? ? 48 8b 49 ? e8",
 		"AppPlatform::_fireAppFocusLost"};
+
+	inline static SigImpl MinecraftGame_onAppSuspended{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 56 48 8b ec 48 83 ec ? 48 8b f1 e8",
+		"MinecraftGame::onAppSuspended"};
 };

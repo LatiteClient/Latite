@@ -1,13 +1,28 @@
 #include "ChakraUtil.h"
 #include "Util.h"
 #include "client/Latite.h"
+#include "Logger.h"
+
+FARPROC Chakra::pass(const char* name)
+{
+	if (!mod) {
+		mod = GetModuleHandleA("Chakra.dll");
+
+		// sadly going to have to cope with chakra and not chakracore
+		if (!mod) mod = LoadLibraryW((util::GetLatitePath() / "Assets" / "ChakraCore.dll").wstring().c_str());
+	}
+	if (!mod) {
+		return 0;
+	}
+	return GetProcAddress(mod, name);
+}
 
 void Chakra::SetPropertyString(JsValueRef ref, std::wstring name, std::wstring value, bool strict) {
 	JsPropertyIdRef propId;
 	JS::JsGetPropertyIdFromName(name.c_str(), &propId);
 
 	JsValueRef strRef;
-	JS::JsCreateStringUtf16((const uint16_t*)value.c_str(), value.size(), &strRef);
+	JS::JsPointerToString(value.c_str(), value.size(), &strRef);
 	JS::JsSetProperty(ref, propId, strRef, strict);
 
 	JS::JsRelease(strRef, nullptr);
@@ -145,6 +160,12 @@ JsValueRef Chakra::GetNull() {
 	return ret;
 }
 
+void Chakra::HandleErrors(JsErrorCode err) {
+	if (err == JsErrorScriptException) {
+
+	}
+}
+
 d2d::Rect Chakra::GetRectFromJs(JsValueRef obj) {
 	return { static_cast<float>(Chakra::GetNumberProperty(obj, L"left")), static_cast<float>(Chakra::GetNumberProperty(obj, L"top")),
 	static_cast<float>(Chakra::GetNumberProperty(obj, L"right")), static_cast<float>(Chakra::GetNumberProperty(obj, L"bottom")) };
@@ -228,7 +249,7 @@ void Chakra::ThrowError(std::wstring message) {
 	JsValueRef errorValue;
 	JsValueRef errorMessageValue;
 
-	JS::JsCreateStringUtf16((const uint16_t*)message.c_str(), message.size(), &errorMessageValue);
+	JS::JsPointerToString(message.c_str(), message.size(), &errorMessageValue);
 	JS::JsCreateError(errorMessageValue, &errorValue);
 	JS::JsSetException(errorValue);
 }
@@ -293,7 +314,7 @@ std::wstring Chakra::GetTypeName(JsValueType type) {
 
 JsValueRef Chakra::MakeString(std::wstring const& ws) {
 	JsValueRef str;
-	JS::JsCreateStringUtf16(reinterpret_cast<const uint16_t*>(ws.c_str()), ws.size(), &str);
+	JS::JsPointerToString(ws.c_str(), ws.size(), &str);
 	return str;
 }
 
@@ -303,8 +324,7 @@ JsValueRef Chakra::MakeInt(int num) {
 	return val;
 }
 
-JsValueRef Chakra::MakeDouble(double num)
-{
+JsValueRef Chakra::MakeDouble(double num) {
 	JsValueRef val;
 	JS::JsDoubleToNumber(num, &val);
 	return val;

@@ -1,5 +1,7 @@
 #include "Util.h"
 #include "pch.h"
+#include "sdk/common/client/game/ClientInstance.h"
+#include "sdk/common/world/Minecraft.h"
 
 std::filesystem::path util::GetRootPath() {
 	char* env;
@@ -93,5 +95,16 @@ std::vector<std::string> util::SplitString(std::string const& s, char delim) {
 		ret.push_back(word);
 	}
 
+	return ret;
+}
+
+Color util::LerpColorState(Color const& current, Color const& on, Color const& off, bool state, float speed)
+{
+	Color ret = current;
+	float t = sdk::ClientInstance::get()->minecraft->timer->alpha* (speed / 10.f);
+	ret.r = std::lerp(current.r, state ? on.r : off.r, t);
+	ret.g = std::lerp(current.g, state ? on.g : off.g, t);
+	ret.b = std::lerp(current.b, state ? on.b : off.b, t);
+	ret.a = std::lerp(current.a, state ? on.a : off.a, t);
 	return ret;
 }

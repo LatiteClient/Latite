@@ -8,6 +8,8 @@
 
 #include "feature/module/ModuleManager.h"
 #include "feature/command/CommandManager.h"
+#include "script/ScriptManager.h"
+
 #include "config/ConfigManager.h"
 #include "misc/ClientMessageSink.h"
 #include "hook/Hooks.h"
@@ -16,12 +18,15 @@
 #include "event/impl/KeyUpdateEvent.h"
 #include "event/impl/RendererInitEvent.h"
 #include "event/impl/FocusLostEvent.h"
+#include "event/impl/AppSuspendedEvent.h"
 
 #include "sdk/signature/storage.h"
 
 #include "sdk/common/client/game/ClientInstance.h"
 #include <winrt/windows.ui.viewmanagement.h>
 #include <winrt/Windows.ApplicationModel.Core.h>
+
+#include <winrt/windows.ui.core.h>
 #include <winrt/windows.ui.popups.h>
 #include <winrt/base.h>
 #include <winrt/Windows.Foundation.h>
@@ -47,6 +52,7 @@ namespace {
     alignas(Renderer) char rendererBuf[sizeof(Renderer)] = {};
     alignas(ScreenManager) char scnMgrBuf[sizeof(ScreenManager)] = {};
     alignas(Assets) char assetsBuf[sizeof(Assets)] = {};
+    alignas(ScriptManager) char scriptMgrBuf[sizeof(ScriptManager)] = {};
 }
 
 #define MVSIG(...) ([]() -> std::pair<SigImpl*, SigImpl*> {\
@@ -109,9 +115,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         for (auto& key : versNumMap) {
             ss << key.first << "\n";
         }
-        ss << "\nContinue at your own risk of crashing.";
 
-        MessageBoxA(NULL, ss.str().c_str(), "Warning", MB_ICONINFORMATION | MB_OK);
+        Logger::Warn(ss.str());
     }
 
     std::vector<std::pair<SigImpl*, SigImpl*>> sigList = {
@@ -129,6 +134,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(GameRenderer__renderCurrentFrame),
         MVSIG(onClick),
         MVSIG(AppPlatform__fireAppFocusLost),
+        MVSIG(MinecraftGame_onAppSuspended),
             };
     
     new (mmgrBuf) ModuleManager;
@@ -137,13 +143,14 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (configMgrBuf) ConfigManager();
     new (hooks) LatiteHooks();
     new (scnMgrBuf) ScreenManager(); // needs to be before renderer
+    new (scriptMgrBuf) ScriptManager();
     new (rendererBuf) Renderer();
     new (assetsBuf) Assets();
 
-    AuthWindow wnd{ Latite::get().dllInst };
+    //AuthWindow wnd{ Latite::get().dllInst };
 
-    wnd.show();
-    wnd.runMessagePump();
+   // wnd.show();
+    //wnd.runMessagePump();
 
     for (auto& entry : sigList) {
         if (!entry.first->mod) continue;
@@ -206,6 +213,7 @@ BOOL WINAPI DllMain(
         Latite::getRenderer().~Renderer();
         Latite::getAssets().~Assets();
         Latite::getScreenManager().~ScreenManager();
+        Latite::getScriptManager().~ScriptManager();
         Latite::get().~Latite();
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
@@ -255,6 +263,10 @@ Assets& Latite::getAssets() noexcept {
     return *std::launder(reinterpret_cast<Assets*>(assetsBuf));
 }
 
+ScriptManager& Latite::getScriptManager() noexcept {
+    return *std::launder(reinterpret_cast<ScriptManager*>(scriptMgrBuf));
+}
+
 void Latite::doEject() noexcept {
     Latite::get().getHooks().uninit();
 
@@ -275,11 +287,17 @@ void Latite::initialize(HINSTANCE hInst) {
     getHooks().enable();
     Logger::Info("Enabled Hooks");
 
+    initSettings();
+
+    Latite::getScriptManager().init();
+    Logger::Info("Script manager initialized.");
+
     // TODO: use UpdateEvent
     Latite::getEventing().listen<RenderGameEvent>(this, (EventListenerFunc)&Latite::onUpdate, 1);
     Latite::getEventing().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Latite::onKey, 1);
     Latite::getEventing().listen<RendererInitEvent>(this, (EventListenerFunc)&Latite::onRendererInit, 1);
     Latite::getEventing().listen<FocusLostEvent>(this, (EventListenerFunc)&Latite::onFocusLost, 1);
+    Latite::getEventing().listen<AppSuspendedEvent>(this, (EventListenerFunc)&Latite::onSuspended, 1);
 }
 
 void Latite::threadsafeInit() {
@@ -287,6 +305,23 @@ void Latite::threadsafeInit() {
     std::string vstr(this->version);
     auto ws = util::StrToWStr("Latite Client " + vstr);
     app.Title(ws);
+    Latite::getScriptManager().loadPrerunScripts();
+    Logger::Info("Loaded startup scripts");   
+
+    if (!Chakra::mod) {
+        winrt::hstring title = L"Error";
+        winrt::hstring content = L"Assets\\ChakraCore.dll could not be found, you will not be able to use scripting.";
+        winrt::Windows::UI::Popups::MessageDialog dialog(content, title);
+        dialog.ShowAsync();
+    }
+}
+
+void Latite::initSettings() {
+    {
+        auto set = std::make_shared<Setting>("menuKey", "Menu Key", "The key used to open the menu", Setting::Type::Key);
+        set->value = &this->menuKey;
+        this->getSettings().addSetting(set);
+    }
 }
 
 void Latite::onUpdate(Event&) {
@@ -294,6 +329,7 @@ void Latite::onUpdate(Event&) {
         threadsafeInit();
         hasInit = true;
     }
+    Latite::getScriptManager().runScriptingOperations();
 }
 
 void Latite::onKey(Event& evGeneric) {
@@ -311,7 +347,7 @@ void Latite::onKey(Event& evGeneric) {
         return;
     }
 
-    if ((ev.getKey() == 'M') && ev.isDown()) {
+    if ((ev.getKey() == std::get<KeyValue>(this->menuKey)) && ev.isDown()) {
         
         if (!ev.inUI() || Latite::getScreenManager().getActiveScreen()) {
             Latite::getScreenManager().tryToggleScreen("ClickGUI");
@@ -331,5 +367,30 @@ void Latite::onFocusLost(Event& evGeneric) {
     if (Latite::getScreenManager().getActiveScreen()) ev.setCancelled(true);
 }
 
-void Latite::loadConfig(SettingGroup&) {
+void Latite::onSuspended(Event& ev) {
+    Latite::getConfigManager().saveCurrentConfig();
+    Logger::Info("Saved config");
+}
+
+void Latite::loadConfig(SettingGroup& gr) {
+    gr.forEach([&](std::shared_ptr<Setting> set) {
+        this->getSettings().forEach([&](std::shared_ptr<Setting> modSet) {
+            if (modSet->name() == set->name()) {
+                switch (set->type) {
+                case Setting::Type::Bool:
+                    *modSet->value = std::get<BoolValue>(set->resolvedValue);
+                    break;
+                case Setting::Type::Int:
+                    *modSet->value = std::get<IntValue>(set->resolvedValue);
+                    break;
+                case Setting::Type::Float:
+                    *modSet->value = std::get<FloatValue>(set->resolvedValue);
+                    break;
+                case Setting::Type::Key:
+                    *modSet->value = std::get<KeyValue>(set->resolvedValue);
+                    break;
+                }
+            }
+            });
+        });
 }

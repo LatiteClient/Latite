@@ -14,6 +14,9 @@ void Module::loadConfig(SettingGroup& resolvedGroup) {
 				case Setting::Type::Float:
 					*modSet->value = std::get<FloatValue>(set->resolvedValue);
 					break;
+				case Setting::Type::Key:
+					*modSet->value = std::get<KeyValue>(set->resolvedValue);
+					break;
 				}
 			}
 			});

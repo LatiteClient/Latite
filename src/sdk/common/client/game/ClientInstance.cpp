@@ -27,7 +27,6 @@ sdk::LocalPlayer* sdk::ClientInstance::getLocalPlayer() {
 }
 
 void sdk::ClientInstance::grabCursor() {
-    uintptr_t offs;
     if (internalVers != VLATEST) {
         // 1.18.12
         memory::callVirtual<void>(this, 0x116);

@@ -43,7 +43,7 @@ namespace d2d {
 
 		Color() : ::Color(0.f, 0.f, 0.f, 1.f) {};
 
-		Color(D2D1::ColorF col) : ::Color(col.r, col.g, col.b, col.a) {}
+		Color(D2D1_COLOR_F col) : ::Color(col.r, col.g, col.b, col.a) {}
 
 		Color(D2D1::ColorF::Enum e) : ::Color(0.f, 0.f, 0.f, 0.f) {
 			D2D1::ColorF col = D2D1::ColorF(e);
@@ -52,6 +52,8 @@ namespace d2d {
 			g = col.g;
 			b = col.b;
 		}
+
+		Color(::Color c) : ::Color(c.r, c.g, c.b, c.a) {};
 
 		Color operator+(Color right) {
 			return Color(r + right.r, g + right.g, b + right.b, a);

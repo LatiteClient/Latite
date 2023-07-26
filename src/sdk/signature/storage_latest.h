@@ -70,4 +70,8 @@ public:
 	inline static SigImpl onClick{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 8b c4 48 89 58 ? 48 89 68 ? 48 89 70 ? 57 41 54 41 55 41 56 41 57 48 83 ec ? 44 0f b7 bc 24",
 		"onClick"};
+
+	inline static SigImpl MinecraftGame_onAppSuspended{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 56 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 4c 8b f1 48 8d b1",
+		"MinecraftGame::onAppSuspended"};
 };

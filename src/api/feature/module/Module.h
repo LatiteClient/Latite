@@ -6,21 +6,29 @@ class IModule : public Listener, public Feature {
 public:
 	std::shared_ptr<SettingGroup> settings;
 
-	explicit IModule(std::string const& name, std::string const& description, 
-		std::string const& displayName, bool visible) : modName(name), description(description), displayName(displayName), visible(visible) {
+	enum Category {
+		GAME,
+		HUD,
+		GAMEHUD,
+		SCRIPT,
+		SURVIVAL,
+	};
+
+	explicit IModule(std::string const& name, std::string const& description,
+		std::string const& displayName, Category category, bool visible) : modName(name), description(description), displayName(displayName), category(category), visible(visible) {
 		settings = std::make_shared<SettingGroup>(name);
 		{
-				auto set = std::make_shared<Setting>("enabled", "Enabled", "Whether the module is on or not", Setting::Type::Bool);
-				set->value = &enabled;
+			auto set = std::make_shared<Setting>("enabled", "Enabled", "Whether the module is on or not", Setting::Type::Bool);
+			set->value = &enabled;
 
-				settings->addSetting(set);
-			}
-			{
-				auto set = std::make_shared<Setting>("key", "Key", "The keybind of the module", Setting::Type::Key);
-				set->value = &key;
+			settings->addSetting(set);
+		}
+		{
+			auto set = std::make_shared<Setting>("key", "Key", "The keybind of the module", Setting::Type::Key);
+			set->value = &key;
 
-				settings->addSetting(set);
-			}
+			settings->addSetting(set);
+		}
 	}
 	IModule(IModule&) = delete;
 	IModule(IModule&&) = delete;
@@ -40,9 +48,12 @@ public:
 	[[nodiscard]] std::string name() override { return modName; }
 	[[nodiscard]] std::string desc() override { return description; }
 	[[nodiscard]] std::string getDisplayName() { return displayName; }
+
+	[[nodiscard]] Category getCategory() { return category; }
 protected:
 	std::string modName, description, displayName;
 	Setting::Value enabled = BoolValue(false);
 	Setting::Value key = KeyValue(0);
 	bool visible;
+	Category category;
 };

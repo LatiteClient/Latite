@@ -5,6 +5,7 @@
 #include "impl/OptionHooks.h"
 #include "impl/DXHooks.h"
 #include "impl/AppPlatformHooks.h"
+#include "impl/MinecraftGameHooks.h"
 #include "MinHook.h"
 
 void LatiteHooks::init() {
@@ -16,6 +17,7 @@ void LatiteHooks::init() {
 	this->items.push_back(std::make_shared<OptionHooks>());
 	this->items.push_back(std::make_shared<DXHooks>());
 	this->items.push_back(std::make_shared<AppPlatformHooks>());
+	this->items.push_back(std::make_shared<MinecraftGameHooks>());
 	this->mutex.unlock();
 }
 

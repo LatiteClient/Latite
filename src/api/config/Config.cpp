@@ -61,6 +61,8 @@ void Config::addSetting(SettingGroup& group, nlohmann::json& obj) {
 		set->resolvedValue = BoolValue(jVal.get<bool>());
 		break;
 	case Setting::Type::Key:
+		set->resolvedValue = KeyValue(jVal.get<int>());
+		break;
 	case Setting::Type::Int:
 		set->resolvedValue = IntValue(jVal.get<int>());
 		break;

@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include <string_view>
 #include "api/eventing/Listenable.h"
+#include "api/feature/setting/Setting.h"
 
 class Latite final : public Listener {
 public:
@@ -18,6 +19,7 @@ public:
 	[[nodiscard]] static class Renderer& getRenderer() noexcept;
 	[[nodiscard]] static class ScreenManager& getScreenManager() noexcept;
 	[[nodiscard]] static class Assets& getAssets() noexcept;
+	[[nodiscard]] static class ScriptManager& getScriptManager() noexcept;
 
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);
@@ -26,6 +28,7 @@ public:
 	void onKey(class Event& ev);
 	void onRendererInit(class Event& ev);
 	void onFocusLost(class Event& ev);
+	void onSuspended(class Event& ev);
 	void loadConfig(class SettingGroup& resolvedGroup);
 
 	Latite() = default;
@@ -34,9 +37,11 @@ public:
 	static constexpr std::string_view version = "v2.0.0";
 	HINSTANCE dllInst;
 private:
+	Setting::Value menuKey = KeyValue('M');
 
 	void doEject() noexcept;
 	void threadsafeInit();
+	void initSettings();
 
 	bool shouldEject = false;
 	bool hasInit = false;
