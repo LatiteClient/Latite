@@ -6,7 +6,7 @@ class ScreenManager : public Manager<Screen> {
 public:
 	ScreenManager();
 
-	bool showScreen(std::string const& screenName);
+	bool showScreen(std::string const& screenName, bool ignoreAnims = false);
 	bool tryToggleScreen(std::string const& screenName);
 	void exitCurrentScreen();
 

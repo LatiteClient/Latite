@@ -19,8 +19,8 @@ void Zoom::onRenderLevel(Event& evGeneric) {
 	float lr = std::lerp(activeModifier, modifyTo, alpha * 0.2f);
 	activeModifier = lr;
 
-	float& fx = ev.getLevelRenderer()->levelRendererPlayer->getFovX();
-	float& fy = ev.getLevelRenderer()->levelRendererPlayer->getFovY();
+	float& fx = ev.getLevelRenderer()->getLevelRendererPlayer()->getFovX();
+	float& fy = ev.getLevelRenderer()->getLevelRendererPlayer()->getFovY();
 
 	fx *= activeModifier;
 	fy *= activeModifier;

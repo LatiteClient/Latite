@@ -124,6 +124,12 @@ bool Renderer::init(IDXGISwapChain* chain) {
 	// brushes
 	createDeviceDependentResources();
 
+	// blur buffers
+	for (int i = 0; i < this->bufferCount; ++i) {
+		auto bmp = copyCurrentBitmap();
+		this->blurBuffers.push_back(bmp);
+	}
+
 	hasInit = true;
 	firstInit = true;
 
@@ -148,6 +154,11 @@ void Renderer::render() {
 	if (gameDevice12) {
 		d3d11On12Device->AcquireWrappedResources(&d3d11Targets[idx], 1);
 	}
+
+	auto bmp = blurBuffers[idx];
+	// Update the current blur buffer
+	bmp->CopyFromBitmap(nullptr, renderTargets[idx], nullptr);
+
 	d2dCtx->SetTarget(renderTargets[idx]);
 	d2dCtx->BeginDraw();
 	d2dCtx->SetTransform(D2D1::Matrix3x2F::Identity());
@@ -219,11 +230,11 @@ void Renderer::releaseAllResources() {
 	d3d11On12Device = nullptr;
 	d3dCtx = nullptr;
 
-	for (auto& mb : this->motionBlurBitmaps) {
+	for (auto& mb : this->blurBuffers) {
 		SafeRelease(&mb);
 	}
 
-	this->motionBlurBitmaps.clear();
+	this->blurBuffers.clear();
 
 	releaseDeviceIndependentResources();
 }

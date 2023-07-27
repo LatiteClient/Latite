@@ -6,12 +6,14 @@
 struct Vec2 final {
 	float x, y;
 
+	constexpr Vec2() : x(0.f), y(0.f) {}
 	constexpr Vec2(float x, float y) : x(x), y(y) {}
 };
 
 struct Vec3 final {
 	float x, y, z;
 
+	constexpr Vec3() : x(0.f), y(0.f), z(0.f) {}
 	constexpr Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
 };
 
@@ -26,6 +28,9 @@ struct Color {
 
 	constexpr Color(float r, float g, float b, float a = 1.f) : r(r), g(g), b(b), a(a) {}
 	constexpr Color() : r(0.f), g(0.f), b(0.f), a(1.f) {}
+	Color(float pFloat[4]) : r(pFloat[0]), g(pFloat[1]), b(pFloat[2]), a(pFloat[3]) {
+
+	}
 	
 	static constexpr Color RGB(int r, int g, int b, int a = 255) { return Color(r / 255.f, g / 255.f, b / 255.f, a / 255.f); }
 };

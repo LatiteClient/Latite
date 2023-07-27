@@ -12,22 +12,26 @@ sdk::ClientInstance* sdk::ClientInstance::get() {
         uintptr_t evalPtr = *reinterpret_cast<uintptr_t*>(sig);
         if (!evalPtr) return nullptr;
         evalPtr = *reinterpret_cast<uintptr_t*>(evalPtr);
-        evalPtr = *reinterpret_cast<uintptr_t*>(evalPtr + 0x58);
-        if (sdk::internalVers > sdk::V1_19_41) instance = *reinterpret_cast<ClientInstance**>(evalPtr);
+
+        int offs = 0x58;
+        if (sdk::internalVers == sdk::V1_19_51) offs = 0x48;
+
+        evalPtr = *reinterpret_cast<uintptr_t*>(evalPtr + offs);
+        if (sdk::internalVers > sdk::V1_19_51) instance = *reinterpret_cast<ClientInstance**>(evalPtr);
         else instance = reinterpret_cast<ClientInstance*>(evalPtr);
     }
     return instance;
 }
 
 sdk::LocalPlayer* sdk::ClientInstance::getLocalPlayer() {
-    if (sdk::internalVers == sdk::V1_18_12) {
+    if (sdk::internalVers == sdk::V1_18_12 || sdk::internalVers == sdk::V1_19_51) {
         return memory::callVirtual<LocalPlayer*>(this, 0x18);
     }
     return memory::callVirtual<LocalPlayer*>(this, 0x1B);
 }
 
 void sdk::ClientInstance::grabCursor() {
-    if (internalVers != VLATEST) {
+    if (internalVers == V1_18_12) {
         // 1.18.12
         memory::callVirtual<void>(this, 0x116);
         return;
@@ -36,7 +40,7 @@ void sdk::ClientInstance::grabCursor() {
 }
 
 void sdk::ClientInstance::releaseCursor() {
-    if (internalVers != VLATEST) {
+    if (internalVers == V1_18_12) {
         // 1.18.12
         memory::callVirtual<void>(this, 0x117);
         return;

@@ -10,8 +10,10 @@ namespace {
 }
 
 HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInterval, UINT Flags) {
-	if (!Latite::getRenderer().hasInitialized())
+	if (!Latite::getRenderer().hasInitialized()) {
+		auto lock = Latite::getRenderer().lock();
 		Latite::getRenderer().init(chain);
+	}
 
 	if (Latite::getRenderer().hasInitialized()) {
 		auto lock = Latite::getRenderer().lock();

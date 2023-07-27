@@ -12,10 +12,10 @@ void LatiteHooks::init() {
 	MH_Initialize();
 
 	this->mutex.lock();
+	this->items.push_back(std::make_shared<DXHooks>());
 	this->items.push_back(std::make_shared<GenericHooks>());
 	this->items.push_back(std::make_shared<LevelRendererHooks>());
 	this->items.push_back(std::make_shared<OptionHooks>());
-	this->items.push_back(std::make_shared<DXHooks>());
 	this->items.push_back(std::make_shared<AppPlatformHooks>());
 	this->items.push_back(std::make_shared<MinecraftGameHooks>());
 	this->mutex.unlock();

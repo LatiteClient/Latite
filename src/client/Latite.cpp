@@ -53,11 +53,13 @@ namespace {
     alignas(ScreenManager) char scnMgrBuf[sizeof(ScreenManager)] = {};
     alignas(Assets) char assetsBuf[sizeof(Assets)] = {};
     alignas(ScriptManager) char scriptMgrBuf[sizeof(ScriptManager)] = {};
+
+    bool hasInjected = false;
 }
 
 #define MVSIG(...) ([]() -> std::pair<SigImpl*, SigImpl*> {\
 if (sdk::internalVers == sdk::VLATEST) return {&Signatures::__VA_ARGS__, &Signatures::__VA_ARGS__};\
-else { return {&Signatures_1_18_12::__VA_ARGS__, &Signatures::__VA_ARGS__}; }\
+else { if (sdk::internalVers == sdk::V1_19_51) { return {&Signatures_1_19_51::__VA_ARGS__, &Signatures::__VA_ARGS__}; }return {&Signatures_1_18_12::__VA_ARGS__, &Signatures::__VA_ARGS__}; }\
 })()
 
 DWORD __stdcall startThread(HINSTANCE dll) {
@@ -100,6 +102,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     std::unordered_map<std::string, sdk::Version> versNumMap = {
         { "1.20.12", sdk::VLATEST },
         { "1.20.10", sdk::VLATEST },
+        { "1.19.50", sdk::V1_19_51 },
+        { "1.19.51", sdk::V1_19_51 },
         { "1.18.12", sdk::V1_18_12 },
         { "1.18.10", sdk::V1_18_12 }
     };
@@ -193,6 +197,14 @@ BOOL WINAPI DllMain(
     LPVOID)  // reserved
 {
     if (fdwReason == DLL_PROCESS_ATTACH) {
+        if (hasInjected) {
+            FreeLibrary(hinstDLL);
+            return TRUE;
+        }
+
+        hasInjected = true;
+
+        DisableThreadLibraryCalls(hinstDLL);
         CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)startThread, hinstDLL, 0, nullptr));
     }
     else if (fdwReason == DLL_PROCESS_DETACH) {
@@ -267,7 +279,15 @@ ScriptManager& Latite::getScriptManager() noexcept {
     return *std::launder(reinterpret_cast<ScriptManager*>(scriptMgrBuf));
 }
 
+std::optional<float> Latite::getMenuBlur() {
+    if (std::get<BoolValue>(this->menuBlurEnabled)) {
+        return std::get<FloatValue>(this->menuBlur);
+    }
+    return std::nullopt;
+}
+
 void Latite::doEject() noexcept {
+    // TODO: this isnt neccesary
     Latite::get().getHooks().uninit();
 
     FreeLibrary(this->dllInst);
@@ -293,11 +313,11 @@ void Latite::initialize(HINSTANCE hInst) {
     Logger::Info("Script manager initialized.");
 
     // TODO: use UpdateEvent
-    Latite::getEventing().listen<RenderGameEvent>(this, (EventListenerFunc)&Latite::onUpdate, 1);
-    Latite::getEventing().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Latite::onKey, 1);
-    Latite::getEventing().listen<RendererInitEvent>(this, (EventListenerFunc)&Latite::onRendererInit, 1);
-    Latite::getEventing().listen<FocusLostEvent>(this, (EventListenerFunc)&Latite::onFocusLost, 1);
-    Latite::getEventing().listen<AppSuspendedEvent>(this, (EventListenerFunc)&Latite::onSuspended, 1);
+    Latite::getEventing().listen<RenderGameEvent>(this, (EventListenerFunc)&Latite::onUpdate, 2);
+    Latite::getEventing().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Latite::onKey, 2);
+    Latite::getEventing().listen<RendererInitEvent>(this, (EventListenerFunc)&Latite::onRendererInit, 2);
+    Latite::getEventing().listen<FocusLostEvent>(this, (EventListenerFunc)&Latite::onFocusLost, 2);
+    Latite::getEventing().listen<AppSuspendedEvent>(this, (EventListenerFunc)&Latite::onSuspended, 2);
 }
 
 void Latite::threadsafeInit() {
@@ -320,6 +340,16 @@ void Latite::initSettings() {
     {
         auto set = std::make_shared<Setting>("menuKey", "Menu Key", "The key used to open the menu", Setting::Type::Key);
         set->value = &this->menuKey;
+        this->getSettings().addSetting(set);
+    }
+    {
+        auto set = std::make_shared<Setting>("menuBlurEnabled", "Menu Blur", "Whether blur is enabled or disabled for the menu", Setting::Type::Bool);
+        set->value = &this->menuBlurEnabled;
+        this->getSettings().addSetting(set);
+    }
+    {
+        auto set = std::make_shared<Setting>("menuIntensity", "Blur Intensity", "The intensity of the menu blur", Setting::Type::Float);
+        set->value = &this->menuBlur;
         this->getSettings().addSetting(set);
     }
 }
@@ -348,9 +378,11 @@ void Latite::onKey(Event& evGeneric) {
     }
 
     if ((ev.getKey() == std::get<KeyValue>(this->menuKey)) && ev.isDown()) {
-        
         if (!ev.inUI() || Latite::getScreenManager().getActiveScreen()) {
-            Latite::getScreenManager().tryToggleScreen("ClickGUI");
+            if (Latite::getScreenManager().getActiveScreen())
+                Latite::getScreenManager().exitCurrentScreen();
+            else
+                Latite::getScreenManager().showScreen("HUDEditor");
             ev.setCancelled(true);
             return;
         }

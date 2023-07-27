@@ -74,7 +74,6 @@ JsValueRef Network::getSync(JsValueRef callee, bool isConstructor, JsValueRef* a
 		auto response = operation.get();
 
 		auto cont = response.Content();
-		winrt::Windows::Foundation::TimeSpan t;
 		auto strs = cont.ReadAsStringAsync().get();
 		JS::JsCreateObject(&ret);
 		Chakra::SetPropertyNumber(ret, L"statusCode", static_cast<double>(response.StatusCode()), true);

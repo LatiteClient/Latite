@@ -51,6 +51,8 @@ public:
 	std::string desc() override { return description; }
 	std::string name() override { return settingName; }
 
+	std::string getDisplayName() { return displayName; }
+
 	Value* value = nullptr;
 	Value resolvedValue;
 	Value defaultValue;
@@ -58,6 +60,11 @@ public:
 	Value min;
 	Value max;
 	Type type;
+
+	struct {
+		bool init = false;
+		float col[4] = { 0.f, 0.f, 0.f, 1.f };
+	} rendererInfo;
 protected:
 	std::string settingName, displayName, description;
 

@@ -53,7 +53,7 @@ void DXContext::drawGaussianBlur(float intensity)  {
 	
 	// maybe we might not need to flush if we dont draw anything before clickgui?
 	ctx->Flush();
-	auto bitmap = Latite::getRenderer().copyCurrentBitmap();
+	auto bitmap = Latite::getRenderer().getBlurBitmap();
 	gaussianBlurEffect->SetInput(0, bitmap);
 	gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, intensity);
 	gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
@@ -63,7 +63,6 @@ void DXContext::drawGaussianBlur(float intensity)  {
 	D2D1::Matrix3x2F oMat;
 	//ctx->SetTransform(D2D1::Matrix3x2F::Scale(sz.width / rc.right, sz.height / rc.bottom));
 	ctx->DrawImage(gaussianBlurEffect, D2D1::Point2F(0.f, 0.f), rc);
-	bitmap->Release();
 }
 
 void DXContext::drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity) {
@@ -80,29 +79,78 @@ void DXContext::drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity) {
 	D2D1::Matrix3x2F oMat;
 	//ctx->SetTransform(D2D1::Matrix3x2F::Scale(sz.width / rc.right, sz.height / rc.bottom));
 	ctx->DrawImage(gaussianBlurEffect, D2D1::Point2F(0.f, 0.f), rc);
-	bmp->Release();
 }
 
 void DXContext::setFont(Renderer::FontSelection font)  {
 	this->currentFormat = Latite::getRenderer().getTextFormat(font);
 }
 
-void DXContext::drawText(RectF const& rc, std::string const& text, d2d::Color const& color, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment)  {
+void DXContext::drawText(RectF const& rc, std::wstring const& ws, d2d::Color const& color, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment)  {
 	brush->SetColor(color.get());
-	auto ws = util::StrToWStr(text);
 	IDWriteTextLayout* layout;
 	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
 		currentFormat, rc.getWidth(), rc.getHeight(),
 		&layout))) {
 		DWRITE_TEXT_RANGE range;
-			range.startPosition = 0;
-			layout->SetFontSize(size, range);
-			layout->SetTextAlignment(alignment);
-			layout->SetParagraphAlignment(verticalAlignment);
-			this->ctx->DrawTextLayout({ rc.getPos().x, rc.getPos().y }, layout,
-				brush);
-			SafeRelease(&layout);
+		range.startPosition = 0;
+		layout->SetFontSize(size, range);
+		layout->SetTextAlignment(alignment);
+		layout->SetParagraphAlignment(verticalAlignment);
+		this->ctx->DrawTextLayout({ rc.getPos().x, rc.getPos().y }, layout,
+			brush);
+		SafeRelease(&layout);
 	}
+}
+
+Vec2 DXContext::getTextSize(std::wstring const& ws, float size) {
+	auto ss = ctx->GetSize();
+	IDWriteTextLayout* layout;
+	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
+		currentFormat, ss.width, ss.height,
+		&layout))) {
+		DWRITE_TEXT_RANGE range;
+		range.startPosition = 0;
+		layout->SetFontSize(size, range);
+		layout->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+		layout->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		DWRITE_TEXT_METRICS textMetrics;
+		DWRITE_OVERHANG_METRICS overhangs;
+		layout->GetMetrics(&textMetrics);
+		layout->GetOverhangMetrics(&overhangs);
+		
+		SafeRelease(&layout);
+		float width = (textMetrics.layoutWidth + overhangs.right) - (textMetrics.left - overhangs.left);
+		float height = (textMetrics.top - overhangs.top) - (textMetrics.layoutHeight + overhangs.bottom);
+		
+		return Vec2(width, height);
+	}
+	return {};
+}
+
+d2d::Rect DXContext::getTextRect(std::wstring const& ws, float size, float pad) {
+	auto ss = ctx->GetSize();
+	IDWriteTextLayout* layout;
+	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
+		currentFormat, ss.width, ss.height,
+		&layout))) {
+		DWRITE_TEXT_RANGE range;
+		range.startPosition = 0;
+		layout->SetFontSize(size, range);
+		layout->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+		layout->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		DWRITE_TEXT_METRICS metrics;
+		DWRITE_OVERHANG_METRICS overhangs;
+		layout->GetMetrics(&metrics);
+		layout->GetOverhangMetrics(&overhangs);
+
+		SafeRelease(&layout);
+
+		return {
+			metrics.left - overhangs.left - pad, metrics.top - overhangs.top - pad,
+			metrics.layoutWidth + overhangs.right + pad, metrics.layoutHeight + overhangs.bottom + pad
+		};
+	}
+	return {};
 }
 
 DXContext::DXContext() : brush(Latite::getRenderer().getSolidBrush()), ctx(Latite::getRenderer().getDeviceContext()), factory(Latite::getRenderer().getDWriteFactory())  {

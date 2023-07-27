@@ -27,6 +27,11 @@ ScriptCommand::ScriptCommand() : Command("script", "Do actions related to script
 bool ScriptCommand::execute(std::string const label, std::vector<std::string> args)
 {
 	if (args.empty()) return false;
+	if (!ScriptManager::scriptingSupported()) {
+		message("&eScripting is not supported!");
+		return true;
+	}
+
 	if (args[0] == "load") {
 		if (args.size() != 2) return false;
 		auto res = Latite::getScriptManager().loadScript(args[1], true);

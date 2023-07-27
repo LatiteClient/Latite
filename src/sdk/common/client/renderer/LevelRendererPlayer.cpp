@@ -4,7 +4,7 @@
 #include "util/LMath.h"
 
 Vec3& sdk::LevelRendererPlayer::getOrigin() {
-    if (sdk::internalVers == sdk::V1_18_12) return util::directAccess<Vec3>(this, 0x508);
+    if (sdk::internalVers == sdk::V1_18_12) return util::directAccess<Vec3>(this, 0x504);
     return util::directAccess<Vec3>(this, Signatures::Offset::LevelRendererPlayer_origin.result);
 }
 

@@ -1,6 +1,6 @@
 #include "Fullbright.h"
 
-Fullbright::Fullbright() : Module("Fullbright", "Fullbright", "Lights up your world") {
+Fullbright::Fullbright() : Module("Fullbright", "Fullbright", "Extra world brightness") {
 	addSetting("gamma", "Gamma", "The amount of light", this->gamma);
 	listen<GammaEvent>(&Fullbright::onGamma);
 }

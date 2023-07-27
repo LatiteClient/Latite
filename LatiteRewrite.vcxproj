@@ -297,6 +297,7 @@
     <ClInclude Include="src\client\render\asset\Asset.h" />
     <ClInclude Include="src\client\render\Renderer.h" />
     <ClInclude Include="src\client\screen\impl\ClickGUI.h" />
+    <ClInclude Include="src\client\screen\impl\HUDEditor.h" />
     <ClInclude Include="src\client\screen\Screen.h" />
     <ClInclude Include="src\client\screen\ScreenManager.h" />
     <ClInclude Include="src\client\script\event\ScriptListener.h" />
@@ -328,6 +329,7 @@
     <ClInclude Include="src\sdk\common\world\Minecraft.h" />
     <ClInclude Include="src\sdk\common\world\Timer.h" />
     <ClInclude Include="src\sdk\signature\storage_1_18_12.h" />
+    <ClInclude Include="src\sdk\signature\storage_1_19_51.h" />
     <ClInclude Include="src\sdk\signature\storage_latest.h" />
     <ClInclude Include="src\sdk\Util.h" />
     <ClInclude Include="src\sdk\Version.h" />
@@ -394,6 +396,8 @@
     <ClCompile Include="src\client\render\asset\Asset.cpp" />
     <ClCompile Include="src\client\render\Renderer.cpp" />
     <ClCompile Include="src\client\screen\impl\ClickGUI.cpp" />
+    <ClCompile Include="src\client\screen\impl\HUDEditor.cpp" />
+    <ClCompile Include="src\client\screen\Screen.cpp" />
     <ClCompile Include="src\client\screen\ScreenManager.cpp" />
     <ClCompile Include="src\client\script\event\ScriptListener.cpp" />
     <ClCompile Include="src\client\script\JsScript.cpp" />

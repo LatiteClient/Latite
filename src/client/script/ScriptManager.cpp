@@ -2,6 +2,7 @@
 #include "ScriptManager.h"
 #include "client/Latite.h"
 #include "client/misc/ClientMessageSink.h"
+#include "util/Logger.h"
 #include <memory>
 
 std::shared_ptr<JsScript> ScriptManager::loadScript(std::string const& folderPath, bool run)
@@ -98,6 +99,11 @@ void ScriptManager::handleErrors(JsErrorCode code) {
 
 bool ScriptManager::loadPrerunScripts()
 {
+	if (!scriptingSupported()) {
+		Logger::Warn("Scripting is not supported");
+		return false;
+	}
+
 	auto prerunPath = util::GetLatitePath() / ("Scripts") / "Startup";
 	std::filesystem::create_directory(prerunPath);
 
@@ -114,6 +120,8 @@ bool ScriptManager::loadPrerunScripts()
 
 void ScriptManager::runScriptingOperations()
 {
+	if (!scriptingSupported()) return;
+
 	for (auto& scr : this->items) {
 		scr->handleAsyncOperations();
 
@@ -198,11 +206,14 @@ void ScriptManager::unloadScript(std::shared_ptr<JsScript> ptr)
 	}
 }
 
-void ScriptManager::unloadAll()
-{
+void ScriptManager::unloadAll() {
 	for (auto& s : this->items) {
 		popScript(s);
 	}
+}
+
+bool ScriptManager::scriptingSupported() {
+	return JS::JsAddRef;
 }
 
 void ScriptManager::uninitialize()

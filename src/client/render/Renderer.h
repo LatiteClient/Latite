@@ -55,7 +55,7 @@ private:
 	std::vector<ID3D11Resource*> d3d11Targets = {};
 	std::vector<ID2D1Bitmap1*> renderTargets = {};
 
-	std::vector<ID2D1Bitmap1*> motionBlurBitmaps = {};
+	std::vector<ID2D1Bitmap1*> blurBuffers = {};
 
 	std::shared_mutex mutex;
 	int bufferCount = 3;
@@ -163,6 +163,10 @@ public:
 	[[nodiscard]] ID2D1Bitmap1* getBitmap() {
 		auto buf = swapChain4->GetCurrentBackBufferIndex();
 		return this->renderTargets[buf];
+	}
+
+	[[nodiscard]] ID2D1Bitmap1* getBlurBitmap() {
+		return blurBuffers[swapChain4->GetCurrentBackBufferIndex()];
 	}
 
 	[[nodiscard]] IWICImagingFactory* getImagingFactory() {

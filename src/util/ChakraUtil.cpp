@@ -3,12 +3,48 @@
 #include "client/Latite.h"
 #include "Logger.h"
 
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Web.Http.h>
+#include <winrt/impl/windows.web.http.2.h>
+#include <winrt/Windows.Web.Http.Filters.h>
+#include <winrt/windows.storage.h>
+#include <winrt/windows.storage.streams.h>
+
+using namespace winrt;
+using namespace winrt::Windows::Web::Http;
+using namespace winrt::Windows::Web::Http::Filters;
+using namespace winrt::Windows::Storage::Streams;
+using namespace winrt::Windows::Storage;
+
 FARPROC Chakra::pass(const char* name)
 {
 	if (!mod) {
 		mod = GetModuleHandleA("Chakra.dll");
 
+		// https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll
+
+		//mod = LoadLibraryW(L"C:\\Windows\\system32\\Chakra.dll");
 		// sadly going to have to cope with chakra and not chakracore
+
+#if 0
+		auto http = HttpClient();
+
+		auto filePath = util::GetLatitePath() / "Assets" / "ChakraCore.dll";
+
+		// TODO: FIXME: xor
+		winrt::Windows::Foundation::Uri requestUri(L"https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bexp.txt");
+
+		auto buffer = http.GetBufferAsync(requestUri).get();
+
+		auto file = StorageFile::GetFileFromPathAsync(filePath.wstring()).get();
+		IRandomAccessStream stream = file.OpenAsync(FileAccessMode::ReadWrite).get();
+
+		DataWriter writer(stream);
+		writer.WriteBuffer(buffer);
+		writer.StoreAsync().get();
+		writer.FlushAsync().get();
+#endif
+
 		if (!mod) mod = LoadLibraryW((util::GetLatitePath() / "Assets" / "ChakraCore.dll").wstring().c_str());
 	}
 	if (!mod) {

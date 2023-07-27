@@ -39,11 +39,11 @@ namespace d2d {
 
 	class Color : public ::Color {
 	public:
-		Color(float r, float g, float b, float a = 1.f) : ::Color(r, g, b, a) {};
+		constexpr Color(float r, float g, float b, float a = 1.f) : ::Color(r, g, b, a) {};
 
-		Color() : ::Color(0.f, 0.f, 0.f, 1.f) {};
+		constexpr Color() : ::Color(0.f, 0.f, 0.f, 1.f) {};
 
-		Color(D2D1_COLOR_F col) : ::Color(col.r, col.g, col.b, col.a) {}
+		constexpr Color(D2D1_COLOR_F col) : ::Color(col.r, col.g, col.b, col.a) {}
 
 		Color(D2D1::ColorF::Enum e) : ::Color(0.f, 0.f, 0.f, 0.f) {
 			D2D1::ColorF col = D2D1::ColorF(e);
@@ -53,29 +53,29 @@ namespace d2d {
 			b = col.b;
 		}
 
-		Color(::Color c) : ::Color(c.r, c.g, c.b, c.a) {};
+		constexpr Color(::Color c) : ::Color(c.r, c.g, c.b, c.a) {};
 
-		Color operator+(Color right) {
+		constexpr Color operator+(Color right) {
 			return Color(r + right.r, g + right.g, b + right.b, a);
 		}
 
-		Color operator+(float right) {
+		constexpr Color operator+(float right) {
 			return Color(r + right, g + right, b + right, a);
 		}
 
-		Color operator*(Color right) {
+		constexpr Color operator*(Color right) {
 			return Color(r * right.r, g * right.g, b * right.b, a);
 		}
 
-		Color operator*(float right) {
+		constexpr Color operator*(float right) {
 			return Color(r * right, g * right, b * right, a * right);
 		}
 
-		Color operator-(Color right) {
+		constexpr Color operator-(Color right) {
 			return Color(r - right.r, g - right.g, b - right.b, a);
 		}
 
-		Color operator-(float right) {
+		constexpr Color operator-(float right) {
 			return Color(r - right, g - right, b - right, a);
 		}
 
@@ -83,7 +83,7 @@ namespace d2d {
 			return r < 0.f || g < 0.f || b < 0.f || isnan(r) || isnan(g) || isnan(b) || isinf(r) || isinf(g) || isinf(b);
 		}
 
-		[[nodiscard]] static Color RGB(int r, int g, int b, int alpha = 255) {
+		[[nodiscard]] static constexpr Color RGB(int r, int g, int b, int alpha = 255) {
 			return Color((float)r / 255.f, (float)g / 255.f, (float)b / 255.f, (float)alpha / 255.f);
 		};
 
@@ -106,17 +106,18 @@ namespace d2d {
 
 		[[nodiscard]] std::string getHex() const;
 
-		[[nodiscard]] Color asAlpha(float al) const {
+		[[nodiscard]] constexpr Color asAlpha(float al) const {
 			return { r, g, b, al };
 		}
 
-		[[nodiscard]] D2D1_COLOR_F get() const {
+		[[nodiscard]] constexpr D2D1_COLOR_F get() const {
 			return D2D1_COLOR_F(r, g, b, a);
 		}
 	};
 
 	class Rect {
 	public:
+		Rect(Vec2 const& p1, Vec2 const& p2) : left(p1.x), top(p1.y), right(p2.x), bottom(p2.y) {}
 		Rect(float left, float top, float right, float bottom) : left(left), top(top), right(right), bottom(bottom) {}
 		Rect() : left(0.f), top(0.f), right(0.f), bottom(0.f) {}
 
@@ -128,6 +129,17 @@ namespace d2d {
 
 		[[nodiscard]] Vec2 getPos() const {
 			return { left, top };
+		}
+
+		void setPos(Vec2 const& pos) {
+			float bOffX = right - left;
+			float bOffY = bottom - top;
+
+			left = pos.x;
+			top = pos.y;
+
+			right = left + bOffX;
+			bottom = top + bOffY;
 		}
 
 		[[nodiscard]] Vec2 getSize() const {
@@ -190,6 +202,18 @@ namespace d2d {
 		// Center X-axis, Y is bottom
 		[[nodiscard]] Vec2 centerXB() const {
 			return Vec2(left + ((right - left) / 2), bottom);
+		}
+
+		[[nodiscard]] d2d::Rect translate(Vec2 const& vec) {
+			return Rect(left + vec.x, top + vec.y, right + vec.x, bottom + vec.y);
+		}
+
+		[[nodiscard]] d2d::Rect translate(const float x, const float y) {
+			return Rect(left + x, top + y, right + x, bottom + y);
+		}
+
+		operator D2D1_RECT_F() {
+			return { left, top, right, bottom };
 		}
 	};
 }

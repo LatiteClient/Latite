@@ -19,6 +19,8 @@ public:
 	void initListeners();
 	void unloadScript(std::shared_ptr<JsScript> ptr);
 	void unloadAll();
+	
+	static bool scriptingSupported();
 
 	using event_callback_t = void(__fastcall*)(JsValueRef func);
 

@@ -1,12 +1,15 @@
 #pragma once
 #include <string>
 #include "api/eventing/Listenable.h"
+#include "api/eventing/Event.h"
+#include "client/event/impl/RenderGameEvent.h"
 #include <vector>
 #include "util/DXUtil.h"
+#include <optional>
 
 class Screen : public Listener {
 public:
-	Screen(std::string const& name) : name(name) {}
+	Screen(std::string const& name);
 
 	~Screen() = default;
 	Screen(Screen&) = delete;
@@ -19,7 +22,7 @@ public:
 	[[nodiscard]] std::string getName() { return name; }
 
 	// TODO: grabMouse and releaseMouse
-	virtual void onEnable() {};
+	virtual void onEnable(bool ignoreAnimations = false) {};
 	virtual void onDisable() {};
 	
 	void setLayer(int layer) {
@@ -35,13 +38,38 @@ public:
 		layers.push_back({});
 	}
 
+	[[nodiscard]] bool shouldClose() { return closing; }
+
 	[[nodiscard]] bool shouldSelect(d2d::Rect rc, Vec2 const& pt) {
 		for (int i = 0; i < layers.size(); i++) {
 			if (i >= currentLayer || layers[i].contains(pt)) return false;
 		}
 		return rc.contains(pt);
 	}
+
+	enum class Cursor {
+		Arrow,
+		Hand,
+		IBeam
+	} cursor = Cursor::Arrow;
+protected:
+	HCURSOR arrow;
+	HCURSOR hand;
+	HCURSOR ibeam;
+	virtual void close();
+	std::array<bool, 3> mouseButtons = {};
+	std::array<bool, 3> justClicked = {};
+
+	std::optional<std::wstring> tooltip;
+	void playClickSound();
 private:
+
+	bool closing = false;
+
+	void onRenderGame(Event& ev);
+	void onClick(Event& ev);
+	void onRenderOverlay(Event& ev);
+
 	int currentLayer = 0;
 	std::vector<d2d::Rect> layers;
 	bool active = false;

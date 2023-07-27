@@ -11,6 +11,11 @@ public:
 	Asset latiteLogo{ L"logo.png" };
 	Asset searchIcon{ L"searchicon.png" };
 	Asset arrowIcon{ L"arrow.png" };
+	Asset xIcon{ L"x.png" };
+	Asset hudEditIcon{ L"hudedit.png" };
+	Asset arrowBackIcon{ L"arrow_back.png" };
+	Asset cogIcon{ L"cog.png" };
+	Asset checkmarkIcon{ L"checkmark.png" };
 
 	void loadAll();
 	void unloadAll();

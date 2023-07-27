@@ -27,7 +27,9 @@ public:
 	// More optimized (please use this)
 	void drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity = 5.f);
 	void setFont(Renderer::FontSelection font);
-	void drawText(RectF const& rc, std::string const& text, d2d::Color const& color, float size = 30.f, DWRITE_TEXT_ALIGNMENT alignment = DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT verticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+	void drawText(RectF const& rc, std::wstring const& text, d2d::Color const& color, float size = 30.f, DWRITE_TEXT_ALIGNMENT alignment = DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT verticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+	Vec2 getTextSize(std::wstring const& text, float size);
+	RectF getTextRect(std::wstring const& text, float size, float pad = 0.f);
 
 	DXContext();
 	~DXContext() = default;

@@ -21,6 +21,7 @@ namespace {
 	std::shared_ptr<Hook> GameRenderer_renderCurrentFrameHook;
 	std::shared_ptr<Hook> Keyboard_feedHook;
 	std::shared_ptr<Hook> OnClickHook;
+	std::shared_ptr<Hook> LoadLibraryHook;
 }
 
 void GenericHooks::Level_tick(sdk::Level* level) {
@@ -66,7 +67,16 @@ void GenericHooks::onClick(ClickMap* map, char clickType, char isDownWheelDelta,
 	return OnClickHook->oFunc<decltype(&onClick)>()(map, clickType, isDownWheelDelta, a4, a5, a6, a7, a8);
 }
 
+BOOL __stdcall GenericHooks::hkLoadLibraryW(LPCWSTR lib) {
+	// prevent double injections
+	return 0;
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
+	//LoadLibraryHook = addHook((uintptr_t)&::LoadLibraryW, hkLoadLibraryW);
+	//LoadLibraryHook = addHook((uintptr_t) & ::LoadLibraryA, hkLoadLibraryW);
+
+
 	Level_tickHook = addHook(Signatures::Level_tick.result,
 		Level_tick, "Level::tick");
 
@@ -79,4 +89,5 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	Keyboard_feedHook = addHook(Signatures::Keyboard_feed.result, Keyboard_feed, "Keyboard::feed");
 
 	OnClickHook = addHook(Signatures::onClick.result, onClick, "onClick");
+
 }

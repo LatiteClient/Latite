@@ -5,6 +5,7 @@
 #include <string_view>
 #include "api/eventing/Listenable.h"
 #include "api/feature/setting/Setting.h"
+#include <optional>
 
 class Latite final : public Listener {
 public:
@@ -36,8 +37,12 @@ public:
 
 	static constexpr std::string_view version = "v2.0.0";
 	HINSTANCE dllInst;
+
+	std::optional<float> getMenuBlur();
 private:
 	Setting::Value menuKey = KeyValue('M');
+	Setting::Value menuBlurEnabled = BoolValue(true);
+	Setting::Value menuBlur = FloatValue(20.f);
 
 	void doEject() noexcept;
 	void threadsafeInit();

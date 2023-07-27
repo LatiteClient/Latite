@@ -17,14 +17,18 @@ public:
 		}
 	}
 
+	[[nodiscard]] size_t size() {
+		return settings.size();
+	}
+
 	inline void addSetting(std::shared_ptr<Setting> set) {
 		settings.push_back(set);
 	}
 
-	std::string name() { return groupName; }
+	[[nodiscard]] std::string name() { return groupName; }
 
 	// TODO: Is this needed?
-	std::shared_ptr<SettingGroup> getShared() {
+	[[nodiscard]] std::shared_ptr<SettingGroup> getShared() {
 		return shared_from_this();
 	}
 

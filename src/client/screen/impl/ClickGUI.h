@@ -2,6 +2,7 @@
 #include "../Screen.h"
 #include "api/eventing/Event.h"
 #include "client/render/asset/Asset.h"
+#include "util/DxUtil.h"
 #include <memory>
 #include <array>
 
@@ -14,10 +15,14 @@ public:
 	void onInit(Event& ev);
 	void onKey(Event& ev);
 	void onClick(Event& ev);
+
+	void drawSetting(class Setting* set, struct Vec2 const& pos, float size = 150.f);
+protected:
+	void onEnable(bool ignoreAnims) override;
+	void onDisable() override;
 private:
-	std::array<bool, 3> mouseButtons = {};
-	std::array<bool, 3> lastMouseButtons = {};
-	std::array<bool, 3> justClicked = {};
+
+	ComPtr<ID2D1Bitmap1> shadowBitmap;
 
 	// TODO: move this somewhere more public
 	Asset latiteLogo{L"logo.png"};
@@ -43,12 +48,15 @@ private:
 		float arrowRot = 180.f;
 		float lerpArrowRot = 0.f;
 		float lerpToggle = 0.f;
+		Color toggleColorOn = {};
+		Color toggleColorOff = {};
 
 		static bool compare(ModContainer const& a, ModContainer const& b) {
 			return a.name < b.name;
 		}
 	};
 
-	ComPtr<ID2D1Bitmap1> blurBuffer;
+	d2d::Rect rect = {};
+
 	ComPtr<ID2D1Effect> compositeEffect;
 };

@@ -339,6 +339,12 @@
     <ClInclude Include="src\client\event\impl\AppSuspendedEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\sdk\signature\storage_1_19_51.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\screen\impl\HUDEditor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -525,6 +531,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\sdk\common\world\level\Level.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\screen\Screen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\screen\impl\HUDEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

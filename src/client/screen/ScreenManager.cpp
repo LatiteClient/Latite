@@ -1,19 +1,23 @@
 #include "ScreenManager.h"
 #include "impl/ClickGUI.h"
+#include "impl/HUDEditor.h"
 #include "util/Util.h"
 #include "sdk/common/client/game/ClientInstance.h"
 
 ScreenManager::ScreenManager() {
 	this->mutex.lock();
 	this->items.push_back(std::make_shared<ClickGUI>());
+	this->items.push_back(std::make_shared<HUDEditor>());
 	this->mutex.unlock();
+
 }
 
-bool ScreenManager::showScreen(std::string const& screenName) {
+bool ScreenManager::showScreen(std::string const& screenName, bool ignoreAnims) {
 	for (auto& screen : items) {
 		if (util::ToLower(screenName) == util::ToLower(screen->getName())) {
 			this->activeScreen = screen;
 			this->activeScreen->setActive(true);
+			this->activeScreen->onEnable(ignoreAnims);
 			return true;
 		}
 	}
@@ -34,7 +38,10 @@ bool ScreenManager::tryToggleScreen(std::string const& screenName) {
 }
 
 void ScreenManager::exitCurrentScreen() {
-	this->activeScreen->setActive(false);
-	this->activeScreen = nullptr;
-	sdk::ClientInstance::get()->grabCursor();
+	if (this->activeScreen) {
+		this->activeScreen->setActive(false);
+		this->activeScreen->onDisable();
+		this->activeScreen = nullptr;
+		sdk::ClientInstance::get()->grabCursor();
+	}
 }

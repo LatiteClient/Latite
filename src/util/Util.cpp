@@ -2,6 +2,8 @@
 #include "pch.h"
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/world/Minecraft.h"
+#include "sdk/common/client/renderer/LevelRendererPlayer.h"
+#include "sdk/common/client/renderer/LevelRenderer.h"
 
 std::filesystem::path util::GetRootPath() {
 	char* env;
@@ -96,6 +98,14 @@ std::vector<std::string> util::SplitString(std::string const& s, char delim) {
 	}
 
 	return ret;
+}
+
+void util::PlaySoundUI(std::string const& sound, float volume, float pitch) {
+	auto cInst = sdk::ClientInstance::get();
+	auto lr = cInst->levelRenderer;
+	if (lr) {
+		cInst->minecraft->getLevel()->playSoundEvent(sound, lr->getLevelRendererPlayer()->getOrigin(), volume, pitch);
+	} // TODO: make it work outside world
 }
 
 Color util::LerpColorState(Color const& current, Color const& on, Color const& off, bool state, float speed)

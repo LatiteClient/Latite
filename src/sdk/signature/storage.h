@@ -16,4 +16,5 @@ public:
 };
 
 #include "storage_latest.h"
+#include "storage_1_19_51.h"
 #include "storage_1_18_12.h"
