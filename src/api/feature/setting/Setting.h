@@ -61,6 +61,8 @@ public:
 	Value max;
 	Type type;
 
+	bool visible = true;
+
 	struct {
 		bool init = false;
 		float col[4] = { 0.f, 0.f, 0.f, 1.f };

@@ -16,7 +16,7 @@ public:
 	void onKey(Event& ev);
 	void onClick(Event& ev);
 
-	void drawSetting(class Setting* set, struct Vec2 const& pos, float size = 150.f);
+	void drawSetting(class Setting* set, struct Vec2 const& pos, class DXContext& dc, float size = 150.f);
 protected:
 	void onEnable(bool ignoreAnims) override;
 	void onDisable() override;
@@ -57,6 +57,9 @@ private:
 	};
 
 	d2d::Rect rect = {};
+
+	Setting* activeSetting = nullptr;
+	int capturedKey = 0;
 
 	ComPtr<ID2D1Effect> compositeEffect;
 };

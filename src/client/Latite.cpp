@@ -41,15 +41,15 @@ int sdk::internalVers = sdk::VLATEST;
 using namespace std;
 
 namespace {
+    alignas(Eventing) char eventing[sizeof(Eventing)] = {};
     alignas(Latite) char latiteBuf[sizeof(Latite)] = {};
+    alignas(Renderer) char rendererBuf[sizeof(Renderer)] = {};
     alignas(ModuleManager) char mmgrBuf[sizeof(ModuleManager)] = {};
     alignas(ClientMessageSink) char messageSinkBuf[sizeof(ClientMessageSink)] = {};
     alignas(CommandManager) char commandMgrBuf[sizeof(CommandManager)] = {};
     alignas(ConfigManager) char configMgrBuf[sizeof(ConfigManager)] = {};
     alignas(SettingGroup) char mainSettingGroup[sizeof(SettingGroup)] = {};
     alignas(LatiteHooks) char hooks[sizeof(LatiteHooks)] = {};
-    alignas(Eventing) char eventing[sizeof(Eventing)] = {};
-    alignas(Renderer) char rendererBuf[sizeof(Renderer)] = {};
     alignas(ScreenManager) char scnMgrBuf[sizeof(ScreenManager)] = {};
     alignas(Assets) char assetsBuf[sizeof(Assets)] = {};
     alignas(ScriptManager) char scriptMgrBuf[sizeof(ScriptManager)] = {};
@@ -362,6 +362,7 @@ void Latite::onUpdate(Event&) {
     Latite::getScriptManager().runScriptingOperations();
 }
 
+// TODO: port this to ScreenManager
 void Latite::onKey(Event& evGeneric) {
     auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
     if (ev.getKey() == VK_END && ev.isDown()) {

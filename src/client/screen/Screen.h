@@ -58,6 +58,7 @@ protected:
 	HCURSOR ibeam;
 	virtual void close();
 	std::array<bool, 3> mouseButtons = {};
+	std::array<bool, 3> activeMouseButtons = {};
 	std::array<bool, 3> justClicked = {};
 
 	std::optional<std::wstring> tooltip;

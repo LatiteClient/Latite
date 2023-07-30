@@ -2,6 +2,7 @@
 #include "client/event/impl/RenderOverlayEvent.h"
 #include "client/event/Eventing.h"
 #include "client/Latite.h"
+#include "client/config/ConfigManager.h"
 #include "util/DxUtil.h"
 #include "util/DxContext.h"
 #include "util/Util.h"
@@ -41,7 +42,7 @@ void HUDEditor::onRender(Event& ev) {
 		d2d::Color outlineCol = d2d::Color::RGB(0, 0, 0).asAlpha(0.28f);
 
 		bool state = shouldSelect(btnRect, cursorPos);
-		if (state && mouseButtons[0]) {
+		if (state && justClicked[0]) {
 			Latite::getScreenManager().exitCurrentScreen();
 			Latite::getScreenManager().showScreen("ClickGUI");
 			playClickSound();
@@ -51,8 +52,7 @@ void HUDEditor::onRender(Event& ev) {
 		dc.fillRoundedRectangle(btnRect, col, 20.f);
 		dc.drawRoundedRectangle(btnRect, outlineCol, 20.f, 2.f, DXContext::OutlinePosition::Outside);
 
-		dc.setFont(Renderer::FontSelection::Regular);
-		dc.drawText(btnRect, L"Mod Settings", d2d::Color(0.9f, 0.9f, 0.9f, 1.f), 20.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(btnRect, L"Mod Settings", d2d::Color(0.9f, 0.9f, 0.9f, 1.f), Renderer::FontSelection::Regular, 20.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	}
 }
 
@@ -63,4 +63,5 @@ void HUDEditor::onEnable(bool ignoreAnims) {
 
 void HUDEditor::onDisable() {
 	sdk::ClientInstance::get()->grabCursor();
+	Latite::getConfigManager().saveCurrentConfig();
 }

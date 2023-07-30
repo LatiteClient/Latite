@@ -17,18 +17,6 @@ public:
 	explicit IModule(std::string const& name, std::string const& description,
 		std::string const& displayName, Category category, bool visible) : modName(name), description(description), displayName(displayName), category(category), visible(visible) {
 		settings = std::make_shared<SettingGroup>(name);
-		{
-			auto set = std::make_shared<Setting>("enabled", "Enabled", "Whether the module is on or not", Setting::Type::Bool);
-			set->value = &enabled;
-
-			settings->addSetting(set);
-		}
-		{
-			auto set = std::make_shared<Setting>("key", "Key", "The keybind of the module", Setting::Type::Key);
-			set->value = &key;
-
-			settings->addSetting(set);
-		}
 	}
 	IModule(IModule&) = delete;
 	IModule(IModule&&) = delete;
@@ -37,6 +25,7 @@ public:
 	virtual void onEnable() {};
 	virtual void onDisable() {};
 
+	[[nodiscard]] KeyValue getKeybind() { return std::get<KeyValue>(key); }
 	[[nodiscard]] bool isEnabled() { return std::get<BoolValue>(enabled); };
 	[[nodiscard]] bool isVisible() { return visible; };
 	void setEnabled(bool b) { std::get<BoolValue>(enabled) = b; }

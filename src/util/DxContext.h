@@ -9,6 +9,7 @@ public:
 	ID2D1SolidColorBrush* brush = nullptr;
 	IDWriteTextFormat* currentFormat = nullptr;
 	IDWriteFactory* factory = nullptr;
+private:
 public:
 	enum class OutlinePosition : int {
 		Center,
@@ -26,10 +27,9 @@ public:
 	void drawGaussianBlur(float intensity = 5.f);
 	// More optimized (please use this)
 	void drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity = 5.f);
-	void setFont(Renderer::FontSelection font);
-	void drawText(RectF const& rc, std::wstring const& text, d2d::Color const& color, float size = 30.f, DWRITE_TEXT_ALIGNMENT alignment = DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT verticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-	Vec2 getTextSize(std::wstring const& text, float size);
-	RectF getTextRect(std::wstring const& text, float size, float pad = 0.f);
+	void drawText(RectF const& rc, std::wstring const& text, d2d::Color const& color, Renderer::FontSelection font, float size = 30.f, DWRITE_TEXT_ALIGNMENT alignment = DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT verticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+	Vec2 getTextSize(std::wstring const& text, Renderer::FontSelection font, float size);
+	RectF getTextRect(std::wstring const& text, Renderer::FontSelection font, float size, float pad = 0.f);
 
 	DXContext();
 	~DXContext() = default;

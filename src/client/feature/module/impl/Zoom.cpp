@@ -2,9 +2,9 @@
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/world/Minecraft.h"
 
-Zoom::Zoom() : Module("Zoom", "Zoom", "Zooms like OptiFine") {
-	addSetting("modifier", "Modifier", "How far to zoom", this->modifier);
+Zoom::Zoom() : Module("Zoom", "Zoom", "Zooms like OptiFine", GAME, 1) {
 	addSetting("zoomKey", "Zoom Key", "The key to press to zoom", this->zoomKey);
+	addSliderSetting("modifier", "Modifier", "How far to zoom", this->modifier, FloatValue(1.f), FloatValue(50.f), FloatValue(1.f));
 	listen<RenderLevelEvent>((EventListenerFunc)&Zoom::onRenderLevel);
 	listen<KeyUpdateEvent>((EventListenerFunc)&Zoom::onKeyUpdate);
 }

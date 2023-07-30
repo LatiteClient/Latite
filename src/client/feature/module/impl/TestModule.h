@@ -8,5 +8,6 @@ public:
 	~TestModule() = default;
 
 	void onTick(Event& ev);
+	void onRender(Event& ev);
 	void onEnable() override {};
 };

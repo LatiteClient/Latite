@@ -12,6 +12,9 @@ namespace util {
 	extern std::wstring StrToWStr(std::string const& s);
 	extern std::string WStrToStr(std::wstring const& ws);
 	extern std::string Format(std::string const& s);
+
+	extern std::string KeyToString(int key);
+	extern int StringToKey(std::string const& s);
 	
 	extern std::string ToLower(std::string const& s);
 	extern std::string ToUpper(std::string const& s);

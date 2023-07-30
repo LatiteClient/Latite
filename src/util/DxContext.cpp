@@ -81,11 +81,8 @@ void DXContext::drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity) {
 	ctx->DrawImage(gaussianBlurEffect, D2D1::Point2F(0.f, 0.f), rc);
 }
 
-void DXContext::setFont(Renderer::FontSelection font)  {
+void DXContext::drawText(RectF const& rc, std::wstring const& ws, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment)  {
 	this->currentFormat = Latite::getRenderer().getTextFormat(font);
-}
-
-void DXContext::drawText(RectF const& rc, std::wstring const& ws, d2d::Color const& color, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment)  {
 	brush->SetColor(color.get());
 	IDWriteTextLayout* layout;
 	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
@@ -102,7 +99,8 @@ void DXContext::drawText(RectF const& rc, std::wstring const& ws, d2d::Color con
 	}
 }
 
-Vec2 DXContext::getTextSize(std::wstring const& ws, float size) {
+Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font, float size) {
+	this->currentFormat = Latite::getRenderer().getTextFormat(font);
 	auto ss = ctx->GetSize();
 	IDWriteTextLayout* layout;
 	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
@@ -127,7 +125,8 @@ Vec2 DXContext::getTextSize(std::wstring const& ws, float size) {
 	return {};
 }
 
-d2d::Rect DXContext::getTextRect(std::wstring const& ws, float size, float pad) {
+d2d::Rect DXContext::getTextRect(std::wstring const& ws, Renderer::FontSelection font, float size, float pad) {
+	this->currentFormat = Latite::getRenderer().getTextFormat(font);
 	auto ss = ctx->GetSize();
 	IDWriteTextLayout* layout;
 	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),

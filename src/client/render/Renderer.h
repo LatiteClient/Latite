@@ -60,6 +60,8 @@ private:
 	std::shared_mutex mutex;
 	int bufferCount = 3;
 public:
+	ID2D1Bitmap1* testBitmap;
+
 	enum class FontSelection {
 		Regular,
 		Semilight,
@@ -134,7 +136,7 @@ public:
 		D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
 		D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
 
-		HRESULT hr = d2dCtx->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_NONE,pixelFormat), &newBitmap);
+		HRESULT hr = d2dCtx->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET,pixelFormat), &newBitmap);
 		if (SUCCEEDED(hr)) {
 			newBitmap->CopyFromBitmap(nullptr, myBitmap, nullptr);
 		}

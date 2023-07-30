@@ -2,6 +2,8 @@
 #include "sdk/signature/storage.h"
 #include "client/event/Eventing.h"
 #include "client/event/impl/RenderLevelEvent.h"
+#include "client/render/Renderer.h"
+#include "client/Latite.h"
 
 namespace {
 	std::shared_ptr<Hook> renderLevelHook;
