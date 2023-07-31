@@ -1,5 +1,5 @@
 #pragma once
-#include "../Module.h"
+#include "../../Module.h"
 #include "client/event/impl/GammaEvent.h"
 
 class Fullbright : public Module {

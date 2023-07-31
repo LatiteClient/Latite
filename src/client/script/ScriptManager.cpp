@@ -5,12 +5,19 @@
 #include "util/Logger.h"
 #include <memory>
 
-std::shared_ptr<JsScript> ScriptManager::loadScript(std::string const& folderPath, bool run)
+std::shared_ptr<JsScript> ScriptManager::loadScript(std::wstring const& folderPath, bool run)
 {
-	auto fPathW = util::StrToWStr(folderPath);
+	auto fPathW = folderPath;
 	auto scriptsPathW = util::GetLatitePath() / ("Scripts");
 	auto scriptPath = scriptsPathW / fPathW / "index.js";
 	if (!std::filesystem::exists(scriptPath)) return nullptr;
+
+	for (auto& scr : this->items) {
+		if (scr->relFolderPath == fPathW) {
+			Latite::getClientMessageSink().push(util::Format(std::format("Script {} is already loaded.", scr->data.name)));
+			return nullptr;
+		}
+	}
 
 	auto myScript = std::make_shared<JsScript>(scriptPath);
 	myScript->relFolderPath = fPathW;
@@ -46,10 +53,10 @@ std::shared_ptr<JsScript> ScriptManager::loadScript(std::string const& folderPat
 	return myScript;
 }
 
-std::shared_ptr<JsScript> ScriptManager::getScriptByName(std::string const& name)
+std::shared_ptr<JsScript> ScriptManager::getScriptByName(std::wstring const& name)
 {
 	for (auto& script : items) {
-		if (util::WStrToStr(script->data.name) == name) {
+		if (script->data.name == name) {
 			return script;
 		}
 	}
@@ -111,7 +118,7 @@ bool ScriptManager::loadPrerunScripts()
 	for (auto& dirEntry : recursive_directory_iterator(prerunPath)) {
 		if (dirEntry.is_directory()) {
 			if (std::filesystem::exists(dirEntry.path().string() + "\\index.js")) {
-				loadScript(std::string("Startup") + "\\" + dirEntry.path().filename().string(), true);
+				loadScript(std::wstring(L"Startup") + L"\\" + dirEntry.path().filename().wstring(), true);
 			}
 		}
 	}

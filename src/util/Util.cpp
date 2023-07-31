@@ -124,10 +124,10 @@ namespace util {
 }
 
 std::filesystem::path util::GetRootPath() {
-	char* env;
+	wchar_t* env;
 	size_t size;
-	if (!_dupenv_s(&env, &size, "localappdata") && env) {
-		auto str = std::string(env).substr(0, strlen(env) - 2);
+	if (!_wdupenv_s(&env, &size, L"localappdata") && env) {
+		auto str = std::wstring(env).substr(0, lstrlenW(env) - 2);
 		delete env;
 		return str;
 	}
@@ -135,10 +135,10 @@ std::filesystem::path util::GetRootPath() {
 }
 
 std::filesystem::path util::GetRoamingPath() {
-	char* env;
+	wchar_t* env;
 	size_t size;
-	if (!_dupenv_s(&env, &size, "localappdata") && env) {
-		auto str = std::string(env).substr(0, strlen(env) - 2) + "RoamingState";
+	if (!_wdupenv_s(&env, &size, L"localappdata") && env) {
+		auto str = std::wstring(env).substr(0, lstrlenW(env) - 2) + L"RoamingState";
 		delete env;
 		return str;
 	}

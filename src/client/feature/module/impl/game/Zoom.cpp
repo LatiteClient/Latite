@@ -2,9 +2,11 @@
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/world/Minecraft.h"
 
-Zoom::Zoom() : Module("Zoom", "Zoom", "Zooms like OptiFine", GAME, 1) {
+Zoom::Zoom() : Module("Zoom", "Zoom", "Zooms like OptiFine", GAME, nokeybind) {
 	addSetting("zoomKey", "Zoom Key", "The key to press to zoom", this->zoomKey);
 	addSliderSetting("modifier", "Modifier", "How far to zoom", this->modifier, FloatValue(1.f), FloatValue(50.f), FloatValue(1.f));
+	addSliderSetting("animationSpeed", "Speed", "The speed of the animation", animSpeed, FloatValue(1.f), FloatValue(20.f), FloatValue(0.5f));
+
 	listen<RenderLevelEvent>((EventListenerFunc)&Zoom::onRenderLevel);
 	listen<KeyUpdateEvent>((EventListenerFunc)&Zoom::onKeyUpdate);
 }
@@ -16,7 +18,7 @@ void Zoom::onRenderLevel(Event& evGeneric) {
 
 	// partial ticks
 	auto alpha = sdk::ClientInstance::get()->minecraft->timer->alpha;
-	float lr = std::lerp(activeModifier, modifyTo, alpha * 0.2f);
+	float lr = std::lerp(activeModifier, modifyTo, alpha * (std::get<FloatValue>(animSpeed) - 10.f) / 10.f);
 	activeModifier = lr;
 
 	float& fx = ev.getLevelRenderer()->getLevelRendererPlayer()->getFovX();

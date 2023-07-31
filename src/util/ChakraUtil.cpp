@@ -302,7 +302,7 @@ JsValueRef Chakra::GetUndefined() {
 
 Chakra::Result Chakra::VerifyArgCount(unsigned short has, unsigned short expected, bool autoThrow) {
 	if (has != expected) {
-		auto ws = L"Function does not take " + std::to_wstring(expected - 1) + L" arguments";
+		auto ws = L"Function does not take " + std::to_wstring(has - 1) + L" arguments";
 		if (autoThrow) Chakra::ThrowError(ws);
 		return { false, ws };
 	}

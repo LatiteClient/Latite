@@ -2,7 +2,7 @@
 #include <sstream>
 #include "pch.h"
 #include "util/Chakrautil.h"
-#include "util/util.h"
+#include "util/Util.h"
 
 #include "client/Latite.h"
 #include "client/misc/ClientMessageSink.h"
@@ -263,6 +263,10 @@ namespace {
 
 void JsScript::loadScriptObjects() {
 	JS::JsSetCurrentContext(ctx);
+	int i = 0;
+	this->objects.clear();
+	this->objects.push_back(std::make_shared<ClientScriptingObject>(i++));
+
 	JsErrorCode err;
 	JsValueRef myScript;
 	err = JS::JsCreateObject(&myScript);
@@ -319,6 +323,9 @@ void JsScript::loadScriptObjects() {
 
 	for (auto& obj : objects) {
 		obj->initialize(ctx, globalObj);
+		JsPropertyIdRef propId;
+		JS::JsGetPropertyIdFromName(obj->objName, &propId);
+		JS::JsSetProperty(globalObj, propId, obj->object, false);
 	}
 
 	JS::JsRelease(myScript, nullptr);

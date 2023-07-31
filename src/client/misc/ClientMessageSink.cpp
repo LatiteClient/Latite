@@ -5,6 +5,7 @@
 #include "pch.h"
 
 void ClientMessageSink::doPrint(int numMessages) {
+	sinkLock.lock();
 	int msgs = 0;
 	for (auto it = messages.begin(); it != messages.end();) {
 		if (msgs >= numMessages) break;
@@ -20,6 +21,7 @@ void ClientMessageSink::doPrint(int numMessages) {
 		++it;
 		msgs++;
 	}
+	sinkLock.unlock();
 }
 
 void ClientMessageSink::push(std::string const& message) {

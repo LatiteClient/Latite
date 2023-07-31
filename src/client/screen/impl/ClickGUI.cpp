@@ -55,10 +55,6 @@ void ClickGUI::onRender(Event&) {
 
 	Vec2& cursorPos = sdk::ClientInstance::get()->cursorPos;
 
-	RECT desktopSize;
-	HWND hDesktop = GetDesktopWindow();
-	GetWindowRect(hDesktop, &desktopSize);
-
 	//auto& ev = reinterpret_cast<RenderOverlayEvent&>(evGeneric);
 	auto& rend = Latite::getRenderer();
 	auto ss = rend.getDeviceContext()->GetSize();
@@ -399,11 +395,9 @@ void ClickGUI::onRender(Event&) {
 					modRectActual.bottom += padToSetting;
 					mod.mod->settings->forEach([&](std::shared_ptr<Setting> set) {
 						if (set->visible) {
-							if (set->type == Setting::Type::Bool || set->type == Setting::Type::Float || set->type == Setting::Type::Key) {
-								drawSetting(set.get(), { descTextRect.left, modRectActual.bottom }, dc, descTextRect.getWidth());
-								modRectActual.bottom += settingHeight;
-								modRectActual.bottom += settingPadY;
-							}
+							drawSetting(set.get(), { descTextRect.left, modRectActual.bottom }, dc, descTextRect.getWidth());
+							modRectActual.bottom += settingHeight;
+							modRectActual.bottom += settingPadY;
 						}
 						});
 
@@ -508,18 +502,34 @@ void ClickGUI::onRender(Event&) {
 	if (shouldArrow) cursor = Cursor::Arrow;
 }
 
-void ClickGUI::onCleanup(Event&) {
-	this->compositeEffect = nullptr;
-}
-
 void ClickGUI::onInit(Event&) {
 	auto myBitmap = Latite::getRenderer().getBitmap();
 	D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
 	D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
 
-	Latite::getRenderer().getDeviceContext()->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, pixelFormat), shadowBitmap.GetAddressOf());
-	Latite::getRenderer().getDeviceContext()->CreateEffect(CLSID_D2D1Composite, compositeEffect.GetAddressOf());
+	auto dc = Latite::getRenderer().getDeviceContext();
+
+	dc->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, pixelFormat), shadowBitmap.GetAddressOf());
+	dc->CreateEffect(CLSID_D2D1Composite, compositeEffect.GetAddressOf());
+	D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES prop{};
+	auto ss = dc->GetSize();
+	prop.startPoint = { 0.f, ss.height / 2.f };
+	prop.endPoint = { ss.width, ss.height / 2.f };
+
+	const D2D1_GRADIENT_STOP stops[] = {
+		{ 0.f, 0.f, 0.f, 1.f },
+		{ 1.f, 1.f, 1.f, 1.f },
+	};
+	dc->CreateGradientStopCollection(stops, _countof(stops), gradientStopCollection.GetAddressOf());
+	dc->CreateLinearGradientBrush(prop, gradientStopCollection.Get(), gradientBrush.GetAddressOf());
 }
+
+void ClickGUI::onCleanup(Event&) {
+	compositeEffect = nullptr;
+	gradientStopCollection = nullptr;
+	gradientBrush = nullptr;
+}
+
 
 void ClickGUI::onKey(Event& evGeneric) {
 	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
@@ -544,8 +554,8 @@ void ClickGUI::onClick(Event& evGeneric) {
 }
 
 void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float size) {
-	static const float checkboxSize = rect.getWidth() * setting_height_relative;
-	static const float textSize = checkboxSize * 0.8f;
+	const float checkboxSize = rect.getWidth() * setting_height_relative;
+	const float textSize = checkboxSize * 0.8f;
 	const auto cursorPos = sdk::ClientInstance::get()->cursorPos;
 	const float round = 0.1875f * checkboxSize;
 
@@ -593,7 +603,8 @@ void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 
 		dc.drawText(textRect, disp, { 1.f, 1.f, 1.f, 1.f }, FontSelection::Regular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		auto desc = util::StrToWStr(set->desc());
-		if (contains || shouldSelect(textRect, cursorPos)) tooltip = desc;
+		if (!desc.empty())
+			if (contains || shouldSelect(textRect, cursorPos)) tooltip = desc;
 	}
 		break;
 	case Setting::Type::Key:
@@ -652,7 +663,8 @@ void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 
 		auto disp = util::StrToWStr(set->getDisplayName());
 		dc.drawText(textRect, disp, { 1.f, 1.f, 1.f, 1.f }, FontSelection::Regular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-		if ( shouldSelect(textRect, cursorPos)) tooltip = util::StrToWStr(set->desc());
+		if (!set->desc().empty())
+			if (shouldSelect(textRect, cursorPos)) tooltip = util::StrToWStr(set->desc());
 		if (shouldSelect(keyRect, cursorPos)) {
 			tooltip = L"Right click to reset";
 			if (justClicked[0]) {
@@ -667,6 +679,21 @@ void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 		}
 	}
 		break;
+	case Setting::Type::Color:
+	{
+		float padToName = 0.006335f * rect.getWidth();
+
+		RectF colRect = { pos.x, pos.y, pos.x + checkboxSize * 2.f, pos.y + checkboxSize };
+		bool contains = this->shouldSelect(colRect, cursorPos);
+		std::wstring name = util::StrToWStr(set->getDisplayName());
+
+		RectF textRect = { colRect.right + padToName, colRect.top, pos.x + size, colRect.bottom };
+		dc.drawText(textRect, name, { 1.f, 1.f, 1.f, 1.f }, FontSelection::Regular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		gradientBrush->SetStartPoint({ textRect.left, textRect.centerY() });
+		gradientBrush->SetEndPoint({ textRect.right, textRect.centerY() });
+		dc.ctx->FillRectangle(colRect, gradientBrush.Get());
+	}
+	break;
 	case Setting::Type::Float:
 	{
 		float textWidth = 0.1947f * size;
@@ -758,5 +785,6 @@ void ClickGUI::onEnable(bool ignoreAnims) {
 
 void ClickGUI::onDisable() {
 	capturedKey = 0;
+	activeSetting = nullptr;
 	Latite::getConfigManager().saveCurrentConfig();
 }

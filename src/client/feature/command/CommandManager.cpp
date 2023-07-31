@@ -3,7 +3,7 @@
 #include "client/latite.h"
 #include "client/misc/ClientMessageSink.h"
 #include "pch.h"
-#include "util/util.h"
+#include "util/Util.h"
 
 // Commands
 #include "impl/TestCommand.h"

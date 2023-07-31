@@ -34,7 +34,7 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 
 	if (args[0] == "load") {
 		if (args.size() != 2) return false;
-		auto res = Latite::getScriptManager().loadScript(args[1], true);
+		auto res = Latite::getScriptManager().loadScript(util::StrToWStr(args[1]), true);
 		if (res) {
 			std::wstringstream ss;
 			ss << "Loaded script " << res->data.name << " " << res->data.version << "!";
@@ -52,7 +52,7 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 			return true;
 		}
 		else {
-			if (auto script = Latite::getScriptManager().getScriptByName(args[1])) {
+			if (auto script = Latite::getScriptManager().getScriptByName(util::StrToWStr(args[1]))) {
 				Latite::getScriptManager().unloadScript(script);
 				message("Successfully unloaded script.");
 				return true;
@@ -78,10 +78,10 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 	}
 	else if (args[0] == "reload") {
 		if (args.size() != 2) return false;
-		if (auto script = Latite::getScriptManager().getScriptByName(args[1])) {
+		if (auto script = Latite::getScriptManager().getScriptByName(util::StrToWStr(args[1]))) {
 			auto path = script->relFolderPath;
 			Latite::getScriptManager().unloadScript(script);
-			auto sc = Latite::getScriptManager().loadScript(util::WStrToStr(path), true);
+			auto sc = Latite::getScriptManager().loadScript(path, true);
 			if (sc) message("Successfully reloaded script.");
 			else message("Could not reload script properly.", true);
 			return true;
@@ -93,7 +93,7 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 	else if (args[0] == "install") {
 		if (args.size() != 2) return false;
 		std::wstring token = L"?token=GHSAT0AAAAAACETEXYVRCL7YLMVSDOYZB6OZFLNT7Q";
-		std::wstring registry = L"https://raw.githubusercontent.com/LatiteScripting/Scripts/master/registry/";
+		std::wstring registry = L"https://raw.githubusercontent.com/LatiteScripting/Scripts/master/registry";
 		std::wstring jsonPath = registry + L"/scripts.json" + token;
 		nlohmann::json scriptsJson;
 		auto http = HttpClient();
@@ -132,7 +132,7 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 			std::transform(name.begin(), name.end(), name.begin(), ::tolower);
 			if (in == name) {
 				message("Installing " + oName + " v" + js["version"].get<std::string>() + " by " + js["author"].get<std::string>());
-				std::wstring path = util::GetLatitePath() / "Scripts" / woName;
+				std::wstring path = util::GetLatitePath() / "Startup" / "Scripts" / woName;
 				std::filesystem::create_directory(path);
 				for (auto& fil : js["files"]) {
 					auto fws = util::StrToWStr(fil.get<std::string>());
@@ -151,7 +151,8 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 					ofs << strs.c_str();
 					ofs.close();
 				}
-				message("Script installed. Do &7" + Latite::getCommandManager().prefix + "script load &7" + oName + "&r to run the script.");
+				message("Script installed. Do &7" + CommandManager::prefix + "script load &7Startup/" + oName + "&r to run the script.");
+				message("This script will load every time you load Minecraft. To disable this, move the script out of the &7Startup&r folder.");
 				return true;
 			}
 		}

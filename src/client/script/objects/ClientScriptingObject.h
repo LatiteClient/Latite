@@ -8,11 +8,13 @@ class ClientScriptingObject final : public ScriptingObject {
 
 public:
 	inline static int objectID = -1;
-	ClientScriptingObject(int id) : ScriptingObject(id) { objectID = id; }
+	ClientScriptingObject(int id) : ScriptingObject(id, L"client") { objectID = id; }
 
 	void initialize(JsContextRef ctx, JsValueRef parentObj) override;
 
 	~ClientScriptingObject() {
 		JS::JsRelease(this->object, nullptr);
 	}
+
+	JsValueRef moduleManager;
 };

@@ -3,7 +3,7 @@
 
 #include "Latite.h"
 #include "pch.h"
-#include "util/util.h"
+#include "util/Util.h"
 #include "util/Logger.h"
 
 #include "feature/module/ModuleManager.h"
@@ -139,6 +139,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(onClick),
         MVSIG(AppPlatform__fireAppFocusLost),
         MVSIG(MinecraftGame_onAppSuspended),
+        MVSIG(RenderController_getOverlayColor),
             };
     
     new (mmgrBuf) ModuleManager;

@@ -1,5 +1,5 @@
 #include "ClientInstance.h"
-#include "util/util.h"
+#include "util/Util.h"
 #include "api/memory/memory.h"
 #include "sdk/signature/storage.h"
 

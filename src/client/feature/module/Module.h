@@ -5,6 +5,8 @@
 
 class Module : public IModule {
 public:
+	inline static constexpr int nokeybind = 1;
+
 	explicit Module(std::string const& name, std::string const& displayName, std::string const& description, Category category,
 		int keybind = 0, bool visible = true) : IModule(name, description, displayName, category, visible) {
 			{

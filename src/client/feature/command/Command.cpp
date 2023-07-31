@@ -3,7 +3,7 @@
 
 #include "client/misc/ClientMessageSink.h"
 #include "client/Latite.h"
-#include "util/util.h"
+#include "util/Util.h"
 
 /*
 Command::Command(std::string const& name, std::string const& description, std::string const& usage, std::vector<std::string> aliases)

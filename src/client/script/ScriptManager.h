@@ -6,8 +6,8 @@
 class ScriptManager final : public Manager<JsScript> {
 private:
 public:
-	std::shared_ptr<JsScript> loadScript(std::string const& folderPath, bool run = true);
-	std::shared_ptr<JsScript> getScriptByName(std::string const& name);
+	std::shared_ptr<JsScript> loadScript(std::wstring const& folderPath, bool run = true);
+	std::shared_ptr<JsScript> getScriptByName(std::wstring const& name);
 
 	void popScript(std::shared_ptr<JsScript> ptr);
 	void reportError(JsValueRef except, std::wstring filePath);

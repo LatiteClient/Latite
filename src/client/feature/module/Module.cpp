@@ -39,6 +39,9 @@ void Module::addSetting(std::string const& internalName, std::string const& disp
 	case 3:
 		type = Setting::Type::Key;
 		break;
+	case 4:
+		type = Setting::Type::Color;
+		break;
 	default:
 		throw std::runtime_error("Unknown key");
 	}

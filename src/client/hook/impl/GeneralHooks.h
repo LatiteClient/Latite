@@ -1,7 +1,7 @@
 #pragma once
 #include "client/hook/Hook.h"
 #include "sdk/common/world/level/Level.h"
-#include "util/util.h"
+#include "util/Util.h"
 #include "sdk/misc/ClickMap.h"
 
 class GenericHooks : public HookGroup {

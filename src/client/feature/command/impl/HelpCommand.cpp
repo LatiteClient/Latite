@@ -2,7 +2,7 @@
 #include <sstream>
 #include "client/latite.h"
 #include "client/feature/command/CommandManager.h"
-#include "util/util.h"
+#include "util/Util.h"
 
 HelpCommand::HelpCommand() : Command("help", "Shows all commands and descriptions.", "", {"?", ""}) {
 }

@@ -30,5 +30,5 @@ JsValueRef ClientScriptingObject::registerEventCallback(JsValueRef callee, bool 
 }
 
 void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
-	Chakra::DefineFunc(object, registerEventCallback, L"registerEvent");
+	Chakra::DefineFunc(object, registerEventCallback, L"on");
 }

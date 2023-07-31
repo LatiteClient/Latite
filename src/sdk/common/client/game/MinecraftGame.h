@@ -1,5 +1,5 @@
 #pragma once
-#include "sdk/util.h"
+#include "sdk/Util.h"
 
 namespace sdk {
 	class MinecraftGame {

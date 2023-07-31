@@ -2,7 +2,7 @@
 #include "client/event/Eventing.h"
 #include "client/event/impl/RenderOverlayEvent.h"
 #include "client/event/impl/RendererCleanupEvent.h"
-#include "../Module.h"
+#include "../../Module.h"
 
 class MotionBlur : public Module {
 public:

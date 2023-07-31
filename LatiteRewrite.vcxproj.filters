@@ -177,7 +177,7 @@
     <ClInclude Include="src\client\feature\command\impl\EjectCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\client\feature\module\impl\TestModule.h">
+    <ClInclude Include="src\client\feature\module\impl\misc\TestModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\api\eventing\EventManager.h">
@@ -225,7 +225,7 @@
     <ClInclude Include="src\client\event\impl\RenderLevelEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\client\feature\module\impl\Zoom.h">
+    <ClInclude Include="src\client\feature\module\impl\game\Zoom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\event\impl\KeyUpdateEvent.h">
@@ -240,7 +240,7 @@
     <ClInclude Include="src\client\hook\impl\OptionHooks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\client\feature\module\impl\Fullbright.h">
+    <ClInclude Include="src\client\feature\module\impl\visual\Fullbright.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\hook\impl\DXHooks.h">
@@ -267,7 +267,7 @@
     <ClInclude Include="src\client\event\impl\RendererCleanupEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\client\feature\module\impl\MotionBlur.h">
+    <ClInclude Include="src\client\feature\module\impl\visual\MotionBlur.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\screen\Screen.h">
@@ -343,6 +343,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\screen\impl\HUDEditor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\visual\HurtColor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\hook\impl\RenderControllerHooks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\event\impl\OverlayColorEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\script\class\JsClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -434,7 +446,7 @@
     <ClCompile Include="src\client\event\Eventing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\TestModule.cpp">
+    <ClCompile Include="src\client\feature\module\impl\misc\TestModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\command\impl\ToggleCommand.cpp">
@@ -449,7 +461,7 @@
     <ClCompile Include="src\client\hook\impl\LevelRendererHooks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\Zoom.cpp">
+    <ClCompile Include="src\client\feature\module\impl\game\Zoom.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\sdk\common\client\game\MinecraftGame.cpp">
@@ -461,7 +473,7 @@
     <ClCompile Include="src\client\hook\impl\OptionHooks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\Fullbright.cpp">
+    <ClCompile Include="src\client\feature\module\impl\visual\Fullbright.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\hook\impl\DXHooks.cpp">
@@ -476,7 +488,7 @@
     <ClCompile Include="src\client\render\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\MotionBlur.cpp">
+    <ClCompile Include="src\client\feature\module\impl\visual\MotionBlur.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\screen\impl\ClickGUI.cpp">
@@ -537,6 +549,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\screen\impl\HUDEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\visual\HurtColor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\hook\impl\RenderControllerHooks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

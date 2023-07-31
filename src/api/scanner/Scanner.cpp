@@ -1,6 +1,6 @@
 #include "Scanner.h"
 #include "pch.h"
-#include "util/util.h"
+#include "util/Util.h"
 
 uintptr_t memory::findSignature(std::string_view signature, const char* module) {
 	static auto pattern_to_byte = [](std::string_view pattern) {

@@ -69,9 +69,11 @@ void Config::addSetting(SettingGroup& group, nlohmann::json& obj) {
 	case Setting::Type::Float:
 		set->resolvedValue = FloatValue(jVal.get<float>());
 		break;
+	case Setting::Type::Color:
+		set->resolvedValue = ColorValue(jVal);
+		break;
 	default:
 		return;
-		break;
 	}
 	group.addSetting(set);
 }
@@ -122,6 +124,13 @@ void Config::saveSetting(std::shared_ptr<Setting> set, nlohmann::json& jout) {
 	case Setting::Type::Key:
 		jout["value"] = std::get<KeyValue>(val).value;
 		break;
+	case Setting::Type::Color:
+	{
+		json obj = json::object();
+		std::get<ColorValue>(val).store(obj);
+		jout["value"] = obj;
+	}
+	break;
 	default:
 		break;
 	}

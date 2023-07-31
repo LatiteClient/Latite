@@ -1,5 +1,5 @@
 #include "ConfigManager.h"
-#include "util/util.h"
+#include "util/Util.h"
 #include "util/Logger.h"
 #include "client/Latite.h"
 #include "client/feature/module/ModuleManager.h"

@@ -4,12 +4,14 @@
 class ScriptingObject {
 public:
 	int id;
+	const wchar_t* objName;
 
 	// Object is already created.
-	ScriptingObject(int id) { this->id = id; JS::JsCreateObject(&object); }
+	ScriptingObject(int id, const wchar_t* name) : objName(name) { this->id = id; JS::JsCreateObject(&object); }
 
 	virtual ~ScriptingObject();
 	virtual void initialize(JsContextRef ctx, JsValueRef parentObj) = 0;
-protected:
+
 	JsValueRef object = JS_INVALID_REFERENCE;
+protected:
 };

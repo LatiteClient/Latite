@@ -74,4 +74,8 @@ public:
 	inline static SigImpl MinecraftGame_onAppSuspended{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 56 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 4c 8b f1 48 8d b1",
 		"MinecraftGame::onAppSuspended"};
+
+	inline static SigImpl RenderController_getOverlayColor{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? 0f 28 05 ? ? ? ? 0f 11 85 ? ? ? ? 4c 8d 8d",
+		"RenderController::getOverlayColor"};
 };
