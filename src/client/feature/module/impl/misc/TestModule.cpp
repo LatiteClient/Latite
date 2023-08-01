@@ -12,8 +12,8 @@ TestModule::TestModule() : Module("TestModule", "TestModule", "Module for testin
 	this->listen<RenderOverlayEvent>(&TestModule::onRender);
 }
 
-void TestModule::onTick(Event&) {
-	//auto& even = reinterpret_cast<TickEvent&>(ev);
+void TestModule::onTick(Event& evGeneric) {
+	auto& even = reinterpret_cast<TickEvent&>(evGeneric);
 }
 
 void TestModule::onRender(Event& ev) {

@@ -24,6 +24,10 @@ public:
 			}
 	}
 
+	~Module() {
+		Eventing::get().unlisten(this);
+	}
+
 	template <typename Event, typename Listener>
 	void listen(Listener listener, bool callWhenInactive = false, int priority = 0) {
 		Eventing::get().listen<Event>(this, (EventListenerFunc)listener, priority, callWhenInactive);

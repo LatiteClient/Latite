@@ -1,8 +1,9 @@
 #pragma once
 #include "api/feature/Feature.h"
 #include "api/feature/setting/SettingGroup.h"
+#include <memory>
 
-class IModule : public Listener, public Feature {
+class IModule : public Listener, public Feature, public std::enable_shared_from_this<IModule> {
 public:
 	std::shared_ptr<SettingGroup> settings;
 
@@ -27,22 +28,31 @@ public:
 
 	[[nodiscard]] KeyValue getKeybind() { return std::get<KeyValue>(key); }
 	[[nodiscard]] bool isEnabled() { return std::get<BoolValue>(enabled); };
+	[[nodiscard]] bool isHud() { return hud; };
 	[[nodiscard]] bool isVisible() { return visible; };
+	[[nodiscard]] bool isBlocked() { return blocked; };
 	void setEnabled(bool b) { std::get<BoolValue>(enabled) = b; }
 
 	bool shouldListen() { return isEnabled(); }
 
 	virtual void loadConfig(SettingGroup& resolvedGroup) = 0;
+	virtual bool shouldHoldToToggle() { return false; }
 
 	[[nodiscard]] std::string name() override { return modName; }
 	[[nodiscard]] std::string desc() override { return description; }
 	[[nodiscard]] std::string getDisplayName() { return displayName; }
 
 	[[nodiscard]] Category getCategory() { return category; }
+
+	std::shared_ptr<IModule> getShared() {
+		return shared_from_this();
+	}
 protected:
 	std::string modName, description, displayName;
 	Setting::Value enabled = BoolValue(false);
 	Setting::Value key = KeyValue(0);
 	bool visible;
+	bool hud = false;
+	bool blocked = false;
 	Category category;
 };

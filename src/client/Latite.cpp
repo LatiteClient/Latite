@@ -287,13 +287,6 @@ std::optional<float> Latite::getMenuBlur() {
     return std::nullopt;
 }
 
-void Latite::doEject() noexcept {
-    // TODO: this isnt neccesary
-    Latite::get().getHooks().uninit();
-
-    FreeLibrary(this->dllInst);
-}
-
 void Latite::queueEject() noexcept {
     auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     app.Title(L"");

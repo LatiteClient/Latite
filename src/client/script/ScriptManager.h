@@ -2,9 +2,12 @@
 #include "api/manager/Manager.h"
 #include "JsScript.h"
 #include "ScriptingObject.h"
+#include <queue>
+#include <variant>
 
 class ScriptManager final : public Manager<JsScript> {
 private:
+	std::queue<std::shared_ptr<JsScript>> scriptCheckQueue = {};
 public:
 	std::shared_ptr<JsScript> loadScript(std::wstring const& folderPath, bool run = true);
 	std::shared_ptr<JsScript> getScriptByName(std::wstring const& name);
@@ -35,18 +38,15 @@ public:
 		std::wstring type;
 		struct Value {
 			enum ValueType {
-				Number, String, Bool, EntityRef
+				Number = 1, 
+				String, 
+				EntityRef, 
+				Bool
 			};
 
-			// TODO: switch to std::variant
-
 			std::wstring name;
-			ValueType type;
-			double number_;
-			std::wstring string_;
-			int64_t entityref;
+			std::variant<std::nullptr_t, double, std::wstring, int64_t, bool> val = nullptr;
 
-			bool bool_;
 			Value(std::wstring const& name) : name(name) {
 			}
 

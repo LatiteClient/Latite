@@ -35,6 +35,8 @@ public:
 	static void SetPropertyString(JsValueRef ref, std::wstring name, std::wstring value, bool strict = false);
 	static void SetPropertyNumber(JsValueRef ref, std::wstring name, double value, bool strict = false);
 	static void SetPropertyBool(JsValueRef ref, std::wstring name, bool value, bool strict = false);
+	static void SetPropertyObject(JsValueRef ref, std::wstring name, JsValueRef obj, bool strict = false);
+
 	static void DefineFunc(JsValueRef obj, JsNativeFunction func, std::wstring name, void* state = nullptr);
 	static std::wstring GetTypeName(JsValueType type);
 

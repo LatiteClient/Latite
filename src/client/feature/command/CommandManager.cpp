@@ -85,7 +85,6 @@ bool CommandManager::runCommand(std::string const& line) {
 					try {
 						bool result = cmd->execute(newArgs[0], args);
 						if (!result) {
-							// TODO: Send message
 							Latite::get().getClientMessageSink().push(util::Format("&cUsage: " + prefix + newArgs[0] + " " + cmd->getUsage()));
 						}
 						return result;

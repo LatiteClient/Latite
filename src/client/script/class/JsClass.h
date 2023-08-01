@@ -10,12 +10,20 @@ public:
 
 	~JsClass() {
 		if (prototype != JS_INVALID_REFERENCE) JS::JsRelease(prototype, nullptr);
+		if (constructor != JS_INVALID_REFERENCE) JS::JsRelease(constructor, nullptr);
 	}
+	
+	virtual void prepareFunctions() {};
 
 	void createConstructor(JsNativeFunction callback, void* callbackState = nullptr) {
 		this->constructor = callback;
 		JS::JsCreateFunction(callback, callbackState, &constructor);
-		Chakra::DefineFunc(constructor, callback, name, callbackState);
+		JS::JsAddRef(constructor, nullptr);
+	}
+
+	JsValueRef errConstructCall() {
+		Chakra::ThrowError(name + std::wstring(L" cannot be invoked without 'new'"));
+		return JS_INVALID_REFERENCE;
 	}
 
 	void createPrototype() {
@@ -38,9 +46,12 @@ public:
 		JS::JsRelease(classRef, nullptr);
 	}
 	[[nodiscard]] JsValueRef getPrototype() { return prototype; }
+	[[nodiscard]] JsValueRef getConstructor() { return constructor; }
+	[[nodiscard]] const wchar_t* getName() { return name; }
 protected:
 	const wchar_t* name;
 	JsNativeFunction constructorCallback = nullptr;
 	JsValueRef constructor = JS_INVALID_REFERENCE;
 	JsValueRef prototype = JS_INVALID_REFERENCE;
+public:
 };

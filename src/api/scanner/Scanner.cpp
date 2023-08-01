@@ -23,7 +23,7 @@ uintptr_t memory::findSignature(std::string_view signature, const char* module) 
 
 	// ...
 
-	auto gameModule = (uintptr_t)GetModuleHandleA(module);
+	auto gameModule = reinterpret_cast<uintptr_t>(GetModuleHandleA(module));
 	auto* const scanBytes = reinterpret_cast<uint8_t*>(gameModule);
 	auto* const dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(gameModule);
 	auto* const ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(scanBytes + dosHeader->e_lfanew);
@@ -37,6 +37,6 @@ uintptr_t memory::findSignature(std::string_view signature, const char* module) 
 			return !opt.has_value() || *opt == byte;
 		});
 
-	auto ret = it != end ? reinterpret_cast<uintptr_t>(it) : 0u;
+	auto ret = it != end ? reinterpret_cast<uintptr_t>(it) : 0ull;
 	return ret;
 }

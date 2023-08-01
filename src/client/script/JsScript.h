@@ -6,9 +6,11 @@
 #include "chakra/ChakraCore.h"
 #include "lib/JsLibrary.h"
 #include "ScriptingObject.h"
+#include "class/JsClass.h"
 
 class JsScript final {
 	std::vector<std::shared_ptr<ScriptingObject>> objects;
+	std::vector<std::shared_ptr<JsClass>> classes;
 public:
 	JsContextRef ctx;
 	JsSourceContext sCtx = 1;
@@ -37,7 +39,6 @@ public:
 		bool shouldRemove = false;
 		JsContextRef ctx = JS_INVALID_REFERENCE;
 		JsValueRef callback = JS_INVALID_REFERENCE;
-		// TODO: derive from this and adjust arguments as needed
 		std::vector<JsValueRef> args;
 		void(*initFunc)(AsyncOperation*);
 		//std::function<void(AsyncOperation& op)> checkFunc;
@@ -92,7 +93,16 @@ public:
 
 	JsScript(std::wstring const& indexPath);
 	bool load();
+	bool shouldRemove();
 	
+	template <typename T>
+	[[nodiscard]] T* findClass(std::wstring const& name) {
+		for (auto& cl : this->classes) {
+			if (cl->getName() == name) return reinterpret_cast<T*>(cl.get());
+		}
+		return nullptr;
+	}
+
 	void loadPrototypes();
 	void loadScriptObjects();
 	void fetchScriptData();

@@ -12,6 +12,7 @@ public:
 		static_assert(std::is_convertible<T*, Event*>::value, "type must inherit from Event");
 		//static_assert(!(std::is_convertible<Event*, T*>::value), "type must not be an Event");
 
+		mutex.lock();
 		std::sort(listeners.begin(), listeners.end(), [](std::pair<uint32_t, EventListener> const& left,
 			std::pair<uint32_t, EventListener> const& right) {
 				return left.second.priority > right.second.priority;
@@ -25,22 +26,39 @@ public:
 					if (isCancel) {
 						auto& cEv = reinterpret_cast<Cancellable&>(ev);
 						if (cEv.isCancelled()) {
+							mutex.unlock();
 							return true;
 						}
 					}
 				}
 			}
 		}
+		mutex.unlock();
 		return false;
 	}
 
 	template <typename T>
 	void listen(Listener* ptr, EventListenerFunc listener, int priority = 0, bool callWhileInactive = false) {
+		mutex.lock();
 		static_assert(std::is_convertible<T*, Event*>::value, "type is not an Event");
 		listeners.push_back({ T::hash, EventListener{ listener, ptr, callWhileInactive, priority } });
+		mutex.unlock();
+	}
+
+	void unlisten(Listener* ptr) {
+		mutex.lock();
+		for (auto it = listeners.begin(); it != listeners.end();) {
+			if (it->second.listener == ptr) {
+				listeners.erase(it);
+				continue;
+			}
+			++it;
+		}
+		mutex.unlock();
 	}
 
 	//virtual void init() = 0;
 protected:
+	std::mutex mutex;
 	std::vector<std::pair<uint32_t, EventListener>> listeners;
 };

@@ -24,9 +24,6 @@ private:
 
 	ComPtr<ID2D1Bitmap1> shadowBitmap;
 
-	// TODO: move this somewhere more public
-	Asset latiteLogo{L"logo.png"};
-
 	enum Tab {
 		MODULES = 0,
 		SETTINGS,

@@ -44,7 +44,6 @@ private:
 	Setting::Value menuBlurEnabled = BoolValue(true);
 	Setting::Value menuBlur = FloatValue(20.f);
 
-	void doEject() noexcept;
 	void threadsafeInit();
 	void initSettings();
 

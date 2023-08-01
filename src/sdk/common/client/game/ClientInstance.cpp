@@ -7,7 +7,6 @@ sdk::ClientInstance* sdk::ClientInstance::instance = nullptr;
 
 sdk::ClientInstance* sdk::ClientInstance::get() {
     if (!instance) {
-        // TODO: move this to the signature namespace
         static auto sig = Signatures::Misc::clientInstance.result;
         uintptr_t evalPtr = *reinterpret_cast<uintptr_t*>(sig);
         if (!evalPtr) return nullptr;

@@ -191,7 +191,6 @@ void ClickGUI::onRender(Event&) {
 					tooltip = L"Open the HUD editor";
 					if (justClicked[0]) {
 						playClickSound();
-						// TODO: hud screen
 						close();
 						Latite::getScreenManager().showScreen("HUDEditor", true);
 					}

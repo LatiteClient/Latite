@@ -19,6 +19,10 @@
 
 #include "objects/ClientScriptingObject.h"
 
+#include "class/impl/JsVec2.h"
+#include "class/impl/JsVec3.h"
+#include "class/impl/JsModuleClass.h"
+
 using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Web::Http;
 using namespace winrt::Windows::Web::Http::Filters;
@@ -48,6 +52,10 @@ bool JsScript::load() {
 	auto res = JS::JsCreateContext(runtime, &this->ctx) == JsNoError;
 	JS::JsSetContextData(ctx, this);
 	return res;
+}
+
+bool JsScript::shouldRemove() {
+	return false;
 }
 
 namespace {
@@ -267,6 +275,11 @@ void JsScript::loadScriptObjects() {
 	this->objects.clear();
 	this->objects.push_back(std::make_shared<ClientScriptingObject>(i++));
 
+	this->classes.clear();
+	this->classes.push_back(std::make_shared<JsVec2>());
+	this->classes.push_back(std::make_shared<JsVec3>());
+	this->classes.push_back(std::make_shared<JsModuleClass>());
+
 	JsErrorCode err;
 	JsValueRef myScript;
 	err = JS::JsCreateObject(&myScript);
@@ -319,6 +332,12 @@ void JsScript::loadScriptObjects() {
 		err = JS::JsSetProperty(myScript, propId, myPrint, false);
 
 		err = JS::JsRelease(myPrint, nullptr);
+	}
+
+	for (auto& cl : classes) {
+		Chakra::SetPropertyObject(globalObj, cl->getName(), cl->getConstructor());
+		cl->createPrototype();
+		cl->prepareFunctions();
 	}
 
 	for (auto& obj : objects) {

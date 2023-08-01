@@ -3,7 +3,6 @@
 #define API_NAMES
 #endif
 
-// FIXME: None of these are for 1.18.12
 class Signatures_1_18_12 {
 public:
 	struct Offset {

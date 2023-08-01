@@ -14,7 +14,7 @@ std::shared_ptr<JsScript> ScriptManager::loadScript(std::wstring const& folderPa
 
 	for (auto& scr : this->items) {
 		if (scr->relFolderPath == fPathW) {
-			Latite::getClientMessageSink().push(util::Format(std::format("Script {} is already loaded.", scr->data.name)));
+			Latite::getClientMessageSink().push(util::Format(std::format("Script {} is already loaded.", util::WStrToStr(scr->data.name))));
 			return nullptr;
 		}
 	}
@@ -39,14 +39,11 @@ std::shared_ptr<JsScript> ScriptManager::loadScript(std::wstring const& folderPa
 		}
 		myScript->fetchScriptData();
 		Event::Value val{L"scriptName"};
-		val.type = Event::Value::String;
-		val.string_ = myScript->data.name;
+		val.val= myScript->data.name;
 		Event::Value val2{L"scriptVersion"};
-		val2.type = Event::Value::String;
-		val2.string_ = myScript->data.version;
+		val2.val = myScript->data.version;
 		Event::Value val3{L"scriptAuthor"};
-		val3.type = Event::Value::String;
-		val3.string_ = myScript->data.author;
+		val3.val = myScript->data.author;
 		Event newEv{ L"load-script", {val, val2, val3}, false };
 		dispatchEvent(newEv);
 	}
@@ -193,8 +190,7 @@ void ScriptManager::unloadScript(std::shared_ptr<JsScript> ptr)
 {
 	Event::Value val{L"scriptName"};
 	val.name = L"scriptName";
-	val.type = Event::Value::String;
-	val.string_ = ptr->data.name;
+	val.val = ptr->data.name;
 	Event newEv{ L"unload-script", {val}, false };
 	dispatchEvent(newEv);
 
@@ -203,7 +199,8 @@ void ScriptManager::unloadScript(std::shared_ptr<JsScript> ptr)
 			for (auto it = ev.second.begin(); it != ev.second.end();) {
 				if (it->second == ptr->ctx) {
 					JS::JsSetCurrentContext(it->second);
-					JS::JsRelease(it->first, nullptr);
+					unsigned int refCount;
+					JS::JsRelease(it->first, &refCount);
 					ev.second.erase(it);
 				}
 				else {
@@ -245,8 +242,7 @@ bool ScriptManager::dispatchEvent(Event& ev)
 				if (ev.isCancellable) {
 
 					Event::Value val{};
-					val.type = Event::Value::Bool;
-					val.bool_ = false;
+					val.val = false;
 					val.name = L"cancel";
 					ev.values.push_back(val);
 				}
@@ -255,26 +251,26 @@ bool ScriptManager::dispatchEvent(Event& ev)
 					JsPropertyIdRef idRef;
 
 					JsValueRef ref = JS_INVALID_REFERENCE;
-					switch (val.type) {
+					switch (val.val.index()) {
 					case Event::Value::Bool:
 					{
-						JS::JsBoolToBoolean(val.bool_, &ref);
+						JS::JsBoolToBoolean(std::get<bool>(val.val), &ref);
 					}
 					break;
 					case Event::Value::Number:
 					{
-						JS::JsDoubleToNumber(val.number_, &ref);
+						JS::JsDoubleToNumber(std::get<double>(val.val), &ref);
 					}
 					break;
 					case Event::Value::String:
 					{
-						JS::JsPointerToString(val.string_.c_str(), val.string_.size(), &ref);
+						JS::JsPointerToString(std::get<std::wstring>(val.val).c_str(), std::get<std::wstring>(val.val).size(), &ref);
 					}
 					break;
 					case Event::Value::EntityRef:
 
 					{
-
+						// TODO: Entity refs
 					}
 					break;
 					default:

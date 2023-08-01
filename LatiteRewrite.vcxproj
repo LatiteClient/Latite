@@ -303,6 +303,11 @@
     <ClInclude Include="src\client\screen\impl\HUDEditor.h" />
     <ClInclude Include="src\client\screen\Screen.h" />
     <ClInclude Include="src\client\screen\ScreenManager.h" />
+    <ClInclude Include="src\client\feature\module\script\JsEvented.h" />
+    <ClInclude Include="src\client\feature\module\script\JsModule.h" />
+    <ClInclude Include="src\client\script\class\impl\JsModuleClass.h" />
+    <ClInclude Include="src\client\script\class\impl\JsVec2.h" />
+    <ClInclude Include="src\client\script\class\impl\JsVec3.h" />
     <ClInclude Include="src\client\script\class\JsClass.h" />
     <ClInclude Include="src\client\script\event\ScriptListener.h" />
     <ClInclude Include="src\client\script\JsScript.h" />
@@ -310,6 +315,8 @@
     <ClInclude Include="src\client\script\lib\libraries\Filesystem.h" />
     <ClInclude Include="src\client\script\lib\libraries\Network.h" />
     <ClInclude Include="src\client\script\objects\ClientScriptingObject.h" />
+    <ClInclude Include="src\client\script\objects\D2DScriptingObject.h" />
+    <ClInclude Include="src\client\script\objects\GameScriptingObject.h" />
     <ClInclude Include="src\client\script\ScriptingObject.h" />
     <ClInclude Include="src\client\script\ScriptManager.h" />
     <ClInclude Include="src\sdk\deps\Application\AppPlatform.h" />
@@ -365,7 +372,6 @@
     <Text Include="src\util\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\api\eventing\EventManager.cpp" />
     <ClCompile Include="src\api\memory\memory.cpp" />
     <ClCompile Include="src\api\memory\signature\signature.cpp" />
     <ClCompile Include="src\api\scanner\scanner.cpp" />
@@ -405,12 +411,16 @@
     <ClCompile Include="src\client\screen\impl\HUDEditor.cpp" />
     <ClCompile Include="src\client\screen\Screen.cpp" />
     <ClCompile Include="src\client\screen\ScreenManager.cpp" />
+    <ClCompile Include="src\client\feature\module\script\JsModule.cpp" />
+    <ClCompile Include="src\client\script\class\impl\JsModuleClass.cpp" />
     <ClCompile Include="src\client\script\event\ScriptListener.cpp" />
     <ClCompile Include="src\client\script\JsScript.cpp" />
     <ClCompile Include="src\client\script\lib\JsLibrary.cpp" />
     <ClCompile Include="src\client\script\lib\libraries\Filesystem.cpp" />
     <ClCompile Include="src\client\script\lib\libraries\Network.cpp" />
     <ClCompile Include="src\client\script\objects\ClientScriptingObject.cpp" />
+    <ClCompile Include="src\client\script\objects\D2DScriptingObject.cpp" />
+    <ClCompile Include="src\client\script\objects\GameScriptingObject.cpp" />
     <ClCompile Include="src\client\script\ScriptingObject.cpp" />
     <ClCompile Include="src\client\script\ScriptManager.cpp" />
     <ClCompile Include="src\pch.cpp">

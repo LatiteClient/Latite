@@ -86,6 +86,13 @@ void Chakra::SetPropertyBool(JsValueRef ref, std::wstring name, bool value, bool
 	JS::JsRelease(num, nullptr);
 }
 
+void Chakra::SetPropertyObject(JsValueRef ref, std::wstring name, JsValueRef obj, bool strict)
+{
+	JsPropertyIdRef propId;
+	JS::JsGetPropertyIdFromName(name.c_str(), &propId);
+	JS::JsSetProperty(ref, propId, obj, strict);
+}
+
 void Chakra::DefineFunc(JsValueRef obj, JsNativeFunction func, std::wstring name, void* state) {
 	JsPropertyIdRef propId;
 	JS::JsGetPropertyIdFromName(name.c_str(), &propId);
