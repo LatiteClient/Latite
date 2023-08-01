@@ -31,10 +31,24 @@
 #include <winrt/base.h>
 #include <winrt/Windows.Foundation.h>
 
+#include <winrt/Windows.Web.Http.h>
+#include <winrt/impl/windows.web.http.2.h>
+#include <winrt/Windows.Web.Http.Filters.h>
+#include <winrt/windows.storage.h>
+#include <winrt/windows.storage.streams.h>
+
+using namespace winrt;
+using namespace winrt::Windows::Web::Http;
+using namespace winrt::Windows::Web::Http::Filters;
+using namespace winrt::Windows::Storage::Streams;
+using namespace winrt::Windows::Storage;
+
+
 #include "misc/AuthWindow.h"
 #include "render/Renderer.h"
 #include "screen/ScreenManager.h"
 #include "render/Assets.h"
+#include "resource.h"
 
 int sdk::internalVers = sdk::VLATEST;
 
@@ -73,8 +87,16 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     Logger::Setup();
 
     Logger::Info("Loading assets");
+    Latite::get().dllInst = dll;
     // ... init assets
-
+    Latite::get().initAsset(ICON_LOGO, L"logo.png");
+    Latite::get().initAsset(ICON_SEARCH, L"searchicon.png");
+    Latite::get().initAsset(ICON_ARROW, L"arrow.png");
+    Latite::get().initAsset(ICON_X, L"x.png");
+    Latite::get().initAsset(ICON_HUDEDIT, L"hudedit.png");
+    Latite::get().initAsset(ICON_ARROWBACK, L"arrow_back.png");
+    Latite::get().initAsset(ICON_COG, L"cog.png");
+    Latite::get().initAsset(ICON_CHECKMARK, L"checkmark.png");
     //
 
 
@@ -152,10 +174,10 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (rendererBuf) Renderer();
     new (assetsBuf) Assets();
 
-    //AuthWindow wnd{ Latite::get().dllInst };
+    AuthWindow wnd{ Latite::get().dllInst };
 
-   // wnd.show();
-    //wnd.runMessagePump();
+    wnd.show();
+    wnd.runMessagePump();
 
     for (auto& entry : sigList) {
         if (!entry.first->mod) continue;
@@ -296,6 +318,7 @@ void Latite::queueEject() noexcept {
 
 void Latite::initialize(HINSTANCE hInst) {
     this->dllInst = hInst;
+
     getHooks().init();
     Logger::Info("Initialized Hooks");
     getHooks().enable();
@@ -346,6 +369,44 @@ void Latite::initSettings() {
         set->value = &this->menuBlur;
         this->getSettings().addSetting(set);
     }
+}
+
+void Latite::initAsset(int resource, std::wstring const& filename) {
+    HRSRC hRes = FindResource((HMODULE)dllInst, MAKEINTRESOURCE(resource), MAKEINTRESOURCE(RT_RCDATA));
+    HGLOBAL hData = LoadResource((HMODULE)dllInst, hRes);
+    DWORD hSize = SizeofResource((HMODULE)dllInst, hRes);
+    char* hFinal = (char*)LockResource(hData);
+
+    auto path = util::GetLatitePath() / "Assets";
+    std::filesystem::create_directory(path);
+
+    auto fullPath = path / filename;
+
+    auto ofs = std::ofstream(fullPath.c_str(), std::ios::binary);
+    ofs << std::string(hFinal, hSize);
+    ofs.close();
+}
+
+winrt::Windows::Foundation::IAsyncAction Latite::downloadExtraAssets() {
+    auto http = HttpClient();
+
+    auto folderPath = util::GetLatitePath() / "Assets";
+
+    // TODO: FIXME: xor
+    winrt::Windows::Foundation::Uri requestUri(L"https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll");
+
+    auto buffer = http.GetBufferAsync(requestUri).get();
+    
+    auto folder = co_await StorageFolder::GetFolderFromPathAsync(folderPath.wstring());
+    auto file = co_await folder.CreateFileAsync(L"ChakraCore.dll", CreationCollisionOption::OpenIfExists);
+
+    IRandomAccessStream stream = co_await file.OpenAsync(FileAccessMode::ReadWrite);
+
+    DataWriter writer(stream);
+    writer.WriteBuffer(buffer);
+    writer.StoreAsync().get();
+    writer.FlushAsync().get();
+    co_return;
 }
 
 void Latite::onUpdate(Event&) {

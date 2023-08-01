@@ -2,6 +2,7 @@
 #include "Util.h"
 #include "client/Latite.h"
 #include "Logger.h"
+#include <filesystem>
 
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Web.Http.h>
@@ -26,24 +27,14 @@ FARPROC Chakra::pass(const char* name)
 		//mod = LoadLibraryW(L"C:\\Windows\\system32\\Chakra.dll");
 		// sadly going to have to cope with chakra and not chakracore
 
-#if 0
-		auto http = HttpClient();
+		auto latitePath = util::GetLatitePath();
+		std::filesystem::create_directory(latitePath);
+		auto assetsPath = latitePath / "Assets";
+		std::filesystem::create_directory(latitePath / "Assets");
 
-		auto filePath = util::GetLatitePath() / "Assets" / "ChakraCore.dll";
-
-		// TODO: FIXME: xor
-		winrt::Windows::Foundation::Uri requestUri(L"https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bexp.txt");
-
-		auto buffer = http.GetBufferAsync(requestUri).get();
-
-		auto file = StorageFile::GetFileFromPathAsync(filePath.wstring()).get();
-		IRandomAccessStream stream = file.OpenAsync(FileAccessMode::ReadWrite).get();
-
-		DataWriter writer(stream);
-		writer.WriteBuffer(buffer);
-		writer.StoreAsync().get();
-		writer.FlushAsync().get();
-#endif
+		if (!std::filesystem::exists(assetsPath / "ChakraCore.dll")) {
+			Latite::get().downloadExtraAssets();
+		}
 
 		if (!mod) mod = LoadLibraryW((util::GetLatitePath() / "Assets" / "ChakraCore.dll").wstring().c_str());
 	}

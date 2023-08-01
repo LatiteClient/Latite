@@ -9,9 +9,12 @@
 #include "sdk/common/client/game/ClientInstance.h"
 
 Screen::Screen(std::string const& name) : name(name) {
-	arrow = LoadCursorA(Latite::get().dllInst, MAKEINTRESOURCEA(IDC_ARROW));
-	hand = LoadCursorA(Latite::get().dllInst, MAKEINTRESOURCEA(IDC_HAND));
-	ibeam = LoadCursorA(Latite::get().dllInst, MAKEINTRESOURCEA(IDC_IBEAM));
+	/*
+	arrow = LoadCursorW(Latite::get().dllInst, IDC_ARROW);
+	hand = LoadCursorW(Latite::get().dllInst, IDC_HAND);
+	ibeam = LoadCursorW(Latite::get().dllInst, IDC_IBEAM);
+	*/
+	// ^ this doesnt work with resources...
 
 	Eventing::get().listen<RenderGameEvent>(this, (EventListenerFunc)&Screen::onRenderGame, 0);
 	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Screen::onRenderOverlay, 0);
@@ -19,6 +22,7 @@ Screen::Screen(std::string const& name) : name(name) {
 }
 
 void Screen::onRenderGame(Event& ev) {
+	/*
 	switch (cursor) {
 	case Cursor::Arrow:
 		SetCursor(arrow);
@@ -30,7 +34,7 @@ void Screen::onRenderGame(Event& ev) {
 		SetCursor(ibeam);
 		break;
 	}
-
+	*/
 	sdk::ClientInstance::get()->releaseCursor();
 }
 

@@ -378,6 +378,9 @@
     <ClInclude Include="src\client\script\objects\D2DScriptingObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -591,5 +594,36 @@
   <ItemGroup>
     <None Include="CMakePresets.json" />
     <None Include="CppProperties.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="LatiteRewrite.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\arrow.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\arrow_back.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\checkmark.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\cog.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\hudedit.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\logo.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\searchicon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\x.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

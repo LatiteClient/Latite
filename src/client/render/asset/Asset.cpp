@@ -10,7 +10,7 @@ void Asset::load(IWICImagingFactory* factory, ID2D1DeviceContext* dc) {
 	ComPtr<IWICBitmapDecoder> pDecoder = NULL;
 
 	auto res = factory->CreateDecoderFromFilename(
-		path.c_str(),
+		path.wstring().c_str(),
 		nullptr,// Do not prefer a particular vendor
 		GENERIC_READ,                    // Desired read access to the file
 		WICDecodeMetadataCacheOnDemand,  // Cache metadata when needed

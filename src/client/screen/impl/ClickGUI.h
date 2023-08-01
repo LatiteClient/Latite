@@ -59,6 +59,4 @@ private:
 	int capturedKey = 0;
 
 	ComPtr<ID2D1Effect> compositeEffect;
-	ComPtr<ID2D1LinearGradientBrush> gradientBrush;
-	ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
 };

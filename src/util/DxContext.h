@@ -24,6 +24,10 @@ public:
 	void drawRectangle(RectF const& rect, d2d::Color const& color, float lineThickness = 1.f);
 	void fillRoundedRectangle(RectF const& rect, d2d::Color const& color, float radius = 10.f);
 	void drawRoundedRectangle(RectF, d2d::Color const& color, float radius = 10.f, float lineThickness = 1.f, OutlinePosition outPos = OutlinePosition::Center);
+	
+	void drawRoundedRectangle(RectF, ID2D1Brush*, float radius = 10.f, float lineThickness = 1.f, OutlinePosition outPos = OutlinePosition::Center);
+	void fillRoundedRectangle(RectF const& rect, ID2D1Brush* cbrush, float radius = 10.f);
+
 	void drawGaussianBlur(float intensity = 5.f);
 	// More optimized (please use this)
 	void drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity = 5.f);

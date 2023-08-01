@@ -6,6 +6,7 @@
 #include "api/eventing/Listenable.h"
 #include "api/feature/setting/Setting.h"
 #include <optional>
+#include <winrt/windows.foundation.h>
 
 class Latite final : public Listener {
 public:
@@ -31,6 +32,8 @@ public:
 	void onFocusLost(class Event& ev);
 	void onSuspended(class Event& ev);
 	void loadConfig(class SettingGroup& resolvedGroup);
+	void initAsset(int resource, std::wstring const& filename);
+	winrt::Windows::Foundation::IAsyncAction downloadExtraAssets();
 
 	Latite() = default;
 	~Latite() = default;

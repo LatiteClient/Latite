@@ -29,7 +29,7 @@ using RectF = d2d::Rect;
 float calcAnim = 0.f;
 
 namespace {
-	static constexpr float setting_height_relative = 0.0168f;
+	static constexpr float setting_height_relative = 0.0168f; // 0.0168
 }
 
 ClickGUI::ClickGUI() : Screen("ClickGUI") {
@@ -68,8 +68,8 @@ void ClickGUI::onRender(Event&) {
 
 		float realGuiX = totalWidth / 2.f;
 
-		guiX = (ss.width / 2.f) - (realGuiX / 2.f);
-		guiY = (ss.height / 4.f);
+		guiX = (ss.width / 2.25f) - (realGuiX / 2.f);
+		guiY = (ss.height / 5.f);
 	}
 
 	rect = { guiX, guiY, ss.width - guiX, ss.height - guiY };
@@ -388,7 +388,7 @@ void ClickGUI::onRender(Event&) {
 					dc.drawText(descTextRect, util::StrToWStr(mod.description), d2d::Color(1.f, 1.f, 1.f, 0.57f), FontSelection::Regular, textSizeDesc, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 					float padToSetting = 0.014184f * rect.getHeight();
-					float settingPadY = padToSetting * 1.5f;
+					float settingPadY = padToSetting * 2.f;
 					float settingHeight = rect.getHeight() * setting_height_relative;
 
 					modRectActual.bottom += padToSetting;
@@ -510,23 +510,11 @@ void ClickGUI::onInit(Event&) {
 
 	dc->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, pixelFormat), shadowBitmap.GetAddressOf());
 	dc->CreateEffect(CLSID_D2D1Composite, compositeEffect.GetAddressOf());
-	D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES prop{};
-	auto ss = dc->GetSize();
-	prop.startPoint = { 0.f, ss.height / 2.f };
-	prop.endPoint = { ss.width, ss.height / 2.f };
-
-	const D2D1_GRADIENT_STOP stops[] = {
-		{ 0.f, 0.f, 0.f, 1.f },
-		{ 1.f, 1.f, 1.f, 1.f },
-	};
-	dc->CreateGradientStopCollection(stops, _countof(stops), gradientStopCollection.GetAddressOf());
-	dc->CreateLinearGradientBrush(prop, gradientStopCollection.Get(), gradientBrush.GetAddressOf());
+	
 }
 
 void ClickGUI::onCleanup(Event&) {
 	compositeEffect = nullptr;
-	gradientStopCollection = nullptr;
-	gradientBrush = nullptr;
 }
 
 
@@ -552,9 +540,37 @@ void ClickGUI::onClick(Event& evGeneric) {
 	}
 }
 
+namespace {
+	void drawAlphaBar(DXContext& dc, d2d::Rect rect, float nodeSize, int rows) {
+		float endY = rect.top;
+		endY += rect.getHeight() / rows;
+		float beginY = rect.top;
+		// gray part
+		float bs = nodeSize;
+
+		for (int i = 0; i < rows; i++) {
+			if (i % 2 == 0) {
+				for (float beginX = rect.left; beginX < rect.right; beginX += bs * 2.f) {
+					float endX = std::min(rect.right, beginX + bs);
+					dc.fillRectangle({ beginX, beginY, endX, endY }, { 1.f, 1.f, 1.f, 0.5f });
+
+				}
+			}
+			else {
+				for (float beginX = rect.left + bs; beginX < rect.right; beginX += bs * 2.f) {
+					float endX = std::min(rect.right, beginX + bs);
+					dc.fillRectangle({ beginX, beginY, endX, endY }, { 1.f, 1.f, 1.f, 0.5f });
+				}
+			}
+			beginY = endY;
+			endY += rect.getHeight() / rows;
+		}
+	}
+}
+
 void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float size) {
 	const float checkboxSize = rect.getWidth() * setting_height_relative;
-	const float textSize = checkboxSize * 0.8f;
+	const float textSize = checkboxSize * 0.9f;
 	const auto cursorPos = sdk::ClientInstance::get()->cursorPos;
 	const float round = 0.1875f * checkboxSize;
 
@@ -638,11 +654,15 @@ void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 			text = L"...";
 		}
 
-		auto ts = dc.getTextSize(text, FontSelection::Regular, textSize);
+		auto ts = dc.getTextSize(text, FontSelection::Regular, textSize * 0.9f);
 		if (ts.x > keyRect.getWidth()) keyRect.right = keyRect.left + (ts.x + 4.f);
 
-		dc.drawText(keyRect, text, d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::Regular, textSize, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		
 		dc.fillRoundedRectangle(keyRect, Color(set->rendererInfo.col), round);
+
+		dc.drawText(keyRect, text, d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::Regular, textSize * 0.9f,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
 		if (activeSetting == set) {
 			dc.drawRoundedRectangle(keyRect, d2d::Color(1.f, 1.f, 1.f, 1.f), round);
 		}
@@ -686,11 +706,43 @@ void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 		bool contains = this->shouldSelect(colRect, cursorPos);
 		std::wstring name = util::StrToWStr(set->getDisplayName());
 
+		auto& colVal = std::get<ColorValue>(*set->value);
+
 		RectF textRect = { colRect.right + padToName, colRect.top, pos.x + size, colRect.bottom };
 		dc.drawText(textRect, name, { 1.f, 1.f, 1.f, 1.f }, FontSelection::Regular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-		gradientBrush->SetStartPoint({ textRect.left, textRect.centerY() });
-		gradientBrush->SetEndPoint({ textRect.right, textRect.centerY() });
-		dc.ctx->FillRectangle(colRect, gradientBrush.Get());
+		
+		ComPtr<ID2D1LinearGradientBrush> gradientBrush;
+		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
+
+		D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES prop{};
+		auto ss = dc.ctx->GetSize();
+		prop.startPoint = { 0.f, ss.height / 2.f };
+		prop.endPoint = { ss.width, ss.height / 2.f };
+
+		d2d::Color col = { colVal.color1.r, colVal.color1.g, colVal.color1.b, colVal.color1.a };
+
+		const D2D1_GRADIENT_STOP stops[] = {
+			0.f, col.asAlpha(1.f).get(),
+			1.f, col.get()
+		};
+		
+		dc.ctx->CreateGradientStopCollection(stops, _countof(stops), gradientStopCollection.GetAddressOf());
+		dc.ctx->CreateLinearGradientBrush(prop, gradientStopCollection.Get(), gradientBrush.GetAddressOf());
+		
+		gradientBrush->SetStartPoint({ colRect.left, textRect.centerY() });
+		gradientBrush->SetEndPoint({ colRect.right, textRect.centerY() });
+		ComPtr<ID2D1GradientStopCollection> stopCol;
+
+		dc.fillRoundedRectangle(colRect, { 1.f, 1.f, 1.f, 0.4f }, round);
+		// alpha bar
+
+		float apad = 1.f;
+		dc.ctx->PushAxisAlignedClip({ colRect.left + apad, colRect.top + apad, colRect.right - apad, colRect.bottom - apad }, D2D1_ANTIALIAS_MODE_ALIASED);
+		drawAlphaBar(dc, colRect, colRect.getWidth() / 16.f, 11);
+		dc.ctx->PopAxisAlignedClip();
+
+		dc.fillRoundedRectangle(colRect, gradientBrush.Get(), round);
+		dc.drawRoundedRectangle(colRect, gradientBrush.Get(), round, 1.f, DXContext::OutlinePosition::Inside);
 	}
 	break;
 	case Setting::Type::Float:
@@ -698,12 +750,13 @@ void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 		float textWidth = 0.1947f * size;
 		float sliderHeight = (rect.getHeight() * 0.017730f);
 
-		float textSz = 0.02127f * rect.getHeight();
+		float textSz = sliderHeight * 1.5f;
 
 		RectF textRect = { pos.x, pos.y, pos.x + textWidth, pos.y + sliderHeight };
+		RectF rtTextRect = textRect.translate(0.f, -(textRect.getHeight() / 2.f));
 		std::wstringstream namew;
 		namew << util::StrToWStr(set->getDisplayName());
-		dc.drawText(textRect, namew.str(), d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::Semilight, sliderHeight, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		dc.drawText(rtTextRect, namew.str(), d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::Semilight, textSz, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 		float padToSlider = rect.getHeight() * 0.01063f;
 
 		float sliderTop = textRect.top + sliderHeight * 0.16f;
@@ -716,7 +769,8 @@ void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 		valuew << std::fixed << std::setprecision(2) << std::get<FloatValue>(*set->value);
 
 		RectF rightRect = { sliderRect.right, sliderRect.top, pos.x + size, sliderRect.bottom };
-		dc.drawText(rightRect, valuew.str(), d2d::Color(1.f, 1.f, 1.f, 1.f), Renderer::FontSelection::Semilight, sliderHeight, DWRITE_TEXT_ALIGNMENT_CENTER);
+		RectF rtRect = rightRect.translate(0.f, -(sliderRect.getHeight() / 2.f));
+		dc.drawText(rtRect, valuew.str(), d2d::Color(1.f, 1.f, 1.f, 1.f), Renderer::FontSelection::Semilight, sliderHeight * 1.4f, DWRITE_TEXT_ALIGNMENT_CENTER);
 
 		float min = std::get<FloatValue>(set->min);
 		float max = std::get<FloatValue>(set->max);

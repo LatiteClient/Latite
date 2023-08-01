@@ -99,16 +99,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)src;$(ProjectDir)deps\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);$(ProjectDir)src;$(ProjectDir)deps\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)deps\lib;$(LibraryPath)</LibraryPath>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)src;$(ProjectDir)deps\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);$(ProjectDir)src;$(ProjectDir)deps\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)deps\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLegacy|x64'">
-    <IncludePath>$(ProjectDir)src;$(ProjectDir)deps\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir);$(ProjectDir)src;$(ProjectDir)deps\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)deps\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -238,6 +238,7 @@
     <ClInclude Include="deps\include\chakra\ChakraDebug.h" />
     <ClInclude Include="deps\include\json\json.hpp" />
     <ClInclude Include="deps\include\MinHook.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="src\api\eventing\Event.h" />
     <ClInclude Include="src\api\eventing\EventManager.h" />
     <ClInclude Include="src\api\eventing\Listenable.h" />
@@ -443,6 +444,19 @@
   <ItemGroup>
     <None Include="CMakePresets.json" />
     <None Include="CppProperties.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="LatiteRewrite.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\arrow.png" />
+    <Image Include="assets\arrow_back.png" />
+    <Image Include="assets\checkmark.png" />
+    <Image Include="assets\cog.png" />
+    <Image Include="assets\hudedit.png" />
+    <Image Include="assets\logo.png" />
+    <Image Include="assets\searchicon.png" />
+    <Image Include="assets\x.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

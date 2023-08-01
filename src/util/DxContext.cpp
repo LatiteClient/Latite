@@ -48,6 +48,40 @@ void DXContext::drawRoundedRectangle(RectF irect, d2d::Color const& color, float
 	ctx->DrawRoundedRectangle(rounded, brush, lineThickness);
 }
 
+void DXContext::drawRoundedRectangle(RectF irect, ID2D1Brush* cbrush, float radius, float lineThickness, OutlinePosition outPos)
+{
+	RectF rect = irect;
+	switch (outPos) {
+	case OutlinePosition::Inside:
+		rect.left += (lineThickness / 2.f);
+		rect.right -= (lineThickness / 2.f);
+		rect.top += (lineThickness / 2.f);
+		rect.bottom -= (lineThickness / 2.f);
+		break;
+	case OutlinePosition::Outside:
+		rect.left -= lineThickness / 2.f;
+		rect.right += lineThickness / 2.f;
+		rect.top -= lineThickness / 2.f;
+		rect.bottom += lineThickness / 2.f;
+		radius += lineThickness / 2.f;
+		break;
+	default:
+		break;
+	}
+	auto rc = getRect(rect);
+	auto rounded = D2D1::RoundedRect(rc, radius, radius);
+
+	ctx->DrawRoundedRectangle(rounded, cbrush, lineThickness);
+}
+
+void DXContext::fillRoundedRectangle(RectF const& rect, ID2D1Brush* cbrush, float radius)
+{
+	auto rc = getRect(rect);
+	auto rounded = D2D1::RoundedRect(rc, radius, radius);
+
+	ctx->FillRoundedRectangle(rounded, cbrush);
+}
+
 void DXContext::drawGaussianBlur(float intensity)  {
 	ID2D1Effect* gaussianBlurEffect = Latite::getRenderer().getBlurEffect();
 	
@@ -82,32 +116,32 @@ void DXContext::drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity) {
 }
 
 void DXContext::drawText(RectF const& rc, std::wstring const& ws, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment)  {
-	this->currentFormat = Latite::getRenderer().getTextFormat(font);
+	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	brush->SetColor(color.get());
-	IDWriteTextLayout* layout;
+	ComPtr<IDWriteTextLayout> layout;
 	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
-		currentFormat, rc.getWidth(), rc.getHeight(),
-		&layout))) {
+		fmt.Get(), rc.getWidth(), rc.getHeight(),
+		layout.GetAddressOf()))) {
 		DWRITE_TEXT_RANGE range;
 		range.startPosition = 0;
 		layout->SetFontSize(size, range);
 		layout->SetTextAlignment(alignment);
 		layout->SetParagraphAlignment(verticalAlignment);
-		this->ctx->DrawTextLayout({ rc.getPos().x, rc.getPos().y }, layout,
+		this->ctx->DrawTextLayout({ rc.getPos().x, rc.getPos().y }, layout.Get(),
 			brush);
-		SafeRelease(&layout);
 	}
 }
 
 Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font, float size) {
-	this->currentFormat = Latite::getRenderer().getTextFormat(font);
+	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	auto ss = ctx->GetSize();
-	IDWriteTextLayout* layout;
+	ComPtr<IDWriteTextLayout> layout;
 	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
-		currentFormat, ss.width, ss.height,
-		&layout))) {
+		fmt.Get(), ss.width, ss.height,
+		layout.GetAddressOf()))) {
 		DWRITE_TEXT_RANGE range;
 		range.startPosition = 0;
+		range.length = ws.size();
 		layout->SetFontSize(size, range);
 		layout->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 		layout->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
@@ -116,7 +150,6 @@ Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font
 		layout->GetMetrics(&textMetrics);
 		layout->GetOverhangMetrics(&overhangs);
 		
-		SafeRelease(&layout);
 		float width = (textMetrics.layoutWidth + overhangs.right) - (textMetrics.left - overhangs.left);
 		float height = (textMetrics.top - overhangs.top) - (textMetrics.layoutHeight + overhangs.bottom);
 		
@@ -126,14 +159,15 @@ Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font
 }
 
 d2d::Rect DXContext::getTextRect(std::wstring const& ws, Renderer::FontSelection font, float size, float pad) {
-	this->currentFormat = Latite::getRenderer().getTextFormat(font);
+	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	auto ss = ctx->GetSize();
-	IDWriteTextLayout* layout;
+	ComPtr<IDWriteTextLayout> layout;
 	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
-		currentFormat, ss.width, ss.height,
-		&layout))) {
+		fmt.Get(), ss.width, ss.height,
+		layout.GetAddressOf()))) {
 		DWRITE_TEXT_RANGE range;
 		range.startPosition = 0;
+		range.length = ws.size();
 		layout->SetFontSize(size, range);
 		layout->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 		layout->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
@@ -141,8 +175,6 @@ d2d::Rect DXContext::getTextRect(std::wstring const& ws, Renderer::FontSelection
 		DWRITE_OVERHANG_METRICS overhangs;
 		layout->GetMetrics(&metrics);
 		layout->GetOverhangMetrics(&overhangs);
-
-		SafeRelease(&layout);
 
 		return {
 			metrics.left - overhangs.left - pad, metrics.top - overhangs.top - pad,
