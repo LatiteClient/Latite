@@ -22,6 +22,10 @@ public:
 	D2D1_RECT_F	getRect(RectF const& rc);
 	void fillRectangle(RectF const& rect, d2d::Color const& color);
 	void drawRectangle(RectF const& rect, d2d::Color const& color, float lineThickness = 1.f);
+
+	void fillRectangle(RectF const& rect, ID2D1Brush* cbrush);
+	void drawRectangle(RectF const& rect, ID2D1Brush* cbrush, float lineThickness = 1.f);
+
 	void fillRoundedRectangle(RectF const& rect, d2d::Color const& color, float radius = 10.f);
 	void drawRoundedRectangle(RectF, d2d::Color const& color, float radius = 10.f, float lineThickness = 1.f, OutlinePosition outPos = OutlinePosition::Center);
 	

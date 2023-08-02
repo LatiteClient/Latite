@@ -35,14 +35,13 @@ public:
 
 	void clearLayers() {
 		layers.clear();
-		layers.push_back({});
 	}
 
 	[[nodiscard]] bool shouldClose() { return closing; }
 
 	[[nodiscard]] bool shouldSelect(d2d::Rect rc, Vec2 const& pt) {
 		for (int i = 0; i < layers.size(); i++) {
-			if (i >= currentLayer || layers[i].contains(pt)) return false;
+			if (layers[i].contains(pt)) return false;
 		}
 		return rc.contains(pt);
 	}

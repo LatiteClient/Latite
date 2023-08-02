@@ -47,6 +47,10 @@ void ClickGUI::onRender(Event&) {
 	}
 	bool shouldArrow = true;
 
+	if (colorPicker.setting) {
+		addLayer(cPickerRect);
+	}
+
 	DXContext dc;
 
 	if (!isActive()) justClicked = { false, false, false };
@@ -59,7 +63,7 @@ void ClickGUI::onRender(Event&) {
 	auto& rend = Latite::getRenderer();
 	auto ss = rend.getDeviceContext()->GetSize();
 
-	float adaptedScale = ss.width / 1920.f;
+	adaptedScale = ss.width / 1920.f;
 
 	float guiX = ss.width / 4.f;
 	float guiY = ss.height / 4.f;
@@ -497,6 +501,10 @@ void ClickGUI::onRender(Event&) {
 
 	}
 
+	cPickerRect = { 300.f, 300.f, 0.f, 0.f };
+	if (colorPicker.setting) drawColorPicker();
+	this->clearLayers();
+
 	dc.ctx->SetTransform(oTransform);
 	if (shouldArrow) cursor = Cursor::Arrow;
 }
@@ -743,6 +751,13 @@ void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 
 		dc.fillRoundedRectangle(colRect, gradientBrush.Get(), round);
 		dc.drawRoundedRectangle(colRect, gradientBrush.Get(), round, 1.f, DXContext::OutlinePosition::Inside);
+		
+		if (shouldSelect(colRect, cursorPos)) {
+			if (justClicked[0]) {
+				playClickSound();
+				colorPicker.setting = set;
+			}
+		}
 	}
 	break;
 	case Setting::Type::Float:
@@ -828,6 +843,92 @@ void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 	default:
 		break;
 	}
+}
+
+void ClickGUI::drawColorPicker() {
+	DXContext dc;
+	dc.ctx->SetTarget(shadowBitmap.Get());
+	dc.ctx->Clear();
+
+	float rectWidth = 0.21119f * rect.getWidth();
+	cPickerRect.right = cPickerRect.left + rectWidth;
+
+	float boxWidth = 0.79f * rectWidth;
+	float remPad = (rectWidth - boxWidth) / 2.f;
+
+	// Color PIcker Text
+	float textSize = 0.09f * rectWidth;
+	RectF titleRect = { cPickerRect.left + remPad, cPickerRect.top + remPad, cPickerRect.right - remPad, cPickerRect.top + remPad + textSize };
+
+	{
+		dc.drawText(titleRect, L"Color Picker", { 1.f, 1.f, 1.f, 1.f }, Renderer::FontSelection::Light, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	}
+
+	float boxTop = titleRect.bottom + remPad;
+
+	RectF boxRect = { titleRect.left, boxTop, titleRect.right, boxTop + boxWidth };
+
+	ComPtr<ID2D1LinearGradientBrush> mainColorBrush;
+	ComPtr<ID2D1LinearGradientBrush> valueBrush;
+	ComPtr<ID2D1LinearGradientBrush> hueBrush;
+
+	// TODO: support chroma, multiple colors
+	auto colVal = std::get<ColorValue>(*colorPicker.setting->value);
+	d2d::Color col = { colVal.color1.r, colVal.color1.g, colVal.color1.b, colVal.color1.a };
+
+	// main brush
+	{
+		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
+
+		D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES prop{};
+		auto ss = dc.ctx->GetSize();
+		prop.startPoint = { boxRect.left, boxRect.top };
+		prop.endPoint = { boxRect.right, boxRect.top };
+
+		const D2D1_GRADIENT_STOP stops[] = {
+			0.f, { 1.f, 1.f, 1.f, 1.f },
+			1.f, col.asAlpha(1.f).get()
+		};
+
+		dc.ctx->CreateGradientStopCollection(stops, _countof(stops), gradientStopCollection.GetAddressOf());
+		dc.ctx->CreateLinearGradientBrush(prop, gradientStopCollection.Get(), mainColorBrush.GetAddressOf());
+	}
+
+	// Value brush
+	{
+		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
+
+		D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES prop{};
+		auto ss = dc.ctx->GetSize();
+		prop.startPoint = { boxRect.left, boxRect.bottom };
+		prop.endPoint = { boxRect.left, boxRect.top };
+
+		const D2D1_GRADIENT_STOP stops[] = {
+			0.f, { 0.f, 0.f, 0.f, 1.f},
+			1.f, { 0.f, 0.f, 0.f, 0.f }
+		};
+
+		dc.ctx->CreateGradientStopCollection(stops, _countof(stops), gradientStopCollection.GetAddressOf());
+		dc.ctx->CreateLinearGradientBrush(prop, gradientStopCollection.Get(), valueBrush.GetAddressOf());
+	}
+	// Draw inner part of colorpicker
+
+	dc.fillRectangle(boxRect, mainColorBrush.Get());
+	dc.fillRectangle(boxRect, valueBrush.Get());
+	dc.drawRectangle(boxRect, d2d::Color::RGB(0x50, 0x50, 0x50).asAlpha(0.28f), 2.f);
+
+	cPickerRect.bottom = boxRect.bottom + remPad * 2.f;
+
+	dc.ctx->SetTarget(Latite::getRenderer().getBitmap());
+
+	// draw menu
+
+	dc.fillRoundedRectangle(cPickerRect, d2d::Color::RGB(0x7, 0x7, 0x7).asAlpha(0.8f), 19.f * adaptedScale);
+	dc.drawRoundedRectangle(cPickerRect, d2d::Color::RGB(0, 0, 0).asAlpha(0.28f), 19.f * adaptedScale, 4.f * adaptedScale, DXContext::OutlinePosition::Outside);
+	
+	// inner contents
+	dc.ctx->DrawBitmap(shadowBitmap.Get());
+
 }
 
 void ClickGUI::onEnable(bool ignoreAnims) {

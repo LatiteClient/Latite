@@ -276,6 +276,7 @@
     <ClInclude Include="src\client\event\Eventing.h" />
     <ClInclude Include="src\client\event\impl\TickEvent.h" />
     <ClInclude Include="src\client\feature\command\impl\ToggleCommand.h" />
+    <ClInclude Include="src\client\feature\module\HUDModule.h" />
     <ClInclude Include="src\client\feature\module\impl\visual\Fullbright.h" />
     <ClInclude Include="src\client\feature\module\impl\visual\HurtColor.h" />
     <ClInclude Include="src\client\feature\module\impl\visual\MotionBlur.h" />
@@ -386,6 +387,7 @@
     <ClCompile Include="src\client\feature\command\impl\TestCommand.cpp" />
     <ClCompile Include="src\client\event\Eventing.cpp" />
     <ClCompile Include="src\client\feature\command\impl\ToggleCommand.cpp" />
+    <ClCompile Include="src\client\feature\module\HUDModule.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\Fullbright.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\HurtColor.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\MotionBlur.cpp" />

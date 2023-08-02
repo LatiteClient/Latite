@@ -8,7 +8,8 @@ public:
 	inline static constexpr int nokeybind = 1;
 
 	explicit Module(std::string const& name, std::string const& displayName, std::string const& description, Category category,
-		int keybind = 0, bool visible = true) : IModule(name, description, displayName, category, visible) {
+		int keybind = 0, bool hud = false, bool visible = true) : IModule(name, description, displayName, category, visible) {
+		this->hud = hud;
 			{
 				auto set = std::make_shared<Setting>("enabled", "Enabled", "Whether the module is on or not", Setting::Type::Bool);
 				set->value = &enabled;

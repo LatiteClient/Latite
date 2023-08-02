@@ -115,6 +115,17 @@ namespace d2d {
 		}
 	};
 
+	namespace Colors {
+		inline static Color WHITE  =  { 1.f, 1.f, 1.f, 1.f };
+		inline static Color RED    =  { 1.f, 0.f, 0.f, 1.f };
+		inline static Color GREEN  =  { 0.f, 1.f, 0.f, 1.f };
+		inline static Color BLUE   =  { 0.f, 0.f, 1.f, 1.f };
+		inline static Color YELLOW =  { 1.F, 1.F, 0.f, 1.f };
+		inline static Color AQUA   =  { 0.f, 1.F, 1.f, 1.f };
+		inline static Color PURPLE =  { 1.f, 0.f, 1.f, 1.f };
+		inline static Color BLACK  =  { 0.f, 0.f, 0.f, 1.f };
+	}
+
 	class Rect {
 	public:
 		Rect(Vec2 const& p1, Vec2 const& p2) : left(p1.x), top(p1.y), right(p2.x), bottom(p2.y) {}

@@ -23,6 +23,9 @@ namespace util {
 
 	extern Color LerpColorState(Color const& current, Color const& on, Color const& off, bool state, float speed = 3.f);
 
+	extern HSV ColorToHSV(Color const& color);
+	extern Color HSVToColor(HSV const& hsv);
+
 	extern inline uintptr_t FindSignature(std::string_view signature) {
 		return memory::findSignature(signature, "Minecraft.Windows.exe");
 	}

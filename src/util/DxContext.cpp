@@ -16,6 +16,14 @@ void DXContext::drawRectangle(RectF const& rect, d2d::Color const& color, float 
 	ctx->DrawRectangle(getRect(rect), brush, lineThickness);
 }
 
+void DXContext::fillRectangle(RectF const& rect, ID2D1Brush* cbrush) {
+	ctx->FillRectangle(getRect(rect), cbrush);
+}
+
+void DXContext::drawRectangle(RectF const& rect, ID2D1Brush* cbrush, float lineThickness) {
+	ctx->DrawRectangle(getRect(rect), cbrush, lineThickness);
+}
+
 void DXContext::fillRoundedRectangle(RectF const& rect, d2d::Color const& color, float radius)  {
 	this->brush->SetColor(color.get());
 	auto rounded = D2D1::RoundedRect(getRect(rect), radius, radius);
@@ -124,6 +132,7 @@ void DXContext::drawText(RectF const& rc, std::wstring const& ws, d2d::Color con
 		layout.GetAddressOf()))) {
 		DWRITE_TEXT_RANGE range;
 		range.startPosition = 0;
+		range.length = ws.size();
 		layout->SetFontSize(size, range);
 		layout->SetTextAlignment(alignment);
 		layout->SetParagraphAlignment(verticalAlignment);

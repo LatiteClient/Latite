@@ -5,9 +5,12 @@
 #include "client/event/impl/RendererInitEvent.h"
 
 MotionBlur::MotionBlur() : Module("MotionBlur", "Motion Blur", "Blurs motion", GAME) {
+	addSliderSetting("intensity", "Intensity", "", intensity, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f));
+	
 	listen<RendererCleanupEvent>(&MotionBlur::onCleanup);
 	listen<RenderOverlayEvent>(&MotionBlur::onRender);
 	listen<RendererInitEvent>(&MotionBlur::onRendererInit, true);
+
 }
 
 void MotionBlur::onEnable() {
@@ -22,7 +25,7 @@ void MotionBlur::onRender(Event& genericEv) {
 
 	ctx->Flush();
 	this->motionBlurList.push_back(Latite::getRenderer().copyCurrentBitmap());
-	size_t factor = 15;
+	size_t factor = static_cast<size_t>(std::floor(std::get<FloatValue>(intensity)));
 	if (motionBlurList.size() > factor) {
 		for (size_t i = 0; i < motionBlurList.size(); i++) {
 			ctx->DrawBitmap(motionBlurList[i], nullptr, 0.098f);

@@ -17,10 +17,16 @@ public:
 	void onClick(Event& ev);
 
 	void drawSetting(class Setting* set, struct Vec2 const& pos, class DXContext& dc, float size = 150.f);
+	void drawColorPicker();
 protected:
 	void onEnable(bool ignoreAnims) override;
 	void onDisable() override;
 private:
+	struct ColorPicker {
+		Setting* setting = nullptr;
+
+	} colorPicker{};
+
 
 	ComPtr<ID2D1Bitmap1> shadowBitmap;
 
@@ -54,9 +60,11 @@ private:
 	};
 
 	d2d::Rect rect = {};
+	d2d::Rect cPickerRect = {};
 
 	Setting* activeSetting = nullptr;
 	int capturedKey = 0;
+	float adaptedScale = 0.f;
 
 	ComPtr<ID2D1Effect> compositeEffect;
 };

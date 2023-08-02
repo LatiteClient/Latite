@@ -261,3 +261,8 @@ Color util::LerpColorState(Color const& current, Color const& on, Color const& o
 	ret.a = std::lerp(current.a, state ? on.a : off.a, t);
 	return ret;
 }
+
+HSV util::ColorToHSV(Color const& color)
+{
+	return HSV();
+}

@@ -8,6 +8,14 @@ struct Vec2 final {
 
 	constexpr Vec2() : x(0.f), y(0.f) {}
 	constexpr Vec2(float x, float y) : x(x), y(y) {}
+
+	constexpr Vec2 operator-(Vec2 const& right) {
+		return { x - right.x, y - right.y };
+	}
+
+	constexpr Vec2 operator+(Vec2 const& right) {
+		return { x + right.x, y + right.y };
+	}
 };
 
 struct Vec3 final {
@@ -33,4 +41,13 @@ struct Color {
 	}
 	
 	static constexpr Color RGB(int r, int g, int b, int a = 255) { return Color(r / 255.f, g / 255.f, b / 255.f, a / 255.f); }
+};
+
+struct HSV {
+	float h;
+	float s;
+	float v;
+
+	constexpr HSV() : h(0.f), s(0.f), v(0.f) {}
+	constexpr HSV(float h, float s, float v) : h(h), s(s), v(v) {}
 };
