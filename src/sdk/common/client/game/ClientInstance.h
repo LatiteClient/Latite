@@ -1,6 +1,7 @@
 #pragma once
 #include "sdk/Util.h"
 #include "util/LMath.h"
+#include "sdk/common/client/gui/GuiData.h"
 
 namespace sdk {
 	class ClientInstance {
@@ -11,6 +12,7 @@ namespace sdk {
 		MVCLASS_FIELD(Vec2, cursorPos, 0x498, 0x458, 0x458);
 
 		static ClientInstance* get();
+		class GuiData* getGuiData();
 		class LocalPlayer* getLocalPlayer();
 
 		void grabCursor();

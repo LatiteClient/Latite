@@ -182,6 +182,51 @@ std::string util::Format(std::string const& s) {
 	return out;
 }
 
+std::string util::GetClipboardText() {
+	// Try opening the clipboard
+	if (!OpenClipboard(nullptr)) {
+		return "";
+	}
+
+	// Get handle of clipboard object for ANSI text
+	HANDLE hData = GetClipboardData(CF_TEXT);
+	if (hData == nullptr)
+		return "";
+
+	// Lock the handle to get the actual text pointer
+	char* pszText = static_cast<char*>(GlobalLock(hData));
+	if (pszText == nullptr)
+		return "";
+
+	// Save text in a string class instance
+	std::string text(pszText);
+
+	// Release the lock
+	GlobalUnlock(hData);
+
+	// Release the clipboard
+	CloseClipboard();
+
+	return text;
+}
+
+void util::SetClipboardText(std::string const& text) {
+	if (OpenClipboard(NULL)) {
+		EmptyClipboard();
+		HGLOBAL hg = GlobalAlloc(GMEM_MOVEABLE, text.size() + 1); // \0
+		if (!hg) {
+			CloseClipboard();
+		}
+		else {
+			memcpy(GlobalLock(hg), text.c_str(), text.size() + 1);
+			GlobalUnlock(hg);
+			SetClipboardData(CF_TEXT, hg);
+			CloseClipboard();
+			GlobalFree(hg);
+		}
+	}
+}
+
 std::string util::KeyToString(int key) {
 	if (key > 0x40 && key < 0x5B) {
 		return std::string(1, (char)key);
@@ -202,7 +247,7 @@ int util::StringToKey(std::string const& s) {
 	}
 
 	for (auto& ent : KeyNames) {
-		if (ToLower(ent.second) == ToLower(s)) return ent.first;
+		if (ToLower(ent.second) == ToLower(s)) return static_cast<int>(ent.first);
 	}
 	return 0;
 }
@@ -262,7 +307,95 @@ Color util::LerpColorState(Color const& current, Color const& on, Color const& o
 	return ret;
 }
 
-HSV util::ColorToHSV(Color const& color)
-{
-	return HSV();
+
+HSV util::ColorToHSV(Color const& color) {
+	HSV hsv{ 0.f, 0.f, 0.f };
+
+	float minVal = std::min(color.r, std::min(color.g, color.b));
+	float maxVal = std::max(color.r, std::max(color.g, color.b));
+	float delta = maxVal - minVal;
+
+	hsv.v = maxVal;
+
+	if (delta == 0) {
+		hsv.h = 0;
+		hsv.s = 0;
+	}
+	else {
+		hsv.s = delta / maxVal;
+
+		if (color.r == maxVal) {
+			hsv.h = (color.g - color.b) / delta;
+		}
+		else if (color.g == maxVal) {
+			hsv.h = 2 + (color.b - color.r) / delta;
+		}
+		else {
+			hsv.h = 4 + (color.r - color.g) / delta;
+		}
+
+		hsv.h *= 60;
+
+		if (hsv.h < 0) {
+			hsv.h += 360;
+		}
+	}
+
+	return hsv;
+}
+
+Color util::HSVToColor(HSV const& hsv) {
+	Color color;
+	color.a = 1.f;
+	float hue = hsv.h;
+	while (hue >= 360.f) hue -= 360.f;
+
+	if (hsv.s == 0) {
+		// grayscale
+		color.r = hsv.v;
+		color.g = hsv.v;
+		color.b = hsv.v;
+	}
+	else {
+		int i = hue / 60;
+		float f = hue / 60 - i;
+		float p = hsv.v * (1 - hsv.s);
+		float q = hsv.v * (1 - hsv.s * f);
+		float t = hsv.v * (1 - hsv.s * (1 - f));
+
+		switch (i) {
+		case 0:
+			color.r = hsv.v;
+			color.g = t;
+			color.b = p;
+			break;
+		case 1:
+			color.r = q;
+			color.g = hsv.v;
+			color.b = p;
+			break;
+		case 2:
+			color.r = p;
+			color.g = hsv.v;
+			color.b = t;
+			break;
+		case 3:
+			color.r = p;
+			color.g = q;
+			color.b = hsv.v;
+			break;
+		case 4:
+			color.r = t;
+			color.g = p;
+			color.b = hsv.v;
+			break;
+		default:
+			color.r = hsv.v;
+			color.g = p;
+			color.b = q;
+			break;
+		}
+	}
+
+	return color;
 }

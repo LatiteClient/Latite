@@ -35,6 +35,7 @@ public:
 
 	bool shouldListen() { return isEnabled(); }
 
+	virtual void afterLoadConfig() {}
 	virtual void loadConfig(SettingGroup& resolvedGroup) = 0;
 	virtual bool shouldHoldToToggle() { return false; }
 

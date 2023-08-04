@@ -4,7 +4,7 @@
 #include "api/feature/setting/SettingGroup.h"
 #include "json/json.hpp"
 
-class Config final {
+class Config {
 public:
 	explicit Config(std::filesystem::path path);
 

@@ -4,7 +4,6 @@
 #include "Logger.h"
 #include <filesystem>
 
-#include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Web.Http.h>
 #include <winrt/impl/windows.web.http.2.h>
 #include <winrt/Windows.Web.Http.Filters.h>

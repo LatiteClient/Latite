@@ -22,6 +22,7 @@ public:
 	[[nodiscard]] static class ScreenManager& getScreenManager() noexcept;
 	[[nodiscard]] static class Assets& getAssets() noexcept;
 	[[nodiscard]] static class ScriptManager& getScriptManager() noexcept;
+	[[nodiscard]] static class Keyboard& getKeyboard() noexcept;
 
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);

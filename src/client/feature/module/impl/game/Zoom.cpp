@@ -17,7 +17,7 @@ void Zoom::onRenderLevel(Event& evGeneric) {
 	modifyTo = shouldZoom ? std::get<FloatValue>(modifier).value : 1.f;
 
 	// partial ticks
-	auto alpha = sdk::ClientInstance::get()->minecraft->timer->alpha;
+	float alpha = sdk::ClientInstance::get()->minecraft->timer->alpha;
 	float lr = std::lerp(activeModifier, modifyTo, alpha * std::get<FloatValue>(animSpeed) / 10.f);
 	activeModifier = lr;
 

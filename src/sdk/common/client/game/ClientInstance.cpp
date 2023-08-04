@@ -22,6 +22,18 @@ sdk::ClientInstance* sdk::ClientInstance::get() {
     return instance;
 }
 
+sdk::GuiData* sdk::ClientInstance::getGuiData() {
+    switch (internalVers) {
+    case VLATEST:
+        return util::directAccess<GuiData*>(this, 0x540);
+    case V1_18_12:
+        return memory::callVirtual<GuiData*>(this, 0xCE);
+    case V1_19_51:
+        return util::directAccess<GuiData*>(this, 0x500);
+    }
+    return nullptr;
+}
+
 sdk::LocalPlayer* sdk::ClientInstance::getLocalPlayer() {
     if (sdk::internalVers == sdk::V1_18_12 || sdk::internalVers == sdk::V1_19_51) {
         return memory::callVirtual<LocalPlayer*>(this, 0x18);

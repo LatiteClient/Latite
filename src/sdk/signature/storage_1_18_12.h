@@ -70,4 +70,12 @@ public:
 	inline static SigImpl RenderController_getOverlayColor{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? 0f 28 05 ? ? ? ? 0f 11 85 ? ? ? ? 4c 8d 8d",
 		"RenderController::getOverlayColor"};
+
+	inline static SigImpl ScreenView_setupAndRender{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 8B C4 48 89 58 ?? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ?? ?? ?? ?? 48 81 EC ?? ?? ?? ?? 0F 29 70 ?? 0F 29 78 ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 ?? ?? ?? ?? 4C 8B FA",
+		"ScreenView::setupAndRender"};
+
+	inline static SigImpl KeyMap{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+		"48 8d 0d ? ? ? ? 89 1c b9",
+		"KeyMap"};
 };

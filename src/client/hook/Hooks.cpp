@@ -7,6 +7,7 @@
 #include "impl/AppPlatformHooks.h"
 #include "impl/MinecraftGameHooks.h"
 #include "impl/RenderControllerHooks.h"
+#include "impl/ScreenViewHooks.h"
 #include "MinHook.h"
 
 void LatiteHooks::init() {
@@ -20,6 +21,7 @@ void LatiteHooks::init() {
 	this->items.push_back(std::make_shared<AppPlatformHooks>());
 	this->items.push_back(std::make_shared<MinecraftGameHooks>());
 	this->items.push_back(std::make_shared<RenderControllerHooks>());
+	this->items.push_back(std::make_shared<ScreenViewHooks>());
 	this->mutex.unlock();
 }
 

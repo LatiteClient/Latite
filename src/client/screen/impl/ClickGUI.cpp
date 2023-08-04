@@ -61,7 +61,7 @@ void ClickGUI::onRender(Event&) {
 
 	//auto& ev = reinterpret_cast<RenderOverlayEvent&>(evGeneric);
 	auto& rend = Latite::getRenderer();
-	auto ss = rend.getDeviceContext()->GetSize();
+	auto ss = rend.getScreenSize();
 
 	adaptedScale = ss.width / 1920.f;
 
@@ -128,7 +128,7 @@ void ClickGUI::onRender(Event&) {
 			auto bmp = Latite::getAssets().latiteLogo.getBitmap();
 
 			D2D1::Matrix3x2F oMat;
-			auto sz = bmp->GetSize();
+			auto sz = Latite::getRenderer().getScreenSize();
 
 			D2D1::Matrix3x2F m;
 
@@ -172,7 +172,6 @@ void ClickGUI::onRender(Event&) {
 			{
 				dc.ctx->DrawBitmap(Latite::getAssets().arrowBackIcon.getBitmap(), backArrowRect);
 			}
-
 			if (shouldSelect(backArrowRect, cursorPos)) {
 				if (justClicked[0]) {
 					playClickSound();
@@ -277,7 +276,48 @@ void ClickGUI::onRender(Event&) {
 			dc.ctx->SetTarget(myBitmap);
 		}
 
-		if (tab == MODULES) {
+		if (tab == SETTINGS) {
+			// actual settings
+			auto& settings = Latite::getSettings();
+
+			float settingWidth = rect.getWidth() / 3.f;
+			float padToSettings = 0.04787f * rect.getHeight();
+			// float settings
+			Vec2 setPos = { searchRect.left, searchRect.bottom + padToSettings };
+			{
+				// go through all float settings
+				settings.forEach([&](std::shared_ptr<Setting> set) {
+					if (set->value->index() == (size_t)Setting::Type::Float /* || set->value->index() == Setting::Type::Int*/) {
+						drawSetting(set.get(), setPos, dc, settingWidth, 0.35f);
+						setPos.y += (setting_height_relative * rect.getHeight()) * 2.f;
+					}
+					});
+			}
+
+			// key/enum settings
+			setPos.y += padToSettings;
+			{
+				// go through all enum settings
+				settings.forEach([&](std::shared_ptr<Setting> set) {
+					if (set->value->index() == (size_t)Setting::Type::Key /* || set->value->index() == Setting::Type::Enum*/) {
+						drawSetting(set.get(), setPos, dc, settingWidth);
+						setPos.y += (setting_height_relative * rect.getHeight()) * 2.f;
+					}
+					});
+			}
+
+			// bool settings
+			setPos = { rect.left + rect.getWidth() * ( 1.3f / 3.f ), searchRect.bottom + padToSettings };
+			{
+				// go through all bool settings
+				settings.forEach([&](std::shared_ptr<Setting> set) {
+					if (set->value->index() == (size_t)Setting::Type::Bool /* || set->value->index() == Setting::Type::Enum*/) {
+						drawSetting(set.get(), setPos, dc, settingWidth);
+						setPos.y += (setting_height_relative * rect.getHeight()) * 2.f;
+					}
+					});
+			}
+		} else if (tab == MODULES) {
 
 			// all, game, hud, etc buttons
 			static std::vector<std::tuple<std::wstring, ClickGUI::ModTab, d2d::Color>> modTabs = { {L"All", ALL, searchCol }, {L"Game", GAME, searchCol}, {L"HUD", HUD, searchCol }, { L"Script", SCRIPT, searchCol } };
@@ -398,9 +438,10 @@ void ClickGUI::onRender(Event&) {
 					modRectActual.bottom += padToSetting;
 					mod.mod->settings->forEach([&](std::shared_ptr<Setting> set) {
 						if (set->visible) {
-							drawSetting(set.get(), { descTextRect.left, modRectActual.bottom }, dc, descTextRect.getWidth());
-							modRectActual.bottom += settingHeight;
-							modRectActual.bottom += settingPadY;
+							if (drawSetting(set.get(), { descTextRect.left, modRectActual.bottom }, dc, descTextRect.getWidth())) {
+								modRectActual.bottom += settingHeight;
+								modRectActual.bottom += settingPadY;
+							}
 						}
 						});
 
@@ -501,8 +542,15 @@ void ClickGUI::onRender(Event&) {
 
 	}
 
-	cPickerRect = { 300.f, 300.f, 0.f, 0.f };
-	if (colorPicker.setting) drawColorPicker();
+	if (colorPicker.setting) {
+		drawColorPicker();
+		if (colorPicker.queueClose) {
+			auto& colVal = std::get<ColorValue>(*colorPicker.setting->value);
+			auto d2dCol = d2d::Color(util::HSVToColor(colorPicker.pickerColor)).asAlpha(colorPicker.opacityMod);
+			*colorPicker.selectedColor = { d2dCol.r, d2dCol.g, d2dCol.b, d2dCol.a };
+			colorPicker = ColorPicker();
+		}
+	}
 	this->clearLayers();
 
 	dc.ctx->SetTransform(oTransform);
@@ -576,13 +624,13 @@ namespace {
 	}
 }
 
-void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float size) {
+bool ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float size, float fTextWidth) {
 	const float checkboxSize = rect.getWidth() * setting_height_relative;
 	const float textSize = checkboxSize * 0.9f;
 	const auto cursorPos = sdk::ClientInstance::get()->cursorPos;
 	const float round = 0.1875f * checkboxSize;
 
-	switch (set->type) {
+	switch ((Setting::Type)((*set->value).index())) {
 	case Setting::Type::Bool:
 	{
 		RectF checkboxRect = { pos.x, pos.y, pos.x + checkboxSize, pos.y + checkboxSize };
@@ -723,7 +771,7 @@ void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
 
 		D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES prop{};
-		auto ss = dc.ctx->GetSize();
+		auto ss = Latite::getRenderer().getScreenSize();
 		prop.startPoint = { 0.f, ss.height / 2.f };
 		prop.endPoint = { ss.width, ss.height / 2.f };
 
@@ -756,13 +804,23 @@ void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 			if (justClicked[0]) {
 				playClickSound();
 				colorPicker.setting = set;
+				colorPicker.dragging = false;
+				cPickerRect = { colRect.left, colRect.bottom + 20.f, 0.f, 0.f };
+				auto& colVal = std::get<ColorValue>(*set->value);
+				colorPicker.selectedColor = &colVal.color1;
+				auto sCol = *colorPicker.selectedColor;
+				colorPicker.pickerColor = util::ColorToHSV({ sCol.r, sCol.g, sCol.b, sCol.a });
+				colorPicker.hueMod = colorPicker.pickerColor.h / 360.f;
+				colorPicker.svModX = colorPicker.pickerColor.s;
+				colorPicker.svModY = 1.f - colorPicker.pickerColor.v;
+				colorPicker.opacityMod = sCol.a;
 			}
 		}
 	}
 	break;
 	case Setting::Type::Float:
 	{
-		float textWidth = 0.1947f * size;
+		float textWidth = fTextWidth * size;
 		float sliderHeight = (rect.getHeight() * 0.017730f);
 
 		float textSz = sliderHeight * 1.5f;
@@ -775,7 +833,7 @@ void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 		float padToSlider = rect.getHeight() * 0.01063f;
 
 		float sliderTop = textRect.top + sliderHeight * 0.16f;
-		RectF sliderRect = { textRect.right, sliderTop, textRect.left + size - textWidth, sliderTop + sliderHeight };
+		RectF sliderRect = { textRect.right, sliderTop, textRect.left + size - (0.1947f * size), sliderTop + sliderHeight };
 		
 		float innerPad = 0.2f * sliderRect.getHeight();
 		RectF innerSliderRect = { sliderRect.left + innerPad, sliderRect.top + innerPad, sliderRect.right - innerPad, sliderTop + (rect.getHeight() * 0.017730f) - innerPad };
@@ -841,8 +899,9 @@ void ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 	}
 		break;
 	default:
-		break;
+		return false;
 	}
+	return true;
 }
 
 void ClickGUI::drawColorPicker() {
@@ -871,23 +930,27 @@ void ClickGUI::drawColorPicker() {
 	ComPtr<ID2D1LinearGradientBrush> mainColorBrush;
 	ComPtr<ID2D1LinearGradientBrush> valueBrush;
 	ComPtr<ID2D1LinearGradientBrush> hueBrush;
+	ComPtr<ID2D1LinearGradientBrush> alphaBrush;
 
 	// TODO: support chroma, multiple colors
-	auto colVal = std::get<ColorValue>(*colorPicker.setting->value);
-	d2d::Color col = { colVal.color1.r, colVal.color1.g, colVal.color1.b, colVal.color1.a };
+	auto& colVal = std::get<ColorValue>(*colorPicker.setting->value);
+	d2d::Color col = util::HSVToColor(colorPicker.pickerColor);
+	d2d::Color sCol = { colorPicker.selectedColor->r, colorPicker.selectedColor->g, colorPicker.selectedColor->b, colorPicker.selectedColor->a };
+	d2d::Color nsCol = util::HSVToColor({ util::ColorToHSV(sCol).h, 1.f, 1.f });
+	d2d::Color baseCol = util::HSVToColor({ colorPicker.pickerColor.h, 1.f, 1.f });
 
 	// main brush
 	{
 		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
 
 		D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES prop{};
-		auto ss = dc.ctx->GetSize();
+		auto ss = Latite::getRenderer().getScreenSize();
 		prop.startPoint = { boxRect.left, boxRect.top };
 		prop.endPoint = { boxRect.right, boxRect.top };
 
 		const D2D1_GRADIENT_STOP stops[] = {
 			0.f, { 1.f, 1.f, 1.f, 1.f },
-			1.f, col.asAlpha(1.f).get()
+			1.f, baseCol.get()
 		};
 
 		dc.ctx->CreateGradientStopCollection(stops, _countof(stops), gradientStopCollection.GetAddressOf());
@@ -899,7 +962,7 @@ void ClickGUI::drawColorPicker() {
 		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
 
 		D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES prop{};
-		auto ss = dc.ctx->GetSize();
+		auto ss = Latite::getRenderer().getScreenSize();
 		prop.startPoint = { boxRect.left, boxRect.bottom };
 		prop.endPoint = { boxRect.left, boxRect.top };
 
@@ -917,7 +980,138 @@ void ClickGUI::drawColorPicker() {
 	dc.fillRectangle(boxRect, valueBrush.Get());
 	dc.drawRectangle(boxRect, d2d::Color::RGB(0x50, 0x50, 0x50).asAlpha(0.28f), 2.f);
 
-	cPickerRect.bottom = boxRect.bottom + remPad * 2.f;
+
+	float hueBarHeight = boxRect.getHeight() * 0.0506329f;
+
+	float padToHueBar = remPad * 0.6f;
+
+	RectF hueBar = { boxRect.left, boxRect.bottom + padToHueBar, boxRect.right, boxRect.bottom + hueBarHeight + padToHueBar };
+
+	// Hue brush
+	{
+		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
+
+		D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES prop{};
+		auto ss = Latite::getRenderer().getScreenSize();
+		prop.startPoint = { hueBar.left, hueBar.top };
+		prop.endPoint = { hueBar.right, hueBar.top };
+
+		float hueMod = 0.f;
+
+		const D2D1_GRADIENT_STOP stops[] = {
+			0.f, d2d::Color(util::HSVToColor({ 0.f, 1.f, 1.f })).get(),
+			1.f / 7.f, d2d::Color(util::HSVToColor({ (1.f / 7.f) * 360.f, 1.f, 1.f })).get(),
+			2.f / 7.f, d2d::Color(util::HSVToColor({ (2.f / 7.f) * 360.f, 1.f, 1.f })).get(),
+			3.f / 7.f, d2d::Color(util::HSVToColor({ (3.f / 7.f) * 360.f, 1.f, 1.f })).get(),
+			4.f / 7.f, d2d::Color(util::HSVToColor({ (4.f / 7.f) * 360.f, 1.f, 1.f })).get(),
+			5.f / 7.f, d2d::Color(util::HSVToColor({ (5.f / 7.f) * 360.f, 1.f, 1.f })).get(),
+			6.f / 7.f, d2d::Color(util::HSVToColor({ (6.f / 7.f) * 360.f, 1.f, 1.f })).get(),
+			1.f, d2d::Color(util::HSVToColor({ 0.f, 1.f, 1.f })).get(),
+		};
+
+		dc.ctx->CreateGradientStopCollection(stops, 8, gradientStopCollection.GetAddressOf());
+		dc.ctx->CreateLinearGradientBrush(prop, gradientStopCollection.Get(), hueBrush.GetAddressOf());
+	}
+
+	dc.fillRoundedRectangle(hueBar, hueBrush.Get(), hueBar.getHeight() / 2.f);
+	dc.drawRoundedRectangle(hueBar, d2d::Color::RGB(0x50, 0x50, 0x50).asAlpha(0.28f), hueBar.getHeight() / 2.f, hueBar.getHeight() / 4.f, DXContext::OutlinePosition::Outside);
+
+	RectF alphaBar = { hueBar.left, hueBar.bottom + padToHueBar, hueBar.right, hueBar.bottom + padToHueBar + hueBarHeight };
+
+	// Alpha brush
+	{
+		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
+
+		D2D1_LINEAR_GRADIENT_BRUSH_PROPERTIES prop{};
+		auto ss = Latite::getRenderer().getScreenSize();
+		prop.startPoint = { alphaBar.left, alphaBar.top };
+		prop.endPoint = { alphaBar.right, alphaBar.top };
+
+		float hueMod = 0.f;
+
+		const D2D1_GRADIENT_STOP stops[] = {
+			{0.f, col.asAlpha(0.f).get()},
+			{1.f, col.asAlpha(1.f).get()}
+		};
+
+		dc.ctx->CreateGradientStopCollection(stops, _countof(stops), gradientStopCollection.GetAddressOf());
+		dc.ctx->CreateLinearGradientBrush(prop, gradientStopCollection.Get(), alphaBrush.GetAddressOf());
+	}
+
+	dc.fillRoundedRectangle(alphaBar, { 1.f, 1.f, 1.f, 0.5f }, alphaBar.getHeight() / 2.f);
+
+	drawAlphaBar(dc, alphaBar, alphaBar.getHeight() / 2.f, 2);
+	//dc.fillRoundedRectangle(hueBar, hueBrush.Get(), hueBar.getHeight() / 2.f);
+	dc.fillRoundedRectangle(alphaBar, alphaBrush.Get(), alphaBar.getHeight() / 2.f);
+	dc.drawRoundedRectangle(alphaBar, d2d::Color::RGB(0x37, 0x37, 0x37).asAlpha(0.88f), alphaBar.getHeight() / 2.f, alphaBar.getHeight() / 3.f, DXContext::OutlinePosition::Outside);
+
+	float ellipseRadius = 0.75f * alphaBar.getHeight();
+	
+	auto& cursorPos = sdk::ClientInstance::get()->cursorPos;
+
+	// sv
+	if (colorPicker.isEditingSV || (justClicked[0] && boxRect.contains(cursorPos))) {
+		colorPicker.svModX = std::max(std::min(cursorPos.x - boxRect.left, boxRect.getWidth()) / boxRect.getWidth(), 0.f);
+		colorPicker.svModY = std::max(std::min(cursorPos.y - boxRect.top, boxRect.getHeight()) / boxRect.getHeight(), 0.f);
+		
+		colorPicker.isEditingSV = true;
+	}
+
+	// hue
+	if (colorPicker.isEditingHue || (justClicked[0] && hueBar.contains(cursorPos))) {
+		colorPicker.hueMod = std::max(std::min(cursorPos.x - hueBar.left, hueBar.getWidth()) / hueBar.getWidth(), 0.f);
+		colorPicker.isEditingHue = true;
+	}
+
+	// alpha
+	if (colorPicker.isEditingOpacity || (justClicked[0] && alphaBar.contains(cursorPos))) {
+		colorPicker.opacityMod = std::max(std::min(cursorPos.x - alphaBar.left, alphaBar.getWidth()) / alphaBar.getWidth(), 0.f);
+		colorPicker.isEditingOpacity = true;
+	}
+
+	if (!mouseButtons[0]) {
+		colorPicker.isEditingSV = false;
+		colorPicker.isEditingHue = false;
+		colorPicker.isEditingOpacity = false;
+	}
+
+	{
+		colorPicker.pickerColor.h = (colorPicker.hueMod * 360.f);
+		colorPicker.pickerColor.s = colorPicker.svModX;
+		colorPicker.pickerColor.v = 1.f - colorPicker.svModY;
+	}
+
+
+	// SV
+	{
+		auto ellipse = D2D1::Ellipse({ boxRect.left + (hueBar.getWidth() * colorPicker.svModX), boxRect.top + (boxRect.getHeight() * colorPicker.svModY)}, ellipseRadius, ellipseRadius);
+		dc.brush->SetColor(baseCol.asAlpha(0.5f).get());
+		dc.ctx->FillEllipse(ellipse, dc.brush);
+		dc.brush->SetColor(D2D1::ColorF(D2D1::ColorF::White));
+		dc.ctx->DrawEllipse(ellipse, dc.brush, ellipseRadius / 2.f);
+	}
+
+	// hue
+	{
+		auto ellipse = D2D1::Ellipse({ hueBar.left + (hueBar.getWidth() * colorPicker.hueMod), hueBar.centerY() }, ellipseRadius, ellipseRadius);
+		auto huedCol = util::HSVToColor({ colorPicker.hueMod * 360.f, 1.f, 1.f });
+		dc.brush->SetColor(d2d::Color(huedCol).get());
+		dc.ctx->FillEllipse(ellipse, dc.brush);
+		dc.brush->SetColor(D2D1::ColorF(D2D1::ColorF::White));
+		dc.ctx->DrawEllipse(ellipse, dc.brush, ellipseRadius / 2.f);
+	}
+
+	// alpha
+	{
+		auto ellipse = D2D1::Ellipse({ alphaBar.left + (alphaBar.getWidth() * colorPicker.opacityMod), alphaBar.centerY() }, ellipseRadius, ellipseRadius);
+		dc.brush->SetColor(col.asAlpha(colorPicker.opacityMod).get());
+		dc.ctx->FillEllipse(ellipse, dc.brush);
+		dc.brush->SetColor(D2D1::ColorF(D2D1::ColorF::White));
+		dc.ctx->DrawEllipse(ellipse, dc.brush, ellipseRadius / 2.f);
+	}
+
+	
+	cPickerRect.bottom = alphaBar.bottom + remPad * 2.f;
 
 	dc.ctx->SetTarget(Latite::getRenderer().getBitmap());
 
@@ -926,9 +1120,31 @@ void ClickGUI::drawColorPicker() {
 	dc.fillRoundedRectangle(cPickerRect, d2d::Color::RGB(0x7, 0x7, 0x7).asAlpha(0.8f), 19.f * adaptedScale);
 	dc.drawRoundedRectangle(cPickerRect, d2d::Color::RGB(0, 0, 0).asAlpha(0.28f), 19.f * adaptedScale, 4.f * adaptedScale, DXContext::OutlinePosition::Outside);
 	
+	// x button
+	float xWidth = 0.06f * rectWidth;
+	RectF xRect = { cPickerRect.right - xWidth * 2.f, cPickerRect.top + xWidth, cPickerRect.right - xWidth, cPickerRect.top + xWidth * 2.f };
+	dc.ctx->DrawBitmap(Latite::getAssets().xIcon.getBitmap(), xRect);
+
+	if (justClicked[0] && xRect.contains(cursorPos)) {
+		colorPicker.queueClose = true;
+		playClickSound();
+	}
+
 	// inner contents
 	dc.ctx->DrawBitmap(shadowBitmap.Get());
 
+	RectF pickerTopBar = { cPickerRect.left, cPickerRect.top, cPickerRect.right, boxRect.top };
+
+	if (!colorPicker.dragging && justClicked[0] && pickerTopBar.contains(cursorPos)) {
+		colorPicker.dragging = true;
+		colorPicker.dragOffs = cursorPos - cPickerRect.getPos();
+	}
+
+	if (!mouseButtons[0]) colorPicker.dragging = false;
+
+	if (colorPicker.dragging) {
+		cPickerRect.setPos(cursorPos - colorPicker.dragOffs);
+	}
 }
 
 void ClickGUI::onEnable(bool ignoreAnims) {

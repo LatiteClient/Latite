@@ -54,9 +54,10 @@ void Config::addGroup(nlohmann::json obj) {
 }
 
 void Config::addSetting(SettingGroup& group, nlohmann::json& obj) {
-	auto set = std::make_shared<Setting>(obj["name"].get<std::string>(), "", "", (Setting::Type)obj["type"].get<int>());
+	auto set = std::make_shared<Setting>(obj["name"].get<std::string>(), "", "");
 	auto jVal = obj["value"];
-	switch (set->type) {
+	auto type = obj["type"].get<int>();
+	switch ((Setting::Type)type) {
 	case Setting::Type::Bool:
 		set->resolvedValue = BoolValue(jVal.get<bool>());
 		break;
@@ -71,6 +72,9 @@ void Config::addSetting(SettingGroup& group, nlohmann::json& obj) {
 		break;
 	case Setting::Type::Color:
 		set->resolvedValue = ColorValue(jVal);
+		break;
+	case Setting::Type::Vec2:
+		set->resolvedValue = Vec2Value(jVal);
 		break;
 	default:
 		return;
@@ -109,9 +113,9 @@ void Config::saveGroup(SettingGroup& group, json& j) {
 
 void Config::saveSetting(std::shared_ptr<Setting> set, nlohmann::json& jout) {
 	jout["name"] = set->name();
-	jout["type"] = set->type;
+	jout["type"] = (*set->value).index();
 	auto val = *set->value;
-	switch (set->type) {
+	switch ((Setting::Type)((*set->value).index())) {
 	case Setting::Type::Bool:
 		jout["value"] = std::get<BoolValue>(val).value;
 		break;
@@ -129,7 +133,15 @@ void Config::saveSetting(std::shared_ptr<Setting> set, nlohmann::json& jout) {
 		json obj = json::object();
 		std::get<ColorValue>(val).store(obj);
 		jout["value"] = obj;
+		break;
 	}
+	case Setting::Type::Vec2:
+	{
+		json obj = json::object();
+		std::get<Vec2Value>(val).store(obj);
+		jout["value"] = obj;
+	}
+		break;
 	break;
 	default:
 		break;

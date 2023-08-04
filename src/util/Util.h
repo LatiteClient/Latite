@@ -1,5 +1,4 @@
 #pragma once
-
 #include <string>
 #include <filesystem>
 #include "api/scanner/Scanner.h"
@@ -12,6 +11,8 @@ namespace util {
 	extern std::wstring StrToWStr(std::string const& s);
 	extern std::string WStrToStr(std::wstring const& ws);
 	extern std::string Format(std::string const& s);
+	extern std::string GetClipboardText();
+	extern void SetClipboardText(std::string const& text);
 
 	extern std::string KeyToString(int key);
 	extern int StringToKey(std::string const& s);

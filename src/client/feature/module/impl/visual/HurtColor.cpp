@@ -12,7 +12,6 @@ HurtColor::HurtColor() : Module("HurtColor", "Hurt Color", "Change the color whe
 void HurtColor::onActorOverlay(Event& evGeneric) {
 	auto& ev = reinterpret_cast<OverlayColorEvent&>(evGeneric);
 	auto setColor = std::get<ColorValue>(this->color).color1;
-	setColor.b = 1.f;
 	if (ev.getActor() && ev.getActor()->invulnerableTime > 0) {
 		ev.getColor() = { setColor.r, setColor.g, setColor.b, setColor.a };
 	}

@@ -100,8 +100,8 @@ void DXContext::drawGaussianBlur(float intensity)  {
 	gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, intensity);
 	gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
 	gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
-	auto sz = ctx->GetSize();
-	auto rc = D2D1::RectF(0, 0, sz.width, sz.height);
+	auto sz = ctx->GetPixelSize();
+	auto rc = D2D1::RectF(0, 0, (float)sz.width, (float)sz.height);
 	D2D1::Matrix3x2F oMat;
 	//ctx->SetTransform(D2D1::Matrix3x2F::Scale(sz.width / rc.right, sz.height / rc.bottom));
 	ctx->DrawImage(gaussianBlurEffect, D2D1::Point2F(0.f, 0.f), rc);
@@ -116,8 +116,8 @@ void DXContext::drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity) {
 	gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, intensity);
 	gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
 	gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
-	auto sz = ctx->GetSize();
-	auto rc = D2D1::RectF(0, 0, sz.width, sz.height);
+	auto sz = ctx->GetPixelSize();
+	auto rc = D2D1::RectF(0, 0, (float)sz.width, (float)sz.height);
 	D2D1::Matrix3x2F oMat;
 	//ctx->SetTransform(D2D1::Matrix3x2F::Scale(sz.width / rc.right, sz.height / rc.bottom));
 	ctx->DrawImage(gaussianBlurEffect, D2D1::Point2F(0.f, 0.f), rc);
@@ -132,7 +132,7 @@ void DXContext::drawText(RectF const& rc, std::wstring const& ws, d2d::Color con
 		layout.GetAddressOf()))) {
 		DWRITE_TEXT_RANGE range;
 		range.startPosition = 0;
-		range.length = ws.size();
+		range.length = static_cast<UINT32>(ws.size());
 		layout->SetFontSize(size, range);
 		layout->SetTextAlignment(alignment);
 		layout->SetParagraphAlignment(verticalAlignment);
@@ -143,14 +143,14 @@ void DXContext::drawText(RectF const& rc, std::wstring const& ws, d2d::Color con
 
 Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font, float size) {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
-	auto ss = ctx->GetSize();
+	auto ss = ctx->GetPixelSize();
 	ComPtr<IDWriteTextLayout> layout;
 	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
-		fmt.Get(), ss.width, ss.height,
+		fmt.Get(), (float)ss.width, (float)ss.height,
 		layout.GetAddressOf()))) {
 		DWRITE_TEXT_RANGE range;
 		range.startPosition = 0;
-		range.length = ws.size();
+		range.length = static_cast<UINT32>(ws.size());
 		layout->SetFontSize(size, range);
 		layout->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 		layout->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
@@ -169,14 +169,14 @@ Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font
 
 d2d::Rect DXContext::getTextRect(std::wstring const& ws, Renderer::FontSelection font, float size, float pad) {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
-	auto ss = ctx->GetSize();
+	auto ss = ctx->GetPixelSize();
 	ComPtr<IDWriteTextLayout> layout;
 	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
-		fmt.Get(), ss.width, ss.height,
+		fmt.Get(), static_cast<float>(ss.width), static_cast<float>(ss.height),
 		layout.GetAddressOf()))) {
 		DWRITE_TEXT_RANGE range;
 		range.startPosition = 0;
-		range.length = ws.size();
+		range.length = static_cast<UINT32>(ws.size());
 		layout->SetFontSize(size, range);
 		layout->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 		layout->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);

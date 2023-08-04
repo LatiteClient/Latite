@@ -7,25 +7,32 @@ class HUDModule : public Module {
 public:
 	HUDModule(std::string const& name, std::string const& displayName, std::string const& description, Category category, int keybind = 0,
 		bool resizable = true)
-		: Module(name, displayName, description, category, keybind, true), resizable(resizable) {}
+		: Module(name, displayName, description, category, keybind, true), resizable(resizable) {
+		
+		addSetting("pos", "Position", "", storedPos);
+		addSliderSetting("scale", "Size", "", scale, FloatValue(0.f), FloatValue(4.f), FloatValue(0.05f));
+	}
 
 	virtual void render(DXContext& ctx, bool isDefault, bool inEditor) = 0;
 
 	virtual void renderSelected();
 	virtual void renderFrame();
 	virtual void renderPost();
+	void afterLoadConfig() override;
+	void storePos();
 
 	void setPos(Vec2 newPos) {
 		rect.setPos(newPos);
 	}
 
-	[[nodiscard]] float getScale() { return scale; }
-	[[nodiscard]] d2d::Rect getRect() { return rect; }
+	[[nodiscard]] float getScale() { return std::get<FloatValue>(scale); }
+	[[nodiscard]] d2d::Rect getRect();
 	
-	void setScale(float f) { scale = f; }
+	void setScale(float f) { std::get<FloatValue>(scale) = f; }
 protected:
 	d2d::Rect rect = {};
-	float scale = 1.f;
+	Setting::Value storedPos = Vec2Value();
+	Setting::Value scale = FloatValue(1.f);
 	bool resizable;
 public:
 	struct Snapping {

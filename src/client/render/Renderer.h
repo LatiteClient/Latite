@@ -40,7 +40,7 @@ private:
 	ComPtr<ID2D1Device> d2dDevice;
 	ComPtr<ID2D1DeviceContext> d2dCtx;
 	ComPtr<IDWriteFactory> dWriteFactory;
-	ComPtr<IWICImagingFactory> wicFactory;
+	ComPtr<IWICImagingFactory2> wicFactory;
 
 	ComPtr<ID2D1SolidColorBrush> solidBrush;
 	ComPtr<ID2D1Effect> shadowEffect;
@@ -98,6 +98,9 @@ public:
 		this->fontFamily = ws;
 	}
 
+	D2D1_SIZE_F getScreenSize() {
+		return { (float)d2dCtx->GetPixelSize().width, (float)d2dCtx->GetPixelSize().height };
+	}
 
 	[[nodiscard]] IDWriteTextFormat* getTextFormat(FontSelection selection) {
 		switch (selection) {
@@ -114,6 +117,10 @@ public:
 
 	[[nodiscard]] ID2D1DeviceContext* getDeviceContext() {
 		return d2dCtx.Get();
+	}
+
+	[[nodiscard]] ID2D1Device* getDevice() {
+		return d2dDevice.Get();
 	}
 
 	[[nodiscard]] ID2D1SolidColorBrush* getSolidBrush() {
@@ -143,11 +150,27 @@ public:
 		return newBitmap;
 	}
 
+	[[nodiscard]] ID2D1Bitmap1* copyCurrentBitmap(d2d::Rect const& rc) {
+		auto idx = swapChain4->GetCurrentBackBufferIndex();
+		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
+		ID2D1Bitmap1* newBitmap;
+
+		D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
+		D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
+
+		HRESULT hr = d2dCtx->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, pixelFormat), &newBitmap);
+		if (SUCCEEDED(hr)) {
+			auto pt = D2D1::Point2U((UINT32)rc.left, (UINT32)rc.top);
+			auto urc = D2D1::RectU((UINT32)rc.left, (UINT32)rc.top, (UINT32)rc.right, (UINT32)rc.bottom);
+			newBitmap->CopyFromBitmap(&pt, myBitmap, &urc);
+		}
+		return newBitmap;
+	}
+
 	[[nodiscard]] void copyCurrentBitmap(ID2D1Bitmap1*& bmp) {
 		auto idx = swapChain4->GetCurrentBackBufferIndex();
 		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
-		[[maybe_unused]] auto hResult = bmp->CopyFromBitmap(nullptr, myBitmap, nullptr);
-		[[maybe_unused]] int test = 32;
+		bmp->CopyFromBitmap(nullptr, myBitmap, nullptr);
 	}
 
 	[[nodiscard]] ID2D1Effect*& getShadowEffect() {
@@ -171,7 +194,7 @@ public:
 		return blurBuffers[swapChain4->GetCurrentBackBufferIndex()];
 	}
 
-	[[nodiscard]] IWICImagingFactory* getImagingFactory() {
+	[[nodiscard]] IWICImagingFactory2* getImagingFactory() {
 		return this->wicFactory.Get();
 	}
 

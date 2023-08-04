@@ -11,6 +11,7 @@ public:
 	void onDisable() override;
 private:
 	void onRender(Event& ev);
+	void onRenderLayer(Event& ev);
 	void renderModule(class HUDModule* mod);
 	void doDragging();
 	void doSnapping(Vec2 const&);
@@ -20,6 +21,7 @@ private:
 
 	float anim = 0.f;
 	Vec2 dragOffset = {};
+	std::vector<d2d::Rect> controls = {};
 
 	struct SnapLine {
 		float left, middle, right;

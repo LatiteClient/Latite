@@ -1,5 +1,6 @@
 #include "HUDEditor.h"
 #include "client/event/impl/RenderOverlayEvent.h"
+#include "client/event/impl/RenderLayerEvent.h"
 #include "client/event/Eventing.h"
 #include "client/Latite.h"
 #include "client/config/ConfigManager.h"
@@ -13,20 +14,40 @@
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/world/Minecraft.h"
 #include "sdk/common/client/game/MinecraftGame.h"
+#include "sdk/common/client/gui/controls/VisualTree.h"
+#include "sdk/common/client/gui/controls/UIControl.h"
 
 HUDEditor::HUDEditor() : Screen("HUDEditor") {
 	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&HUDEditor::onRender, 1, true);
+	Eventing::get().listen<RenderLayerEvent>(this, (EventListenerFunc)&HUDEditor::onRenderLayer, 1, true);
 }
 
 void HUDEditor::onRender(Event& ev) {
 	DXContext dc;
 	if (isActive()) {
+		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
+			if (mod->isHud()) {
+				addLayer(reinterpret_cast<HUDModule*>(mod.get())->getRect());
+			}
+			});
+
+		auto ss = Latite::getRenderer().getScreenSize();
+
 		float toBlur = Latite::get().getMenuBlur().value_or(0.f);
 
 		auto alpha = sdk::ClientInstance::get()->minecraft->timer->alpha / 10.f;
 		anim = std::lerp(anim, 1.f, alpha);
 
 		if (Latite::get().getMenuBlur()) dc.drawGaussianBlur(toBlur * anim);
+		// cut out stuff, for movable scoreboard and paperdoll in future
+/*
+		for (auto& control : controls) {
+			auto bmp = Latite::getRenderer().copyCurrentBitmap(control);
+
+			dc.ctx->DrawBitmap(bmp);
+
+			bmp->Release();
+		}*/
 
 		auto& cursorPos = sdk::ClientInstance::get()->cursorPos;
 
@@ -35,7 +56,7 @@ void HUDEditor::onRender(Event& ev) {
 			float buttonWidth = 200.f;
 			float buttonHeight = 60.f;
 
-			auto ss = dc.ctx->GetSize();
+			auto ss = Latite::getRenderer().getScreenSize();
 
 			d2d::Rect ssRec = { 0.f, 0.f, ss.width, ss.height };
 			Vec2 btnPos = ssRec.center({ 200.f, 60.f });
@@ -59,18 +80,77 @@ void HUDEditor::onRender(Event& ev) {
 			dc.drawText(btnRect, L"Mod Settings", d2d::Color(0.9f, 0.9f, 0.9f, 1.f), Renderer::FontSelection::Regular, 20.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		}
 
-		doDragging();
-		doSnapping(dragOffset);
-		keepModulesInBounds();
+		clearLayers();
 	}
+
+	if (isActive()) doDragging();
+	doSnapping(dragOffset);
+	keepModulesInBounds();
 
 	if (isActive() || sdk::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 			if (mod->isHud() && mod->isEnabled()) {
-				auto hudModule = reinterpret_cast<HUDModule*>(mod.get());
+				auto hudModule = static_cast<HUDModule*>(mod.get());
 				renderModule(hudModule);
+				hudModule->storePos();
 			}
 			});
+	}
+}
+
+void HUDEditor::onRenderLayer(Event& evGeneric) {
+	auto& ev = static_cast<RenderLayerEvent&>(evGeneric);
+	auto view = ev.getScreenView();
+	
+	float uiscale = sdk::ClientInstance::get()->getGuiData()->guiScale;
+
+	auto root = view->visualTree->rootControl;
+	if (root && root->name == "hud_screen") {
+		controls.clear();
+		// TODO: xor string
+		auto hotbarRend = root->findFirstDescendantWithName("hotbar_renderer");
+		auto paperdoll = root->findFirstDescendantWithName("hud_player");
+		auto playerPos = root->findFirstDescendantWithName("player_position");
+
+		if (hotbarRend) {
+			d2d::Rect rec = hotbarRend->getRect();
+			//rec.bottom = 0.f;
+			rec.right = rec.left + (rec.getWidth() * 9.f);
+			rec.right += 1.f;
+			rec.left -= 1.f;
+
+			rec.left *= uiscale;
+			rec.right *= uiscale;
+			rec.top *= uiscale;
+			rec.bottom *= uiscale;
+			controls.push_back(rec);
+		}
+
+		/*if (paperdoll) {
+			d2d::Rect rec = paperdoll->getRect();
+			rec.bottom += rec.getHeight();
+			//rec.bottom = 0.f;
+			if (((sdk::CustomRenderComponent*)paperdoll->uiComponents[4])->rend->timeToClose > 0.05f) {
+
+				rec.left *= uiscale;
+				rec.right *= uiscale;
+				rec.top *= uiscale;
+				rec.bottom *= uiscale;
+				controls.push_back(rec);
+			}
+		}
+
+		if (playerPos) {
+			d2d::Rect rec = playerPos->getRect();
+			//rec.bottom = 0.f;
+			rec.right = rec.left + (rec.getWidth());
+
+			rec.left *= uiscale;
+			rec.right *= uiscale;
+			rec.top *= uiscale;
+			rec.bottom *= uiscale;
+			controls.push_back(rec);
+		}*/
 	}
 }
 
@@ -92,6 +172,7 @@ void HUDEditor::renderModule(HUDModule* mod) {
 	if (isActive()) {
 		if (hovering) {
 			mod->renderSelected();
+			mod->renderPost();
 		}
 	}
 }
@@ -116,7 +197,7 @@ void HUDEditor::doDragging() {
 			Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 				if (doDrag) {
 					if (mod->isEnabled() && mod->isHud()) {
-						HUDModule* rMod = reinterpret_cast<HUDModule*>(mod.get());
+						HUDModule* rMod = static_cast<HUDModule*>(mod.get());
 						if (shouldSelect(rMod->getRect(), cursorPos)) {
 							dragMod = rMod;
 							Vec2 pos = rMod->getRect().getPos();
@@ -132,29 +213,29 @@ void HUDEditor::doDragging() {
 }
 
 void HUDEditor::doSnapping(Vec2 const&) {
-	auto ssx = Latite::getRenderer().getDeviceContext()->GetSize();
+	auto ssx = Latite::getRenderer().getScreenSize();
 	Vec2 ss = {ssx.width, ssx.height};
 	auto mousePos = sdk::ClientInstance::get()->cursorPos;
 
-	std::vector<float> snapLinesX = { ss.x / 4.f, ss.x / 2.f, ss.x / 2 + (ss.x / 4) };
+	std::vector<float> snapLinesX = { 0.f, ss.x / 4.f, ss.x / 2.f, ss.x / 2 + (ss.x / 4), ss.x };
 	std::vector<float> snapLinesY = { ss.y / 2.f };
 
 	std::vector<std::pair<float, float>> snapLinesControlsX = {};
 	std::vector<float> snapLinesControlsY = {};
 
 	// Be able to snap to the minecraft ui (like hotbar)
-	/*
+	
 	for (auto& rec : controls) {
 		if (rec.left > 0.f && rec.bottom < ss.y) snapLinesControlsX.emplace_back(rec.left, rec.top);
 		if (rec.right > 0.f && rec.bottom < ss.y) snapLinesControlsX.emplace_back(rec.right, rec.top);
 		if (rec.top > 0.f && rec.bottom < ss.y) snapLinesControlsY.push_back(rec.top);
 		if (rec.bottom > 0.f && rec.bottom < ss.y) snapLinesControlsY.push_back(rec.bottom);
-	}*/ // TODO: implement controls
+	}
 
 	if (isActive() && dragMod) {
 		auto pos = mousePos - dragOffset;
 
-		float snapRange = 5.f;
+		float snapRange = 10.f;
 
 		DXContext dc;
 
@@ -301,7 +382,7 @@ void HUDEditor::doSnapping(Vec2 const&) {
 		// Keep modules in their snapped state
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 			if (mod->isHud()) {
-				auto rMod = reinterpret_cast<HUDModule*>(mod.get());
+				auto rMod = static_cast<HUDModule*>(mod.get());
 				auto pos = rMod->getRect().getPos();
 				if (rMod->snappingX.doSnapping) {
 					if (rMod->snappingX.type != HUDModule::Snapping::Module) {
@@ -314,10 +395,10 @@ void HUDEditor::doSnapping(Vec2 const&) {
 						auto idk = snapLinesX[idx];
 
 						// TODO: controls
-						/*
+						
 						if (type == Snapping::MCUI && controls.size() > 0) {
 							idk = snapLinesControlsX[idx].first;
-						}*/
+						}
 
 						SnapLine snap(rMod, idk, false);
 						switch (place) {
@@ -336,6 +417,7 @@ void HUDEditor::doSnapping(Vec2 const&) {
 						}
 					}
 				}
+				pos = rMod->getRect().getPos();
 				if (rMod->snappingY.doSnapping) {
 					auto type = rMod->snappingY.type;
 					if (rMod->snappingY.type != HUDModule::Snapping::Module) {
@@ -347,10 +429,10 @@ void HUDEditor::doSnapping(Vec2 const&) {
 						auto idk = snapLinesY[idx];
 
 						// TODO: controls
-						/*
+						
 						if (type == Snapping::MCUI && controls.size() > 0) {
 							idk = snapLinesControlsY[idx];
-						}*/
+						}
 
 						SnapLine snap(rMod, idk, true);
 						switch (place) {
@@ -378,8 +460,8 @@ void HUDEditor::doSnapping(Vec2 const&) {
 void HUDEditor::keepModulesInBounds() {
 	Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 		if (mod->isEnabled() && mod->isHud()) {
-			HUDModule* rMod = reinterpret_cast<HUDModule*>(mod.get());
-			auto ss = Latite::getRenderer().getDeviceContext()->GetSize();
+			HUDModule* rMod = static_cast<HUDModule*>(mod.get());
+			auto ss = Latite::getRenderer().getScreenSize();
 			if (rMod->getRect().left < 0) {
 				Vec2 modPos = rMod->getRect().getPos();
 				rMod->setPos({ 0.f, modPos.y });

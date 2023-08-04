@@ -11,14 +11,14 @@ public:
 		int keybind = 0, bool hud = false, bool visible = true) : IModule(name, description, displayName, category, visible) {
 		this->hud = hud;
 			{
-				auto set = std::make_shared<Setting>("enabled", "Enabled", "Whether the module is on or not", Setting::Type::Bool);
+				auto set = std::make_shared<Setting>("enabled", "Enabled", "Whether the module is on or not");
 				set->value = &enabled;
 				set->visible = false;
 
 				settings->addSetting(set);
 			}
 			if (keybind != 1) {
-				auto set = std::make_shared<Setting>("key", "Key", "The keybind of the module", Setting::Type::Key);
+				auto set = std::make_shared<Setting>("key", "Key", "The keybind of the module");
 				set->value = &key;
 
 				settings->addSetting(set);

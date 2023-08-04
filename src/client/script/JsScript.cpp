@@ -73,7 +73,7 @@ namespace {
 		auto num = Chakra::GetNumber(arguments[2]);
 
 		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
-		auto tim = JsScript::JsTimeout(thi->timeouts.size() + 1, num, func);
+		auto tim = JsScript::JsTimeout(thi->timeouts.size() + 1, static_cast<long long>(num), func);
 		thi->timeouts.push_back(tim);
 		/*JsScript::AsyncOperation op{true, func, [](JsScript::AsyncOperation& op) {}, [](JsScript::AsyncOperation& op) {
 			auto timeNow = std::chrono::system_clock::now();
@@ -102,7 +102,7 @@ namespace {
 		auto num = Chakra::GetNumber(arguments[2]);
 
 		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
-		auto tim = JsScript::JsTimeout(thi->intervals.size() + 1, num, func);
+		auto tim = JsScript::JsTimeout(thi->intervals.size() + 1, static_cast<long long>(num), func);
 		thi->intervals.push_back(tim);
 		/*JsScript::AsyncOperation op{true, func, [](JsScript::AsyncOperation& op) {}, [](JsScript::AsyncOperation& op) {
 			auto timeNow = std::chrono::system_clock::now();

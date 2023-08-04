@@ -1,5 +1,6 @@
 #include "ModuleManager.h"
 #include "impl/misc/TestModule.h"
+#include "impl/misc/Screenshot.h"
 #include "impl/game/Zoom.h"
 #include "impl/visual/Fullbright.h"
 #include "impl/visual/MotionBlur.h"
@@ -16,6 +17,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<Fullbright>());
 	this->items.push_back(std::make_shared<MotionBlur>());
 	this->items.push_back(std::make_shared<HurtColor>());
+	//this->items.push_back(std::make_shared<Screenshot>());
 
 	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc) & ModuleManager::onKey);
 }

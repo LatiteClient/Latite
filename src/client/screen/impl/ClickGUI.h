@@ -2,6 +2,7 @@
 #include "../Screen.h"
 #include "api/eventing/Event.h"
 #include "client/render/asset/Asset.h"
+#include "api/feature/setting/Setting.h"
 #include "util/DxUtil.h"
 #include <memory>
 #include <array>
@@ -16,7 +17,7 @@ public:
 	void onKey(Event& ev);
 	void onClick(Event& ev);
 
-	void drawSetting(class Setting* set, struct Vec2 const& pos, class DXContext& dc, float size = 150.f);
+	bool drawSetting(class Setting* set, struct Vec2 const& pos, class DXContext& dc, float size = 150.f, float fTextWidth = 0.1947f);
 	void drawColorPicker();
 protected:
 	void onEnable(bool ignoreAnims) override;
@@ -24,7 +25,20 @@ protected:
 private:
 	struct ColorPicker {
 		Setting* setting = nullptr;
+		StoredColor* selectedColor = nullptr;
+		HSV pickerColor = {};
+		float svModX = 1.f;
+		float svModY = 0.f;
+		float hueMod = 0.f;
+		float opacityMod = 1.f;
 
+		bool isEditingHue = false;
+		bool isEditingOpacity = false;
+		bool isEditingSV = false;
+
+		bool queueClose = false;
+		bool dragging = false;
+		Vec2 dragOffs = {};
 	} colorPicker{};
 
 

@@ -102,7 +102,7 @@ bool Renderer::init(IDXGISwapChain* chain) {
 			d3d11Targets.push_back(backBuffer);
 		}
 
-		auto ss = d2dCtx->GetSize();
+		auto ss = d2dCtx->GetPixelSize();
 
 		ThrowIfFailed(d3d11Targets[i]->QueryInterface(surf.GetAddressOf()));
 		//auto info = winrt::Windows::Graphics::Display::DisplayInformation::GetForCurrentView(); // crashes
@@ -273,7 +273,7 @@ void Renderer::createDeviceIndependentResources() {
 
 	//ThrowIfFailed(CoInitialize(nullptr));
 
-	ThrowIfFailed(CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, __uuidof(IWICImagingFactory), reinterpret_cast<void**>(this->wicFactory.GetAddressOf())));
+	ThrowIfFailed(CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, __uuidof(IWICImagingFactory2), reinterpret_cast<void**>(this->wicFactory.GetAddressOf())));
 }
 
 void Renderer::createDeviceDependentResources() {

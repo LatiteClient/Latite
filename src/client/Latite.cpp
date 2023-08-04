@@ -12,6 +12,7 @@
 
 #include "config/ConfigManager.h"
 #include "misc/ClientMessageSink.h"
+#include "input/Keyboard.h"
 #include "hook/Hooks.h"
 #include "event/Eventing.h"
 #include "event/impl/RenderGameEvent.h"
@@ -67,6 +68,7 @@ namespace {
     alignas(ScreenManager) char scnMgrBuf[sizeof(ScreenManager)] = {};
     alignas(Assets) char assetsBuf[sizeof(Assets)] = {};
     alignas(ScriptManager) char scriptMgrBuf[sizeof(ScriptManager)] = {};
+    alignas(Keyboard) char keyboardBuf[sizeof(Keyboard)] = {};
 
     bool hasInjected = false;
 }
@@ -162,6 +164,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(AppPlatform__fireAppFocusLost),
         MVSIG(MinecraftGame_onAppSuspended),
         MVSIG(RenderController_getOverlayColor),
+        MVSIG(ScreenView_setupAndRender),
+        MVSIG(KeyMap),
             };
     
     new (mmgrBuf) ModuleManager;
@@ -173,6 +177,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (scriptMgrBuf) ScriptManager();
     new (rendererBuf) Renderer();
     new (assetsBuf) Assets();
+    new (keyboardBuf) Keyboard(reinterpret_cast<int*>(Signatures::KeyMap.result));
 
     AuthWindow wnd{ Latite::get().dllInst };
 
@@ -239,6 +244,7 @@ BOOL WINAPI DllMain(
 
         Latite::getConfigManager().saveCurrentConfig();
 
+        Latite::getKeyboard().~Keyboard();
         Latite::getModuleManager().~ModuleManager();
         Latite::getClientMessageSink().~ClientMessageSink();
         Latite::getCommandManager().~CommandManager();
@@ -302,6 +308,10 @@ ScriptManager& Latite::getScriptManager() noexcept {
     return *std::launder(reinterpret_cast<ScriptManager*>(scriptMgrBuf));
 }
 
+Keyboard& Latite::getKeyboard() noexcept {
+    return *std::launder(reinterpret_cast<Keyboard*>(keyboardBuf));
+}
+
 std::optional<float> Latite::getMenuBlur() {
     if (std::get<BoolValue>(this->menuBlurEnabled)) {
         return std::get<FloatValue>(this->menuBlur);
@@ -355,18 +365,21 @@ void Latite::threadsafeInit() {
 
 void Latite::initSettings() {
     {
-        auto set = std::make_shared<Setting>("menuKey", "Menu Key", "The key used to open the menu", Setting::Type::Key);
+        auto set = std::make_shared<Setting>("menuKey", "Menu Key", "The key used to open the menu");
         set->value = &this->menuKey;
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("menuBlurEnabled", "Menu Blur", "Whether blur is enabled or disabled for the menu", Setting::Type::Bool);
+        auto set = std::make_shared<Setting>("menuBlurEnabled", "Menu Blur", "Whether blur is enabled or disabled for the menu");
         set->value = &this->menuBlurEnabled;
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("menuIntensity", "Blur Intensity", "The intensity of the menu blur", Setting::Type::Float);
+        auto set = std::make_shared<Setting>("menuIntensity", "Blur Intensity", "The intensity of the menu blur");
         set->value = &this->menuBlur;
+        set->min = FloatValue(1.f);
+        set->max = FloatValue(30.f);
+        set->interval = FloatValue(1.f);
         this->getSettings().addSetting(set);
     }
 }
@@ -464,7 +477,7 @@ void Latite::loadConfig(SettingGroup& gr) {
     gr.forEach([&](std::shared_ptr<Setting> set) {
         this->getSettings().forEach([&](std::shared_ptr<Setting> modSet) {
             if (modSet->name() == set->name()) {
-                switch (set->type) {
+                switch ((Setting::Type)((set->resolvedValue).index())) {
                 case Setting::Type::Bool:
                     *modSet->value = std::get<BoolValue>(set->resolvedValue);
                     break;
@@ -476,6 +489,9 @@ void Latite::loadConfig(SettingGroup& gr) {
                     break;
                 case Setting::Type::Key:
                     *modSet->value = std::get<KeyValue>(set->resolvedValue);
+                    break;
+                case Setting::Type::Color:
+                    *modSet->value = std::get<ColorValue>(set->resolvedValue);
                     break;
                 }
             }

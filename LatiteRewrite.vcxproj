@@ -174,7 +174,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -200,7 +200,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -226,7 +226,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -263,6 +263,7 @@
     <ClInclude Include="src\client\event\impl\GammaEvent.h" />
     <ClInclude Include="src\client\event\impl\KeyUpdateEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderGameEvent.h" />
+    <ClInclude Include="src\client\event\impl\RenderLayerEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderLevelEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderOverlayEvent.h" />
     <ClInclude Include="src\client\feature\command\Command.h" />
@@ -277,8 +278,11 @@
     <ClInclude Include="src\client\event\impl\TickEvent.h" />
     <ClInclude Include="src\client\feature\command\impl\ToggleCommand.h" />
     <ClInclude Include="src\client\feature\module\HUDModule.h" />
+    <ClInclude Include="src\client\feature\module\impl\misc\InputLagTest.h" />
+    <ClInclude Include="src\client\feature\module\impl\misc\Screenshot.h" />
     <ClInclude Include="src\client\feature\module\impl\visual\Fullbright.h" />
     <ClInclude Include="src\client\feature\module\impl\visual\HurtColor.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\Minimap.h" />
     <ClInclude Include="src\client\feature\module\impl\visual\MotionBlur.h" />
     <ClInclude Include="src\client\feature\module\impl\game\Zoom.h" />
     <ClInclude Include="src\client\feature\module\Module.h" />
@@ -291,6 +295,7 @@
     <ClInclude Include="src\client\hook\impl\MinecraftGameHooks.h" />
     <ClInclude Include="src\client\hook\impl\OptionHooks.h" />
     <ClInclude Include="src\client\hook\impl\RenderControllerHooks.h" />
+    <ClInclude Include="src\client\hook\impl\ScreenViewHooks.h" />
     <ClInclude Include="src\client\Latite.h" />
     <ClInclude Include="src\client\misc\AuthWindow.h" />
     <ClInclude Include="src\client\misc\ClientMessageSink.h" />
@@ -321,6 +326,11 @@
     <ClInclude Include="src\client\script\objects\GameScriptingObject.h" />
     <ClInclude Include="src\client\script\ScriptingObject.h" />
     <ClInclude Include="src\client\script\ScriptManager.h" />
+    <ClInclude Include="src\sdk\common\client\gui\controls\UIControl.h" />
+    <ClInclude Include="src\sdk\common\client\gui\controls\VisualTree.h" />
+    <ClInclude Include="src\sdk\common\client\gui\GuiData.h" />
+    <ClInclude Include="src\sdk\common\client\gui\ScreenView.h" />
+    <ClInclude Include="src\sdk\common\client\renderer\HudPlayerRenderer.h" />
     <ClInclude Include="src\sdk\deps\Application\AppPlatform.h" />
     <ClInclude Include="src\sdk\misc\ClickMap.h" />
     <ClInclude Include="src\sdk\signature\storage.h" />
@@ -388,6 +398,7 @@
     <ClCompile Include="src\client\event\Eventing.cpp" />
     <ClCompile Include="src\client\feature\command\impl\ToggleCommand.cpp" />
     <ClCompile Include="src\client\feature\module\HUDModule.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\misc\Screenshot.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\Fullbright.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\HurtColor.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\MotionBlur.cpp" />
@@ -402,6 +413,7 @@
     <ClCompile Include="src\client\hook\impl\MinecraftGameHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\OptionHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\RenderControllerHooks.cpp" />
+    <ClCompile Include="src\client\hook\impl\ScreenViewHooks.cpp" />
     <ClCompile Include="src\client\Latite.cpp" />
     <ClCompile Include="src\client\misc\AuthWindow.cpp" />
     <ClCompile Include="src\client\misc\ClientMessageSink.cpp" />

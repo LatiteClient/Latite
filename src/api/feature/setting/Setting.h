@@ -23,6 +23,22 @@ struct FloatValue {
 	operator decltype(value)() { return value; }
 };
 
+struct Vec2Value {
+	float x, y;
+
+	Vec2Value() { x = 0.f; y = 0.f; }
+	Vec2Value(float x, float y) : x(x), y(y) {}
+	Vec2Value(nlohmann::json& js) {
+		x = js["x"];
+		y = js["y"];
+	}
+
+	void store(nlohmann::json& jout) {
+		jout["x"] = x;
+		jout["y"] = y;
+	}
+};
+
 struct IntValue {
 	int value;
 
@@ -114,18 +130,18 @@ struct TextValue {
 
 class Setting : public Feature {
 public:
-	enum class Type {
+	enum class Type : size_t {
 		Bool,
-		Int,
 		Float,
+		Int,
 		Key,
 		Color,
-		Text,
+		Vec2
 	};
 
-	using Value = std::variant<BoolValue, FloatValue, IntValue, KeyValue, ColorValue>;
+	using Value = std::variant<BoolValue, FloatValue, IntValue, KeyValue, ColorValue, Vec2Value>;
 
-	Setting(std::string const& internalName, std::string const& displayName, std::string const& description, Type type) : settingName(internalName), displayName(displayName), description(description), type(type) {}
+	Setting(std::string const& internalName, std::string const& displayName, std::string const& description) : settingName(internalName), displayName(displayName), description(description) {}
 
 	std::string desc() override { return description; }
 	std::string name() override { return settingName; }
@@ -138,7 +154,6 @@ public:
 	Value interval;
 	Value min;
 	Value max;
-	Type type;
 
 	bool visible = true;
 

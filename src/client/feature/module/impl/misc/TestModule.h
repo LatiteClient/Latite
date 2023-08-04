@@ -12,5 +12,6 @@ public:
 
 	void onTick(Event& ev);
 	void onRender(Event& ev);
+	void onKey(Event& ev);
 	void onEnable() override {};
 };
