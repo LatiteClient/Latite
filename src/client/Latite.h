@@ -7,6 +7,7 @@
 #include "api/feature/setting/Setting.h"
 #include <optional>
 #include <winrt/windows.foundation.h>
+#include "ui/TextBox.h"
 
 class Latite final : public Listener {
 public:
@@ -29,11 +30,13 @@ public:
 
 	void onUpdate(class Event& ev);
 	void onKey(class Event& ev);
+	void onChar(class Event& ev);
 	void onRendererInit(class Event& ev);
 	void onFocusLost(class Event& ev);
 	void onSuspended(class Event& ev);
 	void loadConfig(class SettingGroup& resolvedGroup);
 	void initAsset(int resource, std::wstring const& filename);
+	std::string getTextAsset(int resource);
 	winrt::Windows::Foundation::IAsyncAction downloadExtraAssets();
 
 	Latite() = default;
@@ -43,10 +46,25 @@ public:
 	HINSTANCE dllInst;
 
 	std::optional<float> getMenuBlur();
+
+	void addTextBox(ui::TextBox* box) {
+		textBoxes.push_back(box);
+	}
+
+	void removeTextBox(ui::TextBox* box) {
+		for (auto it = textBoxes.begin(); it != textBoxes.end(); ++it) {
+			if (*it == box) {
+				textBoxes.erase(it);
+				break;
+			}
+		}
+	}
 private:
 	Setting::Value menuKey = KeyValue('M');
 	Setting::Value menuBlurEnabled = BoolValue(true);
 	Setting::Value menuBlur = FloatValue(20.f);
+
+	std::vector<ui::TextBox*> textBoxes = {};
 
 	void threadsafeInit();
 	void initSettings();

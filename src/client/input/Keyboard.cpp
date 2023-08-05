@@ -1,10 +1,10 @@
 #include "Keyboard.h"
-#include "client/event/Eventing.h"
 #include "client/event/impl/CharEvent.h"
 #include "util/Util.h"
 #include <chrono>
 
 Keyboard::Keyboard(int* gameKeyMap) : keyMap(gameKeyMap) {
+	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Keyboard::onKey, 4);
 }
 
 void Keyboard::findTextInput() {
@@ -80,4 +80,9 @@ bool Keyboard::isKeyDown(int vKey) {
 void Keyboard::onChar(char ch, bool isChar) {
 	CharEvent ev{ ch, isChar };
 	Eventing::get().dispatchEvent(ev);
+}
+
+void Keyboard::onKey(Event& evGeneric) {
+	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
+	this->keyMapAdjusted[ev.getKey()] = ev.isDown();
 }

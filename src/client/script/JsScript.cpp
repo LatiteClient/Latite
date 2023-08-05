@@ -3,6 +3,7 @@
 #include "pch.h"
 #include "util/Chakrautil.h"
 #include "util/Util.h"
+#include "resource.h"
 
 #include "client/Latite.h"
 #include "client/misc/ClientMessageSink.h"
@@ -21,6 +22,7 @@
 
 #include "class/impl/JsVec2.h"
 #include "class/impl/JsVec3.h"
+#include "class/impl/JsRect.h"
 #include "class/impl/JsModuleClass.h"
 
 using namespace winrt::Windows::Storage::Streams;
@@ -269,6 +271,16 @@ namespace {
 	}
 }
 
+void JsScript::loadJSApi() {
+	JS::JsSetCurrentContext(ctx);
+	JsValueRef res;
+	auto err = JS::JsRunScript(util::StrToWStr(Latite::get().getTextAsset(JS_LATITEAPI)).c_str(), ++sCtx, L"latiteapi.js", &res);
+	Latite::getScriptManager().handleErrors(err);
+	if (!err) {
+		JS::JsRelease(res, nullptr);
+	}
+}
+
 void JsScript::loadScriptObjects() {
 	JS::JsSetCurrentContext(ctx);
 	int i = 0;
@@ -278,6 +290,7 @@ void JsScript::loadScriptObjects() {
 	this->classes.clear();
 	this->classes.push_back(std::make_shared<JsVec2>());
 	this->classes.push_back(std::make_shared<JsVec3>());
+	this->classes.push_back(std::make_shared<JsRect>());
 	this->classes.push_back(std::make_shared<JsModuleClass>());
 
 	JsErrorCode err;

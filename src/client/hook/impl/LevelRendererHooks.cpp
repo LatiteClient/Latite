@@ -11,8 +11,10 @@ namespace {
 
 void* LevelRendererHooks::LevelRenderer_renderLevel(sdk::LevelRenderer* lvl, void* scn, void* unk) {
 	auto res = renderLevelHook->oFunc<decltype(&LevelRenderer_renderLevel)>()(lvl, scn, unk);
-	RenderLevelEvent ev{lvl};
-	Eventing::get().dispatchEvent(ev);
+	{
+		RenderLevelEvent ev{ lvl };
+		Eventing::get().dispatchEvent(ev);
+	}
 	return res;
 }
 

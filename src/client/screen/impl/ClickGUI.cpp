@@ -5,6 +5,7 @@
 #include "client/event/impl/RendererInitEvent.h"
 #include "client/event/impl/KeyUpdateEvent.h"
 #include "client/event/impl/ClickEvent.h"
+#include "client/event/impl/CharEvent.h"
 #include "client/render/Renderer.h"
 #include "client/Latite.h"
 #include "client/feature/module/Module.h"
@@ -33,6 +34,8 @@ namespace {
 }
 
 ClickGUI::ClickGUI() : Screen("ClickGUI") {
+	Latite::get().addTextBox(&this->searchTextBox);
+
 	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&ClickGUI::onRender, 1, true);
 	Eventing::get().listen<RendererCleanupEvent>(this, (EventListenerFunc)&ClickGUI::onCleanup, 1, true);
 	Eventing::get().listen<RendererInitEvent>(this, (EventListenerFunc)&ClickGUI::onInit, 1, true);
@@ -238,6 +241,13 @@ void ClickGUI::onRender(Event&) {
 		if (shouldSelect(searchRect, cursorPos)) {
 			cursor = Cursor::IBeam;
 			shouldArrow = false;
+			
+		}
+
+		if (justClicked[0]) {
+			if (shouldSelect(searchRect, cursorPos))
+				searchTextBox.setSelected(true);
+			else searchTextBox.setSelected(false);
 		}
 
 		{
@@ -266,10 +276,22 @@ void ClickGUI::onRender(Event&) {
 			compositeEffect->SetInput(1, shadowBitmap.Get());
 			{
 				std::wstring searchStr = L"";
-				if (this->tab == SETTINGS) {
-					searchStr = L" Settings";
+				if (searchTextBox.getText().empty() && !searchTextBox.isSelected()) {
+					if (this->tab == SETTINGS) {
+						searchStr += L"Search Settings";
+					}
+					else if (this->tab == MODULES) {
+						searchStr += L"Search";
+					}
 				}
-				dc.drawText({ searchRect.left + 5.f + searchRect.getHeight(), searchRect.top, searchRect.right - 5.f + searchRect.getHeight(), searchRect.bottom }, L"Search" + searchStr, d2d::Color::RGB(0xB9, 0xB9, 0xB9), FontSelection::Regular, searchRect.getHeight() / 2.f, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+				else {
+					searchStr = util::StrToWStr(searchTextBox.getText());
+				}
+				Vec2 ts = dc.getTextSize(util::StrToWStr(searchTextBox.getText().substr(0, searchTextBox.getCaretLocation())), Renderer::FontSelection::Regular, searchRect.getHeight() / 2.f);
+				RectF textSearchRect = { searchRect.left + 5.f + searchRect.getHeight(), searchRect.top, searchRect.right - 5.f + searchRect.getHeight(), searchRect.bottom };
+				d2d::Rect blinkerRect = { textSearchRect.left + ts.x, searchRect.top + 3.f, textSearchRect.left + ts.x + 2.f, searchRect.bottom - 3.f };
+				if (searchTextBox.isSelected() && searchTextBox.shouldBlink() ) dc.fillRectangle(blinkerRect, d2d::Color::RGB(0xB9, 0xB9, 0xB9));
+				dc.drawText(textSearchRect, searchStr, d2d::Color::RGB(0xB9, 0xB9, 0xB9), FontSelection::Regular, searchRect.getHeight() / 2.f, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 				dc.ctx->DrawBitmap(Latite::getAssets().searchIcon.getBitmap(), { searchRect.left + 10.f, searchRect.top + 6.f, searchRect.left - 3.f + searchRect.getHeight(), searchRect.top + searchRect.getHeight() - 6.f });
 			}
 
@@ -595,6 +617,7 @@ void ClickGUI::onClick(Event& evGeneric) {
 		ev.setCancelled(true);
 	}
 }
+
 
 namespace {
 	void drawAlphaBar(DXContext& dc, d2d::Rect rect, float nodeSize, int rows) {
@@ -1156,5 +1179,7 @@ void ClickGUI::onEnable(bool ignoreAnims) {
 void ClickGUI::onDisable() {
 	capturedKey = 0;
 	activeSetting = nullptr;
+	searchTextBox.reset();
+	searchTextBox.setSelected(false);
 	Latite::getConfigManager().saveCurrentConfig();
 }

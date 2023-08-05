@@ -254,6 +254,7 @@
     <ClInclude Include="src\api\scanner\scanner.h" />
     <ClInclude Include="src\client\config\ConfigManager.h" />
     <ClInclude Include="src\client\event\impl\AppSuspendedEvent.h" />
+    <ClInclude Include="src\client\event\impl\CharEvent.h" />
     <ClInclude Include="src\client\event\impl\ChatEvent.h" />
     <ClInclude Include="src\client\event\impl\ClickEvent.h" />
     <ClInclude Include="src\client\event\impl\FocusLostEvent.h" />
@@ -266,6 +267,7 @@
     <ClInclude Include="src\client\event\impl\RenderLayerEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderLevelEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderOverlayEvent.h" />
+    <ClInclude Include="src\client\event\impl\UpdateEvent.h" />
     <ClInclude Include="src\client\feature\command\Command.h" />
     <ClInclude Include="src\client\feature\command\CommandManager.h" />
     <ClInclude Include="src\api\config\Config.h" />
@@ -296,6 +298,7 @@
     <ClInclude Include="src\client\hook\impl\OptionHooks.h" />
     <ClInclude Include="src\client\hook\impl\RenderControllerHooks.h" />
     <ClInclude Include="src\client\hook\impl\ScreenViewHooks.h" />
+    <ClInclude Include="src\client\input\Keyboard.h" />
     <ClInclude Include="src\client\Latite.h" />
     <ClInclude Include="src\client\misc\AuthWindow.h" />
     <ClInclude Include="src\client\misc\ClientMessageSink.h" />
@@ -313,6 +316,7 @@
     <ClInclude Include="src\client\feature\module\script\JsEvented.h" />
     <ClInclude Include="src\client\feature\module\script\JsModule.h" />
     <ClInclude Include="src\client\script\class\impl\JsModuleClass.h" />
+    <ClInclude Include="src\client\script\class\impl\JsRect.h" />
     <ClInclude Include="src\client\script\class\impl\JsVec2.h" />
     <ClInclude Include="src\client\script\class\impl\JsVec3.h" />
     <ClInclude Include="src\client\script\class\JsClass.h" />
@@ -326,6 +330,7 @@
     <ClInclude Include="src\client\script\objects\GameScriptingObject.h" />
     <ClInclude Include="src\client\script\ScriptingObject.h" />
     <ClInclude Include="src\client\script\ScriptManager.h" />
+    <ClInclude Include="src\client\ui\TextBox.h" />
     <ClInclude Include="src\sdk\common\client\gui\controls\UIControl.h" />
     <ClInclude Include="src\sdk\common\client\gui\controls\VisualTree.h" />
     <ClInclude Include="src\sdk\common\client\gui\GuiData.h" />
@@ -414,6 +419,7 @@
     <ClCompile Include="src\client\hook\impl\OptionHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\RenderControllerHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\ScreenViewHooks.cpp" />
+    <ClCompile Include="src\client\input\Keyboard.cpp" />
     <ClCompile Include="src\client\Latite.cpp" />
     <ClCompile Include="src\client\misc\AuthWindow.cpp" />
     <ClCompile Include="src\client\misc\ClientMessageSink.cpp" />
@@ -438,6 +444,7 @@
     <ClCompile Include="src\client\script\objects\GameScriptingObject.cpp" />
     <ClCompile Include="src\client\script\ScriptingObject.cpp" />
     <ClCompile Include="src\client\script\ScriptManager.cpp" />
+    <ClCompile Include="src\client\ui\TextBox.cpp" />
     <ClCompile Include="src\pch.cpp">
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MultiProcessorCompilation>
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MultiProcessorCompilation>
@@ -458,6 +465,7 @@
   <ItemGroup>
     <None Include="CMakePresets.json" />
     <None Include="CppProperties.json" />
+    <None Include="src\client\script\js\latiteapi.js" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />

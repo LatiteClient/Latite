@@ -357,11 +357,11 @@ Color util::HSVToColor(HSV const& hsv) {
 		color.b = hsv.v;
 	}
 	else {
-		int i = hue / 60;
-		float f = hue / 60 - i;
-		float p = hsv.v * (1 - hsv.s);
-		float q = hsv.v * (1 - hsv.s * f);
-		float t = hsv.v * (1 - hsv.s * (1 - f));
+		int i = hue / 60.f;
+		float f = hue / 60.f - i;
+		float p = hsv.v * (1.f - hsv.s);
+		float q = hsv.v * (1.f - hsv.s * f);
+		float t = hsv.v * (1.f - hsv.s * (1.f - f));
 
 		switch (i) {
 		case 0:

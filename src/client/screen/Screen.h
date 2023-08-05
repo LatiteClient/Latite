@@ -66,7 +66,7 @@ private:
 
 	bool closing = false;
 
-	void onRenderGame(Event& ev);
+	void onUpdate(Event& ev);
 	void onClick(Event& ev);
 	void onRenderOverlay(Event& ev);
 

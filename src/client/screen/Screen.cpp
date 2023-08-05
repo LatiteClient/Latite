@@ -4,6 +4,7 @@
 #include "ScreenManager.h"
 #include "client/event/impl/ClickEvent.h"
 #include "client/event/impl/RenderOverlayEvent.h"
+#include "client/event/impl/UpdateEvent.h"
 #include "util/Util.h"
 #include "util/DxContext.h"
 #include "sdk/common/client/game/ClientInstance.h"
@@ -16,12 +17,12 @@ Screen::Screen(std::string const& name) : name(name) {
 	*/
 	// ^ this doesnt work with resources...
 
-	Eventing::get().listen<RenderGameEvent>(this, (EventListenerFunc)&Screen::onRenderGame, 0);
+	Eventing::get().listen<UpdateEvent>(this, (EventListenerFunc)&Screen::onUpdate, 0);
 	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Screen::onRenderOverlay, 0);
 	Eventing::get().listen<ClickEvent>(this, (EventListenerFunc)&Screen::onClick, 3, true);
 }
 
-void Screen::onRenderGame(Event& ev) {
+void Screen::onUpdate(Event& ev) {
 	/*
 	switch (cursor) {
 	case Cursor::Arrow:

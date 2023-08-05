@@ -4,6 +4,7 @@
 #include "client/render/asset/Asset.h"
 #include "api/feature/setting/Setting.h"
 #include "util/DxUtil.h"
+#include "client/ui/TextBox.h"
 #include <memory>
 #include <array>
 
@@ -16,6 +17,7 @@ public:
 	void onInit(Event& ev);
 	void onKey(Event& ev);
 	void onClick(Event& ev);
+	void onChar(Event& ev);
 
 	bool drawSetting(class Setting* set, struct Vec2 const& pos, class DXContext& dc, float size = 150.f, float fTextWidth = 0.1947f);
 	void drawColorPicker();
@@ -41,6 +43,7 @@ private:
 		Vec2 dragOffs = {};
 	} colorPicker{};
 
+	ui::TextBox searchTextBox{};
 
 	ComPtr<ID2D1Bitmap1> shadowBitmap;
 

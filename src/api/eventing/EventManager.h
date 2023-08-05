@@ -12,7 +12,6 @@ public:
 		static_assert(std::is_convertible<T*, Event*>::value, "type must inherit from Event");
 		//static_assert(!(std::is_convertible<Event*, T*>::value), "type must not be an Event");
 
-		mutex.lock();
 		std::sort(listeners.begin(), listeners.end(), [](std::pair<uint32_t, EventListener> const& left,
 			std::pair<uint32_t, EventListener> const& right) {
 				return left.second.priority > right.second.priority;
@@ -26,14 +25,12 @@ public:
 					if (isCancel) {
 						auto& cEv = reinterpret_cast<Cancellable&>(ev);
 						if (cEv.isCancelled()) {
-							mutex.unlock();
 							return true;
 						}
 					}
 				}
 			}
 		}
-		mutex.unlock();
 		return false;
 	}
 

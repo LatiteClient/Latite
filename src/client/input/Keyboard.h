@@ -3,7 +3,10 @@
 #include <Windows.h>
 #include <WinUser.h>
 
-class Keyboard final {
+#include "client/event/Eventing.h"
+#include "client/event/impl/KeyUpdateEvent.h"
+
+class Keyboard final : public Listener {
 public:
 	Keyboard(int* gameKeyMap);
 	Keyboard(Keyboard&) = delete;
@@ -18,6 +21,8 @@ public:
 
 	void findTextInput();
 	bool isKeyDown(int vKey);
+
+	void onKey(Event& ev);
 private:
 	void onChar(char ch, bool isChar = true);
 };

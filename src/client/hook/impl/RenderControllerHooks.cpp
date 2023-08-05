@@ -13,8 +13,10 @@ namespace {
 Color* RenderControllerHooks::getOverlayColor(void* thisptr, Color* out, void* ent) {
 	GetOverlayColorHook->oFunc<decltype(&getOverlayColor)>()(thisptr, out, ent);
 	OverlayColorEvent ev{ *out, util::directAccess<sdk::Actor*>(ent, 0x38) }; // xref: getOverlayColor itself
-	Eventing::get().dispatchEvent(ev);
-	*out = ev.getColor();
+	{
+		Eventing::get().dispatchEvent(ev);
+		*out = ev.getColor();
+	}
 	return out;
 }
 

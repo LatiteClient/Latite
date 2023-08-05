@@ -4,6 +4,7 @@
 #include "util/DxUtil.h"
 #include <variant>
 #include <shared_mutex>
+#include <queue>
 
 class D2DScriptingObject : public ScriptingObject {
 public:
@@ -26,12 +27,14 @@ public:
 		std::variant<OpDrawRect, OpFillRect> op;
 	};
 
-	std::vector<DrawOperation> operations = {};
+	std::queue<DrawOperation> operations = {};
 	std::shared_lock<std::shared_mutex> lock() {
 		return std::shared_lock<std::shared_mutex>(mutex);
 	}
 
 	void initialize(JsContextRef ctx, JsValueRef parentObj) override;
 private:
+	static JsValueRef CALLBACK fillRectCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	std::shared_mutex mutex;
 };

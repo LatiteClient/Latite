@@ -49,8 +49,11 @@ void* GenericHooks::ChatScreenController_sendChatMessage(void* controller, std::
 }
 
 void* GenericHooks::GameRenderer_renderCurrentFrame(void* rend) {
-	RenderGameEvent ev{};
-	Eventing::get().dispatchEvent(ev);
+	//{
+	//	RenderGameEvent ev{};
+	//	Eventing::get().dispatchEvent(ev);
+	//}
+
 	return GameRenderer_renderCurrentFrameHook->oFunc<decltype(&GameRenderer_renderCurrentFrame)>()(rend);
 }
 

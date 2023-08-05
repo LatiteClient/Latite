@@ -87,5 +87,7 @@ public:
 		"4c 8d 05 ? ? ? ? 89 54 24 ? 88 4c 24",
 		"KeyMap"};
 
-	// e8 ? ? ? ? 48 8b 44 24 ? 48 8d 4c 24 ? 48 8b 80
+	inline static SigImpl MinecraftGame__update{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? 48 8b 8b ? ? ? ? ba ? ? ? ? 48 83 c4",
+		"MinecraftGame::_update"};
 };

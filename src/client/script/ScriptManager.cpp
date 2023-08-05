@@ -23,6 +23,7 @@ std::shared_ptr<JsScript> ScriptManager::loadScript(std::wstring const& folderPa
 	myScript->relFolderPath = fPathW;
 	if (!myScript->load()) return nullptr;
 	myScript->loadScriptObjects();
+	myScript->loadJSApi();
 	//loadScriptingObjects(myScript);
 	this->items.push_back(myScript);
 

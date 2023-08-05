@@ -103,7 +103,7 @@ public:
 		return nullptr;
 	}
 
-	void loadPrototypes();
+	void loadJSApi();
 	void loadScriptObjects();
 	void fetchScriptData();
 	void unload();

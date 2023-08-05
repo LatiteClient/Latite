@@ -86,4 +86,8 @@ public:
 	inline static SigImpl KeyMap{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 		"4c 8d 05 ? ? ? ? 89 54 24 ? 88 4c 24",
 		"KeyMap"};
+
+	inline static SigImpl MinecraftGame__update{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? 48 8b 8b ? ? ? ? ba ? ? ? ? 48 83 c4",
+		"MinecraftGame::_update"};
 };

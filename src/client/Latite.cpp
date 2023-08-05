@@ -6,6 +6,8 @@
 #include "util/Util.h"
 #include "util/Logger.h"
 
+#include "client/ui/TextBox.h"
+
 #include "feature/module/ModuleManager.h"
 #include "feature/command/CommandManager.h"
 #include "script/ScriptManager.h"
@@ -15,11 +17,12 @@
 #include "input/Keyboard.h"
 #include "hook/Hooks.h"
 #include "event/Eventing.h"
-#include "event/impl/RenderGameEvent.h"
 #include "event/impl/KeyUpdateEvent.h"
 #include "event/impl/RendererInitEvent.h"
 #include "event/impl/FocusLostEvent.h"
 #include "event/impl/AppSuspendedEvent.h"
+#include "event/impl/UpdateEvent.h"
+#include "event/impl/CharEvent.h"
 
 #include "sdk/signature/storage.h"
 
@@ -166,6 +169,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(RenderController_getOverlayColor),
         MVSIG(ScreenView_setupAndRender),
         MVSIG(KeyMap),
+        MVSIG(MinecraftGame__update),
             };
     
     new (mmgrBuf) ModuleManager;
@@ -340,11 +344,12 @@ void Latite::initialize(HINSTANCE hInst) {
     Logger::Info("Script manager initialized.");
 
     // TODO: use UpdateEvent
-    Latite::getEventing().listen<RenderGameEvent>(this, (EventListenerFunc)&Latite::onUpdate, 2);
+    Latite::getEventing().listen<UpdateEvent>(this, (EventListenerFunc)&Latite::onUpdate, 2);
     Latite::getEventing().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Latite::onKey, 2);
     Latite::getEventing().listen<RendererInitEvent>(this, (EventListenerFunc)&Latite::onRendererInit, 2);
     Latite::getEventing().listen<FocusLostEvent>(this, (EventListenerFunc)&Latite::onFocusLost, 2);
     Latite::getEventing().listen<AppSuspendedEvent>(this, (EventListenerFunc)&Latite::onSuspended, 2);
+    Latite::getEventing().listen<CharEvent>(this, (EventListenerFunc)&Latite::onChar, 2);
 }
 
 void Latite::threadsafeInit() {
@@ -400,6 +405,15 @@ void Latite::initAsset(int resource, std::wstring const& filename) {
     ofs.close();
 }
 
+std::string Latite::getTextAsset(int resource) {
+    HRSRC hRes = FindResource((HMODULE)dllInst, MAKEINTRESOURCE(resource), MAKEINTRESOURCE(TEXTFILE));
+    HGLOBAL hData = LoadResource((HMODULE)dllInst, hRes);
+    DWORD hSize = SizeofResource((HMODULE)dllInst, hRes);
+    char* hFinal = (char*)LockResource(hData);
+
+    return std::string(hFinal, hSize);
+}
+
 winrt::Windows::Foundation::IAsyncAction Latite::downloadExtraAssets() {
     auto http = HttpClient();
 
@@ -422,11 +436,13 @@ winrt::Windows::Foundation::IAsyncAction Latite::downloadExtraAssets() {
     co_return;
 }
 
-void Latite::onUpdate(Event&) {
+void Latite::onUpdate(Event& evGeneric) {
+    auto& ev = reinterpret_cast<UpdateEvent&>(evGeneric);
     if (!hasInit) {
         threadsafeInit();
         hasInit = true;
     }
+    getKeyboard().findTextInput();
     Latite::getScriptManager().runScriptingOperations();
 }
 
@@ -438,6 +454,14 @@ void Latite::onKey(Event& evGeneric) {
         Logger::Info("Uninject key pressed");
 
         return;
+    }
+
+    if (ev.isDown()) {
+        for (auto& tb : textBoxes) {
+            if (tb->isSelected()) {
+                tb->onKeyDown(ev.getKey());
+            }
+        }
     }
 
     if (ev.isDown() && ev.getKey() == VK_ESCAPE && Latite::getScreenManager().getActiveScreen()) {
@@ -454,6 +478,32 @@ void Latite::onKey(Event& evGeneric) {
                 Latite::getScreenManager().showScreen("HUDEditor");
             ev.setCancelled(true);
             return;
+        }
+    }
+}
+
+void Latite::onChar(Event& evGeneric) {
+    auto& ev = reinterpret_cast<CharEvent&>(evGeneric);
+    for (auto tb : textBoxes) {
+        if (tb->isSelected()) {
+            if (ev.isChar()) {
+                tb->onChar(ev.getChar());
+            }
+            else {
+                auto ch = ev.getChar();
+                switch (ch) {
+                case 0x1:
+                    util::SetClipboardText(tb->getText());
+                    break;
+                case 0x2:
+                    tb->setSelected(false);
+                    break;
+                case 0x3:
+                    tb->reset();
+                    break;
+                }
+            }
+            ev.setCancelled(true);
         }
     }
 }

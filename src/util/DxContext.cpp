@@ -141,7 +141,7 @@ void DXContext::drawText(RectF const& rc, std::wstring const& ws, d2d::Color con
 	}
 }
 
-Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font, float size) {
+Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font, float size, bool tw) {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	auto ss = ctx->GetPixelSize();
 	ComPtr<IDWriteTextLayout> layout;
@@ -159,7 +159,7 @@ Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font
 		layout->GetMetrics(&textMetrics);
 		layout->GetOverhangMetrics(&overhangs);
 		
-		float width = (textMetrics.layoutWidth + overhangs.right) - (textMetrics.left - overhangs.left);
+		float width = (tw ? textMetrics.widthIncludingTrailingWhitespace : textMetrics.layoutWidth + overhangs.right) - (textMetrics.left - overhangs.left);
 		float height = (textMetrics.top - overhangs.top) - (textMetrics.layoutHeight + overhangs.bottom);
 		
 		return Vec2(width, height);

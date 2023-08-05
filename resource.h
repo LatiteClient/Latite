@@ -13,6 +13,8 @@
 #endif
 #endif
 
+#define TEXTFILE 255
+
 #define ICON_LOGO 254
 #define ICON_ARROW 253
 #define ICON_ARROWBACK 252
@@ -21,3 +23,5 @@
 #define ICON_HUDEDIT 249
 #define ICON_SEARCH 248
 #define ICON_X 247
+
+#define JS_LATITEAPI 100

@@ -1,11 +1,12 @@
 #pragma once
 #include "api/manager/Manager.h"
+#include "api/eventing/Listenable.h"
 #include "JsScript.h"
 #include "ScriptingObject.h"
 #include <queue>
 #include <variant>
 
-class ScriptManager final : public Manager<JsScript> {
+class ScriptManager final : public Listener, public Manager<JsScript> {
 private:
 	std::queue<std::shared_ptr<JsScript>> scriptCheckQueue = {};
 public:
