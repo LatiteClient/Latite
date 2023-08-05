@@ -2,8 +2,13 @@
 #include "ScriptManager.h"
 #include "client/Latite.h"
 #include "client/misc/ClientMessageSink.h"
+#include "client/event/Eventing.h"
+#include "client/event/impl/UpdateEvent.h"
 #include "util/Logger.h"
 #include <memory>
+
+ScriptManager::ScriptManager() {
+}
 
 std::shared_ptr<JsScript> ScriptManager::loadScript(std::wstring const& folderPath, bool run)
 {
@@ -94,11 +99,16 @@ void ScriptManager::handleErrors(JsErrorCode code) {
 	JsContextRef ctx;
 	JS::JsGetCurrentContext(&ctx);
 	JsScript* script = nullptr;
-	JS::JsGetContextData(ctx, (void**) & script);
-	if (script && code == JsErrorScriptException) {
-		JsValueRef except;
-		JS::JsGetAndClearException(&except);
-		reportError(except, script->indexPath);
+	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
+	if (script) {
+		if (code == JsErrorScriptException) {
+			JsValueRef except;
+			JS::JsGetAndClearException(&except);
+			reportError(except, script->data.name);
+		}
+		else if (code != JsNoError) {
+			Latite::getClientMessageSink().display(util::Format(std::format("&cA JS error occured in script {}: JsErrorCode {}", util::WStrToStr(script->data.name), (int)code)));
+		}
 	}
 }
 
@@ -156,6 +166,10 @@ void ScriptManager::runScriptingOperations()
 			}
 		}
 	}
+
+	// drawing
+	Event ev{ L"renderDX", {}, false };
+	dispatchEvent(ev);
 }
 
 void ScriptManager::init()

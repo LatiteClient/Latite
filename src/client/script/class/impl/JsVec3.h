@@ -14,7 +14,7 @@ private:
 			return thi->construct(Vec3(0.f, 0.f, 0.f));
 		}
 
-		if (!Chakra::VerifyArgCount(argCount, 3)) return JS_INVALID_REFERENCE;
+		if (!Chakra::VerifyArgCount(argCount, 4)) return JS_INVALID_REFERENCE;
 		if (!Chakra::VerifyParameters({ {arguments[1], JsNumber}, {arguments[2], JsNumber } })) return JS_INVALID_REFERENCE;
 
 		return thi->construct(Vec3((float)Chakra::GetNumber(arguments[1]), (float)Chakra::GetNumber(arguments[2]), (float)Chakra::GetNumber(arguments[3])));

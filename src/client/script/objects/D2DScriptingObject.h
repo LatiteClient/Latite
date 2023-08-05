@@ -10,7 +10,7 @@ class D2DScriptingObject : public ScriptingObject {
 public:
 
 	inline static int objectID = -1;
-	D2DScriptingObject(int id) : ScriptingObject(id, L"d2d") { objectID = id; }
+	D2DScriptingObject(int id) : ScriptingObject(id, L"dx") { objectID = id; }
 
 	struct OpDrawRect {
 		d2d::Rect rc;
@@ -21,9 +21,18 @@ public:
 	struct OpFillRect {
 		d2d::Rect rc;
 		d2d::Color col;
+
+		OpFillRect(const d2d::Rect& rc, const d2d::Color& col)
+			: rc(rc), col(col) {
+		}
 	};
 
 	struct DrawOperation {
+		enum Type {
+			DrawRect = 0,
+			FillRect
+		};
+
 		std::variant<OpDrawRect, OpFillRect> op;
 	};
 

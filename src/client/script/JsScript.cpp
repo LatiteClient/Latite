@@ -23,6 +23,7 @@
 #include "class/impl/JsVec2.h"
 #include "class/impl/JsVec3.h"
 #include "class/impl/JsRect.h"
+#include "class/impl/JsColor.h"
 #include "class/impl/JsModuleClass.h"
 
 using namespace winrt::Windows::Storage::Streams;
@@ -291,6 +292,7 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsVec2>());
 	this->classes.push_back(std::make_shared<JsVec3>());
 	this->classes.push_back(std::make_shared<JsRect>());
+	this->classes.push_back(std::make_shared<JsColor>());
 	this->classes.push_back(std::make_shared<JsModuleClass>());
 
 	JsErrorCode err;

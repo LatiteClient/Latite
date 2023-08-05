@@ -1,6 +1,7 @@
 #pragma once
 #include "api/manager/Manager.h"
 #include "api/eventing/Listenable.h"
+#include "api/eventing/EventManager.h"
 #include "JsScript.h"
 #include "ScriptingObject.h"
 #include <queue>
@@ -10,6 +11,8 @@ class ScriptManager final : public Listener, public Manager<JsScript> {
 private:
 	std::queue<std::shared_ptr<JsScript>> scriptCheckQueue = {};
 public:
+	ScriptManager();
+
 	std::shared_ptr<JsScript> loadScript(std::wstring const& folderPath, bool run = true);
 	std::shared_ptr<JsScript> getScriptByName(std::wstring const& name);
 
@@ -23,17 +26,12 @@ public:
 	void initListeners();
 	void unloadScript(std::shared_ptr<JsScript> ptr);
 	void unloadAll();
+
+	void onUpdate(::Event& ev);
 	
 	static bool scriptingSupported();
 
 	using event_callback_t = void(__fastcall*)(JsValueRef func);
-
-	enum class EventType {
-		WorldTick,
-		LeaveGame,
-		SendChat,
-		ReceiveChat
-	};
 
 	struct Event {
 		std::wstring type;

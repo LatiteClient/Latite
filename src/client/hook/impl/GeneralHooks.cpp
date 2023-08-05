@@ -11,9 +11,11 @@
 #include "client/event/impl/KeyUpdateEvent.h"
 #include "client/event/impl/ChatEvent.h"
 #include "client/event/impl/ClickEvent.h"
+#include "client/script/ScriptManager.h"
 
 #include "api/memory/memory.h"
 #include "util/Logger.h"
+#include "util/Util.h"
 
 namespace {
 	std::shared_ptr<Hook> Level_tickHook;
@@ -32,6 +34,9 @@ void GenericHooks::Level_tick(sdk::Level* level) {
 		Latite::get().getEventing().dispatchEvent(ev);
 		Latite::get().getClientMessageSink().doPrint(100);
 	}
+	
+	ScriptManager::Event sEv{L"world-tick", {}, false};
+	Latite::getScriptManager().dispatchEvent(sEv);
 
 	return Level_tickHook->oFunc<decltype(&Level_tick)>()(level);
 }
@@ -44,6 +49,13 @@ void* GenericHooks::ChatScreenController_sendChatMessage(void* controller, std::
 
 	ChatEvent ev{ message };
 	if (Eventing::get().dispatchEvent(ev)) return nullptr;
+
+	{
+		ScriptManager::Event::Value val{L"message"};
+		val.val = util::StrToWStr(message);
+		ScriptManager::Event sev{L"send-chat", { val }, true};
+		if (Latite::getScriptManager().dispatchEvent(sev)) return nullptr;
+	}
 
 	return ChatScreenController_sendChatMesageHook->oFunc<decltype(&ChatScreenController_sendChatMessage)>()(controller, message);
 }
@@ -61,12 +73,50 @@ void GenericHooks::Keyboard_feed(int key, bool isDown) {
 	KeyUpdateEvent ev{key, isDown};
 	if (Eventing::get().dispatchEvent(ev)) return;
 
+	{
+		ScriptManager::Event::Value val{L"isDown"};
+		val.val = isDown;
+
+		ScriptManager::Event::Value val3{L"keyCode"};
+		val3.val = static_cast<double>(key);
+
+		ScriptManager::Event::Value val2{L"keyAsChar"};
+
+		std::string str = "";
+		if (key > 31 && key < 128) {
+			str = (char)key;
+		}
+		val2.val = util::StrToWStr(str);
+
+		ScriptManager::Event sEv{L"key-press", { val, val2, val3 }, true};
+		if (Latite::getScriptManager().dispatchEvent(sEv)) return;
+	}
+
 	return Keyboard_feedHook->oFunc<decltype(&Keyboard_feed)>()(key, isDown);
 }
 
 void GenericHooks::onClick(ClickMap* map, char clickType, char isDownWheelDelta, uintptr_t a4, int16_t a5, int16_t a6, int16_t a7, char a8) {
 	ClickEvent ev{ clickType, isDownWheelDelta };
 	if (Eventing::get().dispatchEvent(ev)) return;
+
+	{
+		Vec2& mousePos = sdk::ClientInstance::get()->cursorPos;
+
+		ScriptManager::Event::Value val{L"mouseX"};
+		val.val = static_cast<double>(mousePos.x);
+
+		ScriptManager::Event::Value val2{L"mouseY"};
+		val2.val = static_cast<double>(mousePos.y);
+
+		ScriptManager::Event::Value val3{L"isDown"};
+		val3.val = isDownWheelDelta;
+
+		ScriptManager::Event::Value val4{L"button"};
+		val4.val = static_cast<double>(clickType);
+
+		ScriptManager::Event ev{L"click", { val, val2, val3, val4 }, true};
+	}
+
 	return OnClickHook->oFunc<decltype(&onClick)>()(map, clickType, isDownWheelDelta, a4, a5, a6, a7, a8);
 }
 

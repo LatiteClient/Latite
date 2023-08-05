@@ -63,7 +63,7 @@ public:
 	static JsValueRef GetFalse();
 	static JsValueRef GetNull();
 
-	static void HandleErrors(JsErrorCode err);
+	[[deprecated]] static void HandleErrors(JsErrorCode err);
 
 	static std::wstring ToString(JsValueRef ref);
 	static Result VerifyParameters(std::initializer_list<ParamContainer> params, bool autoThrow = true);

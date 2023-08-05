@@ -11,7 +11,7 @@
 
 class Latite final : public Listener {
 public:
-	static Latite& get() noexcept;
+	[[nodiscard]] static Latite& get() noexcept;
 	[[nodiscard]] static class ModuleManager& getModuleManager() noexcept;
 	[[nodiscard]] static class CommandManager& getCommandManager() noexcept;
 	[[nodiscard]] static class ConfigManager& getConfigManager() noexcept;

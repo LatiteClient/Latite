@@ -315,6 +315,7 @@
     <ClInclude Include="src\client\screen\ScreenManager.h" />
     <ClInclude Include="src\client\feature\module\script\JsEvented.h" />
     <ClInclude Include="src\client\feature\module\script\JsModule.h" />
+    <ClInclude Include="src\client\script\class\impl\JsColor.h" />
     <ClInclude Include="src\client\script\class\impl\JsModuleClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsRect.h" />
     <ClInclude Include="src\client\script\class\impl\JsVec2.h" />
@@ -409,6 +410,7 @@
     <ClCompile Include="src\client\feature\module\impl\visual\MotionBlur.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\Zoom.cpp" />
     <ClCompile Include="src\client\feature\module\Module.cpp" />
+    <ClCompile Include="src\client\feature\module\script\JsEvented.cpp" />
     <ClCompile Include="src\client\hook\Hook.cpp" />
     <ClCompile Include="src\client\hook\Hooks.cpp" />
     <ClCompile Include="src\client\hook\impl\AppPlatformHooks.cpp" />
