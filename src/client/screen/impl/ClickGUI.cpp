@@ -421,6 +421,17 @@ void ClickGUI::onRender(Event&) {
 			if (modTab == GAME && mod.mod->getCategory() == IModule::HUD) mod.shouldRender = false; // Game Tab
 			if (modTab == HUD && mod.mod->getCategory() == IModule::GAME) mod.shouldRender = false; // Hud Tab
 			if (modTab == SCRIPT && mod.mod->getCategory() != IModule::SCRIPT) mod.shouldRender = false; // Hud Tab
+
+			bool should = mod.shouldRender;
+			if (this->searchTextBox.getText().size() > 0) {
+				should = false;
+				std::string lower = mod.name;
+				std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+				std::string lowerSearch = searchTextBox.getText();
+				std::transform(lowerSearch.begin(), lowerSearch.end(), lowerSearch.begin(), ::tolower);
+				if (lower.rfind(lowerSearch) != UINTPTR_MAX) should = true;
+			}
+			mod.shouldRender = should;
 		}
 
 		int i = 0;
@@ -598,16 +609,32 @@ void ClickGUI::onCleanup(Event&) {
 
 void ClickGUI::onKey(Event& evGeneric) {
 	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
+	if (searchTextBox.isSelected()) {
+		ev.setCancelled(true);
+		return;
+	}
 	if (this->activeSetting) {
 		if (ev.isDown()) {
 			if (ev.getKey() == VK_ESCAPE) {
 				activeSetting = nullptr;
+				ev.setCancelled(true);
+				return;
 			}
 			else {
 				this->capturedKey = ev.getKey();
 			}
 		}
 	}
+
+	if (ev.isDown() && ev.getKey() == VK_ESCAPE) {
+		if (colorPicker.setting) {
+			colorPicker.queueClose = true;
+		}
+		else {
+			this->close();
+		}
+	}
+
 	ev.setCancelled(true);
 }
 

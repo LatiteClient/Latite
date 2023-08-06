@@ -13,12 +13,14 @@ public:
 	bool init(IDXGISwapChain* chain);
 	bool hasInitialized() { return hasInit; };
 	HRESULT reinit();
+	bool queueReinit();
 	std::shared_lock<std::shared_mutex> lock();
 	void render();
 private:
 	std::wstring fontFamily = L"Segoe UI";
 	void releaseAllResources();
 
+	bool shouldReinit = false;
 	bool hasInit = false;
 	bool firstInit = false;
 	bool reqCommandQueue = false;

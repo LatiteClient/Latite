@@ -29,8 +29,8 @@ namespace ui {
 
 		void onChar(char character) {
 			if (character == '\b' && text.size() > 0) {
-				text.erase(text.begin() + std::min(static_cast<int>(text.size()), place));
 				place = std::max(place - 1, 0);
+				text.erase(text.begin() + std::min(static_cast<int>(text.size()), place));
 			}
 			else if (character > 31 && text.size() < maxChars) {
 				text.insert(text.begin() + std::min(static_cast<int>(text.size()), place), character);
@@ -42,9 +42,11 @@ namespace ui {
 		void onKeyDown(int key) {
 			if (key == VK_LEFT) {
 				place = std::max(place - 1, 0);
+				startTime = std::chrono::high_resolution_clock::now();
 			}
 			else if (key == VK_RIGHT) {
 				place = std::min(place + 1, maxChars);
+				startTime = std::chrono::high_resolution_clock::now();
 			}
 		}
 

@@ -2,6 +2,7 @@
 #include "util/DXUtil.h"
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
+#include "util/Logger.h"
 
 namespace {
 	std::shared_ptr<Hook> PresentHook;
@@ -10,14 +11,14 @@ namespace {
 }
 
 HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInterval, UINT Flags) {
-	if (!Latite::getRenderer().hasInitialized()) {
-		auto lock = Latite::getRenderer().lock();
-		Latite::getRenderer().init(chain);
-	}
-
 	if (Latite::getRenderer().hasInitialized()) {
 		auto lock = Latite::getRenderer().lock();
 		Latite::getRenderer().render();
+	}
+
+	if (!Latite::getRenderer().hasInitialized()) {
+		auto lock = Latite::getRenderer().lock();
+		Latite::getRenderer().init(chain);
 	}
 
 	return PresentHook->oFunc<decltype(&SwapChain_Present)>()(chain, SyncInterval, Flags);
@@ -79,8 +80,7 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 	*lvl = D3D_FEATURE_LEVEL_11_0;
 
 	D3D_FEATURE_LEVEL featureLevel;
-	ThrowIfFailed(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, lvl, 1, D3D11_SDK_VERSION,
-		&swapChainDesc, swapChain.GetAddressOf(), device.GetAddressOf(), &featureLevel, dctx.GetAddressOf()));
+	ThrowIfFailed(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, lvl, 1, D3D11_SDK_VERSION, &swapChainDesc, swapChain.GetAddressOf(), device.GetAddressOf(), &featureLevel, dctx.GetAddressOf()));
 
 	uintptr_t* vftable = *reinterpret_cast<uintptr_t**>(swapChain.Get());
 	uintptr_t* cqueueVftable = nullptr;

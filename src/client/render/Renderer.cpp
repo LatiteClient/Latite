@@ -4,6 +4,9 @@
 #include "client/event/impl/RenderOverlayEvent.h"
 #include "client/event/impl/RendererCleanupEvent.h"
 #include "client/event/impl/RendererInitEvent.h"
+#include "client/Latite.h"
+
+#include <comdef.h>
 
 Renderer::~Renderer() {
     // ...
@@ -14,9 +17,22 @@ bool Renderer::init(IDXGISwapChain* chain) {
     this->gameSwapChain = chain;
 	if (!swapChain4)
 		ThrowIfFailed(chain->QueryInterface(&swapChain4));
+	bool force11 = false;
 
 	if (!gameDevice11.Get() || !gameDevice12.Get()) {
-		if (FAILED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12)))) {
+		
+		if (SUCCEEDED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12)))) {
+			if (Latite::get().shouldForceDX11() && gameDevice12) {
+				reinterpret_cast<ID3D12Device5*>(gameDevice12.Get())->RemoveDevice();
+				Logger::Info("Force DX11 Active");
+				force11 = true;
+				swapChain4 = nullptr;
+				return false;
+			}
+			gameDevice12 = nullptr;
+		}
+
+		if (force11 || FAILED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12)))) {
 			ThrowIfFailed(chain->GetDevice(IID_PPV_ARGS(&gameDevice11)));
 			Logger::Info("Using DX11");
 			d3dDevice = gameDevice11.Get();
@@ -31,6 +47,7 @@ bool Renderer::init(IDXGISwapChain* chain) {
 
 	if (gameDevice12.Get()) {
 		if (!this->commandQueue) {
+			swapChain4 = nullptr;
 			return false;
 		}
 	}
@@ -145,6 +162,12 @@ HRESULT Renderer::reinit() {
     return S_OK;
 }
 
+bool Renderer::queueReinit()
+{
+	shouldReinit = true;
+	return true;
+}
+
 std::shared_lock<std::shared_mutex> Renderer::lock() {
 	return std::shared_lock<std::shared_mutex>(mutex);
 }
@@ -157,9 +180,14 @@ void Renderer::render() {
 
 	auto bmp = blurBuffers[idx];
 	// Update the current blur buffer
-	bmp->CopyFromBitmap(nullptr, renderTargets[idx], nullptr);
+	try {
+		bmp->CopyFromBitmap(nullptr, renderTargets[idx], nullptr);
 
-	d2dCtx->SetTarget(renderTargets[idx]);
+		d2dCtx->SetTarget(renderTargets[idx]);
+	}
+	catch (_com_error& err) {
+		auto errm = err.ErrorMessage();
+	}
 	d2dCtx->BeginDraw();
 	d2dCtx->SetTransform(D2D1::Matrix3x2F::Identity());
 
@@ -173,6 +201,13 @@ void Renderer::render() {
 	}
 
 	d3dCtx->Flush();
+
+	if (shouldReinit) {
+		releaseAllResources();
+		hasInit = false;
+		shouldReinit = false;
+		init(this->gameSwapChain);
+	}
 }
 
 void Renderer::releaseAllResources() {

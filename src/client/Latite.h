@@ -59,9 +59,19 @@ public:
 			}
 		}
 	}
+
+	[[nodiscard]] KeyValue getMenuKey() {
+		return std::get<KeyValue>(menuKey);
+	}
+
+	[[nodiscard]] bool shouldForceDX11() {
+		return std::get<BoolValue>(useDX11);
+	}
 private:
 	Setting::Value menuKey = KeyValue('M');
 	Setting::Value menuBlurEnabled = BoolValue(true);
+	// TODO: add disabled settings, for people who already only support dx11, gray it out
+	Setting::Value useDX11 = BoolValue(false);
 	Setting::Value menuBlur = FloatValue(20.f);
 
 	std::vector<ui::TextBox*> textBoxes = {};
