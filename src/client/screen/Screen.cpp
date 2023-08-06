@@ -18,7 +18,7 @@ Screen::Screen(std::string const& name) : name(name) {
 	// ^ this doesnt work with resources...
 
 	Eventing::get().listen<UpdateEvent>(this, (EventListenerFunc)&Screen::onUpdate, 0);
-	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Screen::onRenderOverlay, 0);
+	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Screen::onRenderOverlay, 0, true);
 	Eventing::get().listen<ClickEvent>(this, (EventListenerFunc)&Screen::onClick, 3, true);
 }
 
@@ -66,7 +66,7 @@ void Screen::onRenderOverlay(Event& ev) {
 			this->activeMouseButtons[i] = false;
 		}
 
-	if (this->tooltip.has_value()) {
+	if (isActive() && this->tooltip.has_value()) {
 		DXContext dc;
 		Vec2& mousePos = sdk::ClientInstance::get()->cursorPos;
 		d2d::Rect textRect = dc.getTextRect(this->tooltip.value(), Renderer::FontSelection::Regular, 15.f, 8.f);

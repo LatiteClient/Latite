@@ -91,6 +91,10 @@ struct ColorValue {
 		color1 = { r, g, b, a };
 	}
 
+	ColorValue() {
+		color1 = { 1.f, 1.f, 1.f, 1.f };
+	}
+
 	ColorValue(nlohmann::json const& js) {
 		color1.get(js["color1"]);
 		isRGB = js["isRGB"];

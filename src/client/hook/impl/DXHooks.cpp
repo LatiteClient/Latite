@@ -35,7 +35,7 @@ HRESULT __stdcall DXHooks::CommandQueue_ExecuteCommandLists(ID3D12CommandQueue* 
 }
 
 DXHooks::DXHooks() : HookGroup("DirectX") {
-	ComPtr<IDXGIFactory1> factory;
+	ComPtr<IDXGIFactory> factory;
 	ComPtr<IDXGISwapChain> swapChain;
 	ComPtr<IDXGIAdapter> adapter;
 	ComPtr<ID3D11Device> device;
@@ -43,7 +43,7 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 	ComPtr<ID3D11DeviceContext> dctx;
 	ComPtr<ID3D12CommandQueue> cqueue;
 
-	ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&factory)));
+	ThrowIfFailed(CreateDXGIFactory(IID_PPV_ARGS(&factory)));
 	ThrowIfFailed(factory->EnumAdapters(0, adapter.GetAddressOf()));
 
 
@@ -75,18 +75,11 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.Windowed = TRUE;
 	
-	D3D_FEATURE_LEVEL lvl[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1 };
+	D3D_FEATURE_LEVEL lvl[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 };
 
 	D3D_FEATURE_LEVEL featureLevel;
-	if (FAILED(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, lvl, 1, D3D11_SDK_VERSION,
-		&swapChainDesc, swapChain.GetAddressOf(), device.GetAddressOf(), &featureLevel, dctx.GetAddressOf()))) {
-
-		lvl[1] = D3D_FEATURE_LEVEL_10_0;
-
-		ThrowIfFailed(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, lvl, 1, D3D11_SDK_VERSION,
-			&swapChainDesc, swapChain.GetAddressOf(), device.GetAddressOf(), &featureLevel, dctx.GetAddressOf()));
-
-	}
+	ThrowIfFailed(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, lvl, 1, D3D11_SDK_VERSION,
+		&swapChainDesc, swapChain.GetAddressOf(), device.GetAddressOf(), &featureLevel, dctx.GetAddressOf()));
 
 	uintptr_t* vftable = *reinterpret_cast<uintptr_t**>(swapChain.Get());
 	uintptr_t* cqueueVftable = nullptr;
@@ -101,7 +94,7 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 			D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 			queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-
+			
 			ThrowIfFailed(device12->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cqueue)));
 			cqueueVftable = *reinterpret_cast<uintptr_t**>(cqueue.Get());
 		}
@@ -112,5 +105,7 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 
 	PresentHook = addHook(vftable[8], SwapChain_Present, "IDXGISwapChain::Present");
 	ResizeBuffersHook = addHook(vftable[13], SwapChain_ResizeBuffers, "IDXGISwapChain::ResizeBuffers");
+
+	// Needed for D3D11On12 for DX12
 	if (cqueueVftable) ExecuteCommandListsHook = addHook(cqueueVftable[10], CommandQueue_ExecuteCommandLists, "ID3D12CommandQueue::executeCommandLists");
 }

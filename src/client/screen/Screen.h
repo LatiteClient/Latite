@@ -2,6 +2,7 @@
 #include <string>
 #include "api/eventing/Listenable.h"
 #include "api/eventing/Event.h"
+#include "api/feature/setting/Setting.h"
 #include "client/event/impl/RenderGameEvent.h"
 #include <vector>
 #include "util/DXUtil.h"
@@ -51,6 +52,8 @@ public:
 		Hand,
 		IBeam
 	} cursor = Cursor::Arrow;
+
+	KeyValue key = KeyValue();
 protected:
 	HCURSOR arrow;
 	HCURSOR hand;

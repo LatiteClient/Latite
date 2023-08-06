@@ -4,6 +4,22 @@
 #endif
 
 #include <cmath>
+#include <limits>
+namespace lmath {
+	namespace detail {
+		float constexpr sqrtNewtonRaphson(float x, float curr, float prev) {
+			return curr == prev
+				? curr
+				: sqrtNewtonRaphson(x, 0.5 * (curr + x / curr), curr);
+		}
+	}
+
+	float sqrt(float x) {
+		return x >= 0 && x < std::numeric_limits<double>::infinity()
+			? detail::sqrtNewtonRaphson(x, x, 0)
+			: std::numeric_limits<double>::quiet_NaN();
+	}
+}
 
 struct Vec2 final {
 	float x, y;
@@ -20,7 +36,10 @@ struct Vec2 final {
 	}
 
 	[[nodiscard]] float magnitude() {
-		return static_cast<float>(std::sqrt(std::pow(x, 2.f) + std::pow(y, 2.f)));
+		return static_cast<float>(std::sqrt(x * x + y * y));
+	}
+	[[nodiscard]] constexpr float magnitudeConst() {
+		return static_cast<float>(lmath::sqrt(x * x + y * y));
 	}
 };
 

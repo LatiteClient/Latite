@@ -8,7 +8,7 @@ MotionBlur::MotionBlur() : Module("MotionBlur", "Motion Blur", "Blurs motion", G
 	addSliderSetting("intensity", "Intensity", "", intensity, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f));
 	
 	listen<RendererCleanupEvent>(&MotionBlur::onCleanup);
-	listen<RenderOverlayEvent>(&MotionBlur::onRender);
+	listen<RenderOverlayEvent>(&MotionBlur::onRender, false, 10);
 	listen<RendererInitEvent>(&MotionBlur::onRendererInit, true);
 
 }

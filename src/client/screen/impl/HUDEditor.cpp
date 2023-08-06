@@ -18,6 +18,8 @@
 #include "sdk/common/client/gui/controls/UIControl.h"
 
 HUDEditor::HUDEditor() : Screen("HUDEditor") {
+	this->key = Latite::get().getMenuKey();
+
 	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&HUDEditor::onRender, 1, true);
 	Eventing::get().listen<RenderLayerEvent>(this, (EventListenerFunc)&HUDEditor::onRenderLayer, 1, true);
 }

@@ -280,6 +280,8 @@
     <ClInclude Include="src\client\event\impl\TickEvent.h" />
     <ClInclude Include="src\client\feature\command\impl\ToggleCommand.h" />
     <ClInclude Include="src\client\feature\module\HUDModule.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\FPSCounter.h" />
+    <ClInclude Include="src\client\feature\module\TextModule.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\InputLagTest.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\Screenshot.h" />
     <ClInclude Include="src\client\feature\module\impl\visual\Fullbright.h" />
@@ -306,6 +308,7 @@
     <ClInclude Include="src\api\feature\module\ModuleManager.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\TestModule.h" />
     <ClInclude Include="src\client\feature\module\ModuleManager.h" />
+    <ClInclude Include="src\client\misc\Timings.h" />
     <ClInclude Include="src\client\render\Assets.h" />
     <ClInclude Include="src\client\render\asset\Asset.h" />
     <ClInclude Include="src\client\render\Renderer.h" />
@@ -404,6 +407,7 @@
     <ClCompile Include="src\client\event\Eventing.cpp" />
     <ClCompile Include="src\client\feature\command\impl\ToggleCommand.cpp" />
     <ClCompile Include="src\client\feature\module\HUDModule.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\FPSCounter.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\Screenshot.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\Fullbright.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\HurtColor.cpp" />
@@ -411,6 +415,7 @@
     <ClCompile Include="src\client\feature\module\impl\game\Zoom.cpp" />
     <ClCompile Include="src\client\feature\module\Module.cpp" />
     <ClCompile Include="src\client\feature\module\script\JsEvented.cpp" />
+    <ClCompile Include="src\client\feature\module\TextModule.cpp" />
     <ClCompile Include="src\client\hook\Hook.cpp" />
     <ClCompile Include="src\client\hook\Hooks.cpp" />
     <ClCompile Include="src\client\hook\impl\AppPlatformHooks.cpp" />
@@ -427,6 +432,7 @@
     <ClCompile Include="src\client\misc\ClientMessageSink.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\TestModule.cpp" />
     <ClCompile Include="src\client\feature\module\ModuleManager.cpp" />
+    <ClCompile Include="src\client\misc\Timings.cpp" />
     <ClCompile Include="src\client\render\Assets.cpp" />
     <ClCompile Include="src\client\render\asset\Asset.cpp" />
     <ClCompile Include="src\client\render\Renderer.cpp" />

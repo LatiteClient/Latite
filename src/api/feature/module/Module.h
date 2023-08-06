@@ -25,6 +25,7 @@ public:
 	virtual ~IModule() = default;
 	virtual void onEnable() {};
 	virtual void onDisable() {};
+	virtual void onInit() {};
 
 	[[nodiscard]] KeyValue getKeybind() { return std::get<KeyValue>(key); }
 	[[nodiscard]] bool isEnabled() { return std::get<BoolValue>(enabled); };
@@ -54,6 +55,7 @@ protected:
 	Setting::Value key = KeyValue(0);
 	bool visible;
 	bool hud = false;
+	bool textual = false;
 	bool blocked = false;
 	Category category;
 };

@@ -6,6 +6,8 @@
 #include "impl/visual/MotionBlur.h"
 #include "impl/visual/HurtColor.h"
 
+#include "impl/hud/FPSCounter.h"
+
 #include "client/event/impl/KeyUpdateEvent.h"
 
 // TODO: queue shutdown and disalbe all modules (after config saves)
@@ -18,7 +20,11 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<MotionBlur>());
 	this->items.push_back(std::make_shared<HurtColor>());
 	//this->items.push_back(std::make_shared<Screenshot>());
+	this->items.push_back(std::make_shared<FPSCounter>());
 
+	for (auto& mod : items) {
+		mod->onInit();
+	}
 	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc) & ModuleManager::onKey);
 }
 

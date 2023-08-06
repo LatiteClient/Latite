@@ -23,6 +23,7 @@
 #include "event/impl/AppSuspendedEvent.h"
 #include "event/impl/UpdateEvent.h"
 #include "event/impl/CharEvent.h"
+#include "event/impl/ClickEvent.h"
 
 #include "sdk/signature/storage.h"
 
@@ -380,6 +381,11 @@ void Latite::initSettings() {
         this->getSettings().addSetting(set);
     }
     {
+        auto set = std::make_shared<Setting>("useDX11", "Use DX11 (+FPS)", "Possible game FPS/Memory boost. Restart if you disable it");
+        set->value = &this->useDX11;
+        this->getSettings().addSetting(set);
+    }
+    {
         auto set = std::make_shared<Setting>("menuIntensity", "Blur Intensity", "The intensity of the menu blur");
         set->value = &this->menuBlur;
         set->min = FloatValue(1.f);
@@ -438,12 +444,20 @@ winrt::Windows::Foundation::IAsyncAction Latite::downloadExtraAssets() {
 
 void Latite::onUpdate(Event& evGeneric) {
     auto& ev = reinterpret_cast<UpdateEvent&>(evGeneric);
+    timings.update();
+
     if (!hasInit) {
         threadsafeInit();
         hasInit = true;
     }
     getKeyboard().findTextInput();
     Latite::getScriptManager().runScriptingOperations();
+
+    static bool lastDX11 = std::get<BoolValue>(this->useDX11);
+    if (std::get<BoolValue>(useDX11) != lastDX11) {
+        //Latite::getRenderer().queueReinit();
+        lastDX11 = std::get<BoolValue>(useDX11);
+    }
 }
 
 // TODO: port this to ScreenManager
@@ -463,23 +477,11 @@ void Latite::onKey(Event& evGeneric) {
             }
         }
     }
+}
 
-    if (ev.isDown() && ev.getKey() == VK_ESCAPE && Latite::getScreenManager().getActiveScreen()) {
-        Latite::getScreenManager().exitCurrentScreen();
-        ev.setCancelled(true);
-        return;
-    }
-
-    if ((ev.getKey() == std::get<KeyValue>(this->menuKey)) && ev.isDown()) {
-        if (!ev.inUI() || Latite::getScreenManager().getActiveScreen()) {
-            if (Latite::getScreenManager().getActiveScreen())
-                Latite::getScreenManager().exitCurrentScreen();
-            else
-                Latite::getScreenManager().showScreen("HUDEditor");
-            ev.setCancelled(true);
-            return;
-        }
-    }
+void Latite::onClick(Event& evGeneric) {
+    auto& ev = reinterpret_cast<ClickEvent&>(evGeneric);
+    timings.onClick(ev.getMouseButton(), ev.isDown());
 }
 
 void Latite::onChar(Event& evGeneric) {

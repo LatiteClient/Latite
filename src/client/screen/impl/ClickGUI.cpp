@@ -23,6 +23,7 @@
 #undef min
 #undef max
 #endif
+#include <client/feature/module/HUDModule.h>
 
 using FontSelection = Renderer::FontSelection;
 using RectF = d2d::Rect;
@@ -311,7 +312,7 @@ void ClickGUI::onRender(Event&) {
 				settings.forEach([&](std::shared_ptr<Setting> set) {
 					if (set->value->index() == (size_t)Setting::Type::Float /* || set->value->index() == Setting::Type::Int*/) {
 						drawSetting(set.get(), setPos, dc, settingWidth, 0.35f);
-						setPos.y += (setting_height_relative * rect.getHeight()) * 2.f;
+						setPos.y += (setting_height_relative * rect.getHeight()) * 3.f;
 					}
 					});
 			}
@@ -323,7 +324,7 @@ void ClickGUI::onRender(Event&) {
 				settings.forEach([&](std::shared_ptr<Setting> set) {
 					if (set->value->index() == (size_t)Setting::Type::Key /* || set->value->index() == Setting::Type::Enum*/) {
 						drawSetting(set.get(), setPos, dc, settingWidth);
-						setPos.y += (setting_height_relative * rect.getHeight()) * 2.f;
+						setPos.y += (setting_height_relative * rect.getHeight()) * 3.f;
 					}
 					});
 			}
@@ -335,7 +336,7 @@ void ClickGUI::onRender(Event&) {
 				settings.forEach([&](std::shared_ptr<Setting> set) {
 					if (set->value->index() == (size_t)Setting::Type::Bool /* || set->value->index() == Setting::Type::Enum*/) {
 						drawSetting(set.get(), setPos, dc, settingWidth);
-						setPos.y += (setting_height_relative * rect.getHeight()) * 2.f;
+						setPos.y += (setting_height_relative * rect.getHeight()) * 3.f;
 					}
 					});
 			}
@@ -394,6 +395,7 @@ void ClickGUI::onRender(Event&) {
 		float x = xStart;
 		float y = searchRect.bottom + padFromSearchBar;
 		// TODO: clipping
+		dc.ctx->PushAxisAlignedClip({ rect.left, y, rect.right, rect.bottom }, D2D1_ANTIALIAS_MODE_ALIASED);
 
 		// Sort Modules
 		static std::vector<ModContainer> mods = {};
@@ -421,6 +423,17 @@ void ClickGUI::onRender(Event&) {
 			if (modTab == GAME && mod.mod->getCategory() == IModule::HUD) mod.shouldRender = false; // Game Tab
 			if (modTab == HUD && mod.mod->getCategory() == IModule::GAME) mod.shouldRender = false; // Hud Tab
 			if (modTab == SCRIPT && mod.mod->getCategory() != IModule::SCRIPT) mod.shouldRender = false; // Hud Tab
+
+			bool should = mod.shouldRender;
+			if (this->searchTextBox.getText().size() > 0) {
+				should = false;
+				std::string lower = mod.name;
+				std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+				std::string lowerSearch = searchTextBox.getText();
+				std::transform(lowerSearch.begin(), lowerSearch.end(), lowerSearch.begin(), ::tolower);
+				if (lower.rfind(lowerSearch) != UINTPTR_MAX) should = true;
+			}
+			mod.shouldRender = should;
 		}
 
 		int i = 0;
@@ -547,6 +560,16 @@ void ClickGUI::onRender(Event&) {
 
 			columnOffs[i] += modRectActual.getHeight() - modRect.getHeight();
 
+			if (mod.isExtended && mod.mod->isHud() && (modRectActual.contains(cursorPos) || colorPicker.setting)) {
+				auto hMod = static_cast<HUDModule*>(mod.mod.get());
+
+				D2D1::Matrix3x2F oTrans;
+				dc.ctx->GetTransform(&oTrans);
+				dc.ctx->SetTransform(D2D1::Matrix3x2F::Scale(hMod->getScale(), hMod->getScale())* D2D1::Matrix3x2F::Translation(hMod->getRect().left, hMod->getRect().top));
+				hMod->render(dc, false, isActive());
+				dc.ctx->SetTransform(oTrans);
+			}
+
 			if (i >= (numMods - 1)) {
 				i = 0;
 				row++;
@@ -562,6 +585,7 @@ void ClickGUI::onRender(Event&) {
 			i++;
 		}
 
+		dc.ctx->PopAxisAlignedClip();
 	}
 
 	if (colorPicker.setting) {
@@ -598,16 +622,32 @@ void ClickGUI::onCleanup(Event&) {
 
 void ClickGUI::onKey(Event& evGeneric) {
 	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
+	if (searchTextBox.isSelected()) {
+		ev.setCancelled(true);
+		return;
+	}
 	if (this->activeSetting) {
 		if (ev.isDown()) {
 			if (ev.getKey() == VK_ESCAPE) {
 				activeSetting = nullptr;
+				ev.setCancelled(true);
+				return;
 			}
 			else {
 				this->capturedKey = ev.getKey();
 			}
 		}
 	}
+
+	if (ev.isDown() && ev.getKey() == VK_ESCAPE) {
+		if (colorPicker.setting) {
+			colorPicker.queueClose = true;
+		}
+		else {
+			this->close();
+		}
+	}
+
 	ev.setCancelled(true);
 }
 

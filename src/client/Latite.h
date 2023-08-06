@@ -8,10 +8,12 @@
 #include <optional>
 #include <winrt/windows.foundation.h>
 #include "ui/TextBox.h"
+#include "misc/Timings.h"
 
 class Latite final : public Listener {
 public:
 	[[nodiscard]] static Latite& get() noexcept;
+
 	[[nodiscard]] static class ModuleManager& getModuleManager() noexcept;
 	[[nodiscard]] static class CommandManager& getCommandManager() noexcept;
 	[[nodiscard]] static class ConfigManager& getConfigManager() noexcept;
@@ -25,11 +27,14 @@ public:
 	[[nodiscard]] static class ScriptManager& getScriptManager() noexcept;
 	[[nodiscard]] static class Keyboard& getKeyboard() noexcept;
 
+	[[nodiscard]] Timings& getTimings() noexcept { return timings; }
+
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);
 
 	void onUpdate(class Event& ev);
 	void onKey(class Event& ev);
+	void onClick(class Event& ev);
 	void onChar(class Event& ev);
 	void onRendererInit(class Event& ev);
 	void onFocusLost(class Event& ev);
@@ -59,9 +64,21 @@ public:
 			}
 		}
 	}
+
+	[[nodiscard]] KeyValue getMenuKey() {
+		return std::get<KeyValue>(menuKey);
+	}
+
+	[[nodiscard]] bool shouldForceDX11() {
+		return std::get<BoolValue>(useDX11);
+	}
 private:
+	Timings timings{};
+
 	Setting::Value menuKey = KeyValue('M');
 	Setting::Value menuBlurEnabled = BoolValue(true);
+	// TODO: add disabled settings, for people who already only support dx11, gray it out
+	Setting::Value useDX11 = BoolValue(false);
 	Setting::Value menuBlur = FloatValue(20.f);
 
 	std::vector<ui::TextBox*> textBoxes = {};

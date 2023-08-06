@@ -31,6 +31,7 @@ bool Renderer::init(IDXGISwapChain* chain) {
 
 	if (gameDevice12.Get()) {
 		if (!this->commandQueue) {
+			swapChain4 = nullptr;
 			return false;
 		}
 	}

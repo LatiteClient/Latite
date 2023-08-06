@@ -34,7 +34,10 @@ protected:
 	Setting::Value storedPos = Vec2Value();
 	Setting::Value scale = FloatValue(1.f);
 	bool resizable;
+	bool active = true;
 public:
+	[[nodiscard]] bool isActive() { return active; }
+
 	struct Snapping {
 		enum Type : int {
 			Normal,

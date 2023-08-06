@@ -99,7 +99,7 @@ void GenericHooks::onClick(ClickMap* map, char clickType, char isDownWheelDelta,
 	ClickEvent ev{ clickType, isDownWheelDelta };
 	if (Eventing::get().dispatchEvent(ev)) return;
 
-	{
+	if (clickType > 0) {
 		Vec2& mousePos = sdk::ClientInstance::get()->cursorPos;
 
 		ScriptManager::Event::Value val{L"mouseX"};
@@ -109,12 +109,13 @@ void GenericHooks::onClick(ClickMap* map, char clickType, char isDownWheelDelta,
 		val2.val = static_cast<double>(mousePos.y);
 
 		ScriptManager::Event::Value val3{L"isDown"};
-		val3.val = isDownWheelDelta;
+		val3.val = static_cast<bool>(isDownWheelDelta);
 
 		ScriptManager::Event::Value val4{L"button"};
 		val4.val = static_cast<double>(clickType);
 
 		ScriptManager::Event ev{L"click", { val, val2, val3, val4 }, true};
+		if (Latite::getScriptManager().dispatchEvent(ev)) return;
 	}
 
 	return OnClickHook->oFunc<decltype(&onClick)>()(map, clickType, isDownWheelDelta, a4, a5, a6, a7, a8);
