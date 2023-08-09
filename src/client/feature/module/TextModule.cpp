@@ -9,6 +9,8 @@ void TextModule::onInit() {
 	addSliderSetting("padX", "Pad X", "Padding", padX, FloatValue(0.f), FloatValue(40.f), FloatValue(2.f));
 	addSliderSetting("padY", "Pad Y", "Padding", padY, FloatValue(0.f), FloatValue(40.f), FloatValue(2.f));
 
+	addSliderSetting("textSize", "Text Size", "", textSizeS, FloatValue(2.f), FloatValue(100.f), FloatValue(2.f));
+
 	addSetting("textCol", "Text", "", textColor);
 	addSetting("bgColor", "Background", "", bgColor);
 
@@ -16,6 +18,7 @@ void TextModule::onInit() {
 	addSetting("brackets", "Brackets", "", brackets);
 
 	addSetting("showOutline", "Outline", "", showOutline);
+	addSliderSetting("outlineThickness", "Thickness", "", outlineThickness, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f));
 	addSliderSetting("radius", "Radius", "", radius, FloatValue(0.f), FloatValue(10.f), FloatValue(1.f));
 }
 
@@ -23,9 +26,9 @@ void TextModule::render(DXContext& ctx, bool isDefault, bool inEditor) {
 	DXContext dc;
 	//dc.setTextShadow(textShadow);
 	int textPadding = static_cast<int>(std::get<FloatValue>(padX));
-	int textPaddingY = static_cast<int>(std::get<FloatValue>(padY));
+	int textPaddingY = static_cast<int>(std::get<FloatValue>(padY) * 2.f);
 
-	float textSize = 23.f;//this->getTextSize();
+	float textSize = std::get<FloatValue>(textSizeS);//this->getTextSize();
 
 
 	std::wstringstream text = this->text(isDefault, inEditor);
@@ -48,10 +51,10 @@ void TextModule::render(DXContext& ctx, bool isDefault, bool inEditor) {
 		float rad = (std::get<FloatValue>(radius).value / 10.f) * (rc.getHeight() / 2.f);
 
 		if (std::get<BoolValue>(fillBg)) dc.fillRoundedRectangle(rc, realCol, rad);
-		if (std::get<BoolValue>(showOutline) && std::get<FloatValue>(radius) < 0.03f) dc.drawRectangle(rc, realOCol, std::get<FloatValue>(outlineThickness));
+		if (std::get<BoolValue>(showOutline)) dc.drawRoundedRectangle(rc, realOCol, rad, std::get<FloatValue>(outlineThickness));
 		dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::Regular, textSize, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-		this->rect.right = rect.left + rc.right;
-		this->rect.bottom = rect.top + rc.bottom;
+		this->rect.right = rect.left + std::get<FloatValue>(bgX);
+		this->rect.bottom = rect.top + std::get<FloatValue>(bgY);
 
 	}
 	else {
@@ -59,9 +62,9 @@ void TextModule::render(DXContext& ctx, bool isDefault, bool inEditor) {
 		Vec2 ts = dc.getTextSize(str.c_str(), Renderer::FontSelection::Regular, textSize, false);
 		d2d::Rect rc = d2d::Rect(0, 0, ts.x + (textPadding * 2), ts.y + (textPaddingY * 2));
 
-		float rad = (std::get<FloatValue>(radius).value / 10.f) * rc.getHeight();
+		float rad = (std::get<FloatValue>(radius).value / 10.f) * (rc.getHeight() / 2.f);
 		if (std::get<BoolValue>(fillBg)) dc.fillRoundedRectangle(rc, std::get<ColorValue>(bgColor).color1, rad);
-		if (std::get<BoolValue>(showOutline) && std::get<FloatValue>(radius) < 0.03f) dc.drawRectangle(rc, realOCol, std::get<FloatValue>(outlineThickness));
+		if (std::get<BoolValue>(showOutline)) dc.drawRoundedRectangle(rc, realOCol, rad, std::get<FloatValue>(outlineThickness));
 		dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::Regular, textSize, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		this->rect.right = rect.left + rc.right;
 		this->rect.bottom = rect.top + rc.bottom;

@@ -25,6 +25,9 @@
 #endif
 #include <client/feature/module/HUDModule.h>
 
+#include <optional>
+#include <array>
+
 using FontSelection = Renderer::FontSelection;
 using RectF = d2d::Rect;
 
@@ -421,7 +424,7 @@ void ClickGUI::onRender(Event&) {
 			mod.shouldRender = true;
 
 			if (modTab == GAME && mod.mod->getCategory() == IModule::HUD) mod.shouldRender = false; // Game Tab
-			if (modTab == HUD && mod.mod->getCategory() == IModule::GAME) mod.shouldRender = false; // Hud Tab
+			if (modTab == HUD && !mod.mod->isHud()) mod.shouldRender = false; // Hud Tab
 			if (modTab == SCRIPT && mod.mod->getCategory() != IModule::SCRIPT) mod.shouldRender = false; // Hud Tab
 
 			bool should = mod.shouldRender;
@@ -441,6 +444,10 @@ void ClickGUI::onRender(Event&) {
 		int column = 1;
 
 		std::array<float, 3> columnOffs = { 0.f, 0.f, 0.f };
+
+		modClip = true;
+
+		// modules
 
 		for (auto& mod : mods) {
 			if (!mod.shouldRender) continue;
@@ -473,7 +480,7 @@ void ClickGUI::onRender(Event&) {
 					modRectActual.bottom += padToSetting;
 					mod.mod->settings->forEach([&](std::shared_ptr<Setting> set) {
 						if (set->visible) {
-							if (drawSetting(set.get(), { descTextRect.left, modRectActual.bottom }, dc, descTextRect.getWidth())) {
+							if (drawSetting(set.get(), { descTextRect.left, modRectActual.bottom }, dc, descTextRect.getWidth(), 0.25f)) {
 								modRectActual.bottom += settingHeight;
 								modRectActual.bottom += settingPadY;
 							}
@@ -587,6 +594,8 @@ void ClickGUI::onRender(Event&) {
 
 		dc.ctx->PopAxisAlignedClip();
 	}
+
+	modClip = false;
 
 	if (colorPicker.setting) {
 		drawColorPicker();
@@ -773,8 +782,8 @@ bool ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 			text = L"...";
 		}
 
-		auto ts = dc.getTextSize(text, FontSelection::Regular, textSize * 0.9f);
-		if (ts.x > keyRect.getWidth()) keyRect.right = keyRect.left + (ts.x + 4.f);
+		auto ts = dc.getTextSize(text, FontSelection::Regular, textSize * 0.9f) + Vec2(8.f, 0.f);
+		if (ts.x > keyRect.getWidth()) keyRect.right = keyRect.left + (ts.x);
 
 		
 		dc.fillRoundedRectangle(keyRect, Color(set->rendererInfo.col), round);
@@ -817,6 +826,69 @@ bool ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 		}
 	}
 		break;
+	case Setting::Type::Enum:
+	{
+		RectF enumRect = { pos.x, pos.y, pos.x + checkboxSize * 2.f, pos.y + checkboxSize };
+		bool contains = this->shouldSelect(enumRect, cursorPos);
+
+		EnumValue& val = std::get<EnumValue>(*set->value);
+
+		auto colOff = d2d::Color::RGB(0xD9, 0xD9, 0xD9).asAlpha(0.11f);
+		if (!set->rendererInfo.init) {
+			set->rendererInfo.init = true;
+			set->rendererInfo.col[0] = colOff.r;
+			set->rendererInfo.col[1] = colOff.g;
+			set->rendererInfo.col[2] = colOff.b;
+			set->rendererInfo.col[3] = colOff.a;
+		}
+		auto lerpedColor = util::LerpColorState(set->rendererInfo.col, colOff + 0.1f, colOff, contains);
+		set->rendererInfo.col[0] = lerpedColor.r;
+		set->rendererInfo.col[1] = lerpedColor.g;
+		set->rendererInfo.col[2] = lerpedColor.b;
+		set->rendererInfo.col[3] = lerpedColor.a;
+
+		auto text = util::StrToWStr(set->enumData->getSelectedName());
+
+		auto ts = dc.getTextSize(text, FontSelection::Regular, textSize * 0.9f) + Vec2(8.f, 0.f);
+		if (ts.x > enumRect.getWidth()) enumRect.right = enumRect.left + (ts.x);
+
+		dc.fillRoundedRectangle(enumRect, Color(set->rendererInfo.col), round);
+
+		dc.drawText(enumRect, text, d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::Regular, textSize * 0.9f,
+			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+		if (activeSetting == set) {
+			dc.drawRoundedRectangle(enumRect, d2d::Color(1.f, 1.f, 1.f, 1.f), round);
+		}
+
+
+		float padToName = 0.006335f * rect.getWidth();
+		float newX = enumRect.right + padToName;
+		float rem = newX - pos.x;
+
+
+		RectF textRect = { enumRect.right + padToName, enumRect.top, newX + (size - rem), enumRect.bottom };
+
+		dc.drawText(textRect, util::StrToWStr(set->getDisplayName()), {1.f, 1.f, 1.f, 1.f}, FontSelection::Regular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		if (!set->desc().empty())
+			if (shouldSelect(textRect, cursorPos)) tooltip = util::StrToWStr(set->desc());
+
+		if (shouldSelect(enumRect, cursorPos)) {
+			if (set->enumData->getSelectedDesc().size() > 0) {
+				tooltip = util::StrToWStr(set->enumData->getSelectedDesc());
+			}
+			else tooltip = util::StrToWStr(set->enumData->getSelectedName());
+		}
+
+		if (shouldSelect(enumRect, cursorPos)) {
+			if (justClicked[0]) {
+				// cycle
+				set->enumData->next();
+				playClickSound();
+			}
+		}
+		break;
+	}
 	case Setting::Type::Color:
 	{
 		float padToName = 0.006335f * rect.getWidth();
@@ -967,12 +1039,22 @@ bool ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float s
 	return true;
 }
 
+bool ClickGUI::shouldSelect(d2d::Rect rc, Vec2 const& pt) {
+	if (modClip) {
+		if (!rect.contains(pt) || !Screen::shouldSelect(rc, pt)) {
+			return false;
+		}
+	}
+	return Screen::shouldSelect(rc, pt);
+}
+
 void ClickGUI::drawColorPicker() {
+	auto& cursorPos = sdk::ClientInstance::get()->cursorPos;
 	DXContext dc;
 	dc.ctx->SetTarget(shadowBitmap.Get());
 	dc.ctx->Clear();
 
-	float rectWidth = 0.21119f * rect.getWidth();
+	float rectWidth = 0.2419f * rect.getWidth();
 	cPickerRect.right = cPickerRect.left + rectWidth;
 
 	float boxWidth = 0.79f * rectWidth;
@@ -1108,9 +1190,82 @@ void ClickGUI::drawColorPicker() {
 	dc.fillRoundedRectangle(alphaBar, alphaBrush.Get(), alphaBar.getHeight() / 2.f);
 	dc.drawRoundedRectangle(alphaBar, d2d::Color::RGB(0x37, 0x37, 0x37).asAlpha(0.88f), alphaBar.getHeight() / 2.f, alphaBar.getHeight() / 3.f, DXContext::OutlinePosition::Outside);
 
+	// color hex edits/displays
+
+	std::array<std::optional<StoredColor>, 3> cols = { colVal.color1, std::nullopt, std::nullopt };
+
+	RectF lastrc = alphaBar;
+	for (size_t i = 0; i < cols.size(); ++i) {
+		auto& c = cols[i];
+		if (c.has_value()) {
+			float colorModeWidth = alphaBar.getWidth() / 4.f;
+			float hexBoxWidth = alphaBar.getWidth() * 0.617f;
+			float boxHeight = alphaBar.getHeight() * 2.f;
+			float colorDisplayWidth = boxHeight;
+
+			float pad = (alphaBar.getWidth() - colorModeWidth - hexBoxWidth - colorDisplayWidth) / 3.f;
+
+			RectF totalDisplayRect = lastrc.translate(0.f, padToHueBar);
+			totalDisplayRect.bottom = totalDisplayRect.top + boxHeight;
+			lastrc = totalDisplayRect;
+			RectF colorModeRect = { totalDisplayRect.left, totalDisplayRect.top, totalDisplayRect.left + colorModeWidth, totalDisplayRect.bottom };
+			RectF hexBox = { colorModeRect.right + pad, totalDisplayRect.top, colorModeRect.right + pad + hexBoxWidth, totalDisplayRect.bottom };
+			RectF colorDisplayRect = { totalDisplayRect.right - pad - colorDisplayWidth, totalDisplayRect.top, totalDisplayRect.right - pad, totalDisplayRect.bottom };
+
+			if (pickerTextBoxes.size() <= i) {
+				pickerTextBoxes.insert(pickerTextBoxes.begin() + i, ui::TextBox(hexBox, 7));
+				Latite::get().addTextBox(&pickerTextBoxes[i]);
+			}
+			auto& tb = pickerTextBoxes[i];
+
+			auto bgCol = d2d::Color::RGB(0x50, 0x50, 0x50).asAlpha(0.28f);
+
+			auto round = 0.1875f * colorModeRect.getHeight();
+
+			dc.fillRoundedRectangle(colorModeRect, bgCol, round);
+			//dc.fillRoundedRectangle(hexBox, bgCol, round);
+			dc.fillRoundedRectangle(colorDisplayRect, col.asAlpha(colorPicker.opacityMod), round);
+
+			std::wstring alphaTxt = util::StrToWStr(std::format("{:.2f}", colorPicker.opacityMod));
+
+			dc.drawText(colorDisplayRect, alphaTxt, (colorPicker.opacityMod < 0.5f || colorPicker.pickerColor.v < 0.5f) ? D2D1::ColorF::White : D2D1::ColorF::Black, Renderer::FontSelection::Regular, colorDisplayRect.getHeight() * 0.5f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			tb.setRect(hexBox);
+
+			if (!tb.isSelected()) {
+				tb.setText("#" + col.getHex());
+			}
+
+			tb.render(dc, round, bgCol, D2D1::ColorF::White);
+			if (tb.isSelected()) {
+				d2d::Color newCol = col;
+				std::string txt = tb.getText();
+				if (txt[0] == '#') {
+					txt = txt.substr(1);
+				}
+				if (txt.size() == 6)
+				try {
+					newCol = d2d::Color::Hex(txt);
+				}
+				catch (...) {
+				}
+				
+				auto newHSV = util::ColorToHSV(newCol);
+				colorPicker.svModX = newHSV.s;
+				colorPicker.svModY = 1.f - newHSV.v;
+				colorPicker.hueMod = newHSV.h / 360.f;
+			}
+			else {
+				tb.setCaretLocation(static_cast<int>(tb.getText().size()));
+			}
+
+			if (justClicked[0]) {
+				tb.setSelected(hexBox.contains(cursorPos));
+			}
+		}
+	}
+
 	float ellipseRadius = 0.75f * alphaBar.getHeight();
 	
-	auto& cursorPos = sdk::ClientInstance::get()->cursorPos;
 
 	// sv
 	if (colorPicker.isEditingSV || (justClicked[0] && boxRect.contains(cursorPos))) {
@@ -1128,6 +1283,17 @@ void ClickGUI::drawColorPicker() {
 
 	// alpha
 	if (colorPicker.isEditingOpacity || (justClicked[0] && alphaBar.contains(cursorPos))) {
+		float val = (colorPicker.opacityMod / (cPickerRect.getWidth()));
+
+		float interval = 0.05f;
+
+		// Find a good value to set to ("latch to nearest")
+		val /= interval;
+		val = std::round(val);
+		val *= interval;
+
+		colorPicker.opacityMod = val;
+		
 		colorPicker.opacityMod = std::max(std::min(cursorPos.x - alphaBar.left, alphaBar.getWidth()) / alphaBar.getWidth(), 0.f);
 		colorPicker.isEditingOpacity = true;
 	}
@@ -1148,7 +1314,7 @@ void ClickGUI::drawColorPicker() {
 	// SV
 	{
 		auto ellipse = D2D1::Ellipse({ boxRect.left + (hueBar.getWidth() * colorPicker.svModX), boxRect.top + (boxRect.getHeight() * colorPicker.svModY)}, ellipseRadius, ellipseRadius);
-		dc.brush->SetColor(baseCol.asAlpha(0.5f).get());
+		dc.brush->SetColor(col.asAlpha(1.f).get());
 		dc.ctx->FillEllipse(ellipse, dc.brush);
 		dc.brush->SetColor(D2D1::ColorF(D2D1::ColorF::White));
 		dc.ctx->DrawEllipse(ellipse, dc.brush, ellipseRadius / 2.f);
@@ -1208,6 +1374,9 @@ void ClickGUI::drawColorPicker() {
 	if (colorPicker.dragging) {
 		cPickerRect.setPos(cursorPos - colorPicker.dragOffs);
 	}
+
+	auto ss = Latite::getRenderer().getScreenSize();
+	util::KeepInBounds(cPickerRect, { 0.f, 0.f, ss.width, ss.height });
 }
 
 void ClickGUI::onEnable(bool ignoreAnims) {

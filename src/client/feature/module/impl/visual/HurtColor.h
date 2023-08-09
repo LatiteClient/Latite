@@ -8,5 +8,5 @@ public:
 
 	void onActorOverlay(Event& ev);
 private:
-	Setting::Value color = ColorValue(1.f, 0.f, 0.f, 0.6f);
+	ValueType color = ColorValue(1.f, 0.f, 0.f, 0.6f);
 };

@@ -43,7 +43,7 @@ Color.RGB = function (r, g, b, a) {
 };
 
 eval("var TextColor = {}");
-TextColor.FORMAT_CHAR = "§";
+TextColor.FORMAT_CHAR = "\xc2\xa7";
 TextColor.formatText = function (str) {
     return str.replace("&", TextColor.FORMAT_CHAR);
 };
@@ -78,3 +78,20 @@ TextColor.MATERIAL_EMERALD = TextColor.FORMAT_CHAR + 'q';
 TextColor.MATERIAL_DIAMOND = TextColor.FORMAT_CHAR + 's';
 TextColor.MATERIAL_LAPIS = TextColor.FORMAT_CHAR + 't';
 TextColor.MATERIAL_AMETHYST = TextColor.FORMAT_CHAR + 'u';
+
+util = {
+    bufferToString: function (buf) {
+        let str = "";
+        for (let i = 0; i < buf.byteLength; ++i) {
+            str += String.fromCharCode(buf[i]);
+        }
+        return str;
+    },
+    stringToBuffer: function (str) {
+        let buf = new Uint8Array(str.length);
+        for (let i = 0; i < str.length; ++i) {
+            buf[i] = str.charCodeAt(i);
+        }
+        return buf;
+    }
+};

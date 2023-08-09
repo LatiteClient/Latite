@@ -22,6 +22,9 @@ void HUDModule::renderPost()
 }
 
 void HUDModule::afterLoadConfig() {
+	auto ss = Latite::getRenderer().getScreenSize();
+	auto& sp = std::get<Vec2Value>(this->storedPos);
+	setPos({ sp.x * ss.width, sp.y * ss.height });
 }
 
 void HUDModule::storePos() {
@@ -31,7 +34,6 @@ void HUDModule::storePos() {
 	vec.y = rect.top / ss.height;
 }
 
-d2d::Rect HUDModule::getRect()
-{
+d2d::Rect HUDModule::getRect() {
 	return { rect.left, rect.top, rect.left + ((rect.getWidth()) * getScale()), rect.top + ((rect.getHeight()) * getScale()) };
 }

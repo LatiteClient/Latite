@@ -9,12 +9,12 @@ void ui::TextBox::render(DXContext& dc, float rounding, d2d::Color backgroundCol
 	}
 
 	// draw text
-	float textSize = rect.getHeight() * 0.8f;
-	dc.drawText(rect, util::StrToWStr(getText()), textColor, Renderer::FontSelection::Regular, rect.getHeight() * 0.8f,
+	float textSize = rect.getHeight() * 0.7f;
+	dc.drawText(rect, util::StrToWStr(getText()), textColor, Renderer::FontSelection::Regular, textSize,
 		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 	// draw blinker
 	Vec2 ts = dc.getTextSize(util::StrToWStr(text.substr(0, this->place)), Renderer::FontSelection::Regular, textSize);
-	d2d::Rect blinkerRect = { rect.left + ts.x - 2.f, rect.top + 2.f, rect.left + ts.x, rect.bottom - 2.f };
-	if (shouldBlink()) dc.fillRectangle(blinkerRect, textColor);
+	d2d::Rect blinkerRect = { rect.left + ts.x, rect.top + 2.f, rect.left + ts.x + 2.f, rect.bottom - 2.f };
+	if (isSelected() && shouldBlink()) dc.fillRectangle(blinkerRect, textColor);
 }

@@ -25,6 +25,8 @@
 #include "class/impl/JsRect.h"
 #include "class/impl/JsColor.h"
 #include "class/impl/JsModuleClass.h"
+#include "objects/GameScriptingObject.h"
+#include "objects/D2DScriptingObject.h"
 
 using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Web::Http;
@@ -76,7 +78,7 @@ namespace {
 		auto num = Chakra::GetNumber(arguments[2]);
 
 		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
-		auto tim = JsScript::JsTimeout(thi->timeouts.size() + 1, static_cast<long long>(num), func);
+		auto tim = JsScript::JsTimeout(static_cast<int>(thi->timeouts.size() + 1), static_cast<long long>(num), func);
 		thi->timeouts.push_back(tim);
 		/*JsScript::AsyncOperation op{true, func, [](JsScript::AsyncOperation& op) {}, [](JsScript::AsyncOperation& op) {
 			auto timeNow = std::chrono::system_clock::now();
@@ -105,7 +107,7 @@ namespace {
 		auto num = Chakra::GetNumber(arguments[2]);
 
 		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
-		auto tim = JsScript::JsTimeout(thi->intervals.size() + 1, static_cast<long long>(num), func);
+		auto tim = JsScript::JsTimeout(static_cast<int>(thi->intervals.size() + 1), static_cast<long long>(num), func);
 		thi->intervals.push_back(tim);
 		/*JsScript::AsyncOperation op{true, func, [](JsScript::AsyncOperation& op) {}, [](JsScript::AsyncOperation& op) {
 			auto timeNow = std::chrono::system_clock::now();
@@ -287,6 +289,8 @@ void JsScript::loadScriptObjects() {
 	int i = 0;
 	this->objects.clear();
 	this->objects.push_back(std::make_shared<ClientScriptingObject>(i++));
+	this->objects.push_back(std::make_shared<GameScriptingObject>(i++));
+	this->objects.push_back(std::make_shared<D2DScriptingObject>(i++));
 
 	this->classes.clear();
 	this->classes.push_back(std::make_shared<JsVec2>());
@@ -433,6 +437,6 @@ JsValueRef JsScript::AsyncOperation::call() {
 	JS::JsSetCurrentContext(this->ctx);
 	JsValueRef obj;
 	this->args.insert(this->args.begin(), this->callback);
-	Latite::getScriptManager().handleErrors(JS::JsCallFunction(this->callback, this->args.data(), this->args.size(), &obj));
+	Latite::getScriptManager().handleErrors(JS::JsCallFunction(this->callback, this->args.data(), static_cast<unsigned short>(this->args.size()), &obj));
 	return obj;
 }

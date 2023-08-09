@@ -19,7 +19,10 @@ public:
 	void onClick(Event& ev);
 	void onChar(Event& ev);
 
-	bool drawSetting(class Setting* set, struct Vec2 const& pos, class DXContext& dc, float size = 150.f, float fTextWidth = 0.1947f);
+	bool drawSetting(class Setting* set, struct Vec2 const& pos, class DXContext& dc, float size = 150.f, float fTextWidth = 0.21f);
+	
+	bool shouldSelect(d2d::Rect rc, Vec2 const& pt) override;
+
 	void drawColorPicker();
 protected:
 	void onEnable(bool ignoreAnims) override;
@@ -44,8 +47,10 @@ private:
 	} colorPicker{};
 
 	ui::TextBox searchTextBox{};
+	std::vector<ui::TextBox> pickerTextBoxes{};
 
 	ComPtr<ID2D1Bitmap1> shadowBitmap;
+	bool modClip = false;
 
 	enum Tab {
 		MODULES = 0,

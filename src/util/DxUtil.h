@@ -95,15 +95,13 @@ namespace d2d {
 			Color myColor(0.f, 0.f, 0.f, 0.f);
 			myColor.a = alpha;
 
-			std::string buffer = str.substr(1);
-
-			std::string rBuf = buffer.substr(0, 2);
+			std::string rBuf = str.substr(0, 2);
 			myColor.r = static_cast<float>(std::stoi(rBuf, nullptr, 16)) / 255.f;
 
-			std::string gBuf = buffer.substr(2, 2);
+			std::string gBuf = str.substr(2, 2);
 			myColor.g = static_cast<float>(std::stoi(gBuf, nullptr, 16)) / 255.f;
 
-			std::string bBuf = buffer.substr(4, 2);
+			std::string bBuf = str.substr(4, 2);
 			myColor.b = static_cast<float>(std::stoi(bBuf, nullptr, 16)) / 255.f;
 			return myColor;
 		}

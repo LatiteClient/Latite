@@ -209,9 +209,18 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     Logger::Info("Waiting for game to load..");
 
     while (!sdk::ClientInstance::get()) {
+        std::this_thread::sleep_for(10ms);
     }
 
     Latite::get().initialize(dll);
+
+    // Wait for DX Hook
+
+    Logger::Info("Waiting for DX init..");
+
+    while (!Latite::getRenderer().getDeviceContext() || Latite::getRenderer().getScreenSize().width < 0.02f) { // hacky
+        std::this_thread::sleep_for(10ms);
+    }
 
     if (!Latite::getConfigManager().loadMaster()) {
         Logger::Fatal("Could not load master config!");
@@ -396,7 +405,7 @@ void Latite::initSettings() {
 }
 
 void Latite::initAsset(int resource, std::wstring const& filename) {
-    HRSRC hRes = FindResource((HMODULE)dllInst, MAKEINTRESOURCE(resource), MAKEINTRESOURCE(RT_RCDATA));
+    HRSRC hRes = FindResource((HMODULE)dllInst, MAKEINTRESOURCE(resource), RT_RCDATA);
     HGLOBAL hData = LoadResource((HMODULE)dllInst, hRes);
     DWORD hSize = SizeofResource((HMODULE)dllInst, hRes);
     char* hFinal = (char*)LockResource(hData);

@@ -43,6 +43,12 @@ FARPROC Chakra::pass(const char* name)
 	return GetProcAddress(mod, name);
 }
 
+void Chakra::SetProperty(JsValueRef ref, std::wstring name, JsValueRef value, bool strict) {
+	JsPropertyIdRef propId;
+	JS::JsGetPropertyIdFromName(name.c_str(), &propId);
+	JS::JsSetProperty(ref, propId, value, strict);
+}
+
 void Chakra::SetPropertyString(JsValueRef ref, std::wstring name, std::wstring value, bool strict) {
 	JsPropertyIdRef propId;
 	JS::JsGetPropertyIdFromName(name.c_str(), &propId);
@@ -81,6 +87,11 @@ void Chakra::SetPropertyObject(JsValueRef ref, std::wstring name, JsValueRef obj
 	JsPropertyIdRef propId;
 	JS::JsGetPropertyIdFromName(name.c_str(), &propId);
 	JS::JsSetProperty(ref, propId, obj, strict);
+}
+
+JsValueRef Chakra::TryGet(JsValueRef* args, unsigned short count, unsigned short idx) {
+	if (idx >= count) return JS_INVALID_REFERENCE;
+	return args[idx];
 }
 
 void Chakra::DefineFunc(JsValueRef obj, JsNativeFunction func, std::wstring name, void* state) {
@@ -257,8 +268,12 @@ Chakra::Result Chakra::VerifyParameters(std::initializer_list<ParamContainer> pa
 	size_t count = 0;
 	for (auto const& param : params) {
 		count++;
+		if (param.isOptional && param.val == JS_INVALID_REFERENCE) continue;
 		JsValueType trueType;
 		JS::JsGetValueType(param.val, &trueType);
+		if (param.isOptional && (trueType == JsUndefined || trueType == JsNull)) continue;
+
+
 		if (trueType != param.type) {
 			std::wstring wstr = L"Parameter " + std::to_wstring(count) + L" must be of correct type (has " + Chakra::GetTypeName(trueType) + L", needs " + Chakra::GetTypeName(param.type) + L")";
 			if (autoThrow) {

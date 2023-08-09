@@ -29,10 +29,12 @@ public:
 	[[nodiscard]] d2d::Rect getRect();
 	
 	void setScale(float f) { std::get<FloatValue>(scale) = f; }
+	void setRect(d2d::Rect const& rc) { this->rect = rc; }
+
 protected:
 	d2d::Rect rect = {};
-	Setting::Value storedPos = Vec2Value();
-	Setting::Value scale = FloatValue(1.f);
+	ValueType storedPos = Vec2Value();
+	ValueType scale = FloatValue(1.f);
 	bool resizable;
 	bool active = true;
 public:

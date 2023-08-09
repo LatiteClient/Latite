@@ -130,6 +130,84 @@ struct ColorValue {
 
 struct TextValue {
 	std::string str;
+
+	TextValue(std::string const& str = "") : str(str) {};
+
+	TextValue(nlohmann::json const& js) {
+		str = js.get<std::string>();
+	}
+
+	void store(nlohmann::json& jout) {
+		jout = str;
+	}
+};
+
+struct EnumValue {
+	int val = 0;
+
+	EnumValue(int val) : val(val) {};
+
+	EnumValue(nlohmann::json const& js) {
+		val = js.get<int>();
+	}
+
+	void store(nlohmann::json& jout) {
+		jout = val;
+	}
+
+	operator int() {
+		return val;
+	}
+};
+
+using ValueType = std::variant<
+	BoolValue, 
+	FloatValue, 
+	IntValue, 
+	KeyValue, 
+	ColorValue, 
+	Vec2Value, 
+	EnumValue>;
+
+class EnumEntry : public Feature {
+	std::string entryName;
+	std::string entryDesc;
+public:
+	std::string name() override { return entryName; }
+	std::string desc() override { return entryDesc; }
+
+	EnumEntry(int key, std::string const& name, std::string const& desc = "") : entryName(name), entryDesc(desc) {}
+};
+
+class EnumData {
+	std::vector<EnumEntry> entries = {};
+	ValueType selectedIdx = EnumValue(0);
+public:
+	void addEntry(EnumEntry const& ent) {
+		entries.push_back(ent);
+	}
+
+	[[nodiscard]] ValueType* getValue() {
+		return &selectedIdx;
+	}
+
+	[[nodiscard]] int getSelectedKey() {
+		return std::get<EnumValue>(selectedIdx);
+	}
+
+	[[nodiscard]] std::string getSelectedName() {
+		return entries[std::get<EnumValue>(selectedIdx)].name();
+	}
+
+	[[nodiscard]] std::string getSelectedDesc() {
+		return entries[std::get<EnumValue>(selectedIdx)].desc();
+	}
+
+	void next() {
+		if (++std::get<EnumValue>(selectedIdx).val >= entries.size()) std::get<EnumValue>(selectedIdx) = 0;
+	}
+
+	EnumData() = default;
 };
 
 class Setting : public Feature {
@@ -140,10 +218,9 @@ public:
 		Int,
 		Key,
 		Color,
-		Vec2
+		Vec2,
+		Enum
 	};
-
-	using Value = std::variant<BoolValue, FloatValue, IntValue, KeyValue, ColorValue, Vec2Value>;
 
 	Setting(std::string const& internalName, std::string const& displayName, std::string const& description) : settingName(internalName), displayName(displayName), description(description) {}
 
@@ -152,12 +229,14 @@ public:
 
 	std::string getDisplayName() { return displayName; }
 
-	Value* value = nullptr;
-	Value resolvedValue;
-	Value defaultValue;
-	Value interval;
-	Value min;
-	Value max;
+	EnumData* enumData = nullptr;
+	ValueType* value = nullptr;
+
+	ValueType resolvedValue;
+	ValueType defaultValue;
+	ValueType interval;
+	ValueType min;
+	ValueType max;
 
 	bool visible = true;
 

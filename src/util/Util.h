@@ -3,6 +3,7 @@
 #include <filesystem>
 #include "api/scanner/Scanner.h"
 #include "LMath.h"
+#include "DxUtil.h"
 
 namespace util {
 	extern std::filesystem::path GetRootPath();
@@ -31,5 +32,5 @@ namespace util {
 		return memory::findSignature(signature, "Minecraft.Windows.exe");
 	}
 
-
+	extern void KeepInBounds(d2d::Rect& targ, d2d::Rect const& bounds);
 }

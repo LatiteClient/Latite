@@ -13,9 +13,9 @@ public:
 	void onRenderLevel(Event& ev);
 	void onKeyUpdate(Event& ev);
 private:
-	Setting::Value zoomKey = KeyValue('C');
-	Setting::Value modifier = FloatValue(2.f);
-	Setting::Value animSpeed = FloatValue(2.f);
+	ValueType zoomKey = KeyValue('C');
+	ValueType modifier = FloatValue(2.f);
+	ValueType animSpeed = FloatValue(2.f);
 	float activeModifier = 1.f;
 	float modifyTo = 1.f;
 	bool shouldZoom = false;

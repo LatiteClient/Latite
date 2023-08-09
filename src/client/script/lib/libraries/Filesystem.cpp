@@ -39,20 +39,23 @@ namespace {
 JsValueRef Filesystem::write(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto undef = Chakra::GetUndefined();
 	if (!Chakra::VerifyArgCount(argCount, 4)) return undef;
-	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsString}, {arguments[3], JsFunction}})) return undef;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsTypedArray}, {arguments[3], JsFunction}})) return undef;
 
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 	auto op = std::make_shared<FSAsyncOperation>(arguments[3], [](JsScript::AsyncOperation* op_) {
 		auto op = reinterpret_cast<FSAsyncOperation*>(op_);
 		auto& arguments = op->params;
 		auto thi = reinterpret_cast<Filesystem*>(op->param);
-		std::wofstream ofs{op->path};
+		std::wofstream ofs;
+		ofs.open(op->path, std::ios::out | std::ios::binary);
 		int errn = 0;
 		if (ofs.fail()) {
 			errn = errno;
 		}
 		else {
-			ofs << op->data.value();
+			for (size_t i = 0; i < op->data->size(); i++) {
+				ofs << (char)op->data->data()[i];
+			}
 		}
 		ofs.close();
 		op->err = errn;
@@ -60,6 +63,18 @@ JsValueRef Filesystem::write(JsValueRef callee, bool isConstructor, JsValueRef* 
 		}, thi);
 
 	op->path = thi->getPath(Chakra::GetString(arguments[1]));
+	op->data = std::vector<BYTE>();
+
+	BYTE* buf;
+	unsigned int bufSize;
+	JS::JsGetTypedArrayStorage(arguments[2], &buf, &bufSize, nullptr, nullptr);
+
+	for (size_t i = 0; i < bufSize; i++) {
+		op->data->push_back(buf[i]);
+	}
+
+	op->outData = false;
+
 	op->run();
 
 	thi->owner->pendingOperations.push_back(op);
@@ -74,19 +89,20 @@ JsValueRef Filesystem::read(JsValueRef callee, bool isConstructor, JsValueRef* a
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 	auto op = std::make_shared<FSAsyncOperation>(arguments[2], [](JsScript::AsyncOperation* op_) {
 		auto op = reinterpret_cast<FSAsyncOperation*>(op_);
-		std::wifstream ifs;
+		std::ifstream ifs;
 		std::wstringstream wss;
-		ifs.open(op->path);
+		ifs.open(op->path, std::ios::binary);
 		int errn = 0;
 		if (ifs.fail()) {
 			errn = errno;
 		}
 		else {
-			wss << ifs.rdbuf();
+			auto size = ifs.tellg();
+			op->data->resize(size);
+			ifs.read((char*)op->data->data(), size);
 		}
 		ifs.close();
 		op->err = errn;
-		op->data = wss.str();
 		op->flagDone = true;
 		}, thi);
 
@@ -102,7 +118,7 @@ JsValueRef Filesystem::read(JsValueRef callee, bool isConstructor, JsValueRef* a
 JsValueRef Filesystem::writeSync(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto undef = Chakra::GetUndefined();
 	if (!Chakra::VerifyArgCount(argCount, 3)) return undef;
-	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsString} })) return undef;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsTypedArray} })) return undef;
 
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 
@@ -113,7 +129,13 @@ JsValueRef Filesystem::writeSync(JsValueRef callee, bool isConstructor, JsValueR
 		return undef;
 	}
 	else {
-		ofs << Chakra::GetString(arguments[2]);
+		BYTE* buf;
+		unsigned int bufSize;
+		JS::JsGetTypedArrayStorage(arguments[2], &buf, &bufSize, nullptr, nullptr);
+
+		for (size_t i = 0; i < bufSize; i++) {
+			ofs << buf[bufSize];
+		}
 	}
 	ofs.close();
 	return undef;
@@ -123,20 +145,25 @@ JsValueRef Filesystem::readSync(JsValueRef callee, bool isConstructor, JsValueRe
 	auto ret = Chakra::GetUndefined();
 	if (!Chakra::VerifyArgCount(argCount, 2)) return ret;
 	if (!Chakra::VerifyParameters({ {arguments[1], JsString} })) return ret;
-	std::wifstream ifs;
-	std::wstringstream wss;
+	std::ifstream ifs;
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 
 	ifs.open(thi->getPath(Chakra::GetString(arguments[1])));
+
 	if (ifs.fail()) {
 		throwFsError();
 		return ret;
 	}
 	else {
-		wss << ifs.rdbuf();
+		auto size = ifs.tellg();
+		JS::JsCreateTypedArray(JsArrayTypeUint8, JS_INVALID_REFERENCE, 0, static_cast<unsigned>(size), &ret);
+		BYTE* buf;
+		unsigned int sz;
+		JS::JsGetTypedArrayStorage(ret, &buf, &sz, nullptr, nullptr);
+
+		ifs.read((char*)buf, size);
 	}
 	ifs.close();
-	JS::JsPointerToString(wss.str().c_str(), wss.str().size(), &ret);
 	return ret;
 }
 
@@ -165,4 +192,26 @@ JsValueRef Filesystem::createDirectorySync(JsValueRef callee, bool isConstructor
 		return ret;
 	}
 	return ret;
+}
+
+void Filesystem::FSAsyncOperation::getArgs() {
+	JsValueRef err;
+	JS::JsIntToNumber(this->err, &err);
+	this->args.push_back(err);
+	if (data.has_value() && outData) {
+		JsValueRef jData;
+
+		JS::JsCreateTypedArray(JsArrayTypeUint8, JS_INVALID_REFERENCE, 0, data->size(), &jData);
+		BYTE* storage;
+		unsigned int bufLen;
+		JsTypedArrayType at;
+		int elemSize;
+		JS::JsGetTypedArrayStorage(jData, &storage, &bufLen, &at, &elemSize);
+
+		for (size_t i = 0; i < data->size(); ++i) {
+			storage[i] = data->at(i);
+		}
+		
+		this->args.push_back(jData);
+	}
 }

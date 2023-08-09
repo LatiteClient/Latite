@@ -75,11 +75,11 @@ public:
 private:
 	Timings timings{};
 
-	Setting::Value menuKey = KeyValue('M');
-	Setting::Value menuBlurEnabled = BoolValue(true);
+	ValueType menuKey = KeyValue('M');
+	ValueType menuBlurEnabled = BoolValue(true);
 	// TODO: add disabled settings, for people who already only support dx11, gray it out
-	Setting::Value useDX11 = BoolValue(false);
-	Setting::Value menuBlur = FloatValue(20.f);
+	ValueType useDX11 = BoolValue(false);
+	ValueType menuBlur = FloatValue(20.f);
 
 	std::vector<ui::TextBox*> textBoxes = {};
 

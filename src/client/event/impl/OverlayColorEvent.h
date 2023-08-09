@@ -4,6 +4,7 @@
 #include "util/Util.h"
 #include "sdk/common/world/actor/Actor.h"
 
+// FIXME: is this really cancellable?
 class OverlayColorEvent : public Cancellable {
 public:
 	static const uint32_t hash = TOHASH(OverlayColorEvent);

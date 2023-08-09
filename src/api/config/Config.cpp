@@ -76,6 +76,9 @@ void Config::addSetting(SettingGroup& group, nlohmann::json& obj) {
 	case Setting::Type::Vec2:
 		set->resolvedValue = Vec2Value(jVal);
 		break;
+	case Setting::Type::Enum:
+		set->resolvedValue = EnumValue(jVal);
+		break;
 	default:
 		return;
 	}
@@ -140,9 +143,15 @@ void Config::saveSetting(std::shared_ptr<Setting> set, nlohmann::json& jout) {
 		json obj = json::object();
 		std::get<Vec2Value>(val).store(obj);
 		jout["value"] = obj;
-	}
 		break;
-	break;
+	}
+	case Setting::Type::Enum:
+	{
+		json obj = json::object();
+		std::get<EnumValue>(val).store(obj);
+		jout["value"] = obj;
+		break;
+	}
 	default:
 		break;
 	}

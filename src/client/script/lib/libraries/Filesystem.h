@@ -3,6 +3,7 @@
 #include <functional>
 #include <thread>
 #include "../../JsScript.h"
+#include <winrt/windows.storage.streams.h>
 
 class Filesystem : public JsLibrary {
 public:
@@ -14,26 +15,41 @@ private:
 	//template <typename T>
 	//void runAsyncOperation(std::function<void(T)> func)
 
-	class FSAsyncOperation : public JsScript::AsyncOperation {
-	public:
-		std::wstring path = L"";
+	// can someone tell past me about std::vector....
+	/*
+	struct BufferRef {
+		BYTE* data;
+		size_t size;
 
-		int err = 0;
-		std::optional<std::wstring> data = std::nullopt;
+		BufferRef(size_t sz) : size(sz), data(nullptr) {}
 
-		virtual void getArgs() override {
-			JsValueRef err;
-			JS::JsIntToNumber(this->err, &err);
-			this->args.push_back(err);
-			if (data.has_value()) {
-				JsValueRef data;
-				JS::JsPointerToString(this->data.value().c_str(), this->data.value().size(), &data);
-				this->args.push_back(data);
-			}
+		void alloc(size_t sz) {
+			if (data) delete[] data;
+			data = new BYTE[sz];
+			size = sz;
 		}
 
+		~BufferRef() {
+			if (data) {
+				delete[] data;
+			}
+		}
+	};*/
+
+	class FSAsyncOperation : public JsScript::AsyncOperation {
+	public:
+		
+
+		std::wstring path = {};
+
+		int err = 0;
+		std::optional<std::vector<BYTE>> data = std::nullopt;
+		bool outData = true;
+
+		virtual void getArgs() override;
+
 		FSAsyncOperation(JsValueRef callback, decltype(initFunc) initFunc, void* param)
-			: JsScript::AsyncOperation(true, callback, initFunc, param), err(0), data(L"")
+			: JsScript::AsyncOperation(true, callback, initFunc, param), err(0), data(std::nullopt)
 		{
 		}
 	};

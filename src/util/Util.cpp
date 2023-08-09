@@ -5,6 +5,11 @@
 #include "sdk/common/client/renderer/LevelRendererPlayer.h"
 #include "sdk/common/client/renderer/LevelRenderer.h"
 
+#ifdef min
+#undef min
+#undef max
+#endif
+
 namespace util {
 	namespace detail {
 		template <typename T>
@@ -357,7 +362,7 @@ Color util::HSVToColor(HSV const& hsv) {
 		color.b = hsv.v;
 	}
 	else {
-		int i = hue / 60.f;
+		int i = std::floor(hue / 60.f);
 		float f = hue / 60.f - i;
 		float p = hsv.v * (1.f - hsv.s);
 		float q = hsv.v * (1.f - hsv.s * f);
@@ -398,4 +403,26 @@ Color util::HSVToColor(HSV const& hsv) {
 	}
 
 	return color;
+}
+
+void util::KeepInBounds(d2d::Rect& targ, d2d::Rect const& bounds) {
+	if (targ.left < bounds.left) {
+		Vec2 modPos = targ.getPos();
+		targ.setPos({ bounds.left, modPos.y });
+	}
+
+	if (targ.top < bounds.top) {
+		Vec2 modPos = targ.getPos();
+		targ.setPos({ modPos.x, bounds.top });
+	}
+
+	if (targ.right > bounds.right) {
+		Vec2 modPos = targ.getPos();
+		targ.setPos({ bounds.right - targ.getWidth(), modPos.y });
+	}
+
+	if (targ.bottom > bounds.bottom) {
+		Vec2 modPos = targ.getPos();
+		targ.setPos({ modPos.x, bounds.bottom - targ.getHeight() });
+	}
 }

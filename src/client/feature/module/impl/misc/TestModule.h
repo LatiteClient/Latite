@@ -4,6 +4,8 @@
 #include "client/event/impl/TickEvent.h"
 
 class TestModule : public HUDModule {
+private:
+	EnumData testEnum;
 public:
 	TestModule();
 	~TestModule() = default;

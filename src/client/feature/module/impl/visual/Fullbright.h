@@ -8,5 +8,5 @@ public:
 
 	void onGamma(Event& ev);
 private:
-	Setting::Value gamma = FloatValue(25.f);
+	ValueType gamma = FloatValue(25.f);
 };

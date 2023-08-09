@@ -34,7 +34,12 @@ void MotionBlur::onRender(Event& genericEv) {
 		motionBlurList.erase(motionBlurList.begin());
 	}
 
-	if (motionBlurList.size() > (factor + 1)) motionBlurList.clear();
+	if (motionBlurList.size() > (factor + 1)) {
+		for (auto& mb : motionBlurList) {
+			mb->Release();
+		}
+		motionBlurList.clear();
+	}
 
 	/*
 	oBitmap->CopyFromBitmap(nullptr, Latite::getRenderer().getBitmap(), nullptr);

@@ -14,3 +14,8 @@ void util::doThrowIfFailed(HRESULT hr, int line, std::string func) {
 		throw std::runtime_error("Error setting up DX.");
 	}
 }
+
+std::string d2d::Color::getHex() const {
+	// thank you libfmt guy
+	return std::format("{:02X}{:02X}{:02X}", static_cast<int>(std::round(r * 255.f)), static_cast<int>(std::round(g * 255.f)), static_cast<int>(std::round(b * 255.f)));
+}

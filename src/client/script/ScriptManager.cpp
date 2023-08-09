@@ -192,6 +192,7 @@ void ScriptManager::initListeners()
 	eventListeners[L"receive-chat"] = {};
 	eventListeners[L"send-chat"] = {};
 	eventListeners[L"render2d"] = {};
+	eventListeners[L"renderDX"] = {};
 	eventListeners[L"attack"] = {};
 	eventListeners[L"key-press"] = {};
 	eventListeners[L"click"] = {};
@@ -297,8 +298,6 @@ bool ScriptManager::dispatchEvent(Event& ev)
 					Chakra::Release(ref);
 				}
 				JsValueRef ret;
-
-				unsigned int count;
 
 				handleErrors(JS::JsCallFunction(l.first, params, 2, &ret));
 

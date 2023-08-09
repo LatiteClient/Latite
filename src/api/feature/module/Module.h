@@ -51,8 +51,8 @@ public:
 	}
 protected:
 	std::string modName, description, displayName;
-	Setting::Value enabled = BoolValue(false);
-	Setting::Value key = KeyValue(0);
+	ValueType enabled = BoolValue(false);
+	ValueType key = KeyValue(0);
 	bool visible;
 	bool hud = false;
 	bool textual = false;

@@ -9,8 +9,10 @@ public:
 	JsClass(JsClass&&) = delete;
 
 	~JsClass() {
-		if (prototype != JS_INVALID_REFERENCE) JS::JsRelease(prototype, nullptr);
-		if (constructor != JS_INVALID_REFERENCE) JS::JsRelease(constructor, nullptr);
+
+		// this crash, probably becuase the runtime doesnt exist
+		//if (prototype != JS_INVALID_REFERENCE) JS::JsRelease(prototype, nullptr);
+		//if (constructor != JS_INVALID_REFERENCE) JS::JsRelease(constructor, nullptr);
 	}
 	
 	virtual void prepareFunctions() {};

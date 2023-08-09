@@ -21,8 +21,8 @@ public:
 	void initialize(JsContextRef ctx, JsValueRef parentObj) override;
 
 	~ClientScriptingObject() {
-		JS::JsRelease(this->object, nullptr);
-		JS::JsRelease(this->moduleManager, nullptr);
+		//JS::JsRelease(this->object, nullptr);
+		//JS::JsRelease(this->moduleManager, nullptr);
 	}
 
 	JsValueRef moduleManager = JS_INVALID_REFERENCE;

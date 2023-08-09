@@ -40,7 +40,7 @@ public:
 
 	[[nodiscard]] bool shouldClose() { return closing; }
 
-	[[nodiscard]] bool shouldSelect(d2d::Rect rc, Vec2 const& pt) {
+	[[nodiscard]] virtual bool shouldSelect(d2d::Rect rc, Vec2 const& pt) {
 		for (int i = 0; i < layers.size(); i++) {
 			if (layers[i].contains(pt)) return false;
 		}

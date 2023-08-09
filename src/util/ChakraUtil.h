@@ -32,10 +32,13 @@ public:
 		}
 	};
 
+	static void SetProperty(JsValueRef ref, std::wstring name, JsValueRef value, bool strict = false);
 	static void SetPropertyString(JsValueRef ref, std::wstring name, std::wstring value, bool strict = false);
 	static void SetPropertyNumber(JsValueRef ref, std::wstring name, double value, bool strict = false);
 	static void SetPropertyBool(JsValueRef ref, std::wstring name, bool value, bool strict = false);
 	static void SetPropertyObject(JsValueRef ref, std::wstring name, JsValueRef obj, bool strict = false);
+
+	static JsValueRef TryGet(JsValueRef* args, unsigned short count, unsigned short idx);
 
 	static void DefineFunc(JsValueRef obj, JsNativeFunction func, std::wstring name, void* state = nullptr);
 	static std::wstring GetTypeName(JsValueType type);
@@ -45,6 +48,7 @@ public:
 	static JsValueRef MakeDouble(double num);
 
 	static std::wstring GetStringProperty(JsValueRef ref, std::wstring name);
+
 	static bool GetBoolProperty(JsValueRef ref, std::wstring name);
 	static double GetNumberProperty(JsValueRef ref, std::wstring name);
 	static double GetNumber(JsValueRef ref);

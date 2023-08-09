@@ -78,6 +78,7 @@ namespace ui {
 		void render(DXContext& dc, float rounding, d2d::Color backgroundColor, d2d::Color textColor);
 
 		[[nodiscard]] int getCaretLocation() { return place; }
+		void setCaretLocation(int loc) { place = loc; }
 	private:
 		d2d::Rect rect = { 0, 0, 0, 0 };
 		std::chrono::high_resolution_clock::time_point startTime;

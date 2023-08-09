@@ -3,26 +3,28 @@
 
 class TextModule : public HUDModule {
 protected:
-	Setting::Value customSize = BoolValue(false);
+	ValueType customSize = BoolValue(false);
 
-	Setting::Value fillBg = BoolValue(true);
+	ValueType fillBg = BoolValue(true);
 
-	Setting::Value bgX = FloatValue(150.f);
-	Setting::Value bgY = FloatValue(45.f);
+	ValueType bgX = FloatValue(150.f);
+	ValueType bgY = FloatValue(45.f);
 
-	Setting::Value padX = FloatValue(18.f);
-	Setting::Value padY = FloatValue(12.f);
-
-	Setting::Value textColor = ColorValue(1.f, 1.f, 1.f, 1.f);
-	Setting::Value bgColor = ColorValue(0.f, 0.f, 0.f, 0.5f);
+	ValueType padX = FloatValue(45.f);
+	ValueType padY = FloatValue(30.f);
 	
-	Setting::Value brackets = BoolValue(false);
-	Setting::Value showOutline = BoolValue(false);
+	ValueType textSizeS = FloatValue(30.f);
 
-	Setting::Value outlineThickness = FloatValue(2.f);
-	Setting::Value outlineColor = ColorValue(1.f, 1.f ,1.f, 1.f);
+	ValueType textColor = ColorValue(1.f, 1.f, 1.f, 1.f);
+	ValueType bgColor = ColorValue(0.f, 0.f, 0.f, 0.5f);
+	
+	ValueType brackets = BoolValue(false);
+	ValueType showOutline = BoolValue(false);
 
-	Setting::Value radius = FloatValue(5.f);
+	ValueType outlineThickness = FloatValue(2.f);
+	ValueType outlineColor = ColorValue(1.f, 1.f ,1.f, 1.f);
+
+	ValueType radius = FloatValue(5.f);
 public:
 	TextModule(std::string const& name, std::string const& displayName,
 		std::string const& description, Category category, float maxBgX = 400.f, int keybind = 0)

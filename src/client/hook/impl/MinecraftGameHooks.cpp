@@ -3,6 +3,8 @@
 #include "client/event/impl/AppSuspendedEvent.h"
 #include "client/event/impl/UpdateEvent.h"
 #include "client/event/Eventing.h"
+#include "client/script/ScriptManager.h"
+#include "client/Latite.h"
 
 namespace {
 	std::shared_ptr<Hook> onAppSuspendedHook;
@@ -19,6 +21,11 @@ void* __fastcall MinecraftGameHooks::_update(sdk::MinecraftGame* game) {
 	auto ret = _updateHook->oFunc<decltype(&_update)>()(game);
 	UpdateEvent ev{};
 	Eventing::get().dispatchEvent(ev);
+
+	{
+		ScriptManager::Event sev{L"renderDX", {}, false};
+		Latite::getScriptManager().dispatchEvent(sev);
+	}
 	return ret;
 }
 

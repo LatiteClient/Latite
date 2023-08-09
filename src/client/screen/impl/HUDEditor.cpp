@@ -162,7 +162,7 @@ void HUDEditor::renderModule(HUDModule* mod) {
 	bool hovering = shouldSelect(mod->getRect(), cursorPos);
 
 	if (isActive()) {
-		mod->renderFrame();
+		//mod->renderFrame();
 	}
 
 	D2D1::Matrix3x2F oTrans;
@@ -398,7 +398,7 @@ void HUDEditor::doSnapping(Vec2 const&) {
 
 						// TODO: controls
 						
-						if (type == Snapping::MCUI && controls.size() > 0) {
+						if (type == Snapping::MCUI && snapLinesControlsX.size() > 0) {
 							idk = snapLinesControlsX[idx].first;
 						}
 
@@ -432,7 +432,7 @@ void HUDEditor::doSnapping(Vec2 const&) {
 
 						// TODO: controls
 						
-						if (type == Snapping::MCUI && controls.size() > 0) {
+						if (type == Snapping::MCUI && snapLinesControlsY.size() > 0) {
 							idk = snapLinesControlsY[idx];
 						}
 
@@ -464,25 +464,9 @@ void HUDEditor::keepModulesInBounds() {
 		if (mod->isEnabled() && mod->isHud()) {
 			HUDModule* rMod = static_cast<HUDModule*>(mod.get());
 			auto ss = Latite::getRenderer().getScreenSize();
-			if (rMod->getRect().left < 0) {
-				Vec2 modPos = rMod->getRect().getPos();
-				rMod->setPos({ 0.f, modPos.y });
-			}
-
-			if (rMod->getRect().top < 0) {
-				Vec2 modPos = rMod->getRect().getPos();
-				rMod->setPos({ modPos.x, 0.f });
-			}
-
-			if (rMod->getRect().right > ss.width) {
-				Vec2 modPos = rMod->getRect().getPos();
-				rMod->setPos({ ss.width - rMod->getRect().getWidth(), modPos.y });
-			}
-
-			if (rMod->getRect().bottom > ss.height) {
-				Vec2 modPos = rMod->getRect().getPos();
-				rMod->setPos({ modPos.x, ss.height - rMod->getRect().getHeight() });
-			}
+			d2d::Rect rc = rMod->getRect();
+			util::KeepInBounds(rc, { 0.f, 0.f, ss.width, ss.height });
+			rMod->setRect(rc);
 		}
 		return false;
 		});
