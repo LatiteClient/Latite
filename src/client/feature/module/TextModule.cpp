@@ -1,13 +1,14 @@
 #include "TextModule.h"
+#include "api/feature/setting/Setting.h"
 
 void TextModule::onInit() {
 	addSetting("fillBg", "Background", "", fillBg);
 	addSetting("customSize", "Fixed Size", "Use a custom size instead of padding", customSize);
-	addSliderSetting("bgX", "BG X", "Background size (only if Fixed Size is enabled)", bgX, FloatValue(0.f), FloatValue(maxBGX), FloatValue(2.5f));
-	addSliderSetting("bgY", "BG Y", "Background size (only if Fixed Size is enabled)", bgY, FloatValue(0.f), FloatValue(300.f), FloatValue(2.5f));
+	addSliderSetting("bgX", "BG X", "Background size (only if Fixed Size is enabled)", bgX, FloatValue(0.f), FloatValue(maxBGX), FloatValue(2.5f), "customSize"_istrue);
+	addSliderSetting("bgY", "BG Y", "Background size (only if Fixed Size is enabled)", bgY, FloatValue(0.f), FloatValue(300.f), FloatValue(2.5f), "customSize"_istrue);
 
-	addSliderSetting("padX", "Pad X", "Padding", padX, FloatValue(0.f), FloatValue(40.f), FloatValue(2.f));
-	addSliderSetting("padY", "Pad Y", "Padding", padY, FloatValue(0.f), FloatValue(40.f), FloatValue(2.f));
+	addSliderSetting("padX", "Pad X", "Padding", padX, FloatValue(0.f), FloatValue(40.f), FloatValue(2.f), "customSize"_isfalse);
+	addSliderSetting("padY", "Pad Y", "Padding", padY, FloatValue(0.f), FloatValue(40.f), FloatValue(2.f), "customSize"_isfalse);
 
 	addSliderSetting("textSize", "Text Size", "", textSizeS, FloatValue(2.f), FloatValue(100.f), FloatValue(2.f));
 
@@ -18,7 +19,7 @@ void TextModule::onInit() {
 	addSetting("brackets", "Brackets", "", brackets);
 
 	addSetting("showOutline", "Outline", "", showOutline);
-	addSliderSetting("outlineThickness", "Thickness", "", outlineThickness, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f));
+	addSliderSetting("outlineThickness", "Thickness", "", outlineThickness, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f), "showOutline"_istrue);
 	addSliderSetting("radius", "Radius", "", radius, FloatValue(0.f), FloatValue(10.f), FloatValue(1.f));
 }
 

@@ -8,6 +8,8 @@ protected:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 		auto thi = reinterpret_cast<JsModuleClass*>(callbackState);
 
+		if (!isConstructor) return thi->errConstructCall();
+
 		if (!Chakra::VerifyArgCount(argCount, 5)) return JS_INVALID_REFERENCE;
 		if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsString}, {arguments[3], JsString}, {arguments[4], JsNumber} })) return JS_INVALID_REFERENCE;
 
@@ -35,8 +37,10 @@ protected:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK moduleSetOnEvent(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK moduleGetSettings(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 public:
-	JsModuleClass() : JsClass(L"Module") {
+	JsModuleClass(class JsScript* owner) : JsClass(owner, L"Module") {
 		createConstructor(jsConstructor, this);
 	}
 
@@ -70,6 +74,7 @@ public:
 		Chakra::DefineFunc(prototype, moduleSetEnabled, L"setEnabled", this);
 		Chakra::DefineFunc(prototype, moduleIsBlocked, L"isBlocked", this);
 		Chakra::DefineFunc(prototype, moduleSetOnEvent, L"on", this);
+		Chakra::DefineFunc(prototype, moduleGetSettings, L"getSettings", this);
 
 	};
 

@@ -9,6 +9,8 @@ protected:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 		auto thi = reinterpret_cast<JsColor*>(callbackState);
 
+		if (!isConstructor) return thi->errConstructCall();
+
 		if (argCount == 1) {
 			return thi->construct(d2d::Color(0.f, 0.f, 0.f, 0.f));
 		}
@@ -28,7 +30,7 @@ protected:
 		return Chakra::MakeString(L"[object " + util::StrToWStr(add) + L"]");
 	}
 public:
-	JsColor() : JsClass(L"Color") {
+	JsColor(class JsScript* owner) : JsClass(owner, L"Color") {
 		createConstructor(jsConstructor, this);
 	}
 

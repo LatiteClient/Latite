@@ -3,6 +3,7 @@
 #include "util/Util.h"
 #include "client/event/Eventing.h"
 #include "client/event/impl/RenderOverlayEvent.h"
+#include "client/render/renderer.h"
 #include "util/DxUtil.h"
 #include <variant>
 #include <shared_mutex>
@@ -38,18 +39,37 @@ public:
 		}
 	};
 
+	struct OpDrawText {
+		d2d::Rect rect;
+		std::wstring text;
+		float size;
+		d2d::Color col;
+		Renderer::FontSelection font;
+		DWRITE_TEXT_ALIGNMENT alignment;
+		DWRITE_PARAGRAPH_ALIGNMENT vertAlign;
+
+
+		
+
+		OpDrawText(const d2d::Rect& rect, const std::wstring& text, float size, const d2d::Color& col, const Renderer::FontSelection& font, const DWRITE_TEXT_ALIGNMENT& alignment, const DWRITE_PARAGRAPH_ALIGNMENT& vertAlign)
+			: rect(rect), text(text), size(size), col(col), font(font), alignment(alignment), vertAlign(vertAlign)
+		{
+		}
+	};
+
 	struct DrawOperation {
 		enum Type {
 			DrawRect = 0,
 			FillRect
 		};
 
-		std::variant<OpDrawRect, OpFillRect> op;
+		std::variant<OpDrawRect, OpFillRect, OpDrawText> op;
 	};
 
 	struct DrawVisitor {
 		void operator()(OpDrawRect& op);
 		void operator()(OpFillRect& op);
+		void operator()(OpDrawText& op);
 	};
 
 	std::queue<DrawOperation> operations = {};

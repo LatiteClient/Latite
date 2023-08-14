@@ -1,5 +1,7 @@
 #pragma once
 #include "chakra/ChakraCore.h"
+//#define USE_EDGEMODE_JSRT
+//#include <jsrt.h>
 #include "util.h"
 #include "DxUtil.h"
 #include "LMath.h"
@@ -8,11 +10,9 @@
 // this is needed because we can't "link" ChakraCore with this DLL, as the path wouldn't be specified
 #define FUNC(name) using _Type_ ## name = decltype(&name); inline static _Type_ ## name  name = (_Type_ ## name)Chakra::pass(#name)
 
-
 class Chakra {
 public:
 	inline static HMODULE mod = 0;
-
 	static FARPROC pass(const char* name);
 
 	struct ParamContainer {
@@ -31,6 +31,10 @@ public:
 			return success;
 		}
 	};
+
+	static void StartDebugging(JsRuntimeHandle runtime, JsDiagDebugEventCallback callback, void* callbackState);
+	static bool StopDebugging(JsRuntimeHandle runtime, void** callbackState);
+
 
 	static void SetProperty(JsValueRef ref, std::wstring name, JsValueRef value, bool strict = false);
 	static void SetPropertyString(JsValueRef ref, std::wstring name, std::wstring value, bool strict = false);
@@ -173,7 +177,7 @@ public:
 	//FUNC(JsObjectToInspectable);
 	FUNC(JsParseScript);
 	FUNC(JsParseScriptWithAttributes);
-	FUNC(JsParseSerializedScript);
+	//FUNC(JsParseSerializedScript);
 	FUNC(JsParseSerializedScriptWithCallback);
 	FUNC(JsPointerToString);
 	FUNC(JsPreventExtension);
@@ -195,6 +199,12 @@ public:
 	FUNC(JsSetRuntimeBeforeCollectCallback);
 	FUNC(JsSetRuntimeMemoryAllocationCallback);
 	FUNC(JsSetRuntimeMemoryLimit);
+
+	// ChakraCore ONLY
+	FUNC(JsDiagStartDebugging);
+	// ChakraCore ONLY
+	FUNC(JsDiagStopDebugging);
+
 	//FUNC(JsStartDebugging);
 	//FUNC(JsStartProfiling);
 	//FUNC(JsStopProfiling);

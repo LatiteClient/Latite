@@ -186,7 +186,7 @@ JsValueRef Filesystem::createDirectorySync(JsValueRef callee, bool isConstructor
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 	std::error_code errCode;
 	if (!std::filesystem::create_directory(thi->getPath(Chakra::GetString(arguments[1])), errCode)) {
-		if (errCode.value() != ERROR_ALREADY_EXISTS) {
+		if (errCode.value() != ERROR_ALREADY_EXISTS && errCode.value() != 0) {
 			Chakra::ThrowError(L"Filesystem error: " + util::StrToWStr(errCode.message()));
 		}
 		return ret;
@@ -201,7 +201,7 @@ void Filesystem::FSAsyncOperation::getArgs() {
 	if (data.has_value() && outData) {
 		JsValueRef jData;
 
-		JS::JsCreateTypedArray(JsArrayTypeUint8, JS_INVALID_REFERENCE, 0, data->size(), &jData);
+		JS::JsCreateTypedArray(JsArrayTypeUint8, JS_INVALID_REFERENCE, 0, static_cast<unsigned int>(data->size()), &jData);
 		BYTE* storage;
 		unsigned int bufLen;
 		JsTypedArrayType at;

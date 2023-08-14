@@ -1,6 +1,6 @@
 #pragma once
 #include "api/eventing/Event.h"
-#include "util/chash.h"
+#include "util/FNV32.h"
 #include "sdk/common/client/gui/ScreenView.h"
 
 class RenderLayerEvent : public Event {

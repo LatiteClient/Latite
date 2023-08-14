@@ -1,4 +1,7 @@
 #include "JsModuleClass.h"
+#include "JsSettingClass.h"
+#include "../../JsScript.h"
+#include "util/Logger.h"
 
 JsValueRef JsModuleClass::moduleIsEnabled(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
 {
@@ -95,4 +98,32 @@ JsValueRef JsModuleClass::moduleSetOnEvent(JsValueRef callee, bool isConstructor
 	}
 	Chakra::ThrowError(L"Unknown event " + str);
 	return Chakra::GetUndefined();
+}
+
+JsValueRef JsModuleClass::moduleGetSettings(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	JsModule* mod;
+	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&mod));
+	if (mod) {
+		JsValueRef array;
+		JS::JsCreateArray(static_cast<unsigned int>(mod->settings->size()), &array);
+
+		auto thi = reinterpret_cast<JsModuleClass*>(callbackState);
+
+		int i = 0;
+		mod->settings->forEach([&](std::shared_ptr<Setting> set) {
+			JsValueRef index = Chakra::MakeInt(i);
+			auto setClass = thi->owner->findClass<JsSettingClass>(L"Setting");
+			if (!setClass) {
+				Logger::Fatal("Could not find setting class!!!");
+				throw std::runtime_error("could not find setting class");
+			}
+			JS::JsSetIndexedProperty(array, index, setClass->construct(set.get(), false));
+			Chakra::Release(index);
+			++i;
+			});
+		
+		return array;
+	}
+	Chakra::ThrowError(L"Object is not a module");
+	return JS_INVALID_REFERENCE;
 }

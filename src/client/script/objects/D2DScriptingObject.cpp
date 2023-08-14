@@ -36,7 +36,7 @@ JsValueRef D2DScriptingObject::drawRectCallback(JsValueRef callee, bool isConstr
 
 	auto rect = JsRect::ToRect(arguments[1]);
 	auto color = JsColor::ToColor(arguments[2]);
-	auto thickness = Chakra::GetNumber(arguments[2]);
+	auto thickness = static_cast<float>(Chakra::GetNumber(arguments[2]));
 
 	auto thisptr = reinterpret_cast<D2DScriptingObject*>(callbackState);
 	thisptr->operations.push({ OpDrawRect(rect, color, thickness) });
@@ -52,4 +52,9 @@ void D2DScriptingObject::DrawVisitor::operator()(OpDrawRect& op) {
 void D2DScriptingObject::DrawVisitor::operator()(OpFillRect& op) {
 	DXContext dc;
 	dc.fillRectangle(op.rc, op.col);
+}
+
+void D2DScriptingObject::DrawVisitor::operator()(OpDrawText& op) {
+	DXContext dc;
+	dc.drawText(op.rect, op.text, op.col, op.font, op.size, op.alignment, op.vertAlign);
 }

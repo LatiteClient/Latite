@@ -24,7 +24,7 @@ void Asset::load(IWICImagingFactory* factory, ID2D1DeviceContext* dc) {
 
 	ComPtr<IWICFormatConverter> conv;
 	factory->CreateFormatConverter(conv.GetAddressOf());
-	auto setShouldinit = conv->Initialize(
+	conv->Initialize(
 		pFrame.Get(),
 		GUID_WICPixelFormat32bppPBGRA,
 		WICBitmapDitherTypeNone,

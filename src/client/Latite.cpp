@@ -184,16 +184,18 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (assetsBuf) Assets();
     new (keyboardBuf) Keyboard(reinterpret_cast<int*>(Signatures::KeyMap.result));
 
-    AuthWindow wnd{ Latite::get().dllInst };
+    //AuthWindow wnd{ Latite::get().dllInst };
 
-    wnd.show();
-    wnd.runMessagePump();
+    //wnd.show();
+    //wnd.runMessagePump();
 
     for (auto& entry : sigList) {
         if (!entry.first->mod) continue;
         auto res = entry.first->resolve();
         if (!res) {
+#if LATITE_DEBUG
             Logger::Warn("Signature {} failed to resolve! Pattern: {}", entry.first->name, entry.first->signature);
+#endif
             deadCount++;
         }
         else {
@@ -343,12 +345,12 @@ void Latite::queueEject() noexcept {
 void Latite::initialize(HINSTANCE hInst) {
     this->dllInst = hInst;
 
+    initSettings();
+
     getHooks().init();
     Logger::Info("Initialized Hooks");
     getHooks().enable();
     Logger::Info("Enabled Hooks");
-
-    initSettings();
 
     Latite::getScriptManager().init();
     Logger::Info("Script manager initialized.");
@@ -464,7 +466,13 @@ void Latite::onUpdate(Event& evGeneric) {
 
     static bool lastDX11 = std::get<BoolValue>(this->useDX11);
     if (std::get<BoolValue>(useDX11) != lastDX11) {
-        //Latite::getRenderer().queueReinit();
+        
+        if (lastDX11) {
+            Latite::getClientMessageSink().display(util::Format("&7Please restart your game to use DX12 again!"));
+        }
+        else {
+            Latite::getRenderer().setShouldReinit();
+        }
         lastDX11 = std::get<BoolValue>(useDX11);
     }
 }
@@ -538,23 +546,9 @@ void Latite::loadConfig(SettingGroup& gr) {
     gr.forEach([&](std::shared_ptr<Setting> set) {
         this->getSettings().forEach([&](std::shared_ptr<Setting> modSet) {
             if (modSet->name() == set->name()) {
-                switch ((Setting::Type)((set->resolvedValue).index())) {
-                case Setting::Type::Bool:
-                    *modSet->value = std::get<BoolValue>(set->resolvedValue);
-                    break;
-                case Setting::Type::Int:
-                    *modSet->value = std::get<IntValue>(set->resolvedValue);
-                    break;
-                case Setting::Type::Float:
-                    *modSet->value = std::get<FloatValue>(set->resolvedValue);
-                    break;
-                case Setting::Type::Key:
-                    *modSet->value = std::get<KeyValue>(set->resolvedValue);
-                    break;
-                case Setting::Type::Color:
-                    *modSet->value = std::get<ColorValue>(set->resolvedValue);
-                    break;
-                }
+                std::visit([&](auto&& obj) {
+                    *modSet->value = obj;
+                    }, set->resolvedValue);
             }
             });
         });

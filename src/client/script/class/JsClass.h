@@ -3,7 +3,7 @@
 
 class JsClass {
 public:
-	JsClass(const wchar_t* name): name(name) {
+	JsClass(class JsScript* owner, const wchar_t* name): owner(owner), name(name) {
 	}
 	JsClass(JsClass&) = delete;
 	JsClass(JsClass&&) = delete;
@@ -51,6 +51,7 @@ public:
 	[[nodiscard]] JsValueRef getConstructor() { return constructor; }
 	[[nodiscard]] const wchar_t* getName() { return name; }
 protected:
+	class JsScript* owner;
 	const wchar_t* name;
 	JsNativeFunction constructorCallback = nullptr;
 	JsValueRef constructor = JS_INVALID_REFERENCE;

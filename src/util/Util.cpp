@@ -362,7 +362,7 @@ Color util::HSVToColor(HSV const& hsv) {
 		color.b = hsv.v;
 	}
 	else {
-		int i = std::floor(hue / 60.f);
+		int i = static_cast<int>(std::floor(hue / 60.f));
 		float f = hue / 60.f - i;
 		float p = hsv.v * (1.f - hsv.s);
 		float q = hsv.v * (1.f - hsv.s * f);

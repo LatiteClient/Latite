@@ -5,6 +5,10 @@
 
 struct NullValue {
 	NullValue() = default;
+
+	int getInt() {
+		return 0;
+	}
 };
 
 struct BoolValue {
@@ -12,7 +16,16 @@ struct BoolValue {
 
 	BoolValue() { value = false; }
 	BoolValue(bool b) : value(b) {}
+	BoolValue(nlohmann::json const& js) : value(js.get<bool>()) {}
 	operator decltype(value)(){ return value; }
+
+	void store(nlohmann::json& jout) {
+		jout = value;
+	}
+
+	int getInt() {
+		return static_cast<int>(value);
+	}
 };
 
 struct FloatValue {
@@ -20,7 +33,16 @@ struct FloatValue {
 
 	FloatValue() { value = 0.f; }
 	FloatValue(float f) : value(f) {}
+	FloatValue(nlohmann::json const& js) : value(js.get<float>()) {}
 	operator decltype(value)() { return value; }
+
+	void store(nlohmann::json& jout) {
+		jout = value;
+	}
+
+	int getInt() {
+		return static_cast<int>(value);
+	}
 };
 
 struct Vec2Value {
@@ -28,7 +50,7 @@ struct Vec2Value {
 
 	Vec2Value() { x = 0.f; y = 0.f; }
 	Vec2Value(float x, float y) : x(x), y(y) {}
-	Vec2Value(nlohmann::json& js) {
+	Vec2Value(nlohmann::json const& js) {
 		x = js["x"];
 		y = js["y"];
 	}
@@ -37,6 +59,10 @@ struct Vec2Value {
 		jout["x"] = x;
 		jout["y"] = y;
 	}
+
+	int getInt() {
+		return 0;
+	}
 };
 
 struct IntValue {
@@ -44,7 +70,15 @@ struct IntValue {
 
 	IntValue() { value = 0; }
 	IntValue(int i) : value(i) {}
-	operator decltype(value)() { return value; }
+	IntValue(nlohmann::json const& js) : value(js.get<int>()) {}
+
+	void store(nlohmann::json& jout) {
+		jout = value;
+	}
+
+	int getInt() {
+		return static_cast<int>(value);
+	}
 };
 
 struct KeyValue {
@@ -53,7 +87,19 @@ struct KeyValue {
 	KeyValue() { value = 0; }
 	KeyValue(int i) : value(i) {}
 	KeyValue(char ch) : value((int)ch) {}
-	operator decltype(value)(){ return value; }
+	KeyValue(nlohmann::json const& js) : value(js.get<int>()) {}
+
+	operator int() {
+		return value;
+	}
+
+	void store(nlohmann::json& jout) {
+		jout = value;
+	}
+
+	int getInt() {
+		return static_cast<int>(value);
+	}
 };
 
 struct StoredColor {
@@ -74,6 +120,11 @@ struct StoredColor {
 		g = js["g"];
 		b = js["b"];
 		a = js["a"];
+	}
+
+	int getInt() {
+		// maybe use bit_cast if needed
+		return 0;
 	}
 };
 
@@ -126,6 +177,10 @@ struct ColorValue {
 			jout["chromaDirection"] = chromaDirection;
 		}
 	}
+
+	int getInt() {
+		return 0;
+	}
 };
 
 struct TextValue {
@@ -140,6 +195,10 @@ struct TextValue {
 	void store(nlohmann::json& jout) {
 		jout = str;
 	}
+
+	int getInt() {
+		return 0;
+	}
 };
 
 struct EnumValue {
@@ -153,6 +212,10 @@ struct EnumValue {
 
 	void store(nlohmann::json& jout) {
 		jout = val;
+	}
+
+	int getInt() {
+		return val;
 	}
 
 	operator int() {
@@ -212,6 +275,21 @@ public:
 
 class Setting : public Feature {
 public:
+	struct Condition final {
+		std::string settingName = "";
+		std::vector<int> values = {};
+
+		enum Type {
+			NONE,
+			EQUALS,
+			NOT,
+		} type;
+
+		Condition(const char* name /*shut up c++*/) : type(EQUALS), settingName(name), values({1}) {}
+		Condition(std::string const& name = "", Type type = NONE, std::vector<int> values = {}) : type(type), settingName(name), values(std::move(values)) {}
+		~Condition() = default;
+	};
+
 	enum class Type : size_t {
 		Bool,
 		Float,
@@ -222,7 +300,9 @@ public:
 		Enum
 	};
 
-	Setting(std::string const& internalName, std::string const& displayName, std::string const& description) : settingName(internalName), displayName(displayName), description(description) {}
+	Setting(std::string const& internalName, std::string const& displayName, std::string const& description, Condition condition = Condition()) : settingName(internalName), displayName(displayName), description(description), condition(std::move(condition)) {}
+
+	[[nodiscard]] bool shouldRender(class SettingGroup& group);
 
 	std::string desc() override { return description; }
 	std::string name() override { return settingName; }
@@ -238,6 +318,8 @@ public:
 	ValueType min;
 	ValueType max;
 
+	Condition condition;
+
 	bool visible = true;
 
 	struct {
@@ -248,3 +330,11 @@ protected:
 	std::string settingName, displayName, description;
 
 };
+
+inline Setting::Condition operator"" _istrue(char const* s, size_t size) {
+	return Setting::Condition(std::string(s, size), Setting::Condition::EQUALS, { 1 });
+}
+
+inline Setting::Condition operator"" _isfalse(char const* s, size_t size) {
+	return Setting::Condition(std::string(s, size), Setting::Condition::EQUALS, { 0 });
+}

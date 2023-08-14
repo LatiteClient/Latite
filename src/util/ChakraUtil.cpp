@@ -43,6 +43,23 @@ FARPROC Chakra::pass(const char* name)
 	return GetProcAddress(mod, name);
 }
 
+void Chakra::StartDebugging(JsRuntimeHandle runtime, JsDiagDebugEventCallback callback, void* callbackState) {
+	if (JS::JsDiagStartDebugging) {
+		auto res = JS::JsDiagStartDebugging(runtime, callback, callbackState);
+		int test_ = 34;
+		return;
+	}
+	// fallback to chakra
+	Chakra::pass("JsStartDebugging")();
+}
+
+bool Chakra::StopDebugging(JsRuntimeHandle runtime, void** callbackState) {
+	if (JS::JsDiagStopDebugging) {
+		return JS::JsDiagStopDebugging(runtime, callbackState) == JsNoError;
+	}
+	return false;
+}
+
 void Chakra::SetProperty(JsValueRef ref, std::wstring name, JsValueRef value, bool strict) {
 	JsPropertyIdRef propId;
 	JS::JsGetPropertyIdFromName(name.c_str(), &propId);

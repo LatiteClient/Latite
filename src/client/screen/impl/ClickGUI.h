@@ -17,9 +17,8 @@ public:
 	void onInit(Event& ev);
 	void onKey(Event& ev);
 	void onClick(Event& ev);
-	void onChar(Event& ev);
 
-	bool drawSetting(class Setting* set, struct Vec2 const& pos, class DXContext& dc, float size = 150.f, float fTextWidth = 0.21f);
+	bool drawSetting(class Setting* set, class SettingGroup* group, struct Vec2 const& pos, class DXContext& dc, float size = 150.f, float fTextWidth = 0.21f);
 	
 	bool shouldSelect(d2d::Rect rc, Vec2 const& pt) override;
 
@@ -87,6 +86,10 @@ private:
 	Setting* activeSetting = nullptr;
 	int capturedKey = 0;
 	float adaptedScale = 0.f;
+
+	float scrollMax = 0.f;
+	float scroll = 0.f;
+	float lerpScroll = 0.f;
 
 	ComPtr<ID2D1Effect> compositeEffect;
 };

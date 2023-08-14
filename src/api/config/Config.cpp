@@ -57,18 +57,21 @@ void Config::addSetting(SettingGroup& group, nlohmann::json& obj) {
 	auto set = std::make_shared<Setting>(obj["name"].get<std::string>(), "", "");
 	auto jVal = obj["value"];
 	auto type = obj["type"].get<int>();
+
+	// TODO: I think I need to do some metaprogramming magic instead of a spooky switch statement
+
 	switch ((Setting::Type)type) {
 	case Setting::Type::Bool:
-		set->resolvedValue = BoolValue(jVal.get<bool>());
+		set->resolvedValue = BoolValue(jVal);
 		break;
 	case Setting::Type::Key:
-		set->resolvedValue = KeyValue(jVal.get<int>());
+		set->resolvedValue = KeyValue(jVal);
 		break;
 	case Setting::Type::Int:
-		set->resolvedValue = IntValue(jVal.get<int>());
+		set->resolvedValue = IntValue(jVal);
 		break;
 	case Setting::Type::Float:
-		set->resolvedValue = FloatValue(jVal.get<float>());
+		set->resolvedValue = FloatValue(jVal);
 		break;
 	case Setting::Type::Color:
 		set->resolvedValue = ColorValue(jVal);
@@ -118,43 +121,12 @@ void Config::saveSetting(std::shared_ptr<Setting> set, nlohmann::json& jout) {
 	jout["name"] = set->name();
 	jout["type"] = (*set->value).index();
 	auto val = *set->value;
-	switch ((Setting::Type)((*set->value).index())) {
-	case Setting::Type::Bool:
-		jout["value"] = std::get<BoolValue>(val).value;
-		break;
-	case Setting::Type::Float:
-		jout["value"] = std::get<FloatValue>(val).value;
-		break;
-	case Setting::Type::Int:
-		jout["value"] = std::get<IntValue>(val).value;
-		break;
-	case Setting::Type::Key:
-		jout["value"] = std::get<KeyValue>(val).value;
-		break;
-	case Setting::Type::Color:
-	{
-		json obj = json::object();
-		std::get<ColorValue>(val).store(obj);
-		jout["value"] = obj;
-		break;
-	}
-	case Setting::Type::Vec2:
-	{
-		json obj = json::object();
-		std::get<Vec2Value>(val).store(obj);
-		jout["value"] = obj;
-		break;
-	}
-	case Setting::Type::Enum:
-	{
-		json obj = json::object();
-		std::get<EnumValue>(val).store(obj);
-		jout["value"] = obj;
-		break;
-	}
-	default:
-		break;
-	}
+
+	std::visit([&](auto&& obj) {
+		nlohmann::json objc = json::object();
+		obj.store(objc);
+		jout["value"] = objc;
+		}, *set->value);
 }
 
 std::vector<std::shared_ptr<SettingGroup>> Config::getOutput() noexcept {

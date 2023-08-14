@@ -25,6 +25,8 @@
 #include "class/impl/JsRect.h"
 #include "class/impl/JsColor.h"
 #include "class/impl/JsModuleClass.h"
+#include "class/impl/JsSettingClass.h"
+
 #include "objects/GameScriptingObject.h"
 #include "objects/D2DScriptingObject.h"
 
@@ -47,7 +49,7 @@ bool JsScript::load() {
 
 	std::wstringstream buffer;
 	buffer << indexStream.rdbuf();
-	this->loadedScript = L"\"use strict\";" + buffer.str();
+	this->loadedScript = /*L"\"use strict\";" + */buffer.str();
 	this->indexStream.close();
 
 	this->libraries.push_back(std::make_shared<Filesystem>(this));
@@ -56,6 +58,8 @@ bool JsScript::load() {
 	if (JS::JsCreateRuntime(JsRuntimeAttributeNone, nullptr, &runtime)) return false;
 	auto res = JS::JsCreateContext(runtime, &this->ctx) == JsNoError;
 	JS::JsSetContextData(ctx, this);
+	JS::JsSetCurrentContext(ctx);
+	Chakra::StartDebugging(this->runtime, debugEventCallback, nullptr);
 	return res;
 }
 
@@ -234,8 +238,7 @@ namespace {
 				Chakra::ThrowError(er.message().c_str());
 			}
 		}
-		std::wstring loadedScript = L"\"use strict;\"\n" + buffer.str();
-
+		std::wstring loadedScript = /*L"\"use strict;\"\n" + */buffer.str();
 		// prep
 
 		JsPropertyIdRef modId;
@@ -293,11 +296,12 @@ void JsScript::loadScriptObjects() {
 	this->objects.push_back(std::make_shared<D2DScriptingObject>(i++));
 
 	this->classes.clear();
-	this->classes.push_back(std::make_shared<JsVec2>());
-	this->classes.push_back(std::make_shared<JsVec3>());
-	this->classes.push_back(std::make_shared<JsRect>());
-	this->classes.push_back(std::make_shared<JsColor>());
-	this->classes.push_back(std::make_shared<JsModuleClass>());
+	this->classes.push_back(std::make_shared<JsVec2>(this));
+	this->classes.push_back(std::make_shared<JsVec3>(this));
+	this->classes.push_back(std::make_shared<JsRect>(this));
+	this->classes.push_back(std::make_shared<JsColor>(this));
+	this->classes.push_back(std::make_shared<JsModuleClass>(this));
+	this->classes.push_back(std::make_shared<JsSettingClass>(this));
 
 	JsErrorCode err;
 	JsValueRef myScript;
@@ -391,6 +395,8 @@ void JsScript::fetchScriptData() {
 }
 
 void JsScript::unload() {
+	JS::JsSetCurrentContext(ctx);
+	Chakra::StopDebugging(this->runtime, nullptr);
 	JS::JsDisableRuntimeExecution(runtime);
 	JS::JsDisposeRuntime(runtime);
 	runtime = JS_INVALID_RUNTIME_HANDLE;
@@ -427,9 +433,12 @@ void JsScript::handleAsyncOperations() {
 	}
 }
 
+void __stdcall JsScript::debugEventCallback(JsDiagDebugEvent debugEvent, JsValueRef eventData, void* callbackState) {
+}
+
 JsErrorCode JsScript::runScript() {
 	JS::JsSetCurrentContext(ctx);
-	auto err = JS::JsRunScript(loadedScript.c_str(), sCtx, this->indexPath.c_str(), nullptr);
+	auto err = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(indexPath)), (util::GetLatitePath() / "Scripts" / relFolderPath / "index.js").wstring().c_str(), nullptr);
 	return err;
 }
 

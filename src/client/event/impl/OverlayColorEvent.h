@@ -1,6 +1,6 @@
 #pragma once
 #include "api/eventing/Event.h"
-#include "util/chash.h"
+#include "util/FNV32.h"
 #include "util/Util.h"
 #include "sdk/common/world/actor/Actor.h"
 

@@ -59,7 +59,6 @@ void ClickGUI::onRender(Event&) {
 	}
 
 	DXContext dc;
-
 	if (!isActive()) justClicked = { false, false, false };
 	if (isActive()) sdk::ClientInstance::get()->releaseCursor();
 	dc.ctx->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
@@ -313,8 +312,8 @@ void ClickGUI::onRender(Event&) {
 			{
 				// go through all float settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
-					if (set->value->index() == (size_t)Setting::Type::Float /* || set->value->index() == Setting::Type::Int*/) {
-						drawSetting(set.get(), setPos, dc, settingWidth, 0.35f);
+					if (set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Float /* || set->value->index() == Setting::Type::Int*/) {
+						drawSetting(set.get(), &settings, setPos, dc, settingWidth, 0.35f);
 						setPos.y += (setting_height_relative * rect.getHeight()) * 3.f;
 					}
 					});
@@ -325,8 +324,8 @@ void ClickGUI::onRender(Event&) {
 			{
 				// go through all enum settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
-					if (set->value->index() == (size_t)Setting::Type::Key /* || set->value->index() == Setting::Type::Enum*/) {
-						drawSetting(set.get(), setPos, dc, settingWidth);
+					if (set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Key /* || set->value->index() == Setting::Type::Enum*/) {
+						drawSetting(set.get(), &settings, setPos, dc, settingWidth);
 						setPos.y += (setting_height_relative * rect.getHeight()) * 3.f;
 					}
 					});
@@ -337,8 +336,8 @@ void ClickGUI::onRender(Event&) {
 			{
 				// go through all bool settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
-					if (set->value->index() == (size_t)Setting::Type::Bool /* || set->value->index() == Setting::Type::Enum*/) {
-						drawSetting(set.get(), setPos, dc, settingWidth);
+					if (set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Bool /* || set->value->index() == Setting::Type::Enum*/) {
+						drawSetting(set.get(), &settings, setPos, dc, settingWidth);
 						setPos.y += (setting_height_relative * rect.getHeight()) * 3.f;
 					}
 					});
@@ -400,6 +399,10 @@ void ClickGUI::onRender(Event&) {
 		// TODO: clipping
 		dc.ctx->PushAxisAlignedClip({ rect.left, y, rect.right, rect.bottom }, D2D1_ANTIALIAS_MODE_ALIASED);
 
+		float yStart = y -= this->lerpScroll;
+
+		lerpScroll = std::lerp(lerpScroll, scroll, sdk::ClientInstance::get()->minecraft->timer->alpha / 5.f);
+
 		// Sort Modules
 		static std::vector<ModContainer> mods = {};
 
@@ -448,6 +451,7 @@ void ClickGUI::onRender(Event&) {
 		modClip = true;
 
 		// modules
+		scrollMax = 0.f;
 
 		for (auto& mod : mods) {
 			if (!mod.shouldRender) continue;
@@ -480,7 +484,7 @@ void ClickGUI::onRender(Event&) {
 					modRectActual.bottom += padToSetting;
 					mod.mod->settings->forEach([&](std::shared_ptr<Setting> set) {
 						if (set->visible) {
-							if (drawSetting(set.get(), { descTextRect.left, modRectActual.bottom }, dc, descTextRect.getWidth(), 0.25f)) {
+							if (set->shouldRender(*mod.mod->settings.get()) && drawSetting(set.get(), mod.mod->settings.get(), {descTextRect.left, modRectActual.bottom}, dc, descTextRect.getWidth(), 0.25f)) {
 								modRectActual.bottom += settingHeight;
 								modRectActual.bottom += settingPadY;
 							}
@@ -577,6 +581,9 @@ void ClickGUI::onRender(Event&) {
 				dc.ctx->SetTransform(oTrans);
 			}
 
+			// scrolling max
+			float scrollYNew = std::max(0.f, modRectActual.bottom - rect.bottom) ;
+			if (scrollYNew > scrollMax) scrollMax = scrollYNew;
 			if (i >= (numMods - 1)) {
 				i = 0;
 				row++;
@@ -609,6 +616,10 @@ void ClickGUI::onRender(Event&) {
 	this->clearLayers();
 
 	dc.ctx->SetTransform(oTransform);
+
+	dc.ctx->SetTarget(Latite::getRenderer().getBitmap());
+	dc.ctx->DrawImage(myBitmap);
+
 	if (shouldArrow) cursor = Cursor::Arrow;
 }
 
@@ -665,6 +676,12 @@ void ClickGUI::onClick(Event& evGeneric) {
 	if (ev.getMouseButton() > 0) {
 		ev.setCancelled(true);
 	}
+
+	if (ev.getMouseButton() == 4) {
+		// scroll
+		this->scroll = std::clamp(scroll - static_cast<float>(ev.getWheelDelta()) / 10.f, 0.f, scrollMax);
+		ev.setCancelled(true);
+	}
 }
 
 
@@ -696,7 +713,7 @@ namespace {
 	}
 }
 
-bool ClickGUI::drawSetting(Setting* set, Vec2 const& pos, DXContext& dc, float size, float fTextWidth) {
+bool ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, DXContext& dc, float size, float fTextWidth) {
 	const float checkboxSize = rect.getWidth() * setting_height_relative;
 	const float textSize = checkboxSize * 0.9f;
 	const auto cursorPos = sdk::ClientInstance::get()->cursorPos;
@@ -1382,6 +1399,8 @@ void ClickGUI::drawColorPicker() {
 void ClickGUI::onEnable(bool ignoreAnims) {
 	calcAnim = 0.f;
 	if (ignoreAnims) calcAnim = 1.f;
+	scroll = 0.f;
+	lerpScroll = 0.f;
 	this->tab = MODULES;
 }
 

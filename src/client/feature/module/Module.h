@@ -35,8 +35,8 @@ public:
 	}
 
 	void loadConfig(SettingGroup& resolvedGroup) override;
-	void addSetting(std::string const& internalName, std::string const& displayName, std::string const& desc, ValueType& val);
-	void addEnumSetting(std::string const& internalName, std::string const& displayName, std::string const& desc, EnumData& dat);
-	void addSliderSetting(std::string const& internalName, std::string const& displayName, std::string const& desc, ValueType& val, ValueType min, ValueType max, ValueType interval);
+	std::shared_ptr<Setting> addSetting(std::string const& internalName, std::string const& displayName, std::string const& desc, ValueType& val, Setting::Condition condition = Setting::Condition());
+	std::shared_ptr<Setting> addEnumSetting(std::string const& internalName, std::string const& displayName, std::string const& desc, EnumData& dat, Setting::Condition condition = Setting::Condition());
+	std::shared_ptr<Setting> addSliderSetting(std::string const& internalName, std::string const& displayName, std::string const& desc, ValueType& val, ValueType min, ValueType max, ValueType interval, Setting::Condition condition = Setting::Condition());
 protected:
 };

@@ -9,6 +9,8 @@ protected:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 		auto thi = reinterpret_cast<JsVec2*>(callbackState);
 
+		if (!isConstructor) return thi->errConstructCall();
+
 		if (argCount == 1) {
 			return thi->construct(Vec2(0.f, 0.f));
 		}
@@ -27,7 +29,7 @@ protected:
 		return Chakra::MakeString(L"[object " + util::StrToWStr(add) + L"]");
 	}
 public:
-	JsVec2() : JsClass(L"Vector2") {
+	JsVec2(class JsScript* owner) : JsClass(owner, L"Vector2") {
 		createConstructor(jsConstructor, this);
 	}
 

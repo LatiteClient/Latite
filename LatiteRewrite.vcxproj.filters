@@ -186,7 +186,7 @@
     <ClInclude Include="src\api\eventing\Event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\util\chash.h">
+    <ClInclude Include="src\util\FNV32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\event\Eventing.h">
@@ -441,6 +441,12 @@
     <ClInclude Include="src\client\misc\Timings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\script\class\impl\JsSettingClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\feature\setting\script\JsSetting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -486,9 +492,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\misc\ClientMessageSink.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp">
@@ -675,6 +678,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\misc\Timings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\api\feature\setting\Setting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\script\class\impl\JsSettingClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

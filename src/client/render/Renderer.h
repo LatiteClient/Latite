@@ -13,15 +13,21 @@ public:
 	bool init(IDXGISwapChain* chain);
 	bool hasInitialized() { return hasInit; };
 	HRESULT reinit();
+	void setShouldReinit();
 	std::shared_lock<std::shared_mutex> lock();
 	void render();
+	bool isDX11ByDefault() { return isDX11; }
 private:
+	bool isDX11 = false;
+
 	std::wstring fontFamily = L"Segoe UI";
 	void releaseAllResources();
 
 	bool hasInit = false;
+	bool shouldReinit = false;
 	bool firstInit = false;
 	bool reqCommandQueue = false;
+	bool dx12Removed = false;
 
 	IDXGISwapChain* gameSwapChain;
 	IDXGISwapChain4* swapChain4;

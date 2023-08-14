@@ -7,8 +7,9 @@ class JsVec3 : public JsClass {
 private:
 	static JsValueRef CALLBACK jsConstructor(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+
 		auto thi = reinterpret_cast<JsVec3*>(callbackState);
-		if (!isConstructor) thi->errConstructCall();
+		if (!isConstructor) return thi->errConstructCall();
 
 		if (argCount == 1) {
 			return thi->construct(Vec3(0.f, 0.f, 0.f));
@@ -28,7 +29,7 @@ private:
 		return Chakra::MakeString(L"[object " + util::StrToWStr(add) + L"]");
 	}
 public:
-	JsVec3() : JsClass(L"Vector3") {
+	JsVec3(class JsScript* owner) : JsClass(owner, L"Vector3") {
 		createConstructor(jsConstructor, this);
 	}
 

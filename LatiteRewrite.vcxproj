@@ -290,6 +290,7 @@
     <ClInclude Include="src\client\feature\module\impl\visual\MotionBlur.h" />
     <ClInclude Include="src\client\feature\module\impl\game\Zoom.h" />
     <ClInclude Include="src\client\feature\module\Module.h" />
+    <ClInclude Include="src\client\feature\setting\script\JsSetting.h" />
     <ClInclude Include="src\client\hook\Hook.h" />
     <ClInclude Include="src\client\hook\Hooks.h" />
     <ClInclude Include="src\client\hook\impl\AppPlatformHooks.h" />
@@ -321,6 +322,7 @@
     <ClInclude Include="src\client\script\class\impl\JsColor.h" />
     <ClInclude Include="src\client\script\class\impl\JsModuleClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsRect.h" />
+    <ClInclude Include="src\client\script\class\impl\JsSettingClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsVec2.h" />
     <ClInclude Include="src\client\script\class\impl\JsVec3.h" />
     <ClInclude Include="src\client\script\class\JsClass.h" />
@@ -366,7 +368,7 @@
     <ClInclude Include="src\sdk\Util.h" />
     <ClInclude Include="src\sdk\Version.h" />
     <ClInclude Include="src\util\ChakraUtil.h" />
-    <ClInclude Include="src\util\chash.h" />
+    <ClInclude Include="src\util\FNV32.h" />
     <ClInclude Include="src\util\DxContext.h" />
     <ClInclude Include="src\util\DxUtil.h" />
     <ClInclude Include="src\util\Json.h" />
@@ -393,6 +395,7 @@
     <Text Include="src\util\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\api\feature\setting\Setting.cpp" />
     <ClCompile Include="src\api\memory\memory.cpp" />
     <ClCompile Include="src\api\memory\signature\signature.cpp" />
     <ClCompile Include="src\api\scanner\scanner.cpp" />
@@ -442,6 +445,7 @@
     <ClCompile Include="src\client\screen\ScreenManager.cpp" />
     <ClCompile Include="src\client\feature\module\script\JsModule.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsModuleClass.cpp" />
+    <ClCompile Include="src\client\script\class\impl\JsSettingClass.cpp" />
     <ClCompile Include="src\client\script\event\ScriptListener.cpp" />
     <ClCompile Include="src\client\script\JsScript.cpp" />
     <ClCompile Include="src\client\script\lib\JsLibrary.cpp" />
@@ -453,11 +457,6 @@
     <ClCompile Include="src\client\script\ScriptingObject.cpp" />
     <ClCompile Include="src\client\script\ScriptManager.cpp" />
     <ClCompile Include="src\client\ui\TextBox.cpp" />
-    <ClCompile Include="src\pch.cpp">
-      <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MultiProcessorCompilation>
-      <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MultiProcessorCompilation>
-      <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='ReleaseLegacy|x64'">false</MultiProcessorCompilation>
-    </ClCompile>
     <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp" />
     <ClCompile Include="src\sdk\common\client\game\MinecraftGame.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\LevelRendererPlayer.cpp" />

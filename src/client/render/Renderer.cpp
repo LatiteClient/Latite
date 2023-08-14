@@ -4,6 +4,7 @@
 #include "client/event/impl/RenderOverlayEvent.h"
 #include "client/event/impl/RendererCleanupEvent.h"
 #include "client/event/impl/RendererInitEvent.h"
+#include <client/Latite.h>
 
 Renderer::~Renderer() {
     // ...
@@ -11,17 +12,45 @@ Renderer::~Renderer() {
 }
 
 bool Renderer::init(IDXGISwapChain* chain) {
+	bool isDX12 = true;
+	if (SUCCEEDED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12))) && Latite::get().shouldForceDX11()) {
+		static_cast<ID3D12Device5*>(gameDevice12.Get())->RemoveDevice();
+		bufferCount = 1;
+		Logger::Info("Force DX11 active");
+		isDX12 = false;
+		dx12Removed = true;
+		return false;
+	}
     this->gameSwapChain = chain;
+
+
 	if (!swapChain4)
 		ThrowIfFailed(chain->QueryInterface(&swapChain4));
 
+	if (Latite::get().shouldForceDX11()) {
+		isDX12 = false;
+	}
+
+	if (SUCCEEDED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12))) && !dx12Removed && Latite::get().shouldForceDX11()) {
+		static_cast<ID3D12Device5*>(gameDevice12.Get())->RemoveDevice();
+		bufferCount = 1;
+		Logger::Info("Force DX11 active");
+		isDX12 = false;
+		dx12Removed = true;
+		return init(chain);
+	}
+
+	else gameDevice11 = nullptr;
+
 	if (!gameDevice11.Get() || !gameDevice12.Get()) {
-		if (FAILED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12)))) {
+		if (Latite::get().shouldForceDX11() || FAILED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12)))) {
 			ThrowIfFailed(chain->GetDevice(IID_PPV_ARGS(&gameDevice11)));
 			Logger::Info("Using DX11");
 			d3dDevice = gameDevice11.Get();
 			d3dDevice->GetImmediateContext(d3dCtx.GetAddressOf());
 			bufferCount = 1;
+			isDX11 = true;
+			isDX12 = false;
 		}
 		else {
 			Logger::Info("Using DX12");
@@ -31,7 +60,6 @@ bool Renderer::init(IDXGISwapChain* chain) {
 
 	if (gameDevice12.Get()) {
 		if (!this->commandQueue) {
-			swapChain4 = nullptr;
 			return false;
 		}
 	}
@@ -65,7 +93,7 @@ bool Renderer::init(IDXGISwapChain* chain) {
 #endif
 	if (gameDevice12) {
 		D3D11On12CreateDevice(gameDevice12.Get(),
-#ifdef DEBUG
+#ifdef LATITE_DEBUG
 			D3D11_CREATE_DEVICE_BGRA_SUPPORT | D3D11_CREATE_DEVICE_DEBUG
 #else
 			D3D11_CREATE_DEVICE_BGRA_SUPPORT
@@ -146,11 +174,22 @@ HRESULT Renderer::reinit() {
     return S_OK;
 }
 
+void Renderer::setShouldReinit() {
+	shouldReinit = true;
+}
+
 std::shared_lock<std::shared_mutex> Renderer::lock() {
 	return std::shared_lock<std::shared_mutex>(mutex);
 }
 
 void Renderer::render() {
+	if (shouldReinit) {
+		shouldReinit = false;
+		reinit();
+	}
+
+	if (!hasInit) return;
+
 	auto idx = swapChain4->GetCurrentBackBufferIndex();
 	if (gameDevice12) {
 		d3d11On12Device->AcquireWrappedResources(&d3d11Targets[idx], 1);

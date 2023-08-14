@@ -109,6 +109,8 @@ public:
 	void unload();
 	void handleAsyncOperations();
 
+	static void __stdcall debugEventCallback(JsDiagDebugEvent debugEvent, JsValueRef eventData, void* callbackState);
+
 	JsErrorCode runScript();
 
 	~JsScript() { if (runtime != JS_INVALID_RUNTIME_HANDLE) unload(); }

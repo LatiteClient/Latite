@@ -14,11 +14,19 @@ HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInt
 		auto lock = Latite::getRenderer().lock();
 		Latite::getRenderer().init(chain);
 	}
-
+	
 	if (Latite::getRenderer().hasInitialized()) {
 		auto lock = Latite::getRenderer().lock();
 		Latite::getRenderer().render();
 	}
+
+	//static bool hasKilled = false;
+	//if (!hasKilled) {
+	//	ComPtr<ID3D12Device> d3d12Device;
+	//	chain->GetDevice(IID_PPV_ARGS(&d3d12Device));
+	//	if (d3d12Device) ((ID3D12Device5*)d3d12Device.Get())->RemoveDevice(); // kill dx
+	//	hasKilled = true;
+	//}
 
 	return PresentHook->oFunc<decltype(&SwapChain_Present)>()(chain, SyncInterval, Flags);
 }
