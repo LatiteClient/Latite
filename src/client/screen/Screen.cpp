@@ -40,6 +40,8 @@ void Screen::onUpdate(Event& ev) {
 }
 
 void Screen::close() {
+	this->activeMouseButtons = { false, false, false };
+	this->mouseButtons = { false, false, false };
 	Latite::getScreenManager().exitCurrentScreen();
 }
 
@@ -51,9 +53,11 @@ void Screen::onClick(Event& evGeneric) {
 	auto& ev = reinterpret_cast<ClickEvent&>(evGeneric);
 	if (ev.getMouseButton() > 0) {
 		if (ev.getMouseButton() < 4) {
-			if (ev.isDown())
-				this->activeMouseButtons[ev.getMouseButton() - 1] = ev.isDown();
-			this->mouseButtons[ev.getMouseButton() - 1] = ev.isDown();
+			if (isActive()) {
+				if (ev.isDown())
+					this->activeMouseButtons[ev.getMouseButton() - 1] = ev.isDown();
+				this->mouseButtons[ev.getMouseButton() - 1] = ev.isDown();
+			}
 			if (isActive()) ev.setCancelled(true);
 		}
 	}

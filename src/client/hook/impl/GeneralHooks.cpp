@@ -42,7 +42,7 @@ void GenericHooks::Level_tick(sdk::Level* level) {
 }
 
 void* GenericHooks::ChatScreenController_sendChatMessage(void* controller, std::string& message) {
-	if (message.starts_with(CommandManager::prefix)) {
+	if (message.starts_with(Latite::getCommandManager().prefix)) {
 		Latite::get().getCommandManager().runCommand(message);
 		return 0;
 	}

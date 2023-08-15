@@ -27,6 +27,7 @@ public:
 
 	[[nodiscard]] float getScale() { return std::get<FloatValue>(scale); }
 	[[nodiscard]] d2d::Rect getRect();
+	[[nodiscard]] d2d::Rect getRectNonScaled() { return rect; }
 	
 	void setScale(float f) { std::get<FloatValue>(scale) = f; }
 	void setRect(d2d::Rect const& rc) { this->rect = rc; }

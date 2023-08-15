@@ -11,6 +11,8 @@ class ClientScriptingObject final : public ScriptingObject {
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK getMmgrCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK getCmgrCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 
 
 public:
@@ -18,14 +20,17 @@ public:
 	ClientScriptingObject(int id) : ScriptingObject(id, L"client") { objectID = id; }
 
 	void initModuleManager();
+	void initCommandManager();
 	void initialize(JsContextRef ctx, JsValueRef parentObj) override;
 
 	~ClientScriptingObject() {
 		//JS::JsRelease(this->object, nullptr);
 		//JS::JsRelease(this->moduleManager, nullptr);
+		//JS::JsRelease(this->commandManager, nullptr);
 	}
 
 	JsValueRef moduleManager = JS_INVALID_REFERENCE;
+	JsValueRef commandManager = JS_INVALID_REFERENCE;
 private:
 	static JsValueRef CALLBACK mmgrRegisterModuleCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
@@ -35,8 +40,13 @@ private:
 	static JsValueRef CALLBACK mmgrGetModuleByName(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 
-	static JsValueRef CALLBACK mmgrGetModuleById(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK mmgrForEachModule(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+
+	// command manager
+
+	static JsValueRef CALLBACK cmgrRegisterCommandCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK cmgrDeregisterCommandCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 };

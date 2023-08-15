@@ -1,6 +1,8 @@
 #include "Zoom.h"
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/world/Minecraft.h"
+#include "client/Latite.h"
+#include "client/render/Renderer.h"
 
 Zoom::Zoom() : Module("Zoom", "Zoom", "Zooms like OptiFine", GAME, nokeybind) {
 	addSetting("zoomKey", "Zoom Key", "The key to press to zoom", this->zoomKey);
@@ -17,7 +19,7 @@ void Zoom::onRenderLevel(Event& evGeneric) {
 	modifyTo = shouldZoom ? std::get<FloatValue>(modifier).value : 1.f;
 
 	// partial ticks
-	float alpha = sdk::ClientInstance::get()->minecraft->timer->alpha;
+	float alpha = Latite::getRenderer().getDeltaTime();
 	float lr = std::lerp(activeModifier, modifyTo, alpha * std::get<FloatValue>(animSpeed) / 10.f);
 	activeModifier = lr;
 

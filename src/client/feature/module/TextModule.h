@@ -18,7 +18,9 @@ protected:
 	ValueType textColor = ColorValue(1.f, 1.f, 1.f, 1.f);
 	ValueType bgColor = ColorValue(0.f, 0.f, 0.f, 0.5f);
 	
-	ValueType brackets = BoolValue(false);
+	ValueType prefix = TextValue("");
+	ValueType suffix = TextValue("");
+
 	ValueType showOutline = BoolValue(false);
 
 	ValueType outlineThickness = FloatValue(2.f);

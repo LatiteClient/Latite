@@ -14,6 +14,7 @@ JsModule::JsModule(std::string const& name, std::string const& displayName, std:
 
 void JsModule::onEnable()
 {
+	JS::JsSetCurrentContext(ctx);
 	Event ev{ L"enable", {  } };
 	auto ret = dispatchEvent(ev.name, ev);
 	if (ret != JS_INVALID_REFERENCE) {
@@ -21,8 +22,8 @@ void JsModule::onEnable()
 	}
 }
 
-void JsModule::onDisable()
-{
+void JsModule::onDisable() {
+	JS::JsSetCurrentContext(ctx);
 	Event ev{ L"disable", {  } };
 	auto ret = dispatchEvent(ev.name, ev);
 	if (ret != JS_INVALID_REFERENCE) {
@@ -31,6 +32,7 @@ void JsModule::onDisable()
 }
 
 bool JsModule::shouldHoldToToggle() {
+	JS::JsSetCurrentContext(ctx);
 	Event ev{ L"get-hold-to-toggle", {  } };
 	auto ret = dispatchEvent(ev.name, ev);
 	if (ret != JS_INVALID_REFERENCE) {

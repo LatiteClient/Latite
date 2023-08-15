@@ -363,9 +363,6 @@
     <ClInclude Include="src\client\script\class\impl\JsVec2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\client\feature\module\script\JsEvented.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\client\feature\module\script\JsModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -445,6 +442,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\feature\setting\script\JsSetting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\hud\CPSCounter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\feature\command\impl\ConfigCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\feature\command\impl\SetPrefixCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\script\feature\JsEvented.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\feature\command\script\JsCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\script\class\impl\JsCommandClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -668,9 +683,6 @@
     <ClCompile Include="src\client\ui\TextBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\client\feature\module\script\JsEvented.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\client\feature\module\TextModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -684,6 +696,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\script\class\impl\JsSettingClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\hud\CPSCounter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\command\impl\SetPrefixCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\command\impl\ConfigCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\script\feature\JsEvented.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\command\script\JsCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\script\class\impl\JsCommandClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

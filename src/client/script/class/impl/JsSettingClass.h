@@ -30,6 +30,12 @@ public:
 		createConstructor(jsConstructor, this);
 	}
 
+	/// <summary>
+	/// Constructs a JS setting.
+	/// </summary>
+	/// <param name="set">The C++ setting to create from.</param>
+	/// <param name="finalize">Whether to destroy the C++ setting when the object goes out of scope or not.</param>
+	/// <returns></returns>
 	JsValueRef construct(Setting* set, bool finalize) {
 		JsValueRef obj;
 		if (finalize) {

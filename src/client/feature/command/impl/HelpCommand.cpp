@@ -4,7 +4,7 @@
 #include "client/feature/command/CommandManager.h"
 #include "util/Util.h"
 
-HelpCommand::HelpCommand() : Command("help", "Shows all commands and descriptions.", "", {"?", ""}) {
+HelpCommand::HelpCommand() : Command("help", "Shows all commands and descriptions.", "{0}", {"?", ""}) {
 }
 
 bool HelpCommand::execute(std::string const label, std::vector<std::string> args) {

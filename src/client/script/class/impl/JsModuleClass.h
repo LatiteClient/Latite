@@ -39,6 +39,11 @@ protected:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK moduleGetSettings(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+
+	static JsValueRef CALLBACK moduleAddBoolSetting(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK moduleAddNumberSetting(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 public:
 	JsModuleClass(class JsScript* owner) : JsClass(owner, L"Module") {
 		createConstructor(jsConstructor, this);
@@ -75,7 +80,8 @@ public:
 		Chakra::DefineFunc(prototype, moduleIsBlocked, L"isBlocked", this);
 		Chakra::DefineFunc(prototype, moduleSetOnEvent, L"on", this);
 		Chakra::DefineFunc(prototype, moduleGetSettings, L"getSettings", this);
-
+		Chakra::DefineFunc(prototype, moduleAddBoolSetting, L"addBoolSetting", this);
+		Chakra::DefineFunc(prototype, moduleAddNumberSetting, L"addNumberSetting", this);
 	};
 
 	static JsModule* ToModule(JsValueRef obj) {

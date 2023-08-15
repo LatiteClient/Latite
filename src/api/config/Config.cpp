@@ -82,6 +82,9 @@ void Config::addSetting(SettingGroup& group, nlohmann::json& obj) {
 	case Setting::Type::Enum:
 		set->resolvedValue = EnumValue(jVal);
 		break;
+	case Setting::Type::Text:
+		set->resolvedValue = TextValue(jVal);
+		break;
 	default:
 		return;
 	}

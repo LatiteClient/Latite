@@ -18,6 +18,7 @@ public:
 	virtual bool execute(std::string const label, std::vector<std::string> args) = 0;
 
 	[[nodiscard]] virtual bool isLocalWorldOnly() { return this->localWorldOnly; }
+	[[nodiscard]] virtual bool isScript() { return this->script; }
 	[[nodiscard]] std::vector<std::string> getAliases() { return aliases; }
 	[[nodiscard]] std::string getUsage() { return usage; }
 
@@ -30,6 +31,7 @@ public:
 protected:
 	std::string cmdName, description, usage;
 	std::vector<std::string> aliases;
+	bool script = false;
 private:
 	bool localWorldOnly;
 };

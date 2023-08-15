@@ -1,6 +1,8 @@
 #include "HUDEditor.h"
 #include "client/event/impl/RenderOverlayEvent.h"
 #include "client/event/impl/RenderLayerEvent.h"
+#include "client/event/impl/ClickEvent.h"
+
 #include "client/event/Eventing.h"
 #include "client/Latite.h"
 #include "client/config/ConfigManager.h"
@@ -11,17 +13,19 @@
 #include "util/Util.h"
 #include "../ScreenManager.h"
 
+
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/world/Minecraft.h"
 #include "sdk/common/client/game/MinecraftGame.h"
 #include "sdk/common/client/gui/controls/VisualTree.h"
 #include "sdk/common/client/gui/controls/UIControl.h"
 
-HUDEditor::HUDEditor() : Screen("HUDEditor") {
+HUDEditor::HUDEditor() : Screen("HUDEditor"), dragMod(nullptr) {
 	this->key = Latite::get().getMenuKey();
 
 	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&HUDEditor::onRender, 1, true);
 	Eventing::get().listen<RenderLayerEvent>(this, (EventListenerFunc)&HUDEditor::onRenderLayer, 1, true);
+	Eventing::get().listen<ClickEvent>(this, (EventListenerFunc)&HUDEditor::onClick);
 }
 
 void HUDEditor::onRender(Event& ev) {
@@ -37,7 +41,7 @@ void HUDEditor::onRender(Event& ev) {
 
 		float toBlur = Latite::get().getMenuBlur().value_or(0.f);
 
-		auto alpha = sdk::ClientInstance::get()->minecraft->timer->alpha / 10.f;
+		auto alpha = Latite::getRenderer().getDeltaTime() / 10.f;
 		anim = std::lerp(anim, 1.f, alpha);
 
 		if (Latite::get().getMenuBlur()) dc.drawGaussianBlur(toBlur * anim);
@@ -100,33 +104,46 @@ void HUDEditor::onRender(Event& ev) {
 	}
 }
 
+void HUDEditor::onClick(Event& evGeneric) {
+	auto& ev = reinterpret_cast<ClickEvent&>(evGeneric);
+	if (ev.getMouseButton() == 4) {
+		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
+			if (!mod->isHud()) return;
+			auto hudMod = reinterpret_cast<HUDModule*>(mod.get());
+			if (!shouldSelect(hudMod->getRect(), sdk::ClientInstance::get()->cursorPos)) return;
+			hudMod->setScale(hudMod->getScale() - static_cast<float>(ev.getWheelDelta()) / 1000.f);
+			});
+		ev.setCancelled(true);
+	}
+}
+
 void HUDEditor::onRenderLayer(Event& evGeneric) {
 	auto& ev = static_cast<RenderLayerEvent&>(evGeneric);
-	auto view = ev.getScreenView();
+	//auto view = ev.getScreenView();
 	
-	float uiscale = sdk::ClientInstance::get()->getGuiData()->guiScale;
+	//float uiscale = sdk::ClientInstance::get()->getGuiData()->guiScale;
 
-	auto root = view->visualTree->rootControl;
-	if (root && root->name == "hud_screen") {
-		controls.clear();
+	//auto root = view->visualTree->rootControl;
+	//if (root && root->name == "hud_screen") {
+		//controls.clear();
 		// TODO: xor string
-		auto hotbarRend = root->findFirstDescendantWithName("hotbar_renderer");
-		auto paperdoll = root->findFirstDescendantWithName("hud_player");
-		auto playerPos = root->findFirstDescendantWithName("player_position");
+		//auto hotbarRend = root->findFirstDescendantWithName("hotbar_renderer");
+		//auto paperdoll = root->findFirstDescendantWithName("hud_player");
+		//auto playerPos = root->findFirstDescendantWithName("player_position");
 
-		if (hotbarRend) {
-			d2d::Rect rec = hotbarRend->getRect();
-			//rec.bottom = 0.f;
-			rec.right = rec.left + (rec.getWidth() * 9.f);
-			rec.right += 1.f;
-			rec.left -= 1.f;
-
-			rec.left *= uiscale;
-			rec.right *= uiscale;
-			rec.top *= uiscale;
-			rec.bottom *= uiscale;
-			controls.push_back(rec);
-		}
+		//if (hotbarRend) {
+		//	d2d::Rect rec = hotbarRend->getRect();
+		//	//rec.bottom = 0.f;
+		//	rec.right = rec.left + (rec.getWidth() * 9.f);
+		//	rec.right += 1.f;
+		//	rec.left -= 1.f;
+		//
+		//	rec.left *= uiscale;
+		//	rec.right *= uiscale;
+		//	rec.top *= uiscale;
+		//	rec.bottom *= uiscale;
+		//	controls.push_back(rec);
+		//}
 
 		/*if (paperdoll) {
 			d2d::Rect rec = paperdoll->getRect();
@@ -153,7 +170,7 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 			rec.bottom *= uiscale;
 			controls.push_back(rec);
 		}*/
-	}
+	//}
 }
 
 void HUDEditor::renderModule(HUDModule* mod) {
@@ -474,6 +491,9 @@ void HUDEditor::keepModulesInBounds() {
 
 void HUDEditor::onEnable(bool ignoreAnims) {
 	if (!ignoreAnims) anim = 0.f;
+	mouseButtons = {};
+	activeMouseButtons = {};
+	justClicked = {};
 	sdk::ClientInstance::get()->releaseCursor();
 }
 

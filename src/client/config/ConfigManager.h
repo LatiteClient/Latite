@@ -8,6 +8,9 @@ public:
 
 	bool loadMaster();
 	bool saveCurrentConfig();
+	bool loadUserConfig(std::wstring const& name);
+
+	std::filesystem::path getUserPath();
 private:
 	bool load(std::shared_ptr<Config> cfg);
 	bool save(std::shared_ptr<Config> cfg);

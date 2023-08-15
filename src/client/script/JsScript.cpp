@@ -26,6 +26,7 @@
 #include "class/impl/JsColor.h"
 #include "class/impl/JsModuleClass.h"
 #include "class/impl/JsSettingClass.h"
+#include "class/impl/JsCommandClass.h"
 
 #include "objects/GameScriptingObject.h"
 #include "objects/D2DScriptingObject.h"
@@ -302,6 +303,7 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsColor>(this));
 	this->classes.push_back(std::make_shared<JsModuleClass>(this));
 	this->classes.push_back(std::make_shared<JsSettingClass>(this));
+	this->classes.push_back(std::make_shared<JsCommandClass>(this));
 
 	JsErrorCode err;
 	JsValueRef myScript;

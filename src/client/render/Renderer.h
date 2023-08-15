@@ -65,6 +65,8 @@ private:
 
 	std::shared_mutex mutex;
 	int bufferCount = 3;
+	float deltaTime = 1.f;
+	std::chrono::system_clock::time_point lastTime;
 public:
 	ID2D1Bitmap1* testBitmap;
 
@@ -104,8 +106,12 @@ public:
 		this->fontFamily = ws;
 	}
 
-	D2D1_SIZE_F getScreenSize() {
+	[[nodiscard]] D2D1_SIZE_F getScreenSize() {
 		return { (float)d2dCtx->GetPixelSize().width, (float)d2dCtx->GetPixelSize().height };
+	}
+
+	[[nodiscard]] float getDeltaTime() {
+		return deltaTime;
 	}
 
 	[[nodiscard]] IDWriteTextFormat* getTextFormat(FontSelection selection) {

@@ -16,7 +16,7 @@ struct BoolValue {
 
 	BoolValue() { value = false; }
 	BoolValue(bool b) : value(b) {}
-	BoolValue(nlohmann::json const& js) : value(js.get<bool>()) {}
+	BoolValue(nlohmann::json& js) : value(js.get<bool>()) {}
 	operator decltype(value)(){ return value; }
 
 	void store(nlohmann::json& jout) {
@@ -33,7 +33,7 @@ struct FloatValue {
 
 	FloatValue() { value = 0.f; }
 	FloatValue(float f) : value(f) {}
-	FloatValue(nlohmann::json const& js) : value(js.get<float>()) {}
+	FloatValue(nlohmann::json& js) : value(js.get<float>()) {}
 	operator decltype(value)() { return value; }
 
 	void store(nlohmann::json& jout) {
@@ -50,7 +50,7 @@ struct Vec2Value {
 
 	Vec2Value() { x = 0.f; y = 0.f; }
 	Vec2Value(float x, float y) : x(x), y(y) {}
-	Vec2Value(nlohmann::json const& js) {
+	Vec2Value(nlohmann::json& js) {
 		x = js["x"];
 		y = js["y"];
 	}
@@ -70,7 +70,7 @@ struct IntValue {
 
 	IntValue() { value = 0; }
 	IntValue(int i) : value(i) {}
-	IntValue(nlohmann::json const& js) : value(js.get<int>()) {}
+	IntValue(nlohmann::json& js) : value(js.get<int>()) {}
 
 	void store(nlohmann::json& jout) {
 		jout = value;
@@ -87,7 +87,7 @@ struct KeyValue {
 	KeyValue() { value = 0; }
 	KeyValue(int i) : value(i) {}
 	KeyValue(char ch) : value((int)ch) {}
-	KeyValue(nlohmann::json const& js) : value(js.get<int>()) {}
+	KeyValue(nlohmann::json& js) : value(js.get<int>()) {}
 
 	operator int() {
 		return value;
@@ -115,7 +115,7 @@ struct StoredColor {
 		jout["a"] = a;
 	}
 
-	void get(nlohmann::json const& js) {
+	void get(nlohmann::json& js) {
 		r = js["r"];
 		g = js["g"];
 		b = js["b"];
@@ -146,7 +146,7 @@ struct ColorValue {
 		color1 = { 1.f, 1.f, 1.f, 1.f };
 	}
 
-	ColorValue(nlohmann::json const& js) {
+	ColorValue(nlohmann::json& js) {
 		color1.get(js["color1"]);
 		isRGB = js["isRGB"];
 		isChroma = js["isChroma"];
@@ -186,9 +186,9 @@ struct ColorValue {
 struct TextValue {
 	std::string str;
 
-	TextValue(std::string const& str = "") : str(str) {};
+	TextValue(std::string const& str) : str(str) {};
 
-	TextValue(nlohmann::json const& js) {
+	TextValue(nlohmann::json& js) {
 		str = js.get<std::string>();
 	}
 
@@ -206,7 +206,7 @@ struct EnumValue {
 
 	EnumValue(int val) : val(val) {};
 
-	EnumValue(nlohmann::json const& js) {
+	EnumValue(nlohmann::json& js) {
 		val = js.get<int>();
 	}
 
@@ -230,7 +230,8 @@ using ValueType = std::variant<
 	KeyValue, 
 	ColorValue, 
 	Vec2Value, 
-	EnumValue>;
+	EnumValue,
+	TextValue>;
 
 class EnumEntry : public Feature {
 	std::string entryName;
@@ -297,7 +298,8 @@ public:
 		Key,
 		Color,
 		Vec2,
-		Enum
+		Enum,
+		Text
 	};
 
 	Setting(std::string const& internalName, std::string const& displayName, std::string const& description, Condition condition = Condition()) : settingName(internalName), displayName(displayName), description(description), condition(std::move(condition)) {}
@@ -308,6 +310,12 @@ public:
 	std::string name() override { return settingName; }
 
 	std::string getDisplayName() { return displayName; }
+
+	std::optional<std::function<void(Setting&)>> callback;
+
+	virtual void update() {
+		if (callback) callback.value()(*this);
+	}
 
 	EnumData* enumData = nullptr;
 	ValueType* value = nullptr;

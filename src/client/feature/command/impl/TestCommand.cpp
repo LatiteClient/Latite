@@ -15,7 +15,7 @@
 #include <winrt/windows.ui.viewmanagement.h>
 #include <winrt/windows.ui.core.h>
 
-TestCommand::TestCommand() : Command("test", "A command for testing", "[...]", {"tc"}) {
+TestCommand::TestCommand() : Command("test", "A command for testing", "{0} [...]", {"tc"}) {
 }
 
 bool TestCommand::execute(std::string const label, std::vector<std::string> args) {

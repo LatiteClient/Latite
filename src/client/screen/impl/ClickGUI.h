@@ -7,6 +7,7 @@
 #include "client/ui/TextBox.h"
 #include <memory>
 #include <array>
+#include <map>
 
 class ClickGUI : public Screen {
 public:
@@ -49,7 +50,7 @@ private:
 	std::vector<ui::TextBox> pickerTextBoxes{};
 
 	ComPtr<ID2D1Bitmap1> shadowBitmap;
-	bool modClip = false;
+	std::optional<d2d::Rect> modClip = {};
 
 	enum Tab {
 		MODULES = 0,
@@ -69,6 +70,7 @@ private:
 		std::shared_ptr<class IModule> mod;
 		bool shouldRender = true;
 		bool isExtended = false;
+		Vec2 previewSize = {};
 		float arrowRot = 180.f;
 		float lerpArrowRot = 0.f;
 		float lerpToggle = 0.f;
@@ -79,6 +81,8 @@ private:
 			return a.name < b.name;
 		}
 	};
+
+	std::map<Setting*, std::shared_ptr<ui::TextBox>> settingBoxes = {};
 
 	d2d::Rect rect = {};
 	d2d::Rect cPickerRect = {};

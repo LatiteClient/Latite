@@ -28,6 +28,7 @@ public:
 	[[nodiscard]] static class Keyboard& getKeyboard() noexcept;
 
 	[[nodiscard]] Timings& getTimings() noexcept { return timings; }
+	[[nodiscard]] std::string getCommandPrefix() { return std::get<TextValue>(commandPrefix).str; }
 
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);
@@ -75,6 +76,7 @@ public:
 private:
 	Timings timings{};
 
+	ValueType commandPrefix = TextValue(".");
 	ValueType menuKey = KeyValue('M');
 	ValueType menuBlurEnabled = BoolValue(true);
 	// TODO: add disabled settings, for people who already only support dx11, gray it out

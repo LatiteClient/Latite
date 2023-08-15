@@ -96,7 +96,7 @@ void ClickGUI::onRender(Event&) {
 		dc.ctx->SetTransform(D2D1::Matrix3x2F::Scale({ calcAnim, calcAnim }, D2D1_POINT_2F(rect.center().x, rect.center().y)));
 		dc.ctx->GetTransform(&currentMatr);
 	}
-	calcAnim = std::lerp(calcAnim, isActive() ? 1.f : 0.f, sdk::ClientInstance::get()->minecraft->timer->alpha * 0.2f);
+	calcAnim = std::lerp(calcAnim, isActive() ? 1.f : 0.f, Latite::getRenderer().getDeltaTime() * 0.2f);
 
 	d2d::Color outline = d2d::Color::RGB(0, 0, 0);
 	outline.a = 0.28f;
@@ -398,10 +398,13 @@ void ClickGUI::onRender(Event&) {
 		float y = searchRect.bottom + padFromSearchBar;
 		// TODO: clipping
 		dc.ctx->PushAxisAlignedClip({ rect.left, y, rect.right, rect.bottom }, D2D1_ANTIALIAS_MODE_ALIASED);
+		modClip = { rect.left, y, rect.right, rect.bottom};
 
 		float yStart = y -= this->lerpScroll;
 
-		lerpScroll = std::lerp(lerpScroll, scroll, sdk::ClientInstance::get()->minecraft->timer->alpha / 5.f);
+		this->scroll = std::clamp(scroll, 0.f, scrollMax);
+
+		lerpScroll = std::lerp(lerpScroll, scroll, Latite::getRenderer().getDeltaTime() / 5.f);
 
 		// Sort Modules
 		static std::vector<ModContainer> mods = {};
@@ -448,7 +451,6 @@ void ClickGUI::onRender(Event&) {
 
 		std::array<float, 3> columnOffs = { 0.f, 0.f, 0.f };
 
-		modClip = true;
 
 		// modules
 		scrollMax = 0.f;
@@ -463,11 +465,11 @@ void ClickGUI::onRender(Event&) {
 			float rlBounds = modWidth * 0.04561f;
 
 			// module settings calculations
+			dc.ctx->SetTarget(shadowBitmap.Get());
 			if (mod.isExtended) {
 
 				// clipping pane
 				{
-					dc.ctx->SetTarget(shadowBitmap.Get());
 					dc.ctx->Clear();
 
 					float textSizeDesc = textHeight * 0.72f;
@@ -478,22 +480,39 @@ void ClickGUI::onRender(Event&) {
 					dc.drawText(descTextRect, util::StrToWStr(mod.description), d2d::Color(1.f, 1.f, 1.f, 0.57f), FontSelection::Regular, textSizeDesc, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 					float padToSetting = 0.014184f * rect.getHeight();
-					float settingPadY = padToSetting * 2.f;
+					float settingPadY = padToSetting * 2.5f;
 					float settingHeight = rect.getHeight() * setting_height_relative;
 
 					modRectActual.bottom += padToSetting;
 					mod.mod->settings->forEach([&](std::shared_ptr<Setting> set) {
 						if (set->visible) {
-							if (set->shouldRender(*mod.mod->settings.get()) && drawSetting(set.get(), mod.mod->settings.get(), {descTextRect.left, modRectActual.bottom}, dc, descTextRect.getWidth(), 0.25f)) {
+							if (set->shouldRender(*mod.mod->settings.get()) && drawSetting(set.get(), mod.mod->settings.get(), { descTextRect.left, modRectActual.bottom }, dc, descTextRect.getWidth(), 0.25f)) {
 								modRectActual.bottom += settingHeight;
 								modRectActual.bottom += settingPadY;
 							}
 						}
 						});
 
-					dc.ctx->SetTarget(myBitmap);
+					if (mod.mod->isHud()) {
+						auto rMod = static_cast<HUDModule*>(mod.mod.get());
+
+						RectF box = { modRectActual.left, modRectActual.bottom,
+						modRectActual.right, modRectActual.bottom + mod.previewSize.y };
+
+						Vec2 drawPos = box.center(mod.previewSize);
+						auto real = RectF(drawPos.x, drawPos.y, 0, 0);
+						D2D1::Matrix3x2F oTrans;
+						dc.ctx->GetTransform(&oTrans);
+						dc.ctx->SetTransform(D2D1::Matrix3x2F::Scale(1.f, 1.f) * D2D1::Matrix3x2F::Translation(drawPos.x, drawPos.y));
+						float oSize = rMod->getScale();
+						rMod->render(dc, true, false);
+						mod.previewSize = rMod->getRectNonScaled().getSize();
+						dc.ctx->SetTransform(oTrans);
+						modRectActual.bottom += box.getHeight() * 1.25f;
+					}
 				}
 			}
+			dc.ctx->SetTarget(myBitmap);
 
 			dc.fillRoundedRectangle(modRectActual, d2d::Color::RGB(0x44, 0x44, 0x44).asAlpha(0.22f), .22f * modHeight);
 			if (mod.mod->isEnabled()) dc.drawRoundedRectangle(modRectActual, d2d::Color::RGB(0x32, 0x39, 0x76).asAlpha(1.f), .22f * modHeight, 1.f, DXContext::OutlinePosition::Inside);;
@@ -537,7 +556,7 @@ void ClickGUI::onRender(Event&) {
 				center2.x = toggleRect.right - circleOffs;
 				float onDist = center2.x - center.x;
 
-				mod.lerpToggle = std::lerp(mod.lerpToggle, mod.mod->isEnabled() ? 1.f : 0.f, sdk::ClientInstance::get()->minecraft->timer->alpha * 0.3f);
+				mod.lerpToggle = std::lerp(mod.lerpToggle, mod.mod->isEnabled() ? 1.f : 0.f, Latite::getRenderer().getDeltaTime() * 0.3f);
 
 				center.x += onDist * mod.lerpToggle;
 
@@ -563,7 +582,7 @@ void ClickGUI::onRender(Event&) {
 				dc.ctx->GetTransform(&oMatr);
 				float toLerp = mod.isExtended ? 0.f : 180.f;
 				dc.ctx->SetTransform(D2D1::Matrix3x2F::Rotation(mod.lerpArrowRot, { rc.centerX(), rc.centerY() }) * oMatr);
-				mod.lerpArrowRot = std::lerp(mod.lerpArrowRot, toLerp, sdk::ClientInstance::get()->minecraft->timer->alpha * 0.3f);
+				mod.lerpArrowRot = std::lerp(mod.lerpArrowRot, toLerp, Latite::getRenderer().getDeltaTime() * 0.3f);
 				// icon
 				dc.ctx->DrawBitmap(Latite::getAssets().arrowIcon.getBitmap(), rc.get());
 				dc.ctx->SetTransform(oMatr);
@@ -571,18 +590,8 @@ void ClickGUI::onRender(Event&) {
 
 			columnOffs[i] += modRectActual.getHeight() - modRect.getHeight();
 
-			if (mod.isExtended && mod.mod->isHud() && (modRectActual.contains(cursorPos) || colorPicker.setting)) {
-				auto hMod = static_cast<HUDModule*>(mod.mod.get());
-
-				D2D1::Matrix3x2F oTrans;
-				dc.ctx->GetTransform(&oTrans);
-				dc.ctx->SetTransform(D2D1::Matrix3x2F::Scale(hMod->getScale(), hMod->getScale())* D2D1::Matrix3x2F::Translation(hMod->getRect().left, hMod->getRect().top));
-				hMod->render(dc, false, isActive());
-				dc.ctx->SetTransform(oTrans);
-			}
-
 			// scrolling max
-			float scrollYNew = std::max(0.f, modRectActual.bottom - rect.bottom) ;
+			float scrollYNew = std::max(0.f, (modRectActual.bottom + padFromSearchBar) - rect.bottom) + lerpScroll;
 			if (scrollYNew > scrollMax) scrollMax = scrollYNew;
 			if (i >= (numMods - 1)) {
 				i = 0;
@@ -602,7 +611,7 @@ void ClickGUI::onRender(Event&) {
 		dc.ctx->PopAxisAlignedClip();
 	}
 
-	modClip = false;
+	modClip = std::nullopt;
 
 	if (colorPicker.setting) {
 		drawColorPicker();
@@ -610,6 +619,7 @@ void ClickGUI::onRender(Event&) {
 			auto& colVal = std::get<ColorValue>(*colorPicker.setting->value);
 			auto d2dCol = d2d::Color(util::HSVToColor(colorPicker.pickerColor)).asAlpha(colorPicker.opacityMod);
 			*colorPicker.selectedColor = { d2dCol.r, d2dCol.g, d2dCol.b, d2dCol.a };
+			colorPicker.setting->update();
 			colorPicker = ColorPicker();
 		}
 	}
@@ -715,11 +725,52 @@ namespace {
 
 bool ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, DXContext& dc, float size, float fTextWidth) {
 	const float checkboxSize = rect.getWidth() * setting_height_relative;
-	const float textSize = checkboxSize * 0.9f;
+	const float textSize = checkboxSize * 0.8f;
 	const auto cursorPos = sdk::ClientInstance::get()->cursorPos;
 	const float round = 0.1875f * checkboxSize;
 
 	switch ((Setting::Type)((*set->value).index())) {
+	case Setting::Type::Text:
+	{
+		RectF rc = { pos.x, pos.y, (pos.x + size) - (fTextWidth * size), pos.y + checkboxSize };
+		RectF txtRc = rc;
+		RectF rightRc = rc;
+
+		txtRc.left += (rc.getWidth() * fTextWidth);
+		rightRc.right = txtRc.left;
+
+		d2d::Color col = d2d::Color::RGB(0x8D, 0x8D, 0x8D).asAlpha(0.11f);
+		std::shared_ptr<ui::TextBox> tb;
+		for (auto& items : settingBoxes) {
+			if (items.first == set) {
+				tb = items.second;
+			}
+		}
+
+		if (!tb) {
+			tb = std::make_shared<ui::TextBox>(txtRc);
+			settingBoxes[set] = tb;
+			Latite::get().addTextBox(settingBoxes[set].get());
+
+		}
+		tb->setRect(txtRc);
+		tb->render(dc, round, col, D2D1::ColorF::White);
+		if (tb->isSelected()) {
+			dc.drawRoundedRectangle(txtRc, D2D1::ColorF::White, round, 1.f);
+		}
+
+		auto& textVal = std::get<TextValue>(*set->value);
+
+		if (justClicked[0]) {
+			if (shouldSelect(tb->getRect(), cursorPos))
+				tb->setSelected(true);
+			else tb->setSelected(false);
+		}
+
+		textVal.str = std::move(tb->getText()); // I think im supposed to std::move this?
+		dc.drawText(rightRc, util::StrToWStr(set->getDisplayName()), { 1.f, 1.f, 1.f, 1.f }, Renderer::FontSelection::Semilight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+	}
+	break;
 	case Setting::Type::Bool:
 	{
 		RectF checkboxRect = { pos.x, pos.y, pos.x + checkboxSize, pos.y + checkboxSize };
@@ -741,6 +792,7 @@ bool ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, D
 
 		if (contains && justClicked[0]) {
 			std::get<BoolValue>(*set->value) = !std::get<BoolValue>(*set->value);
+			set->update();
 			playClickSound();
 		}
 
@@ -761,7 +813,7 @@ bool ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, D
 		RectF textRect = { newX, checkboxRect.top, newX + (size - rem), checkboxRect.bottom };
 		auto disp = util::StrToWStr(set->getDisplayName());
 
-		dc.drawText(textRect, disp, { 1.f, 1.f, 1.f, 1.f }, FontSelection::Regular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(textRect, disp, { 1.f, 1.f, 1.f, 1.f }, FontSelection::Semilight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		auto desc = util::StrToWStr(set->desc());
 		if (!desc.empty())
 			if (contains || shouldSelect(textRect, cursorPos)) tooltip = desc;
@@ -813,6 +865,7 @@ bool ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, D
 		}
 		if (activeSetting == set && this->capturedKey > 0) {
 			std::get<KeyValue>(*set->value) = capturedKey;
+			set->update();
 			activeSetting = 0;
 			capturedKey = 0;
 		}
@@ -826,7 +879,7 @@ bool ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, D
 		RectF textRect = { keyRect.right + padToName, keyRect.top, newX + (size - rem), keyRect.bottom };
 
 		auto disp = util::StrToWStr(set->getDisplayName());
-		dc.drawText(textRect, disp, { 1.f, 1.f, 1.f, 1.f }, FontSelection::Regular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(textRect, disp, { 1.f, 1.f, 1.f, 1.f }, FontSelection::Semilight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		if (!set->desc().empty())
 			if (shouldSelect(textRect, cursorPos)) tooltip = util::StrToWStr(set->desc());
 		if (shouldSelect(keyRect, cursorPos)) {
@@ -838,6 +891,7 @@ bool ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, D
 			if (justClicked[1]) {
 				activeSetting = nullptr;
 				std::get<KeyValue>(*set->value) = 0;
+				set->update();
 				playClickSound();
 			}
 		}
@@ -866,7 +920,7 @@ bool ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, D
 
 		auto text = util::StrToWStr(set->enumData->getSelectedName());
 
-		auto ts = dc.getTextSize(text, FontSelection::Regular, textSize * 0.9f) + Vec2(8.f, 0.f);
+		auto ts = dc.getTextSize(text, FontSelection::Semilight, textSize * 0.9f) + Vec2(8.f, 0.f);
 		if (ts.x > enumRect.getWidth()) enumRect.right = enumRect.left + (ts.x);
 
 		dc.fillRoundedRectangle(enumRect, Color(set->rendererInfo.col), round);
@@ -901,6 +955,7 @@ bool ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, D
 			if (justClicked[0]) {
 				// cycle
 				set->enumData->next();
+				set->update();
 				playClickSound();
 			}
 		}
@@ -917,7 +972,7 @@ bool ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, D
 		auto& colVal = std::get<ColorValue>(*set->value);
 
 		RectF textRect = { colRect.right + padToName, colRect.top, pos.x + size, colRect.bottom };
-		dc.drawText(textRect, name, { 1.f, 1.f, 1.f, 1.f }, FontSelection::Regular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(textRect, name, { 1.f, 1.f, 1.f, 1.f }, FontSelection::Semilight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		
 		ComPtr<ID2D1LinearGradientBrush> gradientBrush;
 		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
@@ -975,7 +1030,7 @@ bool ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, D
 		float textWidth = fTextWidth * size;
 		float sliderHeight = (rect.getHeight() * 0.017730f);
 
-		float textSz = sliderHeight * 1.5f;
+		float textSz = textSize;//sliderHeight * 1.5f;
 
 		RectF textRect = { pos.x, pos.y, pos.x + textWidth, pos.y + sliderHeight };
 		RectF rtTextRect = textRect.translate(0.f, -(textRect.getHeight() / 2.f));
@@ -1026,6 +1081,7 @@ bool ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, D
 				newVal *= interval;
 
 				std::get<FloatValue>(*set->value) = newVal;
+				set->update();
 			}
 		}
 
@@ -1058,7 +1114,7 @@ bool ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, D
 
 bool ClickGUI::shouldSelect(d2d::Rect rc, Vec2 const& pt) {
 	if (modClip) {
-		if (!rect.contains(pt) || !Screen::shouldSelect(rc, pt)) {
+		if (!modClip.value().contains(pt) || !Screen::shouldSelect(rc, pt)) {
 			return false;
 		}
 	}
@@ -1300,7 +1356,9 @@ void ClickGUI::drawColorPicker() {
 
 	// alpha
 	if (colorPicker.isEditingOpacity || (justClicked[0] && alphaBar.contains(cursorPos))) {
-		float val = (colorPicker.opacityMod / (cPickerRect.getWidth()));
+		colorPicker.opacityMod = std::max(std::min(cursorPos.x - alphaBar.left, alphaBar.getWidth()) / alphaBar.getWidth(), 0.f);
+		
+		float val = colorPicker.opacityMod;
 
 		float interval = 0.05f;
 
@@ -1310,8 +1368,6 @@ void ClickGUI::drawColorPicker() {
 		val *= interval;
 
 		colorPicker.opacityMod = val;
-		
-		colorPicker.opacityMod = std::max(std::min(cursorPos.x - alphaBar.left, alphaBar.getWidth()) / alphaBar.getWidth(), 0.f);
 		colorPicker.isEditingOpacity = true;
 	}
 
@@ -1409,5 +1465,14 @@ void ClickGUI::onDisable() {
 	activeSetting = nullptr;
 	searchTextBox.reset();
 	searchTextBox.setSelected(false);
+	
+	for (auto& tb : this->settingBoxes) {
+		tb.second->setSelected(false);
+	}
+
+	for (auto& tb : this->pickerTextBoxes) {
+		tb.setSelected(false);
+	}
+
 	Latite::getConfigManager().saveCurrentConfig();
 }

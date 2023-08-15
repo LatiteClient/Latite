@@ -36,6 +36,10 @@ JsValueRef JsSettingClass::getValueCallback(JsValueRef callee, bool isConstructo
 			return colClass->construct(Vec2(std::get<Vec2Value>(*set->value).x, std::get<Vec2Value>(*set->value).y));
 		}
 	}
+	case Setting::Type::Text:
+	{
+		return Chakra::MakeString(util::StrToWStr(std::get<TextValue>(*set->value).str));
+	}
 
 	}
 	return Chakra::GetNull();

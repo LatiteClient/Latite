@@ -188,6 +188,11 @@ void Renderer::render() {
 		reinit();
 	}
 
+	std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+	auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTime);
+	deltaTime = static_cast<float>(diff.count()) / 17.f; // based on 60-ish FPS
+	lastTime = now;
+
 	if (!hasInit) return;
 
 	auto idx = swapChain4->GetCurrentBackBufferIndex();

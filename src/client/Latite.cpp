@@ -231,6 +231,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         Logger::Info("Loaded master config");
     }
 
+    Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
+
     Logger::Info("Initialized Latite Client");
     return 0ul;
 }
@@ -362,6 +364,7 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getEventing().listen<FocusLostEvent>(this, (EventListenerFunc)&Latite::onFocusLost, 2);
     Latite::getEventing().listen<AppSuspendedEvent>(this, (EventListenerFunc)&Latite::onSuspended, 2);
     Latite::getEventing().listen<CharEvent>(this, (EventListenerFunc)&Latite::onChar, 2);
+    Latite::getEventing().listen<ClickEvent>(this, (EventListenerFunc)&Latite::onClick, 2);
 }
 
 void Latite::threadsafeInit() {

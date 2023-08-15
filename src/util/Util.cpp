@@ -4,6 +4,8 @@
 #include "sdk/common/world/Minecraft.h"
 #include "sdk/common/client/renderer/LevelRendererPlayer.h"
 #include "sdk/common/client/renderer/LevelRenderer.h"
+#include "client/Latite.h"
+#include "client/render/Renderer.h"
 
 #ifdef min
 #undef min
@@ -259,9 +261,7 @@ int util::StringToKey(std::string const& s) {
 
 std::string util::ToLower(std::string const& s) {
 	std::string ret = s;
-	std::transform(ret.begin(), ret.end(), ret.begin(), [](char c) {
-		return c + (char)20;
-		});
+	std::transform(ret.begin(), ret.end(), ret.begin(), ::tolower);
 	return ret;
 }
 
@@ -304,7 +304,7 @@ void util::PlaySoundUI(std::string const& sound, float volume, float pitch) {
 Color util::LerpColorState(Color const& current, Color const& on, Color const& off, bool state, float speed)
 {
 	Color ret = current;
-	float t = sdk::ClientInstance::get()->minecraft->timer->alpha* (speed / 10.f);
+	float t = Latite::getRenderer().getDeltaTime()* (speed / 10.f);
 	ret.r = std::lerp(current.r, state ? on.r : off.r, t);
 	ret.g = std::lerp(current.g, state ? on.g : off.g, t);
 	ret.b = std::lerp(current.b, state ? on.b : off.b, t);

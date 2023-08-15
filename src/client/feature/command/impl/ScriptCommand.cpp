@@ -20,7 +20,7 @@ using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Web::Http;
 using namespace winrt::Windows::Web::Http::Filters;
 
-ScriptCommand::ScriptCommand() : Command("script", "Do actions related to scripts", "\nload <folderPath>\ninstall <scriptName>\nunload <scriptName>\nreload <scriptName>\nstartup <folderPath>\nunload all", {})
+ScriptCommand::ScriptCommand() : Command("script", "Do actions related to scripts", "\n$ load <folderPath>\n$ install <scriptName>\n$ unload <scriptName>\n$ reload <scriptName>\n$ startup <folderPath>\n$ unload all", {})
 {
 }
 
@@ -151,7 +151,7 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 					ofs << strs.c_str();
 					ofs.close();
 				}
-				message("Script installed. Do &7" + CommandManager::prefix + "script load &7Startup/" + oName + "&r to run the script.");
+				message("Script installed. Do &7" + Latite::getCommandManager().prefix + "script load &7Startup/" + oName + "&r to run the script.");
 				message("This script will load every time you load Minecraft. To disable this, move the script out of the &7Startup&r folder.");
 				return true;
 			}

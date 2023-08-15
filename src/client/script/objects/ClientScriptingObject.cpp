@@ -7,6 +7,7 @@
 #include "client/feature/module/ModuleManager.h"
 
 #include "../class/impl/JsModuleClass.h"
+#include "client/feature/command/script/JsCommand.h"
 
 JsValueRef ClientScriptingObject::registerEventCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	JsValueRef undefined;
@@ -38,7 +39,7 @@ JsValueRef ClientScriptingObject::runCommandCallback(JsValueRef callee, bool isC
 	if (!Chakra::VerifyArgCount(argCount, 5)) return Chakra::GetFalse();
 	if (!Chakra::VerifyParameters({ {arguments[1], JsString} })) return JS_INVALID_REFERENCE;
 	auto s = Chakra::GetString(arguments[1]);
-	return Latite::getCommandManager().runCommand(CommandManager::prefix + util::WStrToStr(s)) ? Chakra::GetTrue() : Chakra::GetFalse();
+	return Latite::getCommandManager().runCommand(Latite::getCommandManager().prefix + util::WStrToStr(s)) ? Chakra::GetTrue() : Chakra::GetFalse();
 }
 
 JsValueRef ClientScriptingObject::showNotifCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
@@ -59,9 +60,21 @@ JsValueRef ClientScriptingObject::getMmgrCallback(JsValueRef callee, bool isCons
 	return reinterpret_cast<ClientScriptingObject*>(callbackState)->moduleManager;
 }
 
+JsValueRef ClientScriptingObject::getCmgrCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	JsValueRef undefined;
+	JS::JsGetUndefinedValue(&undefined);
+	if (!Chakra::VerifyArgCount(argCount, 1)) return undefined;
+	return reinterpret_cast<ClientScriptingObject*>(callbackState)->commandManager;
+}
+
 void ClientScriptingObject::initModuleManager() {
 	JS::JsCreateObject(&this->moduleManager);
 	JS::JsAddRef(moduleManager, nullptr);
+}
+
+void ClientScriptingObject::initCommandManager() {
+	JS::JsCreateObject(&this->commandManager);
+	JS::JsAddRef(commandManager, nullptr);
 }
 
 void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
@@ -69,6 +82,7 @@ void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(object, runCommandCallback, L"runCommand");
 	Chakra::DefineFunc(object, showNotifCallback, L"showNotification");
 	Chakra::DefineFunc(object, getMmgrCallback, L"getModuleManager", this);
+	Chakra::DefineFunc(object, getCmgrCallback, L"getCommandManager", this);
 
 	initModuleManager();
 	Chakra::DefineFunc(moduleManager, mmgrRegisterModuleCallback, L"registerModule");
@@ -76,6 +90,9 @@ void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(moduleManager, mmgrGetModuleByName, L"getModuleByName");
 	Chakra::DefineFunc(moduleManager, mmgrForEachModule, L"forEachModule");
 
+	initCommandManager();
+	Chakra::DefineFunc(commandManager, cmgrRegisterCommandCallback, L"registerCommand");
+	Chakra::DefineFunc(commandManager, cmgrDeregisterCommandCallback, L"deregisterCommand");
 }
 
 
@@ -205,4 +222,52 @@ JsValueRef ClientScriptingObject::mmgrForEachModule(JsValueRef callee, bool isCo
 		});
 
 	return null;
+}
+
+JsValueRef ClientScriptingObject::cmgrRegisterCommandCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	JsValueRef undefined;
+	JS::JsGetUndefinedValue(&undefined);
+	if (!Chakra::VerifyArgCount(argCount, 2)) return undefined;
+
+	auto sz = Chakra::VerifyParameters({ {arguments[1], JsObject} });
+	if (!sz.success) {
+		// handle
+		Chakra::ThrowError(sz.str);
+		return undefined;
+	}
+
+	JsCommand* cmd;
+
+	JS::JsGetExternalData(arguments[1], reinterpret_cast<void**>(&cmd));
+
+	if (!cmd) {
+		Chakra::ThrowError(L"Object is not a command");
+		return undefined;
+	}
+
+	Latite::getCommandManager().registerScriptCommand(cmd);
+	return undefined;
+}
+
+JsValueRef ClientScriptingObject::cmgrDeregisterCommandCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	JsValueRef undefined;
+	JS::JsGetUndefinedValue(&undefined);
+	if (!Chakra::VerifyArgCount(argCount, 2)) return undefined;
+
+	auto sz = Chakra::VerifyParameters({ {arguments[1], JsObject} });
+	if (!sz.success) {
+		// handle
+		Chakra::ThrowError(sz.str);
+		return undefined;
+	}
+
+	JsCommand* cmd;
+
+	// TODO: check if its a script command
+
+	JS::JsGetExternalData(arguments[1], reinterpret_cast<void**>(&cmd));
+
+	Latite::getCommandManager().deregisterScriptCommand(cmd);
+
+	return undefined;
 }

@@ -106,6 +106,14 @@ void Chakra::SetPropertyObject(JsValueRef ref, std::wstring name, JsValueRef obj
 	JS::JsSetProperty(ref, propId, obj, strict);
 }
 
+JsValueRef Chakra::GetProperty(JsValueRef obj, std::wstring name) {
+	JsPropertyIdRef propId;
+	JS::JsGetPropertyIdFromName(name.c_str(), &propId);
+	JsValueRef ret;
+	JS::JsGetProperty(obj, propId, &ret);
+	return ret;
+}
+
 JsValueRef Chakra::TryGet(JsValueRef* args, unsigned short count, unsigned short idx) {
 	if (idx >= count) return JS_INVALID_REFERENCE;
 	return args[idx];

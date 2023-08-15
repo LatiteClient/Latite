@@ -11,6 +11,7 @@ public:
 	void onDisable() override;
 private:
 	void onRender(Event& ev);
+	void onClick(Event& ev);
 	void onRenderLayer(Event& ev);
 	void renderModule(class HUDModule* mod);
 	void doDragging();

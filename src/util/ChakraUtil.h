@@ -41,6 +41,8 @@ public:
 	static void SetPropertyNumber(JsValueRef ref, std::wstring name, double value, bool strict = false);
 	static void SetPropertyBool(JsValueRef ref, std::wstring name, bool value, bool strict = false);
 	static void SetPropertyObject(JsValueRef ref, std::wstring name, JsValueRef obj, bool strict = false);
+	
+	static JsValueRef GetProperty(JsValueRef obj, std::wstring name);
 
 	static JsValueRef TryGet(JsValueRef* args, unsigned short count, unsigned short idx);
 

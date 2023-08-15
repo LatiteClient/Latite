@@ -6,6 +6,7 @@ void Module::loadConfig(SettingGroup& resolvedGroup) {
 			if (modSet->name() == set->name()) {
 				std::visit([&](auto&& obj) {
 					*modSet->value = obj;
+					modSet->update();
 					}, set->resolvedValue);
 			}
 			});

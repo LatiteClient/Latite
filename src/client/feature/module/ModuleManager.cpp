@@ -7,6 +7,7 @@
 #include "impl/visual/HurtColor.h"
 
 #include "impl/hud/FPSCounter.h"
+#include "impl/hud/CPSCounter.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
 
@@ -21,6 +22,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<HurtColor>());
 	//this->items.push_back(std::make_shared<Screenshot>());
 	this->items.push_back(std::make_shared<FPSCounter>());
+	this->items.push_back(std::make_shared<CPSCounter>());
 
 	for (auto& mod : items) {
 		mod->onInit();

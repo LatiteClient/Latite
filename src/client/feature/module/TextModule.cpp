@@ -1,22 +1,22 @@
 #include "TextModule.h"
 #include "api/feature/setting/Setting.h"
+#include "util/Util.h"
 
 void TextModule::onInit() {
 	addSetting("fillBg", "Background", "", fillBg);
-	addSetting("customSize", "Fixed Size", "Use a custom size instead of padding", customSize);
+	addSetting("customSize", "Fixed Size", "Use a custom size instead of padding", customSize, "fillBg"_istrue);
 	addSliderSetting("bgX", "BG X", "Background size (only if Fixed Size is enabled)", bgX, FloatValue(0.f), FloatValue(maxBGX), FloatValue(2.5f), "customSize"_istrue);
 	addSliderSetting("bgY", "BG Y", "Background size (only if Fixed Size is enabled)", bgY, FloatValue(0.f), FloatValue(300.f), FloatValue(2.5f), "customSize"_istrue);
 
 	addSliderSetting("padX", "Pad X", "Padding", padX, FloatValue(0.f), FloatValue(40.f), FloatValue(2.f), "customSize"_isfalse);
 	addSliderSetting("padY", "Pad Y", "Padding", padY, FloatValue(0.f), FloatValue(40.f), FloatValue(2.f), "customSize"_isfalse);
 
+	addSetting("prefix", "Prefix", "The text before the value", prefix);
+	addSetting("suffix", "Suffix", "The text after the value", suffix);
 	addSliderSetting("textSize", "Text Size", "", textSizeS, FloatValue(2.f), FloatValue(100.f), FloatValue(2.f));
 
 	addSetting("textCol", "Text", "", textColor);
 	addSetting("bgColor", "Background", "", bgColor);
-
-	// TODO: Text settings
-	addSetting("brackets", "Brackets", "", brackets);
 
 	addSetting("showOutline", "Outline", "", showOutline);
 	addSliderSetting("outlineThickness", "Thickness", "", outlineThickness, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f), "showOutline"_istrue);
@@ -74,10 +74,8 @@ void TextModule::render(DXContext& ctx, bool isDefault, bool inEditor) {
 
 std::wstringstream TextModule::processText(std::wstringstream& stream) {
 	std::wstringstream str;
-	if (std::get<BoolValue>(brackets)) {
-		str << L"[";
-	}
+	str << util::StrToWStr(std::get<TextValue>(prefix).str);
 	str << stream.str();
-	if (std::get<BoolValue>(brackets)) str << L"]";
+	str << util::StrToWStr(std::get<TextValue>(suffix).str);
 	return str;
 }
