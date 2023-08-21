@@ -9,7 +9,7 @@
 #include "util/DxContext.h"
 #include "sdk/common/client/game/ClientInstance.h"
 
-Screen::Screen(std::string const& name) : name(name) {
+Screen::Screen() {
 	/*
 	arrow = LoadCursorW(Latite::get().dllInst, IDC_ARROW);
 	hand = LoadCursorW(Latite::get().dllInst, IDC_HAND);
@@ -18,7 +18,7 @@ Screen::Screen(std::string const& name) : name(name) {
 	// ^ this doesnt work with resources...
 
 	Eventing::get().listen<UpdateEvent>(this, (EventListenerFunc)&Screen::onUpdate, 0);
-	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Screen::onRenderOverlay, 0, true);
+	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Screen::onRenderOverlay, 1, true);
 	Eventing::get().listen<ClickEvent>(this, (EventListenerFunc)&Screen::onClick, 3, true);
 }
 
@@ -36,7 +36,7 @@ void Screen::onUpdate(Event& ev) {
 		break;
 	}
 	*/
-	sdk::ClientInstance::get()->releaseCursor();
+	SDK::ClientInstance::get()->releaseCursor();
 }
 
 void Screen::close() {
@@ -72,7 +72,7 @@ void Screen::onRenderOverlay(Event& ev) {
 
 	if (isActive() && this->tooltip.has_value()) {
 		DXContext dc;
-		Vec2& mousePos = sdk::ClientInstance::get()->cursorPos;
+		Vec2& mousePos = SDK::ClientInstance::get()->cursorPos;
 		d2d::Rect textRect = dc.getTextRect(this->tooltip.value(), Renderer::FontSelection::Regular, 15.f, 8.f);
 		textRect.setPos(mousePos);
 		auto height = textRect.getHeight() * 0.9f;

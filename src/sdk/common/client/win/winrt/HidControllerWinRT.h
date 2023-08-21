@@ -1,6 +1,6 @@
 #pragma once
 
-namespace sdk {
+namespace SDK {
 	class HidControllerWinRT {
 	};
 }

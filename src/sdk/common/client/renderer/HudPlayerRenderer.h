@@ -1,5 +1,5 @@
 #pragma once
-namespace sdk {
+namespace SDK {
 	class HudPlayerRenderer {
 		char pad_0000[16]; //0x0000
 	public:

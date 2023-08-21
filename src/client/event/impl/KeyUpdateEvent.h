@@ -10,7 +10,7 @@ public:
 
 	[[nodiscard]] int getKey() { return key; }
 	[[nodiscard]] int isDown() { return down; }
-	[[nodiscard]] int inUI() { return !sdk::ClientInstance::get()->minecraftGame->isCursorGrabbed(); }
+	[[nodiscard]] int inUI() { return !SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed(); }
 
 	KeyUpdateEvent(int key, bool down) : key(key), down(down) {}
 private:

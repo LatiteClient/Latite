@@ -18,6 +18,7 @@ public:
 	void saveSetting(std::shared_ptr<Setting> set, nlohmann::json& obj);
 
 	[[nodiscard]] std::vector<std::shared_ptr<SettingGroup>> getOutput() noexcept;
+	[[nodiscard]] std::filesystem::path getPath() { return path; }
 private:
 	std::vector<std::shared_ptr<SettingGroup>> groups;
 	std::vector<std::shared_ptr<SettingGroup>> out;

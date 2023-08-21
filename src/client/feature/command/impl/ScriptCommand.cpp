@@ -92,71 +92,13 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 	}
 	else if (args[0] == "install") {
 		if (args.size() != 2) return false;
-		std::wstring token = L"?token=GHSAT0AAAAAACETEXYVRCL7YLMVSDOYZB6OZFLNT7Q";
-		std::wstring registry = L"https://raw.githubusercontent.com/LatiteScripting/Scripts/master/registry";
-		std::wstring jsonPath = registry + L"/scripts.json" + token;
-		nlohmann::json scriptsJson;
-		auto http = HttpClient();
-		{
-			// get JSON
-			winrt::Windows::Foundation::Uri requestUri(jsonPath);
-
-			HttpRequestMessage request(HttpMethod::Get(), requestUri);
-
-			try {
-				auto operation = http.SendRequestAsync(request);
-				auto response = operation.get();
-				auto cont = response.Content();
-				auto strs = cont.ReadAsStringAsync().get();
-
-				try {
-					scriptsJson = nlohmann::json::parse(std::wstring(strs.c_str()));
-				}
-				catch (nlohmann::json::parse_error& e) {
-					message(e.what(), true);
-					return true;
-				}
-			}
-			catch (winrt::hresult_error const& err) {
-				message(util::WStrToStr(err.message().c_str()), true);
-				return true;
-			}
+		auto err = Latite::getScriptManager().installScript(args[1]);
+		if (err.has_value()) {
+			message("Could not install script (" + err.value() + std::string(")"), true);
+			return true;
 		}
-		auto arr = scriptsJson["scripts"];
-		for (auto& js : arr) {
-			auto name = js["name"].get<std::string>();
-			auto oName = js["name"].get<std::string>();
-			auto woName = util::StrToWStr(oName);
-			std::string in = args[1];
-			std::transform(in.begin(), in.end(), in.begin(), ::tolower);
-			std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-			if (in == name) {
-				message("Installing " + oName + " v" + js["version"].get<std::string>() + " by " + js["author"].get<std::string>());
-				std::wstring path = util::GetLatitePath() / "Startup" / "Scripts" / woName;
-				std::filesystem::create_directory(path);
-				for (auto& fil : js["files"]) {
-					auto fws = util::StrToWStr(fil.get<std::string>());
-					winrt::Windows::Foundation::Uri requestUri(registry + woName + L"/" + fws + token);
-					HttpRequestMessage request(HttpMethod::Get(), requestUri);
-					auto operation = http.SendRequestAsync(request);
-					auto response = operation.get();
-					auto cont = response.Content();
-					auto strs = cont.ReadAsStringAsync().get();
-					std::wofstream ofs;
-					ofs.open(path + L"\\" + fws);
-					if (ofs.fail()) {
-						message("Error opening file: " + std::to_string(*_errno()), true);
-						return true;
-					}
-					ofs << strs.c_str();
-					ofs.close();
-				}
-				message("Script installed. Do &7" + Latite::getCommandManager().prefix + "script load &7Startup/" + oName + "&r to run the script.");
-				message("This script will load every time you load Minecraft. To disable this, move the script out of the &7Startup&r folder.");
-				return true;
-			}
-		}
-		message("Could not find script " + args[0], true);
+		message("Script installed. Do &7" + Latite::getCommandManager().prefix + "script load &7Startup/" + args[1] + "&r to run the script.");
+		message("This script will load every time you load Minecraft. To disable this, move the script out of the &7Startup&r folder.");
 		return true;
 	}
 	else {

@@ -1,5 +1,5 @@
 #pragma once
-namespace sdk {
+namespace SDK {
 	class Timer {
 	public:
 		float tps;

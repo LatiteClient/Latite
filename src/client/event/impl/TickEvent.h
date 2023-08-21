@@ -7,11 +7,11 @@ class TickEvent : public Event {
 public:
 	static const uint32_t hash = TOHASH(TickEvent);
 	
-	[[nodiscard]] sdk::Level* getLevel() { return level; }
+	[[nodiscard]] SDK::Level* getLevel() { return level; }
 
-	TickEvent(sdk::Level* lvl) : level(lvl) {
+	TickEvent(SDK::Level* lvl) : level(lvl) {
 	}
 
 protected:
-	sdk::Level* level;
+	SDK::Level* level;
 };

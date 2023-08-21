@@ -2,9 +2,9 @@
 #include "sdk/version.h"
 #include "api/memory/memory.h"
 
-void sdk::Level::playSoundEvent(std::string const& text, Vec3 const& pos, float vol, float pitch) {
+void SDK::Level::playSoundEvent(std::string const& text, Vec3 const& pos, float vol, float pitch) {
 	int index = 0;
-	switch (sdk::internalVers) {
+	switch (SDK::internalVers) {
 	case V1_18_12:
 		index = 0xBD;
 		break;

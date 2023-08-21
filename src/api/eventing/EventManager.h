@@ -8,7 +8,7 @@
 class IEventManager {
 public:
 	template <typename T>
-	bool dispatchEvent(T& ev) {
+	bool dispatch(T& ev) {
 		static_assert(std::is_convertible<T*, Event*>::value, "type must inherit from Event");
 		//static_assert(!(std::is_convertible<Event*, T*>::value), "type must not be an Event");
 

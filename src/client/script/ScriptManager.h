@@ -21,6 +21,7 @@ public:
 	void handleErrors(JsErrorCode code);
 	bool loadPrerunScripts();
 	void runScriptingOperations();
+	std::optional<int> installScript(std::string const& name);
 
 	void init();
 	void initListeners();

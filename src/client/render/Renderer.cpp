@@ -163,7 +163,7 @@ bool Renderer::init(IDXGISwapChain* chain) {
 	firstInit = true;
 
 	RendererInitEvent ev{};
-	Eventing::get().dispatchEvent(ev);
+	Eventing::get().dispatch(ev);
 
     return true;
 }
@@ -209,7 +209,7 @@ void Renderer::render() {
 	d2dCtx->SetTransform(D2D1::Matrix3x2F::Identity());
 
 	RenderOverlayEvent ev{ d2dCtx.Get() };
-	Eventing::get().dispatchEvent(ev);
+	Eventing::get().dispatch(ev);
 
 	d2dCtx->EndDraw();
 
@@ -222,7 +222,7 @@ void Renderer::render() {
 
 void Renderer::releaseAllResources() {
 	RendererCleanupEvent ev{};
-	Eventing::get().dispatchEvent(ev);
+	Eventing::get().dispatch(ev);
 
 	if (d2dCtx) d2dCtx->SetTarget(nullptr);
 

@@ -179,6 +179,18 @@ public:
 		return newBitmap;
 	}
 
+	[[nodiscard]] void copyCurrentBitmap(ID2D1Bitmap1*& bmp, d2d::Rect const& rc) {
+		auto idx = swapChain4->GetCurrentBackBufferIndex();
+		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
+
+		D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
+		D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
+
+		auto pt = D2D1::Point2U((UINT32)rc.left, (UINT32)rc.top);
+		auto urc = D2D1::RectU((UINT32)rc.left, (UINT32)rc.top, (UINT32)rc.right, (UINT32)rc.bottom);
+		bmp->CopyFromBitmap(&pt, myBitmap, &urc);
+	}
+
 	[[nodiscard]] void copyCurrentBitmap(ID2D1Bitmap1*& bmp) {
 		auto idx = swapChain4->GetCurrentBackBufferIndex();
 		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];

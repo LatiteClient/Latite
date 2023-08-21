@@ -2,11 +2,11 @@
 #include <cstdint>
 #include "util/LMath.h"
 
-namespace sdk {
+namespace SDK {
 	class EntityContext {
 	public:
 		struct {
-			uintptr_t holder;
+			uintptr_t basicRegistry;
 		}*registry;
 
 		uint32_t id;

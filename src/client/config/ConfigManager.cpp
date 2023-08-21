@@ -19,6 +19,20 @@ bool ConfigManager::saveCurrentConfig() {
 	return save(loadedConfig);
 }
 
+bool ConfigManager::saveTo(std::wstring const& name) {
+	std::filesystem::path path = getUserPath() / (name + L".json");
+
+	for (auto& cfg : items) {
+		if (path == cfg->getPath()) {
+			return save(cfg);
+		}
+	}
+
+	auto cfg = std::make_shared<Config>(path);
+	return save(cfg);
+}
+
+
 bool ConfigManager::loadUserConfig(std::wstring const& name) {
 	auto path = getUserPath() / name;
 	if (!std::filesystem::exists(path)) path += ".json";

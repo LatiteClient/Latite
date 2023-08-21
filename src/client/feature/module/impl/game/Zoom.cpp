@@ -7,10 +7,13 @@
 Zoom::Zoom() : Module("Zoom", "Zoom", "Zooms like OptiFine", GAME, nokeybind) {
 	addSetting("zoomKey", "Zoom Key", "The key to press to zoom", this->zoomKey);
 	addSliderSetting("modifier", "Modifier", "How far to zoom", this->modifier, FloatValue(1.f), FloatValue(50.f), FloatValue(1.f));
-	addSliderSetting("animationSpeed", "Speed", "The speed of the animation", animSpeed, FloatValue(1.f), FloatValue(50.f), FloatValue(1.f));
+	addSetting("animation", "Animation", "Whether to have a zoom animation or not", hasAnim);
+	addSliderSetting("animationSpeed", "Speed", "The speed of the animation", animSpeed, FloatValue(1.f), FloatValue(5.f), FloatValue(1.f), "animation"_istrue);
+	addSetting("cinematic", "Cinematic Camera", "Enable cinematic camera while Zoom is on", this->cinematicCam);
 
 	listen<RenderLevelEvent>((EventListenerFunc)&Zoom::onRenderLevel);
 	listen<KeyUpdateEvent>((EventListenerFunc)&Zoom::onKeyUpdate);
+	listen<CinematicCameraEvent>((EventListenerFunc)&Zoom::onCinematicCamera);
 }
 
 void Zoom::onRenderLevel(Event& evGeneric) {
@@ -20,7 +23,8 @@ void Zoom::onRenderLevel(Event& evGeneric) {
 
 	// partial ticks
 	float alpha = Latite::getRenderer().getDeltaTime();
-	float lr = std::lerp(activeModifier, modifyTo, alpha * std::get<FloatValue>(animSpeed) / 10.f);
+	float lr = modifyTo;
+	if (std::get<BoolValue>(hasAnim)) lr = std::lerp(activeModifier, modifyTo, alpha * std::get<FloatValue>(animSpeed) / 10.f);
 	activeModifier = lr;
 
 	float& fx = ev.getLevelRenderer()->getLevelRendererPlayer()->getFovX();
@@ -35,5 +39,12 @@ void Zoom::onKeyUpdate(Event& evGeneric) {
 	if (ev.inUI()) return;
 	if (ev.getKey() == std::get<KeyValue>(this->zoomKey)) {
 		this->shouldZoom = ev.isDown();
+	}
+}
+
+void Zoom::onCinematicCamera(Event& evGeneric) {
+	auto& ev = reinterpret_cast<CinematicCameraEvent&>(evGeneric);
+	if (std::get<BoolValue>(this->cinematicCam)) {
+		ev.setValue(true);
 	}
 }

@@ -1,5 +1,5 @@
 #pragma once
-namespace sdk {
+namespace SDK {
 	class ScreenView
 	{
 		char pad_0000[72]; //0x0000

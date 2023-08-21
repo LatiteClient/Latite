@@ -1,5 +1,5 @@
 #pragma once
-#ifdef LATITE_DEBUG
+#ifndef LATITE_DEBUG
 #define API_NAMES
 #endif
 
@@ -26,6 +26,13 @@ public:
 		inline static SigImpl clientInstance{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8b 0d ? ? ? ? 48 85 c9 74 ? 48 83 39 ? 74 ? 48 8b 05 ? ? ? ? 48 85 c0 74 ? f0 ff 40 ? 48 8b 05 ? ? ? ? 48 8b 0d ? ? ? ? 48 89 43 ? 48 8b c3 48 89 3b c6 43 ? ? 48 89 4b ? 48 8b 5c 24 ? 48 83 c4 ? 5f c3 33 c0 48 8b cf 48 89 03 88 43 ? 48 89 43 ? 48 89 43 ? e8 ? ? ? ? 48 8b c3 48 8b 5c 24 ? 48 83 c4 ? 5f c3 cc cc cc cc cc cc cc cc cc cc cc e9 ? ? ? ? cc cc cc cc cc cc cc cc cc cc cc 48 89 5c 24 ? 48 89 74 24",
 			"ClientInstance"};
+	};
+
+	struct Components {
+		inline static SigImpl moveInputComponent{[](memory::signature_store&, uintptr_t res) { return res; },
+			// last 4 bytes is the hash of the component
+			"40 53 48 83 EC ? 48 8B DA BA 2E CD 8B 46",
+			"MoveInputComponent::try_get"};
 	};
 
 	inline static SigImpl LevelRenderer_renderLevel{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -90,4 +97,32 @@ public:
 	inline static SigImpl MinecraftGame__update{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? 48 8b 8b ? ? ? ? ba ? ? ? ? 48 83 c4",
 		"MinecraftGame::_update"};
+
+	// "Nat Punch timed out"
+	inline static SigImpl RakNetConnector_tick{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 48 8b f9 45 33 e4 4c 89 a5 ? ? ? ? 48 8d 95",
+		"RakNetConnector::tick"};
+	
+	// ref: your GPU ("AMD Radeon RX 5500")
+	inline static SigImpl GpuInfo{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+		"4c 8d 0d ? ? ? ? 48 c7 c7 ? ? ? ? 48 8b df 48 ff c3 41 80 3c 19 ? 75 ? 48 8d 4c 24 ? 48 83 fb ? 77 ? 48 89 5c 24 ? 4c 8b c3 49 8b d1 e8 ? ? ? ? c6 44 1c ? ? eb ? 45 33 c0 48 8b d3 e8 ? ? ? ? 48 8d 4c 24",
+		"GpuInfo"};
+
+	// ref: RakPeer vtable
+	inline static SigImpl RakPeer_GetAveragePing{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 81 ec ? ? ? ? 4c 8b d1 48 8d 4c 24 ? e8 ? ? ? ? 48 8b d0 45 33 c0 45 33 c9 49 8b ca e8 ? ? ? ? 4c 8b c0",
+		"RakPeer::GetAveragePing"};
+
+	inline static SigImpl LocalPlayer_applyTurnDelta{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 8b c4 48 89 58 ? 55 56 57 41 56 41 57 48 8d 68 ? 48 81 ec ? ? ? ? 0f 29 70 ? 0f 29 78 ? 44 0f 29 40 ? 44 0f 29 48 ? 44 0f 29 50 ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 45 ? 4c 8b fa",
+		"LocalPlayer::applyTurnDelta"};
+
+	// see what accesses things in moveinputhandler
+	inline static SigImpl MovePlayer{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5c 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 83 ec ? 4d 8b f9 4c 8b ea",
+		"MovePlayer"};
+
+	inline static SigImpl MoveInputHandler_tick{};
 };
+
+// after adding sigs here, add them in latite.cpp

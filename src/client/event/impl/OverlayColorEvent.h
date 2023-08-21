@@ -10,12 +10,12 @@ public:
 	static const uint32_t hash = TOHASH(OverlayColorEvent);
 
 	[[nodiscard]] Color& getColor() { return *color; }
-	[[nodiscard]] sdk::Actor* getActor() { return actor; }
+	[[nodiscard]] SDK::Actor* getActor() { return actor; }
 
-	OverlayColorEvent(Color& color, sdk::Actor* actor) : color(&color), actor(actor) {
+	OverlayColorEvent(Color& color, SDK::Actor* actor) : color(&color), actor(actor) {
 	}
 
 protected:
 	Color* color;
-	sdk::Actor* actor;
+	SDK::Actor* actor;
 };

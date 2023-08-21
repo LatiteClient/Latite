@@ -18,6 +18,10 @@ struct Vec2 final {
 	constexpr Vec2 operator+(Vec2 const& right) {
 		return { x + right.x, y + right.y };
 	}
+	
+	constexpr Vec2 operator/(Vec2 const& right) {
+		return { x / right.x, y / right.y };
+	}
 
 	[[nodiscard]] float magnitude() {
 		return static_cast<float>(std::sqrt(x * x + y * y));
@@ -30,6 +34,18 @@ struct Vec3 final {
 	constexpr Vec3() : x(0.f), y(0.f), z(0.f) {}
 	constexpr Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
 	//constexpr Vec3(struct Vec3i const& vec);
+
+	constexpr Vec3 operator-(Vec3& right) {
+		return { right.x - x, right.y - y, right.z - z };
+	}
+
+	constexpr Vec3 operator+(Vec3& right) {
+		return { right.x + x, right.y + y, right.z + z };
+	}
+
+	inline float distance(Vec3& vec) {
+		return static_cast<float>(std::sqrt(std::pow(x - vec.x, 2) + std::pow(y - vec.y, 2) + std::pow(z - vec.z, 2)));
+	}
 };
 
 struct Vec3i final {

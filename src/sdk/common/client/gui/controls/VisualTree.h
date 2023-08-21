@@ -1,5 +1,5 @@
 #pragma once
-namespace sdk {
+namespace SDK {
 	class VisualTree {
 		char pad[8];
 	public:

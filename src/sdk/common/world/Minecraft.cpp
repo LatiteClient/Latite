@@ -2,11 +2,11 @@
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/client/player/LocalPlayer.h"
 
-sdk::Level* sdk::Minecraft::getLevel() {
+SDK::Level* SDK::Minecraft::getLevel() {
 	// very special case
-	if (sdk::internalVers == V1_19_51) {
-		if (sdk::ClientInstance::get()->getLocalPlayer()) {
-			return sdk::ClientInstance::get()->getLocalPlayer()->level_1_19_51;
+	if (SDK::internalVers == V1_19_51) {
+		if (SDK::ClientInstance::get()->getLocalPlayer()) {
+			return SDK::ClientInstance::get()->getLocalPlayer()->level_1_19_51;
 		}
 		return nullptr;
 	}

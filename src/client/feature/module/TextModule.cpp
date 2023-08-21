@@ -1,6 +1,7 @@
 #include "TextModule.h"
 #include "api/feature/setting/Setting.h"
 #include "util/Util.h"
+#include <client/Latite.h>
 
 void TextModule::onInit() {
 	addSetting("fillBg", "Background", "", fillBg);
@@ -20,6 +21,7 @@ void TextModule::onInit() {
 
 	addSetting("showOutline", "Outline", "", showOutline);
 	addSliderSetting("outlineThickness", "Thickness", "", outlineThickness, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f), "showOutline"_istrue);
+	addSetting("outlineCol", "Outline Color", "", outlineColor, "showOutline"_istrue);
 	addSliderSetting("radius", "Radius", "", radius, FloatValue(0.f), FloatValue(10.f), FloatValue(1.f));
 }
 
@@ -43,13 +45,16 @@ void TextModule::render(DXContext& ctx, bool isDefault, bool inEditor) {
 	d2d::Color realTCol = sTCol;
 	auto sOCol = std::get<ColorValue>(outlineColor).color1;
 	d2d::Color realOCol = sOCol;
+
+	float rad = 0.f;
+
 	//if (textScaled && customSize) textSize = dc.scaleTextInBounds(str.c_str(), 100.f, rect.getWidth(), 4.f, rect.getHeight());
 	if (std::get<BoolValue>(customSize)) {
 		d2d::Rect rc = d2d::Rect(0, 0, std::get<FloatValue>(bgX), std::get<FloatValue>(bgY));
 		Vec2 ts = dc.getTextSize(str.c_str(), Renderer::FontSelection::Regular, textSize, false);
 		Vec2 drawPos = rc.center(ts);
 
-		float rad = (std::get<FloatValue>(radius).value / 10.f) * (rc.getHeight() / 2.f);
+		rad = (std::get<FloatValue>(radius).value / 10.f) * (rc.getHeight() / 2.f);
 
 		if (std::get<BoolValue>(fillBg)) dc.fillRoundedRectangle(rc, realCol, rad);
 		if (std::get<BoolValue>(showOutline)) dc.drawRoundedRectangle(rc, realOCol, rad, std::get<FloatValue>(outlineThickness));
@@ -63,13 +68,17 @@ void TextModule::render(DXContext& ctx, bool isDefault, bool inEditor) {
 		Vec2 ts = dc.getTextSize(str.c_str(), Renderer::FontSelection::Regular, textSize, false);
 		d2d::Rect rc = d2d::Rect(0, 0, ts.x + (textPadding * 2), ts.y + (textPaddingY * 2));
 
-		float rad = (std::get<FloatValue>(radius).value / 10.f) * (rc.getHeight() / 2.f);
+		rad = (std::get<FloatValue>(radius).value / 10.f) * (rc.getHeight() / 2.f);
 		if (std::get<BoolValue>(fillBg)) dc.fillRoundedRectangle(rc, std::get<ColorValue>(bgColor).color1, rad);
 		if (std::get<BoolValue>(showOutline)) dc.drawRoundedRectangle(rc, realOCol, rad, std::get<FloatValue>(outlineThickness));
 		dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::Regular, textSize, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		this->rect.right = rect.left + rc.right;
 		this->rect.bottom = rect.top + rc.bottom;
 	}
+
+	//d2d::Rect rc = { 0.f, 0.f, rect.getWidth(), rect.getHeight() };
+
+	//dc.fillRoundedRectangle(rc, Latite::get().getHUDBlurBrush(), rad);
 }
 
 std::wstringstream TextModule::processText(std::wstringstream& stream) {

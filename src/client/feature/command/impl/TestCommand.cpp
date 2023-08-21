@@ -37,10 +37,6 @@ bool TestCommand::execute(std::string const label, std::vector<std::string> args
 	dialog.Commands().Append(yesCommand);
 	dialog.Commands().Append(noCommand);
 #endif
-	auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
-	app.Title(L"");
 	
-	message("test");
-	message("test", true);
 	return true;
 }

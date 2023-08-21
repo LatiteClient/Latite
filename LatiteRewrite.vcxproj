@@ -184,7 +184,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_HAS_STATIC_RTTI=0;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -238,6 +238,7 @@
     <ClInclude Include="deps\include\chakra\ChakraDebug.h" />
     <ClInclude Include="deps\include\json\json.hpp" />
     <ClInclude Include="deps\include\MinHook.h" />
+    <ClInclude Include="deps\include\xorstr.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\api\eventing\Event.h" />
     <ClInclude Include="src\api\eventing\EventManager.h" />
@@ -249,13 +250,18 @@
     <ClInclude Include="src\api\feature\setting\SettingGroup.h" />
     <ClInclude Include="src\api\manager\FeatureManager.h" />
     <ClInclude Include="src\api\manager\Manager.h" />
+    <ClInclude Include="src\api\manager\StaticManager.h" />
     <ClInclude Include="src\api\memory\memory.h" />
     <ClInclude Include="src\api\memory\signature\signature.h" />
     <ClInclude Include="src\api\scanner\scanner.h" />
     <ClInclude Include="src\client\config\ConfigManager.h" />
+    <ClInclude Include="src\client\event\impl\AfterMoveEvent.h" />
     <ClInclude Include="src\client\event\impl\AppSuspendedEvent.h" />
+    <ClInclude Include="src\client\event\impl\AveragePingEvent.h" />
+    <ClInclude Include="src\client\event\impl\BeforeMoveEvent.h" />
     <ClInclude Include="src\client\event\impl\CharEvent.h" />
     <ClInclude Include="src\client\event\impl\ChatEvent.h" />
+    <ClInclude Include="src\client\event\impl\CinematicCameraEvent.h" />
     <ClInclude Include="src\client\event\impl\ClickEvent.h" />
     <ClInclude Include="src\client\event\impl\FocusLostEvent.h" />
     <ClInclude Include="src\client\event\impl\OverlayColorEvent.h" />
@@ -285,6 +291,10 @@
     <ClInclude Include="src\client\feature\module\HUDModule.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\CPSCounter.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\FPSCounter.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\ServerDisplay.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\PingDisplay.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\SpeedDisplay.h" />
+    <ClInclude Include="src\client\feature\module\impl\game\ToggleSprintSneak.h" />
     <ClInclude Include="src\client\feature\module\TextModule.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\InputLagTest.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\Screenshot.h" />
@@ -322,6 +332,7 @@
     <ClInclude Include="src\client\screen\Screen.h" />
     <ClInclude Include="src\client\screen\ScreenManager.h" />
     <ClInclude Include="src\client\feature\module\script\JsModule.h" />
+    <ClInclude Include="src\client\script\class\impl\game\JsItemStack.h" />
     <ClInclude Include="src\client\script\class\impl\JsColor.h" />
     <ClInclude Include="src\client\script\class\impl\JsModuleClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsRect.h" />
@@ -347,6 +358,11 @@
     <ClInclude Include="src\sdk\common\client\gui\GuiData.h" />
     <ClInclude Include="src\sdk\common\client\gui\ScreenView.h" />
     <ClInclude Include="src\sdk\common\client\renderer\HudPlayerRenderer.h" />
+    <ClInclude Include="src\sdk\common\entity\component\MoveInputComponent.h" />
+    <ClInclude Include="src\sdk\common\network\RakPeer.h" />
+    <ClInclude Include="src\sdk\common\world\Item.h" />
+    <ClInclude Include="src\sdk\common\world\ItemStack.h" />
+    <ClInclude Include="src\sdk\common\world\ItemStackBase.h" />
     <ClInclude Include="src\sdk\deps\Application\AppPlatform.h" />
     <ClInclude Include="src\sdk\misc\ClickMap.h" />
     <ClInclude Include="src\sdk\signature\storage.h" />
@@ -367,6 +383,7 @@
     <ClInclude Include="src\sdk\common\world\level\Level.h" />
     <ClInclude Include="src\sdk\common\world\Minecraft.h" />
     <ClInclude Include="src\sdk\common\world\Timer.h" />
+    <ClInclude Include="src\sdk\signature\storage_1_16_40.h" />
     <ClInclude Include="src\sdk\signature\storage_1_18_12.h" />
     <ClInclude Include="src\sdk\signature\storage_1_19_51.h" />
     <ClInclude Include="src\sdk\signature\storage_latest.h" />
@@ -379,6 +396,7 @@
     <ClInclude Include="src\util\Json.h" />
     <ClInclude Include="src\util\Logger.h" />
     <ClInclude Include="src\util\LMath.h" />
+    <ClInclude Include="src\util\Meta.h" />
     <ClInclude Include="src\util\Util.h" />
   </ItemGroup>
   <ItemGroup>
@@ -418,8 +436,12 @@
     <ClCompile Include="src\client\feature\command\impl\ToggleCommand.cpp" />
     <ClCompile Include="src\client\feature\command\script\JsCommand.cpp" />
     <ClCompile Include="src\client\feature\module\HUDModule.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\game\ToggleSprintSneak.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\CPSCounter.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\FPSCounter.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\PingDisplay.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\ServerDisplay.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\SpeedDisplay.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\Screenshot.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\Fullbright.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\HurtColor.cpp" />
@@ -473,6 +495,7 @@
     <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp" />
     <ClCompile Include="src\sdk\common\world\level\Level.cpp" />
     <ClCompile Include="src\sdk\common\world\Minecraft.cpp" />
+    <ClCompile Include="src\sdk\deps\Application\AppPlatform.cpp" />
     <ClCompile Include="src\util\ChakraUtil.cpp" />
     <ClCompile Include="src\util\DxContext.cpp" />
     <ClCompile Include="src\util\DxUtil.cpp" />

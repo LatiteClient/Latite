@@ -1,7 +1,7 @@
 #pragma once
 #include "util/LMath.h"
 
-namespace sdk {
+namespace SDK {
 	class LevelRendererPlayer {
 	public:
 		Vec3& getOrigin();

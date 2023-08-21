@@ -6,45 +6,15 @@
 #include "client/event/impl/KeyUpdateEvent.h"
 
 ScreenManager::ScreenManager() {
-	this->mutex.lock();
-	this->items.push_back(std::make_shared<ClickGUI>());
-	this->items.push_back(std::make_shared<HUDEditor>());
-	this->mutex.unlock();
-
 	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc)&ScreenManager::onKey);
-}
-
-bool ScreenManager::showScreen(std::string const& screenName, bool ignoreAnims) {
-	for (auto& screen : items) {
-		if (util::ToLower(screenName) == util::ToLower(screen->getName())) {
-			this->activeScreen = screen;
-			this->activeScreen->setActive(true);
-			this->activeScreen->onEnable(ignoreAnims);
-			return true;
-		}
-	}
-	return false;
-}
-
-bool ScreenManager::tryToggleScreen(std::string const& screenName) {
-	if (!this->activeScreen) {
-		return showScreen(screenName);
-	}
-	else {
-		if (activeScreen->getName() == screenName) {
-			this->exitCurrentScreen();
-			return true;
-		}
-	}
-	return false;
 }
 
 void ScreenManager::exitCurrentScreen() {
 	if (this->activeScreen) {
-		this->activeScreen->setActive(false);
-		this->activeScreen->onDisable();
-		this->activeScreen = nullptr;
-		sdk::ClientInstance::get()->grabCursor();
+		this->activeScreen->get().setActive(false);
+		this->activeScreen->get().onDisable();
+		this->activeScreen = std::nullopt;
+		SDK::ClientInstance::get()->grabCursor();
 	}
 }
 
@@ -57,22 +27,21 @@ void ScreenManager::onKey(Event& evGeneric) {
 		return;
 	}
 
-	std::shared_ptr<Screen> associatedScreen;
-	for (auto& screen : this->items) {
-		if (screen->key == ev.getKey()) associatedScreen = screen;
-	}
+	std::optional<std::reference_wrapper<Screen>> associatedScreen;
+	this->forEach([&](Screen& s) {
+		if (s.key == ev.getKey()) associatedScreen = s;
+		});
 
-	if (associatedScreen && ev.isDown()) {
-		if (!ev.inUI() || getActiveScreen()) {
-			if (getActiveScreen())
-				exitCurrentScreen();
-			else {
-				this->activeScreen = associatedScreen;
-				this->activeScreen->setActive(true);
-				this->activeScreen->onEnable(false);
-			}
-			ev.setCancelled(true);
-			return;
+	if (associatedScreen && ev.isDown()
+		&& (!ev.inUI() || getActiveScreen())) {
+		if (getActiveScreen())
+			exitCurrentScreen();
+		else {
+			this->activeScreen = associatedScreen;
+			associatedScreen->get().setActive(true);
+			associatedScreen->get().onEnable(false);
 		}
+		ev.setCancelled(true);
+		return;
 	}
 }

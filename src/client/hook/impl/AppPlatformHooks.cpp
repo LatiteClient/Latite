@@ -7,9 +7,9 @@ namespace {
 	std::shared_ptr<Hook> FocusLostHook;
 }
 
-int AppPlatformHooks::_fireAppFocusLost(sdk::AppPlatform* plat) {
+int AppPlatformHooks::_fireAppFocusLost(SDK::AppPlatform* plat) {
 	FocusLostEvent ev{};
-	if (Eventing::get().dispatchEvent(ev)) return 0;
+	if (Eventing::get().dispatch(ev)) return 0;
 	return FocusLostHook->oFunc<decltype(&_fireAppFocusLost)>()(plat);
 }
 

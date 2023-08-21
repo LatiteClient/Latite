@@ -8,6 +8,7 @@ public:
 
 	bool loadMaster();
 	bool saveCurrentConfig();
+	bool saveTo(std::wstring const& name);
 	bool loadUserConfig(std::wstring const& name);
 
 	std::filesystem::path getUserPath();

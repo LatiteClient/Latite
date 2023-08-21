@@ -1,19 +1,44 @@
 #pragma once
-#include "api/manager/Manager.h"
+#include "impl/ClickGUI.h"
+#include "impl/HUDEditor.h"
+
+#include "api/manager/StaticManager.h"
 #include "api/eventing/Listenable.h"
 #include "Screen.h"
 
-class ScreenManager : public Listener, public Manager<Screen> {
+#include "util/Util.h"
+
+class ScreenManager : public Listener, public StaticManager<Screen,
+	ClickGUI,
+	HUDEditor> {
 public:
 	ScreenManager();
 
-	bool showScreen(std::string const& screenName, bool ignoreAnims = false);
-	bool tryToggleScreen(std::string const& screenName);
+	template <typename T>
+	void showScreen(bool ignoreAnims = false) {
+		auto& scr = std::get<T>(items);
+
+		this->activeScreen = scr;
+		scr.setActive(true);
+	}
+
+	template <typename T>
+	bool tryToggleScreen() {
+		if (activeScreen) {
+			showScreen<T>();
+			return true;
+		}
+		if (activeScreen->get().getName() == std::get<T>(items).getName()) {
+			this->exitCurrentScreen();
+			return true;
+		}
+		return false;
+	}
 	void exitCurrentScreen();
 
-	[[nodiscard]] std::shared_ptr<Screen> getActiveScreen() { return activeScreen; };
+	[[nodiscard]] std::optional<std::reference_wrapper<Screen>> getActiveScreen() { return activeScreen; };
 
 	void onKey(Event& ev);
 private:
-	std::shared_ptr<Screen> activeScreen;
+	std::optional<std::reference_wrapper<Screen>> activeScreen;
 };

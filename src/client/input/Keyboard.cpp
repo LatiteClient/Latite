@@ -79,7 +79,7 @@ bool Keyboard::isKeyDown(int vKey) {
 
 void Keyboard::onChar(char ch, bool isChar) {
 	CharEvent ev{ ch, isChar };
-	Eventing::get().dispatchEvent(ev);
+	Eventing::get().dispatch(ev);
 }
 
 void Keyboard::onKey(Event& evGeneric) {

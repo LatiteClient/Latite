@@ -19,8 +19,10 @@
 #include "event/Eventing.h"
 #include "event/impl/KeyUpdateEvent.h"
 #include "event/impl/RendererInitEvent.h"
+#include "event/impl/RendererCleanupEvent.h"
 #include "event/impl/FocusLostEvent.h"
 #include "event/impl/AppSuspendedEvent.h"
+#include "event/impl/RenderOverlayEvent.h"
 #include "event/impl/UpdateEvent.h"
 #include "event/impl/CharEvent.h"
 #include "event/impl/ClickEvent.h"
@@ -55,7 +57,9 @@ using namespace winrt::Windows::Storage;
 #include "render/Assets.h"
 #include "resource.h"
 
-int sdk::internalVers = sdk::VLATEST;
+#include "xorstr.hpp"
+
+int SDK::internalVers = SDK::VLATEST;
 
 using namespace std;
 
@@ -78,9 +82,13 @@ namespace {
 }
 
 #define MVSIG(...) ([]() -> std::pair<SigImpl*, SigImpl*> {\
-if (sdk::internalVers == sdk::VLATEST) return {&Signatures::__VA_ARGS__, &Signatures::__VA_ARGS__};\
-else { if (sdk::internalVers == sdk::V1_19_51) { return {&Signatures_1_19_51::__VA_ARGS__, &Signatures::__VA_ARGS__}; }return {&Signatures_1_18_12::__VA_ARGS__, &Signatures::__VA_ARGS__}; }\
+if (SDK::internalVers == SDK::VLATEST) return {&Signatures::__VA_ARGS__, &Signatures::__VA_ARGS__};\
+else { if (SDK::internalVers == SDK::V1_19_51) { return {&Signatures_1_19_51::__VA_ARGS__, &Signatures::__VA_ARGS__}; }return {&Signatures_1_18_12::__VA_ARGS__, &Signatures::__VA_ARGS__}; }\
 })()
+
+namespace {
+    AuthWindow* wnd = nullptr;
+}
 
 DWORD __stdcall startThread(HINSTANCE dll) {
     // Needed for Logger
@@ -127,18 +135,20 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int sigCount = 0;
     int deadCount = 0;
 
-    std::unordered_map<std::string, sdk::Version> versNumMap = {
-        { "1.20.12", sdk::VLATEST },
-        { "1.20.10", sdk::VLATEST },
-        { "1.19.50", sdk::V1_19_51 },
-        { "1.19.51", sdk::V1_19_51 },
-        { "1.18.12", sdk::V1_18_12 },
-        { "1.18.10", sdk::V1_18_12 }
+    std::unordered_map<std::string, SDK::Version> versNumMap = {
+        { "1.20.15", SDK::VLATEST },
+        { "1.20.12", SDK::VLATEST },
+        { "1.20.10", SDK::VLATEST },
+        { "1.19.50", SDK::V1_19_51 },
+        { "1.19.51", SDK::V1_19_51 },
+        { "1.18.12", SDK::V1_18_12 },
+        { "1.18.10", SDK::V1_18_12 },
+        { "1.16.40", SDK::V1_18_12 }
     };
 
     if (versNumMap.contains(gameVersion)) {
         auto vers =  versNumMap[gameVersion];
-        sdk::internalVers = vers;
+        SDK::internalVers = vers;
     }
     else {
         std::stringstream ss;
@@ -158,6 +168,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Offset::LevelRendererPlayer_fovX),
         MVSIG(Offset::LevelRendererPlayer_origin),
         MVSIG(Offset::MinecraftGame_cursorGrabbed),
+        MVSIG(Components::moveInputComponent),
         MVSIG(Options_getGamma),
         MVSIG(ClientInstance_grabCursor),
         MVSIG(ClientInstance_releaseCursor),
@@ -171,6 +182,11 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(ScreenView_setupAndRender),
         MVSIG(KeyMap),
         MVSIG(MinecraftGame__update),
+        MVSIG(RakNetConnector_tick),
+        MVSIG(GpuInfo),
+        MVSIG(RakPeer_GetAveragePing),
+        MVSIG(MoveInputHandler_tick),
+        MVSIG(MovePlayer),
             };
     
     new (mmgrBuf) ModuleManager;
@@ -183,11 +199,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (rendererBuf) Renderer();
     new (assetsBuf) Assets();
     new (keyboardBuf) Keyboard(reinterpret_cast<int*>(Signatures::KeyMap.result));
-
-    //AuthWindow wnd{ Latite::get().dllInst };
-
-    //wnd.show();
-    //wnd.runMessagePump();
 
     for (auto& entry : sigList) {
         if (!entry.first->mod) continue;
@@ -208,9 +219,17 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     Logger::Info("Resolved {} signatures ({} dead)", sigCount, deadCount);
 #endif
 
+    // TODO: latite beta only
+    wnd = new AuthWindow(Latite::get().dllInst);
+
+    wnd->show();
+    wnd->runMessagePump();
+
+    wnd->destroy();
+
     Logger::Info("Waiting for game to load..");
 
-    while (!sdk::ClientInstance::get()) {
+    while (!SDK::ClientInstance::get()) {
         std::this_thread::sleep_for(10ms);
     }
 
@@ -254,7 +273,9 @@ BOOL WINAPI DllMain(
         CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)startThread, hinstDLL, 0, nullptr));
     }
     else if (fdwReason == DLL_PROCESS_DETACH) {
+        delete wnd;
         // Remove singletons
+
         Latite::getHooks().disable();
 
         // Wait for hooks to disable
@@ -361,6 +382,7 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getEventing().listen<UpdateEvent>(this, (EventListenerFunc)&Latite::onUpdate, 2);
     Latite::getEventing().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Latite::onKey, 2);
     Latite::getEventing().listen<RendererInitEvent>(this, (EventListenerFunc)&Latite::onRendererInit, 2);
+    Latite::getEventing().listen<RendererCleanupEvent>(this, (EventListenerFunc)&Latite::onRendererCleanup, 2);
     Latite::getEventing().listen<FocusLostEvent>(this, (EventListenerFunc)&Latite::onFocusLost, 2);
     Latite::getEventing().listen<AppSuspendedEvent>(this, (EventListenerFunc)&Latite::onSuspended, 2);
     Latite::getEventing().listen<CharEvent>(this, (EventListenerFunc)&Latite::onChar, 2);
@@ -368,6 +390,10 @@ void Latite::initialize(HINSTANCE hInst) {
 }
 
 void Latite::threadsafeInit() {
+
+    // TODO: latite beta only
+    //if (SDK::ClientInstance::get()->minecraftGame->xuid.size() > 0) wnd->postXUID();
+
     auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     std::string vstr(this->version);
     auto ws = util::StrToWStr("Latite Client " + vstr);
@@ -397,6 +423,12 @@ void Latite::initSettings() {
     {
         auto set = std::make_shared<Setting>("useDX11", "Use DX11 (+FPS)", "Possible game FPS/Memory boost. Restart if you disable it");
         set->value = &this->useDX11;
+        this->getSettings().addSetting(set);
+    }
+    {
+        auto set = std::make_shared<Setting>("commandPrefix", "Command Prefix", "");
+        set->value = &this->commandPrefix;
+        set->visible = false;
         this->getSettings().addSetting(set);
     }
     {
@@ -440,7 +472,7 @@ winrt::Windows::Foundation::IAsyncAction Latite::downloadExtraAssets() {
     auto folderPath = util::GetLatitePath() / "Assets";
 
     // TODO: FIXME: xor
-    winrt::Windows::Foundation::Uri requestUri(L"https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll");
+    winrt::Windows::Foundation::Uri requestUri(util::StrToWStr(xorstr_("https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll")));
 
     auto buffer = http.GetBufferAsync(requestUri).get();
     
@@ -480,10 +512,9 @@ void Latite::onUpdate(Event& evGeneric) {
     }
 }
 
-// TODO: port this to ScreenManager
 void Latite::onKey(Event& evGeneric) {
     auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
-    if (ev.getKey() == VK_END && ev.isDown()) {
+    if (ev.getKey() == std::get<KeyValue>(ejectKey) && ev.isDown()) {
         this->queueEject();
         Logger::Info("Uninject key pressed");
 
@@ -533,6 +564,22 @@ void Latite::onChar(Event& evGeneric) {
 void Latite::onRendererInit(Event&) {
     getAssets().unloadAll(); // should be safe even if we didn't load resources yet
     getAssets().loadAll();
+
+    this->hudBlurBitmap = getRenderer().copyCurrentBitmap();
+    getRenderer().getDeviceContext()->CreateEffect(CLSID_D2D1GaussianBlur, gaussianBlurEffect.GetAddressOf());
+
+    gaussianBlurEffect->SetInput(0, hudBlurBitmap.Get());
+    gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, std::get<FloatValue>(this->hudBlurIntensity));
+    gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
+    gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
+
+    getRenderer().getDeviceContext()->CreateBitmapBrush(hudBlurBitmap.Get(), this->hudBlurBrush.GetAddressOf());
+}
+
+void Latite::onRendererCleanup(Event& ev) {
+    this->hudBlurBitmap = nullptr;
+    this->gaussianBlurEffect = nullptr;
+    this->hudBlurBrush = nullptr;
 }
 
 void Latite::onFocusLost(Event& evGeneric) {
@@ -556,3 +603,7 @@ void Latite::loadConfig(SettingGroup& gr) {
             });
         });
 }
+
+//char* LatiteGetVersionsSupported() {
+//    return nullptr;
+//}

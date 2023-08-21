@@ -10,7 +10,7 @@ namespace {
 float OptionHooks::Options_getGamma(void* options) {
 	auto o = getGammaHook->oFunc<decltype(&Options_getGamma)>()(options);
 	GammaEvent ev{ o };
-	Eventing::get().dispatchEvent(ev);
+	Eventing::get().dispatch(ev);
 	return ev.getGamma();
 }
 

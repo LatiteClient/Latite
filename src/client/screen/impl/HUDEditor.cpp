@@ -20,7 +20,7 @@
 #include "sdk/common/client/gui/controls/VisualTree.h"
 #include "sdk/common/client/gui/controls/UIControl.h"
 
-HUDEditor::HUDEditor() : Screen("HUDEditor"), dragMod(nullptr) {
+HUDEditor::HUDEditor() : dragMod(nullptr) {
 	this->key = Latite::get().getMenuKey();
 
 	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&HUDEditor::onRender, 1, true);
@@ -55,7 +55,7 @@ void HUDEditor::onRender(Event& ev) {
 			bmp->Release();
 		}*/
 
-		auto& cursorPos = sdk::ClientInstance::get()->cursorPos;
+		auto& cursorPos = SDK::ClientInstance::get()->cursorPos;
 
 		// Center Button
 		{
@@ -75,7 +75,7 @@ void HUDEditor::onRender(Event& ev) {
 			bool state = shouldSelect(btnRect, cursorPos);
 			if (state && justClicked[0]) {
 				Latite::getScreenManager().exitCurrentScreen();
-				Latite::getScreenManager().showScreen("ClickGUI");
+				Latite::getScreenManager().showScreen<ClickGUI>();
 				playClickSound();
 			}
 
@@ -93,7 +93,7 @@ void HUDEditor::onRender(Event& ev) {
 	doSnapping(dragOffset);
 	keepModulesInBounds();
 
-	if (isActive() || sdk::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
+	if (isActive() || SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 			if (mod->isHud() && mod->isEnabled()) {
 				auto hudModule = static_cast<HUDModule*>(mod.get());
@@ -110,7 +110,7 @@ void HUDEditor::onClick(Event& evGeneric) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 			if (!mod->isHud()) return;
 			auto hudMod = reinterpret_cast<HUDModule*>(mod.get());
-			if (!shouldSelect(hudMod->getRect(), sdk::ClientInstance::get()->cursorPos)) return;
+			if (!shouldSelect(hudMod->getRect(), SDK::ClientInstance::get()->cursorPos)) return;
 			hudMod->setScale(hudMod->getScale() - static_cast<float>(ev.getWheelDelta()) / 1000.f);
 			});
 		ev.setCancelled(true);
@@ -175,7 +175,7 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 
 void HUDEditor::renderModule(HUDModule* mod) {
 	DXContext dc;
-	auto& cursorPos = sdk::ClientInstance::get()->cursorPos;
+	auto& cursorPos = SDK::ClientInstance::get()->cursorPos;
 	bool hovering = shouldSelect(mod->getRect(), cursorPos);
 
 	if (isActive()) {
@@ -198,7 +198,7 @@ void HUDEditor::renderModule(HUDModule* mod) {
 
 
 void HUDEditor::doDragging() {
-	auto& cursorPos = sdk::ClientInstance::get()->cursorPos;
+	auto& cursorPos = SDK::ClientInstance::get()->cursorPos;
 
 	bool isDown = mouseButtons[0];
 	if (dragMod) {
@@ -234,7 +234,7 @@ void HUDEditor::doDragging() {
 void HUDEditor::doSnapping(Vec2 const&) {
 	auto ssx = Latite::getRenderer().getScreenSize();
 	Vec2 ss = {ssx.width, ssx.height};
-	auto mousePos = sdk::ClientInstance::get()->cursorPos;
+	auto mousePos = SDK::ClientInstance::get()->cursorPos;
 
 	std::vector<float> snapLinesX = { 0.f, ss.x / 4.f, ss.x / 2.f, ss.x / 2 + (ss.x / 4), ss.x };
 	std::vector<float> snapLinesY = { ss.y / 2.f };
@@ -494,10 +494,10 @@ void HUDEditor::onEnable(bool ignoreAnims) {
 	mouseButtons = {};
 	activeMouseButtons = {};
 	justClicked = {};
-	sdk::ClientInstance::get()->releaseCursor();
+	SDK::ClientInstance::get()->releaseCursor();
 }
 
 void HUDEditor::onDisable() {
-	sdk::ClientInstance::get()->grabCursor();
+	SDK::ClientInstance::get()->grabCursor();
 	Latite::getConfigManager().saveCurrentConfig();
 }

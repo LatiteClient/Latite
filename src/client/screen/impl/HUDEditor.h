@@ -7,6 +7,8 @@
 class HUDEditor : public Screen {
 public:
 	HUDEditor();
+
+	std::string getName() override { return "HUDEditor"; }
 	void onEnable(bool ignoreAnims) override;
 	void onDisable() override;
 private:

@@ -3,7 +3,7 @@
 #include "util/LMath.h"
 #include "sdk/common/client/gui/GuiData.h"
 
-namespace sdk {
+namespace SDK {
 	class ClientInstance {
 	public:
 		MVCLASS_FIELD(class MinecraftGame*, minecraftGame, 0xC8, 0xA8, 0xA8);

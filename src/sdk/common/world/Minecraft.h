@@ -3,7 +3,7 @@
 #include "sdk/Util.h"
 #include "Timer.h"
 
-namespace sdk {
+namespace SDK {
 	class Minecraft {
 	public:
 		Level* getLevel();

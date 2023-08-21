@@ -8,7 +8,7 @@
 #include <memory>
 #include <functional>
 
-namespace sdk {
+namespace SDK {
 	class UIComponent
 	{
 	public:

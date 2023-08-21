@@ -10,17 +10,20 @@
 
 class Screen : public Listener {
 public:
-	Screen(std::string const& name);
+	Screen();
 
 	~Screen() = default;
 	Screen(Screen&) = delete;
 	Screen(Screen&&) = delete;
 
 	[[nodiscard]] bool isActive() { return active; }
-	void setActive(bool b) { this->active = b; }
+	void setActive(bool b) { 
+		this->active = b;
+		b ? onEnable() : onDisable();
+	}
 
 	[[nodiscard]] bool shouldListen() override { return isActive(); }
-	[[nodiscard]] std::string getName() { return name; }
+	[[nodiscard]] virtual std::string getName() = 0;
 
 	// TODO: grabMouse and releaseMouse
 	virtual void onEnable(bool ignoreAnimations = false) {};
@@ -76,5 +79,4 @@ private:
 	int currentLayer = 0;
 	std::vector<d2d::Rect> layers;
 	bool active = false;
-	std::string name;
 };

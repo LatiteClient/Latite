@@ -8,13 +8,13 @@ namespace {
 	std::shared_ptr<Hook> setupAndRenderHook;
 }
 
-void __fastcall ScreenViewHooks::setupAndRender(sdk::ScreenView* view, void* ctx) {
+void __fastcall ScreenViewHooks::setupAndRender(SDK::ScreenView* view, void* ctx) {
 	setupAndRenderHook->oFunc<decltype(&setupAndRender)>()(view, ctx);
 	RenderLayerEvent ev{ view };
-	Eventing::get().dispatchEvent(ev);
+	Eventing::get().dispatch(ev);
 
 	RenderGameEvent evt{ };
-	Eventing::get().dispatchEvent(evt);
+	Eventing::get().dispatch(evt);
 }
 
 ScreenViewHooks::ScreenViewHooks() : HookGroup("ScreenView") {

@@ -1,5 +1,5 @@
 #pragma once
-#ifdef LATITE_DEBUG
+#ifndef LATITE_DEBUG
 #define API_NAMES
 #endif
 
@@ -26,6 +26,13 @@ public:
 		inline static SigImpl clientInstance{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8B 15 ?? ?? ?? ?? 48 8B 12 48 89 16 40 84 FF 74 ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B C6 48 8B 4C 24 ?? 48 33 CC E8 ?? ?? ?? ?? 48 8B 5C 24 ?? 48 8B 74 24 ?? 48 83 C4 ?? 5F C3 E8 ?? ?? ?? ?? 90 CC CC CC CC CC CC CC CC CC 48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 44 24 ?? 48 8B DA 48 8B F1 48 89 4C 24 ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 85 C0 0F 95 C1 85 C0 74 ?? 48 8B 05 ?? ?? ?? ?? 48 85 C0 75 ?? 40 B7 ?? EB ?? 84 C9 74 ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 40 32 FF 40 88 7C 24 ?? 40 84 FF 75 ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 40 B7 ?? 40 88 7C 24 ?? 48 85 DB 0F 84 ?? ?? ?? ?? 33 C0 48 89 05 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? 48 89 05 ?? ?? ?? ?? 48 85 C9 74 ?? E8 ?? ?? ?? ?? 48 8B 43 ?? 48 85 C0 74 ?? F0 FF 40 ?? 48 8B 43 ?? 0F B6 7C 24 ?? 48 8B 53 ?? 48 89 15 ?? ?? ?? ?? 48 8B 0D ?? ?? ?? ?? 48 89 05 ?? ?? ?? ?? 48 85 C9 74 ?? E8 ?? ?? ?? ?? 48 8B 15 ?? ?? ?? ?? 48 8B 12 48 89 16 40 84 FF 74 ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B C6 48 8B 4C 24 ?? 48 33 CC E8 ?? ?? ?? ?? 48 8B 5C 24 ?? 48 8B 74 24 ?? 48 83 C4 ?? 5F C3 E8 ?? ?? ?? ?? 90 CC CC CC CC CC CC CC CC CC 40 53 48 83 EC ?? 48 8B D9",
 			"ClientInstance"};
+	};
+
+	struct Components {
+		inline static SigImpl moveInputComponent{[](memory::signature_store&, uintptr_t res) { return res; },
+			// last 4 bytes is the hash of the component
+			"40 53 48 83 EC ? 48 8B DA BA 2E CD 8B 46",
+			"MoveInputComponent::try_get"};
 	};
 
 	inline static SigImpl LevelRenderer_renderLevel{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -90,4 +97,35 @@ public:
 	inline static SigImpl MinecraftGame__update{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? 48 8b 8b ? ? ? ? ba ? ? ? ? 48 83 c4",
 		"MinecraftGame::_update"};
+
+	// "Nat Punch timed out"
+	inline static SigImpl RakNetConnector_tick{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 48 8b f9 45 33 ff",
+		"RakNetConnector::tick"};
+
+	// ref: your GPU ("AMD Radeon RX 5500")
+	inline static SigImpl GpuInfo{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+		"4c 8d 0d ? ? ? ? 48 c7 c3 ? ? ? ? 48 8b fb 48 ff c7 41 80 3c 39 ? 75 ? 48 8d 4c 24 ? 48 83 ff ? 77 ? 48 89 7c 24 ? 4c 8b c7 49 8b d1 e8 ? ? ? ? c6 44 3c ? ? eb ? 48 8b d7 e8 ? ? ? ? 48 8d 4c 24",
+		"GpuInfo"};
+
+	// ref: RakPeer vtable
+	inline static SigImpl RakPeer_GetAveragePing{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+		"48 81 ec ? ? ? ? 4c 8b d1 48 8d 4c 24 ? e8 ? ? ? ? 48 8b d0 45 33 c0 45 33 c9 49 8b ca e8 ? ? ? ? 4c 8b c0",
+		"RakPeer::GetAveragePing"};
+
+	inline static SigImpl LocalPlayer_applyTurnDelta{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 8b c4 48 89 58 ? 55 56 57 41 56 41 57 48 8d 68 ? 48 81 ec ? ? ? ? 0f 29 70 ? 0f 29 78 ? 44 0f 29 40 ? 44 0f 29 48 ? 44 0f 29 50 ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 45 ? 4c 8b fa",
+		"LocalPlayer::applyTurnDelta"};
+
+	// see what accesses things in moveinputhandler
+	inline static SigImpl MovePlayer{};
+
+	// see what accesses things in moveinputhandler
+	// https://github.com/Imrglop/LatiteClient/blob/release/Latite/Functions.cpp#L135
+	inline static SigImpl MoveInputHandler_tick{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? 0F B6 41 ?? 40 32 F6",
+		"MoveInputHandler::tick"};
 };
+
+
+// after adding sigs here, add them in latite.cpp

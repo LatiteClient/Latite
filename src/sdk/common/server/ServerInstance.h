@@ -2,7 +2,7 @@
 #include "util/Util.h"
 #include "sdk/common/world/Minecraft.h"
 
-namespace sdk {
+namespace SDK {
 	class ServerInstance {
 		void* vtable;
 	public:

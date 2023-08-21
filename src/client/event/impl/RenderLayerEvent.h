@@ -7,9 +7,9 @@ class RenderLayerEvent : public Event {
 public:
 	static const uint32_t hash = TOHASH(RenderLayerEvent);
 
-	RenderLayerEvent(sdk::ScreenView* view) : view(view) {}
+	RenderLayerEvent(SDK::ScreenView* view) : view(view) {}
 
-	[[nodiscard]] sdk::ScreenView* getScreenView() { return view; }
+	[[nodiscard]] SDK::ScreenView* getScreenView() { return view; }
 private:
-	sdk::ScreenView* view;
+	SDK::ScreenView* view;
 };

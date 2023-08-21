@@ -9,6 +9,7 @@
 #include <winrt/windows.foundation.h>
 #include "ui/TextBox.h"
 #include "misc/Timings.h"
+#include "util/DxUtil.h"
 
 class Latite final : public Listener {
 public:
@@ -38,6 +39,7 @@ public:
 	void onClick(class Event& ev);
 	void onChar(class Event& ev);
 	void onRendererInit(class Event& ev);
+	void onRendererCleanup(class Event& ev);
 	void onFocusLost(class Event& ev);
 	void onSuspended(class Event& ev);
 	void loadConfig(class SettingGroup& resolvedGroup);
@@ -49,7 +51,7 @@ public:
 	~Latite() = default;
 
 	static constexpr std::string_view version = "v2.0.0";
-	HINSTANCE dllInst;
+	HINSTANCE dllInst = NULL;
 
 	std::optional<float> getMenuBlur();
 
@@ -73,17 +75,32 @@ public:
 	[[nodiscard]] bool shouldForceDX11() {
 		return std::get<BoolValue>(useDX11);
 	}
+
+	[[nodiscard]] bool shoulBlurHUD() {
+		return std::get<BoolValue>(hudBlur);
+	}
+
+	[[nodiscard]] ID2D1BitmapBrush1* getHUDBlurBrush() {
+		return hudBlurBrush.Get();
+	}
+
 private:
 	Timings timings{};
 
 	ValueType commandPrefix = TextValue(".");
 	ValueType menuKey = KeyValue('M');
+	ValueType ejectKey = KeyValue(VK_END);
+	ValueType hudBlur = BoolValue(false);
+	ValueType hudBlurIntensity = FloatValue(10.f);
 	ValueType menuBlurEnabled = BoolValue(true);
 	// TODO: add disabled settings, for people who already only support dx11, gray it out
 	ValueType useDX11 = BoolValue(false);
 	ValueType menuBlur = FloatValue(20.f);
 
-	std::vector<ui::TextBox*> textBoxes = {};
+	std::vector<ui::TextBox*> textBoxes;
+	ComPtr<ID2D1Bitmap1> hudBlurBitmap;
+	ComPtr<ID2D1BitmapBrush1> hudBlurBrush;
+	ComPtr<ID2D1Effect> gaussianBlurEffect;
 
 	void threadsafeInit();
 	void initSettings();
@@ -91,3 +108,5 @@ private:
 	bool shouldEject = false;
 	bool hasInit = false;
 };
+
+//extern "C" __declspec(dllexport) char* LatiteGetVersionsSupported();

@@ -11,7 +11,7 @@ void ClientMessageSink::doPrint(int numMessages) {
 		if (msgs >= numMessages) break;
 
 		auto& msg = *it;
-		auto cInst = sdk::ClientInstance::get();
+		auto cInst = SDK::ClientInstance::get();
 		auto lp = cInst->getLocalPlayer();
 		if (lp) {
 			lp->displayClientMessage(msg);
@@ -31,7 +31,7 @@ void ClientMessageSink::push(std::string const& message) {
 }
 
 void ClientMessageSink::display(std::string const& message) {
-	auto cInst = sdk::ClientInstance::get();
+	auto cInst = SDK::ClientInstance::get();
 	auto lp = cInst->getLocalPlayer();
 	if (lp) {
 		lp->displayClientMessage(message);

@@ -51,8 +51,8 @@ struct Vec2Value {
 	Vec2Value() { x = 0.f; y = 0.f; }
 	Vec2Value(float x, float y) : x(x), y(y) {}
 	Vec2Value(nlohmann::json& js) {
-		x = js["x"];
-		y = js["y"];
+		x = js["x"].get<float>();
+		y = js["y"].get<float>();
 	}
 
 	void store(nlohmann::json& jout) {
@@ -116,10 +116,10 @@ struct StoredColor {
 	}
 
 	void get(nlohmann::json& js) {
-		r = js["r"];
-		g = js["g"];
-		b = js["b"];
-		a = js["a"];
+		r = js["r"].get<float>();
+		g = js["g"].get<float>();
+		b = js["b"].get<float>();
+		a = js["a"].get<float>();
 	}
 
 	int getInt() {
@@ -148,10 +148,10 @@ struct ColorValue {
 
 	ColorValue(nlohmann::json& js) {
 		color1.get(js["color1"]);
-		isRGB = js["isRGB"];
-		isChroma = js["isChroma"];
+		isRGB = js["isRGB"].get<bool>();
+		isChroma = js["isChroma"].get<bool>();
 		if (isChroma) {
-			numColors = js["numColors"];
+			numColors = js["numColors"].get<int>();
 			if (numColors >= 2) color2.get(js["color2"]);
 			if (numColors >= 3) color3.get(js["color3"]);
 		}

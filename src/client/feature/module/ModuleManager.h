@@ -8,7 +8,7 @@
 class ModuleManager : public Listener, public IModuleManager {
 public:
 	ModuleManager();
-	~ModuleManager() = default;
+	~ModuleManager();
 
 	bool registerScriptModule(JsModule* mod) {
 		for (auto& mod_ : items) {

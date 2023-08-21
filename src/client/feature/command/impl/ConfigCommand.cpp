@@ -2,15 +2,23 @@
 #include "client/config/ConfigManager.h"
 #include "client/Latite.h"
 
-ConfigCommand::ConfigCommand() : Command("config", "Do actions related to profiles/configs", "$ load <name>\n$ save", {"profile", "configs", "profiles", "cfg"}) {	
+ConfigCommand::ConfigCommand() : Command("config", "Do actions related to profiles/configs", "$ load <name>\n$ save [name]", {"profile", "configs", "profiles", "cfg"}) {	
 }
 
 bool ConfigCommand::execute(std::string const label, std::vector<std::string> args) {
 	if (args.empty()) return false;
 	if (args[0] == "save") {
-		if (Latite::getConfigManager().saveCurrentConfig())
-			message("Saved current config!");
-		else message("Something went wrong!", true);
+		if (args.size() < 2) {
+			if (Latite::getConfigManager().saveCurrentConfig())
+				message("Saved current config!");
+			else message("Something went wrong!", true);
+			return true;
+		}
+		if (Latite::getConfigManager().saveTo(util::StrToWStr(args[1]))) {
+			message("Successfully saved config to &7" + args[1] + ".json");
+			return false;
+		}
+		message("Something went wrong!", true);
 		return true;
 	}
 	else if (args[0] == "load") {
@@ -28,6 +36,7 @@ bool ConfigCommand::execute(std::string const label, std::vector<std::string> ar
 			return true;
 		}
 		message("Successfully loaded config &7" + args[1]);
+		return true;
 	}
-	return true;
+	return false;
 }

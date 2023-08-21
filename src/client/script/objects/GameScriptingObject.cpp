@@ -23,7 +23,7 @@ JsValueRef GameScriptingObject::getMousePosCallback(JsValueRef callee, bool isCo
 
 	auto vec2 = script->findClass<JsVec2>(L"Vector2");
 	if (vec2) {
-		return vec2->construct(sdk::ClientInstance::get()->cursorPos);
+		return vec2->construct(SDK::ClientInstance::get()->cursorPos);
 	}
 
 	// could not find Vector2
@@ -32,7 +32,7 @@ JsValueRef GameScriptingObject::getMousePosCallback(JsValueRef callee, bool isCo
 }
 
 JsValueRef GameScriptingObject::isInUICallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	return sdk::ClientInstance::get()->minecraftGame->isCursorGrabbed() ? Chakra::GetTrue() : Chakra::GetFalse();
+	return SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed() ? Chakra::GetTrue() : Chakra::GetFalse();
 }
 
 JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
@@ -43,9 +43,9 @@ JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConst
 	float volume = static_cast<float>(Chakra::GetNumber(arguments[2]));
 	float pitch = static_cast<float>(Chakra::GetNumber(arguments[3]));
 
-	auto lvl = sdk::ClientInstance::get()->minecraft->getLevel();
+	auto lvl = SDK::ClientInstance::get()->minecraft->getLevel();
 	if (lvl) {
-		lvl->playSoundEvent(soundName, sdk::ClientInstance::get()->levelRenderer->getLevelRendererPlayer()->getOrigin(), pitch);
+		lvl->playSoundEvent(soundName, SDK::ClientInstance::get()->levelRenderer->getLevelRendererPlayer()->getOrigin(), pitch);
 	}
 	return Chakra::GetUndefined();
 }

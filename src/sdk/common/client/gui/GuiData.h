@@ -2,7 +2,7 @@
 #include "sdk/Util.h"
 #include "util/LMath.h"
 
-namespace sdk {
+namespace SDK {
 	class GuiData {
 	public:
 		MVCLASS_FIELD(Vec2, screenSize, 0x30, 0x18, 0x30);

@@ -160,7 +160,7 @@ Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font
 		layout->GetOverhangMetrics(&overhangs);
 		
 		float width = tw ? textMetrics.widthIncludingTrailingWhitespace : ((textMetrics.layoutWidth) + overhangs.right) - (textMetrics.left - overhangs.left);
-		float height = size;
+		float height = textMetrics.height;
 		
 		return Vec2(width, height);
 	}

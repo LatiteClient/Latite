@@ -1,17 +1,22 @@
 #include "ModuleManager.h"
 #include "impl/misc/TestModule.h"
 #include "impl/misc/Screenshot.h"
+
 #include "impl/game/Zoom.h"
+#include "impl/game/ToggleSprintSneak.h"
+
 #include "impl/visual/Fullbright.h"
 #include "impl/visual/MotionBlur.h"
 #include "impl/visual/HurtColor.h"
 
 #include "impl/hud/FPSCounter.h"
 #include "impl/hud/CPSCounter.h"
+#include "impl/hud/ServerDisplay.h"
+#include "impl/hud/PingDisplay.h"
+#include "impl/hud/SpeedDisplay.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
 
-// TODO: queue shutdown and disalbe all modules (after config saves)
 ModuleManager::ModuleManager() {
 #ifdef LATITE_DEBUG
 	this->items.push_back(std::make_shared<TestModule>());
@@ -23,11 +28,21 @@ ModuleManager::ModuleManager() {
 	//this->items.push_back(std::make_shared<Screenshot>());
 	this->items.push_back(std::make_shared<FPSCounter>());
 	this->items.push_back(std::make_shared<CPSCounter>());
+	this->items.push_back(std::make_shared<ServerDisplay>());
+	this->items.push_back(std::make_shared<PingDisplay>());
+	this->items.push_back(std::make_shared<SpeedDisplay>());
+	this->items.push_back(std::make_shared<ToggleSprintSneak>());
 
 	for (auto& mod : items) {
 		mod->onInit();
 	}
 	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc) & ModuleManager::onKey);
+}
+
+ModuleManager::~ModuleManager() {
+	for (auto& mod : items) {
+		if (mod->isEnabled()) mod->setEnabled(false);
+	}
 }
 
 void ModuleManager::onKey(Event& evGeneric) {

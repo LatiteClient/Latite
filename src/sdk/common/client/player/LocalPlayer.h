@@ -1,7 +1,7 @@
 #pragma once
 #include "sdk/common/world/actor/player/Player.h"
 
-namespace sdk {
+namespace SDK {
 	class LocalPlayer : public Player {
 
 	};

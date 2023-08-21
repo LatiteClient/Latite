@@ -4,8 +4,24 @@
 #include "client/misc/ClientMessageSink.h"
 #include "client/event/Eventing.h"
 #include "client/event/impl/UpdateEvent.h"
+
 #include "util/Logger.h"
 #include <memory>
+
+
+#include <winrt/base.h>
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Web.Http.h>
+#include <winrt/impl/windows.web.http.2.h>
+#include <winrt/Windows.Web.Http.Filters.h>
+#include <winrt/windows.foundation.collections.h>
+#include <winrt/impl/windows.foundation.collections.1.h>
+#include <winrt/Windows.Web.Http.Headers.h>
+
+
+using namespace winrt::Windows::Storage::Streams;
+using namespace winrt::Windows::Web::Http;
+using namespace winrt::Windows::Web::Http::Filters;
 
 ScriptManager::ScriptManager() {
 }
@@ -170,6 +186,81 @@ void ScriptManager::runScriptingOperations()
 	// drawing
 	Event ev{ L"renderDX", {}, false };
 	dispatchEvent(ev);
+}
+
+std::optional<int> ScriptManager::installScript(std::string const& name) {
+	std::wstring token = L"?token=GHSAT0AAAAAACETEXYVRCL7YLMVSDOYZB6OZFLNT7Q";
+	std::wstring registry = L"https://raw.githubusercontent.com/LatiteScripting/Scripts/master/registry";
+	std::wstring jsonPath = registry + L"/scripts.json" + token;
+	nlohmann::json scriptsJson;
+
+	auto message = [](std::string const& msg, bool err = false) -> void {
+		if (err) {
+			Latite::getClientMessageSink().push(util::Format("[Script Installer] &c" + msg));
+		}
+		else Latite::getClientMessageSink().push("[Script Installer] " + msg);
+	};
+
+	auto http = HttpClient();
+	{
+		// get JSON
+		winrt::Windows::Foundation::Uri requestUri(jsonPath);
+
+		HttpRequestMessage request(HttpMethod::Get(), requestUri);
+
+		try {
+			auto operation = http.SendRequestAsync(request);
+			auto response = operation.get();
+			auto cont = response.Content();
+			auto strs = cont.ReadAsStringAsync().get();
+
+			try {
+				scriptsJson = nlohmann::json::parse(std::wstring(strs.c_str()));
+			}
+			catch (nlohmann::json::parse_error& e) {
+				Latite::getClientMessageSink().push(std::string("JSON error while installing script: ") + e.what());
+				return 0;
+			}
+		}
+		catch (winrt::hresult_error const& err) {
+			Latite::getClientMessageSink().push(util::WStrToStr(err.message().c_str()));
+			return 0;
+		}
+	}
+	auto arr = scriptsJson["scripts"];
+	for (auto& js : arr) {
+		auto name = js["name"].get<std::string>();
+		auto oName = js["name"].get<std::string>();
+		auto woName = util::StrToWStr(oName);
+		std::string in = name;
+		std::transform(in.begin(), in.end(), in.begin(), ::tolower);
+		std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+		if (in == name) {
+			message("Installing " + oName + " v" + js["version"].get<std::string>() + " by " + js["author"].get<std::string>());
+			std::wstring path = util::GetLatitePath() / "Startup" / "Scripts" / woName;
+			std::filesystem::create_directory(path);
+			for (auto& fil : js["files"]) {
+				auto fws = util::StrToWStr(fil.get<std::string>());
+				winrt::Windows::Foundation::Uri requestUri(registry + woName + L"/" + fws + token);
+				HttpRequestMessage request(HttpMethod::Get(), requestUri);
+				auto operation = http.SendRequestAsync(request);
+				auto response = operation.get();
+				auto cont = response.Content();
+				auto strs = cont.ReadAsStringAsync().get();
+				std::wofstream ofs;
+				ofs.open(path + L"\\" + fws);
+				if (ofs.fail()) {
+					message("Error opening file: " + std::to_string(*_errno()), true);
+					return *_errno();
+				}
+				ofs << strs.c_str();
+				ofs.close();
+			}
+			return std::nullopt;
+		}
+	}
+	message("Could not find script " + name, true);
+	return 0;
 }
 
 void ScriptManager::init()

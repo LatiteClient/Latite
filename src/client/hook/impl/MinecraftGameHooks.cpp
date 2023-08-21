@@ -11,16 +11,16 @@ namespace {
 	std::shared_ptr<Hook> _updateHook;
 }
 
-void* MinecraftGameHooks::onAppSuspended(sdk::MinecraftGame* game) {
+void* MinecraftGameHooks::onAppSuspended(SDK::MinecraftGame* game) {
 	AppSuspendedEvent ev{};
-	Eventing::get().dispatchEvent(ev);
+	Eventing::get().dispatch(ev);
 	return onAppSuspendedHook->oFunc<decltype(&onAppSuspended)>()(game);
 }
 
-void* __fastcall MinecraftGameHooks::_update(sdk::MinecraftGame* game) {
+void* __fastcall MinecraftGameHooks::_update(SDK::MinecraftGame* game) {
 	auto ret = _updateHook->oFunc<decltype(&_update)>()(game);
 	UpdateEvent ev{};
-	Eventing::get().dispatchEvent(ev);
+	Eventing::get().dispatch(ev);
 
 	{
 		ScriptManager::Event sev{L"renderDX", {}, false};

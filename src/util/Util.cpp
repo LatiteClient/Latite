@@ -294,7 +294,7 @@ std::vector<std::string> util::SplitString(std::string const& s, char delim) {
 }
 
 void util::PlaySoundUI(std::string const& sound, float volume, float pitch) {
-	auto cInst = sdk::ClientInstance::get();
+	auto cInst = SDK::ClientInstance::get();
 	auto lr = cInst->levelRenderer;
 	if (lr) {
 		cInst->minecraft->getLevel()->playSoundEvent(sound, lr->getLevelRendererPlayer()->getOrigin(), volume, pitch);

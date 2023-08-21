@@ -2,7 +2,7 @@
 #include "sdk/Util.h"
 #include <string>
 
-namespace sdk {
+namespace SDK {
 	class Dimension {
 	public:
 		CLASS_FIELD(std::string, dimensionName, 0x20); // reclass

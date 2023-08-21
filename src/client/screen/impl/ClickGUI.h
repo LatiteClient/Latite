@@ -19,7 +19,8 @@ public:
 	void onKey(Event& ev);
 	void onClick(Event& ev);
 
-	bool drawSetting(class Setting* set, class SettingGroup* group, struct Vec2 const& pos, class DXContext& dc, float size = 150.f, float fTextWidth = 0.21f);
+	std::string getName() override { return "ClickGUI"; }
+	float drawSetting(class Setting* set, class SettingGroup* group, struct Vec2 const& pos, class DXContext& dc, float size = 150.f, float fTextWidth = 0.21f);
 	
 	bool shouldSelect(d2d::Rect rc, Vec2 const& pt) override;
 
@@ -70,15 +71,16 @@ private:
 		std::shared_ptr<class IModule> mod;
 		bool shouldRender = true;
 		bool isExtended = false;
+		bool isMarketScript = false;
 		Vec2 previewSize = {};
 		float arrowRot = 180.f;
-		float lerpArrowRot = 0.f;
+		float lerpArrowRot = 1.f;
 		float lerpToggle = 0.f;
 		Color toggleColorOn = {};
 		Color toggleColorOff = {};
 
 		static bool compare(ModContainer const& a, ModContainer const& b) {
-			return a.name < b.name;
+			return (a.name < b.name) || (!a.isMarketScript && b.isMarketScript);
 		}
 	};
 

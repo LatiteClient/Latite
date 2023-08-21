@@ -10,8 +10,8 @@ protected:
 	ValueType bgX = FloatValue(150.f);
 	ValueType bgY = FloatValue(45.f);
 
-	ValueType padX = FloatValue(45.f);
-	ValueType padY = FloatValue(30.f);
+	ValueType padX = FloatValue(22.f);
+	ValueType padY = FloatValue(4.f);
 	
 	ValueType textSizeS = FloatValue(30.f);
 
@@ -26,7 +26,7 @@ protected:
 	ValueType outlineThickness = FloatValue(2.f);
 	ValueType outlineColor = ColorValue(1.f, 1.f ,1.f, 1.f);
 
-	ValueType radius = FloatValue(5.f);
+	ValueType radius = FloatValue(0.f);
 public:
 	TextModule(std::string const& name, std::string const& displayName,
 		std::string const& description, Category category, float maxBgX = 400.f, int keybind = 0)

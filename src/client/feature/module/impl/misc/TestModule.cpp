@@ -44,7 +44,7 @@ bool lastW = false;
 std::chrono::system_clock::time_point tp;
 
 void TestModule::onRender(Event& ev) {
-	auto inst = sdk::ClientInstance::get();
+	auto inst = SDK::ClientInstance::get();
 	realW = (GetKeyState('W') & 0x8000) > 0;
 	if (realW && !lastW) {
 		tp = std::chrono::system_clock::now();
