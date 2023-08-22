@@ -123,6 +123,18 @@ public:
 		"MovePlayer"};
 
 	inline static SigImpl MoveInputHandler_tick{};
+
+	inline static SigImpl Tesesllator_vertex{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? f3 0f 10 5b ? f3 0f 10 13",
+		"Tessellator::vertex"};
+
+	inline static SigImpl Tesesllator_begin{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5C 24 ?? 55 48 83 EC ?? 80 B9 ?? ?? ?? ?? 00 45",
+		"Tessellator::begin"};
+
+	inline static SigImpl Tesesllator_color{[](memory::signature_store&, uintptr_t res) { return res; },
+		"80 b9 ? ? ? ? ? 4c 8b c1 75",
+		"Tessellator::color"};
 };
 
 // after adding sigs here, add them in latite.cpp

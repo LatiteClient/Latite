@@ -44,7 +44,7 @@ void Zoom::onKeyUpdate(Event& evGeneric) {
 
 void Zoom::onCinematicCamera(Event& evGeneric) {
 	auto& ev = reinterpret_cast<CinematicCameraEvent&>(evGeneric);
-	if (std::get<BoolValue>(this->cinematicCam)) {
+	if (shouldZoom && std::get<BoolValue>(this->cinematicCam)) {
 		ev.setValue(true);
 	}
 }

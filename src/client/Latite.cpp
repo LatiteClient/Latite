@@ -187,6 +187,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(RakPeer_GetAveragePing),
         MVSIG(MoveInputHandler_tick),
         MVSIG(MovePlayer),
+        MVSIG(LocalPlayer_applyTurnDelta),
             };
     
     new (mmgrBuf) ModuleManager;
@@ -239,18 +240,9 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     Logger::Info("Waiting for DX init..");
 
-    while (!Latite::getRenderer().getDeviceContext() || Latite::getRenderer().getScreenSize().width < 0.02f) { // hacky
+    while (!Latite::getRenderer().hasInitialized()) { // hacky
         std::this_thread::sleep_for(10ms);
     }
-
-    if (!Latite::getConfigManager().loadMaster()) {
-        Logger::Fatal("Could not load master config!");
-    }
-    else {
-        Logger::Info("Loaded master config");
-    }
-
-    Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
 
     Logger::Info("Initialized Latite Client");
     return 0ul;
@@ -399,7 +391,16 @@ void Latite::threadsafeInit() {
     auto ws = util::StrToWStr("Latite Client " + vstr);
     app.Title(ws);
     Latite::getScriptManager().loadPrerunScripts();
-    Logger::Info("Loaded startup scripts");   
+    Logger::Info("Loaded startup scripts");
+
+    if (!Latite::getConfigManager().loadMaster()) {
+        Logger::Fatal("Could not load master config!");
+    }
+    else {
+        Logger::Info("Loaded master config");
+    }
+
+    Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
 
     if (!Chakra::mod) {
         winrt::hstring title = L"Error";

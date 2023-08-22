@@ -3,7 +3,7 @@
 #include "client/script/class/impl/JsVec2.h"
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/client/game/MinecraftGame.h"
-#include "sdk/common/client/renderer/LevelRenderer.h"
+#include "sdk/common/client/renderer/game/LevelRenderer.h"
 #include "sdk/common/world/Minecraft.h"
 
 void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {

@@ -120,7 +120,6 @@ void ClickGUI::onRender(Event&) {
 	// Menu Rect
 	dc.fillRoundedRectangle(rect, rcColor, 19.f * adaptedScale);
 	dc.drawRoundedRectangle(rect, outline, 19.f * adaptedScale, 4.f * adaptedScale, DXContext::OutlinePosition::Outside);
-	//dc.drawText({ 0, 0, 200, 30 }, "Hello world!", D2D1::ColorF::White, 30.f, DWRITE_TEXT_ALIGNMENT_CENTER);
 
 	float offX = 0.01689f * rect.getWidth();
 	float offY = 0.03191f * rect.getHeight();
@@ -146,8 +145,9 @@ void ClickGUI::onRender(Event&) {
 		}
 
 
+		// FIXME: this is scuffed
 		// Latite Text
-		dc.drawText({ logoRect.right + 9.f * adaptedScale, logoRect.top + 3.f * adaptedScale, logoRect.right + 500.f, logoRect.top + 50.f * adaptedScale }, L"Latite Client", d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::Light, 25.f * adaptedScale, DWRITE_TEXT_ALIGNMENT_LEADING);
+		dc.drawText({ logoRect.right + 9.f * adaptedScale, logoRect.top, logoRect.right + 500.f, logoRect.bottom }, L"Latite Client", d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::Light, 25.f * adaptedScale, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	}
 
 	// X button / other menus

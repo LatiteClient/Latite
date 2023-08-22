@@ -30,7 +30,7 @@ bool Renderer::init(IDXGISwapChain* chain) {
 	if (Latite::get().shouldForceDX11()) {
 		isDX12 = false;
 	}
-
+	/*
 	if (SUCCEEDED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12))) && !dx12Removed && Latite::get().shouldForceDX11()) {
 		static_cast<ID3D12Device5*>(gameDevice12.Get())->RemoveDevice();
 		bufferCount = 1;
@@ -38,7 +38,7 @@ bool Renderer::init(IDXGISwapChain* chain) {
 		isDX12 = false;
 		dx12Removed = true;
 		return init(chain);
-	}
+	}*/
 
 	else gameDevice11 = nullptr;
 

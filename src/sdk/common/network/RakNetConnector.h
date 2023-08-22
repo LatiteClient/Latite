@@ -28,7 +28,10 @@ namespace SDK {
 
 		class RakPeer* getPeer() {
 			if (internalVers > V1_18_12) {
-				return memory::callVirtual<RakPeer*>(this, MV_DETAIL_GETOFFSET(0x19, 0, 0x17));
+				if (internalVers > V1_19_51) {
+					return memory::callVirtual<RakPeer*>(this, 0x19);
+				}
+				return memory::callVirtual<RakPeer*>(this, 0x17);
 			}
 			return util::directAccess<RakPeer*>(this, 0x230);
 		}

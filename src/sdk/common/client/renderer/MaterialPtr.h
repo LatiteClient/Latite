@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#if 0
 #include "sdk/SDKBase.h"
 
 namespace SDK {
@@ -12,3 +13,4 @@ namespace SDK {
 		static MaterialPtr* getUIColor();
 	};
 }
+#endif

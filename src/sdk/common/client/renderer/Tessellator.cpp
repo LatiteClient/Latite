@@ -1,5 +1,5 @@
 #include "Tessellator.h"
-#include "mnemosyne/Scanner.h"
+/*#include "mnemosyne/Scanner.h"
 
 void SDK::Tessellator::vertex(float x, float y, float z) {
 	static auto func = util::InstructionToAddress(mnem::ScanSignature("e8 ? ? ? ? f3 0f 10 5b ? f3 0f 10 13"_sig), 1);
@@ -19,3 +19,4 @@ void SDK::Tessellator::color(float r, float g, float b, float a) {
 void SDK::Tessellator::color(Color const& col) {
 	color(col.r, col.g, col.b, col.a);
 }
+*/

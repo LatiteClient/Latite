@@ -1,7 +1,7 @@
 #pragma once
 #include "api/eventing/Event.h"
 #include "util/FNV32.h"
-#include "sdk/common/client/renderer/LevelRenderer.h"
+#include "sdk/common/client/renderer/game/LevelRenderer.h"
 
 class RenderLevelEvent : public Event {
 public:

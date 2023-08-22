@@ -213,12 +213,6 @@
     <ClInclude Include="src\sdk\signature\storage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sdk\common\client\renderer\LevelRendererPlayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\sdk\common\client\renderer\LevelRenderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\client\hook\impl\LevelRendererHooks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -516,6 +510,36 @@
     <ClInclude Include="src\client\event\impl\AfterMoveEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\sdk\common\client\renderer\MaterialPtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\client\renderer\MeshUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\client\renderer\Tessellator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\client\renderer\TexturePtr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\client\renderer\game\LevelRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\client\renderer\game\LevelRendererPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\hud\BowIndicator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\world\actor\player\PlayerInventory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\world\actor\player\Inventory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\deps\Core\StringUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -618,9 +642,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\sdk\common\client\game\MinecraftGame.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\client\renderer\LevelRendererPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\hook\impl\OptionHooks.cpp">
@@ -783,6 +804,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\module\impl\game\ToggleSprintSneak.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sdk\common\client\renderer\MaterialPtr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sdk\common\client\renderer\MeshUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sdk\common\client\renderer\Tessellator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sdk\common\client\renderer\game\LevelRendererPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\hud\BowIndicator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

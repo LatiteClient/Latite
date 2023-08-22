@@ -2,8 +2,8 @@
 #include "pch.h"
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/world/Minecraft.h"
-#include "sdk/common/client/renderer/LevelRendererPlayer.h"
-#include "sdk/common/client/renderer/LevelRenderer.h"
+#include "sdk/common/client/renderer/game/LevelRendererPlayer.h"
+#include "sdk/common/client/renderer/game/LevelRenderer.h"
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
 
