@@ -3,9 +3,9 @@ const { readdirSync, statSync, writeFile, readFileSync, writeFileSync } = requir
 const folder = ".";
 const watermark = `/* Copyright (C) Imrglop, All rights reserved
  * Copyright (C) Latite Client contributors, All rights reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Unauthorized copying of this file, via any medium is strictly prohibited without the permission of the author.
  * Proprietary and confidential
- * Written by Imrglop <xximrgopxx@gmail.com>, 2023
+ * Written by Imrglop <contact: latiteclientgithub@gmail.com>, 2023
  */`;
 require ("fs");
 
@@ -16,8 +16,9 @@ function loopFiles(path = "") {
         if (statSync(pat).isDirectory()) {
             loopFiles(pat);
         } else {
-			if (file.endsWith(".cpp") || file.endsWidth(".h") {
-            writeFileSync(pat, watermark + "\n\n"); // minify
+			if (pat.endsWith(".cpp") || pat.endsWith(".h")) {
+				writeFileSync(pat, watermark.split("\n").join("\r\n") + "\r\n\r\n" + readFileSync(pat)); // minify
+				console.log(pat);
 			}
         }
     }
