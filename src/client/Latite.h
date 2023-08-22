@@ -40,6 +40,7 @@ public:
 	void onChar(class Event& ev);
 	void onRendererInit(class Event& ev);
 	void onRendererCleanup(class Event& ev);
+	void onRenderOverlay(class Event& ev);
 	void onFocusLost(class Event& ev);
 	void onSuspended(class Event& ev);
 	void loadConfig(class SettingGroup& resolvedGroup);

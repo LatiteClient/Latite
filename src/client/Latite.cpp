@@ -379,6 +379,7 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getEventing().listen<AppSuspendedEvent>(this, (EventListenerFunc)&Latite::onSuspended, 2);
     Latite::getEventing().listen<CharEvent>(this, (EventListenerFunc)&Latite::onChar, 2);
     Latite::getEventing().listen<ClickEvent>(this, (EventListenerFunc)&Latite::onClick, 2);
+    Latite::getEventing().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Latite::onRenderOverlay, 2);
 }
 
 void Latite::threadsafeInit() {
@@ -581,6 +582,11 @@ void Latite::onRendererCleanup(Event& ev) {
     this->hudBlurBitmap = nullptr;
     this->gaussianBlurEffect = nullptr;
     this->hudBlurBrush = nullptr;
+}
+
+void Latite::onRenderOverlay(Event& ev) {
+    DXContext dc;
+    dc.fillRoundedRectangle({ 10.f, 10.f, 100.f, 100.f }, D2D1::ColorF::Red, 10.f);
 }
 
 void Latite::onFocusLost(Event& evGeneric) {

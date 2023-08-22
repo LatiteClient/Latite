@@ -36,6 +36,15 @@ void BowIndicator::render(DXContext& dc, bool isDefault, bool inEditor) {
 			auto mxu = item->getMaxUseDuration(slot);
 			float diff = static_cast<float>(item->getMaxUseDuration(slot) - useDur);
 			float percent = (std::min)((std::max)(diff / 20.f, 0.f), 1.f);
+
+			d2d::Rect fillRc = rc;
+			if (horiz) {
+				fillRc.right = fillRc.left + fillRc.getWidth() * percent;
+			}
+			else {
+				fillRc.bottom = fillRc.top + fillRc.getHeight() * percent;
+			}
+			dc.fillRoundedRectangle(fillRc, std::get<ColorValue>(indicatorCol2).color1, rad);
 		}
 	}
 	else {

@@ -45,7 +45,6 @@ winrt::Windows::Foundation::IAsyncAction Screenshot::takeScreenshot(std::filesys
     auto bmp = Latite::getRenderer().getBitmap();
 
     IRandomAccessStream raStream = file.OpenAsync(FileAccessMode::ReadWrite).get();
-
     ComPtr<IStream> stream;
     ThrowIfFailed(
         CreateStreamOverRandomAccessStream((IUnknown*) & raStream, IID_PPV_ARGS(&stream))

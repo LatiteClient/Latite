@@ -21,6 +21,7 @@ private:
 	bool isDX11 = false;
 
 	std::wstring fontFamily = L"Segoe UI";
+	std::wstring fontFamily2 = L"Outfit";
 	void releaseAllResources();
 
 	bool hasInit = false;
@@ -73,7 +74,8 @@ public:
 	enum class FontSelection {
 		Regular,
 		Semilight,
-		Light
+		Light,
+		Regular2 // TODO: this is kinda bad
 	};
 
 	void createDeviceIndependentResources();
@@ -104,6 +106,14 @@ public:
 
 	void setFontFamily(std::wstring ws) {
 		this->fontFamily = ws;
+	}
+
+	[[nodiscard]] std::wstring getFontFamily2() {
+		return this->fontFamily2;
+	}
+
+	void setFontFamily2(std::wstring const& f2) {
+		fontFamily2 = f2;
 	}
 
 	[[nodiscard]] D2D1_SIZE_F getScreenSize() {
