@@ -231,6 +231,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\client\feature\module\impl\misc\Clock.h" />
     <ClInclude Include="deps\include\chakra\ChakraCommon.h" />
     <ClInclude Include="deps\include\chakra\ChakraCommonWindows.h" />
     <ClInclude Include="deps\include\chakra\ChakraCore.h" />
@@ -426,6 +427,7 @@
     <Text Include="src\util\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\client\feature\module\impl\misc\Clock.cpp" />
     <ClCompile Include="src\api\feature\setting\Setting.cpp" />
     <ClCompile Include="src\api\memory\memory.cpp" />
     <ClCompile Include="src\api\memory\signature\signature.cpp" />

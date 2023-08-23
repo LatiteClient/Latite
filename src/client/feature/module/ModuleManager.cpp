@@ -1,6 +1,7 @@
 #include "ModuleManager.h"
 #include "impl/misc/TestModule.h"
 #include "impl/misc/Screenshot.h"
+#include "impl/misc/Clock.h"
 
 #include "impl/game/Zoom.h"
 #include "impl/game/ToggleSprintSneak.h"
@@ -32,6 +33,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<PingDisplay>());
 	this->items.push_back(std::make_shared<SpeedDisplay>());
 	this->items.push_back(std::make_shared<ToggleSprintSneak>());
+	this->items.push_back(std::make_shared<Clock>());
 
 	for (auto& mod : items) {
 		mod->onInit();
