@@ -16,5 +16,5 @@ private:
 	ValueType indicatorRad = FloatValue(5.f);
 
 	void render(DXContext& dc, bool isDefault, bool inEditor) override;
-	std::wstringstream text();
+	std::wstringstream text(bool isDefault, bool inEditor) override;
 };

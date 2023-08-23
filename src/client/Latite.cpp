@@ -234,15 +234,9 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         std::this_thread::sleep_for(10ms);
     }
 
+    Latite::get().initSettings();
+
     Latite::get().initialize(dll);
-
-    // Wait for DX Hook
-
-    Logger::Info("Waiting for DX init..");
-
-    while (!Latite::getRenderer().hasInitialized()) { // hacky
-        std::this_thread::sleep_for(10ms);
-    }
 
     Logger::Info("Initialized Latite Client");
     return 0ul;
@@ -359,8 +353,6 @@ void Latite::queueEject() noexcept {
 
 void Latite::initialize(HINSTANCE hInst) {
     this->dllInst = hInst;
-
-    initSettings();
 
     getHooks().init();
     Logger::Info("Initialized Hooks");

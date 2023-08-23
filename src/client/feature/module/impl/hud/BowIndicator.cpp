@@ -29,13 +29,18 @@ void BowIndicator::render(DXContext& dc, bool isDefault, bool inEditor) {
 	d2d::Rect rc = { 0.f, 0.f, horiz ? siz : wid, horiz ? wid : siz };
 	float rad = std::get<FloatValue>(indicatorRad) / 10.f * (std::min)(rc.getWidth(), rc.getHeight());
 
+	rect.right = rect.left + rc.getWidth();
+	rect.bottom = rect.top + rc.getHeight();
+
 	if (slot->item) {
 		auto item = *slot->item;
+		auto nam = item->_namespace;
 		if (item->id.hash == 0xd8d9a7186bad3c2f /*bow*/) {
 			int useDur = plr->getItemUseDuration();
 			auto mxu = item->getMaxUseDuration(slot);
 			float diff = static_cast<float>(item->getMaxUseDuration(slot) - useDur);
 			float percent = (std::min)((std::max)(diff / 20.f, 0.f), 1.f);
+			dc.fillRoundedRectangle(rc, std::get<ColorValue>(indicatorCol).color1, rad);
 
 			d2d::Rect fillRc = rc;
 			if (horiz) {
@@ -51,10 +56,9 @@ void BowIndicator::render(DXContext& dc, bool isDefault, bool inEditor) {
 
 	}
 
-	dc.fillRoundedRectangle(rc, std::get<ColorValue>(indicatorCol).color1, rad);
 }
 
-std::wstringstream BowIndicator::text() {
+std::wstringstream BowIndicator::text(bool, bool) {
 	std::wstringstream wss;
 	wss << "hi";
 	return wss;

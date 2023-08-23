@@ -47,6 +47,7 @@ public:
 	void initAsset(int resource, std::wstring const& filename);
 	std::string getTextAsset(int resource);
 	winrt::Windows::Foundation::IAsyncAction downloadExtraAssets();
+	void initSettings();
 
 	Latite() = default;
 	~Latite() = default;
@@ -104,7 +105,6 @@ private:
 	ComPtr<ID2D1Effect> gaussianBlurEffect;
 
 	void threadsafeInit();
-	void initSettings();
 
 	bool shouldEject = false;
 	bool hasInit = false;

@@ -1,5 +1,6 @@
 #include "Screenshot.h"
 #include "client/event/impl/KeyUpdateEvent.h"
+#include "client/event/impl/RenderOverlayEvent.h"
 #include "util/Util.h"
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
@@ -21,33 +22,58 @@ using namespace winrt::Windows::Web::Http::Filters;
 using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Storage;
 
-#define REF &
-
 Screenshot::Screenshot() : Module("Screenshot", "Screenshot Key", "Take a screenshot with a key.", GAME, nokeybind) {
-	listen<KeyUpdateEvent>((EventListenerFunc) REF Screenshot::onKey);
+    listen<KeyUpdateEvent>((EventListenerFunc)&Screenshot::onKey);
+    listen<RenderOverlayEvent>((EventListenerFunc)&Screenshot::onRenderOverlay, false, 0 /*lowest priority so that Latite renders everything else*/);
 }
 
 void Screenshot::onKey(Event& evG) {
 	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evG);
 	if (ev.isDown() && ev.getKey() == this->screenshotKey) {
 		// take a screenshot
-        auto path = util::GetLatitePath() / "Screenshots";
-        std::filesystem::create_directory(path);
-		takeScreenshot(util::GetLatitePath());
-        Latite::getClientMessageSink().push(std::format("Screenshot saved to {}", (path / "screenshot.png").string()));
+        queueToScreenshot = true;
+        screenshotPath = util::GetLatitePath() / "Screenshots";
+        std::filesystem::create_directory(screenshotPath);
 	}
+}
+
+void Screenshot::onRenderOverlay(Event& ev) {
+    DXContext dc;
+    if (queueToScreenshot) {
+        takeScreenshot(screenshotPath);
+        Latite::getClientMessageSink().push(std::format("Screenshot saved to {}", (screenshotPath / "screenshot.png").string()));
+        queueToScreenshot = false;
+    }
+
+    if (savedBitmap) {
+        auto now = std::chrono::system_clock::now();
+        auto dist = now - startTime;
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(dist).count() > 4000ll /*4 seconds*/) {
+            this->savedBitmap = std::nullopt;
+            this->lerpX = 0.f;
+            this->lerpY = 0.f;
+            this->flashLerp = 0.f;
+            return;
+        }
+        if (flashLerp > 0.f) {
+            // fade out
+            flashLerp -= 0.05 * Latite::getRenderer().getDeltaTime();
+            auto ss = Latite::getRenderer().getScreenSize();
+            dc.fillRectangle({ 0.f, 0.f, ss.width, ss.height }, { 1.f, 1.f, 1.f, flashLerp });
+        }
+    }
 }
 
 winrt::Windows::Foundation::IAsyncAction Screenshot::takeScreenshot(std::filesystem::path const& path) {
     // file
     auto folder = co_await StorageFolder::GetFolderFromPathAsync(path.wstring());
     auto file = co_await folder.CreateFileAsync(L"screenshot.png", CreationCollisionOption::OpenIfExists);
-    auto bmp = Latite::getRenderer().getBitmap();
+    ComPtr<ID2D1Bitmap1> bmp = Latite::getRenderer().copyCurrentBitmap();
 
     IRandomAccessStream raStream = file.OpenAsync(FileAccessMode::ReadWrite).get();
     ComPtr<IStream> stream;
     ThrowIfFailed(
-        CreateStreamOverRandomAccessStream((IUnknown*) & raStream, IID_PPV_ARGS(&stream))
+        CreateStreamOverRandomAccessStream(raStream.as<IUnknown>().get(), IID_PPV_ARGS(&stream))
     );
 
     auto wicFactory = Latite::getRenderer().getImagingFactory();
@@ -94,7 +120,7 @@ winrt::Windows::Foundation::IAsyncAction Screenshot::takeScreenshot(std::filesys
 
     ThrowIfFailed(
         imageEncoder->WriteFrame(
-            bmp,
+            bmp.Get(),
             wicFrameEncode.Get(),
             nullptr     // Use default WICImageParameter options.
         )
@@ -113,5 +139,6 @@ winrt::Windows::Foundation::IAsyncAction Screenshot::takeScreenshot(std::filesys
         stream->Commit(STGC_DEFAULT)
     );
 
+    savedBitmap = std::move(bmp);
     co_return;
 }

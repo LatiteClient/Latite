@@ -15,6 +15,7 @@
 #include "impl/hud/ServerDisplay.h"
 #include "impl/hud/PingDisplay.h"
 #include "impl/hud/SpeedDisplay.h"
+#include "impl/hud/BowIndicator.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
 
@@ -34,6 +35,8 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<SpeedDisplay>());
 	this->items.push_back(std::make_shared<ToggleSprintSneak>());
 	this->items.push_back(std::make_shared<Clock>());
+	this->items.push_back(std::make_shared<BowIndicator>());
+	this->items.push_back(std::make_shared<Screenshot>());
 
 	for (auto& mod : items) {
 		mod->onInit();

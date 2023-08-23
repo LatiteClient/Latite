@@ -1,5 +1,6 @@
 #include "DXHooks.h"
-#include "util/DXUtil.h"
+#include "util/DxUtil.h"
+#include "util/Logger.h"
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
 
@@ -53,8 +54,6 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 
 	ThrowIfFailed(CreateDXGIFactory(IID_PPV_ARGS(&factory)));
 	ThrowIfFailed(factory->EnumAdapters(0, adapter.GetAddressOf()));
-
-
 
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 	swapChainDesc.BufferCount = 2;
@@ -116,4 +115,7 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 
 	// Needed for D3D11On12 for DX12
 	if (cqueueVftable) ExecuteCommandListsHook = addHook(cqueueVftable[10], CommandQueue_ExecuteCommandLists, "ID3D12CommandQueue::executeCommandLists");
+	PresentHook->enable();
+	ResizeBuffersHook->enable();
+	if (cqueueVftable) ExecuteCommandListsHook->enable();
 }
