@@ -92,3 +92,7 @@ std::wstringstream ToggleSprintSneak::text(bool isDefault, bool inEditor) {
 	wss << left << " (" << right << ")";
 	return wss;
 }
+
+bool ToggleSprintSneak::isActive() {
+	return std::get<BoolValue>(this->label);
+}

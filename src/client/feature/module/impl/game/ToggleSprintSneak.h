@@ -30,4 +30,5 @@ private:
 	std::wstring right = L"";
 protected:
 	std::wstringstream text(bool isDefault, bool inEditor) override;
+	bool isActive() override;
 };

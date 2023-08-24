@@ -8,7 +8,6 @@ void TextModule::onInit() {
 	addSetting("customSize", "Fixed Size", "Use a custom size instead of padding", customSize, "fillBg"_istrue);
 	addSliderSetting("bgX", "BG X", "Background size (only if Fixed Size is enabled)", bgX, FloatValue(0.f), FloatValue(maxBGX), FloatValue(2.5f), "customSize"_istrue);
 	addSliderSetting("bgY", "BG Y", "Background size (only if Fixed Size is enabled)", bgY, FloatValue(0.f), FloatValue(300.f), FloatValue(2.5f), "customSize"_istrue);
-	addSetting("hideModule", "Hide Module", "", hideModule);
 
 	addSliderSetting("padX", "Pad X", "Padding", padX, FloatValue(0.f), FloatValue(40.f), FloatValue(2.f), "customSize"_isfalse);
 	addSliderSetting("padY", "Pad Y", "Padding", padY, FloatValue(0.f), FloatValue(40.f), FloatValue(2.f), "customSize"_isfalse);
@@ -63,11 +62,6 @@ void TextModule::render(DXContext& ctx, bool isDefault, bool inEditor) {
 		this->rect.right = rect.left + std::get<FloatValue>(bgX);
 		this->rect.bottom = rect.top + std::get<FloatValue>(bgY);
 
-	}
-	else if (std::get<BoolValue>(hideModule))
-	{
-		// don't draw anything, since we're hiding the module.
-		// FIXME: Module still appears when editing module positions. *Maybe* we could keep this in? It looks pretty weird though.
 	}
 	else {
 		Vec2 drawPos = { static_cast<float>(textPadding), static_cast<float>(textPaddingY) };

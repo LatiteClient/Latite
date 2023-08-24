@@ -33,7 +33,9 @@ void HUDEditor::onRender(Event& ev) {
 	if (isActive()) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 			if (mod->isHud()) {
-				addLayer(reinterpret_cast<HUDModule*>(mod.get())->getRect());
+				auto rMod = reinterpret_cast<HUDModule*>(mod.get());
+				if (rMod->isActive()) return;
+				addLayer(rMod->getRect());
 			}
 			});
 
@@ -95,7 +97,7 @@ void HUDEditor::onRender(Event& ev) {
 
 	if (isActive() || SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
-			if (mod->isHud() && mod->isEnabled()) {
+			if (mod->isHud() && mod->isEnabled() && reinterpret_cast<HUDModule*>(mod.get())->isActive()) {
 				auto hudModule = static_cast<HUDModule*>(mod.get());
 				renderModule(hudModule);
 				hudModule->storePos();
@@ -110,6 +112,7 @@ void HUDEditor::onClick(Event& evGeneric) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 			if (!mod->isHud()) return;
 			auto hudMod = reinterpret_cast<HUDModule*>(mod.get());
+			if (!hudMod->isActive()) return;
 			if (!shouldSelect(hudMod->getRect(), SDK::ClientInstance::get()->cursorPos)) return;
 			hudMod->setScale(hudMod->getScale() - static_cast<float>(ev.getWheelDelta()) / 1000.f);
 			});
@@ -217,6 +220,7 @@ void HUDEditor::doDragging() {
 				if (doDrag) {
 					if (mod->isEnabled() && mod->isHud()) {
 						HUDModule* rMod = static_cast<HUDModule*>(mod.get());
+						if (!rMod->isActive()) return;
 						if (shouldSelect(rMod->getRect(), cursorPos)) {
 							dragMod = rMod;
 							Vec2 pos = rMod->getRect().getPos();
@@ -402,6 +406,7 @@ void HUDEditor::doSnapping(Vec2 const&) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 			if (mod->isHud()) {
 				auto rMod = static_cast<HUDModule*>(mod.get());
+				if (!rMod->isActive()) return;
 				auto pos = rMod->getRect().getPos();
 				if (rMod->snappingX.doSnapping) {
 					if (rMod->snappingX.type != HUDModule::Snapping::Module) {
@@ -480,6 +485,7 @@ void HUDEditor::keepModulesInBounds() {
 	Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 		if (mod->isEnabled() && mod->isHud()) {
 			HUDModule* rMod = static_cast<HUDModule*>(mod.get());
+			if (!rMod->isActive()) return false;
 			auto ss = Latite::getRenderer().getScreenSize();
 			d2d::Rect rc = rMod->getRect();
 			util::KeepInBounds(rc, { 0.f, 0.f, ss.width, ss.height });

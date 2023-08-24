@@ -39,7 +39,7 @@ protected:
 	bool resizable;
 	bool active = true;
 public:
-	[[nodiscard]] bool isActive() { return active; }
+	[[nodiscard]] virtual bool isActive() { return active; }
 
 	struct Snapping {
 		enum Type : int {
