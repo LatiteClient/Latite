@@ -22,7 +22,6 @@
 #include "event/impl/RendererCleanupEvent.h"
 #include "event/impl/FocusLostEvent.h"
 #include "event/impl/AppSuspendedEvent.h"
-#include "event/impl/RenderOverlayEvent.h"
 #include "event/impl/UpdateEvent.h"
 #include "event/impl/CharEvent.h"
 #include "event/impl/ClickEvent.h"
@@ -371,7 +370,6 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getEventing().listen<AppSuspendedEvent>(this, (EventListenerFunc)&Latite::onSuspended, 2);
     Latite::getEventing().listen<CharEvent>(this, (EventListenerFunc)&Latite::onChar, 2);
     Latite::getEventing().listen<ClickEvent>(this, (EventListenerFunc)&Latite::onClick, 2);
-    Latite::getEventing().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Latite::onRenderOverlay, 2);
 }
 
 void Latite::threadsafeInit() {
@@ -574,15 +572,6 @@ void Latite::onRendererCleanup(Event& ev) {
     this->hudBlurBitmap = nullptr;
     this->gaussianBlurEffect = nullptr;
     this->hudBlurBrush = nullptr;
-}
-
-void Latite::onRenderOverlay(Event& ev) {
-    /* DXContext dc;
-    std::string vstr(this->version);
-
-    dc.ctx->DrawBitmap(Latite::getAssets().latiteLogo.getBitmap(), { 10.f, 10.f, 100.f, 100.f });
-    dc.drawText({ 10.f, 100.f, 100.f, 100.f }, util::StrToWStr("Latite Client"), d2d::Colors::WHITE, Renderer::FontSelection::Regular);
-    dc.drawText({ 10.f, 100.f, 100.f, 100.f }, util::StrToWStr(vstr), d2d::Colors::PURPLE, Renderer::FontSelection::Regular); */
 }
 
 void Latite::onFocusLost(Event& evGeneric) {

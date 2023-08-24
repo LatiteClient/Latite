@@ -25,11 +25,13 @@ using namespace winrt::Windows::Storage;
 Screenshot::Screenshot() : Module("Screenshot", "Screenshot Key", "Take a screenshot with a key.", GAME, nokeybind) {
     listen<KeyUpdateEvent>((EventListenerFunc)&Screenshot::onKey);
     listen<RenderOverlayEvent>((EventListenerFunc)&Screenshot::onRenderOverlay, false, 0 /*lowest priority so that Latite renders everything else*/);
+
+    addSetting("ssKey", "Screenshot key", "The key you press to take a screenshot", this->screenshotKey);
 }
 
 void Screenshot::onKey(Event& evG) {
 	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evG);
-	if (ev.isDown() && ev.getKey() == this->screenshotKey) {
+	if (ev.isDown() && ev.getKey() == std::get<KeyValue>(this->screenshotKey)) {
 		// take a screenshot
         queueToScreenshot = true;
         screenshotPath = util::GetLatitePath() / "Screenshots";
@@ -57,7 +59,7 @@ void Screenshot::onRenderOverlay(Event& ev) {
         }
         if (flashLerp > 0.f) {
             // fade out
-            flashLerp -= 0.05 * Latite::getRenderer().getDeltaTime();
+            flashLerp -= 0.05f * Latite::getRenderer().getDeltaTime();
             auto ss = Latite::getRenderer().getScreenSize();
             dc.fillRectangle({ 0.f, 0.f, ss.width, ss.height }, { 1.f, 1.f, 1.f, flashLerp });
         }
