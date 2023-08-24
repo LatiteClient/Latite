@@ -366,7 +366,7 @@ void Renderer::releaseDeviceIndependentResources() {
 	segoeSemilight = nullptr;
 	outfit = nullptr;
 	outfitLight = nullptr;
-	segoeSemilight = nullptr;
+	outfitSemilight = nullptr;
 }
 
 void Renderer::releaseDeviceResources() {
