@@ -147,7 +147,9 @@ void ClickGUI::onRender(Event&) {
 
 		// FIXME: this is scuffed
 		// Latite Text
-		dc.drawText({ logoRect.right + 9.f * adaptedScale, logoRect.top, logoRect.right + 500.f, logoRect.bottom }, L"Latite Client", d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::SegoeLight, 25.f * adaptedScale, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		//dc.drawRectangle({ logoRect.right + 9.f * adaptedScale, logoRect.top, logoRect.right + 500.f, logoRect.bottom }, D2D1::ColorF::Red);
+		float realLogoHeight = rect.getHeight() * 0.077921f;
+		dc.drawText({ logoRect.right + 9.f * adaptedScale, logoRect.top, logoRect.right + 500.f, logoRect.top + realLogoHeight }, L"Latite Client", d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::Light, 25.f * adaptedScale, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	}
 
 	// X button / other menus
@@ -763,7 +765,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 		if (!tb) {
 			tb = std::make_shared<ui::TextBox>(txtRc);
 			tb->setText(textVal.str);
-			tb->setCaretLocation(textVal.str.size());
+			tb->setCaretLocation(static_cast<int>(textVal.str.size()));
 			settingBoxes[set] = tb;
 			Latite::get().addTextBox(settingBoxes[set].get());
 

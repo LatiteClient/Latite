@@ -14,7 +14,7 @@ private:
 	void onKey(Event& ev);
 	void onRenderOverlay(Event& ev);
 	winrt::Windows::Foundation::IAsyncAction takeScreenshot(std::filesystem::path const& path);
-	KeyValue screenshotKey = KeyValue(VK_F2);
+	ValueType screenshotKey = KeyValue(VK_F2);
 
 	bool queueToScreenshot = false;
 	std::filesystem::path screenshotPath{};
