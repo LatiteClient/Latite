@@ -10,6 +10,8 @@ protected:
 	ValueType bgX = FloatValue(150.f);
 	ValueType bgY = FloatValue(45.f);
 
+	ValueType hideModule = BoolValue(false);
+
 	ValueType padX = FloatValue(22.f);
 	ValueType padY = FloatValue(4.f);
 	
