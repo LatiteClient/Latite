@@ -581,8 +581,8 @@ void Latite::onRenderOverlay(Event& ev) {
     std::string vstr(this->version);
 
     dc.ctx->DrawBitmap(Latite::getAssets().latiteLogo.getBitmap(), { 10.f, 10.f, 100.f, 100.f });
-    dc.drawText({ 10.f, 100.f, 100.f, 100.f }, util::StrToWStr("Latite Client"), d2d::Colors::WHITE, Renderer::FontSelection::Regular);
-    dc.drawText({ 10.f, 100.f, 100.f, 100.f }, util::StrToWStr(vstr), d2d::Colors::PURPLE, Renderer::FontSelection::Regular); */
+    dc.drawText({ 10.f, 100.f, 100.f, 100.f }, util::StrToWStr("Latite Client"), d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular);
+    dc.drawText({ 10.f, 100.f, 100.f, 100.f }, util::StrToWStr(vstr), d2d::Colors::PURPLE, Renderer::FontSelection::SegoeRegular); */
 }
 
 void Latite::onFocusLost(Event& evGeneric) {

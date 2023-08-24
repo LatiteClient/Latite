@@ -296,7 +296,7 @@ void Renderer::createDeviceIndependentResources() {
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
 		L"en-us",
-		this->font.GetAddressOf()));
+		this->segoe.GetAddressOf()));
 
 	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily.c_str(),
 		nullptr,
@@ -305,7 +305,7 @@ void Renderer::createDeviceIndependentResources() {
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
 		L"en-us",
-		this->fontSemilight.GetAddressOf()));
+		this->segoeSemilight.GetAddressOf()));
 
 	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily.c_str(),
 		nullptr,
@@ -314,7 +314,34 @@ void Renderer::createDeviceIndependentResources() {
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
 		L"en-us",
-		this->fontLight.GetAddressOf()));
+		this->segoeLight.GetAddressOf()));
+
+	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
+		nullptr,
+		DWRITE_FONT_WEIGHT_NORMAL,
+		DWRITE_FONT_STYLE_NORMAL,
+		DWRITE_FONT_STRETCH_NORMAL,
+		fontSize,
+		L"en-us",
+		this->outfit.GetAddressOf()));
+
+	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
+		nullptr,
+		DWRITE_FONT_WEIGHT_SEMI_LIGHT,
+		DWRITE_FONT_STYLE_NORMAL,
+		DWRITE_FONT_STRETCH_NORMAL,
+		fontSize,
+		L"en-us",
+		this->outfitSemilight.GetAddressOf()));
+
+	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
+		nullptr,
+		DWRITE_FONT_WEIGHT_LIGHT,
+		DWRITE_FONT_STYLE_NORMAL,
+		DWRITE_FONT_STRETCH_NORMAL,
+		fontSize,
+		L"en-us",
+		this->outfitLight.GetAddressOf()));
 
 	//ThrowIfFailed(CoInitialize(nullptr));
 
@@ -334,9 +361,12 @@ void Renderer::releaseDeviceIndependentResources() {
 	dWriteFactory = nullptr;
 	wicFactory = nullptr;
 	d2dFactory = nullptr;
-	font = nullptr;
-	fontLight = nullptr;
-	fontSemilight = nullptr;
+	segoe = nullptr;
+	segoeLight = nullptr;
+	segoeSemilight = nullptr;
+	outfit = nullptr;
+	outfitLight = nullptr;
+	segoeSemilight = nullptr;
 }
 
 void Renderer::releaseDeviceResources() {

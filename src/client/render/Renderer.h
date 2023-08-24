@@ -54,9 +54,12 @@ private:
 	ComPtr<ID2D1Effect> affineTransformEffect;
 	ComPtr<ID2D1Effect> blurEffect;
 
-	ComPtr<IDWriteTextFormat> font;
-	ComPtr<IDWriteTextFormat> fontSemilight;
-	ComPtr<IDWriteTextFormat> fontLight;
+	ComPtr<IDWriteTextFormat> segoe;
+	ComPtr<IDWriteTextFormat> segoeSemilight;
+	ComPtr<IDWriteTextFormat> segoeLight;
+	ComPtr<IDWriteTextFormat> outfit;
+	ComPtr<IDWriteTextFormat> outfitSemilight;
+	ComPtr<IDWriteTextFormat> outfitLight;
 
 	std::vector<ID3D12Resource*> d3d12Targets = {  };
 	std::vector<ID3D11Resource*> d3d11Targets = {};
@@ -72,9 +75,12 @@ public:
 	ID2D1Bitmap1* testBitmap;
 
 	enum class FontSelection {
-		Regular,
-		Semilight,
-		Light,
+		SegoeRegular,
+		SegoeSemilight,
+		SegoeLight,
+		OutfitRegular,
+		OutfitSemilight,
+		OutfitLight,
 		Regular2 // TODO: this is kinda bad
 	};
 
@@ -126,12 +132,18 @@ public:
 
 	[[nodiscard]] IDWriteTextFormat* getTextFormat(FontSelection selection) {
 		switch (selection) {
-		case FontSelection::Regular:
-			return font.Get();
-		case FontSelection::Semilight:
-			return fontSemilight.Get();
-		case FontSelection::Light:
-			return fontLight.Get();
+		case FontSelection::SegoeRegular:
+			return segoe.Get();
+		case FontSelection::SegoeSemilight:
+			return segoeSemilight.Get();
+		case FontSelection::SegoeLight:
+			return segoeLight.Get();
+		case FontSelection::OutfitRegular:
+			return outfit.Get();
+		case FontSelection::OutfitSemilight:
+			return outfitSemilight.Get();
+		case FontSelection::OutfitLight:
+			return outfitLight.Get();
 		default:
 			return nullptr;
 		}

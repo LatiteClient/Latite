@@ -17,7 +17,7 @@ void HUDModule::renderFrame()
 void HUDModule::renderPost()
 {
 	DXContext ctx;
-	ctx.drawText(getRect(), util::StrToWStr(this->getDisplayName()), d2d::Color(0.5F, 1.0F, 1.0F, 1.f), Renderer::FontSelection::Light,
+	ctx.drawText(getRect(), util::StrToWStr(this->getDisplayName()), d2d::Color(0.5F, 1.0F, 1.0F, 1.f), Renderer::FontSelection::SegoeLight,
 		16.f);
 }
 

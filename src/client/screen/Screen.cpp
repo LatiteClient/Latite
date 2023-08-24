@@ -73,7 +73,7 @@ void Screen::onRenderOverlay(Event& ev) {
 	if (isActive() && this->tooltip.has_value()) {
 		DXContext dc;
 		Vec2& mousePos = SDK::ClientInstance::get()->cursorPos;
-		d2d::Rect textRect = dc.getTextRect(this->tooltip.value(), Renderer::FontSelection::Regular, 15.f, 8.f);
+		d2d::Rect textRect = dc.getTextRect(this->tooltip.value(), Renderer::FontSelection::SegoeRegular, 15.f, 8.f);
 		textRect.setPos(mousePos);
 		auto height = textRect.getHeight() * 0.9f;
 		textRect.top -= height;
@@ -81,7 +81,7 @@ void Screen::onRenderOverlay(Event& ev) {
 		textRect.left += 5.f;
 		textRect.right += 5.f;
 		dc.fillRectangle(textRect, d2d::Color(0.f, 0.f, 0.f, 0.6f));
-		dc.drawText(textRect, this->tooltip.value(), d2d::Color(1.f, 1.f, 1.f, 0.8f), Renderer::FontSelection::Regular, 15.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(textRect, this->tooltip.value(), d2d::Color(1.f, 1.f, 1.f, 0.8f), Renderer::FontSelection::SegoeRegular, 15.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	}
 	this->tooltip = std::nullopt;
 }
