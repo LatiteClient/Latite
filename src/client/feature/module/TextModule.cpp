@@ -19,6 +19,10 @@ void TextModule::onInit() {
 	addSetting("textCol", "Text", "", textColor);
 	addSetting("bgColor", "Background", "", bgColor);
 
+	alignment.addEntry({ alignment_center, "Center" });
+	alignment.addEntry({ alignment_left, "Left" });
+	alignment.addEntry({ alignment_right, "Right" });
+	addEnumSetting("alignmnet", "Alignment", "How the text is aligned/expands", this->alignment);
 	addSetting("showOutline", "Outline", "", showOutline);
 	addSliderSetting("outlineThickness", "Thickness", "", outlineThickness, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f), "showOutline"_istrue);
 	addSetting("outlineCol", "Outline Color", "", outlineColor, "showOutline"_istrue);
@@ -51,27 +55,27 @@ void TextModule::render(DXContext& ctx, bool isDefault, bool inEditor) {
 	//if (textScaled && customSize) textSize = dc.scaleTextInBounds(str.c_str(), 100.f, rect.getWidth(), 4.f, rect.getHeight());
 	if (std::get<BoolValue>(customSize)) {
 		d2d::Rect rc = d2d::Rect(0, 0, std::get<FloatValue>(bgX), std::get<FloatValue>(bgY));
-		Vec2 ts = dc.getTextSize(str.c_str(), Renderer::FontSelection::SegoeRegular, textSize, false);
+		Vec2 ts = dc.getTextSize(str.c_str(), Renderer::FontSelection::OutfitLight, textSize, false);
 		Vec2 drawPos = rc.center(ts);
 
 		rad = (std::get<FloatValue>(radius).value / 10.f) * (rc.getHeight() / 2.f);
 
 		if (std::get<BoolValue>(fillBg)) dc.fillRoundedRectangle(rc, realCol, rad);
 		if (std::get<BoolValue>(showOutline)) dc.drawRoundedRectangle(rc, realOCol, rad, std::get<FloatValue>(outlineThickness));
-		dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::SegoeRegular, textSize, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::OutfitLight, textSize, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		this->rect.right = rect.left + std::get<FloatValue>(bgX);
 		this->rect.bottom = rect.top + std::get<FloatValue>(bgY);
 
 	}
 	else {
 		Vec2 drawPos = { static_cast<float>(textPadding), static_cast<float>(textPaddingY) };
-		Vec2 ts = dc.getTextSize(str.c_str(), Renderer::FontSelection::SegoeRegular, textSize, false);
+		Vec2 ts = dc.getTextSize(str.c_str(), Renderer::FontSelection::OutfitLight, textSize, false);
 		d2d::Rect rc = d2d::Rect(0, 0, ts.x + (textPadding * 2), ts.y + (textPaddingY * 2));
 
 		rad = (std::get<FloatValue>(radius).value / 10.f) * (rc.getHeight() / 2.f);
 		if (std::get<BoolValue>(fillBg)) dc.fillRoundedRectangle(rc, std::get<ColorValue>(bgColor).color1, rad);
 		if (std::get<BoolValue>(showOutline)) dc.drawRoundedRectangle(rc, realOCol, rad, std::get<FloatValue>(outlineThickness));
-		dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::SegoeRegular, textSize, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::OutfitLight, textSize, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		this->rect.right = rect.left + rc.right;
 		this->rect.bottom = rect.top + rc.bottom;
 	}

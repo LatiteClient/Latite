@@ -27,6 +27,11 @@ protected:
 	ValueType outlineColor = ColorValue(1.f, 1.f ,1.f, 1.f);
 
 	ValueType radius = FloatValue(0.f);
+
+	static constexpr int alignment_center = 0;
+	static constexpr int alignment_left = 1;
+	static constexpr int alignment_right = 2;
+	EnumData alignment;
 public:
 	TextModule(std::string const& name, std::string const& displayName,
 		std::string const& description, Category category, float maxBgX = 400.f, int keybind = 0)
