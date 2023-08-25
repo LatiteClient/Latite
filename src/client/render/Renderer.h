@@ -20,8 +20,8 @@ public:
 private:
 	bool isDX11 = false;
 
-	std::wstring fontFamily = L"Segoe UI";
-	std::wstring fontFamily2 = L"Outfit";
+	std::wstring fontFamily = L"Minecraft Seven v2";
+	std::wstring fontFamily2 = L"Minecraft Seven v2";
 	void releaseAllResources();
 
 	bool hasInit = false;

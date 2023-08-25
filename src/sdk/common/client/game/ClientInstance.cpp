@@ -22,6 +22,21 @@ SDK::ClientInstance* SDK::ClientInstance::get() {
     return instance;
 }
 
+SDK::BlockSource* SDK::ClientInstance::getRegion() {
+    if (SDK::internalVers == SDK::V1_18_12 || SDK::internalVers == SDK::V1_19_51) {
+        return memory::callVirtual<BlockSource*>(this, 0x17);
+    }
+    return memory::callVirtual<BlockSource*>(this, 0x1A);
+}
+
+
+SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
+    if (SDK::internalVers == SDK::V1_18_12 || SDK::internalVers == SDK::V1_19_51) {
+        return memory::callVirtual<LocalPlayer*>(this, 0x18);
+    }
+    return memory::callVirtual<LocalPlayer*>(this, 0x1B);
+}
+
 SDK::GuiData* SDK::ClientInstance::getGuiData() {
     switch (internalVers) {
     case VLATEST:
@@ -32,13 +47,6 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
         return util::directAccess<GuiData*>(this, 0x500);
     }
     return nullptr;
-}
-
-SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
-    if (SDK::internalVers == SDK::V1_18_12 || SDK::internalVers == SDK::V1_19_51) {
-        return memory::callVirtual<LocalPlayer*>(this, 0x18);
-    }
-    return memory::callVirtual<LocalPlayer*>(this, 0x1B);
 }
 
 void SDK::ClientInstance::grabCursor() {

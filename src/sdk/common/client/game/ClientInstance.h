@@ -12,8 +12,9 @@ namespace SDK {
 		MVCLASS_FIELD(Vec2, cursorPos, 0x498, 0x458, 0x458);
 
 		static ClientInstance* get();
-		class GuiData* getGuiData();
+		class BlockSource* getRegion();
 		class LocalPlayer* getLocalPlayer();
+		class GuiData* getGuiData();
 
 		void grabCursor();
 		void releaseCursor();
