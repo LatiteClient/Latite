@@ -374,6 +374,9 @@
     <ClInclude Include="src\sdk\common\world\Item.h" />
     <ClInclude Include="src\sdk\common\world\ItemStack.h" />
     <ClInclude Include="src\sdk\common\world\ItemStackBase.h" />
+    <ClInclude Include="src\sdk\common\world\level\BlockSource.h" />
+    <ClInclude Include="src\sdk\common\world\level\block\Block.h" />
+    <ClInclude Include="src\sdk\common\world\level\block\BlockLegacy.h" />
     <ClInclude Include="src\sdk\deps\Application\AppPlatform.h" />
     <ClInclude Include="src\sdk\deps\Core\StringUtils.h" />
     <ClInclude Include="src\sdk\misc\ClickMap.h" />
