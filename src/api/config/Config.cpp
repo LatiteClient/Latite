@@ -60,6 +60,7 @@ void Config::addSetting(SettingGroup& group, nlohmann::json& obj) {
 
 	// TODO: I think I need to do some metaprogramming magic instead of a spooky switch statement
 
+	
 	switch ((Setting::Type)type) {
 	case Setting::Type::Bool:
 		set->resolvedValue = BoolValue(jVal);

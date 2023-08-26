@@ -353,6 +353,15 @@ void Latite::queueEject() noexcept {
 void Latite::initialize(HINSTANCE hInst) {
     this->dllInst = hInst;
 
+    Latite::getEventing().listen<UpdateEvent>(this, (EventListenerFunc)&Latite::onUpdate, 2);
+    Latite::getEventing().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Latite::onKey, 2);
+    Latite::getEventing().listen<RendererInitEvent>(this, (EventListenerFunc)&Latite::onRendererInit, 2);
+    Latite::getEventing().listen<RendererCleanupEvent>(this, (EventListenerFunc)&Latite::onRendererCleanup, 2);
+    Latite::getEventing().listen<FocusLostEvent>(this, (EventListenerFunc)&Latite::onFocusLost, 2);
+    Latite::getEventing().listen<AppSuspendedEvent>(this, (EventListenerFunc)&Latite::onSuspended, 2);
+    Latite::getEventing().listen<CharEvent>(this, (EventListenerFunc)&Latite::onChar, 2);
+    Latite::getEventing().listen<ClickEvent>(this, (EventListenerFunc)&Latite::onClick, 2);
+
     getHooks().init();
     Logger::Info("Initialized Hooks");
     getHooks().enable();
@@ -362,14 +371,7 @@ void Latite::initialize(HINSTANCE hInst) {
     Logger::Info("Script manager initialized.");
 
     // TODO: use UpdateEvent
-    Latite::getEventing().listen<UpdateEvent>(this, (EventListenerFunc)&Latite::onUpdate, 2);
-    Latite::getEventing().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Latite::onKey, 2);
-    Latite::getEventing().listen<RendererInitEvent>(this, (EventListenerFunc)&Latite::onRendererInit, 2);
-    Latite::getEventing().listen<RendererCleanupEvent>(this, (EventListenerFunc)&Latite::onRendererCleanup, 2);
-    Latite::getEventing().listen<FocusLostEvent>(this, (EventListenerFunc)&Latite::onFocusLost, 2);
-    Latite::getEventing().listen<AppSuspendedEvent>(this, (EventListenerFunc)&Latite::onSuspended, 2);
-    Latite::getEventing().listen<CharEvent>(this, (EventListenerFunc)&Latite::onChar, 2);
-    Latite::getEventing().listen<ClickEvent>(this, (EventListenerFunc)&Latite::onClick, 2);
+    
 }
 
 void Latite::threadsafeInit() {
