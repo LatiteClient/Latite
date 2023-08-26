@@ -21,6 +21,7 @@ public:
 
 	void findTextInput();
 	bool isKeyDown(int vKey);
+	int getMappedKey(std::string const& name);
 
 	void onKey(Event& ev);
 private:

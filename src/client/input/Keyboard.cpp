@@ -77,6 +77,10 @@ bool Keyboard::isKeyDown(int vKey) {
 	return keyMap[vKey];
 }
 
+int Keyboard::getMappedKey(std::string const& name) {
+	return SDK::ClientInstance::get()->inputHandler->mappingFactory->defaultKeyboardLayout->findValue(name);
+}
+
 void Keyboard::onChar(char ch, bool isChar) {
 	CharEvent ev{ ch, isChar };
 	Eventing::get().dispatch(ev);
