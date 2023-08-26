@@ -484,6 +484,7 @@ winrt::Windows::Foundation::IAsyncAction Latite::downloadExtraAssets() {
 
 void Latite::onUpdate(Event& evGeneric) {
     auto& ev = reinterpret_cast<UpdateEvent&>(evGeneric);
+    if (!Latite::getRenderer().getDeviceContext()) return;
     timings.update();
 
     if (!hasInit) {

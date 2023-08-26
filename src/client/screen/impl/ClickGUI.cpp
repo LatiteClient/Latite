@@ -526,7 +526,7 @@ void ClickGUI::onRender(Event&) {
 				dc.ctx->PushAxisAlignedClip(clipRect.get(), D2D1_ANTIALIAS_MODE_ALIASED);
 			}
 			dc.fillRoundedRectangle(modRectActual, d2d::Color::RGB(0x44, 0x44, 0x44).asAlpha(0.22f), .22f * modHeight);
-			dc.drawRoundedRectangle(modRectActual, d2d::Color::RGB(Latite::get().getAccentColor().color1.r, Latite::get().getAccentColor().color1.g, Latite::get().getAccentColor().color1.b).asAlpha(1.f * mod.lerpToggle), .22f * modHeight, 1.f, DXContext::OutlinePosition::Inside);;
+			dc.drawRoundedRectangle(modRectActual, d2d::Color(Latite::get().getAccentColor().color1).asAlpha(1.f * mod.lerpToggle), .22f * modHeight, 1.f, DXContext::OutlinePosition::Inside);;
 			if (renderExtended) {
 				
 				dc.ctx->DrawBitmap(shadowBitmap.Get());
