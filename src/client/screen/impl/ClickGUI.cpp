@@ -525,9 +525,8 @@ void ClickGUI::onRender(Event&) {
 				clipRect.right += 10.f;
 				dc.ctx->PushAxisAlignedClip(clipRect.get(), D2D1_ANTIALIAS_MODE_ALIASED);
 			}
-
 			dc.fillRoundedRectangle(modRectActual, d2d::Color::RGB(0x44, 0x44, 0x44).asAlpha(0.22f), .22f * modHeight);
-			dc.drawRoundedRectangle(modRectActual, d2d::Color::RGB(0x32, 0x39, 0x76).asAlpha(1.f * mod.lerpToggle), .22f * modHeight, 1.f, DXContext::OutlinePosition::Inside);;
+			dc.drawRoundedRectangle(modRectActual, d2d::Color::RGB(Latite::get().getAccentColor().color1.r, Latite::get().getAccentColor().color1.g, Latite::get().getAccentColor().color1.b).asAlpha(1.f * mod.lerpToggle), .22f * modHeight, 1.f, DXContext::OutlinePosition::Inside);;
 			if (renderExtended) {
 				
 				dc.ctx->DrawBitmap(shadowBitmap.Get());
@@ -554,10 +553,9 @@ void ClickGUI::onRender(Event&) {
 						playClickSound();
 					}
 				}
-				static auto onCol = d2d::Color::RGB(0x32, 0x39, 0x76);
 				static auto offCol = d2d::Color::RGB(0x63, 0x63, 0x63);
 
-				mod.toggleColorOn = util::LerpColorState(mod.toggleColorOn, onCol + 0.2f, onCol, selecToggle);
+				mod.toggleColorOn = util::LerpColorState(mod.toggleColorOn, d2d::Color(Latite::get().getAccentColor().color1) + 0.2f, d2d::Color(Latite::get().getAccentColor().color1), selecToggle);
 				mod.toggleColorOff = util::LerpColorState(mod.toggleColorOff, offCol + 0.2f, offCol, selecToggle);
 
 				//float aTogglePadY = toggleRect.getHeight() * 0.15f;
@@ -1119,7 +1117,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 
 		dc.fillRoundedRectangle(sliderRect, d2d::Color::RGB(0x8D, 0x8D, 0x8D).asAlpha(0.11f), sliderRect.getHeight() / 2.f);
 		// 323976
-		dc.fillRoundedRectangle(innerSliderRect, d2d::Color::RGB(0x32, 0x39, 0x76), innerSliderRect.getHeight() / 2.f);
+		dc.fillRoundedRectangle(innerSliderRect, d2d::Color(Latite::get().getAccentColor().color1), innerSliderRect.getHeight() / 2.f);
 
 		dc.brush->SetColor(d2d::Color(0xB9, 0xB9, 0xB9).get());
 		dc.ctx->FillEllipse(D2D1::Ellipse({ innerSliderRect.right, sliderRect.centerY() }, sliderRect.getHeight() * 0.6f, sliderRect.getHeight() * 0.6f), dc.brush);

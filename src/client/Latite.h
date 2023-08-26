@@ -73,6 +73,10 @@ public:
 		return std::get<KeyValue>(menuKey);
 	}
 
+	[[nodiscard]] ColorValue getAccentColor() {
+		return std::get<ColorValue>(accentColor);
+	}
+
 	[[nodiscard]] bool shouldForceDX11() {
 		return std::get<BoolValue>(useDX11);
 	}
@@ -97,6 +101,7 @@ private:
 	// TODO: add disabled settings, for people who already only support dx11, gray it out
 	ValueType useDX11 = BoolValue(false);
 	ValueType menuBlur = FloatValue(20.f);
+	ValueType accentColor = ColorValue(0x32, 0x39, 0x76);
 
 	std::vector<ui::TextBox*> textBoxes;
 	ComPtr<ID2D1Bitmap1> hudBlurBitmap;
