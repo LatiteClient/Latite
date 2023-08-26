@@ -420,7 +420,7 @@ void Latite::initSettings() {
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("commandPrefix", "Command Prefix", "");
+        auto set = std::make_shared<Setting>("commandPrefix", "Command Prefix", "Command Prefix");
         set->value = &this->commandPrefix;
         set->visible = false;
         this->getSettings().addSetting(set);
@@ -431,6 +431,11 @@ void Latite::initSettings() {
         set->min = FloatValue(1.f);
         set->max = FloatValue(30.f);
         set->interval = FloatValue(1.f);
+        this->getSettings().addSetting(set);
+    }
+    {
+        auto set = std::make_shared<Setting>("accentColor", "Accent Color", "Accent Color");
+        set->value = &this->accentColor;
         this->getSettings().addSetting(set);
     }
 }
