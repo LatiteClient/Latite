@@ -101,7 +101,7 @@ private:
 	// TODO: add disabled settings, for people who already only support dx11, gray it out
 	ValueType useDX11 = BoolValue(false);
 	ValueType menuBlur = FloatValue(20.f);
-	ValueType accentColor = ColorValue(0x32, 0x39, 0x76);
+	ValueType accentColor = ColorValue(static_cast<float>(0x32) / 255.f, static_cast<float>(0x39) / 255.f, static_cast<float>(0x76) / 255.f);
 
 	std::vector<ui::TextBox*> textBoxes;
 	ComPtr<ID2D1Bitmap1> hudBlurBitmap;
