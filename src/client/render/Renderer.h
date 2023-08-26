@@ -57,9 +57,9 @@ private:
 	ComPtr<IDWriteTextFormat> segoe;
 	ComPtr<IDWriteTextFormat> segoeSemilight;
 	ComPtr<IDWriteTextFormat> segoeLight;
-	ComPtr<IDWriteTextFormat> outfit;
-	ComPtr<IDWriteTextFormat> outfitSemilight;
-	ComPtr<IDWriteTextFormat> outfitLight;
+	ComPtr<IDWriteTextFormat> font2;
+	ComPtr<IDWriteTextFormat> font2Semilight;
+	ComPtr<IDWriteTextFormat> font2Light;
 
 	std::vector<ID3D12Resource*> d3d12Targets = {  };
 	std::vector<ID3D11Resource*> d3d11Targets = {};
@@ -78,10 +78,9 @@ public:
 		SegoeRegular,
 		SegoeSemilight,
 		SegoeLight,
-		OutfitRegular,
-		OutfitSemilight,
-		OutfitLight,
-		Regular2 // TODO: this is kinda bad
+		Regular2,
+		Semilight2,
+		Light2,
 	};
 
 	void createDeviceIndependentResources();
@@ -138,12 +137,12 @@ public:
 			return segoeSemilight.Get();
 		case FontSelection::SegoeLight:
 			return segoeLight.Get();
-		case FontSelection::OutfitRegular:
-			return outfit.Get();
-		case FontSelection::OutfitSemilight:
-			return outfitSemilight.Get();
-		case FontSelection::OutfitLight:
-			return outfitLight.Get();
+		case FontSelection::Regular2:
+			return font2.Get();
+		case FontSelection::Semilight2:
+			return font2Semilight.Get();
+		case FontSelection::Light2:
+			return font2Light.Get();
 		default:
 			return nullptr;
 		}

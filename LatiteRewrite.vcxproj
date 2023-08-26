@@ -361,6 +361,8 @@
     <ClInclude Include="src\sdk\common\client\gui\controls\VisualTree.h" />
     <ClInclude Include="src\sdk\common\client\gui\GuiData.h" />
     <ClInclude Include="src\sdk\common\client\gui\ScreenView.h" />
+    <ClInclude Include="src\sdk\common\client\input\ClientInputHandler.h" />
+    <ClInclude Include="src\sdk\common\client\input\RemappingLayout.h" />
     <ClInclude Include="src\sdk\common\client\renderer\game\LevelRenderer.h" />
     <ClInclude Include="src\sdk\common\client\renderer\game\LevelRendererPlayer.h" />
     <ClInclude Include="src\sdk\common\client\renderer\HudPlayerRenderer.h" />
@@ -509,6 +511,7 @@
     <ClCompile Include="src\client\ui\TextBox.cpp" />
     <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp" />
     <ClCompile Include="src\sdk\common\client\game\MinecraftGame.cpp" />
+    <ClCompile Include="src\sdk\common\client\input\RemappingLayout.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\game\LevelRendererPlayer.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\MaterialPtr.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\MeshUtils.cpp" />
