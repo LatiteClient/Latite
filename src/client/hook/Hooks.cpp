@@ -10,6 +10,8 @@
 #include "impl/ScreenViewHooks.h"
 #include "MinHook.h"
 
+using namespace std::chrono_literals;
+
 void LatiteHooks::init() {
 	MH_Initialize();
 
