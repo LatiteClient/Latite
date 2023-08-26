@@ -12,6 +12,9 @@
 #include <future> 
 #include <execution>
 #include <optional>
+#include <chrono>
+
+using namespace std::chrono_literals;
 
 // COM
 #include <d2d1.h>

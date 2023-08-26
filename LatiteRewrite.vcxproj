@@ -231,6 +231,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\client\feature\module\impl\game\DynamicLight.h" />
     <ClInclude Include="src\client\feature\module\impl\game\GUIScale.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\Clock.h" />
     <ClInclude Include="deps\include\chakra\ChakraCommon.h" />
@@ -432,6 +433,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\client\feature\module\impl\hud\GuiscaleChanger.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\game\DynamicLight.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\Clock.cpp" />
     <ClCompile Include="src\api\feature\setting\Setting.cpp" />
     <ClCompile Include="src\api\memory\memory.cpp" />
