@@ -56,7 +56,7 @@ using namespace winrt::Windows::Storage;
 #include "render/Assets.h"
 #include "resource.h"
 
-#include "xorstr.hpp"
+#include "util/XorString.h"
 
 int SDK::internalVers = SDK::VLATEST;
 
@@ -186,6 +186,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(MoveInputHandler_tick),
         MVSIG(MovePlayer),
         MVSIG(LocalPlayer_applyTurnDelta),
+        MVSIG(Vtable::TextPacket),
+        MVSIG(Components::runtimeIDComponent),
             };
     
     new (mmgrBuf) ModuleManager;
@@ -452,7 +454,7 @@ void Latite::initAsset(int resource, std::wstring const& filename) {
 
     auto ofs = std::ofstream(fullPath.c_str(), std::ios::binary);
     ofs << std::string(hFinal, hSize);
-    ofs.close();
+    ofs.flush();
 }
 
 std::string Latite::getTextAsset(int resource) {
@@ -470,7 +472,7 @@ winrt::Windows::Foundation::IAsyncAction Latite::downloadExtraAssets() {
     auto folderPath = util::GetLatitePath() / "Assets";
 
     // TODO: FIXME: xor
-    winrt::Windows::Foundation::Uri requestUri(util::StrToWStr(xorstr_("https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll")));
+    winrt::Windows::Foundation::Uri requestUri(util::StrToWStr(XOR_STRING("https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll")));
 
     auto buffer = http.GetBufferAsync(requestUri).get();
     

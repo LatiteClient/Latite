@@ -28,8 +28,12 @@ public:
 	void unloadScript(std::shared_ptr<JsScript> ptr);
 	void unloadAll();
 
-	void onUpdate(::Event& ev);
-	
+	enum class Permission {
+		SendChat,
+		Operator,
+	};
+
+	bool hasPermission(JsScript* script, Permission perm);
 	static bool scriptingSupported();
 
 	using event_callback_t = void(__fastcall*)(JsValueRef func);

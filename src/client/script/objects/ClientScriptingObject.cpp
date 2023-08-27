@@ -93,6 +93,8 @@ void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	initCommandManager();
 	Chakra::DefineFunc(commandManager, cmgrRegisterCommandCallback, L"registerCommand");
 	Chakra::DefineFunc(commandManager, cmgrDeregisterCommandCallback, L"deregisterCommand");
+
+	Chakra::SetPropertyString(object, L"version", util::StrToWStr(std::string(Latite::version.data(), Latite::version.size())));
 }
 
 
@@ -174,7 +176,7 @@ JsValueRef ClientScriptingObject::mmgrGetModuleByName(JsValueRef callee, bool is
 	JsScript* script;
 	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
 	if (script && mod) {
-		auto cl = script->findClass<JsModuleClass>(L"Module");
+		auto cl = script->getClass<JsModuleClass>();
 		if (!cl) {
 			Chakra::ThrowError(L"INTERNAL ERROR: could not find Module class");
 			return JS_INVALID_REFERENCE;
@@ -206,7 +208,7 @@ JsValueRef ClientScriptingObject::mmgrForEachModule(JsValueRef callee, bool isCo
 	JsScript* script;
 	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
 	
-	auto cl = script->findClass<JsModuleClass>(L"Module");
+	auto cl = script->getClass<JsModuleClass>();
 	if (!cl) {
 		Chakra::ThrowError(L"INTERNAL ERROR: could not find Module class");
 		return JS_INVALID_REFERENCE;

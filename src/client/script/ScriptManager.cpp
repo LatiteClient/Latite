@@ -5,6 +5,9 @@
 #include "client/event/Eventing.h"
 #include "client/event/impl/UpdateEvent.h"
 
+#include "sdk/common/client/game/ClientInstance.h"
+#include "sdk/common/client/player/LocalPlayer.h"
+
 #include "util/Logger.h"
 #include <memory>
 
@@ -17,6 +20,8 @@
 #include <winrt/windows.foundation.collections.h>
 #include <winrt/impl/windows.foundation.collections.1.h>
 #include <winrt/Windows.Web.Http.Headers.h>
+
+#include "util/XorString.h"
 
 
 using namespace winrt::Windows::Storage::Streams;
@@ -188,10 +193,9 @@ void ScriptManager::runScriptingOperations()
 	dispatchEvent(ev);
 }
 
-std::optional<int> ScriptManager::installScript(std::string const& name) {
-	std::wstring token = L"?token=GHSAT0AAAAAACETEXYVRCL7YLMVSDOYZB6OZFLNT7Q";
-	std::wstring registry = L"https://raw.githubusercontent.com/LatiteScripting/Scripts/master/registry";
-	std::wstring jsonPath = registry + L"/scripts.json" + token;
+std::optional<int> ScriptManager::installScript(std::string const& inName) {
+	std::wstring registry = L"https://raw.githubusercontent.com/LatiteScripting/Scripts/master/Scripts";
+	std::wstring jsonPath = registry + L"/scripts.json";
 	nlohmann::json scriptsJson;
 
 	auto message = [](std::string const& msg, bool err = false) -> void {
@@ -232,23 +236,23 @@ std::optional<int> ScriptManager::installScript(std::string const& name) {
 		auto name = js["name"].get<std::string>();
 		auto oName = js["name"].get<std::string>();
 		auto woName = util::StrToWStr(oName);
-		std::string in = name;
+		std::string in = inName;
 		std::transform(in.begin(), in.end(), in.begin(), ::tolower);
 		std::transform(name.begin(), name.end(), name.begin(), ::tolower);
 		if (in == name) {
 			message("Installing " + oName + " v" + js["version"].get<std::string>() + " by " + js["author"].get<std::string>());
-			std::wstring path = util::GetLatitePath() / "Startup" / "Scripts" / woName;
-			std::filesystem::create_directory(path);
+			std::filesystem::path path = util::GetLatitePath() / "Scripts" / "Startup" / woName;
+			std::filesystem::create_directories(path);
 			for (auto& fil : js["files"]) {
 				auto fws = util::StrToWStr(fil.get<std::string>());
-				winrt::Windows::Foundation::Uri requestUri(registry + woName + L"/" + fws + token);
+				winrt::Windows::Foundation::Uri requestUri(registry + L"/" + woName + L"/" + fws);
 				HttpRequestMessage request(HttpMethod::Get(), requestUri);
 				auto operation = http.SendRequestAsync(request);
 				auto response = operation.get();
 				auto cont = response.Content();
 				auto strs = cont.ReadAsStringAsync().get();
 				std::wofstream ofs;
-				ofs.open(path + L"\\" + fws);
+				ofs.open(path / fws);
 				if (ofs.fail()) {
 					message("Error opening file: " + std::to_string(*_errno()), true);
 					return *_errno();
@@ -256,10 +260,23 @@ std::optional<int> ScriptManager::installScript(std::string const& name) {
 				ofs << strs.c_str();
 				ofs.close();
 			}
+			// generate certificate
+			auto cert = JsScript::getHash(path);
+			if (cert) {
+#if LATITE_DEBUG
+				Logger::Info("Generated certificate {}", util::WStrToStr(cert.value()));
+#endif
+				std::wofstream ofs(path / XOR_STRING("certificate"));
+				ofs << cert.value();
+				ofs.flush(); // so we can access the certificate directly after
+			}
+			else {
+				Logger::Warn(XOR_STRING("Could not create certificate for script {}"), util::WStrToStr(path));
+			}
 			return std::nullopt;
 		}
 	}
-	message("Could not find script " + name, true);
+	message("Could not find script " + inName, true);
 	return 0;
 }
 
@@ -321,6 +338,23 @@ void ScriptManager::unloadAll() {
 	for (auto& s : this->items) {
 		popScript(s);
 	}
+}
+
+bool ScriptManager::hasPermission(JsScript* script, Permission perm) {
+	auto player = SDK::ClientInstance::get()->getLocalPlayer();
+	if (!player) {
+#if LATITE_DEBUG
+		Logger::Warn("[Script] attempt to call hasPermission while player does not exist!");
+#endif
+		return false;
+	}
+	switch (perm) {
+	case Permission::SendChat:
+		return script->isTrusted() || player->getCommandPermissionLevel() > 0;
+	case Permission::Operator:
+		return player->getCommandPermissionLevel() > 0;
+	}
+	return false;
 }
 
 bool ScriptManager::scriptingSupported() {
@@ -389,6 +423,7 @@ bool ScriptManager::dispatchEvent(Event& ev)
 					Chakra::Release(ref);
 				}
 				JsValueRef ret;
+				Chakra::GetBool
 
 				handleErrors(JS::JsCallFunction(l.first, params, 2, &ret));
 

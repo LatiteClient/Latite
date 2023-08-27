@@ -106,6 +106,13 @@ void Chakra::SetPropertyObject(JsValueRef ref, std::wstring name, JsValueRef obj
 	JS::JsSetProperty(ref, propId, obj, strict);
 }
 
+unsigned int Chakra::GetRefCount(JsValueRef obj) {
+	unsigned count;
+	JS::JsAddRef(obj, &count);
+	JS::JsRelease(obj, &count);
+	return count;
+}
+
 JsValueRef Chakra::GetProperty(JsValueRef obj, std::wstring name) {
 	JsPropertyIdRef propId;
 	JS::JsGetPropertyIdFromName(name.c_str(), &propId);

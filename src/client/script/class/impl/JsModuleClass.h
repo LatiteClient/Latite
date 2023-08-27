@@ -45,7 +45,9 @@ protected:
 	static JsValueRef CALLBACK moduleAddNumberSetting(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 public:
-	JsModuleClass(class JsScript* owner) : JsClass(owner, L"Module") {
+	inline static const wchar_t* class_name = L"Module";
+
+	JsModuleClass(class JsScript* owner) : JsClass(owner, class_name) {
 		createConstructor(jsConstructor, this);
 	}
 

@@ -22,8 +22,16 @@ public:
 			"ClientInstance"};
 	};
 
+	struct Vtable {
+		inline static SigImpl TextPacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+			// last 4 bytes is the hash of the component
+			"48 8D 05 ?? ?? ?? ?? 48 8B F9 48 89 01 48 83 C1 ?? E8 ?? ?? ?? ?? 48 8D 8F",
+			"const TextPacket::vftable"};
+	};
+
 	struct Components {
 		inline static SigImpl moveInputComponent{};
+		inline static SigImpl runtimeIDComponent{};
 	};
 
 	inline static SigImpl LevelRenderer_renderLevel{[](memory::signature_store&, uintptr_t res) { return res; },

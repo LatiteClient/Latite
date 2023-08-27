@@ -558,7 +558,40 @@
     <ClInclude Include="src\client\feature\module\impl\game\DynamicLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\client\feature\module\impl\misc\DebugInfo.h">
+    <ClInclude Include="src\sdk\common\client\input\ClientInputHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\client\input\RemappingLayout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\XorString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\script\ScriptCertificate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\network\Packet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\network\packet\TextPacket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\String.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\network\PacketSender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\script\class\impl\game\JsEntityClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\script\interop\classes\JsEntity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\world\level\HitResult.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\world\actor\player\GameMode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -849,9 +882,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\module\impl\game\DynamicLight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\misc\DebugInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

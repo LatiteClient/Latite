@@ -30,7 +30,9 @@ protected:
 		return Chakra::MakeString(L"[object " + util::StrToWStr(add) + L"]");
 	}
 public:
-	JsRect(class JsScript* owner) : JsClass(owner, L"Rect") {
+	inline static const wchar_t* class_name = L"Rect";
+
+	JsRect(class JsScript* owner) : JsClass(owner, class_name) {
 		createConstructor(jsConstructor, this);
 	}
 

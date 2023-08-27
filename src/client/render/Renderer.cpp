@@ -323,7 +323,7 @@ void Renderer::createDeviceIndependentResources() {
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
 		L"en-us",
-		this->outfit.GetAddressOf()));
+		this->font2.GetAddressOf()));
 
 	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
 		nullptr,
@@ -332,7 +332,7 @@ void Renderer::createDeviceIndependentResources() {
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
 		L"en-us",
-		this->outfitSemilight.GetAddressOf()));
+		this->font2Semilight.GetAddressOf()));
 
 	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
 		nullptr,
@@ -341,7 +341,7 @@ void Renderer::createDeviceIndependentResources() {
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
 		L"en-us",
-		this->outfitLight.GetAddressOf()));
+		this->font2Light.GetAddressOf()));
 
 	//ThrowIfFailed(CoInitialize(nullptr));
 
@@ -364,9 +364,9 @@ void Renderer::releaseDeviceIndependentResources() {
 	segoe = nullptr;
 	segoeLight = nullptr;
 	segoeSemilight = nullptr;
-	outfit = nullptr;
-	outfitLight = nullptr;
-	outfitSemilight = nullptr;
+	font2 = nullptr;
+	font2Light = nullptr;
+	font2Semilight = nullptr;
 }
 
 void Renderer::releaseDeviceResources() {

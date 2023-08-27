@@ -3,14 +3,12 @@
 #include "client/feature/module/HUDModule.h"
 #include "client/event/impl/TickEvent.h"
 
-class TestModule : public HUDModule {
+class TestModule : public Module {
 private:
 	EnumData testEnum;
 public:
 	TestModule();
 	~TestModule() = default;
-
-	void render(DXContext& ctx, bool isDefault, bool inEditor) override;
 
 	void onTick(Event& ev);
 	void onRender(Event& ev);

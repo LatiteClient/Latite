@@ -11,6 +11,8 @@
 class JsScript final {
 	std::vector<std::shared_ptr<ScriptingObject>> objects;
 	std::vector<std::shared_ptr<JsClass>> classes;
+	bool trusted = false;
+	void checkTrusted();
 public:
 	JsContextRef ctx;
 	JsSourceContext sCtx = 1;
@@ -93,12 +95,13 @@ public:
 
 	JsScript(std::wstring const& indexPath);
 	bool load();
-	bool shouldRemove();
+	[[nodiscard]] bool shouldRemove();
+	[[nodiscard]] bool isTrusted() { return trusted; }
 	
 	template <typename T>
-	[[nodiscard]] T* findClass(std::wstring const& name) {
+	[[nodiscard]] T* getClass() {
 		for (auto& cl : this->classes) {
-			if (cl->getName() == name) return reinterpret_cast<T*>(cl.get());
+			if (cl->getName() == T::class_name) return reinterpret_cast<T*>(cl.get());
 		}
 		return nullptr;
 	}
@@ -108,6 +111,9 @@ public:
 	void fetchScriptData();
 	void unload();
 	void handleAsyncOperations();
+
+	[[nodiscard]] std::wstring getCertificate();
+	[[nodiscard]] static std::optional<std::wstring> getHash(std::filesystem::path const& main);
 
 	static void __stdcall debugEventCallback(JsDiagDebugEvent debugEvent, JsValueRef eventData, void* callbackState);
 

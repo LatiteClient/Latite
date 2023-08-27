@@ -26,7 +26,9 @@ protected:
 	static JsValueRef CALLBACK getValueCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 public:
-	JsSettingClass(class JsScript* owner) : JsClass(owner, L"Setting") {
+	inline static const wchar_t* class_name = L"Setting";
+
+	JsSettingClass(class JsScript* owner) : JsClass(owner, class_name) {
 		createConstructor(jsConstructor, this);
 	}
 
