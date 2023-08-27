@@ -33,4 +33,5 @@ namespace util {
 	}
 
 	extern void KeepInBounds(d2d::Rect& targ, d2d::Rect const& bounds);
+	extern std::string GetProcessorInfo();
 }
