@@ -11,7 +11,7 @@
 #include "sdk/common/world/level/Dimension.h"
 #include "sdk/signature/storage.h"
 
-DebugInfo::DebugInfo() : Module("DebugInfo", "Debug Info", "See some craaazy info (send help)", GAME, VK_F3) {
+DebugInfo::DebugInfo() : Module("DebugInfo", "Java Debug Info", "See some craaazy info (send help)", GAME, VK_F3) {
     listen<RenderOverlayEvent>((EventListenerFunc)&DebugInfo::onRenderOverlay);
     listen<DrawHUDModulesEvent>((EventListenerFunc)&DebugInfo::onRenderHUDModules, false, 2);
 }
