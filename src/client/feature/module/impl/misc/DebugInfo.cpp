@@ -28,7 +28,10 @@ namespace {
     }
     std::string getCoordinates() {
         Vec3 position = SDK::ClientInstance::get()->getLocalPlayer()->getPos();
-        return std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", position.x, position.y, position.z);
+        std::string ln1 = std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", position.x, position.y, position.z);
+        std::string ln2;
+        if (SDK::ClientInstance::get()->getLocalPlayer()->dimension->dimensionName == "Nether") ln2 = std::format("Overworld: {:.1f} / {:.1f} / {:.1f}", position.x * 8.f, position.y, position.z * 8.f);
+        return ln1 + "\n" + ln2;
     }
     std::string getCPUInfo() {
         std::string cpuInfo = util::GetProcessorInfo();
