@@ -28,14 +28,15 @@ namespace {
     }
     std::string getCoordinates() {
         Vec3 position = SDK::ClientInstance::get()->getLocalPlayer()->getPos();
-        return std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", position.x, position.y, position.z);
+        return std::format("XYZ Coordinates: {:.3f} / {:.3f} / {:.3f}", position.x, position.y, position.z);
     }
-    std::string getCPUInfo() {
-        std::string cpuInfo = util::GetProcessorInfo();
-        SYSTEM_INFO inf;
-        GetSystemInfo(&inf);
-        cpuInfo = std::to_string(inf.dwNumberOfProcessors) + "x " + cpuInfo;
-        return cpuInfo;
+    std::string getVelocity() {
+        Vec3 velocity = SDK::ClientInstance::get()->getLocalPlayer()->getVelocity();
+        return std::format("XYZ Velocity: {:.3f} / {:.3f} / {:.3f}", velocity.x, velocity.y, velocity.z);
+    }
+    std::string getRotation() {
+        Vec2 rotation = SDK::ClientInstance::get()->getLocalPlayer()->getRot();
+        return std::format("XY Rotation: {:.3f} / {:.3f} | Magnitude: {}", rotation.x, rotation.y, rotation.magnitude());
     }
     // TODO: block info, tps info, tick speed info, biome info, days ran on server.
 
@@ -59,7 +60,11 @@ namespace {
         return std::format("Display: {} (DirectX{})", reinterpret_cast<const char*>(Signatures::GpuInfo.result), Latite::getRenderer().isDX11ByDefault() ? "11/10.1" : "12");
     }
     std::string getCpuInfo() {
-        return std::format("CPU: {}", util::GetProcessorInfo());
+        std::string cpuInfo = util::GetProcessorInfo();
+        SYSTEM_INFO inf;
+        GetSystemInfo(&inf);
+        cpuInfo = std::to_string(inf.dwNumberOfProcessors) + "x " + cpuInfo;
+        return cpuInfo;
     }
 }
 
@@ -72,15 +77,17 @@ void DebugInfo::onRenderOverlay(Event& evG) {
     auto [width, height] = Latite::getRenderer().getScreenSize();
     d2d::Rect rect = { 0.f, 0.f, width, height };
 
-    const std::wstring topLeftDebugInfo = util::StrToWStr(std::format("{}\n{}\n\n{}\n{}",
+    const std::wstring topLeftDebugInfo = util::StrToWStr(std::format("{}\n{}\n\n{}\n{}\n{}\n{}",
         getMinecraftVersion(),
         getFPS(),
         getDimension(),
-        getCoordinates()));
+        getCoordinates(),
+        getVelocity(),
+        getRotation()));
     const std::wstring topRightDebugInfo = util::StrToWStr(std::format("{}\n{}\n{}",
         getMemUsage(),
-        getCPUInfo(),
-        getGpuInfo()));
+        getGpuInfo(),
+        getCpuInfo()));
 
     dc.drawText(rect, topLeftDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular,
         28, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
