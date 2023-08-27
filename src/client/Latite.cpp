@@ -115,8 +115,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
     winrt::Windows::ApplicationModel::PackageVersion version = package.Id().Version();
-    
-    std::string gameVersion = "";
+
     {
         std::string rev = std::to_string(version.Build);
         std::string rem = rev.substr(0, rev.size() - 2); // remove 2 digits from end
@@ -124,7 +123,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         int ps = std::stoi(rem);
         std::stringstream ss;
         ss << version.Major << "." << version.Minor << "." << ps;// hacky
-        gameVersion = ss.str();
+        Latite::get().gameVersion = ss.str();
     }
 #if LATITE_DEBUG
     Logger::Info("Resolving signatures..");
@@ -145,13 +144,13 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         { "1.16.40", SDK::V1_18_12 }
     };
 
-    if (versNumMap.contains(gameVersion)) {
-        auto vers =  versNumMap[gameVersion];
+    if (versNumMap.contains(Latite::get().gameVersion)) {
+        auto vers =  versNumMap[Latite::get().gameVersion];
         SDK::internalVers = vers;
     }
     else {
         std::stringstream ss;
-        ss << "Latite Client does not support your version: " << gameVersion << ". Latite only supports the following versions:\n\n";
+        ss << "Latite Client does not support your version: " << Latite::get().gameVersion << ". Latite only supports the following versions:\n\n";
 
         for (auto& key : versNumMap) {
             ss << key.first << "\n";

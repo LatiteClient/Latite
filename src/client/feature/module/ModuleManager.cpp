@@ -2,6 +2,7 @@
 #include "impl/misc/TestModule.h"
 #include "impl/misc/Screenshot.h"
 #include "impl/misc/Clock.h"
+#include "impl/misc/DebugInfo.h"
 
 #include "impl/game/Zoom.h"
 #include "impl/game/ToggleSprintSneak.h"
@@ -39,6 +40,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<BowIndicator>());
 	this->items.push_back(std::make_shared<GuiscaleChanger>());
 	this->items.push_back(std::make_shared<Screenshot>());
+	this->items.push_back(std::make_shared<DebugInfo>());
 
 	for (auto& mod : items) {
 		mod->onInit();

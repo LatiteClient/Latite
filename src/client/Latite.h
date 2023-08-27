@@ -27,6 +27,7 @@ public:
 	[[nodiscard]] static class Assets& getAssets() noexcept;
 	[[nodiscard]] static class ScriptManager& getScriptManager() noexcept;
 	[[nodiscard]] static class Keyboard& getKeyboard() noexcept;
+	std::string gameVersion;
 
 	[[nodiscard]] Timings& getTimings() noexcept { return timings; }
 	[[nodiscard]] std::string getCommandPrefix() { return std::get<TextValue>(commandPrefix).str; }
