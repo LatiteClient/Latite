@@ -29,7 +29,9 @@ protected:
 		return Chakra::MakeString(L"[object " + util::StrToWStr(add) + L"]");
 	}
 public:
-	JsVec2(class JsScript* owner) : JsClass(owner, L"Vector2") {
+	inline static const wchar_t* class_name = L"Vector2";
+
+	JsVec2(class JsScript* owner) : JsClass(owner, class_name) {
 		createConstructor(jsConstructor, this);
 	}
 

@@ -7,7 +7,7 @@ bool JsEntity::validate() {
     if (runtimeId == 1 && SDK::ClientInstance::get()->getLocalPlayer()) {
         return true;
     }
-    return false;
+    return getEntity();
 }
 
 SDK::Actor* JsEntity::getEntity() {

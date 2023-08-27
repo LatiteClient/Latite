@@ -11,6 +11,7 @@
 #include "util/Logger.h"
 #include "sdk/common/network/packet/TextPacket.h"
 #include "util/XorString.h"
+#include "../class/impl/game/JsEntityClass.h"
 
 void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	this->createWorldObject();
@@ -18,9 +19,54 @@ void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(object, isInUICallback, L"isInUI");
 	Chakra::DefineFunc(object, playSoundUI, L"playSoundUI");
 	Chakra::DefineFunc(object, sendChatCallback, L"sendChatMessage");
+	Chakra::DefineFunc(object, getWorldCallback, L"getWorld", this);
 }
 
 void GameScriptingObject::createWorldObject() {
+	JS::JsCreateObject(&worldObj);
+	Chakra::DefineFunc(worldObj, worldGetEntList, L"getEntityList", this);
+}
+
+JsValueRef GameScriptingObject::worldGetEntList(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
+		Chakra::ThrowError(L"World is not allowed to be used here");
+		return Chakra::GetUndefined();
+	}
+
+	JsScript* scr;
+	JsContextRef ctx;
+	JS::JsGetCurrentContext(&ctx);
+	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&scr));
+
+	if (!Latite::getScriptManager().hasPermission(scr, ScriptManager::Permission::Operator)) {
+		Chakra::ThrowError(util::StrToWStr(XOR_STRING("No permission to use getEntityList here")));
+		return JS_INVALID_REFERENCE;
+	}
+
+	auto lvl = SDK::ClientInstance::get()->minecraft->getLevel();
+	JsValueRef array;
+	auto entList = lvl->getRuntimeActorList();
+	unsigned sz = static_cast<unsigned>(entList.size());
+	JS::JsCreateArray(sz, &array);
+	unsigned idx = 0;
+	for (auto& ent : entList) {
+		JsValueRef db;
+		JS::JsDoubleToNumber(static_cast<double>(idx), &db);
+		JsScript* script;
+		JsContextRef ctx;
+		JS::JsGetCurrentContext(&ctx);
+		JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
+
+		auto entc = script->getClass<JsEntityClass>();
+		JS::JsSetIndexedProperty(array, db, entc->construct(new JsEntity(ent->getRuntimeID()), true));
+		idx++;
+		Chakra::Release(db);
+	}
+	return array;
+}
+
+JsValueRef GameScriptingObject::worldGetEntCount(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	return JsValueRef();
 }
 
 JsValueRef GameScriptingObject::getMousePosCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
@@ -29,7 +75,7 @@ JsValueRef GameScriptingObject::getMousePosCallback(JsValueRef callee, bool isCo
 	JS::JsGetCurrentContext(&ctx);
 	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
 
-	auto vec2 = script->findClass<JsVec2>(L"Vector2");
+	auto vec2 = script->getClass<JsVec2>();
 	if (vec2) {
 		return vec2->construct(SDK::ClientInstance::get()->cursorPos);
 	}
@@ -37,6 +83,13 @@ JsValueRef GameScriptingObject::getMousePosCallback(JsValueRef callee, bool isCo
 	// could not find Vector2
 	__debugbreak();
 	return Chakra::GetUndefined();
+}
+
+JsValueRef GameScriptingObject::getWorldCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!SDK::ClientInstance::get()->minecraft->getLevel()) return Chakra::GetNull();
+	JsContextRef ct;
+	JS::JsGetCurrentContext(&ct);
+	return reinterpret_cast<GameScriptingObject*>(callbackState)->worldObj;
 }
 
 JsValueRef GameScriptingObject::isInUICallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {

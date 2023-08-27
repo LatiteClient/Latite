@@ -24,14 +24,14 @@ JsValueRef JsSettingClass::getValueCallback(JsValueRef callee, bool isConstructo
 		return Chakra::MakeInt(std::get<EnumValue>(*set->value).val);
 	case Setting::Type::Color:
 	{
-		auto colClass = thi->owner->findClass<JsColor>(L"Color");
+		auto colClass = thi->owner->getClass<JsColor>();
 		if (colClass) {
 			return colClass->construct(d2d::Color(std::get<ColorValue>(*set->value).color1));
 		}
 	}
 	case Setting::Type::Vec2:
 	{
-		auto colClass = thi->owner->findClass<JsVec2>(L"Vector2");
+		auto colClass = thi->owner->getClass<JsVec2>();
 		if (colClass) {
 			return colClass->construct(Vec2(std::get<Vec2Value>(*set->value).x, std::get<Vec2Value>(*set->value).y));
 		}

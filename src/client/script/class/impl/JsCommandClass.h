@@ -22,7 +22,9 @@ protected:
 	static JsValueRef CALLBACK setOnEvent(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 public:
-	JsCommandClass(class JsScript* owner) : JsClass(owner, L"Command") {
+	inline static const wchar_t* class_name = L"Command";
+
+	JsCommandClass(class JsScript* owner) : JsClass(owner, class_name) {
 		createConstructor(jsConstructor, this);
 	}
 

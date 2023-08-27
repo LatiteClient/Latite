@@ -29,6 +29,7 @@
 #include "class/impl/JsModuleClass.h"
 #include "class/impl/JsSettingClass.h"
 #include "class/impl/JsCommandClass.h"
+#include "class/impl/game/JsEntityClass.h"
 
 #include "objects/GameScriptingObject.h"
 #include "objects/D2DScriptingObject.h"
@@ -324,6 +325,7 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsModuleClass>(this));
 	this->classes.push_back(std::make_shared<JsSettingClass>(this));
 	this->classes.push_back(std::make_shared<JsCommandClass>(this));
+	this->classes.push_back(std::make_shared<JsEntityClass>(this));
 
 	JsErrorCode err;
 	JsValueRef myScript;

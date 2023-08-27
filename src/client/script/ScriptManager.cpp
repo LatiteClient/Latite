@@ -423,6 +423,7 @@ bool ScriptManager::dispatchEvent(Event& ev)
 					Chakra::Release(ref);
 				}
 				JsValueRef ret;
+				Chakra::GetBool
 
 				handleErrors(JS::JsCallFunction(l.first, params, 2, &ret));
 

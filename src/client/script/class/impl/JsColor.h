@@ -30,7 +30,9 @@ protected:
 		return Chakra::MakeString(L"[object " + util::StrToWStr(add) + L"]");
 	}
 public:
-	JsColor(class JsScript* owner) : JsClass(owner, L"Color") {
+	inline static const wchar_t* class_name = L"Color";
+
+	JsColor(class JsScript* owner) : JsClass(owner, class_name) {
 		createConstructor(jsConstructor, this);
 	}
 
@@ -46,9 +48,7 @@ public:
 	}
 
 	void prepareFunctions() override {
-		Chakra::SetPropertyNumber(prototype, L"r", 0.0, true);
-		Chakra::SetPropertyNumber(prototype, L"g", 0.0, true);
-		Chakra::SetPropertyNumber(prototype, L"b", 0.0, true);
+		Chakra::SetPropertyNumber(prototype, L"r", 0.0, true);		Chakra::SetPropertyNumber(prototype, L"b", 0.0, true);
 		Chakra::SetPropertyNumber(prototype, L"a", 1.0, true);
 
 		Chakra::DefineFunc(prototype, toStringCallback, L"toString", this);

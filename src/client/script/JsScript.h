@@ -99,9 +99,9 @@ public:
 	[[nodiscard]] bool isTrusted() { return trusted; }
 	
 	template <typename T>
-	[[nodiscard]] T* findClass(std::wstring const& name) {
+	[[nodiscard]] T* getClass() {
 		for (auto& cl : this->classes) {
-			if (cl->getName() == name) return reinterpret_cast<T*>(cl.get());
+			if (cl->getName() == T::class_name) return reinterpret_cast<T*>(cl.get());
 		}
 		return nullptr;
 	}

@@ -59,6 +59,10 @@ namespace SDK {
 		}
 
 		int getCommandPermissionLevel() {
+			if (internalVers <= V1_18_12) {
+				return memory::callVirtual<int>(this, 0xCC);
+			}
+
 			if (internalVers <= V1_19_51) {
 				return memory::callVirtual<int>(this, 0xCD);
 			}
@@ -71,6 +75,25 @@ namespace SDK {
 				return util::directAccess<int64_t>(this, 0x550);
 			}
 			return *reinterpret_cast<int64_t * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::runtimeIDComponent.result)(entityContext.registry->basicRegistry, &entityContext.id);
+		}
+
+		uint8_t getEntityTypeID() {
+			if (internalVers <= V1_18_12) {
+				return memory::callVirtual<int>(this, 0xAA);
+			}
+			if (internalVers <= V1_19_51) {
+				return memory::callVirtual<int>(this, 0xAC);
+			}
+
+			return memory::callVirtual<int>(this, 0x99);
+		}
+
+		void swing() {
+			return memory::callVirtual<void>(this, MV_DETAIL_GETOFFSET(0xC8, 0xDB, 0xDC));
+		}
+
+		bool isPlayer() {
+			return getEntityTypeID() == 63;
 		}
 	};
 }

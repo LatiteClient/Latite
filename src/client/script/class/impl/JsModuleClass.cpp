@@ -99,7 +99,7 @@ JsValueRef JsModuleClass::moduleGetSettings(JsValueRef callee, bool isConstructo
 		int i = 0;
 		mod->settings->forEach([&](std::shared_ptr<Setting> set) {
 			JsValueRef index = Chakra::MakeInt(i);
-			auto setClass = thi->owner->findClass<JsSettingClass>(L"Setting");
+			auto setClass = thi->owner->getClass<JsSettingClass>();
 			if (!setClass) {
 				Logger::Fatal("Could not find setting class!!!");
 				throw std::runtime_error("could not find setting class");
@@ -136,7 +136,7 @@ JsValueRef JsModuleClass::moduleAddBoolSetting(JsValueRef callee, bool isConstru
 
 	*set->value = BoolValue(false);
 
-	auto setClass = thi->owner->findClass<JsSettingClass>(L"Setting");
+	auto setClass = thi->owner->getClass<JsSettingClass>();
 
 	if (!setClass) {
 		Logger::Fatal("Could not find setting class!!!");
@@ -179,7 +179,7 @@ JsValueRef JsModuleClass::moduleAddNumberSetting(JsValueRef callee, bool isConst
 	set->max = FloatValue(max);
 	set->interval = FloatValue(intr);
 
-	auto setClass = thi->owner->findClass<JsSettingClass>(L"Setting");
+	auto setClass = thi->owner->getClass<JsSettingClass>();
 
 	if (!setClass) {
 		Logger::Fatal("Could not find setting class!!!");
