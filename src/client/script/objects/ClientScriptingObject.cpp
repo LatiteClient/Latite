@@ -93,6 +93,8 @@ void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	initCommandManager();
 	Chakra::DefineFunc(commandManager, cmgrRegisterCommandCallback, L"registerCommand");
 	Chakra::DefineFunc(commandManager, cmgrDeregisterCommandCallback, L"deregisterCommand");
+
+	Chakra::SetPropertyString(object, L"version", util::StrToWStr(std::string(Latite::version.data(), Latite::version.size())));
 }
 
 

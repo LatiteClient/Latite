@@ -350,7 +350,7 @@ bool ScriptManager::hasPermission(JsScript* script, Permission perm) {
 	}
 	switch (perm) {
 	case Permission::SendChat:
-		return script->isTrusted() || player->getCommandPermissionLevel() > 0;
+		return script->isTrusted() && player->getCommandPermissionLevel() > 0;
 	case Permission::Operator:
 		return player->getCommandPermissionLevel() > 0;
 	}

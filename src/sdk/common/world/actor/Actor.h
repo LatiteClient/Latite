@@ -56,5 +56,13 @@ namespace SDK {
 			
 			return stateVector->posOld;
 		}
+
+		int getCommandPermissionLevel() {
+			if (internalVers <= V1_19_51) {
+				return memory::callVirtual<int>(this, 0xCD);
+			}
+
+			return memory::callVirtual<int>(this, 0xB9);
+		}
 	};
 }

@@ -354,6 +354,7 @@
     <ClInclude Include="src\client\script\objects\ClientScriptingObject.h" />
     <ClInclude Include="src\client\script\objects\D2DScriptingObject.h" />
     <ClInclude Include="src\client\script\objects\GameScriptingObject.h" />
+    <ClInclude Include="src\client\script\ScriptCertificate.h" />
     <ClInclude Include="src\client\script\ScriptingObject.h" />
     <ClInclude Include="src\client\script\ScriptManager.h" />
     <ClInclude Include="src\client\ui\TextBox.h" />
@@ -414,6 +415,7 @@
     <ClInclude Include="src\util\LMath.h" />
     <ClInclude Include="src\util\Meta.h" />
     <ClInclude Include="src\util\Util.h" />
+    <ClInclude Include="src\util\XorString.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />

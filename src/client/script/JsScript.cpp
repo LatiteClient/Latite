@@ -14,6 +14,8 @@
 #include <winrt/Windows.Web.Http.h>
 #include <winrt/impl/windows.web.http.2.h>
 #include <winrt/Windows.Web.Http.Filters.h>
+#include <winrt/windows.security.cryptography.h>
+#include <winrt/windows.security.cryptography.core.h>
 
 #include "Lib/Libraries/Filesystem.h"
 #include "Lib/Libraries/Network.h"
@@ -30,11 +32,29 @@
 
 #include "objects/GameScriptingObject.h"
 #include "objects/D2DScriptingObject.h"
+#include "util/XorString.h"
+#include "util/Logger.h"
+
+#include "ScriptCertificate.h"
 
 using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Web::Http;
 using namespace winrt::Windows::Web::Http::Filters;
 
+
+void JsScript::checkTrusted() {
+	auto hash = JsScript::getHash(std::filesystem::path(this->indexPath).parent_path());
+	if (hash) {
+#if LATITE_DEBUG
+		Logger::Info("{} {}", util::WStrToStr(hash.value()), util::WStrToStr(getCertificate()));
+#endif
+		if (this->getCertificate() == hash) {
+			trusted = true;
+			return;
+		}
+	}
+	trusted = false;
+}
 
 JsScript::JsScript(std::wstring const& indexPath) : indexPath(indexPath), ctx(JS_INVALID_REFERENCE), indexStream(), loadedScript(), runtime(JS_INVALID_RUNTIME_HANDLE){
 }
@@ -435,11 +455,79 @@ void JsScript::handleAsyncOperations() {
 	}
 }
 
+std::wstring JsScript::getCertificate() {
+	std::wifstream ifs(std::filesystem::path(this->indexPath).parent_path() / XOR_STRING("certificate"));
+	if (ifs.fail()) {
+#if LATITE_DEBUG
+		Logger::Info("Failed to get certificate");
+#endif
+		return L"";
+	}
+
+	std::wstringstream wss;
+	wss << ifs.rdbuf();
+	return wss.str();
+}
+
+std::optional<std::wstring> JsScript::getHash(std::filesystem::path const& main) {
+	using winrt::Windows::Security::Cryptography::Core::HashAlgorithmProvider;
+	using winrt::Windows::Security::Cryptography::CryptographicBuffer;
+	using winrt::Windows::Security::Cryptography::BinaryStringEncoding;
+
+	std::vector<std::filesystem::path> jsFiles;
+
+	std::function<void(std::filesystem::path const&)> iterate = [&jsFiles, &iterate](std::filesystem::path const& path) -> void {
+		for (auto& fil : std::filesystem::directory_iterator(path)) {
+			if (fil.is_directory()) {
+				iterate(fil);
+				return;
+			}
+			if (fil.path().string().ends_with(XOR_STRING(".js"))) { // I think I should still be fine with unicode filepaths
+				jsFiles.push_back(fil);
+			}
+		}
+	};
+
+	std::wstringstream toHash;
+
+	bool hasRead = false;
+
+	iterate(main);
+
+	for (auto& fil : jsFiles) {
+		std::wifstream ifs(fil);
+		if (!ifs.fail()) {
+			toHash << XOR_STRING(LATITE_SCRIPT_CERT_SALT);
+			toHash << ifs.rdbuf();
+			hasRead = true;
+		}
+#if LATITE_DEBUG
+		else {
+			Logger::Warn("[Script] Error opening script file {} to get hash: {}", fil.string(), errno);
+		}
+#endif
+	}
+
+	//iterate(std::filesystem::path(indexPath).parent_path());
+	if (hasRead) {
+		auto input = CryptographicBuffer::ConvertStringToBinary(toHash.str(), BinaryStringEncoding::Utf8);
+		auto hasher = HashAlgorithmProvider::OpenAlgorithm(util::StrToWStr(XOR_STRING("SHA256")));
+		auto hashed = hasher.HashData(input);
+
+		auto htostr = CryptographicBuffer::EncodeToHexString(hashed);
+
+		return htostr.c_str();
+	}
+	return std::nullopt;
+}
+
 void __stdcall JsScript::debugEventCallback(JsDiagDebugEvent debugEvent, JsValueRef eventData, void* callbackState) {
 }
 
 JsErrorCode JsScript::runScript() {
 	JS::JsSetCurrentContext(ctx);
+	this->checkTrusted();
+	Logger::Info("isTrusted = {}", this->isTrusted());
 	auto err = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(indexPath)), (util::GetLatitePath() / "Scripts" / relFolderPath / "index.js").wstring().c_str(), nullptr);
 	return err;
 }
