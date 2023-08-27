@@ -4,6 +4,7 @@
 #include "client/event/impl/ClickEvent.h"
 
 #include "client/event/Eventing.h"
+#include "client/event/impl/DrawHUDModulesEvent.h"
 #include "client/Latite.h"
 #include "client/config/ConfigManager.h"
 #include "client/feature/module/ModuleManager.h"
@@ -95,6 +96,14 @@ void HUDEditor::onRender(Event& ev) {
 	doSnapping(dragOffset);
 	keepModulesInBounds();
 
+	bool shouldDraw = true;
+	if (!isActive()) {
+		DrawHUDModulesEvent ev{};
+		shouldDraw = !Eventing::get().dispatch(ev); // not cancelled
+	}
+
+	if (!shouldDraw) return;
+
 	if (isActive() || SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 			if (mod->isHud() && mod->isEnabled() && reinterpret_cast<HUDModule*>(mod.get())->isActive()) {
@@ -180,10 +189,6 @@ void HUDEditor::renderModule(HUDModule* mod) {
 	DXContext dc;
 	auto& cursorPos = SDK::ClientInstance::get()->cursorPos;
 	bool hovering = shouldSelect(mod->getRect(), cursorPos);
-
-	if (isActive()) {
-		//mod->renderFrame();
-	}
 
 	D2D1::Matrix3x2F oTrans;
 	dc.ctx->GetTransform(&oTrans);

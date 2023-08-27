@@ -231,6 +231,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\client\event\impl\DrawHUDModulesEvent.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\DebugInfo.h" />
     <ClInclude Include="src\client\feature\module\impl\game\DynamicLight.h" />
     <ClInclude Include="src\client\feature\module\impl\game\GUIScale.h" />
