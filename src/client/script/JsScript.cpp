@@ -77,7 +77,13 @@ bool JsScript::load() {
 	this->libraries.push_back(std::make_shared<Filesystem>(this));
 	this->libraries.push_back(std::make_shared<Network>(this));
 
-	if (JS::JsCreateRuntime(JsRuntimeAttributeNone, nullptr, &runtime)) return false;
+	if (JS::JsCreateRuntime(
+#if LATITE_DEBUG
+		JsRuntimeAttributeDisableBackgroundWork
+#else
+		JsRuntimeAttributeNone
+#endif
+		, nullptr, &runtime)) return false;
 	auto res = JS::JsCreateContext(runtime, &this->ctx) == JsNoError;
 	JS::JsSetContextData(ctx, this);
 	JS::JsSetCurrentContext(ctx);

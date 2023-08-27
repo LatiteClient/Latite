@@ -138,11 +138,11 @@ public:
 		case FontSelection::SegoeLight:
 			return segoeLight.Get();
 		case FontSelection::Regular2:
-			return font2.Get();
+			return segoe.Get();
 		case FontSelection::Semilight2:
-			return font2Semilight.Get();
+			return segoeSemilight.Get();
 		case FontSelection::Light2:
-			return font2Light.Get();
+			return segoeLight.Get();
 		default:
 			return nullptr;
 		}
