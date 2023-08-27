@@ -659,6 +659,7 @@ void ClickGUI::onInit(Event&) {
 
 void ClickGUI::onCleanup(Event&) {
 	compositeEffect = nullptr;
+	shadowBitmap = nullptr;
 }
 
 
@@ -701,7 +702,7 @@ void ClickGUI::onClick(Event& evGeneric) {
 
 	if (ev.getMouseButton() == 4) {
 		// scroll
-		this->scroll = std::clamp(scroll - static_cast<float>(ev.getWheelDelta()) / 6.f, 0.f, scrollMax);
+		this->scroll = std::max(std::min(scroll - static_cast<float>(ev.getWheelDelta()) / 3.f, scrollMax), 0.f);
 		ev.setCancelled(true);
 	}
 }

@@ -190,7 +190,8 @@ void Renderer::render() {
 
 	std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 	auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTime);
-	deltaTime = static_cast<float>(diff.count()) / 17.f; // based on 60-ish FPS
+	deltaTime = std::clamp(static_cast<float>(diff.count()) / 17.f, 1.f, 20.f); // based on 60-ish FPS
+
 	lastTime = now;
 
 	if (!hasInit) return;
@@ -316,32 +317,32 @@ void Renderer::createDeviceIndependentResources() {
 		L"en-us",
 		this->segoeLight.GetAddressOf()));
 
-	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
-		nullptr,
-		DWRITE_FONT_WEIGHT_NORMAL,
-		DWRITE_FONT_STYLE_NORMAL,
-		DWRITE_FONT_STRETCH_NORMAL,
-		fontSize,
-		L"en-us",
-		this->font2.GetAddressOf()));
-
-	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
-		nullptr,
-		DWRITE_FONT_WEIGHT_SEMI_LIGHT,
-		DWRITE_FONT_STYLE_NORMAL,
-		DWRITE_FONT_STRETCH_NORMAL,
-		fontSize,
-		L"en-us",
-		this->font2Semilight.GetAddressOf()));
-
-	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
-		nullptr,
-		DWRITE_FONT_WEIGHT_LIGHT,
-		DWRITE_FONT_STYLE_NORMAL,
-		DWRITE_FONT_STRETCH_NORMAL,
-		fontSize,
-		L"en-us",
-		this->font2Light.GetAddressOf()));
+	//ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
+	//	nullptr,
+	//	DWRITE_FONT_WEIGHT_NORMAL,
+	//	DWRITE_FONT_STYLE_NORMAL,
+	//	DWRITE_FONT_STRETCH_NORMAL,
+	//	fontSize,
+	//	L"en-us",
+	//	this->font2.GetAddressOf()));
+	//
+	//ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
+	//	nullptr,
+	//	DWRITE_FONT_WEIGHT_SEMI_LIGHT,
+	//	DWRITE_FONT_STYLE_NORMAL,
+	//	DWRITE_FONT_STRETCH_NORMAL,
+	//	fontSize,
+	//	L"en-us",
+	//	this->font2Semilight.GetAddressOf()));
+	//
+	//ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
+	//	nullptr,
+	//	DWRITE_FONT_WEIGHT_LIGHT,
+	//	DWRITE_FONT_STYLE_NORMAL,
+	//	DWRITE_FONT_STRETCH_NORMAL,
+	//	fontSize,
+	//	L"en-us",
+	//	this->font2Light.GetAddressOf()));
 
 	//ThrowIfFailed(CoInitialize(nullptr));
 

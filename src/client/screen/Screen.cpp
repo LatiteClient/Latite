@@ -18,7 +18,7 @@ Screen::Screen() {
 	// ^ this doesnt work with resources...
 
 	Eventing::get().listen<UpdateEvent>(this, (EventListenerFunc)&Screen::onUpdate, 0);
-	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Screen::onRenderOverlay, 1, true);
+	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Screen::onRenderOverlay, 0, true);
 	Eventing::get().listen<ClickEvent>(this, (EventListenerFunc)&Screen::onClick, 3, true);
 }
 

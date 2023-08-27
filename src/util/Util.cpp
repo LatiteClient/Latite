@@ -426,3 +426,19 @@ void util::KeepInBounds(d2d::Rect& targ, d2d::Rect const& bounds) {
 		targ.setPos({ modPos.x, bounds.bottom - targ.getHeight() });
 	}
 }
+
+std::string util::GetProcessorInfo() {
+	constexpr std::array<int, 3> cpuIds = { 0x80000002, 0x80000003, 0x80000004 };
+
+	std::array<int, 4> data{};
+
+	std::string model = "";
+
+	for (auto& id : cpuIds) {
+		__cpuid(data.data(), id);
+
+		model += std::string(reinterpret_cast<const char*>(data.data()), data.size() * sizeof(int));
+	}
+
+	return model;
+}
