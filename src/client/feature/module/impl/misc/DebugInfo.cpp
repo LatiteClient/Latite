@@ -4,8 +4,10 @@
 #include "client/Latite.h"
 #include "client/event/impl/KeyUpdateEvent.h"
 #include "client/event/impl/RenderOverlayEvent.h"
-#include <format>
 
+#include "sdk/common/client/player/LocalPlayer.h"
+#include "sdk/common/world/Minecraft.h"
+#include "sdk/common/world/level/Dimension.h"
 #include "sdk/signature/storage.h"
 
 DebugInfo::DebugInfo() : Module("DebugInfo", "Debug Info", "See some craaazy info (send help)", GAME, this->debugInfoKey) {
@@ -13,6 +15,22 @@ DebugInfo::DebugInfo() : Module("DebugInfo", "Debug Info", "See some craaazy inf
 }
 
 namespace {
+    std::string getMinecraftVersion() {
+        return std::format("Latite Client {}, Minecraft {}", Latite::get().version, Latite::get().gameVersion);
+    }
+    std::string getFPS() {
+        return std::format("{} fps", Latite::get().getTimings().getFPS());
+    }
+    std::string getDimension() {
+        return std::format("Dimension: {}", SDK::ClientInstance::get()->getLocalPlayer()->dimension->dimensionName);
+    }
+    std::string getCoordinates() {
+        Vec3 position = SDK::ClientInstance::get()->getLocalPlayer()->getPos();
+        return std::format("XYZ: {:.3f} / {:.3f} / {:.3f}", position.x, position.y, position.z);
+    }
+    // TODO: block info, tps info, tick speed info, biome info, days ran on server.
+
+
     std::string getMemUsage() {
         // Get the total available memory
         MEMORYSTATUSEX memStatus;
@@ -32,9 +50,6 @@ namespace {
     std::string getGpuInfo() {
         return std::format("GPU: {}", reinterpret_cast<const char*>(Signatures::GpuInfo.result));
     }
-    std::string getMinecraftVersion() {
-        return Latite::get().gameVersion;
-    }
 }
 
 void DebugInfo::onRenderOverlay(Event& evG) {
@@ -43,12 +58,18 @@ void DebugInfo::onRenderOverlay(Event& evG) {
 
     auto [width, height] = Latite::getRenderer().getScreenSize();
     d2d::Rect rect = { 0.f, 0.f, width, height };
-    const std::wstring topLeftDebugInfo = util::StrToWStr(std::format("Latite Client, Minecraft {}", getMinecraftVersion()));
-    const std::wstring topRightDebugInfo = util::StrToWStr(std::format("{}\n{}", getMemUsage(), getGpuInfo()));
+    const std::wstring topLeftDebugInfo = util::StrToWStr(std::format("{}\n{}\n\n{}\n{}",
+        getMinecraftVersion(),
+        getFPS(),
+        getDimension(),
+        getCoordinates()));
+    const std::wstring topRightDebugInfo = util::StrToWStr(std::format("{}\n{}",
+        getMemUsage(),
+        getGpuInfo()));
 
     dc.drawText(rect, topLeftDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular,
-            25, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+        28, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
     dc.drawText(rect, topRightDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular,
-        25, DWRITE_TEXT_ALIGNMENT_TRAILING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+        28, DWRITE_TEXT_ALIGNMENT_TRAILING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 }
