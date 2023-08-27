@@ -75,7 +75,7 @@ void DebugInfo::onRenderOverlay(Event& evG) {
     RenderOverlayEvent& ev = reinterpret_cast<RenderOverlayEvent&>(evG);
     DXContext dc;
 
-    if (!SDK::ClientInstance::get()->minecraft->getLevel()) return;
+    if (!SDK::ClientInstance::get()->getLocalPlayer()) return;
 
     auto [width, height] = Latite::getRenderer().getScreenSize();
     d2d::Rect rect = { 0.f, 0.f, width, height };
