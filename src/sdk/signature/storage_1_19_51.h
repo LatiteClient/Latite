@@ -35,6 +35,13 @@ public:
 			"MoveInputComponent::try_get"};
 	};
 
+	struct Vtable {
+		inline static SigImpl TextPacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+			// last 4 bytes is the hash of the component
+			"48 8D 05 ?? ?? ?? ?? 48 8B F9 48 89 01 48 83 C1 ?? E8 ?? ?? ?? ?? 48 8D 8F",
+			"const TextPacket::vftable"};
+	};
+
 	inline static SigImpl LevelRenderer_renderLevel{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5c 24 ? 55 56 57 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 49 8b f0 48 8b da",
 		"LevelRenderer::renderLevel"};

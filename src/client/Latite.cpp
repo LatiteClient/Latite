@@ -187,6 +187,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(MoveInputHandler_tick),
         MVSIG(MovePlayer),
         MVSIG(LocalPlayer_applyTurnDelta),
+        MVSIG(Vtable::TextPacket),
             };
     
     new (mmgrBuf) ModuleManager;

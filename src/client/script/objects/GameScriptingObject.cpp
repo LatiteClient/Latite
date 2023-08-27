@@ -4,10 +4,13 @@
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/client/game/MinecraftGame.h"
 #include "sdk/common/client/renderer/game/LevelRenderer.h"
+#include "sdk/common/client/player/LocalPlayer.h"
 #include "sdk/common/world/Minecraft.h"
 #include "client/Latite.h"
 #include "client/script/ScriptManager.h"
 #include "util/Logger.h"
+#include "sdk/common/network/packet/TextPacket.h"
+#include "util/XorString.h"
 
 void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	this->createWorldObject();
@@ -41,17 +44,27 @@ JsValueRef GameScriptingObject::isInUICallback(JsValueRef callee, bool isConstru
 }
 
 JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsString} })) return JS_INVALID_REFERENCE;
+
 	JsScript* script;
 	JsContextRef ctx;
 	JS::JsGetCurrentContext(&ctx);
 	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
 	
 	if (Latite::getScriptManager().hasPermission(script, ScriptManager::Permission::SendChat)) {
-		Logger::Info("granted permission to send chat");
+		auto lp = SDK::ClientInstance::get()->getLocalPlayer();
+		if (lp) {
+			SDK::TextPacket tp{};
+			String s{};
+			s.setString(util::WStrToStr(Chakra::GetString(arguments[1])).c_str());
+			tp.chat(s);
+			lp->packetSender->sendToServer(tp);
+		}
+
+		return Chakra::GetUndefined();
 	}
-	else {
-		Logger::Info("no perms to use send chat");
-	}
+	Chakra::ThrowError(util::StrToWStr(XOR_STRING("Permission denied to use sendChatMessage")));
 	return Chakra::GetUndefined();
 }
 

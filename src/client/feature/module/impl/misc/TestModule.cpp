@@ -11,6 +11,8 @@
 #include "client/event/impl/KeyUpdateEvent.h"
 #include "client/misc/ClientMessageSink.h"
 #include "sdk/common/client/player/LocalPlayer.h"
+#include "sdk/common/network/packet/TextPacket.h"
+#include "sdk/String.h"
 
 #define FUNC_HELPER(x)  void(Feature::*)(x&)
 
@@ -33,6 +35,11 @@ void TestModule::onTick(Event& evGeneric) {
 	auto inst = SDK::ClientInstance::get();
 	if (inst->getLocalPlayer()) {
 		Logger::Info("{}", inst->getLocalPlayer()->getCommandPermissionLevel());
+		SDK::TextPacket pkt{};
+		String s{};
+		s.setString("hello");
+		pkt.chat(s);
+		inst->getLocalPlayer()->packetSender->sendToServer(pkt);
 	}
 }
 

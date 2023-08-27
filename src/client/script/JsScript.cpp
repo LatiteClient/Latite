@@ -527,7 +527,9 @@ void __stdcall JsScript::debugEventCallback(JsDiagDebugEvent debugEvent, JsValue
 JsErrorCode JsScript::runScript() {
 	JS::JsSetCurrentContext(ctx);
 	this->checkTrusted();
+#if LATITE_DEBUG
 	Logger::Info("isTrusted = {}", this->isTrusted());
+#endif
 	auto err = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(indexPath)), (util::GetLatitePath() / "Scripts" / relFolderPath / "index.js").wstring().c_str(), nullptr);
 	return err;
 }

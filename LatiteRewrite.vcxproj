@@ -372,6 +372,9 @@
     <ClInclude Include="src\sdk\common\client\renderer\Tessellator.h" />
     <ClInclude Include="src\sdk\common\client\renderer\TexturePtr.h" />
     <ClInclude Include="src\sdk\common\entity\component\MoveInputComponent.h" />
+    <ClInclude Include="src\sdk\common\network\Packet.h" />
+    <ClInclude Include="src\sdk\common\network\PacketSender.h" />
+    <ClInclude Include="src\sdk\common\network\packet\TextPacket.h" />
     <ClInclude Include="src\sdk\common\network\RakPeer.h" />
     <ClInclude Include="src\sdk\common\world\actor\player\Inventory.h" />
     <ClInclude Include="src\sdk\common\world\actor\player\PlayerInventory.h" />
@@ -404,6 +407,7 @@
     <ClInclude Include="src\sdk\signature\storage_1_18_12.h" />
     <ClInclude Include="src\sdk\signature\storage_1_19_51.h" />
     <ClInclude Include="src\sdk\signature\storage_latest.h" />
+    <ClInclude Include="src\sdk\String.h" />
     <ClInclude Include="src\sdk\Util.h" />
     <ClInclude Include="src\sdk\Version.h" />
     <ClInclude Include="src\util\ChakraUtil.h" />
@@ -518,6 +522,7 @@
     <ClCompile Include="src\sdk\common\client\renderer\MaterialPtr.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\MeshUtils.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\Tessellator.cpp" />
+    <ClCompile Include="src\sdk\common\network\packet\TextPacket.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp" />
     <ClCompile Include="src\sdk\common\world\level\Level.cpp" />
     <ClCompile Include="src\sdk\common\world\Minecraft.cpp" />
