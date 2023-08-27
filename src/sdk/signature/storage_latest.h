@@ -33,6 +33,11 @@ public:
 			// last 4 bytes is the hash of the component
 			"40 53 48 83 EC ? 48 8B DA BA 2E CD 8B 46",
 			"MoveInputComponent::try_get"};
+
+		inline static SigImpl runtimeIDComponent{[](memory::signature_store&, uintptr_t res) { return res; },
+			// last 4 bytes is the hash of the component
+			"40 53 48 83 EC ? 48 8B DA BA 14 14 A1 3C",
+			"ActorRuntimeIDComponent"};
 	};
 
 	struct Vtable {

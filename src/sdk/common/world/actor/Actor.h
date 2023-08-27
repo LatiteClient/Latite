@@ -2,6 +2,7 @@
 #include "api/memory/Memory.h"
 #include "sdk/Util.h"
 #include "sdk/common/entity/EntityContext.h"
+#include "sdk/signature/storage.h"
 #include <memory>
 
 namespace SDK {
@@ -63,6 +64,13 @@ namespace SDK {
 			}
 
 			return memory::callVirtual<int>(this, 0xB9);
+		}
+
+		int64_t getRuntimeID() {
+			if (internalVers < V1_19_51) {
+				return util::directAccess<int64_t>(this, 0x550);
+			}
+			return *reinterpret_cast<int64_t * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::runtimeIDComponent.result)(entityContext.registry->basicRegistry, &entityContext.id);
 		}
 	};
 }
