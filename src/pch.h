@@ -61,6 +61,7 @@ using namespace std::chrono_literals;
 #include "client/misc/Timings.h"
 #include "client/misc/ClientMessageSink.h"
 #include "client/event/Events.h"
+#include "client/Latite.h"
 
 // API
 #include "api/eventing/Event.h"
