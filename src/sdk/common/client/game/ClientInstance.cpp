@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ClientInstance.h"
 #include "util/Util.h"
 #include "api/memory/memory.h"

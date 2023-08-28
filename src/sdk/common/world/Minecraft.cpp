@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Minecraft.h"
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/client/player/LocalPlayer.h"

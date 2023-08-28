@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ModuleManager.h"
 #include "impl/misc/TestModule.h"
 #include "impl/misc/Screenshot.h"
@@ -20,7 +21,6 @@
 #include "impl/hud/GuiscaleChanger.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
-#include "pch.h"
 
 ModuleManager::ModuleManager() {
 #ifdef LATITE_DEBUG

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "TextPacket.h"
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/client/game/MinecraftGame.h"

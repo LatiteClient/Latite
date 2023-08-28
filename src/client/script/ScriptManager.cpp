@@ -1,3 +1,4 @@
+#include "pch.h"
 // brace yourselves
 #include "ScriptManager.h"
 #include "client/Latite.h"

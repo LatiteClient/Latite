@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ClickGUI.h"
 #include "client/event/Eventing.h"
 #include "client/event/impl/RenderOverlayEvent.h"
@@ -13,7 +14,6 @@
 #include "util/DxContext.h"
 #include "client/render/Assets.h"
 #include "client/config/ConfigManager.h"
-#include "pch.h"
 
 #include "../ScreenManager.h"
 

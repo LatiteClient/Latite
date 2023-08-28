@@ -1,7 +1,7 @@
+#include "pch.h"
 #include "GuiscaleChanger.h"
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/client/gui/GuiData.h"
-#include "pch.h"
 
 GuiscaleChanger::GuiscaleChanger() : Module("GuiscaleChanger", "Guiscale Changer", "Change the scale of GUI", HUD, nokeybind) {
     this->listen<TickEvent>(&GuiscaleChanger::onTick);

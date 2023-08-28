@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "DxContext.h"
 #include "client/Latite.h"
 #include "Util.h"

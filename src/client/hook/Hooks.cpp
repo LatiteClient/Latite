@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Hooks.h"
 
 #include "impl/GeneralHooks.h"
@@ -9,7 +10,6 @@
 #include "impl/RenderControllerHooks.h"
 #include "impl/ScreenViewHooks.h"
 #include "MinHook.h"
-#include "pch.h"
 
 using namespace std::chrono_literals;
 

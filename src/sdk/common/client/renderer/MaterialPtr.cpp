@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "MaterialPtr.h"
 #include "util/Util.h"
 #if 0

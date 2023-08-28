@@ -1,5 +1,5 @@
-#include "Command.h"
 #include "pch.h"
+#include "Command.h"
 
 #include "client/misc/ClientMessageSink.h"
 #include "client/Latite.h"

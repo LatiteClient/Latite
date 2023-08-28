@@ -1,5 +1,5 @@
-#include "JsEntity.h"
 #include "pch.h"
+#include "JsEntity.h"
 
 bool JsEntity::validate() {
     if (runtimeId == 1 && SDK::ClientInstance::get()->getLocalPlayer()) {

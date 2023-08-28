@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ScriptCommand.h"
 #include "client/script/ScriptManager.h"
 #include <filesystem>
@@ -6,7 +7,6 @@
 #include "util/Util.h"
 #include "client/Latite.h"
 
-#include "pch.h"
 
 
 using namespace winrt::Windows::Storage::Streams;

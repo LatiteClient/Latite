@@ -1,5 +1,5 @@
-#include "JsModule.h"
 #include "pch.h"
+#include "JsModule.h"
 
 JsModule::JsModule(std::string const& name, std::string const& displayName, std::string const& desc, int key)
 	: Module(name, displayName, desc, SCRIPT, key, false)

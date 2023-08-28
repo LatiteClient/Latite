@@ -1,8 +1,8 @@
-ï»¿// LatiteRecode.cpp : Defines the entry point for the application.
+#include "pch.h"
+ÿ// LatiteRecode.cpp : Defines the entry point for the application.
 //
 
 #include "Latite.h"
-#include "pch.h"
 #include "util/Util.h"
 #include "util/Logger.h"
 

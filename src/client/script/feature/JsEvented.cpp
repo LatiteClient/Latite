@@ -1,7 +1,7 @@
+#include "pch.h"
 #include "JsEvented.h"
 #include "client/Latite.h"
 #include "client/script/ScriptManager.h"
-#include "pch.h"
 
 JsValueRef JsEvented::dispatchEvent(std::wstring name, Event& ev) {
 	for (auto& evs : this->eventListeners[name]) {

@@ -1,8 +1,8 @@
+#include "pch.h"
 #include "ToggleSprintSneak.h"
 #include "client/event/impl/TickEvent.h"
 #include "client/event/impl/BeforeMoveEvent.h"
 #include "client/event/impl/AfterMoveEvent.h"
-#include "pch.h"
 
 ToggleSprintSneak::ToggleSprintSneak() : TextModule("ToggleSprintSneak", "Toggle Sprint/Sneak", "Toggle sprinting or sneaking without holding the button", GAMEHUD) {
 	listen<TickEvent>((EventListenerFunc)&ToggleSprintSneak::onTick);

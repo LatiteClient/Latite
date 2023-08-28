@@ -1,8 +1,8 @@
+#include "pch.h"
 #include "ClientMessageSink.h"
 #include "util/Logger.h"
 #include "sdk/common/client/player/LocalPlayer.h"
 #include "sdk/common/client/game/ClientInstance.h"
-#include "pch.h"
 
 void ClientMessageSink::doPrint(int numMessages) {
 	sinkLock.lock();

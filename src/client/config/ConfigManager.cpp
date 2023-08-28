@@ -1,7 +1,7 @@
+#include "pch.h"
 #include "ConfigManager.h"
 #include "client/Latite.h"
 #include "client/feature/module/ModuleManager.h"
-#include "pch.h"
 
 ConfigManager::ConfigManager() {
 	auto folder = util::GetLatitePath() / "Configs";

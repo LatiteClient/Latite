@@ -1,6 +1,6 @@
+#include "pch.h"
 #include "Config.h"
 #include "json/json.hpp"
-#include "pch.h"
 
 using nlohmann::json;
 

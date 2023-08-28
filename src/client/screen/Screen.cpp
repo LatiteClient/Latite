@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Screen.h"
 #include "client/Latite.h"
 #include "client/event/Eventing.h"
@@ -7,7 +8,6 @@
 #include "client/event/impl/UpdateEvent.h"
 #include "util/DxContext.h"
 #include "sdk/common/client/game/ClientInstance.h"
-#include "pch.h"
 
 Screen::Screen() {
 	/*

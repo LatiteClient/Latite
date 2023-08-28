@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ClientScriptingObject.h"
 #include "util/Util.h"
 #include "util/ChakraUtil.h"

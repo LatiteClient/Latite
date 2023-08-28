@@ -1,5 +1,5 @@
-#include "Scanner.h"
 #include "pch.h"
+#include "Scanner.h"
 #include "util/Util.h"
 
 uintptr_t memory::findSignature(std::string_view signature, const char* module) {

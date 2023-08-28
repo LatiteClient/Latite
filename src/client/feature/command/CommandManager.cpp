@@ -1,8 +1,8 @@
+#include "pch.h"
 #include "CommandManager.h"
 #include "util/logger.h"
 #include "client/latite.h"
 #include "client/misc/ClientMessageSink.h"
-#include "pch.h"
 #include "util/Util.h"
 
 // Commands

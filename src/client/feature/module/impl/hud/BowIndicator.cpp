@@ -1,5 +1,5 @@
-#include "BowIndicator.h"
 #include "pch.h"
+#include "BowIndicator.h"
 
 BowIndicator::BowIndicator() : TextModule("BowIndicator", "Bow Indicator", "Shows bow chargedness", HUD) {
 	addSetting("visual", "Visual Indicator", "To show a bar instead of text", this->visual);

@@ -1,7 +1,7 @@
+#include "pch.h"
 #include "EjectCommand.h"
 #include "client/Latite.h"
 #include "client/misc/ClientMessageSink.h"
-#include "pch.h"
 
 EjectCommand::EjectCommand() : Command("eject", "Removes Latite from the game.", "{0}") {
 }

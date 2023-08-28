@@ -1,5 +1,5 @@
-#include "Asset.h"
 #include "pch.h"
+#include "Asset.h"
 
 Asset::Asset(std::wstring const& relPath) : relPath(relPath) {
 }

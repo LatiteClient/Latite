@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "TestModule.h"
 #include "client/Latite.h"
 #include "client/event/Eventing.h"
@@ -8,7 +9,6 @@
 #include "client/misc/ClientMessageSink.h"
 #include "sdk/common/network/packet/TextPacket.h"
 #include "sdk/String.h"
-#include "pch.h"
 
 #define FUNC_HELPER(x)  void(Feature::*)(x&)
 

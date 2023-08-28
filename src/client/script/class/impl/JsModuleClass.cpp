@@ -1,7 +1,7 @@
+#include "pch.h"
 #include "JsModuleClass.h"
 #include "JsSettingClass.h"
 #include "../../JsScript.h"
-#include "pch.h"
 
 JsValueRef JsModuleClass::moduleIsEnabled(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
 {

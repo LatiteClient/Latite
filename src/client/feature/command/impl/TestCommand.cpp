@@ -1,5 +1,5 @@
-#include "TestCommand.h"
 #include "pch.h"
+#include "TestCommand.h"
 
 
 TestCommand::TestCommand() : Command("test", "A command for testing", "{0} [...]", {"tc"}) {

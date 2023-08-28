@@ -1,6 +1,6 @@
+#include "pch.h"
 #include "TextBox.h"
 #include "util/DxContext.h"
-#include "pch.h"
 
 bool ui::TextBox::isSelected() {
 	return isSelectedBool;

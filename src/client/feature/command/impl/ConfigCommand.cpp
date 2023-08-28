@@ -1,7 +1,7 @@
+#include "pch.h"
 #include "ConfigCommand.h"
 #include "client/config/ConfigManager.h"
 #include "client/Latite.h"
-#include "pch.h"
 
 ConfigCommand::ConfigCommand() : Command("config", "Do actions related to profiles/configs", "$ load <name>\n$ save [name]", {"profile", "configs", "profiles", "cfg"}) {	
 }

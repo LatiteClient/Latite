@@ -1,6 +1,6 @@
+#include "pch.h"
 #include "HUDModule.h"
 #include <client/Latite.h>
-#include "pch.h"
 
 void HUDModule::renderSelected() {
 	DXContext dc;

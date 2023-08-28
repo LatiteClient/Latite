@@ -1,5 +1,5 @@
-#include "JsCommand.h"
 #include "pch.h"
+#include "JsCommand.h"
 
 bool JsCommand::execute(std::string const label, std::vector<std::string> args) {
     JS::JsSetCurrentContext(ctx);

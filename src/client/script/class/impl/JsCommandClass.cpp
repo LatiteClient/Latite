@@ -1,5 +1,5 @@
-#include "JsCommandClass.h"
 #include "pch.h"
+#include "JsCommandClass.h"
 
 JsValueRef JsCommandClass::jsConstructor(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto thi = reinterpret_cast<JsCommandClass*>(callbackState);

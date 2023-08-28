@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "GameScriptingObject.h"
 #include "../JsScript.h"
 #include "client/script/class/impl/JsVec2.h"

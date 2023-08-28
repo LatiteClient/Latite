@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "GeneralHooks.h"
 #include "sdk/common/network/RakNetConnector.h"
 #include "sdk/signature/storage.h"
@@ -18,7 +19,6 @@
 
 #include "api/memory/memory.h"
 #include "util/Logger.h"
-#include "pch.h"
 
 namespace {
 	std::shared_ptr<Hook> Level_tickHook;

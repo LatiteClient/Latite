@@ -1,7 +1,7 @@
+#include "pch.h"
 #include "Zoom.h"
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
-#include "pch.h"
 
 Zoom::Zoom() : Module("Zoom", "Zoom", "Zooms like OptiFine", GAME, nokeybind) {
 	addSetting("zoomKey", "Zoom Key", "The key to press to zoom", this->zoomKey);

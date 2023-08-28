@@ -1,6 +1,6 @@
+#include "pch.h"
 #include "JsScript.h"
 #include <sstream>
-#include "pch.h"
 #include "util/Chakrautil.h"
 #include "util/Util.h"
 #include "resource.h"

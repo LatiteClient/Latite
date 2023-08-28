@@ -1,6 +1,6 @@
+#include "pch.h"
 #include "Logger.h"
 #include "util/Util.h"
-#include "pch.h"
 #include "client/Latite.h"
 #include "client/misc/ClientMessageSink.h"
 

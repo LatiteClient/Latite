@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Screenshot.h"
 #include "client/event/impl/KeyUpdateEvent.h"
 #include "client/event/impl/UpdateEvent.h"
@@ -11,7 +12,6 @@
 
 #include <winrt/windows.storage.h>
 #include <winrt/windows.storage.streams.h>
-#include "pch.h"
 
 using namespace winrt;
 using namespace winrt::Windows::Web::Http;

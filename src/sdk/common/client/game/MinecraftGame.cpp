@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "MinecraftGame.h"
 #include "sdk/signature/storage.h"
 

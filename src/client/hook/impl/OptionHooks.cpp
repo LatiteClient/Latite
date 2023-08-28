@@ -1,7 +1,7 @@
+#include "pch.h"
 #include "OptionHooks.h"
 #include "client/event/Eventing.h"
 #include "client/event/impl/GammaEvent.h"
-#include "pch.h"
 
 namespace {
 	std::shared_ptr<Hook> getGammaHook;

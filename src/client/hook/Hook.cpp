@@ -1,6 +1,6 @@
+#include "pch.h"
 #include "Hook.h"
 #include "util/logger.h"
-#include "pch.h"
 #include "MinHook.h"
 
 Hook::Hook(uintptr_t target, void* detour, std::string const& hookName, bool tableSwap)

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Network.h"
 
 #include <winrt/base.h>

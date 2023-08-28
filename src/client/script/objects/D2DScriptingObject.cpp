@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "D2DScriptingObject.h"
 #include "../class/impl/JsColor.h"
 #include "../class/impl/JsRect.h"

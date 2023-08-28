@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "HUDEditor.h"
 #include "client/event/impl/RenderOverlayEvent.h"
 #include "client/event/impl/RenderLayerEvent.h"
@@ -16,7 +17,6 @@
 #include "sdk/common/client/gui/controls/VisualTree.h"
 #include "sdk/common/client/gui/controls/UIControl.h"
 
-#include "pch.h"
 
 HUDEditor::HUDEditor() : dragMod(nullptr) {
 	this->key = Latite::get().getMenuKey();

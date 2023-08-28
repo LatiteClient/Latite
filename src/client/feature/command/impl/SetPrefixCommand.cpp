@@ -1,7 +1,7 @@
+#include "pch.h"
 #include "SetPrefixCommand.h"
 #include "../CommandManager.h"
 #include "client/Latite.h"
-#include "pch.h"
 
 SetPrefixCommand::SetPrefixCommand() : Command("setprefix", "Set the command prefix", "{0} [prefix]") {
 }

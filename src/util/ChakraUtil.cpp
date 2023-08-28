@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ChakraUtil.h"
 #include "Util.h"
 #include "client/Latite.h"
