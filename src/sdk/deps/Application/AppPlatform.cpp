@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "AppPlatform.h"
-#include "util/Util.h"
 #include "api/memory/memory.h"
 
 SDK::AppPlatform* SDK::AppPlatform::get() {

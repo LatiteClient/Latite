@@ -18,7 +18,6 @@
 #include "client/script/ScriptManager.h"
 
 #include "api/memory/memory.h"
-#include "util/Logger.h"
 
 namespace {
 	std::shared_ptr<Hook> Level_tickHook;

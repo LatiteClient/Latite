@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "DXHooks.h"
-#include "util/DxUtil.h"
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
 

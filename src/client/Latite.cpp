@@ -3,8 +3,6 @@
 //
 
 #include "Latite.h"
-#include "util/Util.h"
-#include "util/Logger.h"
 
 #include "client/ui/TextBox.h"
 
@@ -44,8 +42,6 @@ using namespace winrt::Windows::Storage;
 #include "screen/ScreenManager.h"
 #include "render/Assets.h"
 #include "resource.h"
-
-#include "util/XorString.h"
 
 int SDK::internalVers = SDK::VLATEST;
 

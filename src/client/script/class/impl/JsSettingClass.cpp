@@ -2,8 +2,6 @@
 #include "JsSettingClass.h"
 #include "JsColor.h"
 #include "JsVec2.h"
-#include "util/DxUtil.h"
-#include "util/LMath.h"
 #include "../../JsScript.h"
 
 JsValueRef JsSettingClass::getValueCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)

@@ -3,7 +3,6 @@
 #include "client/event/impl/KeyUpdateEvent.h"
 #include "client/event/impl/UpdateEvent.h"
 #include "client/event/impl/RenderOverlayEvent.h"
-#include "util/DxContext.h"
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
 #include "client/misc/ClientMessageSink.h"

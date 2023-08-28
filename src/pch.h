@@ -51,5 +51,9 @@ using namespace std::chrono_literals;
 #include "util/Util.h"
 #include "util/Logger.h"
 #include "util/XorString.h"
-
+#include "util/ChakraUtil.h"
+#include "util/DxUtil.h"
+#include "util/LMath.h"
+#include "util/Json.h"
+#include "util/DxContext.h"
 #endif

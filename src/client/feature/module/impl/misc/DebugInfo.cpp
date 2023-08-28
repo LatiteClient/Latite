@@ -5,7 +5,6 @@
 #include "client/render/Renderer.h"
 #include "client/event/impl/DrawHUDModulesEvent.h"
 #include "client/event/impl/RenderOverlayEvent.h"
-#include "util/DXContext.h"
 
 DebugInfo::DebugInfo() : Module("DebugInfo", "Java Debug Info", "See some craaazy info (send help)", GAME, VK_F3) {
     listen<RenderOverlayEvent>((EventListenerFunc)&DebugInfo::onRenderOverlay);

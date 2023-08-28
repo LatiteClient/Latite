@@ -1,6 +1,5 @@
 #pragma once
 #include "util/LMath.h"
-#include "block/"
 #include <vector>
 #include <functional>
 
@@ -23,7 +22,7 @@ namespace SDK {
         virtual bool hasChunksAt(AABB const&, bool) const = 0; // 0xE
         virtual void getDimensionId() const = 0; // 0xF
         virtual void fetchAABBs(std::vector<AABB, std::allocator<AABB>>&, AABB const&, bool) const = 0; // 0x10
-        virtual void fetchCollisionShapes(std::vector<AABB, std::allocator<AABB>>&, AABB const&, class float*, bool, /*optional_ref<GetCollisionShapeInterface const>*/) const = 0; // 0x11
+        virtual void fetchCollisionShapes(std::vector<AABB, std::allocator<AABB>>&, AABB const&, float*, bool, void*/*optional_ref<GetCollisionShapeInterface const>*/) const = 0; // 0x11
         virtual void getTallestCollisionShape(AABB const&, float*, bool, /*optional_ref<GetCollisionShapeInterface const>*/void*) const = 0; // 0x12
         virtual void getBrightness(BlockPos const&) const = 0; // 0x13
         virtual void getWeakRef() = 0; // 0x14
@@ -31,7 +30,7 @@ namespace SDK {
         virtual void removeListener(/*BlockSourceListener&*/void*) = 0; // 0x16
         virtual void fetchEntities(class Actor const*, AABB const&, bool, bool) = 0; // 0x17
         virtual void fetchEntities(int actorType, AABB const&, class Actor const*, std::function<bool (Actor*)>) = 0; // 0x18
-        virtual void setBlock(BlockPos const&, Block const&, int, class ActorBlockSyncMessage const*, class Actor*) = 0; // 0x19
+        virtual void setBlock(BlockPos const&, class Block const&, int, class ActorBlockSyncMessage const*, class Actor*) = 0; // 0x19
         virtual void getMaxHeight() const = 0; // 0x1A
         virtual void getMinHeight() const = 0; // 0x1B
         virtual void getDimension() const = 0; // 0x1C

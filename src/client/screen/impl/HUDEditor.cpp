@@ -10,8 +10,6 @@
 #include "client/config/ConfigManager.h"
 #include "client/feature/module/ModuleManager.h"
 #include "client/feature/module/HUDModule.h"
-#include "util/DxUtil.h"
-#include "util/DxContext.h"
 #include "../ScreenManager.h"
 
 #include "sdk/common/client/gui/controls/VisualTree.h"
