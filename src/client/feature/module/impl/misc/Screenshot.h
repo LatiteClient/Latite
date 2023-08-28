@@ -3,9 +3,6 @@
 #include "util/DxUtil.h"
 #include "client/event/Eventing.h"
 #include <filesystem>
-#include <Windows.h>
-
-#include <winrt/Windows.Foundation.h>
 
 class Screenshot : public Module {
 public:

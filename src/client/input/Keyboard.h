@@ -1,8 +1,4 @@
 #pragma once
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#include <WinUser.h>
-
 #include "client/event/Eventing.h"
 #include "client/event/impl/KeyUpdateEvent.h"
 
