@@ -24,6 +24,7 @@ void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 
 void GameScriptingObject::createWorldObject() {
 	JS::JsCreateObject(&worldObj);
+	JS::JsAddRef(worldObj, nullptr); // never forget to add a refernce to an object that isn't set !!
 	Chakra::DefineFunc(worldObj, worldGetEntList, L"getEntityList", this);
 }
 

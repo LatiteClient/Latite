@@ -42,7 +42,7 @@ public:
 	static void SetPropertyBool(JsValueRef ref, std::wstring name, bool value, bool strict = false);
 	static void SetPropertyObject(JsValueRef ref, std::wstring name, JsValueRef obj, bool strict = false);
 
-	unsigned int GetRefCount(JsValueRef obj);
+	static unsigned int GetRefCount(JsValueRef obj);
 	
 	static JsValueRef GetProperty(JsValueRef obj, std::wstring name);
 

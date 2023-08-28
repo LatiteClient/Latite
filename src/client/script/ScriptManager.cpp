@@ -424,6 +424,8 @@ bool ScriptManager::dispatchEvent(Event& ev)
 				}
 				JsValueRef ret;
 
+				//int refc1 = Chakra::GetRefCount(l.first);
+				//int refc = Chakra::GetRefCount(params[1]);
 				handleErrors(JS::JsCallFunction(l.first, params, 2, &ret));
 
 				if (ev.isCancellable) {
@@ -433,7 +435,7 @@ bool ScriptManager::dispatchEvent(Event& ev)
 
 				Chakra::Release(ret);
 				Chakra::Release(params[1]);
-				Chakra::Release(params[0]);
+				//Chakra::Release(params[0]);
 			}
 			break;
 		}
