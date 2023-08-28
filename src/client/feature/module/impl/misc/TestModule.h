@@ -1,7 +1,5 @@
 #pragma once
 #include "client/feature/module/Module.h"
-#include "client/feature/module/HUDModule.h"
-#include "client/event/impl/TickEvent.h"
 
 class TestModule : public Module {
 private:

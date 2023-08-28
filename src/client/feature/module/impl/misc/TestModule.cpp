@@ -9,6 +9,7 @@
 #include "client/misc/ClientMessageSink.h"
 #include "sdk/common/network/packet/TextPacket.h"
 #include "sdk/String.h"
+#include "client/event/impl/TickEvent.h"
 
 #define FUNC_HELPER(x)  void(Feature::*)(x&)
 

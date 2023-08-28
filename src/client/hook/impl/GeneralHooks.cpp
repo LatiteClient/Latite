@@ -1,7 +1,5 @@
 #include "pch.h"
 #include "GeneralHooks.h"
-#include "sdk/common/network/RakNetConnector.h"
-#include "sdk/signature/storage.h"
 #include "client/Latite.h"
 #include "client/misc/ClientMessageSink.h"
 #include "client/feature/command/commandmanager.h"
@@ -16,8 +14,6 @@
 #include "client/event/impl/BeforeMoveEvent.h"
 #include "client/event/impl/AfterMoveEvent.h"
 #include "client/script/ScriptManager.h"
-
-#include "api/memory/memory.h"
 
 namespace {
 	std::shared_ptr<Hook> Level_tickHook;

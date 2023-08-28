@@ -1,9 +1,6 @@
 #pragma once
 #include "../Screen.h"
-#include "api/eventing/Event.h"
 #include "client/render/asset/Asset.h"
-#include "api/feature/setting/Setting.h"
-#include "util/DxUtil.h"
 #include "client/ui/TextBox.h"
 #include <memory>
 #include <array>
@@ -13,7 +10,7 @@ class ClickGUI : public Screen {
 public:
 	ClickGUI();
 
-	void onRender(Event& ev);
+	void onRender(class Event& ev);
 	void onCleanup(Event& ev);
 	void onInit(Event& ev);
 	void onKey(Event& ev);

@@ -1,6 +1,5 @@
 #pragma once
 #include "client/feature/module/HUDModule.h"
-#include "client/event/impl/TickEvent.h"
 
 class GuiscaleChanger : public Module {
 public:

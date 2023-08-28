@@ -1,6 +1,5 @@
 #pragma once
 #include "../../Module.h"
-#include "util/DxUtil.h"
 #include "client/event/Eventing.h"
 #include <filesystem>
 
@@ -17,7 +16,7 @@ private:
 	bool queueToScreenshot = false;
 	std::filesystem::path screenshotPath{};
 
-	std::optional<ComPtr<ID2D1Bitmap1>> savedBitmap = std::nullopt;
+	std::optional<ComPtr<struct ID2D1Bitmap1>> savedBitmap = std::nullopt;
 	float lerpX = 0.f;
 	float lerpY = 0.f;
 	float flashLerp = 1.f;

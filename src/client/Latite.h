@@ -4,7 +4,6 @@
 #include "api/feature/setting/Setting.h"
 #include <optional>
 #include "misc/Timings.h"
-#include "util/DxUtil.h"
 
 namespace ui {
 	class TextBox;
@@ -32,6 +31,7 @@ public:
 
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);
+
 
 	void onUpdate(class Event& ev);
 	void onKey(class Event& ev);
@@ -85,7 +85,7 @@ public:
 		return std::get<BoolValue>(hudBlur);
 	}
 
-	[[nodiscard]] ID2D1BitmapBrush1* getHUDBlurBrush() {
+	[[nodiscard]] struct ID2D1BitmapBrush1* getHUDBlurBrush() {
 		return hudBlurBrush.Get();
 	}
 
@@ -104,9 +104,9 @@ private:
 	ValueType accentColor = ColorValue(static_cast<float>(0x32) / 255.f, static_cast<float>(0x39) / 255.f, static_cast<float>(0x76) / 255.f);
 
 	std::vector<ui::TextBox*> textBoxes;
-	ComPtr<ID2D1Bitmap1> hudBlurBitmap;
-	ComPtr<ID2D1BitmapBrush1> hudBlurBrush;
-	ComPtr<ID2D1Effect> gaussianBlurEffect;
+	ComPtr<struct ID2D1Bitmap1> hudBlurBitmap;
+	ComPtr<struct ID2D1BitmapBrush1> hudBlurBrush;
+	ComPtr<struct ID2D1Effect> gaussianBlurEffect;
 
 	void threadsafeInit();
 

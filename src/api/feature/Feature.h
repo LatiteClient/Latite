@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include "api/eventing/Listenable.h"
 
 // A basic feature with a name and a description.
 class Feature {

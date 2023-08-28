@@ -1,8 +1,4 @@
 #include "pch.h"
-#include "DxUtil.h"
-#include <sstream>
-#include "Logger.h"
-#include "api/feature/setting/Setting.h"
 
 void util::doThrowIfFailed(HRESULT hr, int line, std::string func) {
 	if (FAILED(hr)) {

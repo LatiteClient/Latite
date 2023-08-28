@@ -1,7 +1,5 @@
 #include "pch.h"
 #include "Level.h"
-#include "sdk/version.h"
-#include "api/memory/memory.h"
 
 void SDK::Level::playSoundEvent(std::string const& text, Vec3 const& pos, float vol, float pitch) {
 	int index = 0;

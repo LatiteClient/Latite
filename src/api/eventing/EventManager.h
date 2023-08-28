@@ -1,6 +1,4 @@
 #pragma once
-#include "api/manager/Manager.h"
-#include "api/feature/module/Module.h"
 #include "Listenable.h"
 #include "Event.h"
 #include <algorithm>
