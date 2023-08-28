@@ -30,12 +30,6 @@
 
 #include "sdk/common/client/game/ClientInstance.h"
 #include <winrt/windows.ui.viewmanagement.h>
-#include <winrt/Windows.ApplicationModel.Core.h>
-
-#include <winrt/base.h>
-#include <winrt/Windows.Foundation.h>
-
-#include <winrt/Windows.Web.Http.h>
 #include <winrt/windows.storage.streams.h>
 
 using namespace winrt;
