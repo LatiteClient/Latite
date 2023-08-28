@@ -1,6 +1,7 @@
 #include "DxUtil.h"
 #include <sstream>
 #include "Logger.h"
+#include "api/feature/setting/Setting.h"
 
 void util::doThrowIfFailed(HRESULT hr, int line, std::string func) {
 	if (FAILED(hr)) {
@@ -13,6 +14,9 @@ void util::doThrowIfFailed(HRESULT hr, int line, std::string func) {
 #endif
 		//throw std::runtime_error("Error setting up DX.");
 	}
+}
+
+d2d::Color::Color(StoredColor const& col) : ::Color(col.r, col.g, col.b, col.a) {
 }
 
 std::string d2d::Color::getHex() const {

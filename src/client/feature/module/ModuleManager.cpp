@@ -39,7 +39,9 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<Clock>());
 	this->items.push_back(std::make_shared<BowIndicator>());
 	this->items.push_back(std::make_shared<GuiscaleChanger>());
+#if LATITE_DEBUG
 	this->items.push_back(std::make_shared<Screenshot>());
+#endif
 	this->items.push_back(std::make_shared<DebugInfo>());
 
 	for (auto& mod : items) {

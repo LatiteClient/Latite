@@ -20,8 +20,6 @@
 
 #include "LMath.h"
 
-#include "api/feature/setting/Setting.h"
-
 #ifdef RGB
 #undef RGB
 #endif
@@ -37,6 +35,8 @@ template <class T> void SafeRelease(T** ppT) {
 }
 using OColor = Color;
 
+struct StoredColor;
+
 namespace d2d {
 
 	class Color : public ::Color {
@@ -47,7 +47,7 @@ namespace d2d {
 
 		constexpr Color(D2D1_COLOR_F col) : ::Color(col.r, col.g, col.b, col.a) {}
 
-		constexpr Color(StoredColor const& col) : ::Color(col.r, col.g, col.b, col.a) {}
+		Color(StoredColor const& col);
 
 		Color(D2D1::ColorF::Enum e) : ::Color(0.f, 0.f, 0.f, 0.f) {
 			D2D1::ColorF col = D2D1::ColorF(e);

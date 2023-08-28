@@ -21,4 +21,4 @@ using namespace std::chrono_literals;
 #include <d3d11.h>
 #include <d3d11on12.h>
 #include <d3d12.h>
-#include <winrt/base.h>
+//#include <winrt/base.h>

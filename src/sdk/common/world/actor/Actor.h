@@ -2,7 +2,6 @@
 #include "api/memory/Memory.h"
 #include "sdk/Util.h"
 #include "sdk/common/entity/EntityContext.h"
-#include "sdk/signature/storage.h"
 #include <memory>
 
 namespace SDK {
@@ -21,79 +20,24 @@ namespace SDK {
 		// 1.19.51 only
 		CLASS_FIELD(class Level*, level_1_19_51, 0x310);
 
-		AABB& getBoundingBox() {
-			if (internalVers < V1_19_51) {
-				return util::directAccess<AABB>(this, 0x4B8);
-			}
-			return aabbShape->boundingBox;
-		}
+		AABB& getBoundingBox();
 
-		Vec2& getRot() { 
-			if (internalVers < V1_19_51) {
-				return util::directAccess<Vec2>(this, 0x138);
-			}
-			return movementInterpolator->rotation;
-		}
+		Vec2& getRot();
 
-		Vec3& getVelocity() {
-			if (internalVers < V1_19_51) {
-				return util::directAccess<Vec3>(this, 0x4F0);
-			}
-			return stateVector->velocity;
-		}
+		Vec3& getVelocity();
 
-		Vec3& getPos() {
-			if (internalVers < V1_19_51) {
-				return memory::callVirtual<Vec3&>(this, 22);
-			}
+		Vec3& getPos();
 
-			return stateVector->pos;
-		}
+		Vec3& getPosOld();
 
-		Vec3& getPosOld() {
-			if (internalVers < V1_19_51) {
-				return memory::callVirtual<Vec3&>(this, 23);
-			}
-			
-			return stateVector->posOld;
-		}
+		int getCommandPermissionLevel();
 
-		int getCommandPermissionLevel() {
-			if (internalVers <= V1_18_12) {
-				return memory::callVirtual<int>(this, 0xCC);
-			}
+		int64_t getRuntimeID();
 
-			if (internalVers <= V1_19_51) {
-				return memory::callVirtual<int>(this, 0xCD);
-			}
+		uint8_t getEntityTypeID();
 
-			return memory::callVirtual<int>(this, 0xB9);
-		}
+		void swing();
 
-		int64_t getRuntimeID() {
-			if (internalVers < V1_19_51) {
-				return util::directAccess<int64_t>(this, 0x550);
-			}
-			return *reinterpret_cast<int64_t * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::runtimeIDComponent.result)(entityContext.registry->basicRegistry, &entityContext.id);
-		}
-
-		uint8_t getEntityTypeID() {
-			if (internalVers <= V1_18_12) {
-				return memory::callVirtual<int>(this, 0xAA);
-			}
-			if (internalVers <= V1_19_51) {
-				return memory::callVirtual<int>(this, 0xAC);
-			}
-
-			return memory::callVirtual<int>(this, 0x99);
-		}
-
-		void swing() {
-			return memory::callVirtual<void>(this, MV_DETAIL_GETOFFSET(0xC8, 0xDB, 0xDC));
-		}
-
-		bool isPlayer() {
-			return getEntityTypeID() == 63;
-		}
+		bool isPlayer();
 	};
 }

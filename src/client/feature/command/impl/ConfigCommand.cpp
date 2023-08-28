@@ -1,6 +1,7 @@
 #include "ConfigCommand.h"
 #include "client/config/ConfigManager.h"
 #include "client/Latite.h"
+#include "util/Util.h"
 
 ConfigCommand::ConfigCommand() : Command("config", "Do actions related to profiles/configs", "$ load <name>\n$ save [name]", {"profile", "configs", "profiles", "cfg"}) {	
 }

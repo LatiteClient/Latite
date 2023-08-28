@@ -1,7 +1,9 @@
 #include "Screenshot.h"
 #include "client/event/impl/KeyUpdateEvent.h"
+#include "client/event/impl/UpdateEvent.h"
 #include "client/event/impl/RenderOverlayEvent.h"
 #include "util/Util.h"
+#include "util/DxContext.h"
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
 #include "client/misc/ClientMessageSink.h"
@@ -10,11 +12,8 @@
 
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Web.Http.h>
-#include <winrt/impl/windows.web.http.2.h>
-#include <winrt/Windows.Web.Http.Filters.h>
 #include <winrt/windows.storage.h>
 #include <winrt/windows.storage.streams.h>
-
 
 using namespace winrt;
 using namespace winrt::Windows::Web::Http;
@@ -24,9 +23,14 @@ using namespace winrt::Windows::Storage;
 
 Screenshot::Screenshot() : Module("Screenshot", "Screenshot", "Take a screenshot with a key.", GAME, nokeybind) {
     listen<KeyUpdateEvent>((EventListenerFunc)&Screenshot::onKey);
+    listen<UpdateEvent>((EventListenerFunc)&Screenshot::onUpdate);
     listen<RenderOverlayEvent>((EventListenerFunc)&Screenshot::onRenderOverlay, false, 0 /*lowest priority so that Latite renders everything else*/);
 
     addSetting("ssKey", "Screenshot key", "The key you press to take a screenshot", this->screenshotKey);
+}
+
+namespace {
+    bool shouldSleep = false;
 }
 
 void Screenshot::onKey(Event& evG) {
@@ -36,6 +40,7 @@ void Screenshot::onKey(Event& evG) {
         queueToScreenshot = true;
         screenshotPath = util::GetLatitePath() / "Screenshots";
         std::filesystem::create_directory(screenshotPath);
+        shouldSleep = true;
 	}
 }
 
@@ -66,11 +71,21 @@ void Screenshot::onRenderOverlay(Event& ev) {
     }
 }
 
+void Screenshot::onUpdate(Event& ev) {
+    if (shouldSleep) {
+        //Sleep(200);
+        shouldSleep = false;
+    }
+}
+
 winrt::Windows::Foundation::IAsyncAction Screenshot::takeScreenshot(std::filesystem::path const& path) {
     // file
     auto folder = co_await StorageFolder::GetFolderFromPathAsync(path.wstring());
     auto file = co_await folder.CreateFileAsync(L"screenshot.png", CreationCollisionOption::OpenIfExists);
     ComPtr<ID2D1Bitmap1> bmp = Latite::getRenderer().copyCurrentBitmap();
+
+    auto ctx = Latite::getRenderer().getDeviceContext();
+    ctx->Flush();// MC won't let me flush (???)s
 
     IRandomAccessStream raStream = file.OpenAsync(FileAccessMode::ReadWrite).get();
     ComPtr<IStream> stream;
@@ -79,8 +94,6 @@ winrt::Windows::Foundation::IAsyncAction Screenshot::takeScreenshot(std::filesys
     );
 
     auto wicFactory = Latite::getRenderer().getImagingFactory();
-    auto ctx = Latite::getRenderer().getDeviceContext();
-    ctx->Flush();
 
     // https://learn.microsoft.com/en-us/windows/win32/direct2d/save-direct2d-content-to-an-image-file
 

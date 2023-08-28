@@ -9,10 +9,7 @@
 #include <winrt/base.h>
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Web.Http.h>
-#include <winrt/impl/windows.web.http.2.h>
-#include <winrt/Windows.Web.Http.Filters.h>
 #include <winrt/windows.foundation.collections.h>
-#include <winrt/impl/windows.foundation.collections.1.h>
 #include <winrt/Windows.Web.Http.Headers.h>
 
 

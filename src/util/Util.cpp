@@ -301,8 +301,7 @@ void util::PlaySoundUI(std::string const& sound, float volume, float pitch) {
 	} // TODO: make it work outside world
 }
 
-Color util::LerpColorState(Color const& current, Color const& on, Color const& off, bool state, float speed)
-{
+Color util::LerpColorState(Color const& current, Color const& on, Color const& off, bool state, float speed) {
 	Color ret = current;
 	float t = Latite::getRenderer().getDeltaTime()* (speed / 10.f);
 	ret.r = std::lerp(current.r, state ? on.r : off.r, t);

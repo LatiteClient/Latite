@@ -1,5 +1,4 @@
 #pragma once
-#include "sdk/common/client/renderer/HudPlayerRenderer.h"
 #include <string>
 #include "util/LMath.h"
 #include "util/DxUtil.h"
@@ -33,7 +32,7 @@ namespace SDK {
 	class CustomRenderComponent : UIComponent { // 4 in list
 		char pad[8];
 	public:
-		HudPlayerRenderer* rend;
+		class HudPlayerRenderer* rend;
 	};
 
 	static_assert(offsetof(CustomRenderComponent, rend) == 0x18);

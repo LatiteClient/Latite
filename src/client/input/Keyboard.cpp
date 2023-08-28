@@ -1,6 +1,7 @@
 #include "Keyboard.h"
 #include "client/event/impl/CharEvent.h"
 #include "util/Util.h"
+#include "sdk/common/client/input/ClientInputHandler.h"
 #include <chrono>
 
 Keyboard::Keyboard(int* gameKeyMap) : keyMap(gameKeyMap) {

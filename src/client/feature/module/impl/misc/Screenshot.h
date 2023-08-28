@@ -13,6 +13,7 @@ public:
 private:
 	void onKey(Event& ev);
 	void onRenderOverlay(Event& ev);
+	void onUpdate(Event& ev);
 	winrt::Windows::Foundation::IAsyncAction takeScreenshot(std::filesystem::path const& path);
 	ValueType screenshotKey = KeyValue(VK_F2);
 

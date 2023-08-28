@@ -2,8 +2,13 @@
 #include <string>
 #include <filesystem>
 #include "api/scanner/Scanner.h"
-#include "LMath.h"
-#include "DxUtil.h"
+
+namespace d2d {
+	class Rect;
+}
+
+struct Color;
+struct HSV;
 
 namespace util {
 	extern std::filesystem::path GetRootPath();
@@ -23,9 +28,9 @@ namespace util {
 	extern std::vector<std::string> SplitString(std::string const& s, char delim);
 	extern void PlaySoundUI(std::string const& sound, float volume = 1.f, float pitch = 1.f);
 
-	extern Color LerpColorState(Color const& current, Color const& on, Color const& off, bool state, float speed = 3.f);
+	extern Color LerpColorState(Color const& current, ::Color const& on, Color const& off, bool state, float speed = 3.f);
 
-	extern HSV ColorToHSV(Color const& color);
+	extern struct HSV ColorToHSV(Color const& color);
 	extern Color HSVToColor(HSV const& hsv);
 
 	extern inline uintptr_t FindSignature(std::string_view signature) {

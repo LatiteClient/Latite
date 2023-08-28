@@ -1,11 +1,10 @@
 #pragma once
-#include "util/Util.h"
-#include "sdk/common/world/Minecraft.h"
+#include "sdk/Util.h"
 
 namespace SDK {
 	class ServerInstance {
 		void* vtable;
 	public:
-		CLASS_FIELD(Minecraft*, minecraft, 0xA8);
+		CLASS_FIELD(class Minecraft*, minecraft, 0xA8);
 	};
 }

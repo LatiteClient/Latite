@@ -2,6 +2,7 @@
 #include "Windows.h"
 
 #include "client/Latite.h"
+#include "client/render/Renderer.h"
 #include "client/event/impl/DrawHUDModulesEvent.h"
 #include "client/event/impl/RenderOverlayEvent.h"
 
@@ -10,6 +11,9 @@
 #include "sdk/common/world/Minecraft.h"
 #include "sdk/common/world/level/Dimension.h"
 #include "sdk/signature/storage.h"
+
+#include "util/Util.h"
+#include "util/DXContext.h"
 
 DebugInfo::DebugInfo() : Module("DebugInfo", "Java Debug Info", "See some craaazy info (send help)", GAME, VK_F3) {
     listen<RenderOverlayEvent>((EventListenerFunc)&DebugInfo::onRenderOverlay);

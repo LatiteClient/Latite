@@ -6,10 +6,12 @@
 #include "api/eventing/Listenable.h"
 #include "api/feature/setting/Setting.h"
 #include <optional>
-#include <winrt/windows.foundation.h>
-#include "ui/TextBox.h"
 #include "misc/Timings.h"
 #include "util/DxUtil.h"
+
+namespace ui {
+	class TextBox;
+}
 
 class Latite final : public Listener {
 public:
@@ -27,7 +29,6 @@ public:
 	[[nodiscard]] static class Assets& getAssets() noexcept;
 	[[nodiscard]] static class ScriptManager& getScriptManager() noexcept;
 	[[nodiscard]] static class Keyboard& getKeyboard() noexcept;
-	std::string gameVersion;
 
 	[[nodiscard]] Timings& getTimings() noexcept { return timings; }
 	[[nodiscard]] std::string getCommandPrefix() { return std::get<TextValue>(commandPrefix).str; }
@@ -46,7 +47,7 @@ public:
 	void loadConfig(class SettingGroup& resolvedGroup);
 	void initAsset(int resource, std::wstring const& filename);
 	std::string getTextAsset(int resource);
-	winrt::Windows::Foundation::IAsyncAction downloadExtraAssets();
+	void downloadExtraAssets();
 	void initSettings();
 
 	Latite() = default;
@@ -54,6 +55,7 @@ public:
 
 	static constexpr std::string_view version = "v2.0.0";
 	HINSTANCE dllInst = NULL;
+	std::string gameVersion;
 
 	std::optional<float> getMenuBlur();
 

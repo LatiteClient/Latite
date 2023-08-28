@@ -32,15 +32,10 @@
 #include <winrt/windows.ui.viewmanagement.h>
 #include <winrt/Windows.ApplicationModel.Core.h>
 
-#include <winrt/windows.ui.core.h>
-#include <winrt/windows.ui.popups.h>
 #include <winrt/base.h>
 #include <winrt/Windows.Foundation.h>
 
 #include <winrt/Windows.Web.Http.h>
-#include <winrt/impl/windows.web.http.2.h>
-#include <winrt/Windows.Web.Http.Filters.h>
-#include <winrt/windows.storage.h>
 #include <winrt/windows.storage.streams.h>
 
 using namespace winrt;
@@ -395,13 +390,6 @@ void Latite::threadsafeInit() {
     }
 
     Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
-
-    if (!Chakra::mod) {
-        winrt::hstring title = L"Error";
-        winrt::hstring content = L"Assets\\ChakraCore.dll could not be found, you will not be able to use scripting.";
-        winrt::Windows::UI::Popups::MessageDialog dialog(content, title);
-        dialog.ShowAsync();
-    }
 }
 
 void Latite::initSettings() {
@@ -466,26 +454,32 @@ std::string Latite::getTextAsset(int resource) {
     return std::string(hFinal, hSize);
 }
 
-winrt::Windows::Foundation::IAsyncAction Latite::downloadExtraAssets() {
-    auto http = HttpClient();
+namespace {
+    winrt::Windows::Foundation::IAsyncAction doDownloadAssets() {
+        auto http = HttpClient();
 
-    auto folderPath = util::GetLatitePath() / "Assets";
+        auto folderPath = util::GetLatitePath() / "Assets";
 
-    // TODO: FIXME: xor
-    winrt::Windows::Foundation::Uri requestUri(util::StrToWStr(XOR_STRING("https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll")));
+        // TODO: FIXME: xor
+        winrt::Windows::Foundation::Uri requestUri(util::StrToWStr(XOR_STRING("https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll")));
 
-    auto buffer = http.GetBufferAsync(requestUri).get();
-    
-    auto folder = co_await StorageFolder::GetFolderFromPathAsync(folderPath.wstring());
-    auto file = co_await folder.CreateFileAsync(L"ChakraCore.dll", CreationCollisionOption::OpenIfExists);
+        auto buffer = http.GetBufferAsync(requestUri).get();
 
-    IRandomAccessStream stream = co_await file.OpenAsync(FileAccessMode::ReadWrite);
+        auto folder = co_await StorageFolder::GetFolderFromPathAsync(folderPath.wstring());
+        auto file = co_await folder.CreateFileAsync(L"ChakraCore.dll", CreationCollisionOption::OpenIfExists);
 
-    DataWriter writer(stream);
-    writer.WriteBuffer(buffer);
-    writer.StoreAsync().get();
-    writer.FlushAsync().get();
-    co_return;
+        IRandomAccessStream stream = co_await file.OpenAsync(FileAccessMode::ReadWrite);
+
+        DataWriter writer(stream);
+        writer.WriteBuffer(buffer);
+        writer.StoreAsync().get();
+        writer.FlushAsync().get();
+        co_return;
+    }
+}
+
+void Latite::downloadExtraAssets() {
+    doDownloadAssets();
 }
 
 void Latite::onUpdate(Event& evGeneric) {
