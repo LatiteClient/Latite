@@ -3,6 +3,7 @@
 #include "client/Latite.h"
 
 #include "client/event/impl/RendererInitEvent.h"
+#include "pch.h"
 
 MotionBlur::MotionBlur() : Module("MotionBlur", "Motion Blur", "Blurs motion", GAME) {
 	addSliderSetting("intensity", "Intensity", "", intensity, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f));

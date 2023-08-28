@@ -1,7 +1,5 @@
 #include "JsEntity.h"
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/world/Minecraft.h"
-#include "sdk/common/client/player/LocalPlayer.h"
+#include "pch.h"
 
 bool JsEntity::validate() {
     if (runtimeId == 1 && SDK::ClientInstance::get()->getLocalPlayer()) {

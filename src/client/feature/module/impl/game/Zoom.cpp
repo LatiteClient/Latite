@@ -1,8 +1,7 @@
 #include "Zoom.h"
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/world/Minecraft.h"
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
+#include "pch.h"
 
 Zoom::Zoom() : Module("Zoom", "Zoom", "Zooms like OptiFine", GAME, nokeybind) {
 	addSetting("zoomKey", "Zoom Key", "The key to press to zoom", this->zoomKey);

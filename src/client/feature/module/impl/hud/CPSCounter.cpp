@@ -1,5 +1,6 @@
 #include "CPSCounter.h"
 #include "client/Latite.h"
+#include "pch.h"
 
 CPSCounter::CPSCounter() : TextModule("CPS", "CPS Counter", "Shows your CPS", HUD) {
 	mode.addEntry(EnumEntry(0, "Left", "Left"));

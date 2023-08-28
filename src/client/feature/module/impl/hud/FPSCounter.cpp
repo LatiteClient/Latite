@@ -1,5 +1,6 @@
 #include "FPSCounter.h"
 #include "client/Latite.h"
+#include "pch.h"
 
 FPSCounter::FPSCounter() : TextModule("FPS", "FPS Counter", "Shows your FPS.", HUD) {
 	this->prefix = TextValue("FPS: ");

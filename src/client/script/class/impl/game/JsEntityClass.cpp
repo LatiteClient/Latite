@@ -5,6 +5,7 @@
 #include "sdk/common/client/player/LocalPlayer.h"
 #include "sdk/common/client/game/ClientInstance.h"
 #include "../../../JsScript.h"
+#include "pch.h"
 
 JsValueRef JsEntityClass::entityIsValid(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
 {

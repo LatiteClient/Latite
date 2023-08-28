@@ -171,6 +171,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
       <ShowIncludes>false</ShowIncludes>
+      <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -188,7 +189,7 @@
       <PreprocessorDefinitions>_HAS_STATIC_RTTI=0;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <PrecompiledHeaderOutputFile>$(ProjectDir)out\release\$(TargetName).pch</PrecompiledHeaderOutputFile>
@@ -527,6 +528,9 @@
     <ClCompile Include="src\client\ui\TextBox.cpp" />
     <ClCompile Include="src\pch.cpp">
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MultiProcessorCompilation>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseLegacy|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp" />
     <ClCompile Include="src\sdk\common\client\game\MinecraftGame.cpp" />

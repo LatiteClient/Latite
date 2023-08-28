@@ -1,8 +1,8 @@
 #include "ScreenViewHooks.h"
-#include "sdk/signature/storage.h"
 #include "client/event/Eventing.h"
 #include "client/event/impl/RenderLayerEvent.h"
 #include "client/event/impl/RenderGameEvent.h"
+#include "pch.h"
 
 namespace {
 	std::shared_ptr<Hook> setupAndRenderHook;

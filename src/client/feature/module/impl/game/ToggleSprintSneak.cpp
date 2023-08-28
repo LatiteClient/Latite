@@ -2,10 +2,7 @@
 #include "client/event/impl/TickEvent.h"
 #include "client/event/impl/BeforeMoveEvent.h"
 #include "client/event/impl/AfterMoveEvent.h"
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/client/player/LocalPlayer.h"
-#include "sdk/common/client/game/MinecraftGame.h"
-#include "util/Logger.h"
+#include "pch.h"
 
 ToggleSprintSneak::ToggleSprintSneak() : TextModule("ToggleSprintSneak", "Toggle Sprint/Sneak", "Toggle sprinting or sneaking without holding the button", GAMEHUD) {
 	listen<TickEvent>((EventListenerFunc)&ToggleSprintSneak::onTick);

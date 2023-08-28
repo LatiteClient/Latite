@@ -1,6 +1,7 @@
 #include "Signature.h"
 #include "api/scanner/scanner.h"
 #include "api/memory/memory.h"
+#include "pch.h"
 
 uintptr_t memory::signature_store::ref(int offset) {
 	return memory::instructionToOffset(scan_result, offset);

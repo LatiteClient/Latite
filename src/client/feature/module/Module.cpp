@@ -1,4 +1,5 @@
 #include "Module.h"
+#include "pch.h"
 
 void Module::loadConfig(SettingGroup& resolvedGroup) {
 	resolvedGroup.forEach([&](std::shared_ptr<Setting> set) {

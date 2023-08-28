@@ -9,6 +9,7 @@
 #include "impl/RenderControllerHooks.h"
 #include "impl/ScreenViewHooks.h"
 #include "MinHook.h"
+#include "pch.h"
 
 using namespace std::chrono_literals;
 

@@ -5,9 +5,9 @@
 #include "client/event/impl/ClickEvent.h"
 #include "client/event/impl/RenderOverlayEvent.h"
 #include "client/event/impl/UpdateEvent.h"
-#include "util/Util.h"
 #include "util/DxContext.h"
 #include "sdk/common/client/game/ClientInstance.h"
+#include "pch.h"
 
 Screen::Screen() {
 	/*

@@ -2,7 +2,6 @@
 #include "client/event/impl/KeyUpdateEvent.h"
 #include "client/event/impl/UpdateEvent.h"
 #include "client/event/impl/RenderOverlayEvent.h"
-#include "util/Util.h"
 #include "util/DxContext.h"
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
@@ -10,10 +9,9 @@
 
 #include <SHCore.h>
 
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Web.Http.h>
 #include <winrt/windows.storage.h>
 #include <winrt/windows.storage.streams.h>
+#include "pch.h"
 
 using namespace winrt;
 using namespace winrt::Windows::Web::Http;

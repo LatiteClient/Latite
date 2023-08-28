@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "DynamicLight.h"
 #include "client/event/Eventing.h"
 #include "client/event/impl/TickEvent.h"

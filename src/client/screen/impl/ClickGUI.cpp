@@ -10,12 +10,10 @@
 #include "client/Latite.h"
 #include "client/feature/module/Module.h"
 #include "client/feature/module/ModuleManager.h"
-#include "util/Util.h"
 #include "util/DxContext.h"
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/world/Minecraft.h"
 #include "client/render/Assets.h"
 #include "client/config/ConfigManager.h"
+#include "pch.h"
 
 #include "../ScreenManager.h"
 

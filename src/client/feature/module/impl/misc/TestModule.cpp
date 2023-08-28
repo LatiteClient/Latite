@@ -4,15 +4,11 @@
 #include "client/event/impl/RenderOverlayEvent.h"
 #include "client/event/impl/RenderGameEvent.h"
 #include "client/render/Renderer.h"
-#include "util/Logger.h"
-#include "util/Util.h"
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/client/game/MinecraftGame.h"
 #include "client/event/impl/KeyUpdateEvent.h"
 #include "client/misc/ClientMessageSink.h"
-#include "sdk/common/client/player/LocalPlayer.h"
 #include "sdk/common/network/packet/TextPacket.h"
 #include "sdk/String.h"
+#include "pch.h"
 
 #define FUNC_HELPER(x)  void(Feature::*)(x&)
 

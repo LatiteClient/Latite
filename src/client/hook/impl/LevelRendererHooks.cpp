@@ -1,9 +1,9 @@
 #include "LevelRendererHooks.h"
-#include "sdk/signature/storage.h"
 #include "client/event/Eventing.h"
 #include "client/event/impl/RenderLevelEvent.h"
 #include "client/render/Renderer.h"
 #include "client/Latite.h"
+#include "pch.h"
 
 namespace {
 	std::shared_ptr<Hook> renderLevelHook;

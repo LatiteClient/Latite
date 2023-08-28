@@ -1,6 +1,7 @@
 #include "Assets.h"
 #include "client/Latite.h"
 #include "Renderer.h"
+#include "pch.h"
 
 Assets::Assets() {
 	allAssets.push_back(&this->latiteLogo);

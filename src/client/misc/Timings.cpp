@@ -1,4 +1,5 @@
 #include "Timings.h"
+#include "pch.h"
 
 int Timings::getPerSecond(std::vector<std::chrono::steady_clock::time_point>& list)
 {

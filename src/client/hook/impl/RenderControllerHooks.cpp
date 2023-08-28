@@ -1,10 +1,9 @@
 #include "RenderControllerHooks.h"
-#include "sdk/signature/storage.h"
 #include "client/event/Eventing.h"
 #include "client/event/impl/OverlayColorEvent.h"
-#include "util/Util.h"
 #include "sdk/common/world/actor/Actor.h"
 #include "sdk/Util.h"
+#include "pch.h"
 
 namespace {
 	std::shared_ptr<Hook> GetOverlayColorHook;

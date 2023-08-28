@@ -1,9 +1,9 @@
 #include "ScreenManager.h"
 #include "impl/ClickGUI.h"
 #include "impl/HUDEditor.h"
-#include "util/Util.h"
 #include "sdk/common/client/game/ClientInstance.h"
 #include "client/event/impl/KeyUpdateEvent.h"
+#include "pch.h"
 
 ScreenManager::ScreenManager() {
 	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc)&ScreenManager::onKey);

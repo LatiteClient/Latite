@@ -1,10 +1,10 @@
 #include "MinecraftGameHooks.h"
-#include "sdk/signature/storage.h"
 #include "client/event/impl/AppSuspendedEvent.h"
 #include "client/event/impl/UpdateEvent.h"
 #include "client/event/Eventing.h"
 #include "client/script/ScriptManager.h"
 #include "client/Latite.h"
+#include "pch.h"
 
 namespace {
 	std::shared_ptr<Hook> onAppSuspendedHook;

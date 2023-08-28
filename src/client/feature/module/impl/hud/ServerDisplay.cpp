@@ -1,7 +1,6 @@
 #include "ServerDisplay.h"
 #include "sdk/common/network/RakNetConnector.h"
-
-#include "util/Util.h"
+#include "pch.h"
 
 ServerDisplay::ServerDisplay() : TextModule("ServerDisplay", "Server Display", "Displays what server you are on", HUD) {
     port.addEntry({ port_mixed, "Non-Default" });

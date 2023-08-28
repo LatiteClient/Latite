@@ -2,6 +2,7 @@
 #include "sdk/signature/storage.h"
 #include "client/event/Eventing.h"
 #include "client/event/impl/FocusLostEvent.h"
+#include "pch.h"
 
 namespace {
 	std::shared_ptr<Hook> FocusLostHook;

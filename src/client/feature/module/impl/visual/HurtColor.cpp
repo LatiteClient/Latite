@@ -1,7 +1,7 @@
 #include "HurtColor.h"
 #include "client/event/Eventing.h"
 #include "client/event/impl/OverlayColorEvent.h"
-#include "util/Util.h"
+#include "pch.h"
 
 HurtColor::HurtColor() : Module("HurtColor", "Hurt Color", "Change the color when entities get hit", IModule::GAME) {
 	addSetting("color", "Color", "", color);

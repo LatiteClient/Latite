@@ -20,6 +20,7 @@
 #include "impl/hud/GuiscaleChanger.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
+#include "pch.h"
 
 ModuleManager::ModuleManager() {
 #ifdef LATITE_DEBUG

@@ -1,18 +1,10 @@
 #include "DebugInfo.h"
-#include "Windows.h"
+#include "pch.h"
 
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
 #include "client/event/impl/DrawHUDModulesEvent.h"
 #include "client/event/impl/RenderOverlayEvent.h"
-
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/client/player/LocalPlayer.h"
-#include "sdk/common/world/Minecraft.h"
-#include "sdk/common/world/level/Dimension.h"
-#include "sdk/signature/storage.h"
-
-#include "util/Util.h"
 #include "util/DXContext.h"
 
 DebugInfo::DebugInfo() : Module("DebugInfo", "Java Debug Info", "See some craaazy info (send help)", GAME, VK_F3) {

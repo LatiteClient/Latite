@@ -11,15 +11,12 @@
 #include "client/feature/module/HUDModule.h"
 #include "util/DxUtil.h"
 #include "util/DxContext.h"
-#include "util/Util.h"
 #include "../ScreenManager.h"
 
-
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/world/Minecraft.h"
-#include "sdk/common/client/game/MinecraftGame.h"
 #include "sdk/common/client/gui/controls/VisualTree.h"
 #include "sdk/common/client/gui/controls/UIControl.h"
+
+#include "pch.h"
 
 HUDEditor::HUDEditor() : dragMod(nullptr) {
 	this->key = Latite::get().getMenuKey();

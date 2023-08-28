@@ -1,10 +1,10 @@
 #include "Renderer.h"
-#include "util/Logger.h"
 #include "client/event/Eventing.h"
 #include "client/event/impl/RenderOverlayEvent.h"
 #include "client/event/impl/RendererCleanupEvent.h"
 #include "client/event/impl/RendererInitEvent.h"
-#include <client/Latite.h>
+#include "client/Latite.h"
+#include "pch.h"
 
 Renderer::~Renderer() {
     // ...

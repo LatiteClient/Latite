@@ -1,7 +1,7 @@
 #include "ToggleCommand.h"
 #include "client/Latite.h"
 #include "client/feature/module/ModuleManager.h"
-#include <format>
+#include "pch.h"
 
 ToggleCommand::ToggleCommand() : Command("toggle", "Toggles a module on or off.", "{0} <module>", {"t"}) {
 }

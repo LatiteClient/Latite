@@ -2,6 +2,7 @@
 #include "sdk/common/network/RakNetConnector.h"
 #include "client/event/impl/AveragePingEvent.h"
 #include "client/event/Eventing.h"
+#include "pch.h"
 
 PingDisplay::PingDisplay() : TextModule("PingDisplay", "Ping Display", "Displays the ping of the server you're connected to", HUD) {
 	this->suffix = TextValue(" MS");

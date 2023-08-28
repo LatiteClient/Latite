@@ -1,7 +1,7 @@
 #include "TextModule.h"
 #include "api/feature/setting/Setting.h"
-#include "util/Util.h"
 #include <client/Latite.h>
+#include "pch.h"
 
 void TextModule::onInit() {
 	addSetting("fillBg", "Background", "", fillBg);

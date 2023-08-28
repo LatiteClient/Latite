@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Setting.h"
 #include "SettingGroup.h"
 

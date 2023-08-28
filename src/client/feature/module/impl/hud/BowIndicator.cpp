@@ -1,7 +1,5 @@
 #include "BowIndicator.h"
-#include "sdk/common/world/actor/player/Player.h"
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/client/player/LocalPlayer.h"
+#include "pch.h"
 
 BowIndicator::BowIndicator() : TextModule("BowIndicator", "Bow Indicator", "Shows bow chargedness", HUD) {
 	addSetting("visual", "Visual Indicator", "To show a bar instead of text", this->visual);

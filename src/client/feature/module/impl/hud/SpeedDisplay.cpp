@@ -1,8 +1,7 @@
 #include "SpeedDisplay.h"
 #include "client/event/Eventing.h"
 #include "client/event/impl/TickEvent.h"
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/client/player/LocalPlayer.h"
+#include "pch.h"
 
 SpeedDisplay::SpeedDisplay() : TextModule("SpeedDisplay", "Speed Display", "Displays your speed in blocks per second.", HUD) {
 	addSliderSetting("decimals", "Decimals", "The number of decimals to show", decimals, FloatValue(0.f), FloatValue(10.f), FloatValue(1.f));

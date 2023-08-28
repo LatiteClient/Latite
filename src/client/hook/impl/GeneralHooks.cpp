@@ -1,6 +1,4 @@
 #include "GeneralHooks.h"
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/world/Minecraft.h"
 #include "sdk/common/network/RakNetConnector.h"
 #include "sdk/signature/storage.h"
 #include "client/Latite.h"
@@ -20,7 +18,7 @@
 
 #include "api/memory/memory.h"
 #include "util/Logger.h"
-#include "util/Util.h"
+#include "pch.h"
 
 namespace {
 	std::shared_ptr<Hook> Level_tickHook;

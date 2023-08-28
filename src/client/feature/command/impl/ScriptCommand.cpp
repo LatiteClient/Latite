@@ -6,11 +6,7 @@
 #include "util/Util.h"
 #include "client/Latite.h"
 
-#include <winrt/base.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Web.Http.h>
-#include <winrt/windows.foundation.collections.h>
-#include <winrt/Windows.Web.Http.Headers.h>
+#include "pch.h"
 
 
 using namespace winrt::Windows::Storage::Streams;
