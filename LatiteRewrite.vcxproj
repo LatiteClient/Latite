@@ -238,7 +238,7 @@
     <ClInclude Include="src\client\feature\module\impl\misc\DebugInfo.h" />
     <ClInclude Include="src\client\feature\module\impl\game\DynamicLight.h" />
     <ClInclude Include="src\client\feature\module\impl\game\GUIScale.h" />
-    <ClInclude Include="src\client\feature\module\impl\misc\Clock.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\Clock.h" />
     <ClInclude Include="deps\include\chakra\ChakraCommon.h" />
     <ClInclude Include="deps\include\chakra\ChakraCommonWindows.h" />
     <ClInclude Include="deps\include\chakra\ChakraCore.h" />
@@ -343,6 +343,7 @@
     <ClInclude Include="src\client\feature\module\script\JsModule.h" />
     <ClInclude Include="src\client\script\class\impl\game\JsEntityClass.h" />
     <ClInclude Include="src\client\script\class\impl\game\JsItemStack.h" />
+    <ClInclude Include="src\client\script\class\impl\game\JsPlayerClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsColor.h" />
     <ClInclude Include="src\client\script\class\impl\JsModuleClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsRect.h" />
@@ -381,6 +382,7 @@
     <ClInclude Include="src\sdk\common\entity\component\MoveInputComponent.h" />
     <ClInclude Include="src\sdk\common\network\Packet.h" />
     <ClInclude Include="src\sdk\common\network\PacketSender.h" />
+    <ClInclude Include="src\sdk\common\network\packet\CommandRequestPacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\TextPacket.h" />
     <ClInclude Include="src\sdk\common\network\RakPeer.h" />
     <ClInclude Include="src\sdk\common\world\actor\player\GameMode.h" />
@@ -452,7 +454,7 @@
     <ClCompile Include="src\client\feature\module\impl\misc\DebugInfo.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\GuiscaleChanger.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\DynamicLight.cpp" />
-    <ClCompile Include="src\client\feature\module\impl\misc\Clock.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\Clock.cpp" />
     <ClCompile Include="src\api\feature\setting\Setting.cpp" />
     <ClCompile Include="src\api\memory\memory.cpp" />
     <ClCompile Include="src\api\memory\signature\signature.cpp" />
@@ -511,6 +513,7 @@
     <ClCompile Include="src\client\screen\ScreenManager.cpp" />
     <ClCompile Include="src\client\feature\module\script\JsModule.cpp" />
     <ClCompile Include="src\client\script\class\impl\game\JsEntityClass.cpp" />
+    <ClCompile Include="src\client\script\class\impl\game\JsPlayerClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsCommandClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsModuleClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsSettingClass.cpp" />
@@ -540,6 +543,7 @@
     <ClCompile Include="src\sdk\common\client\renderer\MaterialPtr.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\MeshUtils.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\Tessellator.cpp" />
+    <ClCompile Include="src\sdk\common\network\packet\CommandRequestPacket.cpp" />
     <ClCompile Include="src\sdk\common\network\packet\TextPacket.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\Actor.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp" />

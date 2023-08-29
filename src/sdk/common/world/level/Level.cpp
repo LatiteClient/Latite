@@ -57,3 +57,21 @@ SDK::HitResult* SDK::Level::getHitResult() {
 
 	return memory::callVirtual<HitResult*>(this, index);
 }
+
+SDK::HitResult* SDK::Level::getLiquidHitResult() { // getHitResult + 1
+	int index = 0;
+	switch (SDK::internalVers) {
+	case V1_18_12:
+		index = 0x13A;
+		break;
+		//case V1_19_41:
+	case V1_19_51:
+		index = 0x149;
+		break;
+	default:
+		index = 0x133;
+		break;
+	}
+
+	return memory::callVirtual<HitResult*>(this, index);
+}

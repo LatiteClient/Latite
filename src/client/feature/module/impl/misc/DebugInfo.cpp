@@ -6,6 +6,8 @@
 #include "client/event/impl/DrawHUDModulesEvent.h"
 #include "client/event/impl/RenderOverlayEvent.h"
 
+#include "sdk/common/world/level/HitResult.h"
+
 DebugInfo::DebugInfo() : Module("DebugInfo", "Java Debug Info", "See some craaazy info (send help)", GAME, VK_F3) {
     listen<RenderOverlayEvent>((EventListenerFunc)&DebugInfo::onRenderOverlay);
     listen<DrawHUDModulesEvent>((EventListenerFunc)&DebugInfo::onRenderHUDModules, false, 2);
@@ -16,25 +18,38 @@ namespace {
         return std::format("Latite Client {}, Minecraft {}", Latite::get().version, Latite::get().gameVersion);
     }
     std::string getFPS() {
-        return std::format("FPS: {} ({} MSPF)", Latite::get().getTimings().getFPS(), 1000.f / static_cast<float>(Latite::get().getTimings().getFPS()));
+        return std::format("FPS: {}", Latite::get().getTimings().getFPS());
     }
     std::string getDimension() {
         return std::format("Dimension: {}", SDK::ClientInstance::get()->getLocalPlayer()->dimension->dimensionName);
     }
     std::string getCoordinates() {
         Vec3 position = SDK::ClientInstance::get()->getLocalPlayer()->getPos();
-        std::string ln1 = std::format("XYZ Coordinates: {:.1f} / {:.1f} / {:.1f}", position.x, position.y, position.z);
+        std::string ln1 = std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", position.x, position.y, position.z);
         std::string ln2;
         if (SDK::ClientInstance::get()->getLocalPlayer()->dimension->dimensionName == "Nether") ln2 = std::format("Overworld: {:.1f} / {:.1f} / {:.1f}", position.x * 8.f, position.y, position.z * 8.f);
         return ln1 + "\n" + ln2;
     }
     std::string getVelocity() {
         Vec3 velocity = SDK::ClientInstance::get()->getLocalPlayer()->getVelocity();
-        return std::format("XYZ Velocity: {:.3f} / {:.3f} / {:.3f}", velocity.x, velocity.y, velocity.z);
+        return std::format("Velocity: {:.3f} / {:.3f} / {:.3f}", velocity.x, velocity.y, velocity.z);
     }
     std::string getRotation() {
         Vec2 rotation = SDK::ClientInstance::get()->getLocalPlayer()->getRot();
-        return std::format("XY Rotation: {:.3f} / {:.3f} | Magnitude: {}", rotation.x, rotation.y, rotation.magnitude());
+        return std::format("Facing: {:.3f} / {:.3f}", rotation.x, rotation.y);
+    }
+    std::string getLookingAt() {
+        auto lvl = SDK::ClientInstance::get()->minecraft->getLevel();
+        std::string fin;
+        if (lvl->getHitResult()->hitType == SDK::HitType::BLOCK) {
+            BlockPos solidBlock = lvl->getHitResult()->hitBlock;
+            fin += std::format("Looking at block: {} {} {}\n", solidBlock.x, solidBlock.y, solidBlock.z);
+        }
+        if (lvl->getLiquidHitResult()->hitType == SDK::HitType::BLOCK) {
+            BlockPos liquidBlock = lvl->getLiquidHitResult()->hitBlock;
+            fin += std::format("Looking at liquid: {} {} {}", liquidBlock.x, liquidBlock.y, liquidBlock.z);
+        }
+        return fin;
     }
     // TODO: block info, tps info, tick speed info, biome info, days ran on server.
 
@@ -75,13 +90,14 @@ void DebugInfo::onRenderOverlay(Event& evG) {
     auto [width, height] = Latite::getRenderer().getScreenSize();
     d2d::Rect rect = { 0.f, 0.f, width, height };
 
-    const std::wstring topLeftDebugInfo = util::StrToWStr(std::format("{}\n{}\n\n{}\n{}\n{}\n{}",
+    const std::wstring topLeftDebugInfo = util::StrToWStr(std::format("{}\n{}\n\n{}\n{}\n{}\n{}\n{}",
         getMinecraftVersion(),
         getFPS(),
         getDimension(),
         getCoordinates(),
         getVelocity(),
-        getRotation()));
+        getRotation(),
+        getLookingAt()));
     const std::wstring topRightDebugInfo = util::StrToWStr(std::format("{}\n{}\n{}",
         getMemUsage(),
         getGpuInfo(),

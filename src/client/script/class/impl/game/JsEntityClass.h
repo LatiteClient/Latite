@@ -15,11 +15,11 @@ public:
 	}
 
 	inline static const wchar_t* class_name = L"Entity";
-	JsEntityClass(class JsScript* owner) : JsClass(owner, class_name) {
+	JsEntityClass(class JsScript* owner, const wchar_t* name = class_name) : JsClass(owner, name) {
 		createConstructor(jsConstructor, this);
 	}
 
-	JsValueRef construct(JsEntity* ent, bool finalize) {
+	virtual JsValueRef construct(JsEntity* ent, bool finalize) {
 		JsValueRef obj;
 		if (finalize) {
 			JS::JsCreateExternalObject(ent, [](void* obj) {
