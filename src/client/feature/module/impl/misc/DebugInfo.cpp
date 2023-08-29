@@ -46,7 +46,7 @@ namespace {
             fin += std::format("Looking at block: {} {} {}\n", solidBlock.x, solidBlock.y, solidBlock.z);
         }
         if (lvl->getLiquidHitResult()->hitType == SDK::HitType::BLOCK) {
-            BlockPos liquidBlock = lvl->getLiquidHitResult()->hitBlock;
+            BlockPos liquidBlock = lvl->getLiquidHitResult()->liquidBlock;
             fin += std::format("Looking at liquid: {} {} {}", liquidBlock.x, liquidBlock.y, liquidBlock.z);
         }
         return fin;

@@ -58,7 +58,7 @@ SDK::HitResult* SDK::Level::getHitResult() {
 	return memory::callVirtual<HitResult*>(this, index);
 }
 
-SDK::HitResult* SDK::Level::getLiquidHitResult() { // getHitResult + 1
+SDK::HitResult* SDK::Level::getLiquidHitResult() {
 	int index = 0;
 	switch (SDK::internalVers) {
 	case V1_18_12:
@@ -73,5 +73,6 @@ SDK::HitResult* SDK::Level::getLiquidHitResult() { // getHitResult + 1
 		break;
 	}
 
-	return memory::callVirtual<HitResult*>(this, index);
+	// funny hack because this isnt actually working
+	return reinterpret_cast<SDK::HitResult*>(memory::callVirtual<uintptr_t>(this, index)) /*sizeof hitResult (0x60) / 8*/;
 }

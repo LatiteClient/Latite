@@ -1,5 +1,6 @@
 #pragma once
 #include "util/LMath.h"
+#include "sdk/Util.h"
 
 namespace SDK {
 	enum struct HitType : int {
@@ -17,5 +18,7 @@ namespace SDK {
 		BlockPos hitBlock;
 		Vec3 hitPos;
 		// ...
+		CLASS_FIELD(BlockPos, liquidBlock, 0x54);
+		CLASS_FIELD(Vec3, liquidPos, 0x54);
 	};
 }
