@@ -6,6 +6,7 @@ public:
 	Clock();
 
 	std::wstringstream text(bool isDefault, bool inEditor) override;
+	std::string getTimeString();
 private:
 	ValueType militaryTime = BoolValue(false);
 };
