@@ -13,26 +13,29 @@ std::string Clock::getTimeString() {
     std::tm now;
     localtime_s(&now, &t);
 
-    std::string result;
+    std::string time;
+    std::string date;
 
     if (std::get<BoolValue>(this->militaryTime)) {
-        result += std::format("{:2}", now.tm_hour);
+        time += std::format("{:2}", now.tm_hour);
     }
     else {
-        result += std::format("{:2}", (now.tm_hour + 11) % 12 + 1);
+        time += std::format("{:2}", (now.tm_hour + 11) % 12 + 1);
     }
 
-    result += ":" + std::format("{:2}", now.tm_min);
+    time += ":" + std::format("{:2}", now.tm_min);
 
     if (!std::get<BoolValue>(this->militaryTime)) {
-        result += now.tm_hour < 12 ? " AM" : " PM";
+        time += now.tm_hour < 12 ? " AM" : " PM";
     }
 
     if (std::get<BoolValue>(this->showDate)) {
-        result += std::format("{}/{}/{}", now.tm_mon, now.tm_mday, now.tm_year);
+        // maybe I'll make this date compatible with people outside good ol 'murica soon - plextora
+        date += std::format("{}/{}/{}", now.tm_mon, now.tm_mday, now.tm_year + 1900);
+        return std::format("{}, {}", time, date);
     }
 
-    return result;
+    return time;
 }
 
 std::wstringstream Clock::text(bool isDefault, bool inEditor)
