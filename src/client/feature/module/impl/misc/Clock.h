@@ -9,4 +9,5 @@ public:
 	std::string getTimeString();
 private:
 	ValueType militaryTime = BoolValue(false);
+	ValueType showDate = BoolValue(false);
 };
