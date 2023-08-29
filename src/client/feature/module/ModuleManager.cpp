@@ -2,7 +2,6 @@
 #include "ModuleManager.h"
 #include "impl/misc/TestModule.h"
 #include "impl/misc/Screenshot.h"
-#include "impl/misc/Clock.h"
 #include "impl/misc/DebugInfo.h"
 
 #include "impl/game/Zoom.h"
@@ -17,6 +16,7 @@
 #include "impl/hud/ServerDisplay.h"
 #include "impl/hud/PingDisplay.h"
 #include "impl/hud/SpeedDisplay.h"
+#include "impl/hud/Clock.h"
 #include "impl/hud/BowIndicator.h"
 #include "impl/hud/GuiscaleChanger.h"
 

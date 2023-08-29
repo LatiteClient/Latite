@@ -540,7 +540,7 @@
     <ClInclude Include="src\sdk\deps\Core\StringUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\client\feature\module\impl\misc\Clock.h">
+    <ClInclude Include="src\client\feature\module\impl\hud\Clock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\feature\module\impl\game\GUIScale.h">
@@ -604,6 +604,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\event\Events.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\network\packet\CommandRequestPacket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\script\class\impl\game\JsPlayerClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -887,7 +893,7 @@
     <ClCompile Include="src\client\feature\module\impl\hud\BowIndicator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\misc\Clock.cpp">
+    <ClCompile Include="src\client\feature\module\impl\hud\Clock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\module\impl\hud\GuiscaleChanger.cpp">
@@ -915,6 +921,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sdk\common\network\packet\CommandRequestPacket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\script\class\impl\game\JsPlayerClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

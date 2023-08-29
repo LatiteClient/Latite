@@ -12,6 +12,7 @@ namespace util {
 	constexpr uint32_t FNV_PRIME = 16777619u;
 	constexpr uint32_t FNV_OFFSET_BASIS = 2166136261u;
 
+	// TODO: find a better way to do this without recursion (it slows down builds)
 	namespace detail {
 		inline constexpr uint32_t fnv1a_32_const(char const* s, std::size_t count) {
 			return count ? (fnv1a_32_const(s, count - 1) ^ s[count - 1]) * FNV_PRIME : FNV_OFFSET_BASIS;
