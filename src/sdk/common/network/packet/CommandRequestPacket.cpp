@@ -1,5 +1,5 @@
-#include "CommandRequestPacket.h"
 #include "pch.h"
+#include "CommandRequestPacket.h"
 #include "sdk/Util.h"
 
 SDK::CommandRequestPacket::CommandRequestPacket(std::string command) {

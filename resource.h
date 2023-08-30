@@ -23,5 +23,6 @@
 #define ICON_HUDEDIT 249
 #define ICON_SEARCH 248
 #define ICON_X 247
+#define ICON_LOGOWHITE 246
 
 #define JS_LATITEAPI 100

@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "TestCommand.h"
-
+#include "client/Latite.h"
 
 TestCommand::TestCommand() : Command("test", "A command for testing", "{0} [...]", {"tc"}) {
 }
@@ -24,6 +24,6 @@ bool TestCommand::execute(std::string const label, std::vector<std::string> args
 	dialog.Commands().Append(yesCommand);
 	dialog.Commands().Append(noCommand);
 #endif
-	
+	Latite::get().fetchLatiteUsers();
 	return true;
 }
