@@ -109,6 +109,7 @@ private:
 	ComPtr<struct ID2D1Effect> gaussianBlurEffect;
 
 	void threadsafeInit();
+	void patchKey();
 
 	bool shouldEject = false;
 	bool hasInit = false;

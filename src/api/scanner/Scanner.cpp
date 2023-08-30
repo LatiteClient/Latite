@@ -40,3 +40,18 @@ uintptr_t memory::findSignature(std::string_view signature, const char* module) 
 	auto ret = it != end ? reinterpret_cast<uintptr_t>(it) : 0ull;
 	return ret;
 }
+
+char* memory::findString(std::string_view find, const char* module) {
+	auto gameModule = reinterpret_cast<uintptr_t>(GetModuleHandleA(module));
+	auto* const scanBytes = reinterpret_cast<uint8_t*>(gameModule);
+	auto* const dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(gameModule);
+	auto* const ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(scanBytes + dosHeader->e_lfanew);
+	const auto sizeOfCode = ntHeaders->OptionalHeader.SizeOfImage;
+
+	const auto end = scanBytes + sizeOfCode;
+
+	auto it = std::search(std::execution::par, scanBytes, end, find.cbegin(), find.cend());
+
+	auto ret = it != end ? reinterpret_cast<char*>(it) : 0ull;
+	return ret;
+}

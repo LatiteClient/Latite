@@ -19,6 +19,7 @@
 #include "impl/hud/Clock.h"
 #include "impl/hud/BowIndicator.h"
 #include "impl/hud/GuiscaleChanger.h"
+#include "impl/hud/TabList.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
 
@@ -44,6 +45,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<Screenshot>());
 #endif
 	this->items.push_back(std::make_shared<DebugInfo>());
+	this->items.push_back(std::make_shared<TabList>());
 
 	for (auto& mod : items) {
 		mod->onInit();
@@ -61,8 +63,19 @@ void ModuleManager::onKey(Event& evGeneric) {
 	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
 	for (auto& mod : items) {
 		if (ev.inUI()) return;
-		if (ev.isDown() && mod->getKeybind() == ev.getKey()) {
-			mod->setEnabled(!mod->isEnabled());
+		if (mod->getKeybind() == ev.getKey()) {
+			if (mod->shouldHoldToToggle()) {
+				if (!mod->isEnabled() && ev.isDown()) {
+					mod->setEnabled(true);
+				}
+				else if (mod->isEnabled() && !ev.isDown()) {
+					mod->setEnabled(false);
+				}
+				continue;
+			}
+			else if (ev.isDown()) {
+				mod->setEnabled(!mod->isEnabled());
+			}
 		}
 	}
 }

@@ -356,8 +356,9 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getScriptManager().init();
     Logger::Info("Script manager initialized.");
 
-    // TODO: use UpdateEvent
-    
+    if (SDK::internalVers < SDK::V1_20) {
+        patchKey();
+    }
 }
 
 void Latite::threadsafeInit() {
@@ -380,6 +381,24 @@ void Latite::threadsafeInit() {
     }
 
     Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
+}
+
+void Latite::patchKey() {
+    static constexpr std::string_view old_key = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAE8ELkixyLcwlZryUQcu1TvPOmI2B7vX83ndnWRUaXm74wFfa5f/lwQNTfrLVHa2PmenpGI6JhIMUJaWZrjmMj90NoKNFSNBuKdm8rYiXsfaz3K36x/1U26HpG0ZxK/V1V";
+    static constexpr std::string_view new_key = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAECRXueJeTDqNRRgJi/vlRufByu/2G0i2Ebt6YMar5QX/R0DIIyrJMcUpruK4QveTfJSTp3Shlq4Gk34cD/4GUWwkv0DVuzeuB+tXija7HBxii03NHDbPAD0AKnLr2wdAp";
+
+    auto str = memory::findString(old_key, "Minecraft.Windows.exe");
+    if (!str) {
+        Logger::Info("No old key found");
+        return;
+    }
+
+    DWORD oProt;
+    VirtualProtect(str, old_key.size(), PAGE_EXECUTE_READWRITE, &oProt);
+    memcpy(str, new_key.data(), new_key.size());
+    VirtualProtect(str, old_key.size(), oProt, &oProt);
+
+    Logger::Info("Old and new keys patched");
 }
 
 void Latite::initSettings() {

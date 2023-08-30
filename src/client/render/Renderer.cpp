@@ -183,6 +183,13 @@ std::shared_lock<std::shared_mutex> Renderer::lock() {
 }
 
 void Renderer::render() {
+	if (gameDevice12) {
+		ThrowIfFailed(gameDevice12->GetDeviceRemovedReason());
+	}
+	else {
+		ThrowIfFailed(gameDevice11->GetDeviceRemovedReason());
+	}
+
 	if (shouldReinit) {
 		shouldReinit = false;
 		reinit();

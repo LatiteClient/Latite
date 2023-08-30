@@ -1,13 +1,15 @@
 #include "pch.h"
+#include <COMDef.h>
 
 void util::doThrowIfFailed(HRESULT hr, int line, std::string func) {
 	if (FAILED(hr)) {
 		std::stringstream ss;
-		ss << "DX assertion failed: " << func << ":" << line << " HRESULT: " << std::hex << hr;
+		_com_error err(hr);
+		ss << "DX assertion failed: " << func << ":" << line << "\n HRESULT: " << std::hex << hr << "\n\n" << util::WStrToStr(err.ErrorMessage()) << ")";
 		Logger::Fatal(ss.str());
 #ifndef DEBUG
 		// Set a breakpoint on this line to catch Win32 API errors.
-		MessageBoxA(NULL, (std::string("An error has occured! Please screenshot and report this to the developer!\n") + ss.str()).c_str(), "DX assertion failed", MB_ICONERROR | MB_OK);
+		MessageBoxA(NULL, (std::string("An error has occured! Please screenshot and report this to the developer!\n\n") + ss.str()).c_str(), "DX assertion failed", MB_ICONERROR | MB_OK);
 #endif
 		//throw std::runtime_error("Error setting up DX.");
 	}

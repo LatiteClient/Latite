@@ -431,6 +431,7 @@
     <ClInclude Include="src\util\Meta.h" />
     <ClInclude Include="src\util\Util.h" />
     <ClInclude Include="src\util\XorString.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\TabList.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />
@@ -555,6 +556,7 @@
     <ClCompile Include="src\util\DxUtil.cpp" />
     <ClCompile Include="src\util\Logger.cpp" />
     <ClCompile Include="src\util\Util.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\TabList.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CMakePresets.json" />

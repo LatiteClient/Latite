@@ -612,6 +612,9 @@
     <ClInclude Include="src\client\script\class\impl\game\JsPlayerClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\hud\TabList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -927,6 +930,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\script\class\impl\game\JsPlayerClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\hud\TabList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
