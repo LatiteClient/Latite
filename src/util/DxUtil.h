@@ -115,6 +115,10 @@ namespace d2d {
 		[[nodiscard]] constexpr D2D1_COLOR_F get() const {
 			return D2D1_COLOR_F(r, g, b, a);
 		}
+
+		operator ::Color() {
+			return ::Color(r, g, b, a);
+		}
 	};
 
 	namespace Colors {
