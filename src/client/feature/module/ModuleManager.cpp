@@ -5,6 +5,7 @@
 #include "impl/misc/DebugInfo.h"
 
 #include "impl/game/Zoom.h"
+#include "impl/game/CinematicCamera.h"
 #include "impl/game/ToggleSprintSneak.h"
 
 #include "impl/visual/Fullbright.h"
@@ -48,6 +49,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<DebugInfo>());
 	this->items.push_back(std::make_shared<TabList>());
 	this->items.push_back(std::make_shared<Keystrokes>());
+	this->items.push_back(std::make_shared<CinematicCamera>());
 
 	for (auto& mod : items) {
 		mod->onInit();
