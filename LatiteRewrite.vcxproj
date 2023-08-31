@@ -234,6 +234,7 @@
   <ItemGroup>
     <ClInclude Include="src\client\event\Events.h" />
     <ClInclude Include="src\client\event\impl\DrawHUDModulesEvent.h" />
+    <ClInclude Include="src\client\feature\module\impl\game\CinematicCamera.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\GuiscaleChanger.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\DebugInfo.h" />
     <ClInclude Include="src\client\feature\module\impl\game\DynamicLight.h" />
@@ -452,6 +453,7 @@
     <Text Include="src\util\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\client\feature\module\impl\game\CinematicCamera.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\DebugInfo.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\GuiscaleChanger.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\DynamicLight.cpp" />
