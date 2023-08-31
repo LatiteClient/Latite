@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "TabList.h"
+#include "client/Latite.h"
+#include "client/render/Assets.h"
 
 TabList::TabList() : Module("PlayerList", "Player List", "Shows the player list.", HUD, VK_TAB) {
 	
@@ -30,15 +32,25 @@ void TabList::onRenderOverlay(Event& evG) {
 	}
 
 	constexpr auto font = Renderer::FontSelection::SegoeRegular;
+	float sectionHeight = textP * 1.3f;
+
+	float logoSize = sectionHeight;
+	float logoPad = 4.f;
 
 	float longestText = dc.getTextSize(txt, font, textP).x;
 	for (auto& ent : *lvl->getPlayerList()) {
 		auto w = dc.getTextSize(util::StrToWStr(ent.second.name), font, textP).x + 3.f;
+		auto const& name = util::StrToWStr(ent.second.name);
+		for (auto& user : Latite::get().getLatiteUsers()) {
+			if (user == ent.second.name) {
+				w += logoPad + logoSize;
+			}
+		}
+
 		if (w > longestText) longestText = w;
 	}
 
 	float sectionSize = longestText;
-	float sectionHeight = textP * 1.3f;
 
 	size_t maxPerTab = 15;
 	int numTabs = static_cast<int>(std::ceil(static_cast<float>(size) / static_cast<float>(maxPerTab)));
@@ -69,8 +81,16 @@ void TabList::onRenderOverlay(Event& evG) {
 
 	for (auto& ent : *lvl->getPlayerList()) {
 		auto const& name = util::StrToWStr(ent.second.name);
-		// render
 		d2d::Rect rc = { x, y, x + longestText, y + sectionHeight };
+		for (auto& user : Latite::get().getLatiteUsers()) {
+			if (user == ent.second.name) {
+				rc.left += logoSize + logoPad;
+				d2d::Rect logoRc = { x, y, x + logoSize, y + logoSize };
+				dc.ctx->DrawBitmap(Latite::getAssets().logoWhite.getBitmap(), logoRc);
+			}
+		}
+
+		// render
 		//dc.drawRectangle(rc, d2d::Colors::BLACK, 0.5f);
 
 		dc.drawText(rc, name, std::get<ColorValue>(textCol).color1, font, textP);

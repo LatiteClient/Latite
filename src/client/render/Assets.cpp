@@ -12,6 +12,7 @@ Assets::Assets() {
 	allAssets.push_back(&this->arrowBackIcon);
 	allAssets.push_back(&this->cogIcon);
 	allAssets.push_back(&this->checkmarkIcon);
+	allAssets.push_back(&this->logoWhite);
 }
 
 void Assets::loadAll() {

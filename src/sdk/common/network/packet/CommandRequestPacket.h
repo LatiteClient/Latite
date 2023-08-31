@@ -1,6 +1,7 @@
 #pragma once
 #include "../Packet.h"
 #include "sdk/String.h"
+#include "sdk/Util.h"
 
 namespace SDK {
 	class CommandRequestPacket : public Packet {

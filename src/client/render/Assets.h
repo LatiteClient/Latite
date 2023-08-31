@@ -16,6 +16,7 @@ public:
 	Asset arrowBackIcon{ L"arrow_back.png" };
 	Asset cogIcon{ L"cog.png" };
 	Asset checkmarkIcon{ L"checkmark.png" };
+	Asset logoWhite{ L"latitewhite.png" };
 
 	void loadAll();
 	void unloadAll();

@@ -84,6 +84,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     std::filesystem::create_directory(util::GetLatitePath() / "Assets");
     Logger::Setup();
 
+    Logger::Info("Latite Client {}", Latite::version);
     Logger::Info("Loading assets");
     Latite::get().dllInst = dll;
     // ... init assets
@@ -95,6 +96,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     Latite::get().initAsset(ICON_ARROWBACK, L"arrow_back.png");
     Latite::get().initAsset(ICON_COG, L"cog.png");
     Latite::get().initAsset(ICON_CHECKMARK, L"checkmark.png");
+    Latite::get().initAsset(ICON_LOGOWHITE, L"latitewhite.png");
     //
 
 
@@ -329,6 +331,10 @@ std::optional<float> Latite::getMenuBlur() {
     return std::nullopt;
 }
 
+std::vector<std::string> Latite::getLatiteUsers() {
+    return latiteUsers;
+}
+
 void Latite::queueEject() noexcept {
     auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     app.Title(L"");
@@ -356,9 +362,10 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getScriptManager().init();
     Logger::Info("Script manager initialized.");
 
-    if (SDK::internalVers < SDK::V1_20) {
-        patchKey();
-    }
+    // doesn't work, maybe it's stored somewhere else too
+    //if (SDK::internalVers < SDK::V1_20) {
+    //    patchKey();
+    //}
 }
 
 void Latite::threadsafeInit() {
@@ -384,6 +391,8 @@ void Latite::threadsafeInit() {
 }
 
 void Latite::patchKey() {
+    // next to "certificateAuthority"
+    //                                           MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAE8ELkixyLcwlZryUQcu1TvPOmI2B7vX83ndnWRUaXm74wFfa5f/lwQNTfrLVHa2PmenpGI6JhIMUJaWZrjmMj90NoKNFSNBuKdm8rYiXsfaz3K36x/1U26HpG0ZxK/V1V
     static constexpr std::string_view old_key = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAE8ELkixyLcwlZryUQcu1TvPOmI2B7vX83ndnWRUaXm74wFfa5f/lwQNTfrLVHa2PmenpGI6JhIMUJaWZrjmMj90NoKNFSNBuKdm8rYiXsfaz3K36x/1U26HpG0ZxK/V1V";
     static constexpr std::string_view new_key = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAECRXueJeTDqNRRgJi/vlRufByu/2G0i2Ebt6YMar5QX/R0DIIyrJMcUpruK4QveTfJSTp3Shlq4Gk34cD/4GUWwkv0DVuzeuB+tXija7HBxii03NHDbPAD0AKnLr2wdAp";
 
@@ -399,6 +408,43 @@ void Latite::patchKey() {
     VirtualProtect(str, old_key.size(), oProt, &oProt);
 
     Logger::Info("Old and new keys patched");
+}
+
+namespace {
+    HttpClient client{};
+}
+
+void Latite::fetchLatiteUsers() {
+    auto lp = SDK::ClientInstance::get()->getLocalPlayer();
+    if (!lp) {
+        latiteUsers = {};
+        return;
+    }
+
+    std::string str = XOR_STRING("https://latiteserver-1-s4535035.deta.app/users");
+
+    winrt::Windows::Foundation::Uri requestUri(util::StrToWStr(str));
+
+    auto name = util::StrToWStr(lp->playerName);
+
+    auto content = HttpStringContent(L"{\"name\":\"" + name + L"\"}");
+    std::string medType = XOR_STRING("application/json");
+    content.Headers().ContentType().MediaType(util::StrToWStr(medType));
+    auto usersDirty = &this->latiteUsersDirty;
+    client.PostAsync(requestUri, content).Completed([usersDirty](winrt::Windows::Foundation::IAsyncOperationWithProgress<HttpResponseMessage, HttpProgress> task, winrt::Windows::Foundation::AsyncStatus status) {
+        if (status == winrt::Windows::Foundation::AsyncStatus::Completed) {
+            auto res = task.GetResults();
+            if (res.IsSuccessStatusCode()) {
+                auto cont = res.Content();
+                auto str = cont.ReadAsStringAsync().get();
+                auto json = nlohmann::json::parse(util::WStrToStr(str.c_str()));
+                usersDirty->clear();
+                for (auto& item : json) {
+                    usersDirty->push_back(item.get<std::string>());
+                }
+            }
+        }
+        });
 }
 
 void Latite::initSettings() {
@@ -495,6 +541,15 @@ void Latite::onUpdate(Event& evGeneric) {
     auto& ev = reinterpret_cast<UpdateEvent&>(evGeneric);
     if (!Latite::getRenderer().getDeviceContext()) return;
     timings.update();
+    auto now = std::chrono::system_clock::now();
+    static auto lastSend = now;
+
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSend) > 30000ms) {
+        this->fetchLatiteUsers();
+        lastSend = now;
+    }
+
+    latiteUsers = latiteUsersDirty;
 
     if (!hasInit) {
         threadsafeInit();

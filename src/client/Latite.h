@@ -69,6 +69,8 @@ public:
 		}
 	}
 
+	std::vector<std::string> getLatiteUsers();
+
 	[[nodiscard]] KeyValue getMenuKey() {
 		return std::get<KeyValue>(menuKey);
 	}
@@ -89,7 +91,11 @@ public:
 		return hudBlurBrush.Get();
 	}
 
+	void fetchLatiteUsers();
 private:
+	std::vector<std::string> latiteUsers;
+	std::vector<std::string> latiteUsersDirty;
+
 	Timings timings{};
 
 	ValueType commandPrefix = TextValue(".");
