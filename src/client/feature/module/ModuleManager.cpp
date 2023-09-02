@@ -21,6 +21,7 @@
 #include "impl/hud/BowIndicator.h"
 #include "impl/hud/GuiscaleChanger.h"
 #include "impl/hud/TabList.h"
+#include "impl/hud/Keystrokes.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
 
@@ -47,6 +48,7 @@ ModuleManager::ModuleManager() {
 #endif
 	this->items.push_back(std::make_shared<DebugInfo>());
 	this->items.push_back(std::make_shared<TabList>());
+	this->items.push_back(std::make_shared<Keystrokes>());
 	this->items.push_back(std::make_shared<CinematicCamera>());
 
 	for (auto& mod : items) {
