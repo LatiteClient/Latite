@@ -1,7 +1,5 @@
 #include "pch.h"
 #include "Clock.h"
-#include <codecvt>
-#include "client/Latite.h"
 
 Clock::Clock() : TextModule("Clock", "Clock", "Shows the current time.", HUD) {
     addSetting("militaryTime", "24-hour time", "Display the time in 24-hour format.", this->militaryTime);
