@@ -17,21 +17,15 @@ std::string Clock::getTimeString() {
     std::string date;
 
     if (std::get<BoolValue>(this->militaryTime)) {
-        time += std::format("{:2}", now.tm_hour);
+        time = std::format("{:2}:{:02}", now.tm_hour, now.tm_min);
     }
     else {
-        time += std::format("{:2}", (now.tm_hour + 11) % 12 + 1);
-    }
-
-    time += ":" + std::format("{:2}", now.tm_min);
-
-    if (!std::get<BoolValue>(this->militaryTime)) {
-        time += now.tm_hour < 12 ? " AM" : " PM";
+        time = std::format("{:2}:{:02} {}", (now.tm_hour + 11) % 12 + 1, now.tm_min, now.tm_hour < 12 ? "AM" : "PM");
     }
 
     if (std::get<BoolValue>(this->showDate)) {
         // maybe I'll make this date compatible with people outside good ol 'murica soon - plextora
-        date += std::format("{}/{}/{}", now.tm_mon, now.tm_mday, now.tm_year + 1900);
+        date = std::format("{}/{}/{}", now.tm_mon, now.tm_mday, now.tm_year + 1900);
         return std::format("{}, {}", time, date);
     }
 
