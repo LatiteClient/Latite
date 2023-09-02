@@ -22,7 +22,6 @@ uintptr_t memory::findSignature(std::string_view signature, const char* module) 
 	};
 
 	// ...
-
 	auto gameModule = reinterpret_cast<uintptr_t>(GetModuleHandleA(module));
 	auto* const scanBytes = reinterpret_cast<uint8_t*>(gameModule);
 	auto* const dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(gameModule);

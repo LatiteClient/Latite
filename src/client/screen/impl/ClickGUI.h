@@ -5,6 +5,7 @@
 #include <memory>
 #include <array>
 #include <map>
+#include <optional>
 
 class ClickGUI : public Screen {
 public:
@@ -75,6 +76,7 @@ private:
 		float lerpToggle = 0.f;
 		Color toggleColorOn = {};
 		Color toggleColorOff = {};
+		std::optional<d2d::Rect> modRect = std::nullopt;
 
 		static bool compare(ModContainer const& a, ModContainer const& b) {
 			return (a.name < b.name) || (!a.isMarketScript && b.isMarketScript);

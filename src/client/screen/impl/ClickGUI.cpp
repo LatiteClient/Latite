@@ -312,8 +312,10 @@ void ClickGUI::onRender(Event&) {
 			{
 				// go through all float settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
-					if (set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Float /* || set->value->index() == Setting::Type::Int*/) {
-						setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth, 0.35f) + (setting_height_relative * rect.getHeight());
+					if (setPos.y <= rect.bottom) {
+						if (set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Float /* || set->value->index() == Setting::Type::Int*/) {
+							setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth, 0.35f) + (setting_height_relative * rect.getHeight());
+						}
 					}
 					});
 			}
@@ -323,8 +325,10 @@ void ClickGUI::onRender(Event&) {
 			{
 				// go through all enum settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
-					if (set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Key || set->value->index() == (size_t)Setting::Type::Enum || set->value->index() == (size_t)Setting::Type::Color) {
+					if (setPos.y <= rect.bottom) {
+						if (set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Key || set->value->index() == (size_t)Setting::Type::Enum || set->value->index() == (size_t)Setting::Type::Color) {
 						setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth) + (setting_height_relative * rect.getHeight());
+					}
 					}
 					});
 			}
@@ -334,9 +338,12 @@ void ClickGUI::onRender(Event&) {
 			{
 				// go through all bool settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
-					if (set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Bool /* || set->value->index() == Setting::Type::Enum*/) {
-						setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth) + (setting_height_relative * rect.getHeight());
+					if (setPos.y <= rect.bottom) {
+						if (set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Bool /* || set->value->index() == Setting::Type::Enum*/) {
+							setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth) + (setting_height_relative * rect.getHeight());
+						}
 					}
+
 					});
 			}
 		} else if (tab == MODULES) {
@@ -455,14 +462,24 @@ void ClickGUI::onRender(Event&) {
 
 		// modules
 		scrollMax = 0.f;
+		dc.ctx->Draw
 
 		for (auto& mod : mods) {
 			if (!mod.shouldRender) continue;
-			Vec2 pos = { x, y + columnOffs[i]};
+			Vec2 pos = { x, y + columnOffs[i] };
 			RectF modRect = { pos.x, pos.y, pos.x + modWidth, pos.y + modHeight };
 			RectF modRectActual = modRect;
 
-			float textHeight = 0.4f * modHeight;
+			if (mod.modRect.has_value()) {
+				dc.drawRectangle(rect, D2D1::ColorF::Red);
+				if (mod.modRect->bottom < rect.top || mod.modRect->top > rect.bottom) {
+					mod.modRect->setPos({ 0.f, pos.y });
+					goto end;
+				}
+			}
+
+			{
+				float textHeight = 0.4f * modHeight;
 			float rlBounds = modWidth * 0.04561f;
 
 			// module settings calculations
@@ -488,9 +505,11 @@ void ClickGUI::onRender(Event&) {
 					modRectActual.bottom += padToSetting;
 					mod.mod->settings->forEach([&](std::shared_ptr<Setting> set) {
 						if (set->visible) {
-							if (set->shouldRender(*mod.mod->settings.get())) {
-								float newY = drawSetting(set.get(), mod.mod->settings.get(), { descTextRect.left, modRectActual.bottom }, dc, descTextRect.getWidth(), 0.25f);
-								modRectActual.bottom = (newY - modRectActual.bottom) > 2.f ? (newY + setting_height_relative * rect.getHeight() * 1.6f) : modRectActual.bottom;
+							if (modRectActual.bottom <= rect.bottom) {
+								if (set->shouldRender(*mod.mod->settings.get())) {
+									float newY = drawSetting(set.get(), mod.mod->settings.get(), { descTextRect.left, modRectActual.bottom }, dc, descTextRect.getWidth(), 0.25f);
+									modRectActual.bottom = (newY - modRectActual.bottom) > 2.f ? (newY + setting_height_relative * rect.getHeight() * 1.6f) : modRectActual.bottom;
+								}
 							}
 						}
 						});
@@ -526,7 +545,7 @@ void ClickGUI::onRender(Event&) {
 			dc.fillRoundedRectangle(modRectActual, d2d::Color::RGB(0x44, 0x44, 0x44).asAlpha(0.22f), .22f * modHeight);
 			dc.drawRoundedRectangle(modRectActual, d2d::Color(Latite::get().getAccentColor().color1).asAlpha(1.f * mod.lerpToggle), .22f * modHeight, 1.f, DXContext::OutlinePosition::Inside);;
 			if (renderExtended) {
-				
+
 				dc.ctx->DrawBitmap(shadowBitmap.Get());
 				dc.ctx->PopAxisAlignedClip();
 			}
@@ -599,6 +618,10 @@ void ClickGUI::onRender(Event&) {
 			}
 
 			columnOffs[i] += modRectActual.getHeight() - modRect.getHeight();
+		}
+			// set mod rect
+		end:
+			mod.modRect = modRectActual;
 
 			// scrolling max
 			float scrollYNew = std::max(0.f, (modRectActual.bottom + padFromSearchBar) - rect.bottom) + lerpScroll;
