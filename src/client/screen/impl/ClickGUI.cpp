@@ -462,7 +462,6 @@ void ClickGUI::onRender(Event&) {
 
 		// modules
 		scrollMax = 0.f;
-		dc.ctx->Draw
 
 		for (auto& mod : mods) {
 			if (!mod.shouldRender) continue;
