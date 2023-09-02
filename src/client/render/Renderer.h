@@ -17,6 +17,11 @@ public:
 	std::shared_lock<std::shared_mutex> lock();
 	void render();
 	bool isDX11ByDefault() { return isDX11; }
+
+	int64_t mcePerf;
+	int64_t arpPerf;
+	int64_t d2dPerf;
+	int64_t d3dPerf;
 private:
 	bool isDX11 = false;
 
@@ -29,6 +34,7 @@ private:
 	bool firstInit = false;
 	bool reqCommandQueue = false;
 	bool dx12Removed = false;
+	bool hasCopiedBitmap = false;
 
 	IDXGISwapChain* gameSwapChain;
 	IDXGISwapChain4* swapChain4;
@@ -171,14 +177,13 @@ public:
 	[[nodiscard]] ID2D1Bitmap1* copyCurrentBitmap() {
 		auto idx = swapChain4->GetCurrentBackBufferIndex();
 		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
-		ID2D1Bitmap1* newBitmap;
+		ID2D1Bitmap1* newBitmap = blurBuffers[0];
 
 		D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
 		D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
-
-		HRESULT hr = d2dCtx->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET,pixelFormat), &newBitmap);
-		if (SUCCEEDED(hr)) {
+		if (!hasCopiedBitmap) {
 			newBitmap->CopyFromBitmap(nullptr, myBitmap, nullptr);
+			hasCopiedBitmap = true;
 		}
 		return newBitmap;
 	}
@@ -236,7 +241,7 @@ public:
 	}
 
 	[[nodiscard]] ID2D1Bitmap1* getBlurBitmap() {
-		return blurBuffers[swapChain4->GetCurrentBackBufferIndex()];
+		return copyCurrentBitmap();
 	}
 
 	[[nodiscard]] IWICImagingFactory2* getImagingFactory() {

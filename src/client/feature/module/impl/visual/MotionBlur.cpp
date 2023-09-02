@@ -24,7 +24,7 @@ void MotionBlur::onRender(Event& genericEv) {
 	auto& ev = reinterpret_cast<RenderOverlayEvent&>(genericEv);
 	auto ctx = ev.getDeviceContext();
 
-	ctx->Flush();
+	//ctx->Flush();
 	this->motionBlurList.push_back(Latite::getRenderer().copyCurrentBitmap());
 	size_t factor = static_cast<size_t>(std::floor(std::get<FloatValue>(intensity)));
 	if (motionBlurList.size() > factor) {

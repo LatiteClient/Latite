@@ -79,7 +79,34 @@ namespace {
         cpuInfo = std::to_string(inf.dwNumberOfProcessors) + "x " + cpuInfo;
         return cpuInfo;
     }
+    std::string getRenderPerfInfo() {
+#define CHKVEC(x) if (x.)
+#define GETFPS(x) x, (x / 1000.f)
+        static std::vector<float> arpPerf = {};
+        static std::vector<float> d2dPerf = {};
+        static std::vector<float> d3dPerf = {};
+
+        auto chkVec = [](std::vector<float>& vec, float add) -> float {
+            vec.insert(vec.begin(), add);
+            if (vec.size() > 100) {
+                vec.pop_back();
+            }
+
+            float avg = 0.f;
+            for (auto& a : vec) {
+                avg += a;
+            }
+            return avg / (float)vec.size();
+        };
+
+        float arp = chkVec(arpPerf, Latite::getRenderer().arpPerf / 1000.f);
+        float d2d = chkVec(d2dPerf, Latite::getRenderer().d2dPerf / 1000.f);
+        float d3d = chkVec(d3dPerf, Latite::getRenderer().d3dPerf / 1000.f);
+
+        return std::format("\nAverages:\nAcquireWrappedResources: {:.3f}ms\nLatite Direct2D total: {:.3f}ms \nLatite Direct3D total: {:.3f}ms", arp, d2d, d3d);
+    }
 }
+#undef GETFPS
 
 void DebugInfo::onRenderOverlay(Event& evG) {
     RenderOverlayEvent& ev = reinterpret_cast<RenderOverlayEvent&>(evG);
@@ -98,10 +125,10 @@ void DebugInfo::onRenderOverlay(Event& evG) {
         getVelocity(),
         getRotation(),
         getLookingAt()));
-    const std::wstring topRightDebugInfo = util::StrToWStr(std::format("{}\n{}\n{}",
+    const std::wstring topRightDebugInfo = util::StrToWStr(std::format("{}\n{}\n{}\n",
         getMemUsage(),
         getGpuInfo(),
-        getCpuInfo()));
+        getCpuInfo())) + util::StrToWStr(getRenderPerfInfo()) + L'\n'; // im fed up std::format
 
     dc.drawText(rect, topLeftDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular,
         28, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);

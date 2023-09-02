@@ -616,10 +616,10 @@ void ClickGUI::onRender(Event&) {
 				dc.ctx->SetTransform(oMatr);
 			}
 
-			columnOffs[i] += modRectActual.getHeight() - modRect.getHeight();
 		}
-			// set mod rect
-		end:
+	end:
+		columnOffs[i] += modRectActual.getHeight() - modRect.getHeight();
+		// set mod rect
 			mod.modRect = modRectActual;
 
 			// scrolling max

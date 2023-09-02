@@ -110,7 +110,7 @@ bool Renderer::init(IDXGISwapChain* chain) {
 
 	ThrowIfFailed(d3dDevice->QueryInterface(dxgiDevice.GetAddressOf()));
 	ThrowIfFailed(d2dFactory->CreateDevice(dxgiDevice.Get(), d2dDevice.GetAddressOf()));
-	ThrowIfFailed(d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_NONE, d2dCtx.GetAddressOf()));
+	ThrowIfFailed(d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS, d2dCtx.GetAddressOf()));
 
 	renderTargets.clear();
 	d3d11Targets.clear();
@@ -154,10 +154,17 @@ bool Renderer::init(IDXGISwapChain* chain) {
 	createDeviceDependentResources();
 
 	// blur buffers
-	for (int i = 0; i < this->bufferCount; ++i) {
-		auto bmp = copyCurrentBitmap();
-		this->blurBuffers.push_back(bmp);
-	}
+	blurBuffers = { 0 };
+
+	auto idx = swapChain4->GetCurrentBackBufferIndex();
+	ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
+	ID2D1Bitmap1* bmp;
+	D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
+	D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
+
+	ThrowIfFailed(d2dCtx->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, pixelFormat), &bmp));
+	this->blurBuffers[0] = bmp;
+	this->hasCopiedBitmap = true;
 
 	hasInit = true;
 	firstInit = true;
@@ -206,27 +213,42 @@ void Renderer::render() {
 
 	auto idx = swapChain4->GetCurrentBackBufferIndex();
 	if (gameDevice12) {
+		std::chrono::high_resolution_clock::time_point perfCount = std::chrono::high_resolution_clock::now();
 		d3d11On12Device->AcquireWrappedResources(&d3d11Targets[idx], 1);
+		auto hnow = std::chrono::high_resolution_clock::now();
+		this->arpPerf = std::chrono::duration_cast<std::chrono::microseconds>(hnow - perfCount).count();
 	}
 
-	auto bmp = blurBuffers[idx];
-	// Update the current blur buffer
-	bmp->CopyFromBitmap(nullptr, renderTargets[idx], nullptr);
+
+	std::chrono::high_resolution_clock::time_point perfCount = std::chrono::high_resolution_clock::now();
 
 	d2dCtx->SetTarget(renderTargets[idx]);
 	d2dCtx->BeginDraw();
 	d2dCtx->SetTransform(D2D1::Matrix3x2F::Identity());
+	d2dCtx->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
 
 	RenderOverlayEvent ev{ d2dCtx.Get() };
 	Eventing::get().dispatch(ev);
 
 	d2dCtx->EndDraw();
 
+	auto hnow = std::chrono::high_resolution_clock::now();
+
+	this->d2dPerf = std::chrono::duration_cast<std::chrono::microseconds>(hnow - perfCount).count();
+
+	perfCount = hnow;
 	if (gameDevice12) {
 		d3d11On12Device->ReleaseWrappedResources(&d3d11Targets[idx], 1);
 	}
 
 	d3dCtx->Flush();
+	hnow = std::chrono::high_resolution_clock::now();
+
+	this->d3dPerf = std::chrono::duration_cast<std::chrono::microseconds>(hnow - perfCount).count() + arpPerf;
+
+	this->mcePerf = std::chrono::duration_cast<std::chrono::microseconds>(diff).count() - d3dPerf - d2dPerf;
+
+	this->hasCopiedBitmap = false;
 }
 
 void Renderer::releaseAllResources() {

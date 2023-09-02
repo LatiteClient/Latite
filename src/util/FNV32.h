@@ -1,21 +1,24 @@
 #pragma once
 #include <cstdint>
-#include <iostream>
-#include <array>
 #include <cstddef>
 #include <cstring>
-#include <sstream>
 #include <string>
-#include <utility>
 
 namespace util {
 	constexpr uint32_t FNV_PRIME = 16777619u;
 	constexpr uint32_t FNV_OFFSET_BASIS = 2166136261u;
 
+	constexpr uint64_t FNV_PRIME_64 = 0x100000001b3;
+	constexpr uint64_t FNV_OFFSET_BASIS_64 = 0xcbf29ce484222325;
+
 	// TODO: find a better way to do this without recursion (it slows down builds)
 	namespace detail {
 		inline constexpr uint32_t fnv1a_32_const(char const* s, std::size_t count) {
 			return count ? (fnv1a_32_const(s, count - 1) ^ s[count - 1]) * FNV_PRIME : FNV_OFFSET_BASIS;
+		}
+
+		inline constexpr uint64_t fnv1a_64_const(char const* s, std::size_t count) {
+			return count ? (fnv1a_64_const(s, count - 1) ^ s[count - 1]) * FNV_PRIME_64 : FNV_OFFSET_BASIS_64;
 		}
 	}
 
@@ -29,10 +32,23 @@ namespace util {
 
 		return hash;
 	}
+
+	inline uint64_t fnv1a_64(std::string const& str) {
+		uint64_t hash = FNV_OFFSET_BASIS_64;
+
+		for (char c : str) {
+			hash ^= static_cast<uint64_t>(c);
+			hash *= FNV_PRIME_64;
+		}
+	}
 }
 
-constexpr uint32_t operator"" _hash(char const* s, std::size_t count) {
+constexpr uint32_t operator"" _fnv32(char const* s, std::size_t count) {
 	return util::detail::fnv1a_32_const(s, count);
 }
 
-#define TOHASH(x) #x##_hash
+constexpr uint64_t operator"" _fnv64(char const* s, std::size_t count) {
+	return util::detail::fnv1a_64_const(s, count);
+}
+
+#define TOHASH(x) #x##_fnv32

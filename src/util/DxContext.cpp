@@ -128,6 +128,7 @@ void DXContext::drawText(RectF const& rc, std::wstring const& ws, d2d::Color con
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	brush->SetColor(color.get());
 	ComPtr<IDWriteTextLayout> layout;
+	//this->ctx->DrawTextW(ws.c_str(), ws.size(), fmt.Get(), rc.get(), brush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT, DWRITE_MEASURING_MODE_NATURAL);
 	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
 		fmt.Get(), rc.getWidth(), rc.getHeight(),
 		layout.GetAddressOf()))) {
