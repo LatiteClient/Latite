@@ -27,13 +27,23 @@ void DXContext::drawRectangle(RectF const& rect, ID2D1Brush* cbrush, float lineT
 
 void DXContext::fillRoundedRectangle(RectF const& rect, d2d::Color const& color, float radius)  {
 	this->brush->SetColor(color.get());
+	if (radius < 0.005f) {
+		ctx->FillRectangle(rect.get(), brush);
+		return;
+	}
+
 	auto rounded = D2D1::RoundedRect(getRect(rect), radius, radius);
 	ctx->FillRoundedRectangle(rounded, brush);
 }
 
 void DXContext::drawRoundedRectangle(RectF irect, d2d::Color const& color, float radius, float lineThickness, OutlinePosition outPos)  {
-	RectF rect = irect;
 	this->brush->SetColor(color.get());
+	if (radius < 0.005f) {
+		ctx->DrawRectangle(irect, brush, lineThickness);
+		return;
+	}
+	
+	RectF rect = irect;
 	switch (outPos) {
 	case OutlinePosition::Inside:
 		rect.left += (lineThickness / 2.f);

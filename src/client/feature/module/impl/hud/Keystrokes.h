@@ -16,7 +16,7 @@ private:
 	ValueType textSize = FloatValue(23.f);
 	ValueType keystrokeSize = FloatValue(60.f);
 	ValueType spaceSize = FloatValue(30.f);
-	ValueType mouseButtonHeight = FloatValue(60.f);
+	ValueType mouseButtonHeight = FloatValue(30.f);
 	ValueType padding = FloatValue(3.f);
 	ValueType borderLength = FloatValue(2.f);
 	ValueType lerpSpeed = FloatValue(0.1f);

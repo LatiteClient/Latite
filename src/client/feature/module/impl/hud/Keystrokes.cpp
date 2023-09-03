@@ -3,7 +3,7 @@
 #include "client/input/Keyboard.h"
 #include <array>
 
-Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement keys") {
+Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement keys", HUD) {
 	addSetting("mouseButtons", "Mouse Buttons", "Show mouse buttons", mouseButtons);
 	addSetting("showCps", "CPS", "Show clicks per second", cps);
 	addSetting("spaceBar", "Space Bar", "Space bar", spaceBar);
@@ -14,7 +14,7 @@ Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement
 	addSliderSetting("textSize", "Text Size", "Text Size", textSize,   FloatValue(2.f), FloatValue(15.f), FloatValue(0.2f));
 	addSliderSetting("keySize", "Key Size", "Key Size", keystrokeSize, FloatValue(15.f), FloatValue(90.f), FloatValue(2.f));
 	addSliderSetting("spaceSize", "Space Bar", "Spacebar Size", spaceSize, FloatValue(0.f), FloatValue(90.f), FloatValue(2.f));
-	addSliderSetting("mouseButtonHeight", "Mouse Button Height", "Mouse Button Height", mouseButtonHeight, FloatValue(15.f), FloatValue(90.f), FloatValue(2.f), "showCps"_istrue);
+	addSliderSetting("mouseButtonHeight", "Mouse Button Height", "Mouse Button Height", mouseButtonHeight, FloatValue(15.f), FloatValue(90.f), FloatValue(2.f), "mouseButtons"_istrue);
 	addSliderSetting("padding", "Padding", "Padding between keys", padding, FloatValue(0.f), FloatValue(6.f), FloatValue(0.25f));
 	addSliderSetting("borderLength", "Border Length", "The border length", borderLength, FloatValue(0.f), FloatValue(6.f), FloatValue(0.25f), "border"_istrue);
 	addSliderSetting("transition", "Transition", "The smooth color transition", lerpSpeed, FloatValue(0.05f), FloatValue(1.f), FloatValue(0.05f));
@@ -84,7 +84,7 @@ void Keystrokes::render(DXContext& dc, bool, bool inEditor) {
 			auto& btn = mouseButtons[0];
 			d2d::Rect mb = { pad, pos.y, pos.x, pos.y + mbHeight };
 			mb.right -= (mb.getWidth() / 2);
-			dc.fillRoundedRectangle(mb, btn.col, std::get<FloatValue>(radius) * mb.getHeight());
+			dc.fillRoundedRectangle(mb, btn.col, rad);
 
 			std::wstring str = L"LMB";
 			dc.drawText(mb, str, btn.textCol, Renderer::FontSelection::SegoeLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
@@ -98,12 +98,30 @@ void Keystrokes::render(DXContext& dc, bool, bool inEditor) {
 			mb.left += (mb.getWidth() / 2) + pad;
 
 			dc.fillRoundedRectangle(mb, btn.col, rad);
-			std::wstring str = L"LMB";
+			std::wstring str = L"RMB";
 			dc.drawText(mb, str, btn.textCol, Renderer::FontSelection::SegoeLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 			if (std::get<BoolValue>(border)) {
 				dc.drawRoundedRectangle(mb, std::get<ColorValue>(this->borderColor).color1, rad);
 			}
 		}
+		pos.y += mbHeight;
+	}
+
+	float rad = std::get<FloatValue>(radius);
+	if (std::get<BoolValue>(spaceBar)) {
+		d2d::Rect spaceBox = { pad, pos.y, pos.x, pos.y + std::get<FloatValue>(spaceSize) };
+		dc.fillRoundedRectangle(spaceBox, keystrokes[5].col, rad);
+		if (std::get<BoolValue>(border)) dc.drawRoundedRectangle(spaceBox, std::get<ColorValue>(borderColor).color1, rad, std::get<FloatValue>(borderLength));
+		Vec2 center = spaceBox.center({ 1.f * std::get<FloatValue>(keystrokeSize), 1 });
+		dc.fillRoundedRectangle({ center.x, center.y, center.x + (1.f * std::get<FloatValue>(keystrokeSize)), center.y + 1 }, keystrokes[5].textCol, rad);
+		pos.y += spaceBox.getHeight() + pad;
+	}
+
+	if (std::get<BoolValue>(shiftKey)) {
+		d2d::Rect shiftBox = { pad, pos.y, pos.x, pos.y + std::get<FloatValue>(spaceSize) };
+		dc.fillRoundedRectangle(shiftBox, keystrokes[4].col, rad);
+		if (std::get<BoolValue>(border)) dc.drawRoundedRectangle(shiftBox, std::get<ColorValue>(borderColor).color1, rad, std::get<FloatValue>(borderLength));
+		dc.drawText(shiftBox, L"Sneak", keystrokes[4].textCol, Renderer::FontSelection::SegoeLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	}
 
 	int cpsL = 0;

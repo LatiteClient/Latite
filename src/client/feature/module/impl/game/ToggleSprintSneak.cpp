@@ -4,7 +4,7 @@
 #include "client/event/impl/BeforeMoveEvent.h"
 #include "client/event/impl/AfterMoveEvent.h"
 
-ToggleSprintSneak::ToggleSprintSneak() : TextModule("ToggleSprintSneak", "Toggle Sprint/Sneak", "Toggle sprinting or sneaking without holding the button", GAMEHUD) {
+ToggleSprintSneak::ToggleSprintSneak() : TextModule("ToggleSprintSneak", "Toggle Sprint/Sneak", "Toggle sprinting or sneaking without holding the button", GAMEHUD, 400.f, 0, true) {
 	listen<TickEvent>((EventListenerFunc)&ToggleSprintSneak::onTick);
 	listen<BeforeMoveEvent>((EventListenerFunc)&ToggleSprintSneak::beforeMove);
 	listen<AfterMoveEvent>((EventListenerFunc)&ToggleSprintSneak::afterMove);
