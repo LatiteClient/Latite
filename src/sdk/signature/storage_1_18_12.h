@@ -20,6 +20,9 @@ public:
 		inline static SigImpl clientInstance{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8B 15 ? ? ? ? 4C 8B 02 4C 89 06 40 84 FF 74 ? 48 8B CD E8 ? ? ? ? 48 8B C6 48 8B 4C 24 ? 48 33 CC E8 ? ? ? ? 48 8B 5C 24 ? 48 8B 6C 24 ? 48 8B 74 24 ? 48 83 C4 ? 5F C3 B9 ? ? ? ? E8 ? ? ? ? CC E8 ? ? ? ? CC CC CC CC CC CC CC CC CC CC CC 48 89 5C 24 ? 48 89 6C 24 ? 56",
 			"ClientInstance"};
+		inline static SigImpl clickMap{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+			"48 8d 0d ? ? ? ? e8 ? ? ? ? b3 ? 48 85 f6",
+			"ClickMap"};
 	};
 
 	struct Vtable {

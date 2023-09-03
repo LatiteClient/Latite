@@ -37,5 +37,10 @@ namespace memory {
 			}
 		};
 		bool resolve();
+
+		template <typename T>
+		[[nodiscard]] T* as_ptr() {
+			return reinterpret_cast<T*>(result);
+		}
 	};
 }

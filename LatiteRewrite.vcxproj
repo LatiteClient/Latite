@@ -555,6 +555,7 @@
     <ClCompile Include="src\sdk\common\world\level\Level.cpp" />
     <ClCompile Include="src\sdk\common\world\Minecraft.cpp" />
     <ClCompile Include="src\sdk\deps\Application\AppPlatform.cpp" />
+    <ClCompile Include="src\sdk\misc\ClickMap.cpp" />
     <ClCompile Include="src\util\ChakraUtil.cpp" />
     <ClCompile Include="src\util\DxContext.cpp" />
     <ClCompile Include="src\util\DxUtil.cpp" />

@@ -175,6 +175,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(LocalPlayer_applyTurnDelta),
         MVSIG(Vtable::TextPacket),
         MVSIG(Components::runtimeIDComponent),
+        MVSIG(Misc::clickMap),
             };
     
     new (mmgrBuf) ModuleManager;
@@ -541,15 +542,15 @@ void Latite::onUpdate(Event& evGeneric) {
     auto& ev = reinterpret_cast<UpdateEvent&>(evGeneric);
     if (!Latite::getRenderer().getDeviceContext()) return;
     timings.update();
-    auto now = std::chrono::system_clock::now();
-    static auto lastSend = now;
-
-    if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSend) > 30000ms) {
-        this->fetchLatiteUsers();
-        lastSend = now;
-    }
-
-    latiteUsers = latiteUsersDirty;
+    //auto now = std::chrono::system_clock::now();
+    //static auto lastSend = now;
+    //
+    //if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSend) > 30000ms) {
+    //    this->fetchLatiteUsers();
+    //    lastSend = now;
+    //}
+    //
+    //latiteUsers = latiteUsersDirty;
 
     if (!hasInit) {
         threadsafeInit();
