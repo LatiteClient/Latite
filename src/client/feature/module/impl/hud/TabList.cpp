@@ -93,7 +93,7 @@ void TabList::onRenderOverlay(Event& evG) {
 		// render
 		//dc.drawRectangle(rc, d2d::Colors::BLACK, 0.5f);
 
-		dc.drawText(rc, name, std::get<ColorValue>(textCol).color1, font, textP);
+		dc.drawText(rc, name, std::get<ColorValue>(textCol).color1, font, textP, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
 
 		idx++;
 		if (idx < maxPerTab) {

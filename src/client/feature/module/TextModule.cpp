@@ -62,7 +62,7 @@ void TextModule::render(DXContext& ctx, bool isDefault, bool inEditor) {
 
 		if (std::get<BoolValue>(fillBg)) dc.fillRoundedRectangle(rc, realCol, rad);
 		if (std::get<BoolValue>(showOutline)) dc.drawRoundedRectangle(rc, realOCol, rad, std::get<FloatValue>(outlineThickness));
-		dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::Light2, textSize, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::Light2, textSize, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, !isDefault && !inEditor && cacheText);
 		this->rect.right = rect.left + std::get<FloatValue>(bgX);
 		this->rect.bottom = rect.top + std::get<FloatValue>(bgY);
 
@@ -75,7 +75,7 @@ void TextModule::render(DXContext& ctx, bool isDefault, bool inEditor) {
 		rad = (std::get<FloatValue>(radius).value / 10.f) * (rc.getHeight() / 2.f);
 		if (std::get<BoolValue>(fillBg)) dc.fillRoundedRectangle(rc, std::get<ColorValue>(bgColor).color1, rad);
 		if (std::get<BoolValue>(showOutline)) dc.drawRoundedRectangle(rc, realOCol, rad, std::get<FloatValue>(outlineThickness));
-		dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::Light2, textSize, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::Light2, textSize, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, !isDefault && !inEditor && cacheText);
 		this->rect.right = rect.left + rc.right;
 		this->rect.bottom = rect.top + rc.bottom;
 	}

@@ -269,6 +269,7 @@ void Renderer::releaseAllResources() {
 			d3dCtx->OMSetRenderTargets(1, nullViews, nullptr);
 	}
 
+	cachedLayouts.clear();
 	gameDevice11 = nullptr;
 
 	for (auto& i : renderTargets) {
@@ -407,4 +408,20 @@ void Renderer::releaseDeviceResources() {
 	affineTransformEffect = nullptr;
 	shadowEffect = nullptr;
 	blurEffect = nullptr;
+}
+
+IDWriteTextLayout* Renderer::getLayout(IDWriteTextFormat* fmt, std::wstring const& str, bool cache) {
+	auto hash = util::fnv1a_64w(str);
+	auto it = this->cachedLayouts.find(hash);
+	if (it != cachedLayouts.end()) {
+		if (it->second.first == fmt) {
+			return it->second.second.Get();
+		}
+	}
+
+	auto [width, height] = getScreenSize();
+	ComPtr<IDWriteTextLayout> layout;
+	dWriteFactory->CreateTextLayout(str.c_str(), str.size(), fmt, width, height, layout.GetAddressOf());
+	this->cachedLayouts[hash] = { fmt, layout };
+	return layout.Get(); // Im pretty sure it implicitly adds a ref when I add it to cachedLayouts
 }

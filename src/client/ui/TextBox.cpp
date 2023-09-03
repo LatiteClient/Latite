@@ -66,7 +66,7 @@ void ui::TextBox::render(DXContext& dc, float rounding, d2d::Color backgroundCol
 	// draw text
 	float textSize = rect.getHeight() * 0.7f;
 	dc.drawText(rect, util::StrToWStr(getText()), textColor, Renderer::FontSelection::SegoeRegular, textSize,
-		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, false); // Don't cache
 
 	// draw blinker
 	Vec2 ts = dc.getTextSize(util::StrToWStr(text.substr(0, this->place)), Renderer::FontSelection::SegoeRegular, textSize);

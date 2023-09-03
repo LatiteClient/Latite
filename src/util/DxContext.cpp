@@ -124,32 +124,28 @@ void DXContext::drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity) {
 	ctx->DrawImage(gaussianBlurEffect, D2D1::Point2F(0.f, 0.f), rc);
 }
 
-void DXContext::drawText(RectF const& rc, std::wstring const& ws, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment)  {
+void DXContext::drawText(RectF const& rc, std::wstring const& ws, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment, bool cache)  {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	brush->SetColor(color.get());
-	ComPtr<IDWriteTextLayout> layout;
-	//this->ctx->DrawTextW(ws.c_str(), ws.size(), fmt.Get(), rc.get(), brush, D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT, DWRITE_MEASURING_MODE_NATURAL);
-	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
-		fmt.Get(), rc.getWidth(), rc.getHeight(),
-		layout.GetAddressOf()))) {
-		DWRITE_TEXT_RANGE range;
+	if (auto layout = Latite::getRenderer().getLayout(fmt.Get(), ws, cache)) {
+		layout->SetMaxWidth(rc.getWidth());
+		layout->SetMaxHeight(rc.getHeight());
+		DWRITE_TEXT_RANGE range{};
 		range.startPosition = 0;
 		range.length = static_cast<UINT32>(ws.size());
 		layout->SetFontSize(size, range);
 		layout->SetTextAlignment(alignment);
 		layout->SetParagraphAlignment(verticalAlignment);
-		this->ctx->DrawTextLayout({ rc.getPos().x, rc.getPos().y }, layout.Get(),
-			brush);
+		this->ctx->DrawTextLayout({ rc.getPos().x, rc.getPos().y }, layout, brush);
 	}
 }
 
-Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font, float size, bool tw) {
+Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font, float size, bool tw, bool cache) {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	auto ss = ctx->GetPixelSize();
-	ComPtr<IDWriteTextLayout> layout;
-	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
-		fmt.Get(), (float)ss.width, (float)ss.height,
-		layout.GetAddressOf()))) {
+	if (auto layout = Latite::getRenderer().getLayout(fmt.Get(), ws, cache)) {
+		layout->SetMaxWidth(static_cast<float>(ss.width));
+		layout->SetMaxHeight(static_cast<float>(ss.height));
 		DWRITE_TEXT_RANGE range;
 		range.startPosition = 0;
 		range.length = static_cast<UINT32>(ws.size());
@@ -169,13 +165,13 @@ Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font
 	return {};
 }
 
-d2d::Rect DXContext::getTextRect(std::wstring const& ws, Renderer::FontSelection font, float size, float pad) {
+d2d::Rect DXContext::getTextRect(std::wstring const& ws, Renderer::FontSelection font, float size, float pad, bool cache) {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	auto ss = ctx->GetPixelSize();
 	ComPtr<IDWriteTextLayout> layout;
-	if (SUCCEEDED(this->factory->CreateTextLayout(ws.c_str(), static_cast<uint32_t>(ws.size()),
-		fmt.Get(), static_cast<float>(ss.width), static_cast<float>(ss.height),
-		layout.GetAddressOf()))) {
+	if (auto layout = Latite::getRenderer().getLayout(fmt.Get(), ws, cache)) {
+		layout->SetMaxWidth(static_cast<float>(ss.width));
+		layout->SetMaxHeight(static_cast<float>(ss.height));
 		DWRITE_TEXT_RANGE range;
 		range.startPosition = 0;
 		range.length = static_cast<UINT32>(ws.size());

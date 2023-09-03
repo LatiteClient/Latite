@@ -34,9 +34,9 @@ protected:
 	EnumData alignment;
 public:
 	TextModule(std::string const& name, std::string const& displayName,
-		std::string const& description, Category category, float maxBgX = 400.f, int keybind = 0)
+		std::string const& description, Category category, float maxBgX = 400.f, int keybind = 0, bool cacheText = false)
 	: HUDModule(name, displayName, description, category, keybind, true),
-	maxBGX(maxBgX) {
+	maxBGX(maxBgX), cacheText(cacheText) {
 		this->textual = true;
 	}
 
@@ -46,7 +46,7 @@ public:
 
 protected:
 	virtual std::wstringstream text(bool isDefault, bool inEditor) = 0;
-	
+	bool cacheText;
 	FloatValue maxBGX = 0.f;
 private:
 	std::wstringstream processText(std::wstringstream& stream);

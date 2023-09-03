@@ -73,6 +73,8 @@ private:
 
 	std::vector<ID2D1Bitmap1*> blurBuffers = {};
 
+	std::unordered_map<int64_t, std::pair<IDWriteTextFormat*, ComPtr<IDWriteTextLayout>>> cachedLayouts;
+
 	std::shared_mutex mutex;
 	int bufferCount = 3;
 	float deltaTime = 1.f;
@@ -248,4 +250,5 @@ public:
 		return this->wicFactory.Get();
 	}
 
+	[[nodiscard]] IDWriteTextLayout* getLayout(IDWriteTextFormat* fmt, std::wstring const& str, bool cache = false);
 };

@@ -40,6 +40,20 @@ namespace util {
 			hash ^= static_cast<uint64_t>(c);
 			hash *= FNV_PRIME_64;
 		}
+
+		return hash;
+	}
+
+	// TODO: test this
+	inline uint64_t fnv1a_64w(std::wstring const& str) {
+		uint64_t hash = FNV_OFFSET_BASIS_64;
+
+		for (wchar_t c : str) {
+			hash ^= static_cast<uint64_t>(c);
+			hash *= FNV_PRIME_64;
+		}
+
+		return hash;
 	}
 }
 

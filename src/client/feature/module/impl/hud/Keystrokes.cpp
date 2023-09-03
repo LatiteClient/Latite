@@ -3,7 +3,7 @@
 #include "client/input/Keyboard.h"
 #include <array>
 
-Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement keys", HUD) {
+Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement keys") {
 	addSetting("mouseButtons", "Mouse Buttons", "Show mouse buttons", mouseButtons);
 	addSetting("showCps", "CPS", "Show clicks per second", cps);
 	addSetting("spaceBar", "Space Bar", "Space bar", spaceBar);
