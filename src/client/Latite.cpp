@@ -220,6 +220,10 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     Logger::Info("Waiting for game to load..");
 
+    // its actually the real offset - 0x10
+    Latite::get().cInstOffs = wnd->getResult()[1];
+    Latite::get().plrOffs = wnd->getResult()[0];
+
     while (!SDK::ClientInstance::get()) {
         std::this_thread::sleep_for(10ms);
     }

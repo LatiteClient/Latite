@@ -94,6 +94,9 @@ public:
 	}
 
 	void fetchLatiteUsers();
+
+	int cInstOffs = 0;
+	int plrOffs = 0;
 private:
 	std::vector<std::string> latiteUsers;
 	std::vector<std::string> latiteUsersDirty;
