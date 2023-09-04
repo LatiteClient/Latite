@@ -14,6 +14,7 @@
 #include "util/XorString.h"
 #include "../class/impl/game/JsEntityClass.h"
 #include "../class/impl/game/JsPlayerClass.h"
+#include "../class/impl/game/JsLocalPlayerClass.h"
 #include <sdk/common/network/packet/CommandRequestPacket.h>
 
 void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
@@ -101,8 +102,11 @@ JsValueRef GameScriptingObject::worldGetEntList(JsValueRef callee, bool isConstr
 
 		auto entc = script->getClass<JsEntityClass>();
 		auto plrc = script->getClass<JsPlayerClass>();
+		auto lplrc = script->getClass<JsLocalPlayerClass>();
 
-		if (ent->isPlayer()) {
+		if (ent->getRuntimeID() == 1) {
+			JS::JsSetIndexedProperty(array, db, lplrc->construct(new JsEntity(ent->getRuntimeID(), JsEntity::AccessLevel::LocalPlayer), true));
+		} else if (ent->isPlayer()) {
 			JS::JsSetIndexedProperty(array, db, plrc->construct(new JsEntity(ent->getRuntimeID()), true));
 		} else JS::JsSetIndexedProperty(array, db, entc->construct(new JsEntity(ent->getRuntimeID()), true));
 		idx++;

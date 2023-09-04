@@ -31,6 +31,7 @@ public:
 				}, &obj);
 		}
 		JS::JsSetPrototype(obj, getPrototype());
+		Chakra::SetProperty(obj, L"runtimeId", Chakra::MakeInt(ent->runtimeId));
 		return obj;
 	}
 
@@ -40,9 +41,11 @@ public:
 		Chakra::DefineFunc(prototype, entityGetPos, L"getPosition", this);
 		Chakra::DefineFunc(prototype, entityGetRot, L"getRotation", this);
 		Chakra::DefineFunc(prototype, entityIsPlayer, L"isPlayer", this);
+		Chakra::DefineFunc(prototype, entityIsLocalPlayer, L"isLocalPlayer", this);
 		Chakra::DefineFunc(prototype, entityGetHurtTime, L"getHurtTime", this);
 		Chakra::DefineFunc(prototype, entityGetType, L"getEntityType", this);
 		Chakra::DefineFunc(prototype, entityAttack, L"attack", this);
+		Chakra::SetPropertyNumber(prototype, L"runtimeId", 0.0, true);
 	};
 
 	static JsValueRef CALLBACK toStringCallback(JsValueRef callee, bool isConstructor,
@@ -73,5 +76,7 @@ private:
 	static JsValueRef CALLBACK entityAttack(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK entityGetType(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK entityIsLocalPlayer(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 };

@@ -42,3 +42,7 @@ SDK::MoveInputComponent* SDK::Player::getMoveInputComponent() {
 	static auto func = reinterpret_cast<try_get_t>(Signatures::Components::moveInputComponent.result);
 	return func(entityContext.registry->basicRegistry, &entityContext.id);
 }
+
+std::string SDK::Player::getXUID() {
+	return memory::callVirtual<std::string>(this, MV_DETAIL_GETOFFSET(0x193, 0x1B6, 0x1BC));
+}

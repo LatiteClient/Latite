@@ -7,8 +7,7 @@
 #include "sdk/common/client/game/ClientInstance.h"
 #include "../../../JsScript.h"
 
-JsValueRef JsEntityClass::entityIsValid(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
-{
+JsValueRef JsEntityClass::entityIsValid(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 1)) return Chakra::GetFalse();
 	JsEntity* ent;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
@@ -19,8 +18,7 @@ JsValueRef JsEntityClass::entityIsValid(JsValueRef callee, bool isConstructor, J
 	return Chakra::GetFalse();
 }
 
-JsValueRef JsEntityClass::entityGetPos(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
-{
+JsValueRef JsEntityClass::entityGetPos(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 1)) return Chakra::GetUndefined();
 	JsEntity* ent;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
@@ -34,7 +32,7 @@ JsValueRef JsEntityClass::entityGetPos(JsValueRef callee, bool isConstructor, Js
 			return ret;
 		}
 		else {
-			Chakra::ThrowError(L"Access denied");
+			Chakra::ThrowError(L"Access denied, cannot use getPosition");
 			return Chakra::GetUndefined();
 		}
 	}
@@ -42,8 +40,7 @@ JsValueRef JsEntityClass::entityGetPos(JsValueRef callee, bool isConstructor, Js
 	return Chakra::GetUndefined();
 }
 
-JsValueRef JsEntityClass::entityGetRot(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
-{
+JsValueRef JsEntityClass::entityGetRot(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 1)) return Chakra::GetUndefined();
 	JsEntity* ent;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
@@ -57,7 +54,7 @@ JsValueRef JsEntityClass::entityGetRot(JsValueRef callee, bool isConstructor, Js
 			return ret;
 		}
 		else {
-			Chakra::ThrowError(L"Access denied");
+			Chakra::ThrowError(L"Access denied, cannot use getRotation");
 			return Chakra::GetUndefined();
 		}
 	}
@@ -65,8 +62,7 @@ JsValueRef JsEntityClass::entityGetRot(JsValueRef callee, bool isConstructor, Js
 	return Chakra::GetUndefined();
 }
 
-JsValueRef JsEntityClass::entityGetDimensionName(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
-{
+JsValueRef JsEntityClass::entityGetDimensionName(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	JsEntity* ent;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
@@ -124,4 +120,14 @@ JsValueRef JsEntityClass::entityGetType(JsValueRef callee, bool isConstructor, J
 	}
 	Chakra::ThrowError(L"Invalid entity");
 	return Chakra::GetUndefined();
+}
+
+JsValueRef JsEntityClass::entityIsLocalPlayer(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	JsEntity* ent;
+	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
+	if (ent && ent->validate()) {
+		return Chakra::MakeInt(ent->runtimeId == 1);
+	}
+	Chakra::ThrowError(L"Invalid entity");
+	return JS_INVALID_REFERENCE;
 }
