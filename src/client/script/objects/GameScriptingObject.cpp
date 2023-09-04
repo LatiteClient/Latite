@@ -35,6 +35,38 @@ void GameScriptingObject::createWorldObject() {
 	JS::JsAddRef(worldObj, nullptr); // never forget to add a refernce to an object that isn't set !!
 	Chakra::DefineFunc(worldObj, worldGetEntList, L"getEntities", this);
 	Chakra::DefineFunc(worldObj, worldGetEntCount, L"getEntityCount", this);
+	Chakra::DefineFunc(worldObj, worldGetPlayers, L"getPlayers", this);
+	Chakra::DefineFunc(worldObj, worldGetName, L"getName", this);
+}
+
+JsValueRef GameScriptingObject::worldGetName(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
+{
+	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
+		Chakra::ThrowError(L"World is not allowed to be used here");
+		return Chakra::GetUndefined();
+	}
+
+	return Chakra::MakeString(util::StrToWStr(SDK::ClientInstance::get()->minecraft->getLevel()->name));
+}
+
+JsValueRef GameScriptingObject::worldGetPlayers(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
+		Chakra::ThrowError(L"World is not allowed to be used here");
+		return Chakra::GetUndefined();
+	}
+
+	JsValueRef array;
+	auto arr = SDK::ClientInstance::get()->minecraft->getLevel()->getPlayerList();
+	auto size = arr->size();
+	JS::JsCreateArray(size, &array);
+
+	int i = 0;
+	for (auto& pair : *arr) {
+		JS::JsSetIndexedProperty(arr, Chakra::MakeInt(i), Chakra::MakeString(util::StrToWStr(pair.second.name)));
+		++i;
+	}
+	return array;
+
 }
 
 JsValueRef GameScriptingObject::worldGetEntList(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {

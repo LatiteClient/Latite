@@ -78,6 +78,7 @@ void Keystrokes::render(DXContext& dc, bool, bool inEditor) {
 	// Mouse Buttons
 
 	if (std::get<BoolValue>(this->mouseButtons)) {
+		pos.y += pad;
 		float mbHeight = std::get<FloatValue>(mouseButtonHeight);
 		float rad = std::min(std::get<FloatValue>(this->radius).value, mbHeight / 2.f);
 		{
@@ -109,19 +110,22 @@ void Keystrokes::render(DXContext& dc, bool, bool inEditor) {
 
 	float rad = std::get<FloatValue>(radius);
 	if (std::get<BoolValue>(spaceBar)) {
+		pos.y += pad;
 		d2d::Rect spaceBox = { pad, pos.y, pos.x, pos.y + std::get<FloatValue>(spaceSize) };
 		dc.fillRoundedRectangle(spaceBox, keystrokes[5].col, rad);
 		if (std::get<BoolValue>(border)) dc.drawRoundedRectangle(spaceBox, std::get<ColorValue>(borderColor).color1, rad, std::get<FloatValue>(borderLength));
 		Vec2 center = spaceBox.center({ 1.f * std::get<FloatValue>(keystrokeSize), 1 });
 		dc.fillRoundedRectangle({ center.x, center.y, center.x + (1.f * std::get<FloatValue>(keystrokeSize)), center.y + 1 }, keystrokes[5].textCol, rad);
-		pos.y += spaceBox.getHeight() + pad;
+		pos.y += spaceBox.getHeight();
 	}
 
 	if (std::get<BoolValue>(shiftKey)) {
+		pos.y += pad;
 		d2d::Rect shiftBox = { pad, pos.y, pos.x, pos.y + std::get<FloatValue>(spaceSize) };
 		dc.fillRoundedRectangle(shiftBox, keystrokes[4].col, rad);
 		if (std::get<BoolValue>(border)) dc.drawRoundedRectangle(shiftBox, std::get<ColorValue>(borderColor).color1, rad, std::get<FloatValue>(borderLength));
 		dc.drawText(shiftBox, L"Sneak", keystrokes[4].textCol, Renderer::FontSelection::SegoeLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		pos.y += shiftBox.getHeight();
 	}
 
 	int cpsL = 0;

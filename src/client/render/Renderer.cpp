@@ -13,7 +13,7 @@ Renderer::~Renderer() {
 
 bool Renderer::init(IDXGISwapChain* chain) {
 	bool isDX12 = true;
-	if (SUCCEEDED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12))) && Latite::get().shouldForceDX11()) {
+	if (!dx12Removed && SUCCEEDED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12))) && Latite::get().shouldForceDX11()) {
 		static_cast<ID3D12Device5*>(gameDevice12.Get())->RemoveDevice();
 		bufferCount = 1;
 		Logger::Info("Force DX11 active");
@@ -421,7 +421,7 @@ IDWriteTextLayout* Renderer::getLayout(IDWriteTextFormat* fmt, std::wstring cons
 
 	auto [width, height] = getScreenSize();
 	ComPtr<IDWriteTextLayout> layout;
-	dWriteFactory->CreateTextLayout(str.c_str(), str.size(), fmt, width, height, layout.GetAddressOf());
+	dWriteFactory->CreateTextLayout(str.c_str(), static_cast<uint32_t>(str.size()), fmt, width, height, layout.GetAddressOf());
 	this->cachedLayouts[hash] = { fmt, layout };
 	return layout.Get(); // Im pretty sure it implicitly adds a ref when I add it to cachedLayouts
 }

@@ -27,6 +27,7 @@ class GenericHooks : public HookGroup {
         uintptr_t a9,
         uintptr_t a10,
         uintptr_t a11);
+    static void __fastcall CameraViewBob(void*, void*, void*);
 public:
     GenericHooks();
 };

@@ -155,6 +155,10 @@ public:
 	inline static SigImpl Tesesllator_color{[](memory::signature_store&, uintptr_t res) { return res; },
 		"80 b9 ? ? ? ? ? 4c 8b c1 75",
 		"Tessellator::color"};
+
+	inline static SigImpl CameraViewBob{[](memory::signature_store&, uintptr_t res) { return res; },
+		"40 53 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 44 24 ? 49 8b 00",
+		"CameraViewBob"};
 };
 
 // after adding sigs here, add them in latite.cpp

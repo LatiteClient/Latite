@@ -621,6 +621,9 @@
     <ClInclude Include="src\client\feature\module\impl\game\CinematicCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\event\impl\BobMovementEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />

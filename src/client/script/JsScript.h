@@ -103,6 +103,7 @@ public:
 		for (auto& cl : this->classes) {
 			if (cl->getName() == T::class_name) return reinterpret_cast<T*>(cl.get());
 		}
+		Logger::Fatal("Could not find scripting class {}!", T::class_name);
 		return nullptr;
 	}
 

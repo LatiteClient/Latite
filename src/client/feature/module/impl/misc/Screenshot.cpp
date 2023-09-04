@@ -70,7 +70,7 @@ void Screenshot::onRenderOverlay(Event& ev) {
 
 void Screenshot::onUpdate(Event& ev) {
     if (shouldSleep) {
-        //Sleep(200);
+        Sleep(200);
         shouldSleep = false;
     }
 }

@@ -13,6 +13,7 @@
 #include "client/event/impl/CinematicCameraEvent.h"
 #include "client/event/impl/BeforeMoveEvent.h"
 #include "client/event/impl/AfterMoveEvent.h"
+#include "client/event/impl/BobMovementEvent.h"
 #include "client/script/ScriptManager.h"
 
 namespace {
@@ -27,6 +28,7 @@ namespace {
 	std::shared_ptr<Hook> TurnDeltaHook;
 	std::shared_ptr<Hook> MoveInputHandler_tickHook;
 	std::shared_ptr<Hook> MovePlayerHook;
+	std::shared_ptr<Hook> ViewBobHook;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -200,6 +202,15 @@ void __fastcall GenericHooks::MovePlayer(uintptr_t** a1, void* a2, uintptr_t* a3
 	}
 }
 
+void __fastcall GenericHooks::CameraViewBob(void* a, void* b, void* c) {
+	BobMovementEvent ev{};
+	if (Eventing::get().dispatch(ev)) {
+		return;
+	}
+
+	return ViewBobHook->oFunc<decltype(&CameraViewBob)>()(a, b, c);
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	LoadLibraryHook = addHook((uintptr_t)&::LoadLibraryW, hkLoadLibraryW);
 	LoadLibraryHook = addHook((uintptr_t) & ::LoadLibraryA, hkLoadLibraryW);
@@ -230,4 +241,6 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	else {
 		MoveInputHandler_tickHook = addHook(Signatures::MoveInputHandler_tick.result, MoveInputHandler_tick, "MoveInputHandler::tick");
 	}
+
+	ViewBobHook = addHook(Signatures::CameraViewBob.result, CameraViewBob, "`anonymous namespace'::_bobMovement");
 }

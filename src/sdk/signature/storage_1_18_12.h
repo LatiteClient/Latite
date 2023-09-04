@@ -125,6 +125,11 @@ public:
 	inline static SigImpl MoveInputHandler_tick{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? 0F B6 41 ?? 40 32 F6",
 		"MoveInputHandler::tick"};
+
+	// see what accesses the Y camera position value in Camera
+	inline static SigImpl CameraViewBob{[](memory::signature_store&, uintptr_t res) { return res; },
+		"40 53 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 44 24 ? 49 8b 00",
+		"`anonymous namespace'::_bobMovement"};
 };
 
 // after adding sigs here, add them in latite.cpp

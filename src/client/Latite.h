@@ -41,6 +41,8 @@ public:
 	void onRendererCleanup(class Event& ev);
 	void onFocusLost(class Event& ev);
 	void onSuspended(class Event& ev);
+	void onBobView(class Event& ev);
+
 	void loadConfig(class SettingGroup& resolvedGroup);
 	void initAsset(int resource, std::wstring const& filename);
 	std::string getTextAsset(int resource);
@@ -108,6 +110,7 @@ private:
 	ValueType useDX11 = BoolValue(false);
 	ValueType menuBlur = FloatValue(20.f);
 	ValueType accentColor = ColorValue(static_cast<float>(0x32) / 255.f, static_cast<float>(0x39) / 255.f, static_cast<float>(0x76) / 255.f);
+	ValueType minimalViewBob = BoolValue(false);
 
 	std::vector<ui::TextBox*> textBoxes;
 	ComPtr<struct ID2D1Bitmap1> hudBlurBitmap;

@@ -233,6 +233,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\client\event\Events.h" />
+    <ClInclude Include="src\client\event\impl\BobMovementEvent.h" />
     <ClInclude Include="src\client\event\impl\DrawHUDModulesEvent.h" />
     <ClInclude Include="src\client\feature\module\impl\game\CinematicCamera.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\GuiscaleChanger.h" />

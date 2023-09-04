@@ -23,6 +23,7 @@
 #include "event/impl/UpdateEvent.h"
 #include "event/impl/CharEvent.h"
 #include "event/impl/ClickEvent.h"
+#include "event/impl/BobMovementEvent.h"
 
 #include "sdk/signature/storage.h"
 
@@ -176,6 +177,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Vtable::TextPacket),
         MVSIG(Components::runtimeIDComponent),
         MVSIG(Misc::clickMap),
+        MVSIG(CameraViewBob),
             };
     
     new (mmgrBuf) ModuleManager;
@@ -354,6 +356,7 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getEventing().listen<AppSuspendedEvent>(this, (EventListenerFunc)&Latite::onSuspended, 2);
     Latite::getEventing().listen<CharEvent>(this, (EventListenerFunc)&Latite::onChar, 2);
     Latite::getEventing().listen<ClickEvent>(this, (EventListenerFunc)&Latite::onClick, 2);
+    Latite::getEventing().listen<BobMovementEvent>(this, (EventListenerFunc)&Latite::onBobView, 2);
 
     getHooks().init();
     Logger::Info("Initialized Hooks");
@@ -481,6 +484,12 @@ void Latite::initSettings() {
     {
         auto set = std::make_shared<Setting>("accentColor", "Accent Color", "Accent Color");
         set->value = &this->accentColor;
+        this->getSettings().addSetting(set);
+    }
+
+    {
+        auto set = std::make_shared<Setting>("minViewBob", "Minimal View Bob", "Only bob the item in hand, not the camera");
+        set->value = &this->minimalViewBob;
         this->getSettings().addSetting(set);
     }
 }
@@ -650,6 +659,12 @@ void Latite::onFocusLost(Event& evGeneric) {
 void Latite::onSuspended(Event& ev) {
     Latite::getConfigManager().saveCurrentConfig();
     Logger::Info("Saved config");
+}
+
+void Latite::onBobView(Event& ev) {
+    if (std::get<BoolValue>(this->minimalViewBob)) {
+        reinterpret_cast<Cancellable&>(ev).setCancelled(true);
+    }
 }
 
 void Latite::loadConfig(SettingGroup& gr) {
