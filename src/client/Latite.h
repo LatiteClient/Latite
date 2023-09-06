@@ -98,6 +98,7 @@ public:
 	int cInstOffs = 0;
 	int plrOffs = 0;
 private:
+	bool downloadingAssets = false;
 	std::vector<std::string> latiteUsers;
 	std::vector<std::string> latiteUsersDirty;
 

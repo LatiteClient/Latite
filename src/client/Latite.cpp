@@ -210,19 +210,42 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     Logger::Info("Resolved {} signatures ({} dead)", sigCount, deadCount);
 #endif
 
-    // TODO: latite beta only
-    wnd = new AuthWindow(Latite::get().dllInst);
-
-    wnd->show();
-    wnd->runMessagePump();
-
-    wnd->destroy();
+#ifdef LATITE_BETA
+    {
+        wnd = new AuthWindow(Latite::get().dllInst);
+        auto autoLogPath = util::GetLatitePath() / XOR_STRING("login.txt");
+        if (std::filesystem::exists(autoLogPath)) {
+            std::wifstream ifs{autoLogPath};
+            if (ifs.good()) {
+                wnd->beforeAuth();
+                std::wstring ws;
+                std::getline(ifs, ws);
+                auto res = wnd->doAuth(ws);
+                if (res.empty()) {
+                    Logger::Fatal(XOR_STRING("Auth has failed, maybe your token has expired?"));
+                }
+                wnd->setResult(res);
+            }
+            else {
+                wnd->show();
+                wnd->runMessagePump();
+            }
+        }
+        else {
+            wnd->show();
+            wnd->runMessagePump();
+        }
+        wnd->destroy();
+    }
+#endif
 
     Logger::Info("Waiting for game to load..");
 
+#ifdef  LATITE_BETA
     // its actually the real offset - 0x10
     Latite::get().cInstOffs = wnd->getResult()[1];
     Latite::get().plrOffs = wnd->getResult()[0];
+#endif
 
     while (!SDK::ClientInstance::get()) {
         std::this_thread::sleep_for(10ms);
@@ -253,7 +276,9 @@ BOOL WINAPI DllMain(
         CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)startThread, hinstDLL, 0, nullptr));
     }
     else if (fdwReason == DLL_PROCESS_DETACH) {
+#ifdef LATITE_BETA
         delete wnd;
+#endif
         // Remove singletons
 
         Latite::getHooks().disable();
@@ -529,14 +554,14 @@ namespace {
 
         auto folderPath = util::GetLatitePath() / "Assets";
 
-        // TODO: FIXME: xor
         winrt::Windows::Foundation::Uri requestUri(util::StrToWStr(XOR_STRING("https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll")));
 
-        auto buffer = http.GetBufferAsync(requestUri).get();
+        auto buffer = co_await http.GetBufferAsync(requestUri);
+
+        std::filesystem::create_directories(folderPath);
 
         auto folder = co_await StorageFolder::GetFolderFromPathAsync(folderPath.wstring());
         auto file = co_await folder.CreateFileAsync(L"ChakraCore.dll", CreationCollisionOption::OpenIfExists);
-
         IRandomAccessStream stream = co_await file.OpenAsync(FileAccessMode::ReadWrite);
 
         DataWriter writer(stream);
@@ -548,7 +573,10 @@ namespace {
 }
 
 void Latite::downloadExtraAssets() {
-    doDownloadAssets();
+    if (!downloadingAssets) {
+        doDownloadAssets();
+        this->downloadingAssets = true;
+    }
 }
 
 void Latite::onUpdate(Event& evGeneric) {

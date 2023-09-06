@@ -470,7 +470,6 @@ void ClickGUI::onRender(Event&) {
 			RectF modRectActual = modRect;
 
 			if (mod.modRect.has_value()) {
-				dc.drawRectangle(rect, D2D1::ColorF::Red);
 				if (mod.modRect->bottom < rect.top || mod.modRect->top > rect.bottom) {
 					mod.modRect->setPos({ 0.f, pos.y });
 					goto end;
