@@ -627,6 +627,9 @@
     <ClInclude Include="src\client\script\class\impl\game\JsLocalPlayerClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\script\class\impl\game\JsItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />

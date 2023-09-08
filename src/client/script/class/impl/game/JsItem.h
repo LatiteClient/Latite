@@ -1,13 +1,13 @@
 #pragma once
 #include "../../JsClass.h"
 #include "sdk/common/world/Item.h"
-#include "sdk/common/world/ItemStack.h"
+#include "sdk/common/world/Item.h"
 
-class JsItemStack : public JsClass {
+class JsItem : public JsClass {
 protected:
 	static JsValueRef CALLBACK jsConstructor(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-		auto thi = reinterpret_cast<JsItemStack*>(callbackState);
+		auto thi = reinterpret_cast<JsItem*>(callbackState);
 
 		if (!isConstructor) return thi->errConstructCall();
 
@@ -17,17 +17,17 @@ protected:
 
 	static JsValueRef CALLBACK toStringCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-		auto thi = reinterpret_cast<JsItemStack*>(callbackState);
-		auto item = ToItemStack(arguments[0]);
-		std::string add = std::format("{} (name={}, aux={})", util::WStrToStr(thi->name), item->getHoverName(), item->aux);
+		auto thi = reinterpret_cast<JsItem*>(callbackState);
+		auto item = ToItem(arguments[0]);
+		std::string add = std::format("{} ({})", util::WStrToStr(thi->name), item->namespacedId);
 		return Chakra::MakeString(L"[object " + util::StrToWStr(add) + L"]");
 	}
 public:
-	JsItemStack(class JsScript* owner) : JsClass(owner, L"ItemStack") {
+	JsItem(class JsScript* owner) : JsClass(owner, L"Item") {
 		createConstructor(jsConstructor, this);
 	}
 
-	JsValueRef construct(SDK::ItemStack* item, bool del) {
+	JsValueRef construct(SDK::Item* item, bool del) {
 		JsValueRef obj;
 		if (del) {
 			JS::JsCreateExternalObject(item, [](void* obj) {
@@ -46,9 +46,9 @@ public:
 		Chakra::DefineFunc(prototype, toStringCallback, L"toString", this);
 	};
 
-	static SDK::ItemStack* ToItemStack(JsValueRef obj) {
-		SDK::ItemStack* stack = nullptr;
-		JS::JsGetExternalData(obj, reinterpret_cast<void**>(&stack));
-		return stack;
+	static SDK::Item* ToItem(JsValueRef obj) {
+		SDK::Item* it = nullptr;
+		JS::JsGetExternalData(obj, reinterpret_cast<void**>(&it));
+		return it;
 	}
 };

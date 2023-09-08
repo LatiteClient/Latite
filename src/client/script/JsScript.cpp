@@ -28,6 +28,9 @@
 #include "class/impl/JsSettingClass.h"
 #include "class/impl/JsCommandClass.h"
 #include "class/impl/game/JsEntityClass.h"
+#include "class/impl/game/JsPlayerClass.h"
+#include "class/impl/game/JsItem.h"
+#include "class/impl/game/JsItemStack.h"
 
 #include "objects/GameScriptingObject.h"
 #include "objects/D2DScriptingObject.h"
@@ -35,7 +38,6 @@
 #include "util/Logger.h"
 
 #include "ScriptCertificate.h"
-#include "class/impl/game/JsPlayerClass.h"
 
 using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Web::Http;
@@ -332,6 +334,8 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsCommandClass>(this));
 	this->classes.push_back(std::make_shared<JsEntityClass>(this));
 	this->classes.push_back(std::make_shared<JsPlayerClass>(this));
+	this->classes.push_back(std::make_shared<JsItem>(this));
+	this->classes.push_back(std::make_shared<JsItemStack>(this));
 
 	JsErrorCode err;
 	JsValueRef myScript;

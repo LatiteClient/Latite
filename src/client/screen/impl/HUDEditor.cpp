@@ -489,6 +489,16 @@ void HUDEditor::keepModulesInBounds() {
 			auto ss = Latite::getRenderer().getScreenSize();
 			d2d::Rect rc = rMod->getRect();
 			util::KeepInBounds(rc, { 0.f, 0.f, ss.width, ss.height });
+
+			auto round2 = [](float& f){
+				f = std::round(f);
+			};
+
+			auto oPos = rc.getPos();
+			round2(rc.left);
+			round2(rc.top);
+			round2(rc.right);
+			round2(rc.bottom);
 			rMod->setRect(rc);
 		}
 		return false;
