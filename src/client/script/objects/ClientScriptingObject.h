@@ -15,6 +15,10 @@ class ClientScriptingObject final : public ScriptingObject {
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 
 
+	static JsValueRef CALLBACK testCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+
+
 public:
 	inline static int objectID = -1;
 	ClientScriptingObject(int id) : ScriptingObject(id, L"client") { objectID = id; }

@@ -19,11 +19,12 @@ protected:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 		auto thi = reinterpret_cast<JsItem*>(callbackState);
 		auto item = ToItem(arguments[0]);
-		std::string add = std::format("{} ({})", util::WStrToStr(thi->name), item->namespacedId);
+		std::string add = std::format("{} ({})", util::WStrToStr(thi->name), item->namespacedId.getString());
 		return Chakra::MakeString(L"[object " + util::StrToWStr(add) + L"]");
 	}
 public:
-	JsItem(class JsScript* owner) : JsClass(owner, L"Item") {
+	inline static const wchar_t* class_name = L"Item";
+	JsItem(class JsScript* owner) : JsClass(owner, class_name) {
 		createConstructor(jsConstructor, this);
 	}
 
@@ -39,6 +40,8 @@ public:
 				}, &obj);
 		}
 		JS::JsSetPrototype(obj, getPrototype());
+		Chakra::SetPropertyString(obj, L"name", util::StrToWStr(item->namespacedId.getString()));
+		Chakra::SetPropertyString(obj, L"translateName", util::StrToWStr(item->translateName));
 		return obj;
 	}
 

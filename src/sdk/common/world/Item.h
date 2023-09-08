@@ -11,7 +11,7 @@ namespace SDK {
 		CLASS_FIELD(std::string, translateName, 0xA8); // item.bow
 		CLASS_FIELD(HashedString, id, 0xC8); // bow
 		CLASS_FIELD(HashedString, _namespace, 0xF0); // minecraft
-		CLASS_FIELD(HashedString, namespacedId, 0x120); // minecraft:bow 
+		CLASS_FIELD(HashedString, namespacedId, 0x118); // minecraft:bow 
 
 		int getMaxUseDuration(class ItemStack* item) {
 			if (internalVers > V1_19_41) {

@@ -631,6 +631,7 @@
     <ClCompile Include="src\sdk\common\network\packet\TextPacket.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\Actor.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp" />
+    <ClCompile Include="src\sdk\common\world\ItemStackBase.cpp" />
     <ClCompile Include="src\sdk\common\world\level\Level.cpp" />
     <ClCompile Include="src\sdk\common\world\Minecraft.cpp" />
     <ClCompile Include="src\sdk\deps\Application\AppPlatform.cpp" />

@@ -145,6 +145,10 @@ public:
 	inline static SigImpl CameraViewBob{[](memory::signature_store&, uintptr_t res) { return res; },
 		"40 53 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 44 24 ? 49 8b 00",
 		"`anonymous namespace'::_bobMovement"};
+
+	inline static SigImpl ItemStackBase_getHoverName{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5C 24 ?? 48 89 74 24 ?? 57 48 81 EC ?? ?? ?? ?? 48 8B FA 48 8B D9 48 89 94 24",
+		"ItemStackBase::getHoverName"};
 };
 
 

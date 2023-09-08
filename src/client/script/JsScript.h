@@ -115,6 +115,7 @@ public:
 
 	[[nodiscard]] std::wstring getCertificate();
 	[[nodiscard]] static std::optional<std::wstring> getHash(std::filesystem::path const& main);
+	[[nodiscard]] static JsScript* getThis();
 
 	static void __stdcall debugEventCallback(JsDiagDebugEvent debugEvent, JsValueRef eventData, void* callbackState);
 

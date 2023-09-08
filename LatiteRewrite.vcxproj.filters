@@ -962,6 +962,9 @@
     <ClCompile Include="src\client\script\class\impl\game\JsLocalPlayerClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\sdk\common\world\ItemStackBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CMakePresets.json" />

@@ -533,6 +533,14 @@ std::optional<std::wstring> JsScript::getHash(std::filesystem::path const& main)
 	return std::nullopt;
 }
 
+JsScript* JsScript::getThis() {
+	JsScript* ret = nullptr;
+	JsContextRef ct;
+	JS::JsGetCurrentContext(&ct);
+	JS::JsGetContextData(ct, reinterpret_cast<void**>(&ret));
+	return ret;
+}
+
 void __stdcall JsScript::debugEventCallback(JsDiagDebugEvent debugEvent, JsValueRef eventData, void* callbackState) {
 }
 

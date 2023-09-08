@@ -178,6 +178,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Components::runtimeIDComponent),
         MVSIG(Misc::clickMap),
         MVSIG(CameraViewBob),
+        MVSIG(ItemStackBase_getHoverName),
             };
     
     new (mmgrBuf) ModuleManager;

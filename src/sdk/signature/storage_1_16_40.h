@@ -114,6 +114,10 @@ public:
 	inline static SigImpl MoveInputHandler_tick{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? 0F B6 41 ?? 40 32 F6",
 		"MoveInputHandler::tick"};
+
+	inline static SigImpl ItemStackBase_getHoverName{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5C 24 ?? 48 89 74 24 ?? 57 48 81 EC ?? ?? ?? ?? 48 8B FA 48 8B D9 48 89 94 24",
+		"ItemStackBase::getHoverName"};
 };
 
 // after adding sigs here, add them in latite.cpp

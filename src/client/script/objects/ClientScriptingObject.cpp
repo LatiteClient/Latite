@@ -6,6 +6,7 @@
 #include "client/script/ScriptManager.h"
 #include "client/feature/command/CommandManager.h"
 #include "client/feature/module/ModuleManager.h"
+#include "../class/impl/game/JsItemStack.h"
 
 #include "../class/impl/JsModuleClass.h"
 #include "client/feature/command/script/JsCommand.h"
@@ -68,6 +69,10 @@ JsValueRef ClientScriptingObject::getCmgrCallback(JsValueRef callee, bool isCons
 	return reinterpret_cast<ClientScriptingObject*>(callbackState)->commandManager;
 }
 
+JsValueRef ClientScriptingObject::testCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState){
+	return JsScript::getThis()->getClass<JsItemStack>()->construct(SDK::ClientInstance::get()->getLocalPlayer()->supplies->inventory->getItem(0), false);
+}
+
 void ClientScriptingObject::initModuleManager() {
 	JS::JsCreateObject(&this->moduleManager);
 	JS::JsAddRef(moduleManager, nullptr);
@@ -79,6 +84,10 @@ void ClientScriptingObject::initCommandManager() {
 }
 
 void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
+#if LATITE_DEBUG
+	Chakra::DefineFunc(object, testCallback, L"test", this);
+#endif
+
 	Chakra::DefineFunc(object, registerEventCallback, L"on");
 	Chakra::DefineFunc(object, runCommandCallback, L"runCommand");
 	Chakra::DefineFunc(object, showNotifCallback, L"showNotification");
