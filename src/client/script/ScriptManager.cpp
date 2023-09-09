@@ -229,7 +229,7 @@ std::optional<int> ScriptManager::installScript(std::string const& inName) {
 			return 0;
 		}
 	}
-	auto arr = scriptsJson["scripts"];
+	auto& arr = scriptsJson["scripts"];
 	for (auto& js : arr) {
 		auto name = js["name"].get<std::string>();
 		auto oName = js["name"].get<std::string>();
@@ -269,7 +269,7 @@ std::optional<int> ScriptManager::installScript(std::string const& inName) {
 				ofs.flush(); // so we can access the certificate directly after
 			}
 			else {
-				Logger::Warn(XOR_STRING("Could not create certificate for script {}"), util::WStrToStr(path));
+				Logger::Warn(XOR_STRING("Could not create certificate for script {}"), path.string());
 			}
 			return std::nullopt;
 		}

@@ -636,6 +636,9 @@
     <ClInclude Include="src\client\script\class\JsWrapperClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\feature\command\impl\SignCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -969,6 +972,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\sdk\common\world\ItemStackBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\command\impl\SignCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

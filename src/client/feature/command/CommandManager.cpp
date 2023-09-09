@@ -13,6 +13,7 @@
 #include "impl/ScriptCommand.h"
 #include "impl/SetPrefixCommand.h"
 #include "impl/ConfigCommand.h"
+#include "impl/SignCommand.h"
 //
 
 CommandManager::CommandManager() {
@@ -25,6 +26,9 @@ CommandManager::CommandManager() {
 	this->items.push_back(std::make_shared<ScriptCommand>());
 	this->items.push_back(std::make_shared<SetPrefixCommand>());
 	this->items.push_back(std::make_shared<ConfigCommand>());
+#if LATITE_DEBUG
+	this->items.push_back(std::make_shared<SignCommand>());
+#endif
 }
 
 bool CommandManager::runCommand(std::string const& line) {

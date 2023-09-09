@@ -3,7 +3,7 @@
 #include "client/Latite.h"
 #include "client/feature/module/ModuleManager.h"
 
-ToggleCommand::ToggleCommand() : Command("toggle", "Toggles a module on or off.", "{0} <module>", {"t"}) {
+ToggleCommand::ToggleCommand() : Command("toggle", "Toggles a module on or off.", "$ <module>", {"t"}) {
 }
 
 bool ToggleCommand::execute(std::string const label, std::vector<std::string> args) {

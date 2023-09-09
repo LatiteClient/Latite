@@ -3,7 +3,7 @@
 #include "../CommandManager.h"
 #include "client/Latite.h"
 
-SetPrefixCommand::SetPrefixCommand() : Command("setprefix", "Set the command prefix", "{0} [prefix]") {
+SetPrefixCommand::SetPrefixCommand() : Command("setprefix", "Set the command prefix", "$ [prefix]") {
 }
 
 bool SetPrefixCommand::execute(std::string const label, std::vector<std::string> args) {

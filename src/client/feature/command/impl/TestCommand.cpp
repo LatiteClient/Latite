@@ -2,7 +2,7 @@
 #include "TestCommand.h"
 #include "client/Latite.h"
 
-TestCommand::TestCommand() : Command("test", "A command for testing", "{0} [...]", {"tc"}) {
+TestCommand::TestCommand() : Command("test", "A command for testing", "$ [...]", {"tc"}) {
 }
 
 bool TestCommand::execute(std::string const label, std::vector<std::string> args) {
