@@ -3,7 +3,7 @@
 #include <vector>
 #include "api/feature/Feature.h"
 
-class ICommand : public Feature {
+class ICommand : public Listener, public Feature {
 public:
 	ICommand(std::string const& name, std::string const& description, std::string const& usage, std::vector<std::string> aliases = {})
 		: cmdName(name), description(description), usage(usage)

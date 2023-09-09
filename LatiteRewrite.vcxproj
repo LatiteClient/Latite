@@ -306,6 +306,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="deps\include\vhook\vtable_hook.h" />
     <ClInclude Include="src\client\event\Events.h" />
     <ClInclude Include="src\client\event\impl\BobMovementEvent.h" />
     <ClInclude Include="src\client\event\impl\DrawHUDModulesEvent.h" />
@@ -400,6 +401,7 @@
     <ClInclude Include="src\client\hook\impl\LevelRendererHooks.h" />
     <ClInclude Include="src\client\hook\impl\MinecraftGameHooks.h" />
     <ClInclude Include="src\client\hook\impl\OptionHooks.h" />
+    <ClInclude Include="src\client\hook\impl\PacketHooks.h" />
     <ClInclude Include="src\client\hook\impl\RenderControllerHooks.h" />
     <ClInclude Include="src\client\hook\impl\ScreenViewHooks.h" />
     <ClInclude Include="src\client\input\Keyboard.h" />
@@ -465,11 +467,13 @@
     <ClInclude Include="src\sdk\common\network\Packet.h" />
     <ClInclude Include="src\sdk\common\network\PacketSender.h" />
     <ClInclude Include="src\sdk\common\network\packet\CommandRequestPacket.h" />
+    <ClInclude Include="src\sdk\common\network\packet\SetTitlePacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\TextPacket.h" />
     <ClInclude Include="src\sdk\common\network\RakPeer.h" />
     <ClInclude Include="src\sdk\common\world\actor\player\GameMode.h" />
     <ClInclude Include="src\sdk\common\world\actor\player\Inventory.h" />
     <ClInclude Include="src\sdk\common\world\actor\player\PlayerInventory.h" />
+    <ClInclude Include="src\sdk\common\world\Attribute.h" />
     <ClInclude Include="src\sdk\common\world\Item.h" />
     <ClInclude Include="src\sdk\common\world\ItemStack.h" />
     <ClInclude Include="src\sdk\common\world\ItemStackBase.h" />
@@ -534,6 +538,7 @@
     <Text Include="src\util\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="deps\include\vhook\vtable_hook.cpp" />
     <ClCompile Include="src\client\feature\command\impl\SignCommand.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\Keystrokes.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\CinematicCamera.cpp" />
@@ -581,6 +586,7 @@
     <ClCompile Include="src\client\hook\impl\LevelRendererHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\MinecraftGameHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\OptionHooks.cpp" />
+    <ClCompile Include="src\client\hook\impl\PacketHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\RenderControllerHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\ScreenViewHooks.cpp" />
     <ClCompile Include="src\client\input\Keyboard.cpp" />

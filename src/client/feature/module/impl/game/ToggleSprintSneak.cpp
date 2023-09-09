@@ -33,7 +33,7 @@ void ToggleSprintSneak::onTick(Event& evGeneric) {
 	}
 	else if ((std::get<BoolValue>(sprint) && toggleSprinting) || input->sprintKey) {
 		left = L"Sprinting";
-		if (input->front && !plr->getItemUseDuration() && !input->sneak) { // TODO: check CollidedHorizontally/vertically + hunger
+		if (input->front && !plr->getItemUseDuration() && !input->sneak && plr->getHunger() > 6.f) { // TODO: check CollidedHorizontally/vertically + hunger
 			if (!input->sprintKey) {
 				plr->setSprinting(true);
 			}

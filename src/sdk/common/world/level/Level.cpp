@@ -80,3 +80,7 @@ SDK::HitResult* SDK::Level::getLiquidHitResult() {
 	// funny hack because this isnt actually working
 	return reinterpret_cast<SDK::HitResult*>(memory::callVirtual<uintptr_t>(this, index)) /*sizeof hitResult (0x60) / 8*/;
 }
+
+bool SDK::Level::isClientSide() {
+	return memory::callVirtual<bool>(this, MV_DETAIL_GETOFFSET(0x124, 0x12B, 0x127));
+}

@@ -20,6 +20,7 @@ namespace SDK {
 		std::unordered_map<UUID, PlayerListEntry>* getPlayerList();
 		class HitResult* getHitResult();
 		class HitResult* getLiquidHitResult();
+		bool isClientSide();
 
 		MVCLASS_FIELD(std::string, name, 0x678, 0x5B8, 0x548);
 	};

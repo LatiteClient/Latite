@@ -28,6 +28,8 @@ class GenericHooks : public HookGroup {
         uintptr_t a10,
         uintptr_t a11);
     static void __fastcall CameraViewBob(void*, void*, void*);
+    static bool Level_initialize(SDK::Level* obj, void* palette, void* settings, void* tickRange, void* experiments, uint64_t a6);
+    static void* Level_startLeaveGame(SDK::Level* obj);
 public:
     GenericHooks();
 };

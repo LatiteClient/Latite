@@ -296,6 +296,7 @@ void ScriptManager::initListeners()
 	eventListeners[L"world-tick"] = {};
 	eventListeners[L"leave-game"] = {};
 	eventListeners[L"receive-chat"] = {};
+	eventListeners[L"title"] = {};
 	eventListeners[L"send-chat"] = {};
 	eventListeners[L"render2d"] = {};
 	eventListeners[L"renderDX"] = {};

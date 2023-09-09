@@ -106,15 +106,11 @@ namespace SDK {
 			}
 		}
 
-		void getDescendants(std::function<void(std::shared_ptr<UIControl> control)> func, int* deep = nullptr) {
-			if (children.size() == 0) {
-				if (deep) *deep = 1;
-			}
-
+		void getDescendants(std::function<void(std::shared_ptr<UIControl> control)> func) {
 			for (size_t i = 0; i < children.size(); i++) {
 				auto child = children[i];
 				func(child);
-				child->getDescendants(func, deep);
+				child->getDescendants(func);
 			}
 		}
 

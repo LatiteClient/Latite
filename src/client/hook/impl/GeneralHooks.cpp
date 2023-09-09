@@ -29,6 +29,8 @@ namespace {
 	std::shared_ptr<Hook> MoveInputHandler_tickHook;
 	std::shared_ptr<Hook> MovePlayerHook;
 	std::shared_ptr<Hook> ViewBobHook;
+	std::shared_ptr<Hook> Level_initializeHook;
+	std::shared_ptr<Hook> Level_startLeaveGameHook;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -211,6 +213,21 @@ void __fastcall GenericHooks::CameraViewBob(void* a, void* b, void* c) {
 	return ViewBobHook->oFunc<decltype(&CameraViewBob)>()(a, b, c);
 }
 
+bool GenericHooks::Level_initialize(SDK::Level* obj, void* palette, void* settings, void* tickRange, void* experiments, uint64_t a6) {
+	auto o = Level_initializeHook->oFunc<decltype(&Level_initialize)>()(obj, palette, settings, tickRange, experiments, a6);
+	if (obj->isClientSide()) {
+		ScriptManager::Event ev{L"join-game", {}, false};
+	}
+	return o;
+}
+
+void* GenericHooks::Level_startLeaveGame(SDK::Level* obj) {
+	if (obj->isClientSide()) {
+		ScriptManager::Event ev{L"leave-game", {}, false};
+	}
+	return Level_startLeaveGameHook->oFunc<decltype(&Level_startLeaveGame)>()(obj);
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	LoadLibraryHook = addHook((uintptr_t)&::LoadLibraryW, hkLoadLibraryW);
 	LoadLibraryHook = addHook((uintptr_t) & ::LoadLibraryA, hkLoadLibraryW);
@@ -243,4 +260,6 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	}
 
 	ViewBobHook = addHook(Signatures::CameraViewBob.result, CameraViewBob, "`anonymous namespace'::_bobMovement");
+	Level_initializeHook = addHook(reinterpret_cast<uintptr_t*>(Signatures::Vtable::Level.result)[1], Level_initialize, "Level::initialize");
+	Level_startLeaveGameHook = addHook(reinterpret_cast<uintptr_t*>(Signatures::Vtable::Level.result)[2], Level_startLeaveGame, "Level::startLeaveGame");
 }

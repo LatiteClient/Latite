@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <cstdint>
+#include "util/FNV32.h"
 
 namespace SDK {
 	class HashedString {
@@ -17,20 +18,8 @@ namespace SDK {
 			return string;
 		}
 
-		static uint64_t Hash(std::string const& str) {
-			const uint64_t FNV_OFFSET_BASIS = 0xcbf29ce484222325;
-			const uint64_t FNV_PRIME = 0x100000001b3;
-			const uint8_t* bytes = reinterpret_cast<const uint8_t*>(str.c_str());
-			uint64_t hash = FNV_OFFSET_BASIS;
-			for (size_t i = 0; i < str.length(); ++i) {
-				hash = hash ^ bytes[i];
-				hash = hash * FNV_PRIME;
-			}
-			return hash;
-		}
-
 		HashedString(std::string const& str) : string(str.c_str()), idk(nullptr) {
-			hash = Hash(str);
+			hash = util::fnv1a_64(str);
 			string = str;
 		}
 

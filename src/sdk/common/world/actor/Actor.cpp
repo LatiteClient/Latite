@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Actor.h"
 #include "sdk/signature/storage.h"
+#include "sdk/common/world/Attribute.h"
 
 AABB& SDK::Actor::getBoundingBox() {
 	if (internalVers < V1_19_51) {
@@ -75,4 +76,20 @@ void SDK::Actor::swing() {
 
 bool SDK::Actor::isPlayer() {
 	return getEntityTypeID() == 63;
+}
+
+SDK::AttributeInstance* SDK::Actor::getAttribute(SDK::Attribute& attribute) {
+	return memory::callVirtual<SDK::AttributeInstance*>(this, MV_DETAIL_GETOFFSET(0xBC, 0xCF, 0xD0), attribute);
+}
+
+float SDK::Actor::getHealth() {
+	return getAttribute(SDK::Attributes::Health)->value;
+}
+
+float SDK::Actor::getHunger() {
+	return getAttribute(SDK::Attributes::Hunger)->value;
+}
+
+float SDK::Actor::getSaturation() {
+	return getAttribute(SDK::Attributes::Saturation)->value;
 }

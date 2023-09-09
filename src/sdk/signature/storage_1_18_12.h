@@ -30,6 +30,13 @@ public:
 			// last 4 bytes is the hash of the component
 			"48 8D 05 ?? ?? ?? ?? 48 8B F9 48 89 01 48 83 C1 ?? E8 ?? ?? ?? ?? 48 8D 8F",
 			"const TextPacket::vftable"};
+		inline static SigImpl CommandRequestPacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+			// last 4 bytes is the hash of the component
+			"4c 8d 3d ? ? ? ? 4c 89 7d ? 48 89 75 ? 66 0f 7f 45",
+			"const TextPacket::`vftable'"};
+		inline static SigImpl Level{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+			"48 8d 05 ? ? ? ? 48 89 07 48 8d 05 ? ? ? ? 48 89 47 ? 48 8d 05 ? ? ? ? 48 89 47 ? 33 c0",
+			"const Level::`vftable'"};
 	};
 
 	struct Components {
@@ -134,6 +141,10 @@ public:
 	inline static SigImpl ItemStackBase_getHoverName{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5C 24 ?? 48 89 74 24 ?? 57 48 81 EC ?? ?? ?? ?? 48 8B FA 48 8B D9 48 89 94 24",
 		"ItemStackBase::getHoverName"};
+
+	inline static SigImpl SetTitlePacket_readExtended{[](memory::signature_store&, uintptr_t res) { return res; },
+		"40 55 53 56 57 41 56 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 4d 8b f0 48 8b fa 48 8b d9 48 89 54 24 ? 48 8d 55",
+		"SetTimePacket::readExtended"};
 };
 
 // after adding sigs here, add them in latite.cpp

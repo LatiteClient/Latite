@@ -48,4 +48,5 @@ public:
 	~HookGroup() = default;
 
 	[[nodiscard]] std::shared_ptr<Hook> addHook(uintptr_t ptr, func_ptr_t detour, const char* name = "Unnamed Hook");
+	[[nodiscard]] std::shared_ptr<Hook> addTableSwapHook(uintptr_t ptr, func_ptr_t detour, const char* name = "Unnamed Hook");
 };
