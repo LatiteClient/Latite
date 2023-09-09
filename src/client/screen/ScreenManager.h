@@ -19,7 +19,7 @@ public:
 		auto& scr = std::get<T>(items);
 
 		this->activeScreen = scr;
-		scr.setActive(true);
+		scr.setActive(true, ignoreAnims);
 	}
 
 	template <typename T>

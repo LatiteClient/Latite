@@ -69,11 +69,11 @@ void Keystrokes::render(DXContext& dc, bool, bool inEditor) {
 	// Direction Keys
 
 	FloatValue pad = std::get<FloatValue>(padding);
-	Vec2 pos = Vec2(pad + std::get<FloatValue>(keystrokeSize) + pad, pad);
+	Vec2 pos = Vec2(std::get<FloatValue>(keystrokeSize) + pad, 0.f);
 	pos.y += drawKeystroke(dc, pos, keystrokes[0]).y + pad; // w
 	pos.x -= (drawKeystroke(dc, pos, keystrokes[2]).x + pad); // s
-	pos.x += (drawKeystroke(dc, pos, keystrokes[1]).x + pad) * 2; // a
-	pos = pos + (drawKeystroke(dc, pos, keystrokes[3]) + Vec2(0, pad)); // d
+	pos.x += (drawKeystroke(dc, pos, keystrokes[1]).x + pad) * 2.f; // a
+	pos = pos + (drawKeystroke(dc, pos, keystrokes[3]));
 
 	// Mouse Buttons
 
@@ -83,26 +83,26 @@ void Keystrokes::render(DXContext& dc, bool, bool inEditor) {
 		float rad = std::min(std::get<FloatValue>(this->radius).value, mbHeight / 2.f);
 		{
 			auto& btn = mouseButtons[0];
-			d2d::Rect mb = { pad, pos.y, pos.x, pos.y + mbHeight };
+			d2d::Rect mb = { 0.f, pos.y, pos.x, pos.y + mbHeight };
 			mb.right -= (mb.getWidth() / 2);
 			dc.fillRoundedRectangle(mb, btn.col, rad);
 
 			std::wstring str = L"LMB";
 			dc.drawText(mb, str, btn.textCol, Renderer::FontSelection::SegoeLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 			if (std::get<BoolValue>(border)) {
-				dc.drawRoundedRectangle(mb, std::get<ColorValue>(this->borderColor).color1, rad);
+				dc.drawRoundedRectangle(mb, std::get<ColorValue>(this->borderColor).color1, rad, std::get<FloatValue>(this->borderLength));
 			}
 		}
 		{
 			auto& btn = mouseButtons[1];
-			d2d::Rect mb = { pad, pos.y, pos.x, pos.y + mbHeight };
+			d2d::Rect mb = { 0.f, pos.y, pos.x, pos.y + mbHeight };
 			mb.left += (mb.getWidth() / 2) + pad;
 
 			dc.fillRoundedRectangle(mb, btn.col, rad);
 			std::wstring str = L"RMB";
 			dc.drawText(mb, str, btn.textCol, Renderer::FontSelection::SegoeLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 			if (std::get<BoolValue>(border)) {
-				dc.drawRoundedRectangle(mb, std::get<ColorValue>(this->borderColor).color1, rad);
+				dc.drawRoundedRectangle(mb, std::get<ColorValue>(this->borderColor).color1, rad, std::get<FloatValue>(this->borderLength));
 			}
 		}
 		pos.y += mbHeight;
@@ -111,20 +111,20 @@ void Keystrokes::render(DXContext& dc, bool, bool inEditor) {
 	float rad = std::get<FloatValue>(radius);
 	if (std::get<BoolValue>(spaceBar)) {
 		pos.y += pad;
-		d2d::Rect spaceBox = { pad, pos.y, pos.x, pos.y + std::get<FloatValue>(spaceSize) };
+		d2d::Rect spaceBox = { 0.f, pos.y, pos.x, pos.y + std::get<FloatValue>(spaceSize) };
 		dc.fillRoundedRectangle(spaceBox, keystrokes[5].col, rad);
 		if (std::get<BoolValue>(border)) dc.drawRoundedRectangle(spaceBox, std::get<ColorValue>(borderColor).color1, rad, std::get<FloatValue>(borderLength));
 		Vec2 center = spaceBox.center({ 1.f * std::get<FloatValue>(keystrokeSize), 1 });
-		dc.fillRoundedRectangle({ center.x, center.y, center.x + (1.f * std::get<FloatValue>(keystrokeSize)), center.y + 1 }, keystrokes[5].textCol, rad);
+		dc.fillRectangle({ center.x, center.y, center.x + (1.f * std::get<FloatValue>(keystrokeSize)), center.y + 1 }, keystrokes[5].textCol);
 		pos.y += spaceBox.getHeight();
 	}
 
 	if (std::get<BoolValue>(shiftKey)) {
 		pos.y += pad;
-		d2d::Rect shiftBox = { pad, pos.y, pos.x, pos.y + std::get<FloatValue>(spaceSize) };
+		d2d::Rect shiftBox = { 0.f, pos.y, pos.x, pos.y + std::get<FloatValue>(spaceSize) };
 		dc.fillRoundedRectangle(shiftBox, keystrokes[4].col, rad);
 		if (std::get<BoolValue>(border)) dc.drawRoundedRectangle(shiftBox, std::get<ColorValue>(borderColor).color1, rad, std::get<FloatValue>(borderLength));
-		dc.drawText(shiftBox, L"Sneak", keystrokes[4].textCol, Renderer::FontSelection::SegoeLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(shiftBox, keystrokes[4].keyName, keystrokes[4].textCol, Renderer::FontSelection::SegoeLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		pos.y += shiftBox.getHeight();
 	}
 

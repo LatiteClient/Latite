@@ -17,9 +17,9 @@ public:
 	Screen(Screen&&) = delete;
 
 	[[nodiscard]] bool isActive() { return active; }
-	void setActive(bool b) { 
+	void setActive(bool b, bool ignoreAnims = false) { 
 		this->active = b;
-		b ? onEnable() : onDisable();
+		b ? onEnable(ignoreAnims) : onDisable();
 	}
 
 	[[nodiscard]] bool shouldListen() override { return isActive(); }

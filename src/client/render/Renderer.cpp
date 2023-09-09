@@ -205,7 +205,7 @@ void Renderer::render() {
 
 	std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 	auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastTime);
-	deltaTime = std::clamp(static_cast<float>(diff.count()) / 17.f, 1.f, 20.f); // based on 60-ish FPS
+	deltaTime = std::clamp(static_cast<float>(diff.count()) / 17.f, 0.02f, 20.f); // based on 60-ish FPS
 
 	lastTime = now;
 

@@ -46,10 +46,21 @@ ClickGUI::ClickGUI() {
 }
 
 void ClickGUI::onRender(Event&) {
-	if (!isActive() && calcAnim < 0.03f) {
-		calcAnim = 0.f;
-		return;
+	{
+		auto scn = Latite::getScreenManager().getActiveScreen();
+		if (!isActive() && (calcAnim < 0.03f)) {
+			calcAnim = 0.f;
+			return;
+		}
+		if (scn) {
+			auto scnName = scn->get().getName();
+			if (scnName != this->getName()) {
+				calcAnim = 0.f;
+				return;
+			}
+		}
 	}
+
 	bool shouldArrow = true;
 
 	if (colorPicker.setting) {
@@ -1495,6 +1506,8 @@ void ClickGUI::onEnable(bool ignoreAnims) {
 	if (ignoreAnims) calcAnim = 1.f;
 	scroll = 0.f;
 	lerpScroll = 0.f;
+	mouseButtons = {};
+	justClicked = {};
 	this->tab = MODULES;
 }
 
