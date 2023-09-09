@@ -121,7 +121,7 @@ JsValueRef JsModuleClass::moduleAddBoolSetting(JsValueRef callee, bool isConstru
 	
 	auto thi = reinterpret_cast<JsModuleClass*>(callbackState);
 
-	auto mod = ToModule(arguments[0]);
+	auto mod = Get(arguments[0]);
 
 	if (!mod) {
 		Chakra::ThrowError(L"Object is not a module");
@@ -157,7 +157,7 @@ JsValueRef JsModuleClass::moduleAddNumberSetting(JsValueRef callee, bool isConst
 
 	auto thi = reinterpret_cast<JsModuleClass*>(callbackState);
 
-	auto mod = ToModule(arguments[0]);
+	auto mod = Get(arguments[0]);
 
 	if (!mod) {
 		Chakra::ThrowError(L"Object is not a module");

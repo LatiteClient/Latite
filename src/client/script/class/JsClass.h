@@ -8,7 +8,7 @@ public:
 	JsClass(JsClass&) = delete;
 	JsClass(JsClass&&) = delete;
 
-	~JsClass() {
+	virtual ~JsClass() {
 
 		// this crash, probably becuase the runtime doesnt exist
 		//if (prototype != JS_INVALID_REFERENCE) JS::JsRelease(prototype, nullptr);

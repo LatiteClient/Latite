@@ -4,22 +4,12 @@
 #include "sdk/common/world/ItemStack.h"
 #include "JsItem.h"
 
-class JsItemStack : public JsClass {
+class JsItemStack : public JsWrapperClass<SDK::ItemStack> {
 protected:
-	static JsValueRef CALLBACK jsConstructor(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-		auto thi = reinterpret_cast<JsItemStack*>(callbackState);
-
-		if (!isConstructor) return thi->errConstructCall();
-
-		Chakra::ThrowError(thi->name + std::wstring(L" cannot be constructed"));
-		return JS_INVALID_REFERENCE;
-	}
-
 	static JsValueRef CALLBACK toStringCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 		auto thi = reinterpret_cast<JsItemStack*>(callbackState);
-		auto item = ToItemStack(arguments[0]);
+		auto item = Get(arguments[0]);
 		std::string add = std::format("{} (name={}, aux={})", util::WStrToStr(thi->name), item->item ? item->getHoverName() : "air", item->aux);
 		return Chakra::MakeString(L"[object " + util::StrToWStr(add) + L"]");
 	}
@@ -28,7 +18,7 @@ protected:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 
 		auto thi = reinterpret_cast<JsItemStack*>(callbackState);
-		auto item = ToItemStack(arguments[0]);
+		auto item = Get(arguments[0]);
 		return Chakra::MakeString(util::StrToWStr(item->getHoverName()));
 	}
 
@@ -36,7 +26,7 @@ protected:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 
 		auto thi = reinterpret_cast<JsItemStack*>(callbackState);
-		auto item = ToItemStack(arguments[0]);
+		auto item = Get(arguments[0]);
 		return Chakra::MakeInt(item->itemCount);
 	}
 
@@ -44,29 +34,19 @@ protected:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 
 		auto thi = reinterpret_cast<JsItemStack*>(callbackState);
-		auto item = ToItemStack(arguments[0]);
+		auto item = Get(arguments[0]);
 
 		// double because of Y2K38 problem
 		return Chakra::MakeDouble(static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(item->pickupTime.time_since_epoch()).count()));
 	}
 public:
 	inline static const wchar_t* class_name = L"ItemStack";
-	JsItemStack(class JsScript* owner) : JsClass(owner, class_name) {
-		createConstructor(jsConstructor, this);
+	JsItemStack(class JsScript* owner) : JsWrapperClass(owner, class_name) {
+		createConstructor(jsNoConstructor, this);
 	}
 
 	JsValueRef construct(SDK::ItemStack* item, bool del) {
-		JsValueRef obj;
-		if (del) {
-			JS::JsCreateExternalObject(item, [](void* obj) {
-				delete obj;
-				}, &obj);
-		}
-		else {
-			JS::JsCreateExternalObject(item, [](void*) {
-				}, &obj);
-		}
-		JS::JsSetPrototype(obj, getPrototype());
+		auto obj = __super::construct(item, del);
 		if (item->item) {
 			Chakra::SetProperty(obj, L"item", this->owner->getClass<JsItem>()->construct(*item->item, false), true);
 		}
@@ -83,10 +63,4 @@ public:
 		Chakra::DefineFunc(prototype, getCountCallback, L"getCount", this);
 		Chakra::DefineFunc(prototype, getPickupTime, L"getPickupTime", this);
 	};
-
-	static SDK::ItemStack* ToItemStack(JsValueRef obj) {
-		SDK::ItemStack* stack = nullptr;
-		JS::JsGetExternalData(obj, reinterpret_cast<void**>(&stack));
-		return stack;
-	}
 };

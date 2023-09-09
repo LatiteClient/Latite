@@ -11,7 +11,7 @@ public:
 	// you NEED to call initialize shortly after constructing it or there is a chance the garbage collector will do a funny
 	ScriptingObject(int id, const wchar_t* name) : objName(name) { this->id = id; JS::JsCreateObject(&object); }
 
-	~ScriptingObject();
+	virtual ~ScriptingObject();
 
 	virtual void initialize(JsContextRef ctx, JsValueRef parentObj) = 0;
 

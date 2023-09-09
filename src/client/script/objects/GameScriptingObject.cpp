@@ -59,7 +59,7 @@ JsValueRef GameScriptingObject::worldGetPlayers(JsValueRef callee, bool isConstr
 	JsValueRef array;
 	auto arr = SDK::ClientInstance::get()->minecraft->getLevel()->getPlayerList();
 	auto size = arr->size();
-	JS::JsCreateArray(size, &array);
+	JS::JsCreateArray(static_cast<unsigned>(size), &array);
 
 	int i = 0;
 	for (auto& pair : *arr) {

@@ -1,8 +1,8 @@
 #pragma once
-#include "../JsClass.h"
+#include "../JsWrapperClass.h"
 #include "client/feature/module/script/JsModule.h"
 
-class JsModuleClass : public JsClass {
+class JsModuleClass : public JsWrapperClass<JsModule> {
 protected:
 	static JsValueRef CALLBACK jsConstructor(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
@@ -20,7 +20,7 @@ protected:
 	static JsValueRef CALLBACK toStringCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 		auto thi = reinterpret_cast<JsModuleClass*>(callbackState);
-		auto mod = ToModule(arguments[0]);
+		auto mod = Get(arguments[0]);
 		if (!mod) {
 			Chakra::ThrowError(L"Invalid module");
 			return JS_INVALID_REFERENCE;
@@ -47,23 +47,12 @@ protected:
 public:
 	inline static const wchar_t* class_name = L"Module";
 
-	JsModuleClass(class JsScript* owner) : JsClass(owner, class_name) {
+	JsModuleClass(class JsScript* owner) : JsWrapperClass(owner, class_name) {
 		createConstructor(jsConstructor, this);
 	}
 
 	JsValueRef construct(JsModule* mod, bool finalize) {
-		JsValueRef obj;
-		if (finalize) {
-			JS::JsCreateExternalObject(mod, [](void* obj) {
-				delete obj;
-				}, &obj);
-		}
-		else {
-			JS::JsCreateExternalObject(mod, [](void*) {
-				}, &obj);
-		}
-
-		JS::JsSetPrototype(obj, getPrototype());
+		auto obj = __super::construct(mod, finalize);
 
 		Chakra::SetPropertyNumber(obj, L"key", static_cast<double>(mod->getKeybind()));
 		Chakra::SetPropertyString(obj, L"name", util::StrToWStr(mod->name()));
@@ -85,10 +74,4 @@ public:
 		Chakra::DefineFunc(prototype, moduleAddBoolSetting, L"addBoolSetting", this);
 		Chakra::DefineFunc(prototype, moduleAddNumberSetting, L"addNumberSetting", this);
 	};
-
-	static JsModule* ToModule(JsValueRef obj) {
-		JsModule* mod = nullptr;
-		JS::JsGetExternalData(obj, reinterpret_cast<void**>(&mod));
-		return mod;
-	}
 };

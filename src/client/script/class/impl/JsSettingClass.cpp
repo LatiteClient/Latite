@@ -7,7 +7,7 @@
 JsValueRef JsSettingClass::getValueCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
 {
 	auto thi = reinterpret_cast<JsSettingClass*>(callbackState);
-	auto set = ToSetting(arguments[0]);
+	auto set = Get(arguments[0]);
 
 	// UGH this SUCKS!!!!!!!
 	switch ((Setting::Type)set->value->index()) {

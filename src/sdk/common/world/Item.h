@@ -20,7 +20,6 @@ namespace SDK {
 			return memory::callVirtual<int>(this, 4, item);
 		}
 
-	private:
 		virtual ~Item() = 0;
 	};
 }

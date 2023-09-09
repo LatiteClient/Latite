@@ -5,7 +5,6 @@ class JsLocalPlayerClass : public JsPlayerClass {
 public:
 	inline static const wchar_t* class_name = L"LocalPlayer";
 	JsLocalPlayerClass(class JsScript* owner) : JsPlayerClass(owner, class_name) {
-		createConstructor(jsConstructor, this);
 	}
 
 	void prepareFunctions() override {

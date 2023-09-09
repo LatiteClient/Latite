@@ -5,7 +5,6 @@ class JsPlayerClass : public JsEntityClass {
 public:
 	inline static const wchar_t* class_name = L"Player";
 	JsPlayerClass(class JsScript* owner, const wchar_t* name = class_name) : JsEntityClass(owner, name) {
-		createConstructor(jsConstructor, this);
 	}
 
 	//JsValueRef construct(JsEntity* ent, bool finalize) override{

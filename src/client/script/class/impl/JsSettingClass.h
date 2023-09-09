@@ -1,9 +1,9 @@
 #pragma once
-#include "../JsClass.h"
+#include "../JsWrapperClass.h"
 #include "util/ChakraUtil.h"
 #include "client/feature/setting/script/JsSetting.h"
 
-class JsSettingClass : public JsClass {
+class JsSettingClass : public JsWrapperClass<Setting> {
 protected:
 	static JsValueRef CALLBACK jsConstructor(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
@@ -18,7 +18,7 @@ protected:
 	static JsValueRef CALLBACK toStringCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 		auto thi = reinterpret_cast<JsSettingClass*>(callbackState);
-		auto set = ToSetting(arguments[0]);
+		auto set = Get(arguments[0]);
 		std::string add = std::format("{} ({})", util::WStrToStr(thi->name), set->name());
 		return Chakra::MakeString(L"[object " + util::StrToWStr(add) + L"]");
 	}
@@ -28,7 +28,7 @@ protected:
 public:
 	inline static const wchar_t* class_name = L"Setting";
 
-	JsSettingClass(class JsScript* owner) : JsClass(owner, class_name) {
+	JsSettingClass(class JsScript* owner) : JsWrapperClass(owner, class_name) {
 		createConstructor(jsConstructor, this);
 	}
 
@@ -39,17 +39,7 @@ public:
 	/// <param name="finalize">Whether to destroy the C++ setting when the object goes out of scope or not.</param>
 	/// <returns></returns>
 	JsValueRef construct(Setting* set, bool finalize) {
-		JsValueRef obj;
-		if (finalize) {
-			JS::JsCreateExternalObject(set, [](void* obj) {
-				delete obj;
-				}, &obj);
-		}
-		else {
-			JS::JsCreateExternalObject(set, [](void*) {
-				}, &obj);
-		}
-		JS::JsSetPrototype(obj, getPrototype());
+		auto obj = __super::construct(set, finalize);
 
 		Chakra::SetPropertyString(obj, L"name", util::StrToWStr(set->name()), true);
 		Chakra::SetPropertyString(obj, L"description", util::StrToWStr(set->desc()), true);
@@ -65,10 +55,4 @@ public:
 		Chakra::DefineFunc(prototype, toStringCallback, L"toString", this);
 		Chakra::DefineFunc(prototype, getValueCallback, L"getValue", this);
 	};
-
-	static JsSetting* ToSetting(JsValueRef obj) {
-		JsSetting* mod = nullptr;
-		JS::JsGetExternalData(obj, reinterpret_cast<void**>(&mod));
-		return mod;
-	}
 };
