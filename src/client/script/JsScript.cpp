@@ -492,7 +492,7 @@ std::optional<std::wstring> JsScript::getHash(std::filesystem::path const& main)
 		for (auto& fil : std::filesystem::directory_iterator(path)) {
 			if (fil.is_directory()) {
 				iterate(fil);
-				return;
+				continue;
 			}
 			if (fil.path().string().ends_with(XOR_STRING(".js"))) { // I think I should still be fine with unicode filepaths
 				jsFiles.push_back(fil);
