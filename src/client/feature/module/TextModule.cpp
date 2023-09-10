@@ -29,8 +29,8 @@ void TextModule::onInit() {
 	addSliderSetting("radius", "Radius", "", radius, FloatValue(0.f), FloatValue(10.f), FloatValue(1.f));
 }
 
-void TextModule::render(DXContext& ctx, bool isDefault, bool inEditor) {
-	DXContext dc;
+void TextModule::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
+	DrawUtil dc;
 	//dc.setTextShadow(textShadow);
 	int textPadding = static_cast<int>(std::get<FloatValue>(padX));
 	int textPaddingY = static_cast<int>(std::get<FloatValue>(padY) * 2.f);
@@ -70,7 +70,7 @@ void TextModule::render(DXContext& ctx, bool isDefault, bool inEditor) {
 	else {
 		Vec2 drawPos = { static_cast<float>(textPadding), static_cast<float>(textPaddingY) };
 		Vec2 ts = dc.getTextSize(str.c_str(), Renderer::FontSelection::Light2, textSize, false);
-		d2d::Rect rc = d2d::Rect(0, 0, ts.x + (textPadding * 2), ts.y + (textPaddingY * 2));
+		d2d::Rect rc = d2d::Rect(0, 0, ts.x + (textPadding * 2), textSize + (textPaddingY * 2));
 
 		rad = (std::get<FloatValue>(radius).value / 10.f) * (rc.getHeight() / 2.f);
 		if (std::get<BoolValue>(fillBg)) dc.fillRoundedRectangle(rc, std::get<ColorValue>(bgColor).color1, rad);

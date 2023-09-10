@@ -42,7 +42,7 @@ public:
 
 	void onInit() override;
 
-	void render(DXContext& ctx, bool isDefault, bool inEditor) override;
+	void render(DrawUtil& ctx, bool isDefault, bool inEditor) override;
 
 protected:
 	virtual std::wstringstream text(bool isDefault, bool inEditor) = 0;

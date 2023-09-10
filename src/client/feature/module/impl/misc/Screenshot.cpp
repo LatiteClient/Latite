@@ -42,7 +42,7 @@ void Screenshot::onKey(Event& evG) {
 }
 
 void Screenshot::onRenderOverlay(Event& ev) {
-    DXContext dc;
+    DrawUtil dc;
     if (queueToScreenshot) {
         takeScreenshot(screenshotPath);
         Latite::getClientMessageSink().push(std::format("Screenshot saved to {}", (screenshotPath / "screenshot.png").string()));

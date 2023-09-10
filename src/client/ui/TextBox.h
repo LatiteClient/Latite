@@ -6,7 +6,7 @@
 #undef max
 #endif
 
-class DXContext;
+class DrawUtil;
 
 namespace ui {
 	class TextBox {
@@ -38,7 +38,7 @@ namespace ui {
 		TextBox(d2d::Rect rect, int maxChars = 32) : rect(rect), maxChars(maxChars), startTime(std::chrono::high_resolution_clock::now()) {}
 		TextBox() : startTime(std::chrono::high_resolution_clock::now()) {};
 
-		void render(DXContext& dc, float rounding, d2d::Color backgroundColor, d2d::Color textColor);
+		void render(DrawUtil& dc, float rounding, d2d::Color backgroundColor, d2d::Color textColor);
 
 		[[nodiscard]] int getCaretLocation() { return place; }
 		void setCaretLocation(int loc) { place = loc; }

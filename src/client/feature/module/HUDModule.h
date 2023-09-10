@@ -13,7 +13,7 @@ public:
 		addSliderSetting("scale", "Size", "", scale, FloatValue(0.f), FloatValue(4.f), FloatValue(0.05f));
 	}
 
-	virtual void render(DXContext& ctx, bool isDefault, bool inEditor) = 0;
+	virtual void render(DrawUtil& ctx, bool isDefault, bool inEditor) = 0;
 
 	virtual void renderSelected();
 	virtual void renderFrame();

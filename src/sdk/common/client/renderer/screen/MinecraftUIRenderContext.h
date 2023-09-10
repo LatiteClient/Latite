@@ -1,52 +1,89 @@
 #pragma once
-#include "sdk/SDKBase.h"
 #include "../TexturePtr.h"
 #include "ScreenContext.h"
-#include <glm/glm.hpp>
 
 namespace SDK {
-    class MinecraftUIRenderContext : public Incomplete {
+    namespace ui {
+        // horizontal alignment, there might be a way to align vertically??
+        enum class TextAlignment {
+            // leading
+            LEFT,
+            // trailing
+            RIGHT,
+            CENTER,
+        };
+    }
+
+    // Minecraft's RectangleArea is different from a standard rect
+    struct RectangleArea {
+        float left, right, top, bottom;
+        // x, width, y, height
+        constexpr RectangleArea(float left, float top, float right, float bottom) {
+            this->left = left;
+            this->right = right;
+            this->top = top;
+            this->bottom = bottom;
+        }
+    };
+
+    struct TextMeasureData {
+        float textSize = 10.f;
+        int i1 = 0;
+        bool displayShadow = false;
+        bool showColorSymbols = false;
+        bool b3 = false;
+
+        constexpr TextMeasureData(float textSize, bool displayShadow, bool showColorSymbols)
+            : textSize(textSize), displayShadow(displayShadow), showColorSymbols(showColorSymbols) {
+        }
+    };
+
+    // A pointer to 0xFFFFFFFF by default
+    using CaretMeasureData = uintptr_t*;
+
+
+    class MinecraftUIRenderContext {
     public:
         class ClientInstance* cinst;
         ScreenContext* screenContext;
 
         virtual ~MinecraftUIRenderContext() = 0; // 0x0
-        virtual void getLineLength(DontHave<"Font&">,  std::string const&,  float,  bool) = 0; // 0x1
-        virtual void getTextAlpha() = 0; // 0x2
+        virtual void getLineLength(class Font*,  std::string const&,  float,  bool) = 0; // 0x1
+        virtual float getTextAlpha() = 0; // 0x2
         virtual void setTextAlpha(float) = 0; // 0x3
-        virtual void drawDebugText(DontHave<"RectangleArea const&">,  std::string const&,  DontHave<"mce::Color const&">,  float,  DontHave<"ui::TextAlignment">,  DontHave<"TextMeasureData const&">, DontHave<"CaretMeasureData const&">) = 0; // 0x4
-        virtual void drawText(DontHave<"Font&">, DontHave<"RectangleArea const&">, std::string const&, DontHave<"mce::Color const&">, float, DontHave<"ui::TextAlignment">, DontHave<"TextMeasureData const&">, DontHave<"CaretMeasureData const&">) = 0; // 0x5
+        virtual void drawDebugText(RectangleArea const&,  std::string const&,  Color const&,  float,  ui::TextAlignment,  TextMeasureData const&, CaretMeasureData) = 0; // 0x4
+        virtual void drawText(class Font*, RectangleArea const&, std::string const&, Color const&, float, ui::TextAlignment, TextMeasureData const&, CaretMeasureData) = 0; // 0x5
         virtual void flushText(float) = 0; // 0x6
-        virtual void drawImage(TexturePtr const&, glm::vec<2, float, (glm::qualifier)0> const&, glm::vec<2, float, (glm::qualifier)0> const&, glm::vec<2, float, (glm::qualifier)0> const&, glm::vec<2, float, (glm::qualifier)0> const&) = 0; // 0x7
-        virtual void drawNineslice(TexturePtr const&, DontHave<"NinesliceInfo const&">) = 0; // 0x8
-        virtual void flushImages(DontHave<"mce::Color const&">, float, DontHave<"HashedString const&">) = 0; // 0x9
-        virtual void beginSharedMeshBatch(DontHave<"ComponentRenderBatch &">) = 0; // 0xA
-        virtual void endSharedMeshBatch(DontHave<"ComponentRenderBatch &">) = 0; // 0xB
-        virtual void drawRectangle(DontHave<"RectangleArea const&">, DontHave<"mce::Color const&">, float, int) = 0; // 0xC
-        virtual void fillRectangle(DontHave<"RectangleArea const&">, DontHave<"mce::Color const&">, float) = 0; // 0xD
+        virtual void drawImage(TexturePtr const&, Vec2 const&, Vec2 const&, Vec2 const&, Vec2 const&) = 0; // 0x7
+        virtual void drawNineslice(TexturePtr const&, void* const&) = 0; // 0x8
+        virtual void flushImages(Color const&, float, HashedString const&) = 0; // 0x9
+        virtual void beginSharedMeshBatch(void*) = 0; // 0xA
+        virtual void endSharedMeshBatch(void*) = 0; // 0xB
+        virtual void drawRectangle(RectangleArea const&, Color const&, float, int) = 0; // 0xC
+        virtual void fillRectangle(RectangleArea const&, Color const&, float) = 0; // 0xD
         virtual void increaseStencilRef() = 0; // 0xE
         virtual void decreaseStencilRef() = 0; // 0xF
         virtual void resetStencilRef() = 0; // 0x10
-        virtual void fillRectangleStencil(DontHave<"RectangleArea const&">) = 0; // 0x11
-        virtual void enableScissorTest(DontHave<"RectangleArea const&">) = 0; // 0x12
+        virtual void fillRectangleStencil(RectangleArea const&) = 0; // 0x11
+        virtual void enableScissorTest(RectangleArea const&) = 0; // 0x12
         virtual void disableScissorTest() = 0; // 0x13
-        virtual void setClippingRectangle(DontHave<"RectangleArea const&">) = 0; // 0x14
+        virtual void setClippingRectangle(RectangleArea const&) = 0; // 0x14
         virtual void setFullClippingRectangle() = 0; // 0x15
         virtual void saveCurrentClippingRectangle() = 0; // 0x16
         virtual void restoreSavedClippingRectangle() = 0; // 0x17
-        virtual void getFullClippingRectangle() = 0; // 0x18
-        virtual void updateCustom(DontHave<"gsl::not_null<CustomRenderComponent *>">) = 0; // 0x19
-        virtual void renderCustom(DontHave<"gsl::not_null<CustomRenderComponent *>">, int, DontHave<"RectangleArea const&">) = 0; // 0x1A
+        virtual RectangleArea getFullClippingRectangle() = 0; // 0x18
+        virtual void updateCustom(class CustomRenderComponent*) = 0; // 0x19
+        virtual void renderCustom(class CustomRenderComponent*, int, RectangleArea const&) = 0; // 0x1A
         virtual void cleanup() = 0; // 0x1B
         virtual void removePersistentMeshes() = 0; // 0x1C
-        virtual void getTexture(DontHave<"RectangleArea const&">, bool) = 0; // 0x1D
-        virtual void getZippedTexture(DontHave<"Core::Path const&">, DontHave<"RectangleArea const&">, bool) = 0; // 0x1E
-        virtual void unloadTexture(DontHave<"RectangleArea const&">) = 0; // 0x1F
-        virtual void getUITextureInfo(DontHave<"RectangleArea const&">, bool) = 0; // 0x20
-        virtual void touchTexture(DontHave<"RectangleArea const&">) = 0; // 0x21
+        virtual TexturePtr* getTexture(ResourceLocation const&, bool) = 0; // 0x1D
+        virtual TexturePtr* getZippedTexture(std::string const&, ResourceLocation const&, bool) = 0; // 0x1E
+        virtual void unloadTexture(ResourceLocation const&) = 0; // 0x1F
+        virtual void getUITextureInfo(ResourceLocation const&, bool) = 0; // 0x20
+        virtual void touchTexture(ResourceLocation const&) = 0; // 0x21
         virtual void getMeasureStrategy() = 0; // 0x22
-        virtual void snapImageSizeToGrid(glm::vec<2, float, (glm::qualifier)0> &) = 0; // 0x23
-        virtual void snapImagePositionToGrid(glm::vec<2, float, (glm::qualifier)0> &) = 0; // 0x24
+        virtual void snapImageSizeToGrid(Vec2 &) = 0; // 0x23
+        virtual void snapImagePositionToGrid(Vec2 &) = 0; // 0x24
         virtual void notifyImageEstimate(unsigned long) = 0; // 0x25
     };
 }

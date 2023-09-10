@@ -70,7 +70,7 @@ void Screen::onRenderOverlay(Event& ev) {
 		}
 
 	if (isActive() && this->tooltip.has_value()) {
-		DXContext dc;
+		DrawUtil dc;
 		Vec2& mousePos = SDK::ClientInstance::get()->cursorPos;
 		d2d::Rect textRect = dc.getTextRect(this->tooltip.value(), Renderer::FontSelection::SegoeRegular, 15.f, 8.f);
 		textRect.setPos(mousePos);

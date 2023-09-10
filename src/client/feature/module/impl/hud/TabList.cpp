@@ -16,7 +16,7 @@ void TabList::onRenderOverlay(Event& evG) {
 	auto plr = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!plr) return;
 
-	DXContext dc;
+	DrawUtil dc;
 	auto lvl = SDK::ClientInstance::get()->minecraft->getLevel();
 
 	size_t size = lvl->getPlayerList()->size();

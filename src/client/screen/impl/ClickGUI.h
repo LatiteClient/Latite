@@ -18,7 +18,7 @@ public:
 	void onClick(Event& ev);
 
 	std::string getName() override { return "ClickGUI"; }
-	float drawSetting(class Setting* set, class SettingGroup* group, struct Vec2 const& pos, class DXContext& dc, float size = 150.f, float fTextWidth = 0.21f);
+	float drawSetting(class Setting* set, class SettingGroup* group, struct Vec2 const& pos, class DrawUtil& dc, float size = 150.f, float fTextWidth = 0.21f);
 	
 	bool shouldSelect(d2d::Rect rc, Vec2 const& pt) override;
 

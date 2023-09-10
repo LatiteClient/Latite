@@ -67,7 +67,7 @@ void ClickGUI::onRender(Event&) {
 		addLayer(cPickerRect);
 	}
 
-	DXContext dc;
+	DrawUtil dc;
 	if (!isActive()) justClicked = { false, false, false };
 	if (isActive()) SDK::ClientInstance::get()->releaseCursor();
 	dc.ctx->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
@@ -128,7 +128,7 @@ void ClickGUI::onRender(Event&) {
 
 	// Menu Rect
 	dc.fillRoundedRectangle(rect, rcColor, 19.f * adaptedScale);
-	dc.drawRoundedRectangle(rect, outline, 19.f * adaptedScale, 4.f * adaptedScale, DXContext::OutlinePosition::Outside);
+	dc.drawRoundedRectangle(rect, outline, 19.f * adaptedScale, 4.f * adaptedScale, DrawUtil::OutlinePosition::Outside);
 
 	float offX = 0.01689f * rect.getWidth();
 	float offY = 0.03191f * rect.getHeight();
@@ -552,7 +552,7 @@ void ClickGUI::onRender(Event&) {
 				dc.ctx->PushAxisAlignedClip(clipRect.get(), D2D1_ANTIALIAS_MODE_ALIASED);
 			}
 			dc.fillRoundedRectangle(modRectActual, d2d::Color::RGB(0x44, 0x44, 0x44).asAlpha(0.22f), .22f * modHeight);
-			dc.drawRoundedRectangle(modRectActual, d2d::Color(Latite::get().getAccentColor().color1).asAlpha(1.f * mod.lerpToggle), .22f * modHeight, 1.f, DXContext::OutlinePosition::Inside);;
+			dc.drawRoundedRectangle(modRectActual, d2d::Color(Latite::get().getAccentColor().color1).asAlpha(1.f * mod.lerpToggle), .22f * modHeight, 1.f, DrawUtil::OutlinePosition::Inside);;
 			if (renderExtended) {
 
 				dc.ctx->DrawBitmap(shadowBitmap.Get());
@@ -739,7 +739,7 @@ void ClickGUI::onClick(Event& evGeneric) {
 
 
 namespace {
-	void drawAlphaBar(DXContext& dc, d2d::Rect rect, float nodeSize, int rows) {
+	void drawAlphaBar(DrawUtil& dc, d2d::Rect rect, float nodeSize, int rows) {
 		float endY = rect.top;
 		endY += rect.getHeight() / rows;
 		float beginY = rect.top;
@@ -766,7 +766,7 @@ namespace {
 	}
 }
 
-float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, DXContext& dc, float size, float fTextWidth) {
+float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, DrawUtil& dc, float size, float fTextWidth) {
 	const float checkboxSize = rect.getWidth() * setting_height_relative;
 	const float textSize = checkboxSize * 0.8f;
 	const auto cursorPos = SDK::ClientInstance::get()->cursorPos;
@@ -1052,7 +1052,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 		dc.ctx->PopAxisAlignedClip();
 
 		dc.fillRoundedRectangle(colRect, gradientBrush.Get(), round);
-		dc.drawRoundedRectangle(colRect, gradientBrush.Get(), round, 1.f, DXContext::OutlinePosition::Inside);
+		dc.drawRoundedRectangle(colRect, gradientBrush.Get(), round, 1.f, DrawUtil::OutlinePosition::Inside);
 		
 		if (shouldSelect(colRect, cursorPos)) {
 			if (justClicked[0]) {
@@ -1172,7 +1172,7 @@ bool ClickGUI::shouldSelect(d2d::Rect rc, Vec2 const& pt) {
 
 void ClickGUI::drawColorPicker() {
 	auto& cursorPos = SDK::ClientInstance::get()->cursorPos;
-	DXContext dc;
+	DrawUtil dc;
 	dc.ctx->SetTarget(shadowBitmap.Get());
 	dc.ctx->Clear();
 
@@ -1281,7 +1281,7 @@ void ClickGUI::drawColorPicker() {
 	}
 
 	dc.fillRoundedRectangle(hueBar, hueBrush.Get(), hueBar.getHeight() / 2.f);
-	dc.drawRoundedRectangle(hueBar, d2d::Color::RGB(0x50, 0x50, 0x50).asAlpha(0.28f), hueBar.getHeight() / 2.f, hueBar.getHeight() / 4.f, DXContext::OutlinePosition::Outside);
+	dc.drawRoundedRectangle(hueBar, d2d::Color::RGB(0x50, 0x50, 0x50).asAlpha(0.28f), hueBar.getHeight() / 2.f, hueBar.getHeight() / 4.f, DrawUtil::OutlinePosition::Outside);
 
 	RectF alphaBar = { hueBar.left, hueBar.bottom + padToHueBar, hueBar.right, hueBar.bottom + padToHueBar + hueBarHeight };
 
@@ -1310,7 +1310,7 @@ void ClickGUI::drawColorPicker() {
 	drawAlphaBar(dc, alphaBar, alphaBar.getHeight() / 2.f, 2);
 	//dc.fillRoundedRectangle(hueBar, hueBrush.Get(), hueBar.getHeight() / 2.f);
 	dc.fillRoundedRectangle(alphaBar, alphaBrush.Get(), alphaBar.getHeight() / 2.f);
-	dc.drawRoundedRectangle(alphaBar, d2d::Color::RGB(0x37, 0x37, 0x37).asAlpha(0.88f), alphaBar.getHeight() / 2.f, alphaBar.getHeight() / 3.f, DXContext::OutlinePosition::Outside);
+	dc.drawRoundedRectangle(alphaBar, d2d::Color::RGB(0x37, 0x37, 0x37).asAlpha(0.88f), alphaBar.getHeight() / 2.f, alphaBar.getHeight() / 3.f, DrawUtil::OutlinePosition::Outside);
 
 	// color hex edits/displays
 
@@ -1469,7 +1469,7 @@ void ClickGUI::drawColorPicker() {
 	// draw menu
 
 	dc.fillRoundedRectangle(cPickerRect, d2d::Color::RGB(0x7, 0x7, 0x7).asAlpha(0.8f), 19.f * adaptedScale);
-	dc.drawRoundedRectangle(cPickerRect, d2d::Color::RGB(0, 0, 0).asAlpha(0.28f), 19.f * adaptedScale, 4.f * adaptedScale, DXContext::OutlinePosition::Outside);
+	dc.drawRoundedRectangle(cPickerRect, d2d::Color::RGB(0, 0, 0).asAlpha(0.28f), 19.f * adaptedScale, 4.f * adaptedScale, DrawUtil::OutlinePosition::Outside);
 	
 	// x button
 	float xWidth = 0.06f * rectWidth;

@@ -3,29 +3,29 @@
 #include "client/Latite.h"
 #include "Util.h"
 
-D2D1_RECT_F DXContext::getRect(RectF const& rc)  {
+D2D1_RECT_F D2DUtil::getRect(RectF const& rc)  {
 	return D2D1::RectF(rc.left, rc.top, rc.right, rc.bottom);
 }
 
-void DXContext::fillRectangle(RectF const& rect, d2d::Color const& color)  {
+void D2DUtil::fillRectangle(RectF const& rect, d2d::Color const& color)  {
 	this->brush->SetColor(color.get());
 	ctx->FillRectangle(getRect(rect), brush);
 }
 
-void DXContext::drawRectangle(RectF const& rect, d2d::Color const& color, float lineThickness)  {
+void D2DUtil::drawRectangle(RectF const& rect, d2d::Color const& color, float lineThickness)  {
 	this->brush->SetColor(color.get());
 	ctx->DrawRectangle(getRect(rect), brush, lineThickness);
 }
 
-void DXContext::fillRectangle(RectF const& rect, ID2D1Brush* cbrush) {
+void D2DUtil::fillRectangle(RectF const& rect, ID2D1Brush* cbrush) {
 	ctx->FillRectangle(getRect(rect), cbrush);
 }
 
-void DXContext::drawRectangle(RectF const& rect, ID2D1Brush* cbrush, float lineThickness) {
+void D2DUtil::drawRectangle(RectF const& rect, ID2D1Brush* cbrush, float lineThickness) {
 	ctx->DrawRectangle(getRect(rect), cbrush, lineThickness);
 }
 
-void DXContext::fillRoundedRectangle(RectF const& rect, d2d::Color const& color, float radius)  {
+void D2DUtil::fillRoundedRectangle(RectF const& rect, d2d::Color const& color, float radius)  {
 	this->brush->SetColor(color.get());
 	if (radius < 0.005f) {
 		ctx->FillRectangle(rect.get(), brush);
@@ -36,7 +36,7 @@ void DXContext::fillRoundedRectangle(RectF const& rect, d2d::Color const& color,
 	ctx->FillRoundedRectangle(rounded, brush);
 }
 
-void DXContext::drawRoundedRectangle(RectF irect, d2d::Color const& color, float radius, float lineThickness, OutlinePosition outPos)  {
+void D2DUtil::drawRoundedRectangle(RectF irect, d2d::Color const& color, float radius, float lineThickness, OutlinePosition outPos)  {
 	this->brush->SetColor(color.get());
 	if (radius < 0.005f) {
 		ctx->DrawRectangle(irect, brush, lineThickness);
@@ -67,7 +67,7 @@ void DXContext::drawRoundedRectangle(RectF irect, d2d::Color const& color, float
 	ctx->DrawRoundedRectangle(rounded, brush, lineThickness);
 }
 
-void DXContext::drawRoundedRectangle(RectF irect, ID2D1Brush* cbrush, float radius, float lineThickness, OutlinePosition outPos)
+void D2DUtil::drawRoundedRectangle(RectF irect, ID2D1Brush* cbrush, float radius, float lineThickness, OutlinePosition outPos)
 {
 	RectF rect = irect;
 	switch (outPos) {
@@ -93,7 +93,7 @@ void DXContext::drawRoundedRectangle(RectF irect, ID2D1Brush* cbrush, float radi
 	ctx->DrawRoundedRectangle(rounded, cbrush, lineThickness);
 }
 
-void DXContext::fillRoundedRectangle(RectF const& rect, ID2D1Brush* cbrush, float radius)
+void D2DUtil::fillRoundedRectangle(RectF const& rect, ID2D1Brush* cbrush, float radius)
 {
 	auto rc = getRect(rect);
 	auto rounded = D2D1::RoundedRect(rc, radius, radius);
@@ -101,7 +101,7 @@ void DXContext::fillRoundedRectangle(RectF const& rect, ID2D1Brush* cbrush, floa
 	ctx->FillRoundedRectangle(rounded, cbrush);
 }
 
-void DXContext::drawGaussianBlur(float intensity)  {
+void D2DUtil::drawGaussianBlur(float intensity)  {
 	ID2D1Effect* gaussianBlurEffect = Latite::getRenderer().getBlurEffect();
 	
 	// maybe we might not need to flush if we dont draw anything before clickgui?
@@ -118,7 +118,7 @@ void DXContext::drawGaussianBlur(float intensity)  {
 	ctx->DrawImage(gaussianBlurEffect, D2D1::Point2F(0.f, 0.f), rc);
 }
 
-void DXContext::drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity) {
+void D2DUtil::drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity) {
 	ID2D1Effect* gaussianBlurEffect = Latite::getRenderer().getBlurEffect();
 
 	ctx->Flush();
@@ -134,7 +134,7 @@ void DXContext::drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity) {
 	ctx->DrawImage(gaussianBlurEffect, D2D1::Point2F(0.f, 0.f), rc);
 }
 
-void DXContext::drawText(RectF const& rc, std::wstring const& ws, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment, bool cache)  {
+void D2DUtil::drawText(RectF const& rc, std::wstring const& ws, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment, bool cache)  {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	brush->SetColor(color.get());
 	if (auto layout = Latite::getRenderer().getLayout(fmt.Get(), ws, cache)) {
@@ -150,7 +150,7 @@ void DXContext::drawText(RectF const& rc, std::wstring const& ws, d2d::Color con
 	}
 }
 
-Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font, float size, bool tw, bool cache) {
+Vec2 D2DUtil::getTextSize(std::wstring const& ws, Renderer::FontSelection font, float size, bool tw, bool cache) {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	auto ss = ctx->GetPixelSize();
 	if (auto layout = Latite::getRenderer().getLayout(fmt.Get(), ws, cache)) {
@@ -167,7 +167,7 @@ Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font
 		layout->GetMetrics(&textMetrics);
 		layout->GetOverhangMetrics(&overhangs);
 		
-		float width = tw ? textMetrics.widthIncludingTrailingWhitespace : ((textMetrics.layoutWidth) + overhangs.right) - (textMetrics.left - overhangs.left);
+		float width = tw ? (textMetrics.widthIncludingTrailingWhitespace - overhangs.left) : ((textMetrics.layoutWidth) + overhangs.right) - (textMetrics.left - overhangs.left);
 		float height = textMetrics.height;
 		
 		return Vec2(width, height);
@@ -175,7 +175,7 @@ Vec2 DXContext::getTextSize(std::wstring const& ws, Renderer::FontSelection font
 	return {};
 }
 
-d2d::Rect DXContext::getTextRect(std::wstring const& ws, Renderer::FontSelection font, float size, float pad, bool cache) {
+d2d::Rect D2DUtil::getTextRect(std::wstring const& ws, Renderer::FontSelection font, float size, float pad, bool cache) {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	auto ss = ctx->GetPixelSize();
 	ComPtr<IDWriteTextLayout> layout;
@@ -201,5 +201,34 @@ d2d::Rect DXContext::getTextRect(std::wstring const& ws, Renderer::FontSelection
 	return {};
 }
 
-DXContext::DXContext() : brush(Latite::getRenderer().getSolidBrush()), ctx(Latite::getRenderer().getDeviceContext()), factory(Latite::getRenderer().getDWriteFactory())  {
+D2DUtil::D2DUtil() : brush(Latite::getRenderer().getSolidBrush()), ctx(Latite::getRenderer().getDeviceContext()), factory(Latite::getRenderer().getDWriteFactory())  {
+}
+
+SDK::RectangleArea MCDrawUtil::getRect(d2d::Rect const& rc) {
+	return SDK::RectangleArea(rc.left * guiScale, rc.top * guiScale, rc.right * guiScale, rc.bottom * guiScale);
+}
+
+void MCDrawUtil::fillRectangle(RectF const& rect, d2d::Color const& color) {
+	renderCtx->fillRectangle(SDK::RectangleArea(rect.left, rect.top, rect.right, rect.bottom), color, color.a);
+}
+
+void MCDrawUtil::drawRectangle(RectF const& rect, d2d::Color const& color, float lineThickness) {
+	renderCtx->drawRectangle(SDK::RectangleArea(rect.left, rect.top, rect.right, rect.bottom), color, color.a, static_cast<int>(lineThickness));
+}
+
+void MCDrawUtil::fillRoundedRectangle(RectF const& rect, d2d::Color const& color, float radius) {
+	fillRectangle(rect, color);
+}
+
+void MCDrawUtil::drawRoundedRectangle(RectF rect, d2d::Color const& color, float radius, float lineThickness, OutlinePosition outPos) {
+	drawRectangle(rect, color, lineThickness);
+}
+
+void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlign, bool cache) {
+	static uintptr_t caretMeasure = 0xFFFFFFFF;
+	renderCtx->drawText(this->font, getRect(rc), util::WStrToStr(text), color, color.a, (SDK::ui::TextAlignment)alignment, SDK::TextMeasureData((size * guiScale) / this->font->getLineHeight(), false, false), &caretMeasure);
+}
+
+Vec2 MCDrawUtil::getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace, bool cache) {
+	return { 0.f, this->font->getLineHeight() * size * guiScale };
 }

@@ -55,7 +55,7 @@ d2d::Rect ui::TextBox::getRect() {
 	return this->rect;
 }
 
-void ui::TextBox::render(DXContext& dc, float rounding, d2d::Color backgroundColor, d2d::Color textColor) {
+void ui::TextBox::render(DrawUtil& dc, float rounding, d2d::Color backgroundColor, d2d::Color textColor) {
 	if (rounding == 0.f) {
 		dc.fillRectangle(rect, backgroundColor);
 	}

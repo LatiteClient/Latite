@@ -11,7 +11,7 @@ BowIndicator::BowIndicator() : TextModule("BowIndicator", "Bow Indicator", "Show
 BowIndicator::~BowIndicator() {
 }
 
-void BowIndicator::render(DXContext& dc, bool isDefault, bool inEditor) {
+void BowIndicator::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	if (!std::get<BoolValue>(visual)) {
 		TextModule::render(dc, isDefault, inEditor);
 		return;

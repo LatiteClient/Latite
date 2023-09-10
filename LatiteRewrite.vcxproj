@@ -461,6 +461,8 @@
     <ClInclude Include="src\sdk\common\client\renderer\HudPlayerRenderer.h" />
     <ClInclude Include="src\sdk\common\client\renderer\MaterialPtr.h" />
     <ClInclude Include="src\sdk\common\client\renderer\MeshUtils.h" />
+    <ClInclude Include="src\sdk\common\client\renderer\screen\MinecraftUIRenderContext.h" />
+    <ClInclude Include="src\sdk\common\client\renderer\screen\ScreenContext.h" />
     <ClInclude Include="src\sdk\common\client\renderer\Tessellator.h" />
     <ClInclude Include="src\sdk\common\client\renderer\TexturePtr.h" />
     <ClInclude Include="src\sdk\common\entity\component\MoveInputComponent.h" />

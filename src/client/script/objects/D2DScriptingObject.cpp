@@ -46,16 +46,16 @@ JsValueRef D2DScriptingObject::drawRectCallback(JsValueRef callee, bool isConstr
 }
 
 void D2DScriptingObject::DrawVisitor::operator()(OpDrawRect& op) {
-	DXContext dc;
+	DrawUtil dc;
 	dc.drawRectangle(op.rc, op.col, op.thickness);
 }
 
 void D2DScriptingObject::DrawVisitor::operator()(OpFillRect& op) {
-	DXContext dc;
+	DrawUtil dc;
 	dc.fillRectangle(op.rc, op.col);
 }
 
 void D2DScriptingObject::DrawVisitor::operator()(OpDrawText& op) {
-	DXContext dc;
+	DrawUtil dc;
 	dc.drawText(op.rect, op.text, op.col, op.font, op.size, op.alignment, op.vertAlign);
 }

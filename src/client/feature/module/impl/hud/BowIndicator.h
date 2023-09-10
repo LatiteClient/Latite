@@ -15,6 +15,6 @@ private:
 	ValueType indicatorCol2 = ColorValue({ 0.1f, 0.1f, 0.7f, 0.8f });
 	ValueType indicatorRad = FloatValue(5.f);
 
-	void render(DXContext& dc, bool isDefault, bool inEditor) override;
+	void render(DrawUtil& dc, bool isDefault, bool inEditor) override;
 	std::wstringstream text(bool isDefault, bool inEditor) override;
 };

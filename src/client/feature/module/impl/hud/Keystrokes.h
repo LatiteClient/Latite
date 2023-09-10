@@ -5,7 +5,7 @@ class Keystrokes : public HUDModule {
 public:
 	Keystrokes();
 
-	void render(DXContext& dc, bool, bool) override;
+	void render(DrawUtil& dc, bool, bool) override;
 private:
 	ValueType mouseButtons = BoolValue(true);
 	ValueType cps = BoolValue(false);
@@ -47,5 +47,5 @@ private:
 		void updateKeyName();
 	};
 
-	Vec2 drawKeystroke(DXContext& ctx, Vec2 const& pos, Keystroke& stroke);
+	Vec2 drawKeystroke(DrawUtil& ctx, Vec2 const& pos, Keystroke& stroke);
 };

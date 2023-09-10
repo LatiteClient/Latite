@@ -26,7 +26,7 @@ Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement
 	addSetting("uptCol", "Unpressed Text Color", "The text color when not pressed", unpressedTextColor);
 }
 
-Vec2 Keystrokes::drawKeystroke(DXContext& ctx, Vec2 const& pos, Keystroke& stroke) {
+Vec2 Keystrokes::drawKeystroke(DrawUtil& ctx, Vec2 const& pos, Keystroke& stroke) {
 	d2d::Rect front = { pos.x, pos.y, pos.x + std::get<FloatValue>(keystrokeSize), pos.y + std::get<FloatValue>(keystrokeSize) };
 	float scale = std::get<FloatValue>(textSize);//ctx.scaleTextInBounds(key, 1 * textSize, (front.right - front.left), 2);
 	ctx.fillRoundedRectangle(front, stroke.col, std::min(std::get<FloatValue>(this->radius).value, std::get<FloatValue>(keystrokeSize) / 2.f));
@@ -35,7 +35,11 @@ Vec2 Keystrokes::drawKeystroke(DXContext& ctx, Vec2 const& pos, Keystroke& strok
 	return { front.right - front.left, front.bottom - front.top };
 }
 
-void Keystrokes::render(DXContext& dc, bool, bool inEditor) {
+void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
+	auto bmp = Latite::getRenderer().copyCurrentBitmap();
+
+	Latite::getRenderer().getDeviceContext()->SetTarget(bmp);
+
 	auto input = SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent();
 
 	bool front = input->front;
@@ -138,6 +142,7 @@ void Keystrokes::render(DXContext& dc, bool, bool inEditor) {
 
 	this->rect.right = rect.left + pos.x;
 	this->rect.bottom = rect.top + pos.y;
+	Latite::getRenderer().getDeviceContext()->SetTarget(Latite::getRenderer().getBitmap());
 };
 
 Keystrokes::Keystroke::Keystroke(std::string const& inputMapping, bool& inputKey) : Stroke(inputKey)

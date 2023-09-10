@@ -25,7 +25,7 @@ HUDEditor::HUDEditor() : dragMod(nullptr) {
 }
 
 void HUDEditor::onRender(Event& ev) {
-	DXContext dc;
+	DrawUtil dc;
 	if (isActive()) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 			if (mod->isHud()) {
@@ -79,7 +79,7 @@ void HUDEditor::onRender(Event& ev) {
 
 			col = util::LerpColorState(col, oCol + 0.1f, oCol, state);
 			dc.fillRoundedRectangle(btnRect, col, 20.f);
-			dc.drawRoundedRectangle(btnRect, outlineCol, 20.f, 2.f, DXContext::OutlinePosition::Outside);
+			dc.drawRoundedRectangle(btnRect, outlineCol, 20.f, 2.f, DrawUtil::OutlinePosition::Outside);
 
 			dc.drawText(btnRect, L"Mod Settings", d2d::Color(0.9f, 0.9f, 0.9f, 1.f), Renderer::FontSelection::SegoeRegular, 20.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		}
@@ -181,7 +181,7 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 }
 
 void HUDEditor::renderModule(HUDModule* mod) {
-	DXContext dc;
+	DrawUtil dc;
 	auto& cursorPos = SDK::ClientInstance::get()->cursorPos;
 	bool hovering = shouldSelect(mod->getRect(), cursorPos);
 
@@ -260,7 +260,7 @@ void HUDEditor::doSnapping(Vec2 const&) {
 
 		float snapRange = 10.f;
 
-		DXContext dc;
+		DrawUtil dc;
 
 		Color col = d2d::Color(0.5, 1.0, 1.0);
 		float thickness = 1.f;
