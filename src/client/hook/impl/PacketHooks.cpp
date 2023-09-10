@@ -111,7 +111,7 @@ void* PacketHooks::TextPacket_read(SDK::TextPacket* pkt, void* b, void* c) {
                 || pkt->type == SDK::TextPacketType::SYSTEM_MESSAGE || pkt->type == SDK::TextPacketType::WHISPER
                 || pkt->type == SDK::TextPacketType::OBJECT_WHISPER || pkt->type == SDK::TextPacketType::ANNOUNCEMENT);
 
-            ScriptManager::Event ev{L"receive-chat", { typ, val, val2, val3 }, false};
+            ScriptManager::Event ev{L"receive-chat", { typ, val, val2, val3, isChat }, false};
             if (Latite::getScriptManager().dispatchEvent(ev)) {
                 pkt->type = SDK::TextPacketType::JUKEBOX_POPUP;
                 pkt->str.setString("");

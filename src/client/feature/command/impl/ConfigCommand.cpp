@@ -17,7 +17,7 @@ bool ConfigCommand::execute(std::string const label, std::vector<std::string> ar
 		}
 		if (Latite::getConfigManager().saveTo(util::StrToWStr(args[1]))) {
 			message("Successfully saved config to &7" + args[1] + ".json");
-			return false;
+			return true;
 		}
 		message("Something went wrong!", true);
 		return true;
@@ -29,7 +29,7 @@ bool ConfigCommand::execute(std::string const label, std::vector<std::string> ar
 
 		if (!Latite::getConfigManager().saveCurrentConfig()) {
 			message("Could not save current config before loading!", true);
-			return false;
+			return true;
 		}
 
 		if (!Latite::getConfigManager().loadUserConfig(util::StrToWStr(args[1]))) {

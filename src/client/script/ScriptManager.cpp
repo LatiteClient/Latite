@@ -294,6 +294,7 @@ void ScriptManager::init()
 void ScriptManager::initListeners()
 {
 	eventListeners[L"world-tick"] = {};
+	eventListeners[L"join-game"] = {};
 	eventListeners[L"leave-game"] = {};
 	eventListeners[L"receive-chat"] = {};
 	eventListeners[L"title"] = {};

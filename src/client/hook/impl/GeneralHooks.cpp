@@ -217,6 +217,7 @@ bool GenericHooks::Level_initialize(SDK::Level* obj, void* palette, void* settin
 	auto o = Level_initializeHook->oFunc<decltype(&Level_initialize)>()(obj, palette, settings, tickRange, experiments, a6);
 	if (obj->isClientSide()) {
 		ScriptManager::Event ev{L"join-game", {}, false};
+		Latite::getScriptManager().dispatchEvent(ev);
 	}
 	return o;
 }
@@ -224,6 +225,7 @@ bool GenericHooks::Level_initialize(SDK::Level* obj, void* palette, void* settin
 void* GenericHooks::Level_startLeaveGame(SDK::Level* obj) {
 	if (obj->isClientSide()) {
 		ScriptManager::Event ev{L"leave-game", {}, false};
+		Latite::getScriptManager().dispatchEvent(ev);
 	}
 	return Level_startLeaveGameHook->oFunc<decltype(&Level_startLeaveGame)>()(obj);
 }

@@ -16,10 +16,16 @@ public:
 		__super::prepareFunctions();
 		Chakra::DefineFunc(prototype, playerGetName, L"getName");
 		Chakra::DefineFunc(prototype, playerGetXboxUserID, L"getXUID");
+		Chakra::DefineFunc(prototype, playerGetSelectedItem, L"getHoldingItem");
+		Chakra::DefineFunc(prototype, playerGetSelectedSlot, L"getSelectedSlot");
 	}
 private:
 	static JsValueRef CALLBACK playerGetName(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK playerGetXboxUserID(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK playerGetSelectedItem(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK playerGetSelectedSlot(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 };

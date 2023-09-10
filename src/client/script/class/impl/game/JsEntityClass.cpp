@@ -9,7 +9,7 @@
 
 JsValueRef JsEntityClass::entityIsValid(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 1)) return Chakra::GetFalse();
-	JsEntity* ent;
+	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent) {
 		return ent->validate() ? Chakra::GetTrue() : Chakra::GetFalse();
@@ -20,7 +20,7 @@ JsValueRef JsEntityClass::entityIsValid(JsValueRef callee, bool isConstructor, J
 
 JsValueRef JsEntityClass::entityGetPos(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 1)) return Chakra::GetUndefined();
-	JsEntity* ent;
+	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
 		auto actor = ent->getEntity();
@@ -42,7 +42,7 @@ JsValueRef JsEntityClass::entityGetPos(JsValueRef callee, bool isConstructor, Js
 
 JsValueRef JsEntityClass::entityGetRot(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 1)) return Chakra::GetUndefined();
-	JsEntity* ent;
+	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
 		auto actor = ent->getEntity();
@@ -63,7 +63,7 @@ JsValueRef JsEntityClass::entityGetRot(JsValueRef callee, bool isConstructor, Js
 }
 
 JsValueRef JsEntityClass::entityGetDimensionName(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	JsEntity* ent;
+	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
 		auto actor = ent->getEntity();
@@ -77,7 +77,7 @@ JsValueRef JsEntityClass::entityGetDimensionName(JsValueRef callee, bool isConst
 }
 
 JsValueRef JsEntityClass::entityGetHurtTime(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	JsEntity* ent;
+	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
 		auto actor = ent->getEntity();
@@ -88,7 +88,7 @@ JsValueRef JsEntityClass::entityGetHurtTime(JsValueRef callee, bool isConstructo
 }
 
 JsValueRef JsEntityClass::entityIsPlayer(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	JsEntity* ent;
+	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
 		auto actor = ent->getEntity();
@@ -99,7 +99,7 @@ JsValueRef JsEntityClass::entityIsPlayer(JsValueRef callee, bool isConstructor, 
 }
 
 JsValueRef JsEntityClass::entityAttack(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	JsEntity* ent;
+	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
 		auto actor = ent->getEntity();
@@ -112,7 +112,7 @@ JsValueRef JsEntityClass::entityAttack(JsValueRef callee, bool isConstructor, Js
 }
 
 JsValueRef JsEntityClass::entityGetType(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	JsEntity* ent;
+	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
 		auto actor = ent->getEntity();
@@ -123,10 +123,56 @@ JsValueRef JsEntityClass::entityGetType(JsValueRef callee, bool isConstructor, J
 }
 
 JsValueRef JsEntityClass::entityIsLocalPlayer(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	JsEntity* ent;
+	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
 		return Chakra::MakeInt(ent->runtimeId == 1);
+	}
+	Chakra::ThrowError(L"Invalid entity");
+	return JS_INVALID_REFERENCE;
+}
+
+JsValueRef JsEntityClass::entityGetHealth(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	JsEntity* ent = nullptr;
+	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
+	if (ent && ent->validate()) {
+		if (ent->level != JsEntity::AccessLevel::Restricted) {
+			return Chakra::MakeDouble(static_cast<float>(ent->getEntity()->getHealth()));
+		}
+		else {
+			Chakra::ThrowError(L"Access denied, cannot use getHealth");
+			return JS_INVALID_REFERENCE;
+		}
+	}
+	Chakra::ThrowError(L"Invalid entity");
+	return JS_INVALID_REFERENCE;
+}
+
+JsValueRef JsEntityClass::entityGetHunger(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	JsEntity* ent = nullptr;
+	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
+	if (ent && ent->validate()) {
+		if (ent->level != JsEntity::AccessLevel::Restricted) {
+			return Chakra::MakeDouble(static_cast<float>(ent->getEntity()->getHunger()));
+		}
+		else {
+			Chakra::ThrowError(L"Access denied, cannot use getHunger");
+			return JS_INVALID_REFERENCE;
+		}
+	}
+	Chakra::ThrowError(L"Invalid entity");
+	return JS_INVALID_REFERENCE;
+}
+
+JsValueRef JsEntityClass::entityGetSaturation(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	JsEntity* ent = nullptr;
+	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
+	if (ent->level != JsEntity::AccessLevel::Restricted) {
+		return Chakra::MakeDouble(static_cast<float>(ent->getEntity()->getSaturation()));
+	}
+	else {
+		Chakra::ThrowError(L"Access denied, cannot use getSaturation");
+		return JS_INVALID_REFERENCE;
 	}
 	Chakra::ThrowError(L"Invalid entity");
 	return JS_INVALID_REFERENCE;

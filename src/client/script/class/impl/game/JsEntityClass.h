@@ -26,6 +26,9 @@ public:
 		Chakra::DefineFunc(prototype, entityGetHurtTime, L"getHurtTime", this);
 		Chakra::DefineFunc(prototype, entityGetType, L"getEntityType", this);
 		Chakra::DefineFunc(prototype, entityAttack, L"attack", this);
+		Chakra::DefineFunc(prototype, entityGetHealth, L"getHealth", this);
+		Chakra::DefineFunc(prototype, entityGetHunger, L"getHunger", this);
+		Chakra::DefineFunc(prototype, entityGetSaturation, L"getSaturation", this);
 		Chakra::SetPropertyNumber(prototype, L"runtimeId", 0.0, true);
 	};
 private:
@@ -46,5 +49,11 @@ private:
 	static JsValueRef CALLBACK entityGetType(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK entityIsLocalPlayer(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK entityGetHealth(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK entityGetHunger(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK entityGetSaturation(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 };
