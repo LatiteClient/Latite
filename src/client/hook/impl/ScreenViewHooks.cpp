@@ -10,7 +10,7 @@ namespace {
 
 void __fastcall ScreenViewHooks::setupAndRender(SDK::ScreenView* view, void* ctx) {
 	setupAndRenderHook->oFunc<decltype(&setupAndRender)>()(view, ctx);
-	RenderLayerEvent ev{ view };
+	RenderLayerEvent ev{ view, reinterpret_cast<SDK::MinecraftUIRenderContext*>(ctx) };
 	Eventing::get().dispatch(ev);
 
 	RenderGameEvent evt{ };

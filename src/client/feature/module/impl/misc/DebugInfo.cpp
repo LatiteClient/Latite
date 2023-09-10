@@ -110,7 +110,7 @@ namespace {
 
 void DebugInfo::onRenderOverlay(Event& evG) {
     RenderOverlayEvent& ev = reinterpret_cast<RenderOverlayEvent&>(evG);
-    DrawUtil dc;
+    D2DUtil dc;
 
     if (!SDK::ClientInstance::get()->getLocalPlayer()) return;
 

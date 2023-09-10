@@ -23,6 +23,9 @@ public:
 		inline static SigImpl clickMap{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8d 0d ? ? ? ? e8 ? ? ? ? b3 ? 48 85 f6",
 			"ClickMap"};
+		inline static SigImpl uiColorMaterial{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+			"48 8b 05 ? ? ? ? 48 85 c0 74 ? 48 83 78",
+			"UIFillColorMaterial"};
 	};
 
 	struct Vtable {
@@ -145,6 +148,23 @@ public:
 	inline static SigImpl SetTitlePacket_readExtended{[](memory::signature_store&, uintptr_t res) { return res; },
 		"40 55 53 56 57 41 56 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 4d 8b f0 48 8b fa 48 8b d9 48 89 54 24 ? 48 8d 55",
 		"SetTimePacket::readExtended"};
+
+
+	inline static SigImpl Tessellator_vertex{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? f3 0f 10 5b ? f3 0f 10 13",
+		"Tessellator::vertex"};
+
+	inline static SigImpl Tessellator_begin{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5C 24 ?? 55 48 83 EC ?? 80 B9 ?? ?? ?? ?? 00 45",
+		"Tessellator::begin"};
+
+	inline static SigImpl Tessellator_color{[](memory::signature_store&, uintptr_t res) { return res; },
+		"80 b9 ? ? ? ? ? 4c 8b c1 75",
+		"Tessellator::color"};
+
+	inline static SigImpl MeshHelpers_renderMeshImmediately{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? 90 48 85 ed 74 ? c6 45 ? ? 48 83 6d ? ? 75 ? 48 c7 45",
+		"MeshHelpers::renderMeshImmediately"};
 };
 
 // after adding sigs here, add them in latite.cpp

@@ -1,16 +1,14 @@
 #pragma once
 #include <memory>
-#if 0
-#include "sdk/SDKBase.h"
+#include "sdk/Util.h"
 
 namespace SDK {
-	class MaterialPtr : public Incomplete {
+	class MaterialPtr {
 	public:
 		std::shared_ptr<MaterialPtr> self;
-		void* name[3]; // TODO: HashedString
+		HashedString name;
 
 		// TODO: construct own materials
 		static MaterialPtr* getUIColor();
 	};
 }
-#endif

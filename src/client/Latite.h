@@ -93,6 +93,10 @@ public:
 		return hudBlurBrush.Get();
 	}
 
+	[[nodiscard]] bool useMinecraftRenderer() {
+		return std::get<BoolValue>(minecraftRenderer);
+	}
+
 	void fetchLatiteUsers();
 
 	int cInstOffs = 0;
@@ -115,6 +119,7 @@ private:
 	ValueType menuBlur = FloatValue(20.f);
 	ValueType accentColor = ColorValue(static_cast<float>(0x32) / 255.f, static_cast<float>(0x39) / 255.f, static_cast<float>(0x76) / 255.f);
 	ValueType minimalViewBob = BoolValue(false);
+	ValueType minecraftRenderer = BoolValue(false);
 
 	std::vector<ui::TextBox*> textBoxes;
 	ComPtr<struct ID2D1Bitmap1> hudBlurBitmap;

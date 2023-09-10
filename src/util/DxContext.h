@@ -7,7 +7,14 @@
 
 // Base DrawUtil class (provides no drawing implementation).
 class DrawUtil {
+protected:
+	bool immediate = true;
 public:
+	enum class RenderType {
+		D2D,
+		Game
+	} renderType = RenderType::D2D;
+
 	enum class OutlinePosition : int {
 		Center,
 		Inside,
@@ -29,13 +36,19 @@ public:
 	/// Be careful when setting cache to true
 	virtual RectF getTextRect(std::wstring const& text, Renderer::FontSelection font, float size, float pad = 0.f, bool cache = true) = 0;
 
+	virtual void flush() {}
+	void setImmediate(bool b) { immediate = b; }
+
 	DrawUtil() = default;
 	virtual ~DrawUtil() = default;
 };
 
 // Direct2D implementation for the DrawUtil class. Also includes D2D specific functions.
-class D2DUtil : public DrawUtil {
+class D2DUtil final : public DrawUtil {
 public:
+	D2DUtil();
+	~D2DUtil() = default;
+
 	// D2D/DWrite members
 	D2D1_RECT_F	getRect(RectF const& rc);
 
@@ -67,7 +80,7 @@ public:
 };
 
 // Minecraft Renderer implementation of DrawUtil class (couldn't think of a good name)
-class MCDrawUtil : public DrawUtil {
+class MCDrawUtil final : public DrawUtil {
 public:
 	SDK::RectangleArea getRect(d2d::Rect const& rc);
 
@@ -78,6 +91,7 @@ public:
 	float guiScale = 1.f;
 
 	MCDrawUtil(SDK::MinecraftUIRenderContext* ctx, SDK::Font* font) : renderCtx(ctx), scn(renderCtx->screenContext), font(font), guiScale(SDK::ClientInstance::get()->getGuiData()->guiScaleFrac) {}
+	void flush() override;
 
 	virtual void fillRectangle(RectF const& rect, d2d::Color const& color) override;
 	virtual void drawRectangle(RectF const& rect, d2d::Color const& color, float lineThickness = 1.f) override;

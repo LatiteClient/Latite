@@ -2,6 +2,9 @@
 #include "DxContext.h"
 #include "client/Latite.h"
 #include "Util.h"
+#include "sdk/common/client/renderer/Tessellator.h"
+#include "sdk/common/client/renderer/MeshUtils.h"
+#include "sdk/common/client/renderer/MaterialPtr.h"
 
 D2D1_RECT_F D2DUtil::getRect(RectF const& rc)  {
 	return D2D1::RectF(rc.left, rc.top, rc.right, rc.bottom);
@@ -208,12 +211,40 @@ SDK::RectangleArea MCDrawUtil::getRect(d2d::Rect const& rc) {
 	return SDK::RectangleArea(rc.left * guiScale, rc.top * guiScale, rc.right * guiScale, rc.bottom * guiScale);
 }
 
-void MCDrawUtil::fillRectangle(RectF const& rect, d2d::Color const& color) {
-	renderCtx->fillRectangle(SDK::RectangleArea(rect.left, rect.top, rect.right, rect.bottom), color, color.a);
+void MCDrawUtil::flush() {
+	SDK::MeshHelpers::renderMeshImmediately(scn, scn->tess, SDK::MaterialPtr::getUIColor());
+	renderCtx->flushText(0.f);
 }
 
-void MCDrawUtil::drawRectangle(RectF const& rect, d2d::Color const& color, float lineThickness) {
-	renderCtx->drawRectangle(SDK::RectangleArea(rect.left, rect.top, rect.right, rect.bottom), color, color.a, static_cast<int>(lineThickness));
+void MCDrawUtil::fillRectangle(RectF const& rc, d2d::Color const& color) {
+	auto rect = getRect(rc);
+	auto tess = scn->tess;
+	tess->begin(SDK::Primitive::Quad, 4);
+	*scn->shaderColor = { 1.f, 1.f, 1.f, 1.f };
+	tess->color(color);
+
+	scn->tess->vertex(rect.left, rect.bottom);
+	scn->tess->vertex(rect.right, rect.bottom);
+	scn->tess->vertex(rect.right, rect.top);
+	scn->tess->vertex(rect.left, rect.top);
+
+	if (immediate) SDK::MeshHelpers::renderMeshImmediately(scn, tess, SDK::MaterialPtr::getUIColor());
+}
+
+void MCDrawUtil::drawRectangle(RectF const& rect, d2d::Color const& col, float lineThickness) {
+	bool oImm = immediate;
+	immediate = false;
+
+	lineThickness /= 2.f;
+
+	fillRectangle({ rect.left - lineThickness, rect.top - lineThickness, rect.right + lineThickness, rect.top + lineThickness }, col); // left to right
+	fillRectangle({ rect.left - lineThickness, rect.top - lineThickness, rect.left + lineThickness, rect.bottom + lineThickness }, col); // left to bottom
+	fillRectangle({ rect.right - lineThickness, rect.top - lineThickness, rect.right + lineThickness, rect.bottom + lineThickness }, col); // right to bottom
+	fillRectangle({ rect.left - lineThickness, rect.bottom - lineThickness, rect.right + lineThickness, rect.bottom + lineThickness }, col); // bottomleft to bottomright
+	immediate = oImm;
+	if (immediate) {
+		SDK::MeshHelpers::renderMeshImmediately(scn, scn->tess, SDK::MaterialPtr::getUIColor());
+	}
 }
 
 void MCDrawUtil::fillRoundedRectangle(RectF const& rect, d2d::Color const& color, float radius) {
@@ -226,9 +257,30 @@ void MCDrawUtil::drawRoundedRectangle(RectF rect, d2d::Color const& color, float
 
 void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlign, bool cache) {
 	static uintptr_t caretMeasure = 0xFFFFFFFF;
-	renderCtx->drawText(this->font, getRect(rc), util::WStrToStr(text), color, color.a, (SDK::ui::TextAlignment)alignment, SDK::TextMeasureData((size * guiScale) / this->font->getLineHeight(), false, false), &caretMeasure);
+
+	float newTop = rc.top;
+	float vSize = (size * guiScale) / this->font->getLineHeight();
+
+	switch (verticalAlign) {
+	case DWRITE_PARAGRAPH_ALIGNMENT_CENTER:
+		newTop = rc.centerY((this->font->getLineHeight() * vSize) / guiScale);
+		break;
+	case DWRITE_PARAGRAPH_ALIGNMENT_FAR:
+		newTop = rc.bottom - (size);
+		break;
+	case DWRITE_PARAGRAPH_ALIGNMENT_NEAR:
+		break;
+	}
+	
+	RectF rMod = rc;
+	rMod.top = newTop;
+	renderCtx->drawText(this->font, getRect(rMod), util::WStrToStr(text), color, color.a, (SDK::ui::TextAlignment)alignment, SDK::TextMeasureData((size * guiScale) / this->font->getLineHeight(), false, false), &caretMeasure);
 }
 
 Vec2 MCDrawUtil::getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace, bool cache) {
-	return { 0.f, this->font->getLineHeight() * size * guiScale };
+	return { this->font->getLineLength(util::WStrToStr(text), (size * guiScale) / this->font->getLineHeight(), trailingWhitespace) / guiScale, this->font->getLineHeight() * size * guiScale};
+}
+
+DrawUtil::RectF MCDrawUtil::getTextRect(std::wstring const& text, Renderer::FontSelection font, float size, float pad, bool cache) {
+	return {};
 }

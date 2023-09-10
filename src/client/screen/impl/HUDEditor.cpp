@@ -25,7 +25,9 @@ HUDEditor::HUDEditor() : dragMod(nullptr) {
 }
 
 void HUDEditor::onRender(Event& ev) {
-	DrawUtil dc;
+	D2DUtil dc;
+	bool mcRenderer = Latite::get().useMinecraftRenderer();
+
 	if (isActive()) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 			if (mod->isHud()) {
@@ -35,14 +37,14 @@ void HUDEditor::onRender(Event& ev) {
 			}
 			});
 
-		auto ss = Latite::getRenderer().getScreenSize();
-
-		float toBlur = Latite::get().getMenuBlur().value_or(0.f);
 
 		auto alpha = Latite::getRenderer().getDeltaTime() / 10.f;
 		anim = std::lerp(anim, 1.f, alpha);
 
-		if (Latite::get().getMenuBlur()) dc.drawGaussianBlur(toBlur * anim);
+		if (!mcRenderer) {
+			float toBlur = Latite::get().getMenuBlur().value_or(0.f);
+			if (Latite::get().getMenuBlur()) dc.drawGaussianBlur(toBlur * anim);
+		}
 		// cut out stuff, for movable scoreboard and paperdoll in future
 /*
 		for (auto& control : controls) {
@@ -91,23 +93,7 @@ void HUDEditor::onRender(Event& ev) {
 	doSnapping(dragOffset);
 	keepModulesInBounds();
 
-	bool shouldDraw = true;
-	if (!isActive()) {
-		DrawHUDModulesEvent ev{};
-		shouldDraw = !Eventing::get().dispatch(ev); // not cancelled
-	}
-
-	if (!shouldDraw) return;
-
-	if (isActive() || SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
-		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
-			if (mod->isHud() && mod->isEnabled() && reinterpret_cast<HUDModule*>(mod.get())->isActive()) {
-				auto hudModule = static_cast<HUDModule*>(mod.get());
-				renderModule(hudModule);
-				hudModule->storePos();
-			}
-			});
-	}
+	if (!mcRenderer) renderModules(nullptr);
 }
 
 void HUDEditor::onClick(Event& evGeneric) {
@@ -126,6 +112,19 @@ void HUDEditor::onClick(Event& evGeneric) {
 
 void HUDEditor::onRenderLayer(Event& evGeneric) {
 	auto& ev = static_cast<RenderLayerEvent&>(evGeneric);
+	bool mcRenderer = Latite::get().useMinecraftRenderer();
+	if (!mcRenderer) return;
+
+	if (ev.getScreenView()->visualTree->rootControl->name == "debug_screen") {
+		MCDrawUtil dc = { ev.getUIRenderContext(), SDK::ClientInstance::get()->minecraftGame->minecraftFont };
+
+		auto ss = SDK::ClientInstance::get()->getGuiData()->screenSize;
+		if (isActive()) dc.fillRectangle({ 0.f, 0.f, ss.x, ss.y }, { 0.4f, 0.4f, 0.4f, 0.4f * this->anim });
+		dc.setImmediate(false);
+
+		this->renderModules(ev.getUIRenderContext());
+	}
+
 	//auto view = ev.getScreenView();
 	
 	//float uiscale = sdk::ClientInstance::get()->getGuiData()->guiScale;
@@ -180,18 +179,49 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 	//}
 }
 
-void HUDEditor::renderModule(HUDModule* mod) {
-	DrawUtil dc;
+void HUDEditor::renderModules(SDK::MinecraftUIRenderContext* ctx) {
+	bool shouldDraw = true;
+	if (!isActive()) {
+		DrawHUDModulesEvent ev{};
+		shouldDraw = !Eventing::get().dispatch(ev); // not cancelled
+	}
+
+	if (!shouldDraw) return;
+
+	if (isActive() || SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
+		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
+			if (mod->isHud() && mod->isEnabled() && reinterpret_cast<HUDModule*>(mod.get())->isActive()) {
+				auto hudModule = static_cast<HUDModule*>(mod.get());
+				renderModule(hudModule, ctx);
+				hudModule->storePos();
+			}
+			});
+	}
+}
+
+void HUDEditor::renderModule(HUDModule* mod, SDK::MinecraftUIRenderContext* ctx) {
 	auto& cursorPos = SDK::ClientInstance::get()->cursorPos;
 	bool hovering = shouldSelect(mod->getRect(), cursorPos);
 
-	D2D1::Matrix3x2F oTrans;
-	dc.ctx->GetTransform(&oTrans);
-	dc.ctx->SetTransform(D2D1::Matrix3x2F::Scale(mod->getScale(), mod->getScale()) * D2D1::Matrix3x2F::Translation(mod->getRect().left, mod->getRect().top));
-	mod->render(dc, false, isActive());
-	dc.ctx->SetTransform(oTrans);
+	if (!ctx) {
+		D2DUtil dc;
+		D2D1::Matrix3x2F oTrans;
+		dc.ctx->GetTransform(&oTrans);
+		dc.ctx->SetTransform(D2D1::Matrix3x2F::Scale(mod->getScale(), mod->getScale()) * D2D1::Matrix3x2F::Translation(mod->getRect().left, mod->getRect().top));
+		mod->render(dc, false, isActive());
+		dc.ctx->SetTransform(oTrans);
+	}
+	else {
+		MCDrawUtil dc{ ctx, SDK::ClientInstance::get()->minecraftGame->minecraftFont };
+		dc.setImmediate(false);
 
-	if (isActive()) {
+		dc.scn->matrix->matrixStack.push(D2D1::Matrix4x4F::Scale(mod->getScale(), mod->getScale(), 0.f) * D2D1::Matrix4x4F::Translation(mod->getRect().left * dc.guiScale, mod->getRect().top * dc.guiScale, 0.f));
+		mod->render(dc, false, isActive());
+		dc.flush();
+		dc.scn->matrix->matrixStack.pop();
+	}
+
+	if (isActive() && !ctx) {
 		if (hovering) {
 			mod->renderSelected();
 			mod->renderPost();
@@ -238,7 +268,7 @@ void HUDEditor::doDragging() {
 void HUDEditor::doSnapping(Vec2 const&) {
 	auto ssx = Latite::getRenderer().getScreenSize();
 	Vec2 ss = {ssx.width, ssx.height};
-	auto mousePos = SDK::ClientInstance::get()->cursorPos;
+	auto& mousePos = SDK::ClientInstance::get()->cursorPos;
 
 	std::vector<float> snapLinesX = { 0.f, ss.x / 4.f, ss.x / 2.f, ss.x / 2 + (ss.x / 4), ss.x };
 	std::vector<float> snapLinesY = { ss.y / 2.f };
@@ -260,7 +290,7 @@ void HUDEditor::doSnapping(Vec2 const&) {
 
 		float snapRange = 10.f;
 
-		DrawUtil dc;
+		D2DUtil dc;
 
 		Color col = d2d::Color(0.5, 1.0, 1.0);
 		float thickness = 1.f;
@@ -415,7 +445,7 @@ void HUDEditor::doSnapping(Vec2 const&) {
 						auto place = rMod->snappingX.pos;
 						auto idx = rMod->snappingX.idx;
 
-						auto vector = snapLinesX;
+						auto& vector = snapLinesX;
 						auto idk = snapLinesX[idx];
 
 						// TODO: controls
@@ -449,7 +479,7 @@ void HUDEditor::doSnapping(Vec2 const&) {
 						auto place = rMod->snappingY.pos;
 						auto idx = rMod->snappingY.idx;
 
-						auto vector = snapLinesY;
+						auto& vector = snapLinesY;
 						auto idk = snapLinesY[idx];
 
 						// TODO: controls

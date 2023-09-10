@@ -29,8 +29,7 @@ void TextModule::onInit() {
 	addSliderSetting("radius", "Radius", "", radius, FloatValue(0.f), FloatValue(10.f), FloatValue(1.f));
 }
 
-void TextModule::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
-	DrawUtil dc;
+void TextModule::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	//dc.setTextShadow(textShadow);
 	int textPadding = static_cast<int>(std::get<FloatValue>(padX));
 	int textPaddingY = static_cast<int>(std::get<FloatValue>(padY) * 2.f);
@@ -83,6 +82,7 @@ void TextModule::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 	//d2d::Rect rc = { 0.f, 0.f, rect.getWidth(), rect.getHeight() };
 
 	//dc.fillRoundedRectangle(rc, Latite::get().getHUDBlurBrush(), rad);
+	dc.flush();
 }
 
 std::wstringstream TextModule::processText(std::wstringstream& stream) {

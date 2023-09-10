@@ -67,7 +67,7 @@ void ClickGUI::onRender(Event&) {
 		addLayer(cPickerRect);
 	}
 
-	DrawUtil dc;
+	D2DUtil dc;
 	if (!isActive()) justClicked = { false, false, false };
 	if (isActive()) SDK::ClientInstance::get()->releaseCursor();
 	dc.ctx->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
@@ -739,7 +739,7 @@ void ClickGUI::onClick(Event& evGeneric) {
 
 
 namespace {
-	void drawAlphaBar(DrawUtil& dc, d2d::Rect rect, float nodeSize, int rows) {
+	void drawAlphaBar(D2DUtil& dc, d2d::Rect rect, float nodeSize, int rows) {
 		float endY = rect.top;
 		endY += rect.getHeight() / rows;
 		float beginY = rect.top;
@@ -766,7 +766,7 @@ namespace {
 	}
 }
 
-float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, DrawUtil& dc, float size, float fTextWidth) {
+float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, D2DUtil& dc, float size, float fTextWidth) {
 	const float checkboxSize = rect.getWidth() * setting_height_relative;
 	const float textSize = checkboxSize * 0.8f;
 	const auto cursorPos = SDK::ClientInstance::get()->cursorPos;
@@ -1172,7 +1172,7 @@ bool ClickGUI::shouldSelect(d2d::Rect rc, Vec2 const& pt) {
 
 void ClickGUI::drawColorPicker() {
 	auto& cursorPos = SDK::ClientInstance::get()->cursorPos;
-	DrawUtil dc;
+	D2DUtil dc;
 	dc.ctx->SetTarget(shadowBitmap.Get());
 	dc.ctx->Clear();
 

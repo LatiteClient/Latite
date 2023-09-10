@@ -11,7 +11,7 @@ Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement
 	addSetting("showSneak", "Sneak Key", "Shows the sneak key", shiftKey);
 
 	addSliderSetting("radius", "Radius", "How round the buttons are", radius, FloatValue(0.f), FloatValue(10.f), FloatValue(1.f));
-	addSliderSetting("textSize", "Text Size", "Text Size", textSize,   FloatValue(2.f), FloatValue(15.f), FloatValue(0.2f));
+	addSliderSetting("textSize", "Text Size", "Text Size", textSize,   FloatValue(2.f), FloatValue(40.f), FloatValue(0.2f));
 	addSliderSetting("keySize", "Key Size", "Key Size", keystrokeSize, FloatValue(15.f), FloatValue(90.f), FloatValue(2.f));
 	addSliderSetting("spaceSize", "Space Bar", "Spacebar Size", spaceSize, FloatValue(0.f), FloatValue(90.f), FloatValue(2.f));
 	addSliderSetting("mouseButtonHeight", "Mouse Button Height", "Mouse Button Height", mouseButtonHeight, FloatValue(15.f), FloatValue(90.f), FloatValue(2.f), "mouseButtons"_istrue);
@@ -36,10 +36,6 @@ Vec2 Keystrokes::drawKeystroke(DrawUtil& ctx, Vec2 const& pos, Keystroke& stroke
 }
 
 void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
-	auto bmp = Latite::getRenderer().copyCurrentBitmap();
-
-	Latite::getRenderer().getDeviceContext()->SetTarget(bmp);
-
 	auto input = SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent();
 
 	bool front = input->front;
@@ -142,7 +138,6 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 
 	this->rect.right = rect.left + pos.x;
 	this->rect.bottom = rect.top + pos.y;
-	Latite::getRenderer().getDeviceContext()->SetTarget(Latite::getRenderer().getBitmap());
 };
 
 Keystrokes::Keystroke::Keystroke(std::string const& inputMapping, bool& inputKey) : Stroke(inputKey)

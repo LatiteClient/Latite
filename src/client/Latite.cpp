@@ -182,6 +182,11 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(SetTitlePacket_readExtended),
         MVSIG(Vtable::CommandRequestPacket),
         MVSIG(Vtable::Level),
+        MVSIG(Misc::uiColorMaterial),
+        MVSIG(Tessellator_begin),
+        MVSIG(Tessellator_vertex),
+        MVSIG(Tessellator_color),
+        MVSIG(MeshHelpers_renderMeshImmediately),
             };
     
     new (mmgrBuf) ModuleManager;
@@ -523,6 +528,12 @@ void Latite::initSettings() {
     {
         auto set = std::make_shared<Setting>("minViewBob", "Minimal View Bob", "Only bob the item in hand, not the camera");
         set->value = &this->minimalViewBob;
+        this->getSettings().addSetting(set);
+    }
+
+    {
+        auto set = std::make_shared<Setting>("minecraftRenderer", "Use Minecraft Renderer", "Use the Minecraft renderer in the HUD.");
+        set->value = &this->minecraftRenderer;
         this->getSettings().addSetting(set);
     }
 }
