@@ -25,6 +25,8 @@ protected:
 
 	static JsValueRef CALLBACK getValueCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK setCondition(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 public:
 	inline static const wchar_t* class_name = L"Setting";
 
@@ -54,5 +56,6 @@ public:
 
 		Chakra::DefineFunc(prototype, toStringCallback, L"toString", this);
 		Chakra::DefineFunc(prototype, getValueCallback, L"getValue", this);
+		Chakra::DefineFunc(prototype, setCondition, L"setCondition", this);
 	};
 };

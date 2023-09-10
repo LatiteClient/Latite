@@ -46,6 +46,8 @@ protected:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK moduleAddKeySetting(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK moduleAddTextSetting(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 public:
 	inline static const wchar_t* class_name = L"Module";
 
@@ -75,5 +77,7 @@ public:
 		Chakra::DefineFunc(prototype, moduleGetSettings, L"getSettings", this);
 		Chakra::DefineFunc(prototype, moduleAddBoolSetting, L"addBoolSetting", this);
 		Chakra::DefineFunc(prototype, moduleAddNumberSetting, L"addNumberSetting", this);
+		Chakra::DefineFunc(prototype, moduleAddKeySetting, L"addKeySetting", this);
+		Chakra::DefineFunc(prototype, moduleAddTextSetting, L"addTextSetting", this);
 	};
 };

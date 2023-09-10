@@ -4,8 +4,7 @@
 #include "JsVec2.h"
 #include "../../JsScript.h"
 
-JsValueRef JsSettingClass::getValueCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
-{
+JsValueRef JsSettingClass::getValueCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto thi = reinterpret_cast<JsSettingClass*>(callbackState);
 	auto set = Get(arguments[0]);
 
@@ -42,4 +41,19 @@ JsValueRef JsSettingClass::getValueCallback(JsValueRef callee, bool isConstructo
 
 	}
 	return Chakra::GetNull();
+}
+
+JsValueRef JsSettingClass::setCondition(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState){
+	if (!Chakra::VerifyArgCount(argCount, 2, true, true)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {Chakra::TryGet(arguments, argCount, 2), JsBoolean, true}})) return JS_INVALID_REFERENCE;
+	
+	auto thi = reinterpret_cast<JsSettingClass*>(callbackState);
+	auto set = Get(arguments[0]);
+	bool setBool = true;
+	if (Chakra::TryGet(arguments, argCount, 2)) {
+		setBool = Chakra::GetBool(arguments[2]);
+	}
+
+	set->condition = Setting::Condition(util::WStrToStr(Chakra::GetString(arguments[1])), Setting::Condition::EQUALS, { static_cast<int>(setBool)});
+	return Chakra::GetUndefined();
 }

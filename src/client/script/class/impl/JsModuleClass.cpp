@@ -76,13 +76,13 @@ JsValueRef JsModuleClass::moduleSetOnEvent(JsValueRef callee, bool isConstructor
 	}
 	else
 #endif
-	if (mod->eventListeners.find(str) != mod->eventListeners.end()) {
-		JsContextRef ctx;
-		JS::JsGetCurrentContext(&ctx);
-		JS::JsAddRef(arguments[2], nullptr);
-		mod->eventListeners[str].push_back(std::make_pair(arguments[2], ctx));
-		return Chakra::GetUndefined();
-	}
+		if (mod->eventListeners.find(str) != mod->eventListeners.end()) {
+			JsContextRef ctx;
+			JS::JsGetCurrentContext(&ctx);
+			JS::JsAddRef(arguments[2], nullptr);
+			mod->eventListeners[str].push_back(std::make_pair(arguments[2], ctx));
+			return Chakra::GetUndefined();
+		}
 	Chakra::ThrowError(L"Unknown event " + str);
 	return Chakra::GetUndefined();
 }
@@ -108,7 +108,7 @@ JsValueRef JsModuleClass::moduleGetSettings(JsValueRef callee, bool isConstructo
 			Chakra::Release(index);
 			++i;
 			});
-		
+
 		return array;
 	}
 	Chakra::ThrowError(L"Object is not a module");
@@ -116,9 +116,9 @@ JsValueRef JsModuleClass::moduleGetSettings(JsValueRef callee, bool isConstructo
 }
 
 JsValueRef JsModuleClass::moduleAddBoolSetting(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyArgCount(argCount, 4)) return JS_INVALID_REFERENCE;
-	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, { arguments[2], JsString}, {arguments[3], JsString}})) return JS_INVALID_REFERENCE;
-	
+	if (!Chakra::VerifyArgCount(argCount, 5)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, { arguments[2], JsString}, {arguments[3], JsString}, {arguments[4], JsBoolean} })) return JS_INVALID_REFERENCE;
+
 	auto thi = reinterpret_cast<JsModuleClass*>(callbackState);
 
 	auto mod = Get(arguments[0]);
@@ -134,26 +134,21 @@ JsValueRef JsModuleClass::moduleAddBoolSetting(JsValueRef callee, bool isConstru
 
 	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
 
-	*set->value = BoolValue(false);
+	*set->value = BoolValue(Chakra::GetBool(arguments[4]));
 
 	auto setClass = thi->owner->getClass<JsSettingClass>();
-
-	if (!setClass) {
-		Logger::Fatal("Could not find setting class!!!");
-		throw std::runtime_error("could not find setting class");
-	}
-
 	mod->settings->addSetting(set);
 
 	return setClass->construct(set.get(), false /*do not destroy the setting once it goes out of scope, as module manager will handle that*/);
 }
 
 JsValueRef JsModuleClass::moduleAddNumberSetting(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyArgCount(argCount, 7)) return JS_INVALID_REFERENCE;
-	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, { arguments[2], JsString}, {arguments[3], JsString}, 
+	if (!Chakra::VerifyArgCount(argCount, 8)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, { arguments[2], JsString}, {arguments[3], JsString},
 		/*min*/{arguments[4], JsNumber},
 		/*max*/{arguments[5], JsNumber},
-		/*int*/{arguments[6], JsNumber}})) return JS_INVALID_REFERENCE;
+		/*int*/{arguments[6], JsNumber},
+		/*def*/{arguments[7], JsNumber} })) return JS_INVALID_REFERENCE;
 
 	auto thi = reinterpret_cast<JsModuleClass*>(callbackState);
 
@@ -174,27 +169,21 @@ JsValueRef JsModuleClass::moduleAddNumberSetting(JsValueRef callee, bool isConst
 
 	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
 
-	*set->value = FloatValue(0.f);
+	*set->value = FloatValue(static_cast<float>(Chakra::GetNumber(arguments[7])));
 	set->min = FloatValue(min);
 	set->max = FloatValue(max);
 	set->interval = FloatValue(intr);
 
 	auto setClass = thi->owner->getClass<JsSettingClass>();
-
-	if (!setClass) {
-		Logger::Fatal("Could not find setting class!!!");
-		throw std::runtime_error("could not find setting class");
-	}
-
 	mod->settings->addSetting(set);
 
 	return setClass->construct(set.get(), false /*do not destroy the setting once it goes out of scope, as module manager will handle that*/);
 }
 
 JsValueRef JsModuleClass::moduleAddKeySetting(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyArgCount(argCount, 4)) return JS_INVALID_REFERENCE;
-	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, { arguments[2], JsString}, {arguments[3], JsString}})) return JS_INVALID_REFERENCE;
-	
+	if (!Chakra::VerifyArgCount(argCount, 5)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, { arguments[2], JsString}, {arguments[3], JsString}, {arguments[4], JsNumber} })) return JS_INVALID_REFERENCE;
+
 	auto thi = reinterpret_cast<JsModuleClass*>(callbackState);
 
 	auto mod = Get(arguments[0]);
@@ -210,17 +199,37 @@ JsValueRef JsModuleClass::moduleAddKeySetting(JsValueRef callee, bool isConstruc
 
 	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
 
-	*set->value = BoolValue(false);
+	*set->value = KeyValue(Chakra::GetInt(arguments[4]));
 
 	auto setClass = thi->owner->getClass<JsSettingClass>();
-
-	if (!setClass) {
-		Logger::Fatal("Could not find setting class!!!");
-		throw std::runtime_error("could not find setting class");
-	}
-
 	mod->settings->addSetting(set);
 
 	return setClass->construct(set.get(), false /*do not destroy the setting once it goes out of scope, as module manager will handle that*/);
+}
 
+JsValueRef JsModuleClass::moduleAddTextSetting(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 5)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, { arguments[2], JsString}, {arguments[3], JsString}, {arguments[4], JsString} })) return JS_INVALID_REFERENCE;
+
+	auto thi = reinterpret_cast<JsModuleClass*>(callbackState);
+
+	auto mod = Get(arguments[0]);
+
+	if (!mod) {
+		Chakra::ThrowError(L"Object is not a module");
+		return JS_INVALID_REFERENCE;
+	}
+
+	auto name = Chakra::GetString(arguments[1]);
+	auto disp = Chakra::GetString(arguments[2]);
+	auto desc = Chakra::GetString(arguments[3]);
+
+	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
+
+	*set->value = TextValue(util::WStrToStr(Chakra::GetString(arguments[4])));
+
+	auto setClass = thi->owner->getClass<JsSettingClass>();
+	mod->settings->addSetting(set);
+
+	return setClass->construct(set.get(), false /*do not destroy the setting once it goes out of scope, as module manager will handle that*/);
 }

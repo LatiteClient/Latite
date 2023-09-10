@@ -79,7 +79,7 @@ public:
 
 	static std::wstring ToString(JsValueRef ref);
 	static Result VerifyParameters(std::initializer_list<ParamContainer> params, bool autoThrow = true);
-	static Result VerifyArgCount(unsigned short has, unsigned short expected, bool autoThrow = true);
+	static Result VerifyArgCount(unsigned short has, unsigned short expected, bool autoThrow = true, bool least = false);
 	static void ThrowError(std::wstring message);
 	static void Release(JsValueRef ref);
 };

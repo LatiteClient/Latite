@@ -92,13 +92,15 @@ JsValueRef Filesystem::read(JsValueRef callee, bool isConstructor, JsValueRef* a
 		auto op = reinterpret_cast<FSAsyncOperation*>(op_);
 		std::ifstream ifs;
 		std::wstringstream wss;
-		ifs.open(op->path, std::ios::binary);
+		ifs.open(op->path, std::ios::binary | std::ios::ate);
 		int errn = 0;
 		if (ifs.fail()) {
 			errn = errno;
 		}
 		else {
 			auto size = ifs.tellg();
+			ifs.seekg(0, std::ios::beg);
+
 			op->data->resize(size);
 			ifs.read((char*)op->data->data(), size);
 		}
@@ -149,7 +151,7 @@ JsValueRef Filesystem::readSync(JsValueRef callee, bool isConstructor, JsValueRe
 	std::ifstream ifs;
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 
-	ifs.open(thi->getPath(Chakra::GetString(arguments[1])));
+	ifs.open(thi->getPath(Chakra::GetString(arguments[1])), std::ios::binary | std::ios::ate);
 
 	if (ifs.fail()) {
 		throwFsError();
@@ -157,16 +159,21 @@ JsValueRef Filesystem::readSync(JsValueRef callee, bool isConstructor, JsValueRe
 	}
 	else {
 		auto size = ifs.tellg();
-		JS::JsCreateTypedArray(JsArrayTypeUint8, JS_INVALID_REFERENCE, 0, static_cast<unsigned>(size), &ret);
+		ifs.seekg(0, std::ios::beg);
+		auto realSize = static_cast<unsigned>(size);
+		JS::JsCreateTypedArray(JsArrayTypeUint8, JS_INVALID_REFERENCE, 0, static_cast<unsigned>(realSize), &ret);
 		BYTE* buf;
 		unsigned int sz;
-		JS::JsGetTypedArrayStorage(ret, &buf, &sz, nullptr, nullptr);
+		JsValueRef arrayBuffer;
 
-		ifs.read((char*)buf, size);
+		JS::JsGetTypedArrayInfo(ret, nullptr, &arrayBuffer, nullptr, nullptr);
+		JS::JsGetArrayBufferStorage(arrayBuffer, &buf, &sz);
+		ifs.read((char*)buf, sz);
 	}
 	ifs.close();
 	return ret;
 }
+
 
 JsValueRef Filesystem::existsSync(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto ret = Chakra::GetUndefined();

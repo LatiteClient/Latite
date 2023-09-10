@@ -11,7 +11,7 @@ bool ToggleCommand::execute(std::string const label, std::vector<std::string> ar
 		return false;
 	}
 
-	auto mod = Latite::get().getModuleManager().find(args[0]);
+	auto mod = Latite::getModuleManager().find(args[0]);
 	if (mod) {
 		mod->setEnabled(!mod->isEnabled());
 		message(std::format("Toggled {} {}", mod->getDisplayName(), mod->isEnabled() ? "ON" : "OFF"));

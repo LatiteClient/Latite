@@ -302,7 +302,7 @@ Chakra::Result Chakra::VerifyParameters(std::initializer_list<ParamContainer> pa
 		if (param.isOptional && param.val == JS_INVALID_REFERENCE) continue;
 		JsValueType trueType;
 		JS::JsGetValueType(param.val, &trueType);
-		if (param.isOptional && (trueType == JsUndefined || trueType == JsNull)) continue;
+		if (param.isOptional && (param.val == JS_INVALID_REFERENCE || trueType == JsUndefined || trueType == JsNull)) continue;
 
 
 		if (trueType != param.type) {
@@ -314,7 +314,7 @@ Chakra::Result Chakra::VerifyParameters(std::initializer_list<ParamContainer> pa
 			return { false,wstr };
 		}
 	}
-	return { true,L"" };
+	return { true, L"" };
 }
 
 std::wstring Chakra::GetString(JsValueRef ref) {
@@ -343,8 +343,8 @@ JsValueRef Chakra::GetUndefined() {
 	return ret;
 }
 
-Chakra::Result Chakra::VerifyArgCount(unsigned short has, unsigned short expected, bool autoThrow) {
-	if (has != expected) {
+Chakra::Result Chakra::VerifyArgCount(unsigned short has, unsigned short expected, bool autoThrow, bool least) {
+	if (has != expected || (least && has > expected)) {
 		auto ws = L"Function does not take " + std::to_wstring(has - 1) + L" arguments";
 		if (autoThrow) Chakra::ThrowError(ws);
 		return { false, ws };
