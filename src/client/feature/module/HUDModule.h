@@ -5,12 +5,15 @@
 
 class HUDModule : public Module {
 public:
+	static constexpr float min_scale = 0.f;
+	static constexpr float max_scale = 4.f;
+
 	HUDModule(std::string const& name, std::string const& displayName, std::string const& description, Category category, int keybind = 0,
 		bool resizable = true)
 		: Module(name, displayName, description, category, keybind, true), resizable(resizable) {
 		
 		addSetting("pos", "Position", "", storedPos);
-		addSliderSetting("scale", "Size", "", scale, FloatValue(0.f), FloatValue(4.f), FloatValue(0.05f));
+		addSliderSetting("scale", "Size", "", scale, FloatValue(min_scale), FloatValue(max_scale), FloatValue(0.05f));
 	}
 
 	virtual void render(DrawUtil& ctx, bool isDefault, bool inEditor) = 0;

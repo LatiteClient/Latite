@@ -5,7 +5,7 @@
 
 SpeedDisplay::SpeedDisplay() : TextModule("SpeedDisplay", "Speed Display", "Displays your speed in blocks per second.", HUD) {
 	addSliderSetting("decimals", "Decimals", "The number of decimals to show", decimals, FloatValue(0.f), FloatValue(10.f), FloatValue(1.f));
-	addSetting("includeY", "Y motion", "Include Y motion in the speed value", includeY);
+	addSetting("includeY", "Y Motion", "Include Y motion in the speed value", includeY);
 
 	this->suffix = TextValue(" m/s");
 

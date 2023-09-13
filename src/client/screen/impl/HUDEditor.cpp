@@ -104,7 +104,7 @@ void HUDEditor::onClick(Event& evGeneric) {
 			auto hudMod = reinterpret_cast<HUDModule*>(mod.get());
 			if (!hudMod->isActive()) return;
 			if (!shouldSelect(hudMod->getRect(), SDK::ClientInstance::get()->cursorPos)) return;
-			hudMod->setScale(hudMod->getScale() - static_cast<float>(ev.getWheelDelta()) / 1000.f);
+			hudMod->setScale(std::clamp(hudMod->getScale() - static_cast<float>(ev.getWheelDelta()) / 1000.f, HUDModule::min_scale, HUDModule::max_scale));
 			});
 		ev.setCancelled(true);
 	}

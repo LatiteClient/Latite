@@ -337,7 +337,7 @@ void ClickGUI::onRender(Event&) {
 				// go through all enum settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
 					if (setPos.y <= rect.bottom) {
-						if (set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Key || set->value->index() == (size_t)Setting::Type::Enum || set->value->index() == (size_t)Setting::Type::Color) {
+						if (set->shouldRender(settings) && (set->value->index() == (size_t)Setting::Type::Key || set->value->index() == (size_t)Setting::Type::Enum || set->value->index() == (size_t)Setting::Type::Color)) {
 						setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth) + (setting_height_relative * rect.getHeight());
 					}
 					}
@@ -503,6 +503,7 @@ void ClickGUI::onRender(Event&) {
 					float textSizeDesc = textHeight * 0.72f;
 					float descTextPad = textSizeDesc / 3.f;
 					RectF descTextRect = { modRect.left + rlBounds, modRect.bottom, modRect.right - rlBounds, modRect.bottom + textSizeDesc + descTextPad };
+					descTextRect.bottom = descTextRect.top + dc.getTextSize(util::StrToWStr(mod.description), Renderer::FontSelection::SegoeRegular, textSizeDesc).y + descTextPad;
 					modRectActual.bottom = descTextRect.bottom;
 
 					dc.drawText(descTextRect, util::StrToWStr(mod.description), d2d::Color(1.f, 1.f, 1.f, 0.57f), FontSelection::SegoeRegular, textSizeDesc, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
@@ -1048,7 +1049,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 
 		float apad = 1.f;
 		dc.ctx->PushAxisAlignedClip({ colRect.left + apad, colRect.top + apad, colRect.right - apad, colRect.bottom - apad }, D2D1_ANTIALIAS_MODE_ALIASED);
-		drawAlphaBar(dc, colRect, colRect.getWidth() / 16.f, 11);
+		drawAlphaBar(dc, colRect, colRect.getWidth() / 8.f, 6);
 		dc.ctx->PopAxisAlignedClip();
 
 		dc.fillRoundedRectangle(colRect, gradientBrush.Get(), round);
@@ -1147,12 +1148,11 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 		innerSliderRect.right = std::clamp(newRight, oLeft, oRight);
 
 		dc.fillRoundedRectangle(sliderRect, d2d::Color::RGB(0x8D, 0x8D, 0x8D).asAlpha(0.11f), sliderRect.getHeight() / 2.f);
-		// 323976
 		dc.fillRoundedRectangle(innerSliderRect, d2d::Color(Latite::get().getAccentColor().color1), innerSliderRect.getHeight() / 2.f);
 
 		dc.brush->SetColor(d2d::Color(0xB9, 0xB9, 0xB9).get());
 		dc.ctx->FillEllipse(D2D1::Ellipse({ innerSliderRect.right, sliderRect.centerY() }, sliderRect.getHeight() * 0.6f, sliderRect.getHeight() * 0.6f), dc.brush);
-		return textRect.bottom;
+		return rtTextRect.top + dc.getTextSize(namew.str(), Renderer::FontSelection::SegoeSemilight, textSz).y;
 	}
 		break;
 	default:
