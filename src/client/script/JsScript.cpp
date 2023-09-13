@@ -45,7 +45,13 @@ using namespace winrt::Windows::Web::Http::Filters;
 
 
 void JsScript::checkTrusted() {
+	if (this->loadedScript._Starts_with(util::StrToWStr(XOR_STRING("\"notrust\"")))) {
+		trusted = false;
+		return;
+	}
+
 	auto hash = JsScript::getHash(std::filesystem::path(this->indexPath).parent_path());
+
 	if (hash) {
 #if LATITE_DEBUG
 		Logger::Info("{} {}", util::WStrToStr(hash.value()), util::WStrToStr(getCertificate()));

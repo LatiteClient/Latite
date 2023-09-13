@@ -185,7 +185,7 @@ JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConst
 
 JsValueRef GameScriptingObject::executeCommand(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
-	auto sz = Chakra::VerifyParameters({ {arguments[1], JsValueType::JsString} });
+	if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsString} })) return JS_INVALID_REFERENCE;
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (lp) {
 		auto str = util::WStrToStr(Chakra::GetString(arguments[1]));
@@ -211,7 +211,6 @@ JsValueRef GameScriptingObject::playSoundUI(JsValueRef callee, bool isConstructo
 }
 
 JsValueRef GameScriptingObject::getLocalPlayerCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyArgCount(argCount, 1)) return Chakra::GetUndefined();
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!lp) return Chakra::GetNull();
 	JsScript* script;
@@ -224,7 +223,6 @@ JsValueRef GameScriptingObject::getLocalPlayerCallback(JsValueRef callee, bool i
 }
 
 JsValueRef GameScriptingObject::getConnectedServerCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyArgCount(argCount, 1)) return Chakra::GetUndefined();
 	auto rak = SDK::RakNetConnector::get();
 	if (!rak) return Chakra::GetNull();
 	if (rak->ipAddress.size() == 0) return Chakra::GetNull();
@@ -236,7 +234,6 @@ JsValueRef GameScriptingObject::getConnectedServerCallback(JsValueRef callee, bo
 }
 
 JsValueRef GameScriptingObject::getConnectedFeaturedServerCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyArgCount(argCount, 1)) return Chakra::GetUndefined();
 	auto rak = SDK::RakNetConnector::get();
 	if (!rak) return Chakra::GetNull();
 	if (rak->featuredServer.size() == 0) return Chakra::GetNull();
