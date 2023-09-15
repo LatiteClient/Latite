@@ -211,9 +211,83 @@ SDK::RectangleArea MCDrawUtil::getRect(d2d::Rect const& rc) {
 	return SDK::RectangleArea(rc.left * guiScale, rc.top * guiScale, rc.right * guiScale, rc.bottom * guiScale);
 }
 
-void MCDrawUtil::flush() {
-	SDK::MeshHelpers::renderMeshImmediately(scn, scn->tess, SDK::MaterialPtr::getUIColor());
-	renderCtx->flushText(0.f);
+void MCDrawUtil::flush(bool text, bool mesh) {
+	if (mesh) SDK::MeshHelpers::renderMeshImmediately(scn, scn->tess, SDK::MaterialPtr::getUIColor());
+	if (text) renderCtx->flushText(0.f);
+}
+
+void MCDrawUtil::drawVignette(d2d::Color const& innerCol, float fade) {
+	auto tess = scn->tess;
+	*scn->shaderColor = innerCol;
+
+	auto& ss = SDK::ClientInstance::get()->getGuiData()->guiSize;
+	d2d::Rect scnRect = { 0.f, 0.f, ss.x, ss.y };
+	auto center = scnRect.center();
+
+	tess->begin(SDK::Primitive::Trianglestrip, 1); // TODO: num of vertices
+	{
+		tess->color({ 1.f, 1.f, 1.f, 1.f });
+		tess->vertex(scnRect.right, scnRect.top);
+
+		tess->color({ 1.f, 1.f, 1.f, fade });
+		tess->vertex(center.x, center.y);
+	}
+
+	{
+		tess->color({ 1.f, 1.f, 1.f, 1.f });
+		tess->vertex(scnRect.right, scnRect.bottom);
+
+		tess->color({ 1.f, 1.f, 1.f, fade });
+		tess->vertex(center.x, center.y);
+	}
+
+	{
+		tess->color({ 1.f, 1.f, 1.f, 1.f });
+		tess->vertex(scnRect.left, scnRect.bottom);
+
+		tess->color({ 1.f, 1.f, 1.f, fade });
+		tess->vertex(center.x, center.y);
+	}
+
+	{
+		tess->color({ 1.f, 1.f, 1.f, 1.f });
+		tess->vertex(scnRect.left, scnRect.top);
+
+		tess->color({ 1.f, 1.f, 1.f, fade });
+		tess->vertex(center.x, center.y);
+	}
+
+	tess->color({ 1.f, 1.f, 1.f, 1.f });
+	tess->vertex(scnRect.right, scnRect.top);
+
+	flush(false);
+}
+
+void MCDrawUtil::fillPolygon(Vec2 const& center, float radius, int numSides, d2d::Color const& col) {
+	auto tess = scn->tess;
+	*scn->shaderColor = { 1.f,1.f,1.f,1.f };
+	tess->color(col);
+	
+	//tess->begin(SDK::Primitive::TriangleFan, 3);
+	//tess->vertex(center.x, center.y);
+	//tess->vertex(center.x, center.y + 10.f);
+	//tess->vertex(center.x + 5.f, center.y + 7.34f);
+	float angle = (2.0f * pi_f) / static_cast<float>(numSides);
+
+	constexpr float myNinetyDeg = LatiteMath::deg2rad(90.f);
+
+	tess->begin(SDK::Primitive::Trianglestrip, numSides * 2);
+	for (float i = 0; i <= static_cast<float>(numSides); ++i) {
+		float x = center.x + (radius)*cos(i * angle);
+		float y = center.y + (radius)*sin(i * angle);
+		tess->vertex(x, y);
+		tess->vertex(center.x, center.y);
+	}
+
+	flush(false);
+}
+
+void MCDrawUtil::drawPolygon(Vec2 const& center, float radius, int numSides, d2d::Color const& col, float lineThickness) {
 }
 
 void MCDrawUtil::fillRectangle(RectF const& rc, d2d::Color const& color) {
@@ -247,8 +321,38 @@ void MCDrawUtil::drawRectangle(RectF const& rect, d2d::Color const& col, float l
 	}
 }
 
-void MCDrawUtil::fillRoundedRectangle(RectF const& rect, d2d::Color const& color, float radius) {
-	fillRectangle(rect, color);
+void MCDrawUtil::fillRoundedRectangle(RectF const& rc, d2d::Color const& col, float radius) {
+	auto rect = d2d::Rect(rc.left * guiScale, rc.top * guiScale, rc.right * guiScale, rc.bottom * guiScale);
+	radius *= guiScale;
+	int numSides = 20;
+	auto tess = scn->tess;
+	*scn->shaderColor = { 1.f,1.f,1.f,1.f };
+
+	tess->begin(SDK::Primitive::Trianglestrip, numSides + 2); // TODO: this will probably lag as I dont put the correct # of verticies
+	tess->color(col);
+	float angle = (2.0f * pi_f) / static_cast<float>(numSides);
+	auto drawCorner = [tess, radius, angle, numSides, &rect](Vec2 const& center, float aMin, float aMax) {
+		for (float i = 0; i <= static_cast<float>(numSides); ++i) {
+			float myAngle = angle * i;
+			if (myAngle < aMin || myAngle > aMax) continue;
+
+			float x = center.x + (radius)*cos(myAngle);
+			float y = center.y + (radius)*sin(myAngle);
+
+			auto rc = rect.center();
+			tess->vertex(x, y);
+			tess->vertex(rc.x, rc.y);
+		}
+	};
+
+	drawCorner({ rect.left + radius, rect.top + radius }, LatiteMath::deg2rad(180.f), LatiteMath::deg2rad(270.f));
+	drawCorner({ rect.right - radius, rect.top + radius }, LatiteMath::deg2rad(270.f), LatiteMath::deg2rad(360.f));
+	drawCorner({ rect.right - radius, rect.bottom - radius }, LatiteMath::deg2rad(0.f), LatiteMath::deg2rad(90.f));
+	drawCorner({ rect.left + radius, rect.bottom - radius }, LatiteMath::deg2rad(90.f), LatiteMath::deg2rad(180.f));
+
+	tess->vertex(rect.left, rect.top + radius);
+	tess->vertex(rect.centerX(), rect.centerY());
+	flush(false);
 }
 
 void MCDrawUtil::drawRoundedRectangle(RectF rect, d2d::Color const& color, float radius, float lineThickness, OutlinePosition outPos) {

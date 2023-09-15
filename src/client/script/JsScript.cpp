@@ -29,6 +29,7 @@
 #include "class/impl/JsCommandClass.h"
 #include "class/impl/game/JsEntityClass.h"
 #include "class/impl/game/JsPlayerClass.h"
+#include "class/impl/game/JsLocalPlayerClass.h"
 #include "class/impl/game/JsItem.h"
 #include "class/impl/game/JsItemStack.h"
 
@@ -340,6 +341,7 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsCommandClass>(this));
 	this->classes.push_back(std::make_shared<JsEntityClass>(this));
 	this->classes.push_back(std::make_shared<JsPlayerClass>(this));
+	this->classes.push_back(std::make_shared<JsLocalPlayerClass>(this));
 	this->classes.push_back(std::make_shared<JsItem>(this));
 	this->classes.push_back(std::make_shared<JsItemStack>(this));
 

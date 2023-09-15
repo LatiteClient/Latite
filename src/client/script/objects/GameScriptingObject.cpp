@@ -63,7 +63,7 @@ JsValueRef GameScriptingObject::worldGetPlayers(JsValueRef callee, bool isConstr
 
 	int i = 0;
 	for (auto& pair : *arr) {
-		JS::JsSetIndexedProperty(arr, Chakra::MakeInt(i), Chakra::MakeString(util::StrToWStr(pair.second.name)));
+		JS::JsSetIndexedProperty(array, Chakra::MakeInt(i), Chakra::MakeString(util::StrToWStr(pair.second.name)));
 		++i;
 	}
 	return array;

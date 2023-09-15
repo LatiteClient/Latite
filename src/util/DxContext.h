@@ -36,7 +36,7 @@ public:
 	/// Be careful when setting cache to true
 	virtual RectF getTextRect(std::wstring const& text, Renderer::FontSelection font, float size, float pad = 0.f, bool cache = true) = 0;
 
-	virtual void flush() {}
+	virtual void flush(bool text = true, bool mesh = true) {}
 	void setImmediate(bool b) { immediate = b; }
 
 	DrawUtil() = default;
@@ -91,8 +91,11 @@ public:
 	float guiScale = 1.f;
 
 	MCDrawUtil(SDK::MinecraftUIRenderContext* ctx, SDK::Font* font) : renderCtx(ctx), scn(renderCtx->screenContext), font(font), guiScale(SDK::ClientInstance::get()->getGuiData()->guiScaleFrac) {}
-	void flush() override;
+	void flush(bool text = true, bool mesh = true) override;
 
+	void drawVignette(d2d::Color const& innerCol, float fade = 0.f);
+	void fillPolygon(Vec2 const& center, float radius, int numSides, d2d::Color const& col);
+	void drawPolygon(Vec2 const& center, float radius, int numSides, d2d::Color const& col, float lineThickness = 1.f);
 	virtual void fillRectangle(RectF const& rect, d2d::Color const& color) override;
 	virtual void drawRectangle(RectF const& rect, d2d::Color const& color, float lineThickness = 1.f) override;
 	virtual void fillRoundedRectangle(RectF const& rect, d2d::Color const& color, float radius = 10.f) override;

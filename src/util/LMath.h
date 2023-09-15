@@ -5,6 +5,14 @@
 
 #include <cmath>
 
+static constexpr float pi_f = 3.1415926535;
+
+namespace LatiteMath {
+	static constexpr float deg2rad(float deg) {
+		return deg * (pi_f / 180.f);
+	}
+}
+
 struct Vec2 final {
 	float x, y;
 
