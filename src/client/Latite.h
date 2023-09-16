@@ -42,6 +42,7 @@ public:
 	void onFocusLost(class Event& ev);
 	void onSuspended(class Event& ev);
 	void onBobView(class Event& ev);
+	void onLeaveGame(class Event& ev);
 
 	void loadConfig(class SettingGroup& resolvedGroup);
 	void initAsset(int resource, std::wstring const& filename);
@@ -101,6 +102,8 @@ public:
 		return std::get<BoolValue>(textShadow);
 	}
 
+	[[nodiscard]] SDK::Font* getFont();
+
 	void fetchLatiteUsers();
 
 	int cInstOffs = 0;
@@ -125,6 +128,7 @@ private:
 	ValueType minimalViewBob = BoolValue(false);
 	ValueType minecraftRenderer = BoolValue(false);
 	ValueType textShadow = BoolValue(true);
+	EnumData mcRendFont;
 
 	std::vector<ui::TextBox*> textBoxes;
 	ComPtr<struct ID2D1Bitmap1> hudBlurBitmap;

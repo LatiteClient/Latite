@@ -16,6 +16,8 @@ public:
 		addSliderSetting("scale", "Size", "", scale, FloatValue(min_scale), FloatValue(max_scale), FloatValue(0.05f));
 	}
 
+	virtual ~HUDModule() = default;
+
 	virtual void render(DrawUtil& ctx, bool isDefault, bool inEditor) = 0;
 
 	virtual void renderSelected();

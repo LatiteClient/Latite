@@ -310,8 +310,10 @@
     <ClInclude Include="src\client\event\Events.h" />
     <ClInclude Include="src\client\event\impl\BobMovementEvent.h" />
     <ClInclude Include="src\client\event\impl\DrawHUDModulesEvent.h" />
+    <ClInclude Include="src\client\event\impl\LeaveGameEvent.h" />
     <ClInclude Include="src\client\feature\command\impl\SignCommand.h" />
     <ClInclude Include="src\client\feature\module\impl\game\CinematicCamera.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\BreakIndicator.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\GuiscaleChanger.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\Keystrokes.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\DebugInfo.h" />
@@ -450,6 +452,7 @@
     <ClInclude Include="src\client\script\ScriptingObject.h" />
     <ClInclude Include="src\client\script\ScriptManager.h" />
     <ClInclude Include="src\client\ui\TextBox.h" />
+    <ClInclude Include="src\sdk\common\client\game\FontRepository.h" />
     <ClInclude Include="src\sdk\common\client\gui\controls\UIControl.h" />
     <ClInclude Include="src\sdk\common\client\gui\controls\VisualTree.h" />
     <ClInclude Include="src\sdk\common\client\gui\Font.h" />
@@ -544,6 +547,7 @@
   <ItemGroup>
     <ClCompile Include="deps\include\vhook\vtable_hook.cpp" />
     <ClCompile Include="src\client\feature\command\impl\SignCommand.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\BreakIndicator.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\Keystrokes.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\CinematicCamera.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\DebugInfo.cpp" />

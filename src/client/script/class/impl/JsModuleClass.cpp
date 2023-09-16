@@ -100,10 +100,6 @@ JsValueRef JsModuleClass::moduleGetSettings(JsValueRef callee, bool isConstructo
 		mod->settings->forEach([&](std::shared_ptr<Setting> set) {
 			JsValueRef index = Chakra::MakeInt(i);
 			auto setClass = thi->owner->getClass<JsSettingClass>();
-			if (!setClass) {
-				Logger::Fatal("Could not find setting class!!!");
-				throw std::runtime_error("could not find setting class");
-			}
 			JS::JsSetIndexedProperty(array, index, setClass->construct(set.get(), false));
 			Chakra::Release(index);
 			++i;

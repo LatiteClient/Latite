@@ -401,7 +401,7 @@ void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color 
 
 	switch (verticalAlign) {
 	case DWRITE_PARAGRAPH_ALIGNMENT_CENTER:
-		newTop = rc.centerY((this->font->getLineHeight() * vSize) / guiScale);
+		newTop = rc.centerY(size * (10.f / this->font->getLineHeight()));
 		break;
 	case DWRITE_PARAGRAPH_ALIGNMENT_FAR:
 		newTop = rc.bottom - (size);

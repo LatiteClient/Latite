@@ -24,10 +24,13 @@
 #include "event/impl/CharEvent.h"
 #include "event/impl/ClickEvent.h"
 #include "event/impl/BobMovementEvent.h"
+#include "event/impl/LeaveGameEvent.h"
 
 #include "sdk/signature/storage.h"
 
 #include "sdk/common/client/game/ClientInstance.h"
+#include "sdk/common/client/game/MinecraftGame.h"
+#include "sdk/common/client/game/FontRepository.h"
 #include <winrt/windows.ui.viewmanagement.h>
 #include <winrt/windows.storage.streams.h>
 
@@ -383,6 +386,18 @@ void Latite::queueEject() noexcept {
     CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)FreeLibraryAndExitThread, dllInst, 0, nullptr));
 }
 
+SDK::Font* Latite::getFont() {
+    switch (this->mcRendFont.getSelectedKey()) {
+    case 0:
+        return SDK::ClientInstance::get()->minecraftGame->minecraftFont;
+    case 1:
+        return SDK::ClientInstance::get()->minecraftGame->getFontRepository()->getSmoothFont();
+    default:
+        Logger::Fatal("Unknown font selected: {}", this->mcRendFont.getSelectedKey());
+        throw std::runtime_error("Unknown font");
+    }
+}
+
 void Latite::initialize(HINSTANCE hInst) {
     this->dllInst = hInst;
 
@@ -395,6 +410,7 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getEventing().listen<CharEvent>(this, (EventListenerFunc)&Latite::onChar, 2);
     Latite::getEventing().listen<ClickEvent>(this, (EventListenerFunc)&Latite::onClick, 2);
     Latite::getEventing().listen<BobMovementEvent>(this, (EventListenerFunc)&Latite::onBobView, 2);
+    Latite::getEventing().listen<LeaveGameEvent>(this, (EventListenerFunc)&Latite::onLeaveGame, 2);
 
     getHooks().init();
     Logger::Info("Initialized Hooks");
@@ -542,10 +558,25 @@ void Latite::initSettings() {
         set->value = &this->textShadow;
         this->getSettings().addSetting(set);
     }
+
+    {
+        auto set = std::make_shared<Setting>("mcRendererFont", "HUD Font", "The HUD font", "minecraftRenderer"_istrue);
+        set->enumData = &this->mcRendFont;
+        set->value = set->enumData->getValue();
+        set->enumData->addEntry({ 0, "Default", "The Minecraft font" });
+        set->enumData->addEntry({ 1, "Noto Sans", "The smooth font (Noto Sans MS)" });
+        this->getSettings().addSetting(set);
+    }
 }
 
 void Latite::initAsset(int resource, std::wstring const& filename) {
     HRSRC hRes = FindResource((HMODULE)dllInst, MAKEINTRESOURCE(resource), RT_RCDATA);
+    if (!hRes) {
+        Logger::Fatal("Could not find resource {}", util::WStrToStr(filename));
+        throw std::runtime_error("Could not find resource");
+        return;
+    }
+
     HGLOBAL hData = LoadResource((HMODULE)dllInst, hRes);
     DWORD hSize = SizeofResource((HMODULE)dllInst, hRes);
     char* hFinal = (char*)LockResource(hData);
@@ -562,6 +593,11 @@ void Latite::initAsset(int resource, std::wstring const& filename) {
 
 std::string Latite::getTextAsset(int resource) {
     HRSRC hRes = FindResource((HMODULE)dllInst, MAKEINTRESOURCE(resource), MAKEINTRESOURCE(TEXTFILE));
+    if (!hRes) {
+        Logger::Fatal("Could not find text resource {}", resource);
+        throw std::runtime_error("Could not find resource");
+    }
+
     HGLOBAL hData = LoadResource((HMODULE)dllInst, hRes);
     DWORD hSize = SizeofResource((HMODULE)dllInst, hRes);
     char* hFinal = (char*)LockResource(hData);
@@ -718,6 +754,10 @@ void Latite::onBobView(Event& ev) {
     if (std::get<BoolValue>(this->minimalViewBob)) {
         reinterpret_cast<Cancellable&>(ev).setCancelled(true);
     }
+}
+
+void Latite::onLeaveGame(Event& ev) {
+    getRenderer().clearTextCache();
 }
 
 void Latite::loadConfig(SettingGroup& gr) {

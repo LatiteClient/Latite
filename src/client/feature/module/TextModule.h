@@ -40,6 +40,8 @@ public:
 		this->textual = true;
 	}
 
+	virtual ~TextModule() = default;
+
 	void onInit() override;
 
 	void render(DrawUtil& ctx, bool isDefault, bool inEditor) override;
