@@ -168,12 +168,13 @@ std::wstring util::StrToWStr(std::string const& s) {
 }
 
 std::string util::WStrToStr(std::wstring const& ws) {
-	int len = WideCharToMultiByte(CP_ACP, 0, ws.c_str(), static_cast<int>(ws.size() + 1), 0, 0, 0, 0);
-	char* buf = new char[len];
-	WideCharToMultiByte(CP_ACP, 0, ws.c_str(), static_cast<int>(ws.size() + 1), buf, len, 0, 0);
-	std::string r(buf);
-	delete[] buf;
-	return r;
+	std::string ret;
+	int len = WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), ws.size(), NULL, 0, NULL, NULL);
+	if (len > 0) {
+		ret.resize(len);
+		WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), ws.size(), &ret[0], len, NULL, NULL);
+	}
+	return ret;
 }
 
 std::string util::Format(std::string const& s) {
