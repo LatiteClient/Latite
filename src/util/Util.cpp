@@ -189,24 +189,24 @@ std::string util::Format(std::string const& s) {
 	return out;
 }
 
-std::string util::GetClipboardText() {
+std::wstring util::GetClipboardText() {
 	// Try opening the clipboard
 	if (!OpenClipboard(nullptr)) {
-		return "";
+		return L"";
 	}
 
 	// Get handle of clipboard object for ANSI text
-	HANDLE hData = GetClipboardData(CF_TEXT);
+	HANDLE hData = GetClipboardData(CF_UNICODETEXT);
 	if (hData == nullptr)
-		return "";
+		return L"";
 
 	// Lock the handle to get the actual text pointer
-	char* pszText = static_cast<char*>(GlobalLock(hData));
+	wchar_t* pszText = static_cast<wchar_t*>(GlobalLock(hData));
 	if (pszText == nullptr)
-		return "";
+		return L"";
 
 	// Save text in a string class instance
-	std::string text(pszText);
+	std::wstring text(pszText);
 
 	// Release the lock
 	GlobalUnlock(hData);
@@ -217,7 +217,7 @@ std::string util::GetClipboardText() {
 	return text;
 }
 
-void util::SetClipboardText(std::string const& text) {
+void util::SetClipboardText(std::wstring const& text) {
 	if (OpenClipboard(NULL)) {
 		EmptyClipboard();
 		HGLOBAL hg = GlobalAlloc(GMEM_MOVEABLE, text.size() + 1); // \0
@@ -225,9 +225,9 @@ void util::SetClipboardText(std::string const& text) {
 			CloseClipboard();
 		}
 		else {
-			memcpy(GlobalLock(hg), text.c_str(), text.size() + 1);
+			memcpy(GlobalLock(hg), text.c_str(), (text.size() * 2) + 1);
 			GlobalUnlock(hg);
-			SetClipboardData(CF_TEXT, hg);
+			SetClipboardData(CF_UNICODETEXT, hg);
 			CloseClipboard();
 			GlobalFree(hg);
 		}

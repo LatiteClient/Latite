@@ -17,8 +17,8 @@ namespace util {
 	extern std::wstring StrToWStr(std::string const& s);
 	extern std::string WStrToStr(std::wstring const& ws);
 	extern std::string Format(std::string const& s);
-	extern std::string GetClipboardText();
-	extern void SetClipboardText(std::string const& text);
+	extern std::wstring GetClipboardText();
+	extern void SetClipboardText(std::wstring const& text);
 
 	extern std::string KeyToString(int key);
 	extern int StringToKey(std::string const& s);
