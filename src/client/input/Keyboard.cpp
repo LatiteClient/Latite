@@ -36,16 +36,16 @@ void Keyboard::findTextInput() {
 			}
 			if (keyMapAdjusted[VK_CONTROL]) {
 				if (i == 'V') {
-					std::string str = util::GetClipboardText();
-					for (char ch : str) {
+					std::wstring str = util::GetClipboardText();
+					for (wchar_t ch : str) {
 						onChar(ch);
 					}
 				}
 				else if (i == 'C') {
-					onChar((char)1, false);
+					onChar((wchar_t)1, false);
 				}
 				else if (i == 'A') {
-					onChar(char(3), false);
+					onChar(wchar_t(3), false);
 				}
 			}
 			else {
