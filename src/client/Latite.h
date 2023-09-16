@@ -97,6 +97,10 @@ public:
 		return std::get<BoolValue>(minecraftRenderer);
 	}
 
+	[[nodiscard]] bool shouldRenderTextShadows() {
+		return std::get<BoolValue>(textShadow);
+	}
+
 	void fetchLatiteUsers();
 
 	int cInstOffs = 0;
@@ -120,6 +124,7 @@ private:
 	ValueType accentColor = ColorValue(static_cast<float>(0x32) / 255.f, static_cast<float>(0x39) / 255.f, static_cast<float>(0x76) / 255.f);
 	ValueType minimalViewBob = BoolValue(false);
 	ValueType minecraftRenderer = BoolValue(false);
+	ValueType textShadow = BoolValue(true);
 
 	std::vector<ui::TextBox*> textBoxes;
 	ComPtr<struct ID2D1Bitmap1> hudBlurBitmap;

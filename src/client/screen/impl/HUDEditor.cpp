@@ -193,7 +193,7 @@ void HUDEditor::renderModules(SDK::MinecraftUIRenderContext* ctx) {
 			if (mod->isHud() && mod->isEnabled() && reinterpret_cast<HUDModule*>(mod.get())->isActive()) {
 				auto hudModule = static_cast<HUDModule*>(mod.get());
 				renderModule(hudModule, ctx);
-				hudModule->storePos();
+				hudModule->storePos(ctx ? SDK::ClientInstance::get()->getGuiData()->screenSize : Vec2(Latite::getRenderer().getScreenSize().width, Latite::getRenderer().getScreenSize().height));
 			}
 			});
 	}

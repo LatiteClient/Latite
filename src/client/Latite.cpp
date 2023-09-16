@@ -536,6 +536,12 @@ void Latite::initSettings() {
         set->value = &this->minecraftRenderer;
         this->getSettings().addSetting(set);
     }
+
+    {
+        auto set = std::make_shared<Setting>("textShadow", "Text Shadows", "Whether to have text shadows or not with Minecraft renderer.", "minecraftRenderer"_istrue);
+        set->value = &this->textShadow;
+        this->getSettings().addSetting(set);
+    }
 }
 
 void Latite::initAsset(int resource, std::wstring const& filename) {

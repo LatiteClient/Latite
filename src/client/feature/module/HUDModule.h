@@ -22,7 +22,7 @@ public:
 	virtual void renderFrame();
 	virtual void renderPost();
 	void afterLoadConfig() override;
-	void storePos();
+	void storePos(Vec2 const& ss);
 
 	void setPos(Vec2 newPos) {
 		rect.setPos(newPos);
