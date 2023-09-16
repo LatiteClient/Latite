@@ -9,6 +9,10 @@ namespace ui {
 	class TextBox;
 }
 
+namespace sdk {
+	class Font;
+}
+
 class Latite final : public Listener {
 public:
 	[[nodiscard]] static Latite& get() noexcept;
@@ -27,7 +31,7 @@ public:
 	[[nodiscard]] static class Keyboard& getKeyboard() noexcept;
 
 	[[nodiscard]] Timings& getTimings() noexcept { return timings; }
-	[[nodiscard]] std::string getCommandPrefix() { return std::get<TextValue>(commandPrefix).str; }
+	[[nodiscard]] std::string getCommandPrefix() { return util::WStrToStr(std::get<TextValue>(commandPrefix).str); }
 
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);
@@ -115,7 +119,7 @@ private:
 
 	Timings timings{};
 
-	ValueType commandPrefix = TextValue(".");
+	ValueType commandPrefix = TextValue(L".");
 	ValueType menuKey = KeyValue('M');
 	ValueType ejectKey = KeyValue(VK_END);
 	ValueType hudBlur = BoolValue(false);

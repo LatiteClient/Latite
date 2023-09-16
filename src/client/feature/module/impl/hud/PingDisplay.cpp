@@ -5,7 +5,7 @@
 #include "client/event/Eventing.h"
 
 PingDisplay::PingDisplay() : TextModule("PingDisplay", "Ping Display", "Displays the ping of the server you're connected to", HUD) {
-	this->suffix = TextValue(" MS");
+	this->suffix = TextValue(L" MS");
 
 	listen<AveragePingEvent>((EventListenerFunc)&PingDisplay::onAvgPing, true);
 }

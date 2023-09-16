@@ -8,7 +8,7 @@ CPSCounter::CPSCounter() : TextModule("CPS", "CPS Counter", "Shows your CPS", HU
 	mode.addEntry(EnumEntry(2, "Both", "Both"));
 	addEnumSetting("Mode", "Mode", "What to show", mode);
 
-	std::get<TextValue>(this->prefix).str = "CPS: ";
+	std::get<TextValue>(this->prefix).str = L"CPS: ";
 }
 
 std::wstringstream CPSCounter::text(bool isDefault, bool inEditor) {

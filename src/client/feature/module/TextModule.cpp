@@ -87,8 +87,8 @@ void TextModule::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 
 std::wstringstream TextModule::processText(std::wstringstream& stream) {
 	std::wstringstream str;
-	str << util::StrToWStr(std::get<TextValue>(prefix).str);
+	str << std::get<TextValue>(prefix).str;
 	str << stream.str();
-	str << util::StrToWStr(std::get<TextValue>(suffix).str);
+	str << std::get<TextValue>(suffix).str;
 	return str;
 }

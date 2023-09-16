@@ -704,7 +704,7 @@ void Latite::onChar(Event& evGeneric) {
                 auto ch = ev.getChar();
                 switch (ch) {
                 case 0x1:
-                    util::SetClipboardText(tb->getText());
+                    util::SetClipboardText(util::WStrToStr(tb->getText()));
                     break;
                 case 0x2:
                     tb->setSelected(false);

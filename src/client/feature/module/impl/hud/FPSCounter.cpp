@@ -3,7 +3,7 @@
 #include "client/Latite.h"
 
 FPSCounter::FPSCounter() : TextModule("FPS", "FPS Counter", "Shows your FPS.", HUD) {
-	this->prefix = TextValue("FPS: ");
+	this->prefix = TextValue(L"FPS: ");
 }
 
 std::wstringstream FPSCounter::text(bool isDefault, bool inEditor) {

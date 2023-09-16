@@ -184,12 +184,12 @@ struct ColorValue {
 };
 
 struct TextValue {
-	std::string str;
+	std::wstring str;
 
-	TextValue(std::string const& str) : str(str) {};
+	TextValue(std::wstring const& str) : str(str) {};
 
 	TextValue(nlohmann::json& js) {
-		str = js.get<std::string>();
+		str = js.get<std::wstring>();
 	}
 
 	void store(nlohmann::json& jout) {

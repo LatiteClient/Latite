@@ -21,6 +21,6 @@ public:
 
 	void onKey(Event& ev);
 private:
-	void onChar(char ch, bool isChar = true);
+	void onChar(wchar_t ch, bool isChar = true);
 };
 

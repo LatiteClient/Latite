@@ -18,7 +18,7 @@ bool ui::TextBox::shouldBlink() {
 	return (diff.count() % 1000) < 500;
 }
 
-void ui::TextBox::onChar(char character) {
+void ui::TextBox::onChar(wchar_t character) {
 	if (character == '\b' && text.size() > 0) {
 		place = std::max(place - 1, 0);
 		text.erase(text.begin() + std::min(static_cast<int>(text.size()), place));
@@ -41,7 +41,7 @@ void ui::TextBox::onKeyDown(int key) {
 	}
 }
 
-void ui::TextBox::setText(std::string const& str) {
+void ui::TextBox::setText(std::wstring const& str) {
 	text = str;
 	if (place > str.size()) place = static_cast<int>(str.size());
 }
@@ -65,11 +65,11 @@ void ui::TextBox::render(DrawUtil& dc, float rounding, d2d::Color backgroundColo
 
 	// draw text
 	float textSize = rect.getHeight() * 0.7f;
-	dc.drawText(rect, util::StrToWStr(getText()), textColor, Renderer::FontSelection::SegoeRegular, textSize,
+	dc.drawText(rect, getText(), textColor, Renderer::FontSelection::SegoeRegular, textSize,
 		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, false); // Don't cache
 
 	// draw blinker
-	Vec2 ts = dc.getTextSize(util::StrToWStr(text.substr(0, this->place)), Renderer::FontSelection::SegoeRegular, textSize);
+	Vec2 ts = dc.getTextSize(text.substr(0, this->place), Renderer::FontSelection::SegoeRegular, textSize);
 	d2d::Rect blinkerRect = { rect.left + ts.x, rect.top + 2.f, rect.left + ts.x + 2.f, rect.bottom - 2.f };
 	if (isSelected() && shouldBlink()) dc.fillRectangle(blinkerRect, textColor);
 }

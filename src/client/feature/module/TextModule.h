@@ -18,8 +18,8 @@ protected:
 	ValueType textColor = ColorValue(1.f, 1.f, 1.f, 1.f);
 	ValueType bgColor = ColorValue(0.f, 0.f, 0.f, 0.5f);
 	
-	ValueType prefix = TextValue("");
-	ValueType suffix = TextValue("");
+	ValueType prefix = TextValue(L"");
+	ValueType suffix = TextValue(L"");
 
 	ValueType showOutline = BoolValue(false);
 
