@@ -92,8 +92,8 @@ void HUDEditor::onRender(Event& ev) {
 	if (isActive()) doDragging();
 	doSnapping(dragOffset);
 	if (!mcRenderer) {
-		keepModulesInBounds(Vec2(Latite::getRenderer().getScreenSize().width, Latite::getRenderer().getScreenSize().height));
 		renderModules(nullptr);
+		if (isActive()) keepModulesInBounds(Vec2(Latite::getRenderer().getScreenSize().width, Latite::getRenderer().getScreenSize().height));
 	}
 
 }
@@ -125,7 +125,7 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 		dc.setImmediate(false);
 
 		this->renderModules(ev.getUIRenderContext());
-		keepModulesInBounds(SDK::ClientInstance::get()->getGuiData()->screenSize);
+		if (isActive()) keepModulesInBounds(SDK::ClientInstance::get()->getGuiData()->screenSize);
 	}
 
 	//auto view = ev.getScreenView();
