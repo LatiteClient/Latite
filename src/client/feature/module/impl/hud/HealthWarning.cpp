@@ -4,7 +4,7 @@
 #include "sdk/common/client/gui/controls/VisualTree.h"
 #include "sdk/common/client/gui/controls/UIControl.h"
 
-HealthWarning::HealthWarning() : Module("HealthWarning", "Health Warning", "Give the screen a red vignette when your health is low", HUD, nokeybind) {
+HealthWarning::HealthWarning() : Module("HealthWarning", "Health Warning", "Give the screen a vignette when your health is low", HUD, nokeybind) {
     this->listen<RenderLayerEvent>(&HealthWarning::onRenderLayer);
 	addSetting("vignetteColor", "Vignette Color", "", vignetteColor);
 }
