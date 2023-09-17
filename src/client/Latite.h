@@ -9,6 +9,10 @@ namespace ui {
 	class TextBox;
 }
 
+namespace sdk {
+	class Font;
+}
+
 class Latite final : public Listener {
 public:
 	[[nodiscard]] static Latite& get() noexcept;
@@ -27,7 +31,7 @@ public:
 	[[nodiscard]] static class Keyboard& getKeyboard() noexcept;
 
 	[[nodiscard]] Timings& getTimings() noexcept { return timings; }
-	[[nodiscard]] std::string getCommandPrefix() { return std::get<TextValue>(commandPrefix).str; }
+	[[nodiscard]] std::string getCommandPrefix() { return util::WStrToStr(std::get<TextValue>(commandPrefix).str); }
 
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);
@@ -42,6 +46,7 @@ public:
 	void onFocusLost(class Event& ev);
 	void onSuspended(class Event& ev);
 	void onBobView(class Event& ev);
+	void onLeaveGame(class Event& ev);
 
 	void loadConfig(class SettingGroup& resolvedGroup);
 	void initAsset(int resource, std::wstring const& filename);
@@ -97,6 +102,12 @@ public:
 		return std::get<BoolValue>(minecraftRenderer);
 	}
 
+	[[nodiscard]] bool shouldRenderTextShadows() {
+		return std::get<BoolValue>(textShadow);
+	}
+
+	[[nodiscard]] SDK::Font* getFont();
+
 	void fetchLatiteUsers();
 
 	int cInstOffs = 0;
@@ -108,7 +119,7 @@ private:
 
 	Timings timings{};
 
-	ValueType commandPrefix = TextValue(".");
+	ValueType commandPrefix = TextValue(L".");
 	ValueType menuKey = KeyValue('M');
 	ValueType ejectKey = KeyValue(VK_END);
 	ValueType hudBlur = BoolValue(false);
@@ -120,6 +131,8 @@ private:
 	ValueType accentColor = ColorValue(static_cast<float>(0x32) / 255.f, static_cast<float>(0x39) / 255.f, static_cast<float>(0x76) / 255.f);
 	ValueType minimalViewBob = BoolValue(false);
 	ValueType minecraftRenderer = BoolValue(false);
+	ValueType textShadow = BoolValue(true);
+	EnumData mcRendFont;
 
 	std::vector<ui::TextBox*> textBoxes;
 	ComPtr<struct ID2D1Bitmap1> hudBlurBitmap;

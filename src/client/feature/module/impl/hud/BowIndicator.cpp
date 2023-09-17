@@ -2,10 +2,10 @@
 #include "BowIndicator.h"
 
 BowIndicator::BowIndicator() : TextModule("BowIndicator", "Bow Indicator", "Shows bow chargedness", HUD, 400.f, 0, true) {
-	addSetting("visual", "Visual Indicator", "To show a bar instead of text", this->visual);
-	addSetting("horizontal", "Horizontal", "Whether it's horizontal or not", this->horizontal, "visual"_istrue);
-	addSliderSetting("size", "Size", "The size of the indicator", indicatorSize, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
-	addSliderSetting("width", "Width", "The width of the indicator", indicatorWidth, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
+	//addSetting("visual", "Visual Indicator", "To show a bar instead of text", this->visual);
+	//addSetting("horizontal", "Horizontal", "Whether it's horizontal or not", this->horizontal, "visual"_istrue);
+	//addSliderSetting("size", "Size", "The size of the indicator", indicatorSize, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
+	//addSliderSetting("width", "Width", "The width of the indicator", indicatorWidth, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
 }
 
 BowIndicator::~BowIndicator() {
@@ -30,34 +30,42 @@ void BowIndicator::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	rect.right = rect.left + rc.getWidth();
 	rect.bottom = rect.top + rc.getHeight();
 
-	if (slot->item) {
-		auto item = *slot->item;
-		auto nam = item->_namespace;
-		if (item->id.hash == 0xd8d9a7186bad3c2f /*bow*/) {
-			int useDur = plr->getItemUseDuration();
-			auto mxu = item->getMaxUseDuration(slot);
-			float diff = static_cast<float>(item->getMaxUseDuration(slot) - useDur);
-			float percent = (std::min)((std::max)(diff / 20.f, 0.f), 1.f);
-			dc.fillRoundedRectangle(rc, std::get<ColorValue>(indicatorCol).color1, rad);
+	if (auto percent = getBowCharge(slot)) {
+		dc.fillRoundedRectangle(rc, std::get<ColorValue>(indicatorCol).color1, rad);
 
-			d2d::Rect fillRc = rc;
-			if (horiz) {
-				fillRc.right = fillRc.left + fillRc.getWidth() * percent;
-			}
-			else {
-				fillRc.bottom = fillRc.top + fillRc.getHeight() * percent;
-			}
-			dc.fillRoundedRectangle(fillRc, std::get<ColorValue>(indicatorCol2).color1, rad);
+		d2d::Rect fillRc = rc;
+		if (horiz) {
+			fillRc.right = fillRc.left + fillRc.getWidth() * percent.value();
 		}
-	}
-	else {
-
+		else {
+			fillRc.top = fillRc.bottom - fillRc.getHeight() * percent.value();
+		}
+		dc.fillRoundedRectangle(fillRc, std::get<ColorValue>(indicatorCol2).color1, rad);
 	}
 
 }
 
 std::wstringstream BowIndicator::text(bool, bool) {
+	auto plr = SDK::ClientInstance::get()->getLocalPlayer();
+	auto slot = plr->supplies->inventory->getItem(plr->supplies->selectedSlot);
+	auto charge = getBowCharge(slot);
+
 	std::wstringstream wss;
-	wss << "hi";
+	if (!plr) return wss;
+	wss << std::round(charge.value_or(0.f) * 100.f) << "%";
 	return wss;
+}
+
+std::optional<float> BowIndicator::getBowCharge(SDK::ItemStack* slot) {
+	if (!slot->item) return std::nullopt;
+	auto item = *slot->item;
+	if (item->id.hash == 0xd8d9a7186bad3c2f /*bow*/ || item->id.hash == 0xf53d301813cb9fb1 /*crossbow*/) {
+		int useDur = SDK::ClientInstance::get()->getLocalPlayer()->getItemUseDuration();
+		if (useDur) {
+			auto mxu = item->getMaxUseDuration(slot);
+			float diff = static_cast<float>(item->getMaxUseDuration(slot) - useDur);
+			return (std::min)((std::max)(diff / 20.f, 0.f), 1.f);
+		}
+	}
+	return std::nullopt;
 }

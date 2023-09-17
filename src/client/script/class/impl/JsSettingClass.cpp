@@ -36,7 +36,7 @@ JsValueRef JsSettingClass::getValueCallback(JsValueRef callee, bool isConstructo
 	}
 	case Setting::Type::Text:
 	{
-		return Chakra::MakeString(util::StrToWStr(std::get<TextValue>(*set->value).str));
+		return Chakra::MakeString(std::get<TextValue>(*set->value).str);
 	}
 
 	}

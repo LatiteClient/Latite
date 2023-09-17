@@ -17,4 +17,6 @@ private:
 
 	void render(DrawUtil& dc, bool isDefault, bool inEditor) override;
 	std::wstringstream text(bool isDefault, bool inEditor) override;
+
+	std::optional<float> getBowCharge(SDK::ItemStack*);
 };

@@ -16,13 +16,15 @@ public:
 		addSliderSetting("scale", "Size", "", scale, FloatValue(min_scale), FloatValue(max_scale), FloatValue(0.05f));
 	}
 
+	virtual ~HUDModule() = default;
+
 	virtual void render(DrawUtil& ctx, bool isDefault, bool inEditor) = 0;
 
 	virtual void renderSelected();
 	virtual void renderFrame();
 	virtual void renderPost();
 	void afterLoadConfig() override;
-	void storePos();
+	void storePos(Vec2 const& ss);
 
 	void setPos(Vec2 newPos) {
 		rect.setPos(newPos);

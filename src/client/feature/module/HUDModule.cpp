@@ -27,9 +27,8 @@ void HUDModule::afterLoadConfig() {
 	setPos({ sp.x * ss.width, sp.y * ss.height });
 }
 
-void HUDModule::storePos() {
+void HUDModule::storePos(Vec2 const& ss) {
 	auto& vec = std::get<Vec2Value>(storedPos);
-	auto& ss = SDK::ClientInstance::get()->getGuiData()->screenSize;
 	vec.x = rect.left / ss.x;
 	vec.y = rect.top / ss.y;
 }

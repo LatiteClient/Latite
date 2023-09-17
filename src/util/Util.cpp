@@ -168,12 +168,13 @@ std::wstring util::StrToWStr(std::string const& s) {
 }
 
 std::string util::WStrToStr(std::wstring const& ws) {
-	int len = WideCharToMultiByte(CP_ACP, 0, ws.c_str(), static_cast<int>(ws.size() + 1), 0, 0, 0, 0);
-	char* buf = new char[len];
-	WideCharToMultiByte(CP_ACP, 0, ws.c_str(), static_cast<int>(ws.size() + 1), buf, len, 0, 0);
-	std::string r(buf);
-	delete[] buf;
-	return r;
+	std::string ret;
+	int len = WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), ws.size(), NULL, 0, NULL, NULL);
+	if (len > 0) {
+		ret.resize(len);
+		WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), ws.size(), &ret[0], len, NULL, NULL);
+	}
+	return ret;
 }
 
 std::string util::Format(std::string const& s) {
@@ -189,24 +190,24 @@ std::string util::Format(std::string const& s) {
 	return out;
 }
 
-std::string util::GetClipboardText() {
+std::wstring util::GetClipboardText() {
 	// Try opening the clipboard
 	if (!OpenClipboard(nullptr)) {
-		return "";
+		return L"";
 	}
 
 	// Get handle of clipboard object for ANSI text
-	HANDLE hData = GetClipboardData(CF_TEXT);
+	HANDLE hData = GetClipboardData(CF_UNICODETEXT);
 	if (hData == nullptr)
-		return "";
+		return L"";
 
 	// Lock the handle to get the actual text pointer
-	char* pszText = static_cast<char*>(GlobalLock(hData));
+	wchar_t* pszText = static_cast<wchar_t*>(GlobalLock(hData));
 	if (pszText == nullptr)
-		return "";
+		return L"";
 
 	// Save text in a string class instance
-	std::string text(pszText);
+	std::wstring text(pszText);
 
 	// Release the lock
 	GlobalUnlock(hData);
@@ -217,7 +218,7 @@ std::string util::GetClipboardText() {
 	return text;
 }
 
-void util::SetClipboardText(std::string const& text) {
+void util::SetClipboardText(std::wstring const& text) {
 	if (OpenClipboard(NULL)) {
 		EmptyClipboard();
 		HGLOBAL hg = GlobalAlloc(GMEM_MOVEABLE, text.size() + 1); // \0
@@ -225,9 +226,9 @@ void util::SetClipboardText(std::string const& text) {
 			CloseClipboard();
 		}
 		else {
-			memcpy(GlobalLock(hg), text.c_str(), text.size() + 1);
+			memcpy(GlobalLock(hg), text.c_str(), (text.size() * 2) + 1);
 			GlobalUnlock(hg);
-			SetClipboardData(CF_TEXT, hg);
+			SetClipboardData(CF_UNICODETEXT, hg);
 			CloseClipboard();
 			GlobalFree(hg);
 		}

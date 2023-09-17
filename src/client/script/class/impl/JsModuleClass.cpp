@@ -100,10 +100,6 @@ JsValueRef JsModuleClass::moduleGetSettings(JsValueRef callee, bool isConstructo
 		mod->settings->forEach([&](std::shared_ptr<Setting> set) {
 			JsValueRef index = Chakra::MakeInt(i);
 			auto setClass = thi->owner->getClass<JsSettingClass>();
-			if (!setClass) {
-				Logger::Fatal("Could not find setting class!!!");
-				throw std::runtime_error("could not find setting class");
-			}
 			JS::JsSetIndexedProperty(array, index, setClass->construct(set.get(), false));
 			Chakra::Release(index);
 			++i;
@@ -226,7 +222,7 @@ JsValueRef JsModuleClass::moduleAddTextSetting(JsValueRef callee, bool isConstru
 
 	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
 
-	*set->value = TextValue(util::WStrToStr(Chakra::GetString(arguments[4])));
+	*set->value = TextValue(Chakra::GetString(arguments[4]));
 
 	auto setClass = thi->owner->getClass<JsSettingClass>();
 	mod->settings->addSetting(set);

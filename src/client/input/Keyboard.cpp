@@ -36,27 +36,26 @@ void Keyboard::findTextInput() {
 			}
 			if (keyMapAdjusted[VK_CONTROL]) {
 				if (i == 'V') {
-					std::string str = util::GetClipboardText();
-					for (char ch : str) {
+					std::wstring str = util::GetClipboardText();
+					for (wchar_t ch : str) {
 						onChar(ch);
 					}
 				}
 				else if (i == 'C') {
-					onChar((char)1, false);
+					onChar((wchar_t)1, false);
 				}
 				else if (i == 'A') {
-					onChar(char(3), false);
+					onChar(wchar_t(3), false);
 				}
 			}
 			else {
 
-				WORD wChars = 0;
+				DWORD dwChars = 0;
 				DWORD dwScanCode = 0;
 				(reinterpret_cast<WORD*>(&dwScanCode))[1] = keyMapAdjusted[i];
-
-				int res = ToAscii(i, dwScanCode, winKeyMap, &wChars, 0);
+				int res = ToUnicode(i, dwScanCode, winKeyMap, (LPWSTR) & dwChars, 4, 0);
 				if (res > 0) {
-					char* chars = reinterpret_cast<char*>(&wChars);
+					wchar_t* chars = reinterpret_cast<wchar_t*>(&dwChars);
 					onChar(chars[0]);
 
 					if (res == 2) { // If there's an extra character
@@ -82,7 +81,7 @@ int Keyboard::getMappedKey(std::string const& name) {
 	return SDK::ClientInstance::get()->inputHandler->mappingFactory->defaultKeyboardLayout->findValue(name);
 }
 
-void Keyboard::onChar(char ch, bool isChar) {
+void Keyboard::onChar(wchar_t ch, bool isChar) {
 	CharEvent ev{ ch, isChar };
 	Eventing::get().dispatch(ev);
 }

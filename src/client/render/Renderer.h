@@ -113,6 +113,10 @@ public:
 		gameSwapChain = chain;
 	}
 
+	void clearTextCache() {
+		this->cachedLayouts.clear();
+	}
+
 	[[nodiscard]] std::wstring getFontFamily() {
 		return this->fontFamily;
 	}

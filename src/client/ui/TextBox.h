@@ -17,15 +17,15 @@ namespace ui {
 
 		[[nodiscard]] bool shouldBlink();
 
-		void onChar(char character);
+		void onChar(wchar_t character);
 
 		void onKeyDown(int key);
 
-		[[nodiscard]] std::string getText() {
+		[[nodiscard]] std::wstring getText() {
 			return text;
 		}
 
-		void setText(std::string const& str);
+		void setText(std::wstring const& str);
 
 		void reset();
 
@@ -47,7 +47,7 @@ namespace ui {
 		std::chrono::high_resolution_clock::time_point startTime;
 		int maxChars = 32;
 		int place = 0;
-		std::string text = "";
+		std::wstring text;
 		bool isSelectedBool = false;
 	};
 }

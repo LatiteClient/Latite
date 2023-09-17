@@ -329,7 +329,7 @@ void MCDrawUtil::fillRoundedRectangle(RectF const& rc, d2d::Color const& col, fl
 	auto tess = scn->tess;
 	*scn->shaderColor = { 1.f,1.f,1.f,1.f };
 
-	tess->begin(SDK::Primitive::Trianglestrip, numSides + 2); // TODO: this will probably lag as I dont put the correct # of verticies
+	tess->begin(SDK::Primitive::Trianglestrip, ((numSides * 2) * 4) + 2);
 	tess->color(col);
 	float angle = (2.0f * pi_f) / static_cast<float>(numSides);
 	auto drawCorner = [tess, radius, angle, numSides, &rect](Vec2 const& center, float aMin, float aMax) {
@@ -357,7 +357,41 @@ void MCDrawUtil::fillRoundedRectangle(RectF const& rc, d2d::Color const& col, fl
 }
 
 void MCDrawUtil::drawRoundedRectangle(RectF rect, d2d::Color const& color, float radius, float lineThickness, OutlinePosition outPos) {
-	drawRectangle(rect, color, lineThickness);
+	lineThickness *= guiScale;
+	
+	rect = d2d::Rect(rect.left * guiScale, rect.top * guiScale, rect.right * guiScale, rect.bottom * guiScale);
+	radius *= guiScale;
+	int numSides = 20;
+	auto tess = scn->tess;
+	*scn->shaderColor = { 1.f,1.f,1.f,1.f };
+
+	tess->begin(SDK::Primitive::Trianglestrip, ((numSides * 2) * 4) + 2);
+	tess->color(color);
+	float angle = (2.0f * pi_f) / static_cast<float>(numSides);
+	auto drawCorner = [tess, radius, angle, numSides, &rect, lineThickness](Vec2 const& center, float aMin, float aMax) {
+		for (float i = 0; i <= static_cast<float>(numSides); ++i) {
+			float myAngle = angle * i;
+			if (myAngle < aMin || myAngle > aMax) continue;
+
+			float x = center.x + (radius)*cos(myAngle);
+			float y = center.y + (radius)*sin(myAngle);
+
+			float innerX = center.x + (radius - lineThickness) * std::cos(myAngle);
+			float innerY = center.y + (radius - lineThickness) * std::sin(myAngle);
+
+			tess->vertex(x, y);
+			tess->vertex(innerX, innerY);
+		}
+	};
+
+	drawCorner({ rect.left + radius, rect.top + radius }, LatiteMath::deg2rad(180.f), LatiteMath::deg2rad(270.f));
+	drawCorner({ rect.right - radius, rect.top + radius }, LatiteMath::deg2rad(270.f), LatiteMath::deg2rad(360.f));
+	drawCorner({ rect.right - radius, rect.bottom - radius }, LatiteMath::deg2rad(0.f), LatiteMath::deg2rad(90.f));
+	drawCorner({ rect.left + radius, rect.bottom - radius }, LatiteMath::deg2rad(90.f), LatiteMath::deg2rad(180.f));
+
+	tess->vertex(rect.left, rect.top + radius);
+	tess->vertex(rect.left + lineThickness, rect.top + radius);
+	flush(false);
 }
 
 void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlign, bool cache) {
@@ -368,7 +402,7 @@ void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color 
 
 	switch (verticalAlign) {
 	case DWRITE_PARAGRAPH_ALIGNMENT_CENTER:
-		newTop = rc.centerY((this->font->getLineHeight() * vSize) / guiScale);
+		newTop = rc.centerY(size * (10.f / this->font->getLineHeight()));
 		break;
 	case DWRITE_PARAGRAPH_ALIGNMENT_FAR:
 		newTop = rc.bottom - (size);
@@ -379,7 +413,7 @@ void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color 
 	
 	RectF rMod = rc;
 	rMod.top = newTop;
-	renderCtx->drawText(this->font, getRect(rMod), util::WStrToStr(text), color, color.a, (SDK::ui::TextAlignment)alignment, SDK::TextMeasureData((size * guiScale) / this->font->getLineHeight(), false, false), &caretMeasure);
+	renderCtx->drawText(this->font, getRect(rMod), util::WStrToStr(text), color, color.a, (SDK::ui::TextAlignment)alignment, SDK::TextMeasureData((size * guiScale) / this->font->getLineHeight(), Latite::get().shouldRenderTextShadows(), false), &caretMeasure);
 }
 
 Vec2 MCDrawUtil::getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace, bool cache) {

@@ -299,9 +299,9 @@ void ClickGUI::onRender(Event&) {
 					}
 				}
 				else {
-					searchStr = util::StrToWStr(searchTextBox.getText());
+					searchStr = searchTextBox.getText();
 				}
-				Vec2 ts = dc.getTextSize(util::StrToWStr(searchTextBox.getText().substr(0, searchTextBox.getCaretLocation())), Renderer::FontSelection::SegoeRegular, searchRect.getHeight() / 2.f);
+				Vec2 ts = dc.getTextSize(searchTextBox.getText().substr(0, searchTextBox.getCaretLocation()), Renderer::FontSelection::SegoeRegular, searchRect.getHeight() / 2.f);
 				RectF textSearchRect = { searchRect.left + 5.f + searchRect.getHeight(), searchRect.top, searchRect.right - 5.f + searchRect.getHeight(), searchRect.bottom };
 				d2d::Rect blinkerRect = { textSearchRect.left + ts.x, searchRect.top + 3.f, textSearchRect.left + ts.x + 2.f, searchRect.bottom - 3.f };
 				if (searchTextBox.isSelected() && searchTextBox.shouldBlink() ) dc.fillRectangle(blinkerRect, d2d::Color::RGB(0xB9, 0xB9, 0xB9));
@@ -457,7 +457,7 @@ void ClickGUI::onRender(Event&) {
 				should = false;
 				std::string lower = mod.name;
 				std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-				std::string lowerSearch = searchTextBox.getText();
+				std::string lowerSearch = util::WStrToStr(searchTextBox.getText());
 				std::transform(lowerSearch.begin(), lowerSearch.end(), lowerSearch.begin(), ::tolower);
 				if (lower.rfind(lowerSearch) != UINTPTR_MAX) should = true;
 			}
@@ -1354,13 +1354,13 @@ void ClickGUI::drawColorPicker() {
 			tb.setRect(hexBox);
 
 			if (!tb.isSelected()) {
-				tb.setText("#" + col.getHex());
+				tb.setText(util::StrToWStr("#" + col.getHex()));
 			}
 
 			tb.render(dc, round, bgCol, D2D1::ColorF::White);
 			if (tb.isSelected()) {
 				d2d::Color newCol = col;
-				std::string txt = tb.getText();
+				std::string txt = util::WStrToStr(tb.getText());
 				if (txt[0] == '#') {
 					txt = txt.substr(1);
 				}

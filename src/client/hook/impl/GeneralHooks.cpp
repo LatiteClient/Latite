@@ -4,16 +4,6 @@
 #include "client/misc/ClientMessageSink.h"
 #include "client/feature/command/commandmanager.h"
 #include "client/event/Eventing.h"
-#include "client/event/impl/TickEvent.h"
-#include "client/event/impl/RenderGameEvent.h"
-#include "client/event/impl/KeyUpdateEvent.h"
-#include "client/event/impl/ChatEvent.h"
-#include "client/event/impl/ClickEvent.h"
-#include "client/event/impl/AveragePingEvent.h"
-#include "client/event/impl/CinematicCameraEvent.h"
-#include "client/event/impl/BeforeMoveEvent.h"
-#include "client/event/impl/AfterMoveEvent.h"
-#include "client/event/impl/BobMovementEvent.h"
 #include "client/script/ScriptManager.h"
 
 namespace {
@@ -22,7 +12,8 @@ namespace {
 	std::shared_ptr<Hook> GameRenderer_renderCurrentFrameHook;
 	std::shared_ptr<Hook> Keyboard_feedHook;
 	std::shared_ptr<Hook> OnClickHook;
-	std::shared_ptr<Hook> LoadLibraryHook;
+	std::shared_ptr<Hook> LoadLibraryWHook;
+	std::shared_ptr<Hook> LoadLibraryAHook;
 	std::shared_ptr<Hook> ConnectorTickHook;
 	std::shared_ptr<Hook> AveragePingHook;
 	std::shared_ptr<Hook> TurnDeltaHook;
@@ -227,12 +218,16 @@ void* GenericHooks::Level_startLeaveGame(SDK::Level* obj) {
 		ScriptManager::Event ev{L"leave-game", {}, false};
 		Latite::getScriptManager().dispatchEvent(ev);
 	}
+
+	LeaveGameEvent ev{};
+	Eventing::get().dispatch(ev);
+
 	return Level_startLeaveGameHook->oFunc<decltype(&Level_startLeaveGame)>()(obj);
 }
 
 GenericHooks::GenericHooks() : HookGroup("General") {
-	LoadLibraryHook = addHook((uintptr_t)&::LoadLibraryW, hkLoadLibraryW);
-	LoadLibraryHook = addHook((uintptr_t) & ::LoadLibraryA, hkLoadLibraryW);
+	LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
+	LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
 
 
 	Level_tickHook = addHook(Signatures::Level_tick.result,

@@ -69,11 +69,9 @@ JsScript::JsScript(std::wstring const& indexPath) : indexPath(indexPath), ctx(JS
 }
 
 bool JsScript::load() {
-	try {
-		indexStream.open(indexPath);
-	}
-	catch (std::exception&) {
-		throw std::runtime_error("could not open index path");
+	indexStream.open(indexPath);
+	if (indexStream.fail()) {
+		Logger::Warn("Could not open index path: {}", errno);
 		return false;
 	}
 

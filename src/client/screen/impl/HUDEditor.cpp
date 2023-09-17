@@ -116,7 +116,7 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 	if (!mcRenderer) return;
 
 	if (ev.getScreenView()->visualTree->rootControl->name == "debug_screen") {
-		MCDrawUtil dc = { ev.getUIRenderContext(), SDK::ClientInstance::get()->minecraftGame->minecraftFont };
+		MCDrawUtil dc = { ev.getUIRenderContext(), Latite::get().getFont()};
 
 		auto ss = SDK::ClientInstance::get()->getGuiData()->screenSize;
 		if (isActive()) dc.fillRectangle({ 0.f, 0.f, ss.x, ss.y }, { 0.4f, 0.4f, 0.4f, 0.4f * this->anim });
@@ -193,7 +193,7 @@ void HUDEditor::renderModules(SDK::MinecraftUIRenderContext* ctx) {
 			if (mod->isHud() && mod->isEnabled() && reinterpret_cast<HUDModule*>(mod.get())->isActive()) {
 				auto hudModule = static_cast<HUDModule*>(mod.get());
 				renderModule(hudModule, ctx);
-				hudModule->storePos();
+				hudModule->storePos(ctx ? SDK::ClientInstance::get()->getGuiData()->screenSize : Vec2(Latite::getRenderer().getScreenSize().width, Latite::getRenderer().getScreenSize().height));
 			}
 			});
 	}
@@ -212,7 +212,7 @@ void HUDEditor::renderModule(HUDModule* mod, SDK::MinecraftUIRenderContext* ctx)
 		dc.ctx->SetTransform(oTrans);
 	}
 	else {
-		MCDrawUtil dc{ ctx, SDK::ClientInstance::get()->minecraftGame->minecraftFont };
+		MCDrawUtil dc{ ctx, Latite::get().getFont() };
 		dc.setImmediate(false);
 
 		dc.scn->matrix->matrixStack.push(D2D1::Matrix4x4F::Scale(mod->getScale(), mod->getScale(), 0.f) * D2D1::Matrix4x4F::Translation(mod->getRect().left * dc.guiScale, mod->getRect().top * dc.guiScale, 0.f));

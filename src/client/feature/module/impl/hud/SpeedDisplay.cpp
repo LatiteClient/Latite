@@ -7,7 +7,7 @@ SpeedDisplay::SpeedDisplay() : TextModule("SpeedDisplay", "Speed Display", "Disp
 	addSliderSetting("decimals", "Decimals", "The number of decimals to show", decimals, FloatValue(0.f), FloatValue(10.f), FloatValue(1.f));
 	addSetting("includeY", "Y Motion", "Include Y motion in the speed value", includeY);
 
-	this->suffix = TextValue(" m/s");
+	this->suffix = TextValue(L" m/s");
 
 	listen<TickEvent>((EventListenerFunc)&SpeedDisplay::onTick);
 }
