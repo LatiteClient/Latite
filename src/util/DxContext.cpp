@@ -217,6 +217,7 @@ void MCDrawUtil::flush(bool text, bool mesh) {
 }
 
 void MCDrawUtil::drawVignette(d2d::Color const& innerCol, float fade) {
+	// jay you should totally make the fade float actually fade in the vignette
 	auto tess = scn->tess;
 	*scn->shaderColor = innerCol;
 

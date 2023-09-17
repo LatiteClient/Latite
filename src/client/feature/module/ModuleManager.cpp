@@ -22,6 +22,7 @@
 #include "impl/hud/GuiscaleChanger.h"
 #include "impl/hud/TabList.h"
 #include "impl/hud/Keystrokes.h"
+#include "impl/hud/HealthWarning.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
 
@@ -50,6 +51,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<TabList>());
 	this->items.push_back(std::make_shared<Keystrokes>());
 	this->items.push_back(std::make_shared<CinematicCamera>());
+	this->items.push_back(std::make_shared<HealthWarning>());
 
 	for (auto& mod : items) {
 		mod->onInit();

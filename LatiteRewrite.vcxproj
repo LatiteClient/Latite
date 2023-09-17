@@ -307,6 +307,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="deps\include\vhook\vtable_hook.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\HealthWarning.h" />
     <ClInclude Include="src\client\event\Events.h" />
     <ClInclude Include="src\client\event\impl\BobMovementEvent.h" />
     <ClInclude Include="src\client\event\impl\DrawHUDModulesEvent.h" />
@@ -543,6 +544,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\include\vhook\vtable_hook.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\HealthWarning.cpp" />
     <ClCompile Include="src\client\feature\command\impl\SignCommand.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\Keystrokes.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\CinematicCamera.cpp" />
