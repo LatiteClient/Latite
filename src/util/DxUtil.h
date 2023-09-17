@@ -149,6 +149,10 @@ namespace d2d {
 		}
 
 		void setPos(Vec2 const& pos) {
+			if (isnan(pos.x) || isinf(pos.x) || isnan(pos.y) || isinf(pos.y)) {
+				__debugbreak();
+			}
+
 			float bOffX = right - left;
 			float bOffY = bottom - top;
 

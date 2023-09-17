@@ -6,12 +6,14 @@
 
 HealthWarning::HealthWarning() : Module("HealthWarning", "Health Warning", "Give the screen a red vignette when your health is low", HUD, nokeybind) {
     this->listen<RenderLayerEvent>(&HealthWarning::onRenderLayer);
-	addSetting("vignetteColor", "Vignette color", "", vignetteColor);
+	addSetting("vignetteColor", "Vignette Color", "", vignetteColor);
 }
 
 void HealthWarning::onRenderLayer(Event& evG) {
 	RenderLayerEvent& ev = reinterpret_cast<RenderLayerEvent&>(evG);
 	SDK::ScreenView* screenView = ev.getScreenView();
+
+	if (!SDK::ClientInstance::get()->getLocalPlayer()) return;
 
 	StoredColor vignette = std::get<ColorValue>(vignetteColor).color1;
 
