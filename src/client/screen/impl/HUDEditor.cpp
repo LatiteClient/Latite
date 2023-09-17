@@ -93,7 +93,7 @@ void HUDEditor::onRender(Event& ev) {
 	doSnapping(dragOffset);
 	if (!mcRenderer) {
 		renderModules(nullptr);
-		if (isActive()) keepModulesInBounds(Vec2(Latite::getRenderer().getScreenSize().width, Latite::getRenderer().getScreenSize().height));
+		if (SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) keepModulesInBounds(Vec2(Latite::getRenderer().getScreenSize().width, Latite::getRenderer().getScreenSize().height));
 	}
 
 }
@@ -125,7 +125,7 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 		dc.setImmediate(false);
 
 		this->renderModules(ev.getUIRenderContext());
-		if (isActive()) keepModulesInBounds(SDK::ClientInstance::get()->getGuiData()->screenSize);
+		if (SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) keepModulesInBounds(SDK::ClientInstance::get()->getGuiData()->screenSize);
 	}
 
 	//auto view = ev.getScreenView();

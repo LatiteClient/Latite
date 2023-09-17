@@ -17,7 +17,7 @@ Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement
 	addSliderSetting("mouseButtonHeight", "Mouse Button Height", "Mouse Button Height", mouseButtonHeight, FloatValue(15.f), FloatValue(90.f), FloatValue(2.f), "mouseButtons"_istrue);
 	addSliderSetting("padding", "Padding", "Padding between keys", padding, FloatValue(0.f), FloatValue(6.f), FloatValue(0.25f));
 	addSliderSetting("borderLength", "Border Length", "The border length", borderLength, FloatValue(0.f), FloatValue(6.f), FloatValue(0.25f), "border"_istrue);
-	addSliderSetting("transition", "Transition", "The smooth color transition", lerpSpeed, FloatValue(0.05f), FloatValue(1.f), FloatValue(0.05f));
+	addSliderSetting("transition", "Transition (0 = No Transition)", "The smooth color transition (0 for no transition)", lerpSpeed, FloatValue(0.f), FloatValue(3.f), FloatValue(0.05f));
 	
 	addSetting("borderCol", "Border Color", "The color of the border", borderColor);
 	addSetting("pressedCol", "Pressed Color", "The key color when pressed", pressedColor);
@@ -52,18 +52,30 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 		Keystroke("back", input->back), Keystroke("right", input->right), Keystroke("sneak", input->sneak), Keystroke("jump", input->jump)};
 	
 
-	float lerpT = SDK::ClientInstance::get()->minecraft->timer->alpha * std::get<FloatValue>(lerpSpeed);
+	float ls = std::get<FloatValue>(lerpSpeed);
+	float lerpT = SDK::ClientInstance::get()->minecraft->timer->alpha * ls;
 
 	for (auto& key : keystrokes) {
-		key.updateKeyName();
-
-		key.col = util::LerpColorState(key.col, d2d::Color(std::get<ColorValue>(this->pressedColor).color1), d2d::Color(std::get<ColorValue>(this->unpressedColor).color1), key.input.get(), lerpT);
-		key.textCol = util::LerpColorState(key.textCol, d2d::Color(std::get<ColorValue>(this->pressedTextColor).color1), d2d::Color(std::get<ColorValue>(this->unpressedTextColor).color1), key.input.get(), lerpT);
+		if (ls > 0.01f) {
+			key.col = util::LerpColorState(key.col, d2d::Color(std::get<ColorValue>(this->pressedColor).color1), d2d::Color(std::get<ColorValue>(this->unpressedColor).color1), key.input.get(), lerpT);
+			key.textCol = util::LerpColorState(key.textCol, d2d::Color(std::get<ColorValue>(this->pressedTextColor).color1), d2d::Color(std::get<ColorValue>(this->unpressedTextColor).color1), key.input.get(), lerpT);
+		}
+		else {
+			key.col = key.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedColor).color1) : d2d::Color(std::get<ColorValue>(this->unpressedColor).color1);
+			key.textCol = key.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedTextColor).color1) : d2d::Color(std::get<ColorValue>(this->unpressedTextColor).color1);
+		}
+	
 	}
 
 	for (auto& btn : mouseButtons) {
-		btn.col = util::LerpColorState(btn.col, d2d::Color(std::get<ColorValue>(this->pressedColor).color1), d2d::Color(std::get<ColorValue>(this->unpressedColor).color1), btn.input.get(), lerpT);
-		btn.textCol = util::LerpColorState(btn.textCol, d2d::Color(std::get<ColorValue>(this->pressedTextColor).color1), d2d::Color(std::get<ColorValue>(this->unpressedTextColor).color1), btn.input.get(), lerpT);
+		if (ls > 0.01f) {
+			btn.col = util::LerpColorState(btn.col, d2d::Color(std::get<ColorValue>(this->pressedColor).color1), d2d::Color(std::get<ColorValue>(this->unpressedColor).color1), btn.input.get(), lerpT);
+			btn.textCol = util::LerpColorState(btn.textCol, d2d::Color(std::get<ColorValue>(this->pressedTextColor).color1), d2d::Color(std::get<ColorValue>(this->unpressedTextColor).color1), btn.input.get(), lerpT);
+		}
+		else {
+			btn.col = btn.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedColor).color1) : d2d::Color(std::get<ColorValue>(this->unpressedColor).color1);
+			btn.textCol = btn.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedTextColor).color1) : d2d::Color(std::get<ColorValue>(this->unpressedTextColor).color1);
+		}
 	}
 
 	// Direction Keys
