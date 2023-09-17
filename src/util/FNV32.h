@@ -20,6 +20,15 @@ namespace util {
 		inline constexpr uint64_t fnv1a_64_const(char const* s, std::size_t count) {
 			return count ? (fnv1a_64_const(s, count - 1) ^ s[count - 1]) * FNV_PRIME_64 : FNV_OFFSET_BASIS_64;
 		}
+
+		inline constexpr uint64_t fnv1_64_const(char const* s, std::size_t count) {
+			uint64_t hash = FNV_OFFSET_BASIS_64;
+			for (std::size_t i = 0; i < count; ++i) {
+				hash *= FNV_PRIME_64;
+				hash ^= static_cast<uint64_t>(s[i]);
+			}
+			return hash;
+		}
 	}
 
 	inline uint32_t fnv1a_32(std::string const& str) {
@@ -62,7 +71,7 @@ constexpr uint32_t operator"" _fnv32(char const* s, std::size_t count) {
 }
 
 constexpr uint64_t operator"" _fnv64(char const* s, std::size_t count) {
-	return util::detail::fnv1a_64_const(s, count);
+	return util::detail::fnv1_64_const(s, count);
 }
 
 #define TOHASH(x) #x##_fnv32

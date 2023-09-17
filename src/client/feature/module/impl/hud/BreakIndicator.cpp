@@ -16,6 +16,6 @@ std::wstringstream BreakIndicator::text(bool isDefault, bool inEditor) {
         prog = std::get<BoolValue>(last) ? lp->gameMode->lastBreakProgress : lp->gameMode->breakProgress;
     }
 
-    wss << std::round(prog * 100.f);
+    wss << std::round(prog * 100.f) << L'%';
     return wss;
 }

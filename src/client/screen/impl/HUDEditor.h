@@ -19,7 +19,7 @@ private:
 	void renderModule(class HUDModule* mod, SDK::MinecraftUIRenderContext* ctx);
 	void doDragging();
 	void doSnapping(Vec2 const&);
-	void keepModulesInBounds();
+	void keepModulesInBounds(Vec2 const&);
 
 	class HUDModule* dragMod;
 

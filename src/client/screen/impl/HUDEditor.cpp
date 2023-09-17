@@ -91,9 +91,11 @@ void HUDEditor::onRender(Event& ev) {
 
 	if (isActive()) doDragging();
 	doSnapping(dragOffset);
-	keepModulesInBounds();
+	if (!mcRenderer) {
+		keepModulesInBounds(Vec2(Latite::getRenderer().getScreenSize().width, Latite::getRenderer().getScreenSize().height));
+		renderModules(nullptr);
+	}
 
-	if (!mcRenderer) renderModules(nullptr);
 }
 
 void HUDEditor::onClick(Event& evGeneric) {
@@ -123,6 +125,7 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 		dc.setImmediate(false);
 
 		this->renderModules(ev.getUIRenderContext());
+		keepModulesInBounds(SDK::ClientInstance::get()->getGuiData()->screenSize);
 	}
 
 	//auto view = ev.getScreenView();
@@ -511,14 +514,13 @@ void HUDEditor::doSnapping(Vec2 const&) {
 	}
 }
 
-void HUDEditor::keepModulesInBounds() {
+void HUDEditor::keepModulesInBounds(Vec2 const& ss) {
 	Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 		if (mod->isEnabled() && mod->isHud()) {
 			HUDModule* rMod = static_cast<HUDModule*>(mod.get());
 			if (!rMod->isActive()) return false;
-			auto ss = Latite::getRenderer().getScreenSize();
 			d2d::Rect rc = rMod->getRect();
-			util::KeepInBounds(rc, { 0.f, 0.f, ss.width, ss.height });
+			util::KeepInBounds(rc, { 0.f, 0.f, ss.x, ss.y });
 
 			auto round2 = [](float& f){
 				f = std::round(f);
