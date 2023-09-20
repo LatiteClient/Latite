@@ -47,7 +47,7 @@ SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
 SDK::GuiData* SDK::ClientInstance::getGuiData() {
     switch (internalVers) {
     case VLATEST:
-        return util::directAccess<GuiData*>(this, 0x540);
+        return util::directAccess<GuiData*>(this, 0x560);
     case V1_18_12:
         return memory::callVirtual<GuiData*>(this, 0xCE);
     case V1_19_51:
