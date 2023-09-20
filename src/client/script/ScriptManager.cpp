@@ -117,8 +117,7 @@ void ScriptManager::reportError(JsValueRef except, std::wstring filePath) {
 void ScriptManager::handleErrors(JsErrorCode code) {
 	JsContextRef ctx;
 	JS::JsGetCurrentContext(&ctx);
-	JsScript* script = nullptr;
-	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
+	JsScript* script = JsScript::getThis();
 	if (script) {
 		if (code == JsErrorScriptException) {
 			JsValueRef except;

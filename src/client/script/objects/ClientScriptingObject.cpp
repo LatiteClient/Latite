@@ -183,8 +183,7 @@ JsValueRef ClientScriptingObject::mmgrGetModuleByName(JsValueRef callee, bool is
 
 	JsContextRef ctx;
 	JS::JsGetCurrentContext(&ctx);
-	JsScript* script;
-	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
+	JsScript* script = JsScript::getThis();
 	if (script && mod) {
 		auto cl = script->getClass<JsModuleClass>();
 		if (!cl) {
@@ -215,8 +214,7 @@ JsValueRef ClientScriptingObject::mmgrForEachModule(JsValueRef callee, bool isCo
 	auto thi = reinterpret_cast<ClientScriptingObject*>(callbackState);
 	JsContextRef ctx;
 	JS::JsGetCurrentContext(&ctx);
-	JsScript* script;
-	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
+	JsScript* script = JsScript::getThis();
 	
 	auto cl = script->getClass<JsModuleClass>();
 	if (!cl) {
