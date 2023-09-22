@@ -15,7 +15,9 @@ public:
 	}
 	~ICommand() = default;
 
-	virtual bool execute(std::string const label, std::vector<std::string> args) = 0;
+	virtual bool tryRun(std::string const& label, std::vector<std::string> args, std::string const& commandLine) {
+		return execute(label, args);
+	}
 
 	[[nodiscard]] virtual bool isLocalWorldOnly() { return this->localWorldOnly; }
 	[[nodiscard]] virtual bool isScript() { return this->script; }
@@ -32,6 +34,8 @@ protected:
 	std::string cmdName, description, usage;
 	std::vector<std::string> aliases;
 	bool script = false;
+
+	virtual bool execute(std::string const label, std::vector<std::string> args) = 0;
 private:
 	bool localWorldOnly;
 };

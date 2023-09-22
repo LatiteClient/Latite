@@ -99,14 +99,14 @@ void ScriptManager::popScript(std::shared_ptr<JsScript> ptr)
 void ScriptManager::reportError(JsValueRef except, std::wstring filePath) {
 
 	auto str = util::WStrToStr(Chakra::ToString(except));
-	//JsPropertyIdRef propId;
-	//JS::JsGetPropertyIdFromName(L"stackTrace", &propId);
-	//JsValueRef stackTrace;
-	//JS::JsGetProperty(except, propId, &stackTrace);
-	//auto line = Chakra::GetNumberProperty(stackTrace, L"line");
+	JsPropertyIdRef propId;
+	JS::JsGetPropertyIdFromName(L"stackTrace", &propId);
+	JsValueRef stackTrace;
+	JS::JsGetProperty(except, propId, &stackTrace);
+	auto line = Chakra::GetIntProperty(stackTrace, L"line");
 
 	std::stringstream ss;
-	ss << "&cA runtime error occured in script " + util::WStrToStr(filePath) << ": " << str;
+	ss << util::WStrToStr(filePath) << ":" << line << " " << str;
 
 	Latite::getClientMessageSink().display(util::Format(ss.str()));
 	//ClientMessageF(TextFormat::Format(TextFormat::RED) + "An error occured: " + util::WStrToStr(filePath) << ":" << static_cast<int>(line) << " " << str);
