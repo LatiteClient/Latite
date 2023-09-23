@@ -65,6 +65,8 @@ void SDK::ClientInstance::grabCursor() {
     reinterpret_cast<void(__fastcall*)(void*)>(Signatures::ClientInstance_grabCursor.result)(this);
 }
 
+//vtable call:
+//48 8b 80 ? ? ? ? 48 8b ce ff 15 ? ? ? ? 84 db
 void SDK::ClientInstance::releaseCursor() {
     if (internalVers == V1_18_12) {
         // 1.18.12

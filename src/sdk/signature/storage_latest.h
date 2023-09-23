@@ -64,7 +64,7 @@ public:
 	};
 
 	inline static SigImpl LevelRenderer_renderLevel{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5c 24 ? 55 56 57 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 49 8b f8 48 8b da 48 8b f1 0f 57 c0",
+		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 56 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 49 8b f0 48 8b da 4c 8b f1",
 		"LevelRenderer::renderLevel"};
 
 	inline static SigImpl Keyboard_feed{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -86,7 +86,7 @@ public:
 
 	inline static SigImpl Level_tick{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8b ec 48 83 ec ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 45 ? 48 8b f9",
-		"Level::tick"};
+		"Level::tick"}
 
 	// callsites
 
@@ -128,12 +128,12 @@ public:
 
 	// "Nat Punch timed out"
 	inline static SigImpl RakNetConnector_tick{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 48 8b f9 45 33 e4 4c 89 a5 ? ? ? ? 48 8d 95",
+		"48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B F9 45 33 FF 4C 89 BD ? ? ? ?",
 		"RakNetConnector::tick"};
 	
 	// ref: your GPU ("AMD Radeon RX 5500")
 	inline static SigImpl GpuInfo{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-		"4c 8d 0d ? ? ? ? 48 c7 c7 ? ? ? ? 48 8b df 48 ff c3 41 80 3c 19 ? 75 ? 48 8d 4c 24 ? 48 83 fb ? 77 ? 48 89 5c 24 ? 4c 8b c3 49 8b d1 e8 ? ? ? ? c6 44 1c ? ? eb ? 45 33 c0 48 8b d3 e8 ? ? ? ? 48 8d 4c 24",
+		"48 8d 15 ? ? ? ? 48 c7 c7 ? ? ? ? 4c 8b c7 49 ff c0 42 80 3c 02 ? 75 ? 48 8d 4c 24",
 		"GpuInfo"};
 
 	// ref: RakPeer vtable
