@@ -226,8 +226,8 @@ void* GenericHooks::Level_startLeaveGame(SDK::Level* obj) {
 }
 
 GenericHooks::GenericHooks() : HookGroup("General") {
-	LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
-	LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
+	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
+	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
 
 
 	Level_tickHook = addHook(Signatures::Level_tick.result,

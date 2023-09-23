@@ -12,6 +12,7 @@ public:
 	}
 
 	virtual bool execute(std::string const label, std::vector<std::string> args) override;
+	virtual bool tryRun(std::string const& label, std::vector<std::string> args, std::string const& line) override;
 
 	JsContextRef ctx;
 private:

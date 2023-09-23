@@ -43,7 +43,7 @@ Color.RGB = function (r, g, b, a) {
 };
 
 eval("var TextColor = {}");
-TextColor.FORMAT_CHAR = "\xc2\xa7";
+TextColor.FORMAT_CHAR = "\u00A7";
 TextColor.formatText = function (str) {
     return str.replace("&", TextColor.FORMAT_CHAR);
 };

@@ -97,19 +97,12 @@ void ScriptManager::popScript(std::shared_ptr<JsScript> ptr)
 }
 
 void ScriptManager::reportError(JsValueRef except, std::wstring filePath) {
-
 	auto str = util::WStrToStr(Chakra::ToString(except));
-	//JsPropertyIdRef propId;
-	//JS::JsGetPropertyIdFromName(L"stackTrace", &propId);
-	//JsValueRef stackTrace;
-	//JS::JsGetProperty(except, propId, &stackTrace);
-	//auto line = Chakra::GetNumberProperty(stackTrace, L"line");
 
 	std::stringstream ss;
-	ss << "&cA runtime error occured in script " + util::WStrToStr(filePath) << ": " << str;
+	ss << util::WStrToStr(filePath) << ": " << str;
 
 	Latite::getClientMessageSink().display(util::Format(ss.str()));
-	//ClientMessageF(TextFormat::Format(TextFormat::RED) + "An error occured: " + util::WStrToStr(filePath) << ":" << static_cast<int>(line) << " " << str);
 	// not sure if you release the exception or not, will do it anyway
 	Chakra::Release(except);
 }
@@ -117,8 +110,7 @@ void ScriptManager::reportError(JsValueRef except, std::wstring filePath) {
 void ScriptManager::handleErrors(JsErrorCode code) {
 	JsContextRef ctx;
 	JS::JsGetCurrentContext(&ctx);
-	JsScript* script = nullptr;
-	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
+	JsScript* script = JsScript::getThis();
 	if (script) {
 		if (code == JsErrorScriptException) {
 			JsValueRef except;

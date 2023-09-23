@@ -38,7 +38,7 @@ JsValueRef ClientScriptingObject::registerEventCallback(JsValueRef callee, bool 
 
 JsValueRef ClientScriptingObject::runCommandCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
 {
-	if (!Chakra::VerifyArgCount(argCount, 5)) return Chakra::GetFalse();
+	if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetFalse();
 	if (!Chakra::VerifyParameters({ {arguments[1], JsString} })) return JS_INVALID_REFERENCE;
 	auto s = Chakra::GetString(arguments[1]);
 	return Latite::getCommandManager().runCommand(Latite::getCommandManager().prefix + util::WStrToStr(s)) ? Chakra::GetTrue() : Chakra::GetFalse();
@@ -183,8 +183,7 @@ JsValueRef ClientScriptingObject::mmgrGetModuleByName(JsValueRef callee, bool is
 
 	JsContextRef ctx;
 	JS::JsGetCurrentContext(&ctx);
-	JsScript* script;
-	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
+	JsScript* script = JsScript::getThis();
 	if (script && mod) {
 		auto cl = script->getClass<JsModuleClass>();
 		if (!cl) {
@@ -215,8 +214,7 @@ JsValueRef ClientScriptingObject::mmgrForEachModule(JsValueRef callee, bool isCo
 	auto thi = reinterpret_cast<ClientScriptingObject*>(callbackState);
 	JsContextRef ctx;
 	JS::JsGetCurrentContext(&ctx);
-	JsScript* script;
-	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
+	JsScript* script = JsScript::getThis();
 	
 	auto cl = script->getClass<JsModuleClass>();
 	if (!cl) {

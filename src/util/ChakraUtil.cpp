@@ -31,7 +31,7 @@ FARPROC Chakra::pass(const char* name)
 		std::filesystem::create_directory(latitePath / "Assets");
 
 		if (!std::filesystem::exists(assetsPath / "ChakraCore.dll")) {
-			Latite::get().downloadExtraAssets();
+			Latite::get().downloadChakraCore();
 		}
 
 		if (!mod) mod = LoadLibraryW((util::GetLatitePath() / "Assets" / "ChakraCore.dll").wstring().c_str());
@@ -40,23 +40,6 @@ FARPROC Chakra::pass(const char* name)
 		return 0;
 	}
 	return GetProcAddress(mod, name);
-}
-
-void Chakra::StartDebugging(JsRuntimeHandle runtime, JsDiagDebugEventCallback callback, void* callbackState) {
-	if (JS::JsDiagStartDebugging) {
-		auto res = JS::JsDiagStartDebugging(runtime, callback, callbackState);
-		int test_ = 34;
-		return;
-	}
-	// fallback to chakra
-	Chakra::pass("JsStartDebugging")();
-}
-
-bool Chakra::StopDebugging(JsRuntimeHandle runtime, void** callbackState) {
-	if (JS::JsDiagStopDebugging) {
-		return JS::JsDiagStopDebugging(runtime, callbackState) == JsNoError;
-	}
-	return false;
 }
 
 void Chakra::SetProperty(JsValueRef ref, std::wstring name, JsValueRef value, bool strict) {

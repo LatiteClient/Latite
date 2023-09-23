@@ -76,10 +76,7 @@ JsValueRef GameScriptingObject::worldGetEntList(JsValueRef callee, bool isConstr
 		return Chakra::GetUndefined();
 	}
 
-	JsScript* scr;
-	JsContextRef ctx;
-	JS::JsGetCurrentContext(&ctx);
-	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&scr));
+	JsScript* scr = JsScript::getThis();
 
 	if (!Latite::getScriptManager().hasPermission(scr, ScriptManager::Permission::Operator)) {
 		Chakra::ThrowError(util::StrToWStr(XOR_STRING("No permission to use getEntityList here")));
@@ -95,10 +92,7 @@ JsValueRef GameScriptingObject::worldGetEntList(JsValueRef callee, bool isConstr
 	for (auto& ent : entList) {
 		JsValueRef db;
 		JS::JsDoubleToNumber(static_cast<double>(idx), &db);
-		JsScript* script;
-		JsContextRef ctx;
-		JS::JsGetCurrentContext(&ctx);
-		JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
+		JsScript* script = JsScript::getThis();
 
 		auto entc = script->getClass<JsEntityClass>();
 		auto plrc = script->getClass<JsPlayerClass>();
@@ -121,10 +115,7 @@ JsValueRef GameScriptingObject::worldGetEntCount(JsValueRef callee, bool isConst
 		return Chakra::GetUndefined();
 	}
 
-	JsScript* scr;
-	JsContextRef ctx;
-	JS::JsGetCurrentContext(&ctx);
-	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&scr));
+	JsScript* scr = JsScript::getThis();
 
 	auto lvl = SDK::ClientInstance::get()->minecraft->getLevel();
 	auto entList = lvl->getRuntimeActorList();
@@ -132,10 +123,7 @@ JsValueRef GameScriptingObject::worldGetEntCount(JsValueRef callee, bool isConst
 }
 
 JsValueRef GameScriptingObject::getMousePosCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	JsScript* script;
-	JsContextRef ctx;
-	JS::JsGetCurrentContext(&ctx);
-	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
+	JsScript* script = JsScript::getThis();
 
 	auto vec2 = script->getClass<JsVec2>();
 	if (vec2) {
@@ -162,10 +150,7 @@ JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConst
 	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
 	if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsString} })) return JS_INVALID_REFERENCE;
 
-	JsScript* script;
-	JsContextRef ctx;
-	JS::JsGetCurrentContext(&ctx);
-	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
+	JsScript* script = JsScript::getThis();
 	
 	if (Latite::getScriptManager().hasPermission(script, ScriptManager::Permission::SendChat)) {
 		auto lp = SDK::ClientInstance::get()->getLocalPlayer();
@@ -213,12 +198,9 @@ JsValueRef GameScriptingObject::playSoundUI(JsValueRef callee, bool isConstructo
 JsValueRef GameScriptingObject::getLocalPlayerCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!lp) return Chakra::GetNull();
-	JsScript* script;
-	JsContextRef ctx;
-	JS::JsGetCurrentContext(&ctx);
-	JS::JsGetContextData(ctx, reinterpret_cast<void**>(&script));
+	JsScript* script = JsScript::getThis();
 
-	auto cl = script->getClass<JsPlayerClass>();
+	auto cl = script->getClass<JsLocalPlayerClass>();
 	return cl->construct(new JsEntity(1, JsEntity::AccessLevel::LocalPlayer), true);
 }
 

@@ -51,7 +51,7 @@ public:
 	void loadConfig(class SettingGroup& resolvedGroup);
 	void initAsset(int resource, std::wstring const& filename);
 	std::string getTextAsset(int resource);
-	void downloadExtraAssets();
+	void downloadChakraCore();
 	void initSettings();
 
 	Latite() = default;

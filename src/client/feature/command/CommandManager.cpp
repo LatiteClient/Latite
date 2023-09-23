@@ -97,17 +97,17 @@ bool CommandManager::runCommand(std::string const& line) {
 						args.push_back(newArgs[k]);
 					}
 					try {
-						bool result = cmd->execute(label, args);
+						bool result = cmd->tryRun(label, args, myLine);
 						if (!result) {
 							std::string usage = cmd->getUsage();
 
 							size_t pos = 0;
 							while ((pos = usage.find("$", pos)) != std::string::npos) {
-								usage.replace(pos, strlen("$"), prefix + cmd->name());
+								usage.replace(pos, strlen("$"), prefix + label);
 								pos += strlen("$");
 							}
 
-							Latite::getClientMessageSink().push(util::Format("&cUsage: " + prefix + label + " " + usage));
+							Latite::getClientMessageSink().push(util::Format("&cUsage: " + usage));
 						}
 						return result;
 					}
