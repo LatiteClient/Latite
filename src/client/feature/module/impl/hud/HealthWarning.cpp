@@ -8,7 +8,7 @@ HealthWarning::HealthWarning() : Module("HealthWarning", "Health Warning", "Give
     this->listen<RenderLayerEvent>(&HealthWarning::onRenderLayer);
 	addSetting("vignetteColor", "Vignette Color", "", vignetteColor);
 	addSliderSetting("healthPointThreshold", "Health Threshold", "", healthPointThreshold, FloatValue(1.f), FloatValue(19.f), FloatValue(.5f));
-	addSliderSetting("vignetteFade", "Intensity", "", vignetteFade, FloatValue(0.f), FloatValue(5.f), FloatValue(.5f)); // vignette is weird on whole values (e.g 1), it should only go by half values (1.5, 3.5, etc.)
+	addSliderSetting("vignetteFade", "Intensity", "", vignetteFade, FloatValue(0.f), FloatValue(1.f), FloatValue(.1f));
 }
 
 void HealthWarning::onRenderLayer(Event& evG) {
