@@ -88,8 +88,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     std::filesystem::create_directory(util::GetLatitePath() / "Assets");
     Logger::Setup();
 
-    Logger::Info("Latite Client {}", Latite::version);
-    Logger::Info("Loading assets");
+    Logger::Info(XOR_STRING("Latite Client {}"), Latite::version);
+    Logger::Info(XOR_STRING("Loading assets"));
     Latite::get().dllInst = dll;
     // ... init assets
     Latite::get().initAsset(ICON_LOGO, L"logo.png");
@@ -251,7 +251,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     }
 #endif
 
-    Logger::Info("Waiting for game to load..");
+    Logger::Info(XOR_STRING("Waiting for game to load.."));
 
 #ifdef  LATITE_BETA
     // its actually the real offset - 0x10
@@ -267,7 +267,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     Latite::get().initialize(dll);
 
-    Logger::Info("Initialized Latite Client");
+    Logger::Info(XOR_STRING("Initialized Latite Client"));
     return 0ul;
 }
 
@@ -393,8 +393,8 @@ SDK::Font* Latite::getFont() {
     case 1:
         return SDK::ClientInstance::get()->minecraftGame->getFontRepository()->getSmoothFont();
     default:
-        Logger::Fatal("Unknown font selected: {}", this->mcRendFont.getSelectedKey());
-        throw std::runtime_error("Unknown font");
+        Logger::Fatal(XOR_STRING("Unknown font selected: {}"), this->mcRendFont.getSelectedKey());
+        throw std::runtime_error(XOR_STRING("Unknown font"));
     }
 }
 
@@ -413,12 +413,12 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getEventing().listen<LeaveGameEvent>(this, (EventListenerFunc)&Latite::onLeaveGame, 2);
 
     getHooks().init();
-    Logger::Info("Initialized Hooks");
+    Logger::Info(XOR_STRING("Initialized Hooks"));
     getHooks().enable();
-    Logger::Info("Enabled Hooks");
+    Logger::Info(XOR_STRING("Enabled Hooks"));
 
     Latite::getScriptManager().init();
-    Logger::Info("Script manager initialized.");
+    Logger::Info(XOR_STRING("Script manager initialized."));
 
     // doesn't work, maybe it's stored somewhere else too
     //if (SDK::internalVers < SDK::V1_20) {
@@ -433,16 +433,16 @@ void Latite::threadsafeInit() {
 
     auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     std::string vstr(this->version);
-    auto ws = util::StrToWStr("Latite Client " + vstr);
+    auto ws = util::StrToWStr(XOR_STRING("Latite Client ") + vstr);
     app.Title(ws);
     Latite::getScriptManager().loadPrerunScripts();
-    Logger::Info("Loaded startup scripts");
+    Logger::Info(XOR_STRING("Loaded startup scripts"));
 
     if (!Latite::getConfigManager().loadMaster()) {
-        Logger::Fatal("Could not load master config!");
+        Logger::Fatal(XOR_STRING("Could not load master config!"));
     }
     else {
-        Logger::Info("Loaded master config");
+        Logger::Info(XOR_STRING("Loaded master config"));
     }
 
     Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
@@ -629,7 +629,7 @@ namespace {
     }
 }
 
-void Latite::downloadExtraAssets() {
+void Latite::downloadChakraCore() {
     if (!downloadingAssets) {
         doDownloadAssets();
         this->downloadingAssets = true;
@@ -676,6 +676,7 @@ void Latite::onKey(Event& evGeneric) {
         this->queueEject();
         Logger::Info("Uninject key pressed");
 
+        ev.setCancelled();
         return;
     }
 

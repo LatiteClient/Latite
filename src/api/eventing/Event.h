@@ -20,7 +20,7 @@ public:
 		cancellable = true;
 	}
 
-	void setCancelled(bool b) {
+	void setCancelled(bool b = true) {
 		cancel = b;
 	}
 

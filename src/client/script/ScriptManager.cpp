@@ -97,19 +97,12 @@ void ScriptManager::popScript(std::shared_ptr<JsScript> ptr)
 }
 
 void ScriptManager::reportError(JsValueRef except, std::wstring filePath) {
-
 	auto str = util::WStrToStr(Chakra::ToString(except));
-	JsPropertyIdRef propId;
-	JS::JsGetPropertyIdFromName(L"stackTrace", &propId);
-	JsValueRef stackTrace;
-	JS::JsGetProperty(except, propId, &stackTrace);
-	auto line = Chakra::GetIntProperty(stackTrace, L"line");
 
 	std::stringstream ss;
-	ss << util::WStrToStr(filePath) << ":" << line << " " << str;
+	ss << util::WStrToStr(filePath) << ": " << str;
 
 	Latite::getClientMessageSink().display(util::Format(ss.str()));
-	//ClientMessageF(TextFormat::Format(TextFormat::RED) + "An error occured: " + util::WStrToStr(filePath) << ":" << static_cast<int>(line) << " " << str);
 	// not sure if you release the exception or not, will do it anyway
 	Chakra::Release(except);
 }

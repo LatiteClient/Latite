@@ -32,10 +32,6 @@ public:
 		}
 	};
 
-	static void StartDebugging(JsRuntimeHandle runtime, JsDiagDebugEventCallback callback, void* callbackState);
-	static bool StopDebugging(JsRuntimeHandle runtime, void** callbackState);
-
-
 	static void SetProperty(JsValueRef ref, std::wstring name, JsValueRef value, bool strict = false);
 	static void SetPropertyString(JsValueRef ref, std::wstring name, std::wstring value, bool strict = false);
 	static void SetPropertyNumber(JsValueRef ref, std::wstring name, double value, bool strict = false);

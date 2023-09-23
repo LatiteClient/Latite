@@ -84,16 +84,16 @@ bool JsScript::load() {
 	this->libraries.push_back(std::make_shared<Network>(this));
 
 	if (JS::JsCreateRuntime(
-#if LATITE_DEBUG
-		JsRuntimeAttributeDisableBackgroundWork
-#else
-		JsRuntimeAttributeNone
-#endif
-		, nullptr, &runtime)) return false;
+		JsRuntimeAttributeNone,
+		nullptr, &runtime)) return false;
 	auto res = JS::JsCreateContext(runtime, &this->ctx) == JsNoError;
 	JS::JsSetContextData(ctx, this);
 	JS::JsSetCurrentContext(ctx);
-	Chakra::StartDebugging(this->runtime, debugEventCallback, nullptr);
+
+	if (GetModuleHandleA("Chakra.dll")) {
+		Chakra::pass("JsStartDebugging")();
+	}
+
 	return res;
 }
 
@@ -436,7 +436,6 @@ void JsScript::fetchScriptData() {
 
 void JsScript::unload() {
 	JS::JsSetCurrentContext(ctx);
-	Chakra::StopDebugging(this->runtime, nullptr);
 	JS::JsDisableRuntimeExecution(runtime);
 	JS::JsDisposeRuntime(runtime);
 	runtime = JS_INVALID_RUNTIME_HANDLE;
