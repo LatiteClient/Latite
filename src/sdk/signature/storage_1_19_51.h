@@ -58,6 +58,9 @@ public:
 		inline static SigImpl Level{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8d 05 ? ? ? ? 48 89 07 48 8d 05 ? ? ? ? 48 89 47 ? 48 8d 05 ? ? ? ? 48 89 47 ? 33 c0",
 			"const Level::`vftable'"};
+		inline static SigImpl SetTitlePacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+			"48 8d 05 ? ? ? ? 48 89 01 89 51 ? 48 83 c1 ? 0f 57 c0 0f 11 01 48 89 79",
+			"const SetTitlePacket::`vftable'"};
 	};
 
 	inline static SigImpl LevelRenderer_renderLevel{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -159,10 +162,6 @@ public:
 	inline static SigImpl ItemStackBase_getHoverName{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5C 24 ?? 48 89 74 24 ?? 57 48 81 EC ?? ?? ?? ?? 48 8B FA 48 8B D9 48 89 94 24",
 		"ItemStackBase::getHoverName"};
-
-	inline static SigImpl SetTitlePacket_readExtended{[](memory::signature_store&, uintptr_t res) { return res; },
-		"40 55 53 56 57 41 56 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 4d 8b f0 48 8b fa 48 8b d9 48 89 54 24 ? 48 8d 55",
-		"SetTimePacket::readExtended"};
 
 	inline static SigImpl Tessellator_vertex{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? f3 0f 10 5b ? f3 0f 10 13",

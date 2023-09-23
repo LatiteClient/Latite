@@ -123,7 +123,10 @@ void* PacketHooks::TextPacket_read(SDK::TextPacket* pkt, void* b, void* c) {
 }
 
 PacketHooks::PacketHooks() {
-    SetTitlePacketRead = addHook(Signatures::SetTitlePacket_readExtended.result, SetTitlePacket_readExtended, "SetTitlePacket::readExtended");
+    {
+        auto vfunc = reinterpret_cast<uintptr_t*>(Signatures::Vtable::SetTitlePacket.result);
+        SetTitlePacketRead = addTableSwapHook((uintptr_t)(vfunc + 4), SetTitlePacket_readExtended, "SetTitlePacket::readExtended");
+    }
 
     {
         auto vfunc = reinterpret_cast<uintptr_t*>(Signatures::Vtable::TextPacket.result);

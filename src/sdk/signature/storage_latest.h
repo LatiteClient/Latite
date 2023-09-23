@@ -11,9 +11,7 @@ public:
 			"80 b9 ? ? ? ? ? 0f 84 ? ? ? ? 48 8b 01 48 8b 80 ? ? ? ? ff 15 ? ? ? ? 48 85 c0",
 			"MinecraftGame->cursorGrabbed"};
 
-		inline static SigImpl LevelRendererPlayer_fovX{[](memory::signature_store& store, uintptr_t) { return store.ref(2); },
-			"89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? f3 0f 10 0d",
-			"LevelRendererPlayer->fovX"};
+		inline static SigImpl LevelRendererPlayer_fovX{};
 
 		//89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? f3 0f 10 0d
 
@@ -29,7 +27,7 @@ public:
 			"ClientInstance"};
 		//
 		inline static SigImpl clickMap{[](memory::signature_store& store, uintptr_t) { return store.deref(2); },
-			"c7 05 ? ? ? ? ? ? ? ? 45 32 e4",
+			"8b 0d ? ? ? ? 49 2b c7",
 			"ClickMap"};
 
 		inline static SigImpl uiColorMaterial{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
@@ -59,6 +57,11 @@ public:
 		inline static SigImpl Level{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8d 05 ? ? ? ? 48 89 07 48 8d 05 ? ? ? ? 48 89 47 ? 48 8d 05 ? ? ? ? 48 89 47 ? 33 c0",
 			"const Level::`vftable'"};
+		inline static SigImpl SetTitlePacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+			"48 8d 05 ? ? ? ? 48 89 01 89 51 ? 48 83 c1 ? 0f 57 c0 0f 11 01 48 89 79",
+			"const SetTitlePacket::`vftable'"};
+
+		//
 
 		//48 8d 05 ? ? ? ? 48 89 07 48 8d 05 ? ? ? ? 48 89 47 ? 48 8d 05 ? ? ? ? 48 89 47 ? 33 c0
 	};
@@ -91,7 +94,7 @@ public:
 	// callsites
 
 	inline static SigImpl ChatScreenController_sendChatMessage{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"e8 ? ? ? ? 3c ? 75 ? 48 8b 8f",
+		"e8 ? ? ? ? 3c ? 75 ? 48 8b 8b",
 		"ChatScreenController::sendChatMessage"};
 
 	inline static SigImpl GameRenderer__renderCurrentFrame{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
@@ -99,7 +102,7 @@ public:
 		"GameRenderer::_renderCurrentFrame"};
 
 	inline static SigImpl AppPlatform__fireAppFocusLost{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"e8 ? ? ? ? 48 8b 87 ? ? ? ? 4c 8b 70",
+		"e8 ? ? ? ? 48 8b 87 ? ? ? ? 4c 8b 70 ? 45 33 ff",
 		"AppPlatform::_fireAppFocusLost"};
 
 	inline static SigImpl onClick{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -154,7 +157,7 @@ public:
 
 	// see what accesses things in moveinputhandler
 	inline static SigImpl MovePlayer{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5c 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 83 ec ? 4d 8b f9 4c 8b ea",
+		"48 89 74 24 ? 48 89 7c 24 ? 4c 89 64 24 ? 55 41 56 41 57 48 8d 6c 24 ? 48 81 ec ? ? ? ? 48 8b 7d",
 		"MovePlayer"};
 
 	inline static SigImpl MoveInputHandler_tick{};
@@ -174,10 +177,6 @@ public:
 	inline static SigImpl ItemStackBase_getHoverName{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5C 24 ?? 48 89 74 24 ?? 57 48 81 EC ?? ?? ?? ?? 48 8B FA 48 8B D9 48 89 94 24",
 		"ItemStackBase::getHoverName"};
-
-	inline static SigImpl SetTitlePacket_readExtended{[](memory::signature_store&, uintptr_t res) { return res; },
-		"40 55 53 56 57 41 56 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 4d 8b f0 48 8b fa 48 8b d9 48 89 54 24 ? 48 8d 55",
-		"SetTimePacket::readExtended"};
 
 
 	inline static SigImpl Tessellator_vertex{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },

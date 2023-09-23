@@ -18,7 +18,7 @@ void SDK::Player::displayClientMessage(std::string const& message) {
 		index = 0x18A;
 		break;
 	default:
-		index = 0x165;
+		index = 0x15E;
 		break;
 	}
 	memory::callVirtual<void>(this, index, message);
