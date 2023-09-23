@@ -49,6 +49,7 @@ void Chakra::StartDebugging(JsRuntimeHandle runtime, JsDiagDebugEventCallback ca
 		return;
 	}
 	// fallback to chakra
+	//CoInitializeEx(NULL, COINIT_MULTITHREADED);
 	Chakra::pass("JsStartDebugging")();
 }
 
