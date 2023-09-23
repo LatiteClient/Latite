@@ -28,8 +28,8 @@ public:
 			"48 8b 0d ? ? ? ? 48 89 43 ? 48 8b c3 48 89 3b c6 43 ? ? 48 89 4b ? 48 8b 5c 24 ? 48 83 c4 ? 5f c3 33 c0 48 8b cf 48 89 03 88 43 ? 48 89 43 ? 48 89 43 ? e8 ? ? ? ? 48 8b c3 48 8b 5c 24 ? 48 83 c4 ? 5f c3 cc 48 89 5c 24 ? 48 89 74 24 ? 57 48 83 ec ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 44 24 ? 48 8b da 48 8b f1 48 89 4c 24 ? 48 8d 0d ? ? ? ? e8 ? ? ? ? 85 c0 0f 95 c1 85 c0 74 ? 48 8b 05 ? ? ? ? 48 85 c0 75 ? 40 b7 ? eb ? 84 c9 74 ? 48 8d 0d ? ? ? ? e8 ? ? ? ? 40 32 ff 40 88 7c 24 ? 40 84 ff 75 ? 48 8d 0d ? ? ? ? e8 ? ? ? ? 40 b7 ? 40 88 7c 24 ? 48 85 db 0f 84 ? ? ? ? 48 c7 05 ? ? ? ? ? ? ? ? 48 8b 0d ? ? ? ? 48 c7 05 ? ? ? ? ? ? ? ? 48 85 c9 74 ? e8 ? ? ? ? 48 8b 43 ? 48 85 c0 74 ? f0 ff 40 ? 0f b6 7c 24 ? 48 8b 43 ? 48 8b 53 ? 48 89 15 ? ? ? ? 48 8b 0d ? ? ? ? 48 89 05 ? ? ? ? 48 85 c9 74 ? e8 ? ? ? ? 48 8b 15 ? ? ? ? 48 8b 12 48 89 16 40 84 ff 74 ? 48 8d 0d ? ? ? ? e8 ? ? ? ? 48 8b c6 48 8b 4c 24 ? 48 33 cc e8 ? ? ? ? 48 8b 5c 24 ? 48 8b 74 24 ? 48 83 c4 ? 5f c3 e8 ? ? ? ? 90 cc cc cc 48 89 5c 24 ? 57 48 83 ec ? 48 8b 19",
 			"ClientInstance"};
 		//
-		inline static SigImpl clickMap{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-			"48 8d 0d ? ? ? ? e8 ? ? ? ? b3 ? 48 85 f6",
+		inline static SigImpl clickMap{[](memory::signature_store& store, uintptr_t) { return store.deref(2); },
+			"c7 05 ? ? ? ? ? ? ? ? 45 32 e4",
 			"ClickMap"};
 
 		inline static SigImpl uiColorMaterial{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
@@ -51,10 +51,10 @@ public:
 
 	struct Vtable {
 		inline static SigImpl TextPacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-			"48 8D 05 ?? ?? ?? ?? 48 8B F9 48 89 01 48 83 C1 ?? E8 ?? ?? ?? ?? 48 8D 8F",
+			"48 8d 05 ? ? ? ? 48 89 85 ? ? ? ? c6 85 ? ? ? ? ? 0f 11 85 ? ? ? ? 4c 89 a5",
 			"const TextPacket::`vftable'"};
 		inline static SigImpl CommandRequestPacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-			"4c 8d 3d ? ? ? ? 4c 89 7d ? 48 89 75 ? 66 0f 7f 45",
+			"48 8d 05 ? ? ? ? 48 89 73 ? 48 89 43 ? c7 43 ? ? ? ? ? c7 43 ? ? ? ? ? 66 89 73 ? 48 89 73 ? 89 73 ? 0f 11 43 ? 48 89 73 ? 48 c7 43 ? ? ? ? ? 40 88 73 ? 40 88 73 ? 48 89 73",
 			"const TextPacket::`vftable'"};
 		inline static SigImpl Level{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8d 05 ? ? ? ? 48 89 07 48 8d 05 ? ? ? ? 48 89 47 ? 48 8d 05 ? ? ? ? 48 89 47 ? 33 c0",
@@ -86,7 +86,7 @@ public:
 
 	inline static SigImpl Level_tick{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8b ec 48 83 ec ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 45 ? 48 8b f9",
-		"Level::tick"}
+		"Level::tick"};
 
 	// callsites
 
@@ -106,6 +106,7 @@ public:
 		"48 8b c4 48 89 58 ? 48 89 68 ? 48 89 70 ? 57 41 54 41 55 41 56 41 57 48 83 ec ? 44 0f b7 bc 24",
 		"onClick"};
 
+	//ff 15 ? ? ? ? 48 8d 4c 24 ? e8 ? ? ? ? 48 8b 4c 24 ? 48 3b cb
 	inline static SigImpl MinecraftGame_onAppSuspended{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 56 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 4c 8b f1 48 8d b1",
 		"MinecraftGame::onAppSuspended"};
@@ -156,10 +157,6 @@ public:
 		"e8 ? ? ? ? f3 0f 10 5b ? f3 0f 10 13",
 		"Tessellator::vertex"};
 
-	inline static SigImpl Tesesllator_begin{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ?? 55 48 83 EC ?? 80 B9 ?? ?? ?? ?? 00 45",
-		"Tessellator::begin"};
-
 	inline static SigImpl Tesesllator_color{[](memory::signature_store&, uintptr_t res) { return res; },
 		"80 b9 ? ? ? ? ? 4c 8b c1 75",
 		"Tessellator::color"};
@@ -182,7 +179,7 @@ public:
 		"Tessellator::vertex"};
 
 	inline static SigImpl Tessellator_begin{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ?? 55 48 83 EC ?? 80 B9 ?? ?? ?? ?? 00 45",
+		"48 89 5c 24 ? 56 48 83 ec ? 80 b9 ? ? ? ? ? 45 0f b6 d1",
 		"Tessellator::begin"};
 
 	inline static SigImpl Tessellator_color{[](memory::signature_store&, uintptr_t res) { return res; },

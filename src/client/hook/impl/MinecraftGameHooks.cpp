@@ -11,10 +11,10 @@ namespace {
 	std::shared_ptr<Hook> _updateHook;
 }
 
-void* MinecraftGameHooks::onAppSuspended(SDK::MinecraftGame* game) {
+void* MinecraftGameHooks::onAppSuspended(SDK::MinecraftGame* game,void*a,void*b,void*c) {
 	AppSuspendedEvent ev{};
 	Eventing::get().dispatch(ev);
-	return onAppSuspendedHook->oFunc<decltype(&onAppSuspended)>()(game);
+	return onAppSuspendedHook->oFunc<decltype(&onAppSuspended)>()(game,a,b,c);
 }
 
 void* __fastcall MinecraftGameHooks::_update(SDK::MinecraftGame* game) {
