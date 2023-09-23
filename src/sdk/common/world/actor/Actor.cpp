@@ -49,7 +49,7 @@ int SDK::Actor::getCommandPermissionLevel() {
 		return memory::callVirtual<int>(this, 0xCD);
 	}
 
-	return memory::callVirtual<int>(this, 0xB9);
+	return memory::callVirtual<int>(this, 0xB5);
 }
 
 int64_t SDK::Actor::getRuntimeID() {
@@ -67,11 +67,11 @@ uint8_t SDK::Actor::getEntityTypeID() {
 		return memory::callVirtual<int>(this, 0xAC);
 	}
 
-	return memory::callVirtual<int>(this, 0x99);
+	return memory::callVirtual<int>(this, 0x97);
 }
 
 void SDK::Actor::swing() {
-	return memory::callVirtual<void>(this, MV_DETAIL_GETOFFSET(0xC8, 0xDB, 0xDC));
+	return memory::callVirtual<void>(this, MV_DETAIL_GETOFFSET(0xC4, 0xDB, 0xDC));
 }
 
 bool SDK::Actor::isPlayer() {
@@ -79,7 +79,7 @@ bool SDK::Actor::isPlayer() {
 }
 
 SDK::AttributeInstance* SDK::Actor::getAttribute(SDK::Attribute& attribute) {
-	return memory::callVirtual<SDK::AttributeInstance*>(this, MV_DETAIL_GETOFFSET(0xBC, 0xCF, 0xD0), attribute);
+	return memory::callVirtual<SDK::AttributeInstance*>(this, MV_DETAIL_GETOFFSET(0xB8, 0xCF, 0xD0), attribute);
 }
 
 float SDK::Actor::getHealth() {

@@ -107,8 +107,14 @@ public:
 		"onClick"};
 
 	//ff 15 ? ? ? ? 48 8d 4c 24 ? e8 ? ? ? ? 48 8b 4c 24 ? 48 3b cb
+	/*
+	"SuspendAudio"
+	"forceSendEvents"
+	"SuspendUserManager"
+	"SuspendGameRenderer
+	"unloadAllTextures""*/
 	inline static SigImpl MinecraftGame_onAppSuspended{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 56 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 4c 8b f1 48 8d b1",
+		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 56 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 4c 8b f1 48 8d b1",
 		"MinecraftGame::onAppSuspended"};
 
 	inline static SigImpl RenderController_getOverlayColor{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },

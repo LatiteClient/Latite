@@ -12,7 +12,7 @@ void SDK::Level::playSoundEvent(std::string const& text, Vec3 const& pos, float 
 		index = 0xC9;
 		break;
 	default:
-		index = 0xA4;
+		index = 0xA3;
 		break;
 	}
 
@@ -32,7 +32,7 @@ std::vector<SDK::Actor*> SDK::Level::getRuntimeActorList() {
 		index = 0x13C;
 		break;
 	default:
-		index = 0x129;
+		index = 0x125;
 		break;
 	}
 
@@ -41,7 +41,7 @@ std::vector<SDK::Actor*> SDK::Level::getRuntimeActorList() {
 }
 
 std::unordered_map<UUID, SDK::PlayerListEntry>* SDK::Level::getPlayerList() {
-	return memory::callVirtual<std::unordered_map<UUID, SDK::PlayerListEntry>*>(this, MV_DETAIL_GETOFFSET(0x124, 0x128, 0x137));
+	return memory::callVirtual<std::unordered_map<UUID, SDK::PlayerListEntry>*>(this, MV_DETAIL_GETOFFSET(0x120, 0x128, 0x137));
 }
 
 SDK::HitResult* SDK::Level::getHitResult() {
@@ -55,7 +55,7 @@ SDK::HitResult* SDK::Level::getHitResult() {
 		index = 0x148;
 		break;
 	default:
-		index = 0x132;
+		index = 0x12E;
 		break;
 	}
 
@@ -73,14 +73,13 @@ SDK::HitResult* SDK::Level::getLiquidHitResult() {
 		index = 0x149;
 		break;
 	default:
-		index = 0x133;
+		index = 0x12F;
 		break;
 	}
 
-	// funny hack because this isnt actually working
 	return reinterpret_cast<SDK::HitResult*>(memory::callVirtual<uintptr_t>(this, index)) /*sizeof hitResult (0x60) / 8*/;
 }
 
 bool SDK::Level::isClientSide() {
-	return memory::callVirtual<bool>(this, MV_DETAIL_GETOFFSET(0x124, 0x12B, 0x127));
+	return memory::callVirtual<bool>(this, MV_DETAIL_GETOFFSET(0x11F, 0x12B, 0x127));
 }
