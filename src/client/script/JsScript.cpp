@@ -435,8 +435,9 @@ void JsScript::fetchScriptData() {
 }
 
 void JsScript::unload() {
-	JS::JsSetCurrentContext(ctx);
+	JS::JsSetCurrentContext(JS_INVALID_REFERENCE);
 	JS::JsDisableRuntimeExecution(runtime);
+	JS::JsCollectGarbage(runtime);
 	JS::JsDisposeRuntime(runtime);
 	runtime = JS_INVALID_RUNTIME_HANDLE;
 }

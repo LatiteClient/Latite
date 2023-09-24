@@ -447,7 +447,7 @@ void HUDEditor::doSnapping(Vec2 const&) {
 	else {
 		// Keep modules in their snapped state
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
-			if (mod->isHud()) {
+			if (mod->isHud() && mod->isEnabled()) {
 				auto rMod = static_cast<HUDModule*>(mod.get());
 				if (!rMod->isActive()) return;
 				auto pos = rMod->getRect().getPos();

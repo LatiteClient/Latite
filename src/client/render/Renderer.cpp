@@ -12,6 +12,8 @@ Renderer::~Renderer() {
 }
 
 bool Renderer::init(IDXGISwapChain* chain) {
+	if (!shouldInit) return false;
+
 	bool isDX12 = true;
 	if (!dx12Removed && SUCCEEDED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12))) && Latite::get().shouldForceDX11()) {
 		static_cast<ID3D12Device5*>(gameDevice12.Get())->RemoveDevice();
@@ -184,6 +186,10 @@ HRESULT Renderer::reinit() {
 
 void Renderer::setShouldReinit() {
 	shouldReinit = true;
+}
+
+void Renderer::setShouldInit() {
+	shouldInit = true;
 }
 
 std::shared_lock<std::shared_mutex> Renderer::lock() {

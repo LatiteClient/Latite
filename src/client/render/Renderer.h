@@ -14,6 +14,7 @@ public:
 	bool hasInitialized() { return hasInit; };
 	HRESULT reinit();
 	void setShouldReinit();
+	void setShouldInit();
 	std::shared_lock<std::shared_mutex> lock();
 	void render();
 	bool isDX11ByDefault() { return isDX11; }
@@ -32,6 +33,7 @@ private:
 	bool hasInit = false;
 	bool shouldReinit = false;
 	bool firstInit = false;
+	bool shouldInit = false;
 	bool reqCommandQueue = false;
 	bool dx12Removed = false;
 	bool hasCopiedBitmap = false;

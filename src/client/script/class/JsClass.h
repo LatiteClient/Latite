@@ -28,6 +28,11 @@ public:
 		return JS_INVALID_REFERENCE;
 	}
 
+	JsValueRef errNoConstruct() {
+		Chakra::ThrowError(name + std::wstring(L" cannot be constructed"));
+		return JS_INVALID_REFERENCE;
+	}
+
 	void createPrototype() {
 		JsValueRef global;
 

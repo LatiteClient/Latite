@@ -435,13 +435,13 @@ void Latite::threadsafeInit() {
     app.Title(ws);
     Latite::getScriptManager().loadPrerunScripts();
     Logger::Info(XOR_STRING("Loaded startup scripts"));
-
     if (!Latite::getConfigManager().loadMaster()) {
         Logger::Fatal(XOR_STRING("Could not load master config!"));
     }
     else {
         Logger::Info(XOR_STRING("Loaded master config"));
     }
+    Latite::getRenderer().setShouldInit();
 
     Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
 }
@@ -636,7 +636,6 @@ void Latite::downloadChakraCore() {
 
 void Latite::onUpdate(Event& evGeneric) {
     auto& ev = reinterpret_cast<UpdateEvent&>(evGeneric);
-    if (!Latite::getRenderer().getDeviceContext()) return;
     timings.update();
     //auto now = std::chrono::system_clock::now();
     //static auto lastSend = now;

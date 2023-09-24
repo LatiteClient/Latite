@@ -17,9 +17,9 @@ void HUDModule::renderPost(DrawUtil& ctx) {
 }
 
 void HUDModule::afterLoadConfig() {
-	auto ss = Latite::getRenderer().getScreenSize();
+	auto ss = SDK::ClientInstance::get()->getGuiData()->screenSize;//Latite::getRenderer().getScreenSize();
 	auto& sp = std::get<Vec2Value>(this->storedPos);
-	setPos({ sp.x * ss.width, sp.y * ss.height });
+	setPos({ sp.x * ss.x, sp.y * ss.y });
 }
 
 void HUDModule::storePos(Vec2 const& ss) {

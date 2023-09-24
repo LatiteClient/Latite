@@ -672,6 +672,9 @@
     <ClInclude Include="src\client\feature\module\impl\hud\BreakIndicator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\hud\HealthWarning.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1017,6 +1020,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\module\impl\hud\BreakIndicator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\hud\HealthWarning.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,7 +5,7 @@
 
 #include <cmath>
 
-static constexpr float pi_f = 3.1415926535;
+static constexpr float pi_f = 3.1415926535f;
 
 namespace LatiteMath {
 	static constexpr float deg2rad(float deg) {
