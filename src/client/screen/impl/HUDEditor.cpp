@@ -209,6 +209,7 @@ void HUDEditor::renderModule(HUDModule* mod, SDK::MinecraftUIRenderContext* ctx)
 	if (!ctx) {
 		D2DUtil dc;
 		D2D1::Matrix3x2F oTrans;
+		if (isActive()) mod->renderFrame(dc);
 		dc.ctx->GetTransform(&oTrans);
 		dc.ctx->SetTransform(D2D1::Matrix3x2F::Scale(mod->getScale(), mod->getScale()) * D2D1::Matrix3x2F::Translation(mod->getRect().left, mod->getRect().top));
 		mod->render(dc, false, isActive());
@@ -216,19 +217,28 @@ void HUDEditor::renderModule(HUDModule* mod, SDK::MinecraftUIRenderContext* ctx)
 	}
 	else {
 		MCDrawUtil dc{ ctx, Latite::get().getFont() };
+		if (isActive()) mod->renderFrame(dc);
 		dc.setImmediate(false);
-
+		dc.flush();
 		dc.scn->matrix->matrixStack.push(D2D1::Matrix4x4F::Scale(mod->getScale(), mod->getScale(), 0.f) * D2D1::Matrix4x4F::Translation(mod->getRect().left * dc.guiScale, mod->getRect().top * dc.guiScale, 0.f));
 		mod->render(dc, false, isActive());
 		dc.flush();
 		dc.scn->matrix->matrixStack.pop();
 	}
 
-	if (isActive() && !ctx) {
-		if (hovering) {
-			mod->renderSelected();
-			mod->renderPost();
+	if (isActive()) {
+
+		if (ctx) {
+			MCDrawUtil dc{ ctx, Latite::get().getFont() };
+			if (hovering) mod->renderSelected(dc);
+			mod->renderPost(dc);
 		}
+		else {
+			D2DUtil dc;
+			if (hovering) mod->renderSelected(dc);
+			mod->renderPost(dc);
+		}
+		
 	}
 }
 

@@ -21,10 +21,10 @@ namespace SDK {
 
 		RakNetConnector() = delete;
 
-		MVCLASS_FIELD(std::string, ipAddress, 0x428, 0x3D0, 0x438);
-		MVCLASS_FIELD(std::string, dns, 0x448, 0x3F0, 0x458);
-		MVCLASS_FIELD(uint16_t, port, 0x468, 0x410, 0x478);
-		MVCLASS_FIELD(std::string, featuredServer, 0x4F8, 0x4C8, 0x530);
+		MVCLASS_FIELD(std::string, ipAddress, 0x418, 0x3D0, 0x438);
+		MVCLASS_FIELD(std::string, dns, 0x438, 0x3F0, 0x458);
+		MVCLASS_FIELD(uint16_t, port, 0x458, 0x410, 0x478);
+		MVCLASS_FIELD(std::string, featuredServer, 0x4D8, 0x4C8, 0x530);
 
 		class RakPeer* getPeer() {
 			if (internalVers > V1_18_12) {

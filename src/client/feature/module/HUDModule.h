@@ -20,9 +20,9 @@ public:
 
 	virtual void render(DrawUtil& ctx, bool isDefault, bool inEditor) = 0;
 
-	virtual void renderSelected();
-	virtual void renderFrame();
-	virtual void renderPost();
+	virtual void renderSelected(DrawUtil& dc);
+	virtual void renderFrame(DrawUtil& dc);
+	virtual void renderPost(DrawUtil& dc);
 	void afterLoadConfig() override;
 	void storePos(Vec2 const& ss);
 

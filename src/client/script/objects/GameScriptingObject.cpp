@@ -143,7 +143,7 @@ JsValueRef GameScriptingObject::getWorldCallback(JsValueRef callee, bool isConst
 }
 
 JsValueRef GameScriptingObject::isInUICallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	return SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed() ? Chakra::GetTrue() : Chakra::GetFalse();
+	return SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed() ? Chakra::GetFalse() : Chakra::GetTrue();
 }
 
 JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
@@ -189,8 +189,8 @@ JsValueRef GameScriptingObject::playSoundUI(JsValueRef callee, bool isConstructo
 	float pitch = static_cast<float>(Chakra::GetNumber(arguments[3]));
 
 	auto lvl = SDK::ClientInstance::get()->minecraft->getLevel();
-	if (lvl) {
-		lvl->playSoundEvent(soundName, SDK::ClientInstance::get()->levelRenderer->getLevelRendererPlayer()->getOrigin(), pitch);
+	if (lvl && SDK::ClientInstance::get()->levelRenderer->getLevelRendererPlayer()) {
+		lvl->playSoundEvent(soundName, SDK::ClientInstance::get()->levelRenderer->getLevelRendererPlayer()->getOrigin(), volume, pitch);
 	}
 	return Chakra::GetUndefined();
 }

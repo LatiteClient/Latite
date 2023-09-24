@@ -2,21 +2,16 @@
 #include "HUDModule.h"
 #include <client/Latite.h>
 
-void HUDModule::renderSelected() {
-	D2DUtil dc;
-	dc.fillRectangle(this->getRect(), { 1.f, 1.f, 1.f, 0.2f });
+void HUDModule::renderSelected(DrawUtil& ctx) {
+	ctx.fillRectangle(this->getRect(), { 1.f, 1.f, 1.f, 0.2f });
 }
 
-void HUDModule::renderFrame()
-{
-	D2DUtil ctx;
+void HUDModule::renderFrame(DrawUtil& ctx) {
 	ctx.fillRectangle(this->getRect(), { 0.F, 0.F, 0.F, 0.4F });
-	ctx.drawRectangle(this->getRect(), d2d::Colors::BLACK, 0.6f);
+	ctx.drawRectangle(this->getRect(), d2d::Colors::BLACK, 1.5f);
 }
 
-void HUDModule::renderPost()
-{
-	D2DUtil ctx;
+void HUDModule::renderPost(DrawUtil& ctx) {
 	ctx.drawText(getRect(), util::StrToWStr(this->getDisplayName()), d2d::Color(0.5F, 1.0F, 1.0F, 1.f), Renderer::FontSelection::SegoeLight,
 		16.f);
 }

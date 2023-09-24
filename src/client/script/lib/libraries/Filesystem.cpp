@@ -110,7 +110,7 @@ JsValueRef Filesystem::read(JsValueRef callee, bool isConstructor, JsValueRef* a
 		}, thi);
 
 	op->path = thi->getPath(Chakra::GetString(arguments[1]));
-
+	op->data = std::vector<uint8_t>();
 	op->run();
 
 	thi->owner->pendingOperations.push_back(op);

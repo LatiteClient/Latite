@@ -262,6 +262,8 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	}
 
 	ViewBobHook = addHook(Signatures::CameraViewBob.result, CameraViewBob, "`anonymous namespace'::_bobMovement");
-	Level_initializeHook = addHook(reinterpret_cast<uintptr_t*>(Signatures::Vtable::Level.result)[1], Level_initialize, "Level::initialize");
-	Level_startLeaveGameHook = addHook(reinterpret_cast<uintptr_t*>(Signatures::Vtable::Level.result)[2], Level_startLeaveGame, "Level::startLeaveGame");
+	if (Signatures::Vtable::Level.result) {
+		Level_initializeHook = addHook(reinterpret_cast<uintptr_t*>(Signatures::Vtable::Level.result)[1], Level_initialize, "Level::initialize");
+		Level_startLeaveGameHook = addHook(reinterpret_cast<uintptr_t*>(Signatures::Vtable::Level.result)[2], Level_startLeaveGame, "Level::startLeaveGame");
+	}
 }
