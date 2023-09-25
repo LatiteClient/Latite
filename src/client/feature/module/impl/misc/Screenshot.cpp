@@ -79,7 +79,7 @@ winrt::Windows::Foundation::IAsyncAction Screenshot::takeScreenshot(std::filesys
     // file
     auto folder = co_await StorageFolder::GetFolderFromPathAsync(path.wstring());
     auto file = co_await folder.CreateFileAsync(L"screenshot.png", CreationCollisionOption::OpenIfExists);
-    ComPtr<ID2D1Bitmap1> bmp = Latite::getRenderer().copyCurrentBitmap();
+    ComPtr<ID2D1Bitmap1> bmp = Latite::getRenderer().getCopiedBitmap();
 
     auto ctx = Latite::getRenderer().getDeviceContext();
     //ctx->Flush();// MC won't let me flush (???)s

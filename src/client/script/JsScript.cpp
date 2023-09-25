@@ -564,6 +564,6 @@ JsValueRef JsScript::AsyncOperation::call() {
 	JS::JsSetCurrentContext(this->ctx);
 	JsValueRef obj;
 	this->args.insert(this->args.begin(), this->callback);
-	Latite::getScriptManager().handleErrors(JS::JsCallFunction(this->callback, this->args.data(), static_cast<unsigned short>(this->args.size()), &obj));
+	Latite::getScriptManager().handleErrors(Chakra::CallFunction(this->callback, this->args.data(), static_cast<unsigned short>(this->args.size()), &obj));
 	return obj;
 }

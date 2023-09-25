@@ -225,7 +225,7 @@ JsValueRef ClientScriptingObject::mmgrForEachModule(JsValueRef callee, bool isCo
 	Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> modul) {
 		JsValueRef r[2] = { arguments[0], cl->construct(reinterpret_cast<JsModule*>(modul.get()), false) };
 		JsValueRef res;
-		Latite::getScriptManager().handleErrors(JS::JsCallFunction(arguments[1], r, 2, &res));
+		Latite::getScriptManager().handleErrors(Chakra::CallFunction(arguments[1], r, 2, &res));
 		Chakra::Release(res);
 		Chakra::Release(r[1]);
 		return false;

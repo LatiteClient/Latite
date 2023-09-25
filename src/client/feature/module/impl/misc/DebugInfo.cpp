@@ -128,7 +128,7 @@ void DebugInfo::onRenderOverlay(Event& evG) {
     const std::wstring topRightDebugInfo = util::StrToWStr(std::format("{}\n{}\n{}\n",
         getMemUsage(),
         getGpuInfo(),
-        getCpuInfo())) + util::StrToWStr(getRenderPerfInfo()) + L'\n'; // im fed up std::format
+        getCpuInfo()));
 
     dc.drawText(rect, topLeftDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular,
         28, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);

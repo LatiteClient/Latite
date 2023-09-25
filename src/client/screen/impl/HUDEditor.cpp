@@ -48,7 +48,7 @@ void HUDEditor::onRender(Event& ev) {
 		// cut out stuff, for movable scoreboard and paperdoll in future
 /*
 		for (auto& control : controls) {
-			auto bmp = Latite::getRenderer().copyCurrentBitmap(control);
+			auto bmp = Latite::getRenderer().getCopiedBitmap(control);
 
 			dc.ctx->DrawBitmap(bmp);
 
@@ -93,7 +93,7 @@ void HUDEditor::onRender(Event& ev) {
 	doSnapping(dragOffset);
 	if (!mcRenderer) {
 		renderModules(nullptr);
-		if (SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) keepModulesInBounds(Vec2(Latite::getRenderer().getScreenSize().width, Latite::getRenderer().getScreenSize().height));
+		keepModulesInBounds(Vec2(Latite::getRenderer().getScreenSize().width, Latite::getRenderer().getScreenSize().height));
 	}
 
 }
@@ -125,7 +125,7 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 		dc.setImmediate(false);
 
 		this->renderModules(ev.getUIRenderContext());
-		if (SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) keepModulesInBounds(SDK::ClientInstance::get()->getGuiData()->screenSize);
+		keepModulesInBounds(SDK::ClientInstance::get()->getGuiData()->screenSize);
 	}
 
 	//auto view = ev.getScreenView();
@@ -530,18 +530,34 @@ void HUDEditor::keepModulesInBounds(Vec2 const& ss) {
 			HUDModule* rMod = static_cast<HUDModule*>(mod.get());
 			if (!rMod->isActive()) return false;
 			d2d::Rect rc = rMod->getRect();
-			util::KeepInBounds(rc, { 0.f, 0.f, ss.x, ss.y });
+			Vec2 modPos = rc.getPos();
+
+			if (rc.left < 0) {
+				rMod->setPos({ 0.f, modPos.y });
+			}
+
+			if (rc.top < 0) {
+				rMod->setPos({ modPos.x, 0.f });
+			}
+
+			if (rc.right > ss.x) {
+				rMod->setPos({ ss.x - rc.getWidth(), modPos.y });
+			}
+
+			if (rc.bottom > ss.y) {
+				rMod->setPos({ modPos.x, ss.y - rc.getHeight() });
+			}
 
 			auto round2 = [](float& f){
 				f = std::round(f);
 			};
-
-			auto oPos = rc.getPos();
-			round2(rc.left);
-			round2(rc.top);
-			round2(rc.right);
-			round2(rc.bottom);
-			rMod->setRect(rc);
+			
+			//auto oPos = rc.getPos();
+			//round2(rc.left);
+			//round2(rc.top);
+			//round2(rc.right);
+			//round2(rc.bottom);
+			//rMod->setRect(rc);
 		}
 		return false;
 		});

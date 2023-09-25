@@ -182,7 +182,7 @@ public:
 		return dWriteFactory.Get();
 	}
 
-	[[nodiscard]] ID2D1Bitmap1* copyCurrentBitmap() {
+	[[nodiscard]] ID2D1Bitmap1* getCopiedBitmap() {
 		auto idx = swapChain4->GetCurrentBackBufferIndex();
 		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
 		ID2D1Bitmap1* newBitmap = blurBuffers[0];
@@ -196,7 +196,22 @@ public:
 		return newBitmap;
 	}
 
-	[[nodiscard]] ID2D1Bitmap1* copyCurrentBitmap(d2d::Rect const& rc) {
+	[[nodiscard]] ID2D1Bitmap1* copyCurrentBitmap() {
+		auto idx = swapChain4->GetCurrentBackBufferIndex();
+		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
+		ID2D1Bitmap1* newBitmap;
+
+		D2D1_SIZE_U bitmapSize = myBitmap->GetPixelSize();
+		D2D1_PIXEL_FORMAT pixelFormat = myBitmap->GetPixelFormat();
+
+		HRESULT hr = d2dCtx->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, pixelFormat), &newBitmap);
+		if (SUCCEEDED(hr)) {
+			newBitmap->CopyFromBitmap(nullptr, myBitmap, nullptr);
+		}
+		return newBitmap;
+	}
+
+	[[nodiscard]] ID2D1Bitmap1* getCopiedBitmap(d2d::Rect const& rc) {
 		auto idx = swapChain4->GetCurrentBackBufferIndex();
 		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
 		ID2D1Bitmap1* newBitmap;
@@ -213,7 +228,7 @@ public:
 		return newBitmap;
 	}
 
-	[[nodiscard]] void copyCurrentBitmap(ID2D1Bitmap1*& bmp, d2d::Rect const& rc) {
+	[[nodiscard]] void getCopiedBitmap(ID2D1Bitmap1*& bmp, d2d::Rect const& rc) {
 		auto idx = swapChain4->GetCurrentBackBufferIndex();
 		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
 
@@ -225,7 +240,7 @@ public:
 		bmp->CopyFromBitmap(&pt, myBitmap, &urc);
 	}
 
-	[[nodiscard]] void copyCurrentBitmap(ID2D1Bitmap1*& bmp) {
+	[[nodiscard]] void getCopiedBitmap(ID2D1Bitmap1*& bmp) {
 		auto idx = swapChain4->GetCurrentBackBufferIndex();
 		ID2D1Bitmap1* myBitmap = this->renderTargets[idx];
 		bmp->CopyFromBitmap(nullptr, myBitmap, nullptr);
@@ -249,7 +264,7 @@ public:
 	}
 
 	[[nodiscard]] ID2D1Bitmap1* getBlurBitmap() {
-		return copyCurrentBitmap();
+		return getCopiedBitmap();
 	}
 
 	[[nodiscard]] IWICImagingFactory2* getImagingFactory() {

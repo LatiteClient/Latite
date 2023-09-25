@@ -9,7 +9,7 @@ JsValueRef JsEvented::dispatchEvent(std::wstring name, Event& ev) {
 
 		ev.arguments.insert(ev.arguments.begin(), evs.first);
 		JsValueRef val;
-		Latite::getScriptManager().handleErrors(JS::JsCallFunction(evs.first, ev.arguments.data(), static_cast<unsigned short>(ev.arguments.size()), &val));
+		Latite::getScriptManager().handleErrors(Chakra::CallFunction(evs.first, ev.arguments.data(), static_cast<unsigned short>(ev.arguments.size()), &val));
 		return val;
 	}
 	return JS_INVALID_REFERENCE;

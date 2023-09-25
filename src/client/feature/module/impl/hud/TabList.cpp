@@ -104,4 +104,5 @@ void TabList::onRenderOverlay(Event& evG) {
 		y = oY;
 		idx = 0;
 	}
+	dc.ctx->SetTransform(mat);
 }

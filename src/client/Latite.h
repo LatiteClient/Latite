@@ -110,7 +110,9 @@ public:
 
 	void fetchLatiteUsers();
 
+	int cInstOffs2 = 0;
 	int cInstOffs = 0;
+	int plrOffs2 = 0;
 	int plrOffs = 0;
 private:
 	bool downloadingAssets = false;

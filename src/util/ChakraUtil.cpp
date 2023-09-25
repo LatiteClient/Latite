@@ -95,6 +95,11 @@ unsigned int Chakra::GetRefCount(JsValueRef obj) {
 	return count;
 }
 
+JsErrorCode Chakra::CallFunction(JsValueRef func, JsValueRef* arguments, unsigned short argumentCount, JsValueRef* result) {
+	return JS::JsCallFunction(func, arguments, argumentCount, result);
+}
+
+
 JsValueRef Chakra::GetProperty(JsValueRef obj, std::wstring name) {
 	JsPropertyIdRef propId;
 	JS::JsGetPropertyIdFromName(name.c_str(), &propId);

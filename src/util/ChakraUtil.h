@@ -39,7 +39,7 @@ public:
 	static void SetPropertyObject(JsValueRef ref, std::wstring name, JsValueRef obj, bool strict = false);
 
 	static unsigned int GetRefCount(JsValueRef obj);
-	
+	static JsErrorCode CallFunction(JsValueRef func, JsValueRef* arguments, unsigned short argumentCount, JsValueRef* result);
 	static JsValueRef GetProperty(JsValueRef obj, std::wstring name);
 
 	static JsValueRef TryGet(JsValueRef* args, unsigned short count, unsigned short idx);

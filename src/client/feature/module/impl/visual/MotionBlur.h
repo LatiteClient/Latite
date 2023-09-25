@@ -20,4 +20,5 @@ private:
 	ID2D1Bitmap1* mbBitmap = nullptr;
 	ID2D1Bitmap1* oBitmap = nullptr;
 	ValueType intensity = FloatValue(7.f);
+	ValueType antiBleed = FloatValue(0.3f);
 };

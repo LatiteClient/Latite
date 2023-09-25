@@ -157,7 +157,7 @@ void ScriptManager::runScriptingOperations()
 			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - it->createTime);
 			if (duration.count() > it->time) {
 				JsValueRef res;
-				handleErrors(JS::JsCallFunction(it->callback, &it->callback, 1, &res));
+				handleErrors(Chakra::CallFunction(it->callback, &it->callback, 1, &res));
 				JS::JsRelease(res, nullptr);
 				scr->timeouts.erase(it);
 				continue;
@@ -171,7 +171,7 @@ void ScriptManager::runScriptingOperations()
 			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - tim.createTime);
 			if (duration.count() > tim.time) {
 				JsValueRef res;
-				handleErrors(JS::JsCallFunction(tim.callback, &tim.callback, 1, &res));
+				handleErrors(Chakra::CallFunction(tim.callback, &tim.callback, 1, &res));
 				JS::JsRelease(res, nullptr);
 				tim.createTime = now;
 			}
@@ -418,7 +418,7 @@ bool ScriptManager::dispatchEvent(Event& ev)
 
 				//int refc1 = Chakra::GetRefCount(l.first);
 				//int refc = Chakra::GetRefCount(params[1]);
-				handleErrors(JS::JsCallFunction(l.first, params, 2, &ret));
+				handleErrors(Chakra::CallFunction(l.first, params, 2, &ret));
 
 				if (ev.isCancellable) {
 					auto b = Chakra::GetBoolProperty(params[1], L"cancel");

@@ -125,7 +125,7 @@ void D2DUtil::drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity) {
 	ID2D1Effect* gaussianBlurEffect = Latite::getRenderer().getBlurEffect();
 
 	ctx->Flush();
-	Latite::getRenderer().copyCurrentBitmap(bmp);
+	Latite::getRenderer().getCopiedBitmap(bmp);
 	gaussianBlurEffect->SetInput(0, bmp);
 	gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, intensity);
 	gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);

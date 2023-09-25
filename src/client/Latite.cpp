@@ -253,8 +253,10 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
 #ifdef  LATITE_BETA
     // its actually the real offset - 0x10
-    Latite::get().cInstOffs = wnd->getResult()[1];
+    Latite::get().cInstOffs2 = wnd->getResult()[3];
+    Latite::get().cInstOffs = wnd->getResult()[2];
     Latite::get().plrOffs = wnd->getResult()[0];
+    Latite::get().plrOffs2 = wnd->getResult()[1];
 #endif
 
     while (!SDK::ClientInstance::get()) {
@@ -721,7 +723,7 @@ void Latite::onRendererInit(Event&) {
     getAssets().unloadAll(); // should be safe even if we didn't load resources yet
     getAssets().loadAll();
 
-    this->hudBlurBitmap = getRenderer().copyCurrentBitmap();
+    this->hudBlurBitmap = getRenderer().getCopiedBitmap();
     getRenderer().getDeviceContext()->CreateEffect(CLSID_D2D1GaussianBlur, gaussianBlurEffect.GetAddressOf());
 
     gaussianBlurEffect->SetInput(0, hudBlurBitmap.Get());

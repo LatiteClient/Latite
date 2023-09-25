@@ -6,8 +6,8 @@
 
 HealthWarning::HealthWarning() : Module("HealthWarning", "Health Warning", "Give the screen a vignette when your health is low", HUD, nokeybind) {
     this->listen<RenderLayerEvent>(&HealthWarning::onRenderLayer);
-	addSetting("vignetteColor", "Vignette Color", "", vignetteColor);
-	addSliderSetting("healthPointThreshold", "Health Threshold", "", healthPointThreshold, FloatValue(1.f), FloatValue(19.f), FloatValue(.5f));
+	addSetting("vignetteColor", "Vignette", "", vignetteColor);
+	addSliderSetting("healthPointThreshold", "Health", "", healthPointThreshold, FloatValue(1.f), FloatValue(19.f), FloatValue(.5f));
 	addSliderSetting("vignetteFade", "Intensity", "", vignetteFade, FloatValue(0.f), FloatValue(1.f), FloatValue(.1f));
 }
 
