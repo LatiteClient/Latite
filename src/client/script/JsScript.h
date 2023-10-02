@@ -107,6 +107,15 @@ public:
 		return nullptr;
 	}
 
+	template <typename T>
+	[[nodiscard]] T* getObject() {
+		for (auto& cl : this->objects) {
+			if (cl->id == T::objectID) return reinterpret_cast<T*>(cl.get());
+		}
+		//Logger::Fatal("Could not find scripting object {}!", T::class_name);
+		return nullptr;
+	}
+
 	void loadJSApi();
 	void loadScriptObjects();
 	void fetchScriptData();

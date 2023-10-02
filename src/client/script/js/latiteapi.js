@@ -1,3 +1,11 @@
+HudModule.prototype.setPos = function (x, y) {
+    let rect = this.getRect();
+    this.setRect(new Rect(x, y, rect.left + rect.getWidth(), rect.top + rect.getHeight()));
+};
+HudModule.prototype.getPos = function () {
+    return new Vector2(this.getRect().left, this.getRect().top);
+};
+
 Vector2.prototype.add = function (vec) {
     return new Vector2(this.x + vec.x, this.y + vec.y);
 };
@@ -41,6 +49,14 @@ Color.prototype.asAlpha = function (opacity) {
 Color.RGB = function (r, g, b, a) {
     return new Color(r / 255, g / 255, b / 255, a ? (a / 255) : 1);
 };
+
+Rect.prototype.getWidth = function () {
+    return this.right - this.left;
+};
+Rect.prototype.getHeight = function () {
+    return this.bottom - this.top;
+};
+Rect.prototype.getWidth;
 
 eval("var TextColor = {}");
 TextColor.FORMAT_CHAR = "\u00A7";

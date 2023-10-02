@@ -2,12 +2,10 @@
 #include "JsModule.h"
 
 JsModule::JsModule(std::string const& name, std::string const& displayName, std::string const& desc, int key)
-	: Module(name, displayName, desc, SCRIPT, key, false)
-{
+	: Module(name, displayName, desc, SCRIPT, key, false) {
 	JS::JsAddRef(object, nullptr);
 	JS::JsGetCurrentContext(&this->ctx);
 
-	// TODO(script): isHoldToToggle
 	this->eventListeners[L"enable"] = {};
 	this->eventListeners[L"disable"] = {};
 	this->eventListeners[L"get-hold-to-toggle"] = {};

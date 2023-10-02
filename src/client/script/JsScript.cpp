@@ -17,6 +17,7 @@
 
 #include "Lib/Libraries/Filesystem.h"
 #include "Lib/Libraries/Network.h"
+#include "Lib/Libraries/Clipboard.h"
 
 #include "objects/ClientScriptingObject.h"
 
@@ -25,6 +26,7 @@
 #include "class/impl/JsRect.h"
 #include "class/impl/JsColor.h"
 #include "class/impl/JsModuleClass.h"
+#include "class/impl/JsHudModuleClass.h"
 #include "class/impl/JsSettingClass.h"
 #include "class/impl/JsCommandClass.h"
 #include "class/impl/game/JsEntityClass.h"
@@ -82,6 +84,7 @@ bool JsScript::load() {
 
 	this->libraries.push_back(std::make_shared<Filesystem>(this));
 	this->libraries.push_back(std::make_shared<Network>(this));
+	this->libraries.push_back(std::make_shared<Clipboard>(this));
 
 	if (JS::JsCreateRuntime(
 		JsRuntimeAttributeNone,
@@ -116,16 +119,7 @@ namespace {
 		auto num = Chakra::GetNumber(arguments[2]);
 
 		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
-		auto tim = JsScript::JsTimeout(static_cast<int>(thi->timeouts.size() + 1), static_cast<long long>(num), func);
-		thi->timeouts.push_back(tim);
-		/*JsScript::AsyncOperation op{true, func, [](JsScript::AsyncOperation& op) {}, [](JsScript::AsyncOperation& op) {
-			auto timeNow = std::chrono::system_clock::now();
-			auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - op.createTime).count();
-			if (dur > op.param) {
-				op.flagDone = true;
-			}
-		}};
-		thi->pendingOperations.push_back(op);*/
+		auto& tim = thi->timeouts.emplace_back(static_cast<int>(thi->timeouts.size() + 1), static_cast<long long>(num), func);
 		JsValueRef ret;
 		JS::JsIntToNumber(tim.id, &ret);
 		return ret;
@@ -145,16 +139,7 @@ namespace {
 		auto num = Chakra::GetNumber(arguments[2]);
 
 		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
-		auto tim = JsScript::JsTimeout(static_cast<int>(thi->intervals.size() + 1), static_cast<long long>(num), func);
-		thi->intervals.push_back(tim);
-		/*JsScript::AsyncOperation op{true, func, [](JsScript::AsyncOperation& op) {}, [](JsScript::AsyncOperation& op) {
-			auto timeNow = std::chrono::system_clock::now();
-			auto dur = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - op.createTime).count();
-			if (dur > op.param) {
-				op.flagDone = true;
-			}
-		}};
-		thi->pendingOperations.push_back(op);*/
+		auto& tim = thi->intervals.emplace_back(static_cast<int>(thi->intervals.size() + 1), static_cast<long long>(num), func);
 		JsValueRef ret;
 		JS::JsIntToNumber(tim.id, &ret);
 		return ret;
@@ -335,6 +320,7 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsRect>(this));
 	this->classes.push_back(std::make_shared<JsColor>(this));
 	this->classes.push_back(std::make_shared<JsModuleClass>(this));
+	this->classes.push_back(std::make_shared<JsHudModuleClass>(this));
 	this->classes.push_back(std::make_shared<JsSettingClass>(this));
 	this->classes.push_back(std::make_shared<JsCommandClass>(this));
 	this->classes.push_back(std::make_shared<JsEntityClass>(this));

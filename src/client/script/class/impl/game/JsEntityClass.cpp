@@ -24,7 +24,7 @@ JsValueRef JsEntityClass::entityGetPos(JsValueRef callee, bool isConstructor, Js
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
 		auto actor = ent->getEntity();
-		if (ent->level != JsEntity::AccessLevel::Restricted) {
+		if (ent->level != JsEntity::AccessLevel::Restricted || SDK::ClientInstance::get()->getLocalPlayer()->getCommandPermissionLevel() > 1) {
 			auto thi = reinterpret_cast<JsEntityClass*>(callbackState);
 			auto cl = thi->owner->getClass<JsVec3>();
 
@@ -46,7 +46,7 @@ JsValueRef JsEntityClass::entityGetRot(JsValueRef callee, bool isConstructor, Js
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
 		auto actor = ent->getEntity();
-		if (ent->level != JsEntity::AccessLevel::Restricted) {
+		if (ent->level != JsEntity::AccessLevel::Restricted || SDK::ClientInstance::get()->getLocalPlayer()->getCommandPermissionLevel() > 1) {
 			auto thi = reinterpret_cast<JsEntityClass*>(callbackState);
 			auto cl = thi->owner->getClass<JsVec2>();
 

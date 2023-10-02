@@ -696,6 +696,8 @@ void ClickGUI::onCleanup(Event&) {
 
 void ClickGUI::onKey(Event& evGeneric) {
 	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
+	if (ev.getKey() == VK_F11) return;
+
 	if (searchTextBox.isSelected()) {
 		ev.setCancelled(true);
 		return;

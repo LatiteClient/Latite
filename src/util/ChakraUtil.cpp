@@ -31,6 +31,7 @@ FARPROC Chakra::pass(const char* name)
 		std::filesystem::create_directory(latitePath / "Assets");
 
 		if (!std::filesystem::exists(assetsPath / "ChakraCore.dll")) {
+			Logger::Info("ChakraCore.dll not found, downloading..");
 			Latite::get().downloadChakraCore();
 		}
 

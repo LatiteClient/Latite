@@ -675,6 +675,15 @@
     <ClInclude Include="src\client\feature\module\impl\hud\HealthWarning.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\script\lib\libraries\Clipboard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\script\class\impl\JsHudModuleClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\feature\module\script\JsHudModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1023,6 +1032,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\module\impl\hud\HealthWarning.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\script\lib\libraries\Clipboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\script\JsHudModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\script\class\impl\JsHudModuleClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -10,10 +10,12 @@
 #include "client/config/ConfigManager.h"
 #include "client/feature/module/ModuleManager.h"
 #include "client/feature/module/HUDModule.h"
+#include "client/feature/module/script/JsHudModule.h"
 #include "../ScreenManager.h"
 
 #include "sdk/common/client/gui/controls/VisualTree.h"
 #include "sdk/common/client/gui/controls/UIControl.h"
+#include <client/script/objects/D2DScriptingObject.h>
 
 
 HUDEditor::HUDEditor() : dragMod(nullptr) {
@@ -115,6 +117,26 @@ void HUDEditor::onClick(Event& evGeneric) {
 void HUDEditor::onRenderLayer(Event& evGeneric) {
 	auto& ev = static_cast<RenderLayerEvent&>(evGeneric);
 	bool mcRenderer = Latite::get().useMinecraftRenderer();
+
+	if (ev.getScreenView()->visualTree->rootControl->name == "debug_screen") {
+		if (isActive() || SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
+			Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
+				if (mod->isHud() && mod->isEnabled() && reinterpret_cast<HUDModule*>(mod.get())->isActive() && Latite::getRenderer().getDeviceContext()) {
+					auto rMod = reinterpret_cast<HUDModule*>(mod.get());
+
+					if (rMod->getCategory() == Module::SCRIPT) {
+						auto jsRMod = reinterpret_cast<JsHUDModule*>(mod.get());
+
+						auto oMat = jsRMod->script->getObject<D2DScriptingObject>()->getMatrix();
+						jsRMod->script->getObject<D2DScriptingObject>()->setMatrix(D2D1::Matrix3x2F::Scale(rMod->getScale(), rMod->getScale()) * D2D1::Matrix3x2F::Translation(rMod->getRect().left, rMod->getRect().top));
+						rMod->preRender(mcRenderer, false, isActive());
+						jsRMod->script->getObject<D2DScriptingObject>()->setMatrix(oMat);
+					}
+				}
+				});
+		}
+	}
+
 	if (!mcRenderer) return;
 
 	if (ev.getScreenView()->visualTree->rootControl->name == "debug_screen") {

@@ -3,6 +3,8 @@
 #include "JsSettingClass.h"
 #include "../../JsScript.h"
 
+#include "client/feature/module/script/JsHudModule.h"
+
 JsValueRef JsModuleClass::moduleIsEnabled(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
 {
 	JsModule* mod;
@@ -47,10 +49,10 @@ JsValueRef JsModuleClass::moduleSetOnEvent(JsValueRef callee, bool isConstructor
 	if (!Chakra::VerifyParameters({ {arguments[1], JsString }, {arguments[2], JsFunction} })) return JS_INVALID_REFERENCE;
 
 	JsModule* mod;
-	//JsHudModule* hMod = nullptr;
+	JsHUDModule* hMod = nullptr;
 	//JsTextModule* tMod = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&mod));
-	//if (mod->isVisual()) hMod = reinterpret_cast<JsHudModule*>(mod);
+	if (mod->isHud()) hMod = reinterpret_cast<JsHUDModule*>(mod);
 	//if (mod->isTextual()) tMod = reinterpret_cast<JsTextModule*>(mod);
 	if (!mod) {
 		Chakra::ThrowError(L"Object is not a module");
@@ -67,6 +69,7 @@ JsValueRef JsModuleClass::moduleSetOnEvent(JsValueRef callee, bool isConstructor
 		tMod->eventListeners[str].push_back(std::make_pair(arguments[2], ctx));
 		return Chakra::GetUndefined();
 	}
+#endif
 	if (hMod) {
 		JsContextRef ctx;
 		JS::JsGetCurrentContext(&ctx);
@@ -75,7 +78,6 @@ JsValueRef JsModuleClass::moduleSetOnEvent(JsValueRef callee, bool isConstructor
 		return Chakra::GetUndefined();
 	}
 	else
-#endif
 		if (mod->eventListeners.find(str) != mod->eventListeners.end()) {
 			JsContextRef ctx;
 			JS::JsGetCurrentContext(&ctx);

@@ -15,6 +15,11 @@ void __fastcall ScreenViewHooks::setupAndRender(SDK::ScreenView* view, void* ctx
 	RenderLayerEvent ev{ view, reinterpret_cast<SDK::MinecraftUIRenderContext*>(ctx) };
 	Eventing::get().dispatch(ev);
 
+	if (view->visualTree->rootControl->name == "debug_screen") {
+		ScriptManager::Event ev{L"render2d", {}, false};
+		Latite::getScriptManager().dispatchEvent(ev);
+	}
+
 	RenderGameEvent evt{ };
 	Eventing::get().dispatch(evt);
 }

@@ -19,6 +19,7 @@ public:
 	virtual ~HUDModule() = default;
 
 	virtual void render(DrawUtil& ctx, bool isDefault, bool inEditor) = 0;
+	virtual void preRender(bool mcRend, bool isDefault, bool inEditor) {};
 
 	virtual void renderSelected(DrawUtil& dc);
 	virtual void renderFrame(DrawUtil& dc);

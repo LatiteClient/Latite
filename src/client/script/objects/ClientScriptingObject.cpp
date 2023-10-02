@@ -103,6 +103,7 @@ void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	initCommandManager();
 	Chakra::DefineFunc(commandManager, cmgrRegisterCommandCallback, L"registerCommand");
 	Chakra::DefineFunc(commandManager, cmgrDeregisterCommandCallback, L"deregisterCommand");
+	Chakra::DefineFunc(commandManager, cmgrGetPrefixCallback, L"getPrefix");
 
 	Chakra::SetPropertyString(object, L"version", util::StrToWStr(std::string(Latite::version.data(), Latite::version.size())));
 }
@@ -280,4 +281,8 @@ JsValueRef ClientScriptingObject::cmgrDeregisterCommandCallback(JsValueRef calle
 	Latite::getCommandManager().deregisterScriptCommand(cmd);
 
 	return undefined;
+}
+
+JsValueRef ClientScriptingObject::cmgrGetPrefixCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState){
+	return Chakra::MakeString(util::StrToWStr(Latite::getCommandManager().prefix));
 }

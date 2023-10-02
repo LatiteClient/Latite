@@ -221,7 +221,7 @@ std::wstring util::GetClipboardText() {
 void util::SetClipboardText(std::wstring const& text) {
 	if (OpenClipboard(NULL)) {
 		EmptyClipboard();
-		HGLOBAL hg = GlobalAlloc(GMEM_MOVEABLE, text.size() + 1); // \0
+		HGLOBAL hg = GlobalAlloc(GMEM_MOVEABLE, (text.size() * 2) + 1); // \0
 		if (!hg) {
 			CloseClipboard();
 		}

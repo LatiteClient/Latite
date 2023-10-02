@@ -13,6 +13,14 @@
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="NoPCH|Win32">
+      <Configuration>NoPCH</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="NoPCH|x64">
+      <Configuration>NoPCH</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="ReleaseLegacy|Win32">
       <Configuration>ReleaseLegacy</Configuration>
       <Platform>Win32</Platform>
@@ -95,6 +103,12 @@
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='NoPCH|Win32'">
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='NoPCH|x64'">
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -233,7 +247,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_HAS_STATIC_RTTI=0;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>LATITE_PUBLIC;_HAS_STATIC_RTTI=0;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -386,6 +400,7 @@
     <ClInclude Include="src\client\feature\module\impl\hud\PingDisplay.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\SpeedDisplay.h" />
     <ClInclude Include="src\client\feature\module\impl\game\ToggleSprintSneak.h" />
+    <ClInclude Include="src\client\feature\module\script\JsHudModule.h" />
     <ClInclude Include="src\client\feature\module\TextModule.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\InputLagTest.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\Screenshot.h" />
@@ -431,6 +446,7 @@
     <ClInclude Include="src\client\script\class\impl\game\JsLocalPlayerClass.h" />
     <ClInclude Include="src\client\script\class\impl\game\JsPlayerClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsColor.h" />
+    <ClInclude Include="src\client\script\class\impl\JsHudModuleClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsModuleClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsRect.h" />
     <ClInclude Include="src\client\script\class\impl\JsSettingClass.h" />
@@ -444,6 +460,7 @@
     <ClInclude Include="src\client\script\interop\classes\JsEntity.h" />
     <ClInclude Include="src\client\script\JsScript.h" />
     <ClInclude Include="src\client\script\lib\JsLibrary.h" />
+    <ClInclude Include="src\client\script\lib\libraries\Clipboard.h" />
     <ClInclude Include="src\client\script\lib\libraries\Filesystem.h" />
     <ClInclude Include="src\client\script\lib\libraries\Network.h" />
     <ClInclude Include="src\client\script\objects\ClientScriptingObject.h" />
@@ -587,6 +604,7 @@
     <ClCompile Include="src\client\feature\module\impl\visual\MotionBlur.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\Zoom.cpp" />
     <ClCompile Include="src\client\feature\module\Module.cpp" />
+    <ClCompile Include="src\client\feature\module\script\JsHudModule.cpp" />
     <ClCompile Include="src\client\feature\module\TextModule.cpp" />
     <ClCompile Include="src\client\hook\Hook.cpp" />
     <ClCompile Include="src\client\hook\Hooks.cpp" />
@@ -618,6 +636,7 @@
     <ClCompile Include="src\client\script\class\impl\game\JsLocalPlayerClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\game\JsPlayerClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsCommandClass.cpp" />
+    <ClCompile Include="src\client\script\class\impl\JsHudModuleClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsModuleClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsSettingClass.cpp" />
     <ClCompile Include="src\client\script\event\ScriptListener.cpp" />
@@ -625,6 +644,7 @@
     <ClCompile Include="src\client\script\interop\classes\JsEntity.cpp" />
     <ClCompile Include="src\client\script\JsScript.cpp" />
     <ClCompile Include="src\client\script\lib\JsLibrary.cpp" />
+    <ClCompile Include="src\client\script\lib\libraries\Clipboard.cpp" />
     <ClCompile Include="src\client\script\lib\libraries\Filesystem.cpp" />
     <ClCompile Include="src\client\script\lib\libraries\Network.cpp" />
     <ClCompile Include="src\client\script\objects\ClientScriptingObject.cpp" />

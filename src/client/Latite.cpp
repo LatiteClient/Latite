@@ -148,6 +148,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         Logger::Warn(ss.str());
     }
 
+    Logger::Info("Minecraft {}", Latite::get().gameVersion);
+
     std::vector<std::pair<SigImpl*, SigImpl*>> sigList = {
         MVSIG(Misc::clientInstance),
         MVSIG(Keyboard_feed),
@@ -219,6 +221,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 #if LATITE_DEBUG
     Logger::Info("Resolved {} signatures ({} dead)", sigCount, deadCount);
 #endif
+
+    Logger::Info(XOR_STRING("Waiting for user"));
 
 #ifdef LATITE_BETA
     {
@@ -570,6 +574,10 @@ void Latite::initSettings() {
 }
 
 void Latite::initAsset(int resource, std::wstring const& filename) {
+#ifndef LATITE_PUBLIC
+    Logger::Info("Getting asset: {} ({})", util::WStrToStr(filename), resource);
+#endif
+
     HRSRC hRes = FindResource((HMODULE)dllInst, MAKEINTRESOURCE(resource), RT_RCDATA);
     if (!hRes) {
         Logger::Fatal("Could not find resource {}", util::WStrToStr(filename));
@@ -607,6 +615,10 @@ std::string Latite::getTextAsset(int resource) {
 
 namespace {
     winrt::Windows::Foundation::IAsyncAction doDownloadAssets() {
+#ifndef LATITE_PUBLIC
+        Logger::Info("Downloading ChakraCore");
+#endif
+
         auto http = HttpClient();
 
         auto folderPath = util::GetLatitePath() / "Assets";
