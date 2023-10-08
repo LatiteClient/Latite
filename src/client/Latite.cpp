@@ -89,6 +89,20 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     Logger::Setup();
 
     Logger::Info(XOR_STRING("Latite Client {}"), Latite::version);
+    winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
+    winrt::Windows::ApplicationModel::PackageVersion version = package.Id().Version();
+
+    {
+        std::string rev = std::to_string(version.Build);
+        std::string rem = rev.substr(0, rev.size() - 2); // remove 2 digits from end
+
+        int ps = std::stoi(rem);
+        std::stringstream ss;
+        ss << version.Major << "." << version.Minor << "." << ps;// hacky
+        Latite::get().gameVersion = ss.str();
+    }
+    Logger::Info("Minecraft {}", Latite::get().gameVersion);
+
     Logger::Info(XOR_STRING("Loading assets"));
     Latite::get().dllInst = dll;
     // ... init assets
@@ -102,24 +116,9 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     Latite::get().initAsset(ICON_CHECKMARK, L"checkmark.png");
     Latite::get().initAsset(ICON_LOGOWHITE, L"latitewhite.png");
     //
-
-
-    winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
-    winrt::Windows::ApplicationModel::PackageVersion version = package.Id().Version();
-
-    {
-        std::string rev = std::to_string(version.Build);
-        std::string rem = rev.substr(0, rev.size() - 2); // remove 2 digits from end
-
-        int ps = std::stoi(rem);
-        std::stringstream ss;
-        ss << version.Major << "." << version.Minor << "." << ps;// hacky
-        Latite::get().gameVersion = ss.str();
-    }
 #if LATITE_DEBUG
     Logger::Info("Resolving signatures..");
 #endif
-
 
     int sigCount = 0;
     int deadCount = 0;
@@ -149,8 +148,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
         Logger::Warn(ss.str());
     }
-
-    Logger::Info("Minecraft {}", Latite::get().gameVersion);
 
     std::vector<std::pair<SigImpl*, SigImpl*>> sigList = {
         MVSIG(Misc::clientInstance),
