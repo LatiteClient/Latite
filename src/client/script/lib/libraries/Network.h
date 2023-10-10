@@ -6,7 +6,7 @@
 
 class Network : public JsLibrary {
 public:
-	Network(class JsScript* owner) : JsLibrary(owner, L"network") {}
+	Network(class JsScript* owner) : JsLibrary(owner, L"http") { }
 
 	JsValueRef initialize(JsValueRef parent) override;
 
@@ -24,6 +24,17 @@ public:
 			: JsScript::AsyncOperation(true, callback, initFunc, param), err(0), data(std::nullopt)
 		{
 		}
+	};
+
+private:
+
+	virtual bool shouldInclude(std::wstring const& str) override {
+		// deprecated name
+		if (str == L"network") {
+			return true;
+		}
+
+		return __super::shouldInclude(str);
 	};
 
 	static JsValueRef CALLBACK get(JsValueRef callee, bool isConstructor,
