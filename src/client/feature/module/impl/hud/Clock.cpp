@@ -15,10 +15,10 @@ std::string Clock::getTimeString() {
     std::string date;
 
     if (std::get<BoolValue>(this->militaryTime)) {
-        time = std::format("{:2}:{:2}", now.tm_hour, now.tm_min);
+        time = std::format("{:02}:{:02}", now.tm_hour, now.tm_min);
     }
     else {
-        time = std::format("{:2}:{:02} {}", (now.tm_hour + 11) % 12 + 1, now.tm_min, now.tm_hour < 12 ? "AM" : "PM");
+        time = std::format("{:02}:{:02} {}", (now.tm_hour + 11) % 12 + 1, now.tm_min, now.tm_hour < 12 ? "AM" : "PM");
     }
 
     if (std::get<BoolValue>(this->showDate)) {
