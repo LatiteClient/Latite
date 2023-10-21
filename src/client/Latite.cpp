@@ -201,7 +201,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (scriptMgrBuf) ScriptManager();
     new (rendererBuf) Renderer();
     new (assetsBuf) Assets();
-    new (keyboardBuf) Keyboard(reinterpret_cast<int*>(Signatures::KeyMap.result));
 
     for (auto& entry : sigList) {
         if (!entry.first->mod) continue;
@@ -221,6 +220,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 #if LATITE_DEBUG
     Logger::Info("Resolved {} signatures ({} dead)", sigCount, deadCount);
 #endif
+    new (keyboardBuf) Keyboard(reinterpret_cast<int*>(Signatures::KeyMap.result));
 
     Logger::Info(XOR_STRING("Waiting for user"));
 
