@@ -28,10 +28,10 @@ namespace SDK {
 
     struct TextMeasureData {
         float textSize = 10.f;
-        int i1 = 0;
+        float linePadding = 0.f;
         bool displayShadow = false;
         bool showColorSymbols = false;
-        bool b3 = false;
+        bool hideHyphen = false;
 
         constexpr TextMeasureData(float textSize, bool displayShadow, bool showColorSymbols)
             : textSize(textSize), displayShadow(displayShadow), showColorSymbols(showColorSymbols) {
@@ -39,7 +39,10 @@ namespace SDK {
     };
 
     // A pointer to 0xFFFFFFFF by default
-    using CaretMeasureData = uintptr_t*;
+    struct CaretMeasureData {
+        int position = -1;
+        bool shouldRender = false;
+    };
 
 
     class MinecraftUIRenderContext {
@@ -51,8 +54,8 @@ namespace SDK {
         virtual void getLineLength(class Font*,  std::string const&,  float,  bool) = 0; // 0x1
         virtual float getTextAlpha() = 0; // 0x2
         virtual void setTextAlpha(float) = 0; // 0x3
-        virtual void drawDebugText(RectangleArea const&,  std::string const&,  Color const&,  float,  ui::TextAlignment,  TextMeasureData const&, CaretMeasureData) = 0; // 0x4
-        virtual void drawText(class Font*, RectangleArea const&, std::string const&, Color const&, float, ui::TextAlignment, TextMeasureData const&, CaretMeasureData) = 0; // 0x5
+        virtual void drawDebugText(RectangleArea const&,  std::string const&,  Color const&,  float,  ui::TextAlignment,  TextMeasureData const&, CaretMeasureData const&) = 0; // 0x4
+        virtual void drawText(class Font*, RectangleArea const&, std::string const&, Color const&, float, ui::TextAlignment, TextMeasureData const&, CaretMeasureData const&) = 0; // 0x5
         virtual void flushText(float) = 0; // 0x6
         virtual void drawImage(TexturePtr const&, Vec2 const&, Vec2 const&, Vec2 const&, Vec2 const&) = 0; // 0x7
         virtual void drawNineslice(TexturePtr const&, void* const&) = 0; // 0x8

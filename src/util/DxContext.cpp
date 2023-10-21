@@ -395,7 +395,7 @@ void MCDrawUtil::drawRoundedRectangle(RectF rect, d2d::Color const& color, float
 }
 
 void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlign, bool cache) {
-	static uintptr_t caretMeasure = 0xFFFFFFFF;
+	SDK::CaretMeasureData caretMeasure{};
 
 	float newTop = rc.top;
 	float vSize = (size * guiScale) / this->font->getLineHeight();
@@ -413,7 +413,7 @@ void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color 
 	
 	RectF rMod = rc;
 	rMod.top = newTop;
-	renderCtx->drawText(this->font, getRect(rMod), util::WStrToStr(text), color, color.a, (SDK::ui::TextAlignment)alignment, SDK::TextMeasureData((size * guiScale) / this->font->getLineHeight(), Latite::get().shouldRenderTextShadows(), false), &caretMeasure);
+	renderCtx->drawText(this->font, getRect(rMod), util::WStrToStr(text), color, color.a, (SDK::ui::TextAlignment)alignment, SDK::TextMeasureData((size * guiScale) / this->font->getLineHeight(), Latite::get().shouldRenderTextShadows(), false), caretMeasure);
 }
 
 Vec2 MCDrawUtil::getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace, bool cache) {
