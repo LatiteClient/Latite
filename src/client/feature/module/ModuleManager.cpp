@@ -7,6 +7,7 @@
 #include "impl/game/Zoom.h"
 #include "impl/game/CinematicCamera.h"
 #include "impl/game/ToggleSprintSneak.h"
+#include "impl/game/BehindYou.h"
 
 #include "impl/visual/Fullbright.h"
 #include "impl/visual/MotionBlur.h"
@@ -54,6 +55,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<CinematicCamera>());
 	this->items.push_back(std::make_shared<HealthWarning>());
 	this->items.push_back(std::make_shared<BreakIndicator>());
+	this->items.push_back(std::make_shared<BehindYou>());
 
 	for (auto& mod : items) {
 		mod->onInit();

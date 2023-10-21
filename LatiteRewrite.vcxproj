@@ -321,6 +321,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="deps\include\vhook\vtable_hook.h" />
+    <ClInclude Include="src\client\event\impl\HideHandEvent.h" />
+    <ClInclude Include="src\client\event\impl\PerspectiveEvent.h" />
+    <ClInclude Include="src\client\feature\module\impl\game\BehindYou.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\HealthWarning.h" />
     <ClInclude Include="src\client\event\Events.h" />
     <ClInclude Include="src\client\event\impl\BobMovementEvent.h" />
@@ -564,6 +567,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="deps\include\vhook\vtable_hook.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\game\BehindYou.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\HealthWarning.cpp" />
     <ClCompile Include="src\client\feature\command\impl\SignCommand.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\BreakIndicator.cpp" />

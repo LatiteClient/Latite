@@ -684,6 +684,15 @@
     <ClInclude Include="src\client\feature\module\script\JsHudModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\event\impl\PerspectiveEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\event\impl\HideHandEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\game\BehindYou.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1041,6 +1050,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\script\class\impl\JsHudModuleClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\game\BehindYou.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

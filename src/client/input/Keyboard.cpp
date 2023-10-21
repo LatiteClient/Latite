@@ -50,7 +50,7 @@ void Keyboard::findTextInput() {
 			}
 			else {
 
-				DWORD dwChars = 0;
+				uint64_t dwChars = 0;
 				DWORD dwScanCode = 0;
 				(reinterpret_cast<WORD*>(&dwScanCode))[1] = keyMapAdjusted[i];
 				int res = ToUnicode(i, dwScanCode, winKeyMap, (LPWSTR) & dwChars, 4, 0);

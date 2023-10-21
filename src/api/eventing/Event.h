@@ -7,7 +7,7 @@ public:
 	Event(Event&&) = delete;
 	Event() {}
 
-	[[nodiscard]] bool isCancellable() { return cancellable; }
+	[[nodiscard]] bool isCancellable() const { return cancellable; }
 protected:
 	bool cancellable = false;
 private:
@@ -24,7 +24,7 @@ public:
 		cancel = b;
 	}
 
-	[[nodiscard]] bool isCancelled() {
+	[[nodiscard]] bool isCancelled() const {
 		return cancel;
 	}
 };

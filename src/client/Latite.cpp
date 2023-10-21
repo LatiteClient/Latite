@@ -131,7 +131,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         { "1.19.51", SDK::V1_19_51 },
         { "1.18.12", SDK::V1_18_12 },
         { "1.18.10", SDK::V1_18_12 },
-        { "1.16.40", SDK::V1_18_12 }
     };
 
     if (versNumMap.contains(Latite::get().gameVersion)) {
@@ -158,6 +157,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Offset::MinecraftGame_cursorGrabbed),
         MVSIG(Components::moveInputComponent),
         MVSIG(Options_getGamma),
+        MVSIG(Options_getPerspective),
+        MVSIG(Options_getHideHand),
         MVSIG(ClientInstance_grabCursor),
         MVSIG(ClientInstance_releaseCursor),
         MVSIG(Level_tick),

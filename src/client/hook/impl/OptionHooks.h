@@ -3,7 +3,8 @@
 
 class OptionHooks : public HookGroup {
 private:
-	static float __fastcall Options_getGamma(void* options);
+	static float Options_getGamma(void* options);
+	static int Options_getPerspective(void* options);
 public:
 	OptionHooks();
 };
