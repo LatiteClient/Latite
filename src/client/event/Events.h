@@ -21,5 +21,6 @@
 #include "impl/RenderLayerEvent.h"
 #include "impl/RenderLevelEvent.h"
 #include "impl/RenderOverlayEvent.h"
+#include "impl/SensitivityEvent.h"
 #include "impl/TickEvent.h"
 #include "impl/UpdateEvent.h"

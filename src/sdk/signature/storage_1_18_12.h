@@ -71,6 +71,10 @@ public:
 		"48 83 ec ? 80 b9 ? ? ? ? ? 48 8d 54 24 ? 48 8b 01 74 ? 41 b8 ? ? ? ? ff 50 ? 48 8b 10 48 85 d2 74 ? 48 8b 42 ? 48 8b 88 ? ? ? ? 48 85 c9 74 ? e8 ? ? ? ? 48 83 c4 ? c3 0f b6 42 ? 48 83 c4 ? c3 41 b8 ? ? ? ? ff 50 ? 48 8b 10 48 85 d2 75 ? e8 ? ? ? ? cc e8 ? ? ? ? cc cc cc cc cc cc cc cc cc cc cc 48 83 ec ? 48 8b 05",
 		"Options::getHideHand"};
 
+	inline static SigImpl Options_getSensitivity{[](memory::signature_store&, uintptr_t res) { return res; },
+		"4c 8b d1 44 0f b6 ca 49 bb ? ? ? ? ? ? ? ? 48 b8 ? ? ? ? ? ? ? ? 4c 33 c8 8b c2 4d 0f af cb c1 e8 ? 44 0f b6 c0 8b c2 4d 33 c8 c1 e8 ? 4d 8b 42 ? 4d 0f af cb 0f b6 c8 4c 33 c9 8b c2 49 8b 4a ? 4d 0f af cb 48 c1 e8 ? 4c 33 c8 4d 0f af cb 49 23 c9 4d 8b 4a",
+		"Options::getSensitivity"};
+
 	// manual indices for 1.18.12
 
 	inline static SigImpl ClientInstance_grabCursor{};

@@ -159,6 +159,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Options_getGamma),
         MVSIG(Options_getPerspective),
         MVSIG(Options_getHideHand),
+        MVSIG(Options_getSensitivity),
         MVSIG(ClientInstance_grabCursor),
         MVSIG(ClientInstance_releaseCursor),
         MVSIG(Level_tick),
