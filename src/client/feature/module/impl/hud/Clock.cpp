@@ -18,7 +18,7 @@ std::string Clock::getTimeString() {
         time = std::format("{:02}:{:02}", now.tm_hour, now.tm_min);
     }
     else {
-        time = std::format("{:02}:{:02} {}", (now.tm_hour + 11) % 12 + 1, now.tm_min, now.tm_hour < 12 ? "AM" : "PM");
+        time = std::format("{}:{:02} {}", (now.tm_hour + 11) % 12 + 1, now.tm_min, now.tm_hour < 12 ? "AM" : "PM");
     }
 
     if (std::get<BoolValue>(this->showDate)) {
