@@ -29,15 +29,6 @@ TestModule::TestModule() : Module("TestModule", "TestModule", "Module for testin
 }
 
 void TestModule::onTick(Event& evGeneric) {
-	auto inst = SDK::ClientInstance::get();
-	if (inst->getLocalPlayer()) {
-		Logger::Info("{}", inst->getLocalPlayer()->getCommandPermissionLevel());
-		SDK::TextPacket pkt{};
-		String s{};
-		s.setString("hello");
-		pkt.chat(s);
-		inst->getLocalPlayer()->packetSender->sendToServer(pkt);
-	}
 }
 
 void TestModule::onRender(Event& ev) {
@@ -47,5 +38,16 @@ void TestModule::onRender(Event& ev) {
 void TestModule::onKey(Event& ev)
 {
 	[[maybe_unused]] auto& kev = reinterpret_cast<KeyUpdateEvent&>(ev);
+	if (kev.getKey() == 'K') {
+		auto lp = SDK::ClientInstance::get()->getLocalPlayer();
+		if (lp) {
+			std::string str;
+			auto& map = lp->molangVariableMap;
+			for (auto& var : map.mVariables) {
+				str += "\"" + var->mName.getString() + "\" |\n";
+			}
+			util::SetClipboardText(util::StrToWStr(str));
+		}
+	}
 }
 

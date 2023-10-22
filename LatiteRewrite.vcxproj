@@ -499,6 +499,8 @@
     <ClInclude Include="src\sdk\common\network\packet\SetTitlePacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\TextPacket.h" />
     <ClInclude Include="src\sdk\common\network\RakPeer.h" />
+    <ClInclude Include="src\sdk\common\util\MolangVariable.h" />
+    <ClInclude Include="src\sdk\common\util\MolangVariableMap.h" />
     <ClInclude Include="src\sdk\common\world\actor\player\GameMode.h" />
     <ClInclude Include="src\sdk\common\world\actor\player\Inventory.h" />
     <ClInclude Include="src\sdk\common\world\actor\player\PlayerInventory.h" />

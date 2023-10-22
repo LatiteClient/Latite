@@ -8,7 +8,6 @@
 #include "../../../JsScript.h"
 
 JsValueRef JsEntityClass::entityIsValid(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyArgCount(argCount, 1)) return Chakra::GetFalse();
 	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent) {
@@ -19,7 +18,6 @@ JsValueRef JsEntityClass::entityIsValid(JsValueRef callee, bool isConstructor, J
 }
 
 JsValueRef JsEntityClass::entityGetPos(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyArgCount(argCount, 1)) return Chakra::GetUndefined();
 	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
@@ -41,7 +39,6 @@ JsValueRef JsEntityClass::entityGetPos(JsValueRef callee, bool isConstructor, Js
 }
 
 JsValueRef JsEntityClass::entityGetRot(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyArgCount(argCount, 1)) return Chakra::GetUndefined();
 	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
@@ -174,6 +171,61 @@ JsValueRef JsEntityClass::entityGetSaturation(JsValueRef callee, bool isConstruc
 		Chakra::ThrowError(L"Access denied, cannot use getSaturation");
 		return JS_INVALID_REFERENCE;
 	}
+	Chakra::ThrowError(L"Invalid entity");
+	return JS_INVALID_REFERENCE;
+}
+
+JsValueRef JsEntityClass::entityGetVariable(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsString } }));
+
+	JsEntity* ent = nullptr;
+	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
+
+	auto str = util::WStrToStr(Chakra::GetString(arguments[1]));
+
+	if (ent && ent->getEntity()) {
+		for (auto& var : ent->getEntity()->molangVariableMap.mVariables) {
+			if (var->mName.getString().starts_with(XOR_STRING("variable."))) {
+				if (var->mName == str) {
+					// create it
+					JsValueRef obj;
+					JS::JsCreateObject(&obj);
+					Chakra::SetProperty(obj, util::StrToWStr(XOR_STRING("number")), Chakra::MakeDouble(var->mValue.mPOD.mFloat));
+					return obj;
+				}
+			}
+		}
+		return Chakra::GetNull();
+	}
+
+	Chakra::ThrowError(L"Invalid entity");
+	return JS_INVALID_REFERENCE;
+}
+
+JsValueRef JsEntityClass::entitySetVariable(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 3)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsString }, {arguments[2], JsNumber}}));
+
+	JsEntity* ent = nullptr;
+	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
+
+	auto str = util::WStrToStr(Chakra::GetString(arguments[1]));
+	auto newVal = Chakra::GetNumber(arguments[2]);
+
+	if (ent && ent->getEntity()) {
+		for (auto& var : ent->getEntity()->molangVariableMap.mVariables) {
+			if (var->mName.getString().starts_with(XOR_STRING("variable."))) {
+				if (var->mName == str) {
+					// create it
+					var->mValue.mPOD.mFloat = static_cast<float>(newVal);
+					return arguments[2];
+				}
+			}
+		}
+		return Chakra::GetNull();
+	}
+
 	Chakra::ThrowError(L"Invalid entity");
 	return JS_INVALID_REFERENCE;
 }
