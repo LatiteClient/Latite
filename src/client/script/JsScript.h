@@ -77,15 +77,18 @@ public:
 		long long time;
 		int id;
 		JsValueRef callback;
+		JsContextRef context;
 
 		JsTimeout(int id, long long time, JsValueRef callback)
 			: createTime(std::chrono::system_clock::now()),
 			id(id), time(time), callback(callback) {
 			JS::JsAddRef(callback, nullptr);
+			JS::JsGetCurrentContext(&context);
 		}
 
 		~JsTimeout() {
 			JS::JsRelease(callback, nullptr);
+			JS::JsRelease(context, nullptr);
 		}
 	};
 

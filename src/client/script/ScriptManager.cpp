@@ -31,7 +31,7 @@ ScriptManager::ScriptManager() {
 
 std::shared_ptr<JsScript> ScriptManager::loadScript(std::wstring const& folderPath, bool run)
 {
-	auto fPathW = folderPath;
+	auto& fPathW = folderPath;
 	auto scriptsPathW = util::GetLatitePath() / ("Scripts");
 	auto scriptPath = scriptsPathW / fPathW / "index.js";
 	if (!std::filesystem::exists(scriptPath)) return nullptr;
@@ -44,11 +44,11 @@ std::shared_ptr<JsScript> ScriptManager::loadScript(std::wstring const& folderPa
 	}
 
 	auto myScript = std::make_shared<JsScript>(scriptPath);
+	myScript->runtime = this->runtime;
 	myScript->relFolderPath = fPathW;
 	if (!myScript->load()) return nullptr;
 	myScript->loadScriptObjects();
 	myScript->loadJSApi();
-	//loadScriptingObjects(myScript);
 	this->items.push_back(myScript);
 
 	if (run) {
@@ -156,6 +156,7 @@ void ScriptManager::runScriptingOperations()
 			auto now = std::chrono::system_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - it->createTime);
 			if (duration.count() > it->time) {
+				JS::JsSetCurrentContext(it->context);
 				JsValueRef res;
 				handleErrors(Chakra::CallFunction(it->callback, &it->callback, 1, &res));
 				JS::JsRelease(res, nullptr);
@@ -170,6 +171,7 @@ void ScriptManager::runScriptingOperations()
 			auto now = std::chrono::system_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - tim.createTime);
 			if (duration.count() > tim.time) {
+				JS::JsSetCurrentContext(tim.context);
 				JsValueRef res;
 				handleErrors(Chakra::CallFunction(tim.callback, &tim.callback, 1, &res));
 				JS::JsRelease(res, nullptr);
@@ -353,8 +355,7 @@ bool ScriptManager::scriptingSupported() {
 	return JS::JsAddRef;
 }
 
-void ScriptManager::uninitialize()
-{
+void ScriptManager::uninitialize() {
 	for (auto& script : this->items) {
 		popScript(script);
 	}
