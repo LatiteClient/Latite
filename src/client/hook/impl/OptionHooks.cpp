@@ -13,8 +13,8 @@ namespace {
 	std::shared_ptr<Hook> getSensitivityHook;
 }
 
-float OptionHooks::Options_getGamma(void* options) {
-	auto o = getGammaHook->oFunc<decltype(&Options_getGamma)>()(options);
+float OptionHooks::Options_getGamma(void* options, void* a2) {
+	auto o = getGammaHook->oFunc<decltype(&Options_getGamma)>()(options, a2);
 	GammaEvent ev{ o };
 	Eventing::get().dispatch(ev);
 	return o;
@@ -34,8 +34,8 @@ bool OptionHooks::Options_getHideHand(void* options) {
 	return o;
 }
 
-float OptionHooks::Options_getSensitivity(void* options) {
-	auto o = getSensitivityHook->oFunc<decltype(&Options_getSensitivity)>()(options);
+float OptionHooks::Options_getSensitivity(void* options, unsigned int a2) {
+	auto o = getSensitivityHook->oFunc<decltype(&Options_getSensitivity)>()(options, a2);
 	SensitivityEvent ev{ o };
 	Eventing::get().dispatch(ev);
 	return o;
