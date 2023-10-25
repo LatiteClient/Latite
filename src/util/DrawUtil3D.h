@@ -15,5 +15,6 @@ public:
 
     void setMaterial(SDK::MaterialPtr* material) { this->material = material; }
 
-    void drawLine(Vec3 const& pos1, Vec3 const& pos2, d2d::Color const& color);
+    void drawLine(Vec3 const& pos1, Vec3 const& pos2, d2d::Color const& color, bool immediate = false);
+    void flush();
 }
