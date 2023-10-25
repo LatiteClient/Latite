@@ -44,7 +44,6 @@ std::shared_ptr<JsScript> ScriptManager::loadScript(std::wstring const& folderPa
 	}
 
 	auto myScript = std::make_shared<JsScript>(scriptPath);
-	myScript->runtime = this->runtime;
 	myScript->relFolderPath = fPathW;
 	if (!myScript->load()) return nullptr;
 	myScript->loadScriptObjects();
