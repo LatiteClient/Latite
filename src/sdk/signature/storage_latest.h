@@ -206,6 +206,14 @@ public:
 	inline static SigImpl MeshHelpers_renderMeshImmediately{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5c 24 ? 48 89 74 24 ? 57 48 81 ec ? ? ? ? 49 8b f8 48 8b da 48 8b f1 80 ba",
 		"MeshHelpers::renderMeshImmediately"};
+
+	inline static SigImpl BaseActorRenderContext_BaseActorRenderContext{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 48 89 4C 24 ?? 57 48 83 EC ?? 49 8B F8 48 8B DA 48 8B F1 48 8D 05",
+		"BaseActorRenderContext::BaseActorRenderContext"};
+
+	inline static SigImpl ItemRenderer_renderGuiItemNew{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? 48 81 c3 ? ? ? ? 4c 89 65",
+		"ItemRenderer::renderGuiItemNew"};
 };
 
 // after adding sigs here, add them in latite.cpp
