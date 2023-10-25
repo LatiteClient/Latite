@@ -62,6 +62,6 @@ void Zoom::onHideHand(Event& evG) {
 void Zoom::onSensitivity(Event& evG) {
 	auto& ev = reinterpret_cast<SensitivityEvent&>(evG);
 	if (shouldZoom && std::get<BoolValue>(this->dpiAdjust)) {
-		ev.getValue() = ev.getValue() * (1 / std::get<FloatValue>(modifier));
+		ev.getValue() = std::min(ev.getValue(), ev.getValue() * (2 / std::get<FloatValue>(modifier)));
 	}
 }
