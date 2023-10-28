@@ -71,7 +71,7 @@ uint8_t SDK::Actor::getEntityTypeID() {
 }
 
 void SDK::Actor::swing() {
-	return memory::callVirtual<void>(this, MV_DETAIL_GETOFFSET<0xC4, 0xDB, 0xDC>());
+	return memory::callVirtual<void>(this, SDK::mvGetOffset<0xC4, 0xDB, 0xDC>());
 }
 
 bool SDK::Actor::isPlayer() {
@@ -79,7 +79,7 @@ bool SDK::Actor::isPlayer() {
 }
 
 SDK::AttributeInstance* SDK::Actor::getAttribute(SDK::Attribute& attribute) {
-	return memory::callVirtual<SDK::AttributeInstance*>(this, MV_DETAIL_GETOFFSET<0xB8, 0xCF, 0xD0>(), attribute);
+	return memory::callVirtual<SDK::AttributeInstance*>(this, SDK::mvGetOffset<0xB8, 0xCF, 0xD0>(), attribute);
 }
 
 float SDK::Actor::getHealth() {

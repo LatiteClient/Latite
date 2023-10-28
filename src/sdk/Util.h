@@ -29,40 +29,42 @@ namespace util {
 	}
 }
 
-template <int offs_1_20_40, int offs_1_20_30, int offs_1_18_12, int offs_1_19_51>
-extern inline const int MV_DETAIL_GETOFFSET() {
-	switch (SDK::internalVers) {
-	case SDK::V1_20_40:
-		return offs_1_20_40;
-	case SDK::V1_20_30:
-		return offs_1_20_30;
-	case SDK::V1_19_51:
-		reutrn offs_1_19_51;
-		break;
-	case SDK::V1_18_12:
-		return offs_1_18_12;
-	default:
-		// Don't want to do anything in release mode so we don't bloat the compiled code too much
+namespace SDK {
+	template <int offs_1_20_40, int offs_1_20_30, int offs_1_18_12, int offs_1_19_51>
+	extern inline const int mvGetOffset() {
+		switch (SDK::internalVers) {
+		case SDK::V1_20_40:
+			return offs_1_20_40;
+		case SDK::V1_20_30:
+			return offs_1_20_30;
+		case SDK::V1_19_51:
+			reutrn offs_1_19_51;
+			break;
+		case SDK::V1_18_12:
+			return offs_1_18_12;
+		default:
+			// Don't want to do anything in release mode so we don't bloat the compiled code too much
 #ifdef LATITE_DEBUG
-		__debugbreak();
+			__debugbreak();
 #endif
-		return 0;
+			return 0;
+		}
 	}
-}
 
-template <int offs_1_20_30, int offs_1_18_12, int offs_1_19_51>
-extern inline const int MV_DETAIL_GETOFFSET() {
-	switch (SDK::internalVers) {
-	case SDK::VLATEST:
-	case SDK::V1_20_30:
-		return offs_1_20_30;
-		break;
-	case SDK::V1_19_51:
-		reutrn offs_1_19_51;
-		break;
-	case SDK::V1_18_12:
-		return offs_1_18_12;
-		break;
+	template <int offs_1_20_30, int offs_1_18_12, int offs_1_19_51>
+	extern inline const int mvGetOffset() {
+		switch (SDK::internalVers) {
+		case SDK::VLATEST:
+		case SDK::V1_20_30:
+			return offs_1_20_30;
+			break;
+		case SDK::V1_19_51:
+			reutrn offs_1_19_51;
+			break;
+		case SDK::V1_18_12:
+			return offs_1_18_12;
+			break;
+		}
 	}
 }
 
@@ -72,5 +74,5 @@ extern inline const int MV_DETAIL_GETOFFSET() {
     template<typename T> void __set_field_##name(const T &value) { util::directAccess<type>(this, offset) = value; }
 
 #define MVCLASS_FIELD(type, name, ...) __declspec(property(get = __get_field_##name, put = __set_field_##name)) type name;                             \
-	type& __get_field_##name() const { return util::directAccess<type>(this, MV_DETAIL_GETOFFSET<__VA_ARGS__>()); }                                    \
-	template<typename T> void __set_field_##name(const T& value) { util::directAccess<type>(this, (MV_DETAIL_GETOFFSET<__VA_ARGS__>())) = value; }
+	type& __get_field_##name() const { return util::directAccess<type>(this, SDK::mvGetOffset<__VA_ARGS__>()); }                                    \
+	template<typename T> void __set_field_##name(const T& value) { util::directAccess<type>(this, (SDK::mvGetOffset<__VA_ARGS__>())) = value; }
