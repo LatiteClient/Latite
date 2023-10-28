@@ -64,6 +64,12 @@ namespace SDK {
 		case SDK::V1_18_12:
 			return offs_1_18_12;
 			break;
+		default:
+			// Don't want to do anything in release mode so we don't bloat the compiled code too much
+#ifdef LATITE_DEBUG
+			__debugbreak();
+#endif
+			return 0;
 		}
 	}
 }
