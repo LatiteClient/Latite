@@ -30,10 +30,13 @@ void HUDEditor::onRender(Event& ev) {
 	D2DUtil dc;
 	bool mcRenderer = Latite::get().useMinecraftRenderer();
 
+	std::vector<d2d::Rect> maskRects = {};
+
 	if (isActive()) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 			if (mod->isHud()) {
 				auto rMod = reinterpret_cast<HUDModule*>(mod.get());
+				if (mcRenderer || rMod->forceMinecraftRenderer()) maskRects.push_back(rMod->getRect());
 				if (rMod->isActive()) return;
 				addLayer(rMod->getRect());
 			}
@@ -43,19 +46,17 @@ void HUDEditor::onRender(Event& ev) {
 		auto alpha = Latite::getRenderer().getDeltaTime() / 10.f;
 		anim = std::lerp(anim, 1.f, alpha);
 
-		if (!mcRenderer) {
-			float toBlur = Latite::get().getMenuBlur().value_or(0.f);
-			if (Latite::get().getMenuBlur()) dc.drawGaussianBlur(toBlur * anim);
-		}
+		float toBlur = Latite::get().getMenuBlur().value_or(0.f);
+		if (Latite::get().getMenuBlur()) dc.drawGaussianBlur(toBlur * anim);
 		// cut out stuff, for movable scoreboard and paperdoll in future
-/*
-		for (auto& control : controls) {
+
+		for (auto& control : maskRects) {
 			auto bmp = Latite::getRenderer().getCopiedBitmap(control);
 
 			dc.ctx->DrawBitmap(bmp);
 
 			bmp->Release();
-		}*/
+		}
 
 		auto& cursorPos = SDK::ClientInstance::get()->cursorPos;
 
@@ -135,15 +136,16 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 				}
 				});
 		}
-	}
 
-	if (!mcRenderer) return;
+		if (!mcRenderer) {
+			this->renderModules(ev.getUIRenderContext(), true);
+			return;
+		}
 
-	if (ev.getScreenView()->visualTree->rootControl->name == "debug_screen") {
-		MCDrawUtil dc = { ev.getUIRenderContext(), Latite::get().getFont()};
+		MCDrawUtil dc = { ev.getUIRenderContext(), Latite::get().getFont() };
 
-		auto ss = SDK::ClientInstance::get()->getGuiData()->screenSize;
-		if (isActive()) dc.fillRectangle({ 0.f, 0.f, ss.x, ss.y }, { 0.4f, 0.4f, 0.4f, 0.4f * this->anim });
+		auto& ss = SDK::ClientInstance::get()->getGuiData()->screenSize;
+		//if (isActive()) dc.fillRectangle({ 0.f, 0.f, ss.x, ss.y }, { 0.4f, 0.4f, 0.4f, 0.4f * this->anim });
 		dc.setImmediate(false);
 
 		this->renderModules(ev.getUIRenderContext());
@@ -204,17 +206,18 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 	//}
 }
 
-void HUDEditor::renderModules(SDK::MinecraftUIRenderContext* ctx) {
-	bool shouldDraw = true;
+void HUDEditor::renderModules(SDK::MinecraftUIRenderContext* ctx, bool forceMinecraftOnly) {
 	if (!isActive()) {
 		DrawHUDModulesEvent ev{};
-		shouldDraw = !Eventing::get().dispatch(ev); // not cancelled
+		if (Eventing::get().dispatch(ev)) return; // if cancelled
 	}
-
-	if (!shouldDraw) return;
 
 	if (isActive() || SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
+
+			if (!Latite::get().useMinecraftRenderer()) {
+				if ((forceMinecraftOnly || Latite::get().useMinecraftRenderer()) ^ static_cast<Module*>(mod.get())->forceMinecraftRenderer()) return;
+			}
 			if (mod->isHud() && mod->isEnabled() && reinterpret_cast<HUDModule*>(mod.get())->isActive()) {
 				auto hudModule = static_cast<HUDModule*>(mod.get());
 				renderModule(hudModule, ctx);

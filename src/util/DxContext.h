@@ -32,7 +32,7 @@ public:
 	/// Draws text. Be careful when setting cache to true
 	virtual void drawText(RectF const& rc, std::wstring const& text, d2d::Color const& color, Renderer::FontSelection font, float size = 30.f, DWRITE_TEXT_ALIGNMENT alignment = DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT verticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR, bool cache = true) = 0;
 	/// Be careful when setting cache to true
-	virtual Vec2 getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace = true, bool cache = true) = 0;
+	virtual Vec2 getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace = true, bool cache = true, std::optional<Vec2> bounds = std::nullopt) = 0;
 	/// Be careful when setting cache to true
 	virtual RectF getTextRect(std::wstring const& text, Renderer::FontSelection font, float size, float pad = 0.f, bool cache = true) = 0;
 
@@ -75,7 +75,7 @@ public:
 	virtual void fillRoundedRectangle(RectF const& rect, d2d::Color const& color, float radius = 10.f) override;
 	virtual void drawRoundedRectangle(RectF, d2d::Color const& color, float radius = 10.f, float lineThickness = 1.f, OutlinePosition outPos = OutlinePosition::Center) override;
 	virtual void drawText(RectF const& rc, std::wstring const& text, d2d::Color const& color, Renderer::FontSelection font, float size = 30.f, DWRITE_TEXT_ALIGNMENT alignment = DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT verticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR, bool cache = true) override;
-	virtual Vec2 getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace = true, bool cache = true) override;
+	virtual Vec2 getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace = true, bool cache = true, std::optional<Vec2> bounds = std::nullopt) override;
 	virtual RectF getTextRect(std::wstring const& text, Renderer::FontSelection font, float size, float pad = 0.f, bool cache = true) override;
 };
 
@@ -101,6 +101,6 @@ public:
 	virtual void fillRoundedRectangle(RectF const& rect, d2d::Color const& color, float radius = 10.f) override;
 	virtual void drawRoundedRectangle(RectF, d2d::Color const& color, float radius = 10.f, float lineThickness = 1.f, OutlinePosition outPos = OutlinePosition::Center) override;
 	virtual void drawText(RectF const& rc, std::wstring const& text, d2d::Color const& color, Renderer::FontSelection font, float size = 30.f, DWRITE_TEXT_ALIGNMENT alignment = DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT verticalAlign = DWRITE_PARAGRAPH_ALIGNMENT_NEAR, bool cache = true) override;
-	virtual Vec2 getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace = true, bool cache = true) override;
+	virtual Vec2 getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace = true, bool cache = true, std::optional<Vec2> bounds = std::nullopt) override;
 	virtual RectF getTextRect(std::wstring const& text, Renderer::FontSelection font, float size, float pad = 0.f, bool cache = true) override;
 };

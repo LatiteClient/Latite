@@ -27,9 +27,6 @@ namespace SDK {
     private:
         void* empty[4];
 
-        BedrockTextureData() {
-        }
-
         ~BedrockTextureData() {
         }
     };

@@ -34,6 +34,8 @@ public:
 		Eventing::get().listen<Event>(this, (EventListenerFunc)listener, priority, callWhenInactive);
 	}
 
+	[[nodiscard]] virtual bool forceMinecraftRenderer() { return false; };
+
 	void loadConfig(SettingGroup& resolvedGroup) override;
 	std::shared_ptr<Setting> addSetting(std::string const& internalName, std::string const& displayName, std::string const& desc, ValueType& val, Setting::Condition condition = Setting::Condition());
 	std::shared_ptr<Setting> addEnumSetting(std::string const& internalName, std::string const& displayName, std::string const& desc, EnumData& dat, Setting::Condition condition = Setting::Condition());

@@ -45,7 +45,7 @@ JsValueRef Clipboard::getBitmap(JsValueRef callee, bool isConstructor, JsValueRe
     size_t size = GlobalSize(hData);
 
     JsValueRef arr;
-    JS::JsCreateTypedArray(JsTypedArrayType::JsArrayTypeUint8, nullptr, 0, size, &arr);
+    JS::JsCreateTypedArray(JsTypedArrayType::JsArrayTypeUint8, nullptr, 0, static_cast<unsigned int>(size), &arr);
 
     BYTE* chakraData;
     JS::JsGetTypedArrayStorage(arr, &chakraData, nullptr, nullptr, nullptr);

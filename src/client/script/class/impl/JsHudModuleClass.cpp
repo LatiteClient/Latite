@@ -87,6 +87,6 @@ JsValueRef JsHudModuleClass::hudModuleSetSize(JsValueRef callee, bool isConstruc
 		return Chakra::GetUndefined();
 	}
 
-	mod->setScale(Chakra::GetNumber(arguments[1]));
+	mod->setScale(static_cast<float>(Chakra::GetNumber(arguments[1])));
 	return Chakra::GetUndefined();
 }
