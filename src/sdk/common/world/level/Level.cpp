@@ -41,7 +41,7 @@ std::vector<SDK::Actor*> SDK::Level::getRuntimeActorList() {
 }
 
 std::unordered_map<UUID, SDK::PlayerListEntry>* SDK::Level::getPlayerList() {
-	return memory::callVirtual<std::unordered_map<UUID, SDK::PlayerListEntry>*>(this, MV_DETAIL_GETOFFSET(0x120, 0x128, 0x137));
+	return memory::callVirtual<std::unordered_map<UUID, SDK::PlayerListEntry>*>(this, MV_DETAIL_GETOFFSET<0x120, 0x128, 0x137>());
 }
 
 SDK::HitResult* SDK::Level::getHitResult() {
@@ -81,5 +81,5 @@ SDK::HitResult* SDK::Level::getLiquidHitResult() {
 }
 
 bool SDK::Level::isClientSide() {
-	return memory::callVirtual<bool>(this, MV_DETAIL_GETOFFSET(0x11F, 0x12B, 0x127));
+	return memory::callVirtual<bool>(this, MV_DETAIL_GETOFFSET<0x11F, 0x12B, 0x127>());
 }

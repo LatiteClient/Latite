@@ -44,5 +44,5 @@ SDK::MoveInputComponent* SDK::Player::getMoveInputComponent() {
 }
 
 std::string SDK::Player::getXUID() {
-	return memory::callVirtual<std::string>(this, MV_DETAIL_GETOFFSET(0x18C, 0x1B6, 0x1BC));
+	return memory::callVirtual<std::string>(this, MV_DETAIL_GETOFFSET<0x18C, 0x1B6, 0x1BC>());
 }
