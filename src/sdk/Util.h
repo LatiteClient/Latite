@@ -38,7 +38,7 @@ namespace SDK {
 		case SDK::V1_20_30:
 			return offs_1_20_30;
 		case SDK::V1_19_51:
-			reutrn offs_1_19_51;
+			return offs_1_19_51;
 			break;
 		case SDK::V1_18_12:
 			return offs_1_18_12;
@@ -59,7 +59,7 @@ namespace SDK {
 			return offs_1_20_30;
 			break;
 		case SDK::V1_19_51:
-			reutrn offs_1_19_51;
+			return offs_1_19_51;
 			break;
 		case SDK::V1_18_12:
 			return offs_1_18_12;
