@@ -6,22 +6,7 @@
 #include "sdk/signature/storage.h"
 
 void SDK::Player::displayClientMessage(std::string const& message) {
-	int index = 0;
-	switch (SDK::internalVers) {
-	case V1_18_12:
-		index = 0x184;
-		break;
-	case V1_19_41:
-		index = 0x18C;
-		break;
-	case V1_19_51:
-		index = 0x18A;
-		break;
-	default:
-		index = 0x15E;
-		break;
-	}
-	memory::callVirtual<void>(this, index, message);
+	memory::callVirtual<void>(this, mvGetOffset<0xEF, 0x15E, 0x184, 0x18A>(), message);
 }
 
 SDK::MoveInputComponent* SDK::Player::getMoveInputComponent() {
@@ -44,5 +29,5 @@ SDK::MoveInputComponent* SDK::Player::getMoveInputComponent() {
 }
 
 std::string SDK::Player::getXUID() {
-	return memory::callVirtual<std::string>(this, SDK::mvGetOffset<0x18C, 0x1B6, 0x1BC>());
+	return memory::callVirtual<std::string>(this, SDK::mvGetOffset<0x112, 0x18C, 0x1B6, 0x1BC>());
 }

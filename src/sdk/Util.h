@@ -51,6 +51,7 @@ namespace SDK {
 		}
 	}
 
+	// TODO: keep note of this
 	template <int offs_1_20_30, int offs_1_18_12, int offs_1_19_51>
 	extern inline const int mvGetOffset() {
 		switch (SDK::internalVers) {
