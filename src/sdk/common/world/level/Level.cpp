@@ -22,21 +22,8 @@ void SDK::Level::playSoundEvent(std::string const& text, Vec3 const& pos, float 
 std::vector<SDK::Actor*> SDK::Level::getRuntimeActorList() {
 	std::vector<Actor*> list;
 
-	int index = 0;
-	switch (SDK::internalVers) {
-	case V1_18_12:
-		index = 0x12D;
-		break;
-	//case V1_19_41:
-	case V1_19_51:
-		index = 0x13C;
-		break;
-	default:
-		index = 0x125;
-		break;
-	}
-
-	memory::callVirtual<void, std::vector<Actor*>&>(this, index, list);
+	// TODO: this might return a vector too?
+	memory::callVirtual<void, std::vector<Actor*>&>(this, mvGetOffset<0x125, 0x12D, 0x13C>(), list);
 	return list;
 }
 
