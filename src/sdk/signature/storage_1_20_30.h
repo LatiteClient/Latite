@@ -210,6 +210,8 @@ public:
 	inline static SigImpl ItemRenderer_renderGuiItemNew{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? 48 81 c3 ? ? ? ? 4c 89 65",
 		"ItemRenderer::renderGuiItemNew"};
+
+	inline static SigImpl Actor_getAttribute{};
 };
 
 // after adding sigs here, add them in latite.cpp

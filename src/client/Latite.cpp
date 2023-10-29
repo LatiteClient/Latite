@@ -198,6 +198,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(MeshHelpers_renderMeshImmediately),
         MVSIG(BaseActorRenderContext_BaseActorRenderContext),
         MVSIG(ItemRenderer_renderGuiItemNew),
+        MVSIG(Actor_getAttribute),
             };
     
     new (mmgrBuf) ModuleManager;

@@ -41,15 +41,7 @@ Vec3& SDK::Actor::getPosOld() {
 }
 
 int SDK::Actor::getCommandPermissionLevel() {
-	if (internalVers <= V1_18_12) {
-		return memory::callVirtual<int>(this, 0xCC);
-	}
-
-	if (internalVers <= V1_19_51) {
-		return memory::callVirtual<int>(this, 0xCD);
-	}
-
-	return memory::callVirtual<int>(this, 0xB5);
+	return memory::callVirtual<int>(this, mvGetOffset<0x7C, 0xB5, 0xCC, 0xCD>());
 }
 
 int64_t SDK::Actor::getRuntimeID() {
@@ -60,18 +52,11 @@ int64_t SDK::Actor::getRuntimeID() {
 }
 
 uint8_t SDK::Actor::getEntityTypeID() {
-	if (internalVers <= V1_18_12) {
-		return memory::callVirtual<int>(this, 0xAA);
-	}
-	if (internalVers <= V1_19_51) {
-		return memory::callVirtual<int>(this, 0xAC);
-	}
-
-	return memory::callVirtual<int>(this, 0x97);
+	return memory::callVirtual<int>(this, mvGetOffset<0x64, 0x97, 0xAA, 0xAC>());
 }
 
 void SDK::Actor::swing() {
-	return memory::callVirtual<void>(this, SDK::mvGetOffset<0xC4, 0xDB, 0xDC>());
+	return memory::callVirtual<void>(this, SDK::mvGetOffset<0x86, 0xC4, 0xDB, 0xDC>());
 }
 
 bool SDK::Actor::isPlayer() {
@@ -79,6 +64,10 @@ bool SDK::Actor::isPlayer() {
 }
 
 SDK::AttributeInstance* SDK::Actor::getAttribute(SDK::Attribute& attribute) {
+	if (internalVers >= V1_20_40) {
+		return reinterpret_cast<AttributeInstance*(__fastcall*)(Actor*, Attribute&)>(Signatures::Actor_getAttribute.result)(this, attribute);
+	}
+
 	return memory::callVirtual<SDK::AttributeInstance*>(this, SDK::mvGetOffset<0xB8, 0xCF, 0xD0>(), attribute);
 }
 

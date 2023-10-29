@@ -194,6 +194,8 @@ public:
 	inline static SigImpl ItemRenderer_renderGuiItemNew{[](memory::signature_store&, uintptr_t res) { return res; },
 		"40 53 55 56 57 41 54 41 55 41 56 41 57 48 81 ec ? ? ? ? 0f 29 b4 24 ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 84 24 ? ? ? ? 45 8b e1",
 		"ItemRenderer::renderGuiItemNew"};
+
+	inline static SigImpl Actor_getAttribute{};
 };
 
 
