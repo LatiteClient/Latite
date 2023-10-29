@@ -71,8 +71,10 @@ namespace {
 
 #define MVSIG(...) ([]() -> std::pair<SigImpl*, SigImpl*> {\
 if (SDK::internalVers == SDK::VLATEST) return {&Signatures::__VA_ARGS__, &Signatures::__VA_ARGS__};\
-else { if (SDK::internalVers == SDK::V1_19_51) { return {&Signatures_1_19_51::__VA_ARGS__, &Signatures::__VA_ARGS__}; }return {&Signatures_1_18_12::__VA_ARGS__, &Signatures::__VA_ARGS__}; }\
-})()
+if (SDK::internalVers == SDK::V1_20_30) { return {&Signatures_1_20_30::__VA_ARGS__, &Signatures::__VA_ARGS__}; } \
+if (SDK::internalVers == SDK::V1_19_51) { return {&Signatures_1_19_51::__VA_ARGS__, &Signatures::__VA_ARGS__}; } \
+return {&Signatures_1_18_12::__VA_ARGS__, &Signatures::__VA_ARGS__}; }\
+)()
 
 namespace {
     AuthWindow* wnd = nullptr;
@@ -124,9 +126,10 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int deadCount = 0;
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
-        { "1.20.32", SDK::VLATEST },
-        { "1.20.31", SDK::VLATEST },
-        { "1.20.30", SDK::VLATEST },
+        { "1.20.40", SDK::V1_20_40 },
+        { "1.20.32", SDK::V1_20_30 },
+        { "1.20.31", SDK::V1_20_30 },
+        { "1.20.30", SDK::V1_20_30 },
         { "1.19.50", SDK::V1_19_51 },
         { "1.19.51", SDK::V1_19_51 },
         { "1.18.12", SDK::V1_18_12 },
@@ -139,7 +142,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     }
     else {
         std::stringstream ss;
-        ss << "Latite Client does not support your version: " << Latite::get().gameVersion << ". Latite only supports the following versions:\n\n";
+        ss << XOR_STRING("Latite Client does not support your version: ") << Latite::get().gameVersion << XOR_STRING(". Latite only supports the following versions:\n\n");
 
         for (auto& key : versNumMap) {
             ss << key.first << "\n";
@@ -147,6 +150,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
         Logger::Warn(ss.str());
     }
+
+    Logger::Info(XOR_STRING("Minecraft SDK version {}"), SDK::internalVers);
 
     std::vector<std::pair<SigImpl*, SigImpl*>> sigList = {
         MVSIG(Misc::clientInstance),
@@ -618,9 +623,9 @@ std::string Latite::getTextAsset(int resource) {
 
 namespace {
     winrt::Windows::Foundation::IAsyncAction doDownloadAssets() {
-#ifndef LATITE_PUBLIC
+//#ifndef LATITE_PUBLIC
         Logger::Info("Downloading ChakraCore");
-#endif
+//#endif
 
         auto http = HttpClient();
 
@@ -762,7 +767,7 @@ void Latite::onFocusLost(Event& evGeneric) {
 
 void Latite::onSuspended(Event& ev) {
     Latite::getConfigManager().saveCurrentConfig();
-    Logger::Info("Saved config");
+    Logger::Info(XOR_STRING("Saved config"));
 }
 
 void Latite::onBobView(Event& ev) {

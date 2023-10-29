@@ -534,6 +534,7 @@
     <ClInclude Include="src\sdk\signature\storage_1_16_40.h" />
     <ClInclude Include="src\sdk\signature\storage_1_18_12.h" />
     <ClInclude Include="src\sdk\signature\storage_1_19_51.h" />
+    <ClInclude Include="src\sdk\signature\storage_1_20_30.h" />
     <ClInclude Include="src\sdk\signature\storage_latest.h" />
     <ClInclude Include="src\sdk\String.h" />
     <ClInclude Include="src\sdk\Util.h" />

@@ -1,8 +1,4 @@
 #pragma once
-#ifndef LATITE_DEBUG
-#define API_NAMES
-#endif
-
 
 class Signatures_1_19_51 {
 public:
