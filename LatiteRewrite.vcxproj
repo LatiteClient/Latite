@@ -482,9 +482,11 @@
     <ClInclude Include="src\sdk\common\client\gui\ScreenView.h" />
     <ClInclude Include="src\sdk\common\client\input\ClientInputHandler.h" />
     <ClInclude Include="src\sdk\common\client\input\RemappingLayout.h" />
+    <ClInclude Include="src\sdk\common\client\renderer\game\BaseActorRenderContext.h" />
     <ClInclude Include="src\sdk\common\client\renderer\game\LevelRenderer.h" />
     <ClInclude Include="src\sdk\common\client\renderer\game\LevelRendererPlayer.h" />
     <ClInclude Include="src\sdk\common\client\renderer\HudPlayerRenderer.h" />
+    <ClInclude Include="src\sdk\common\client\renderer\ItemRenderer.h" />
     <ClInclude Include="src\sdk\common\client\renderer\MaterialPtr.h" />
     <ClInclude Include="src\sdk\common\client\renderer\MatrixStack.h" />
     <ClInclude Include="src\sdk\common\client\renderer\MeshUtils.h" />
@@ -671,7 +673,9 @@
     <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp" />
     <ClCompile Include="src\sdk\common\client\game\MinecraftGame.cpp" />
     <ClCompile Include="src\sdk\common\client\input\RemappingLayout.cpp" />
+    <ClCompile Include="src\sdk\common\client\renderer\game\BaseActorRenderContext.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\game\LevelRendererPlayer.cpp" />
+    <ClCompile Include="src\sdk\common\client\renderer\ItemRenderer.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\MaterialPtr.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\MeshUtils.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\Tessellator.cpp" />
