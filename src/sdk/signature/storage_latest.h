@@ -212,8 +212,9 @@ public:
 		"e8 ? ? ? ? 48 81 c3 ? ? ? ? 4c 89 65",
 		"ItemRenderer::renderGuiItemNew"};
 
+	// TODO: this is actually BaseAttributeMap::getInstance
 	inline static SigImpl Actor_getAttribute{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"e8 ? ? ? ? 8b 90 ? ? ? ? 89 57",
+		"e8 ? ? ? ? 48 8d 54 24 ? f3 0f 10 b0",
 		"Actor::getAttribute"};
 };
 
