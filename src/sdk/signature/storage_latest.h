@@ -1,9 +1,6 @@
 #pragma once
-#ifndef LATITE_DEBUG
-#define API_NAMES
-#endif
 
-
+// 1.20.40.1
 class Signatures {
 public:
 	struct Offset {
@@ -23,7 +20,7 @@ public:
 	struct Misc {
 		inline static SigImpl clientInstance{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			// god what a fat signature
-			"48 8b 0d ? ? ? ? 48 89 43 ? 48 8b c3 48 89 3b c6 43 ? ? 48 89 4b ? 48 8b 5c 24 ? 48 83 c4 ? 5f c3 33 c0 48 8b cf 48 89 03 88 43 ? 48 89 43 ? 48 89 43 ? e8 ? ? ? ? 48 8b c3 48 8b 5c 24 ? 48 83 c4 ? 5f c3 cc 48 89 5c 24 ? 48 89 74 24 ? 57 48 83 ec ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 44 24 ? 48 8b da 48 8b f1 48 89 4c 24 ? 48 8d 0d ? ? ? ? e8 ? ? ? ? 85 c0 0f 95 c1 85 c0 74 ? 48 8b 05 ? ? ? ? 48 85 c0 75 ? 40 b7 ? eb ? 84 c9 74 ? 48 8d 0d ? ? ? ? e8 ? ? ? ? 40 32 ff 40 88 7c 24 ? 40 84 ff 75 ? 48 8d 0d ? ? ? ? e8 ? ? ? ? 40 b7 ? 40 88 7c 24 ? 48 85 db 0f 84 ? ? ? ? 48 c7 05 ? ? ? ? ? ? ? ? 48 8b 0d ? ? ? ? 48 c7 05 ? ? ? ? ? ? ? ? 48 85 c9 74 ? e8 ? ? ? ? 48 8b 43 ? 48 85 c0 74 ? f0 ff 40 ? 0f b6 7c 24 ? 48 8b 43 ? 48 8b 53 ? 48 89 15 ? ? ? ? 48 8b 0d ? ? ? ? 48 89 05 ? ? ? ? 48 85 c9 74 ? e8 ? ? ? ? 48 8b 15 ? ? ? ? 48 8b 12 48 89 16 40 84 ff 74 ? 48 8d 0d ? ? ? ? e8 ? ? ? ? 48 8b c6 48 8b 4c 24 ? 48 33 cc e8 ? ? ? ? 48 8b 5c 24 ? 48 8b 74 24 ? 48 83 c4 ? 5f c3 e8 ? ? ? ? 90 cc cc cc 48 89 5c 24 ? 57 48 83 ec ? 48 8b 19",
+			"48 8b 0d ? ? ? ? 48 85 c9 74 ? 48 83 39 ? 74 ? 48 8b 05 ? ? ? ? 48 85 c0 74 ? f0 ff 40 ? 48 8b 05 ? ? ? ? 48 8b 0d ? ? ? ? 48 89 43 ? 48 8b c3 48 89 3b c6 43 ? ? 48 89 4b ? 48 8b 5c 24 ? 48 83 c4 ? 5f c3 33 c0 48 8b cf 48 89 03 88 43 ? 48 89 43 ? 48 89 43 ? e8 ? ? ? ? 48 8b c3 48 8b 5c 24 ? 48 83 c4 ? 5f c3 cc 48 89 5c 24 ? 48 89 74 24 ? 48 89 4c 24 ? 57 48 83 ec ? 48 8b f9 33 f6 89 31 48 89 71 ? 48 89 71 ? 48 83 c1 ? e8 ? ? ? ? 90 48 8d 4f ? 48 89 31 48 89 71 ? 48 89 71 ? 48 c7 47 ? ? ? ? ? 48 c7 47 ? ? ? ? ? c7 07 ? ? ? ? 4c 8b 47 ? 8d 56 ? e8 ? ? ? ? 90 48 8b c7 48 8b 5c 24 ? 48 8b 74 24 ? 48 83 c4 ? 5f c3 cc cc cc cc cc cc cc cc cc cc cc cc cc cc 40 53 48 83 ec ? 48 8b d9 48 8b 49 ? 48 85 c9 74 ? 48 8b 43 ? 48 8b 53",
 			"ClientInstance"};
 		//
 		inline static SigImpl clickMap{[](memory::signature_store& store, uintptr_t) { return store.deref(2); },
@@ -214,6 +211,11 @@ public:
 	inline static SigImpl ItemRenderer_renderGuiItemNew{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? 48 81 c3 ? ? ? ? 4c 89 65",
 		"ItemRenderer::renderGuiItemNew"};
+
+	// TODO: this is actually BaseAttributeMap::getInstance
+	inline static SigImpl Actor_getAttribute{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? 48 8d 54 24 ? f3 0f 10 b0",
+		"Actor::getAttribute"};
 };
 
 // after adding sigs here, add them in latite.cpp

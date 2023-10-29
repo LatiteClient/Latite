@@ -1,4 +1,9 @@
 #pragma once
+
+#ifdef LATITE_DEBUG
+#define API_NAMES
+#endif
+
 #include "api/memory/signature/signature.h"
 
 /*
@@ -16,6 +21,7 @@ public:
 };
 
 #include "storage_latest.h"
+#include "storage_1_20_30.h"
 #include "storage_1_19_51.h"
 #include "storage_1_18_12.h"
 #include "storage_1_16_40.h"

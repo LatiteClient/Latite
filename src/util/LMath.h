@@ -8,8 +8,16 @@
 static constexpr float pi_f = 3.1415926535f;
 
 namespace LatiteMath {
+	static constexpr float abs(float f) {
+		return f < 0.f ? -f : f;
+	}
+
 	static constexpr float deg2rad(float deg) {
 		return deg * (pi_f / 180.f);
+	}
+
+	static constexpr bool aequals(float a, float b) {
+		return abs(b - a) < 0.01f;
 	}
 }
 
@@ -43,11 +51,11 @@ struct Vec3 final {
 	constexpr Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
 	//constexpr Vec3(struct Vec3i const& vec);
 
-	constexpr Vec3 operator-(Vec3& right) {
+	constexpr Vec3 operator-(Vec3 const& right) const {
 		return { right.x - x, right.y - y, right.z - z };
 	}
 
-	constexpr Vec3 operator+(Vec3& right) {
+	constexpr Vec3 operator+(Vec3 const& right) const {
 		return { right.x + x, right.y + y, right.z + z };
 	}
 

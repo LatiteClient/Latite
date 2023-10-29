@@ -12,7 +12,10 @@ SDK::ClientInstance* SDK::ClientInstance::get() {
         evalPtr = *reinterpret_cast<uintptr_t*>(evalPtr);
 
 #ifdef LATITE_BETA
-        int offs = MV_DETAIL_GETOFFSET(Latite::get().cInstOffs + 0x10, Latite::get().cInstOffs + 0x10, Latite::get().cInstOffs2 + 0x10);
+        int offs = Latite::get().cInstOffs + 0x10;
+        if (SDK::internalVers == V1_19_51) {
+            offs = Latite::get().cInstOffs2 + 0x10;
+        }
 #else
         int offs = 0x58;
         if (SDK::internalVers == SDK::V1_19_51) offs = 0x48;
@@ -35,7 +38,12 @@ SDK::BlockSource* SDK::ClientInstance::getRegion() {
 
 SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
 #ifdef LATITE_BETA
-    return memory::callVirtual<LocalPlayer*>(this, MV_DETAIL_GETOFFSET(Latite::get().plrOffs, Latite::get().plrOffs2, Latite::get().plrOffs2));
+    int offs = Latite::get().plrOffs;
+    if (SDK::internalVers <= V1_19_51) {
+        offs = Latite::get().cInstOffs2;
+    }
+
+    return memory::callVirtual<LocalPlayer*>(this, offs);
 #else
     if (SDK::internalVers == SDK::V1_18_12 || SDK::internalVers == SDK::V1_19_51) {
         return memory::callVirtual<LocalPlayer*>(this, 0x18);

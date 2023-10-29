@@ -26,6 +26,7 @@ namespace SDK {
 		Vec3& getVelocity();
 		Vec3& getPos();
 		Vec3& getPosOld();
+
 		int getCommandPermissionLevel();
 		int64_t getRuntimeID();
 		uint8_t getEntityTypeID();

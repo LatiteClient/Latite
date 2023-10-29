@@ -22,26 +22,13 @@ void SDK::Level::playSoundEvent(std::string const& text, Vec3 const& pos, float 
 std::vector<SDK::Actor*> SDK::Level::getRuntimeActorList() {
 	std::vector<Actor*> list;
 
-	int index = 0;
-	switch (SDK::internalVers) {
-	case V1_18_12:
-		index = 0x12D;
-		break;
-	//case V1_19_41:
-	case V1_19_51:
-		index = 0x13C;
-		break;
-	default:
-		index = 0x125;
-		break;
-	}
-
-	memory::callVirtual<void, std::vector<Actor*>&>(this, index, list);
+	// TODO: this might return a vector too?
+	memory::callVirtual<void, std::vector<Actor*>&>(this, mvGetOffset<0x125, 0x12D, 0x13C>(), list);
 	return list;
 }
 
 std::unordered_map<UUID, SDK::PlayerListEntry>* SDK::Level::getPlayerList() {
-	return memory::callVirtual<std::unordered_map<UUID, SDK::PlayerListEntry>*>(this, MV_DETAIL_GETOFFSET(0x120, 0x128, 0x137));
+	return memory::callVirtual<std::unordered_map<UUID, SDK::PlayerListEntry>*>(this, SDK::mvGetOffset<0x120, 0x128, 0x137>());
 }
 
 SDK::HitResult* SDK::Level::getHitResult() {
@@ -81,5 +68,5 @@ SDK::HitResult* SDK::Level::getLiquidHitResult() {
 }
 
 bool SDK::Level::isClientSide() {
-	return memory::callVirtual<bool>(this, MV_DETAIL_GETOFFSET(0x11F, 0x12B, 0x127));
+	return memory::callVirtual<bool>(this, SDK::mvGetOffset<0x11F, 0x12B, 0x127>());
 }

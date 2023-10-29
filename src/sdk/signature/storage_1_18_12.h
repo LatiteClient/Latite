@@ -1,7 +1,4 @@
 #pragma once
-#ifndef LATITE_DEBUG
-#define API_NAMES
-#endif
 
 class Signatures_1_18_12 {
 public:
@@ -184,6 +181,8 @@ public:
 	inline static SigImpl ItemRenderer_renderGuiItemNew{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 8b c4 53 55 56 57 41 54 41 55 41 56 41 57 48 81 ec ? ? ? ? 0f 29 70 ? 0f 29 78 ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 84 24 ? ? ? ? 44 89 8c 24",
 		"ItemRenderer::renderGuiItemNew"};
+
+	inline static SigImpl Actor_getAttribute{};
 };
 
 // after adding sigs here, add them in latite.cpp

@@ -1,7 +1,9 @@
+#include "pch.h"
 #include "DrawUtil3D.h"
 #include "sdk/common/client/renderer/MeshUtils.h"
+#include <sdk/common/client/renderer/Tessellator.h>
 
-MCDrawUtil3D::MCDrawUtil3D(SDK::LevelRenderer* renderer, SDK::ScreenContext* ctx, SDK:MaterialPtr* material)
+MCDrawUtil3D::MCDrawUtil3D(SDK::LevelRenderer* renderer, SDK::ScreenContext* ctx, SDK::MaterialPtr* material)
     : levelRenderer(renderer), screenContext(ctx), material(material) {
     
     if (!material) {
@@ -9,22 +11,28 @@ MCDrawUtil3D::MCDrawUtil3D(SDK::LevelRenderer* renderer, SDK::ScreenContext* ctx
     }
 }
 
-void MCDrawUtil3D::drawLine(Vec3 const& pos1, Vec3 const& pos2, d2d::Color const& color, bool immediate) {
+void MCDrawUtil3D::drawLine(Vec3 const& p1, Vec3 const& p2, d2d::Color const& color, bool immediate) {
     auto scn = screenContext;
 	auto tess = scn->tess;
 	*scn->shaderColor = {1.f,1.f,1.f,1.f};
-	tess->begin(4, 1); // linestrip
+	tess->begin(SDK::Primitive::Linestrip , 1); // linestrip
 	tess->color(color);
-	auto origin = levelRenderer->getLevelRendererPlayer()->origin;
-	a = a - origin;
-	b = b - origin;
+	auto& origin = levelRenderer->getLevelRendererPlayer()->getOrigin();
+	Vec3 a = p1;
+	Vec3 b = p2;
 
+	a.x -= origin.x;
+	a.y -= origin.y;
+	a.z -= origin.z;
+
+	b.x -= origin.x;
+	b.y -= origin.y;
+	b.z -= origin.z;
 	tess->vertex(a.x, a.y, a.z);
 	tess->vertex(b.x, b.y, b.z);
-	//renderImm(scn, tess, DrawUtils::GetClipMaterial());
     if (immediate) flush();
 }
 
 void MCDrawUtil3D::flush() {
-    MeshHelpers::renderMeshImmediately(screenContext, screenContext->tess, material);
+    SDK::MeshHelpers::renderMeshImmediately(screenContext, screenContext->tess, material);
 }
