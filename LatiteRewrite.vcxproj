@@ -404,6 +404,8 @@
     <ClInclude Include="src\client\feature\module\impl\hud\PingDisplay.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\SpeedDisplay.h" />
     <ClInclude Include="src\client\feature\module\impl\game\ToggleSprintSneak.h" />
+    <ClInclude Include="src\client\feature\module\impl\visual\ChunkBorders.h" />
+    <ClInclude Include="src\client\feature\module\impl\visual\Hitboxes.h" />
     <ClInclude Include="src\client\feature\module\script\JsHudModule.h" />
     <ClInclude Include="src\client\feature\module\TextModule.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\InputLagTest.h" />
@@ -542,6 +544,7 @@
     <ClInclude Include="src\sdk\Util.h" />
     <ClInclude Include="src\sdk\Version.h" />
     <ClInclude Include="src\util\ChakraUtil.h" />
+    <ClInclude Include="src\util\DrawUtil3D.h" />
     <ClInclude Include="src\util\FNV32.h" />
     <ClInclude Include="src\util\DxContext.h" />
     <ClInclude Include="src\util\DxUtil.h" />
@@ -609,7 +612,9 @@
     <ClCompile Include="src\client\feature\module\impl\hud\ServerDisplay.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\SpeedDisplay.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\Screenshot.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\visual\ChunkBorders.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\Fullbright.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\visual\Hitboxes.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\HurtColor.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\MotionBlur.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\Zoom.cpp" />
@@ -689,6 +694,7 @@
     <ClCompile Include="src\sdk\deps\Application\AppPlatform.cpp" />
     <ClCompile Include="src\sdk\misc\ClickMap.cpp" />
     <ClCompile Include="src\util\ChakraUtil.cpp" />
+    <ClCompile Include="src\util\DrawUtil3D.cpp" />
     <ClCompile Include="src\util\DxContext.cpp" />
     <ClCompile Include="src\util\DxUtil.cpp" />
     <ClCompile Include="src\util\Logger.cpp" />

@@ -12,6 +12,8 @@
 #include "impl/visual/Fullbright.h"
 #include "impl/visual/MotionBlur.h"
 #include "impl/visual/HurtColor.h"
+#include "impl/visual/Hitboxes.h"
+#include "impl/visual/ChunkBorders.h"
 
 #include "impl/hud/FPSCounter.h"
 #include "impl/hud/CPSCounter.h"
@@ -56,6 +58,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<HealthWarning>());
 	this->items.push_back(std::make_shared<BreakIndicator>());
 	this->items.push_back(std::make_shared<BehindYou>());
+	this->items.push_back(std::make_shared<ChunkBorders>());
 
 	for (auto& mod : items) {
 		mod->onInit();

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ItemRenderer.h"
 
 void SDK::ItemRenderer::renderGuiItemNew(SDK::BaseActorRenderContext* baseActorRenderContext, SDK::ItemStack* itemStack, int mode, float x, float y, float opacity, float scale, float a9, bool ench) {

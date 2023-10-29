@@ -36,7 +36,10 @@ public:
 	/// Be careful when setting cache to true
 	virtual RectF getTextRect(std::wstring const& text, Renderer::FontSelection font, float size, float pad = 0.f, bool cache = true) = 0;
 
+	/// Flushes the content to the screen.
 	virtual void flush(bool text = true, bool mesh = true) {}
+
+	/// Sets whether the content will be immediately flushed to the screen (if supported)
 	void setImmediate(bool b) { immediate = b; }
 
 	DrawUtil() = default;

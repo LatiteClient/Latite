@@ -72,13 +72,16 @@ SDK::AttributeInstance* SDK::Actor::getAttribute(SDK::Attribute& attribute) {
 }
 
 float SDK::Actor::getHealth() {
+	return 20.f;
 	return getAttribute(SDK::Attributes::Health)->value;
 }
 
 float SDK::Actor::getHunger() {
+	return 20.f;
 	return getAttribute(SDK::Attributes::Hunger)->value;
 }
 
 float SDK::Actor::getSaturation() {
+	return 20.f;
 	return getAttribute(SDK::Attributes::Saturation)->value;
 }
