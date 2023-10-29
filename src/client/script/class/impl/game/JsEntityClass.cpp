@@ -177,7 +177,7 @@ JsValueRef JsEntityClass::entityGetSaturation(JsValueRef callee, bool isConstruc
 
 JsValueRef JsEntityClass::entityGetVariable(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
-	if (!Chakra::VerifyParameters({ { arguments[1], JsString } }));
+	if (!Chakra::VerifyParameters({ { arguments[1], JsString } })) return JS_INVALID_REFERENCE;
 
 	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
@@ -205,7 +205,7 @@ JsValueRef JsEntityClass::entityGetVariable(JsValueRef callee, bool isConstructo
 
 JsValueRef JsEntityClass::entitySetVariable(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 3)) return JS_INVALID_REFERENCE;
-	if (!Chakra::VerifyParameters({ { arguments[1], JsString }, {arguments[2], JsNumber}}));
+	if (!Chakra::VerifyParameters({ { arguments[1], JsString }, {arguments[2], JsNumber}})) return JS_INVALID_REFERENCE;
 
 	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));

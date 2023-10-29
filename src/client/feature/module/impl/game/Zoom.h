@@ -11,15 +11,20 @@ public:
 	Zoom();
 	~Zoom() = default;
 
+private:
 	void onRenderLevel(Event& ev);
 	void onKeyUpdate(Event& ev);
 	void onCinematicCamera(Event& ev);
-private:
+	void onHideHand(Event& ev);
+	void onSensitivity(Event& ev);
+	
 	ValueType zoomKey = KeyValue('C');
 	ValueType modifier = FloatValue(15.f);
 	ValueType hasAnim = BoolValue(false);
 	ValueType animSpeed = FloatValue(2.f);
 	ValueType cinematicCam = BoolValue(true);
+	ValueType hideHand = BoolValue(true);
+	ValueType dpiAdjust = BoolValue(true);
 
 	float activeModifier = 1.f;
 	float modifyTo = 1.f;

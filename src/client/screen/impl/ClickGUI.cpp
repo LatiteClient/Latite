@@ -381,7 +381,12 @@ void ClickGUI::onRender(Event&) {
 				rr.radiusY = searchRound;
 				rr.rect = nodeRect.get();
 				auto solidBrush = rend.getSolidBrush();
-				solidBrush->SetColor(std::get<2>(pair).get());
+				if (this->modTab == std::get<1>(pair)) {
+					solidBrush->SetColor((std::get<2>(pair) + 0.3f).get());
+				}
+				else {
+					solidBrush->SetColor(std::get<2>(pair).get());
+				}
 				dc.ctx->FillRoundedRectangle(rr, rend.getSolidBrush());
 
 				dc.drawText(nodeRect, std::get<0>(pair), {1.f, 1.f, 1.f, 0.8f}, FontSelection::SegoeRegular, nodeRect.getHeight() / 2.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
@@ -1097,7 +1102,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 		RectF innerSliderRect = { sliderRect.left + innerPad, sliderRect.top + innerPad, sliderRect.right - innerPad, sliderTop + (rect.getHeight() * 0.017730f) - innerPad };
 
 		std::wstringstream valuew;
-		valuew << std::fixed << std::setprecision(2) << std::get<FloatValue>(*set->value);
+		valuew << std::get<FloatValue>(*set->value);
 
 		RectF rightRect = { sliderRect.right, sliderRect.top, pos.x + size, sliderRect.bottom };
 		RectF rtRect = rightRect.translate(0.f, -(sliderRect.getHeight() / 2.f));
@@ -1154,7 +1159,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 
 		dc.brush->SetColor(d2d::Color(0xB9, 0xB9, 0xB9).get());
 		dc.ctx->FillEllipse(D2D1::Ellipse({ innerSliderRect.right, sliderRect.centerY() }, sliderRect.getHeight() * 0.6f, sliderRect.getHeight() * 0.6f), dc.brush);
-		return rtTextRect.top + dc.getTextSize(namew.str(), Renderer::FontSelection::SegoeSemilight, textSz).y;
+		return rtTextRect.top + dc.getTextSize(namew.str(), Renderer::FontSelection::SegoeSemilight, textSz, false, true, Vec2{rtTextRect.getWidth(), rtTextRect.getHeight()}).y;
 	}
 		break;
 	default:

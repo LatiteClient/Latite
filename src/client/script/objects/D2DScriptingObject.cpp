@@ -106,10 +106,10 @@ JsValueRef D2DScriptingObject::drawTextCallback(JsValueRef callee, bool isConstr
 
 	auto pos = JsVec2::ToVec2(arguments[1]);
 	auto text = Chakra::GetString(arguments[2]);
-	auto size = Chakra::GetNumber(arguments[3]);
+	auto size = static_cast<float>(Chakra::GetNumber(arguments[3]));
 	auto color = JsColor::ToColor(arguments[4]);
 
-	auto ss = SDK::ClientInstance::get()->getGuiData()->screenSize;
+	auto& ss = SDK::ClientInstance::get()->getGuiData()->screenSize;
 
 	d2d::Rect rc = { pos.x, pos.y, ss.x, ss.y };
 
@@ -132,7 +132,7 @@ JsValueRef D2DScriptingObject::drawTextFullCallback(JsValueRef callee, bool isCo
 
 	auto rect = JsRect::ToRect(arguments[1]);
 	auto text = Chakra::GetString(arguments[2]);
-	auto size = Chakra::GetNumber(arguments[3]);
+	auto size = static_cast<float>(Chakra::GetNumber(arguments[3]));
 	auto color = JsColor::ToColor(arguments[4]);
 	auto align = Chakra::GetInt(arguments[4]);
 	auto vertAlign = Chakra::GetInt(arguments[5]);
@@ -142,7 +142,7 @@ JsValueRef D2DScriptingObject::drawTextFullCallback(JsValueRef callee, bool isCo
 		return Chakra::GetUndefined();
 	}
 
-	auto ss = SDK::ClientInstance::get()->getGuiData()->screenSize;
+	auto& ss = SDK::ClientInstance::get()->getGuiData()->screenSize;
 
 	auto thi = reinterpret_cast<D2DScriptingObject*>(callbackState);
 	if (thi->usingMinecraftRend() && thi->cachedCtx) {

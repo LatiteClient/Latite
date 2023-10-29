@@ -14,6 +14,7 @@ public:
 		
 		addSetting("pos", "Position", "", storedPos);
 		addSliderSetting("scale", "Size", "", scale, FloatValue(min_scale), FloatValue(max_scale), FloatValue(0.05f));
+		addSetting("forceMinecraftRend", "Force Minecraft Renderer", "Whether or not to use the Minecraft renderer for this module.", forceMCRend);
 	}
 
 	virtual ~HUDModule() = default;
@@ -34,6 +35,7 @@ public:
 	[[nodiscard]] float getScale() { return std::get<FloatValue>(scale); }
 	[[nodiscard]] d2d::Rect getRect();
 	[[nodiscard]] d2d::Rect getRectNonScaled() { return rect; }
+	[[nodiscard]] virtual bool forceMinecraftRenderer() override { return std::get<BoolValue>(forceMCRend); }
 	
 	void setScale(float f) { std::get<FloatValue>(scale) = f; }
 	void setRect(d2d::Rect const& rc) { this->rect = rc; }
@@ -42,6 +44,7 @@ protected:
 	d2d::Rect rect = {};
 	ValueType storedPos = Vec2Value();
 	ValueType scale = FloatValue(1.f);
+	ValueType forceMCRend = BoolValue(false);
 	bool resizable;
 	bool active = true;
 public:

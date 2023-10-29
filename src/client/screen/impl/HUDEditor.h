@@ -15,7 +15,7 @@ private:
 	void onRender(Event& ev);
 	void onClick(Event& ev);
 	void onRenderLayer(Event& ev);
-	void renderModules(SDK::MinecraftUIRenderContext* ctx);
+	void renderModules(SDK::MinecraftUIRenderContext* ctx, bool forceMinecraftOnly = false);
 	void renderModule(class HUDModule* mod, SDK::MinecraftUIRenderContext* ctx);
 	void doDragging();
 	void doSnapping(Vec2 const&);

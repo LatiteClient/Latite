@@ -153,12 +153,18 @@ void D2DUtil::drawText(RectF const& rc, std::wstring const& ws, d2d::Color const
 	}
 }
 
-Vec2 D2DUtil::getTextSize(std::wstring const& ws, Renderer::FontSelection font, float size, bool tw, bool cache) {
+Vec2 D2DUtil::getTextSize(std::wstring const& ws, Renderer::FontSelection font, float size, bool tw, bool cache, std::optional<Vec2> bounds) {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	auto ss = ctx->GetPixelSize();
 	if (auto layout = Latite::getRenderer().getLayout(fmt.Get(), ws, cache)) {
-		layout->SetMaxWidth(static_cast<float>(ss.width));
-		layout->SetMaxHeight(static_cast<float>(ss.height));
+		if (!bounds.has_value()) {
+			layout->SetMaxWidth(static_cast<float>(ss.width));
+			layout->SetMaxHeight(static_cast<float>(ss.height));
+		}
+		else {
+			layout->SetMaxWidth(bounds->x);
+			layout->SetMaxHeight(bounds->y);
+		}
 		DWRITE_TEXT_RANGE range;
 		range.startPosition = 0;
 		range.length = static_cast<UINT32>(ws.size());
@@ -181,7 +187,6 @@ Vec2 D2DUtil::getTextSize(std::wstring const& ws, Renderer::FontSelection font, 
 d2d::Rect D2DUtil::getTextRect(std::wstring const& ws, Renderer::FontSelection font, float size, float pad, bool cache) {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	auto ss = ctx->GetPixelSize();
-	ComPtr<IDWriteTextLayout> layout;
 	if (auto layout = Latite::getRenderer().getLayout(fmt.Get(), ws, cache)) {
 		layout->SetMaxWidth(static_cast<float>(ss.width));
 		layout->SetMaxHeight(static_cast<float>(ss.height));
@@ -416,7 +421,7 @@ void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color 
 	renderCtx->drawText(this->font, getRect(rMod), util::WStrToStr(text), color, color.a, (SDK::ui::TextAlignment)alignment, SDK::TextMeasureData((size * guiScale) / this->font->getLineHeight(), Latite::get().shouldRenderTextShadows(), false), caretMeasure);
 }
 
-Vec2 MCDrawUtil::getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace, bool cache) {
+Vec2 MCDrawUtil::getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace, bool cache, std::optional<Vec2> bounds) {
 	return { this->font->getLineLength(util::WStrToStr(text), (size * guiScale) / this->font->getLineHeight(), trailingWhitespace) / guiScale, this->font->getLineHeight() * size * guiScale};
 }
 

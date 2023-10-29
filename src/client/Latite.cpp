@@ -191,6 +191,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Tessellator_vertex),
         MVSIG(Tessellator_color),
         MVSIG(MeshHelpers_renderMeshImmediately),
+        MVSIG(BaseActorRenderContext_BaseActorRenderContext),
+        MVSIG(ItemRenderer_renderGuiItemNew),
             };
     
     new (mmgrBuf) ModuleManager;
