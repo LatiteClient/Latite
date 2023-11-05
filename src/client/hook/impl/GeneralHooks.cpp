@@ -241,8 +241,8 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	ChatScreenController_sendChatMesageHook = addHook(Signatures::ChatScreenController_sendChatMessage.result,
 		ChatScreenController_sendChatMessage, "ChatScreenController::sendChatMessage");
 
-	GameRenderer_renderCurrentFrameHook = addHook(Signatures::GameRenderer__renderCurrentFrame.result,
-		GameRenderer_renderCurrentFrame, "GameRenderer::_renderCurrentFrame");
+	//GameRenderer_renderCurrentFrameHook = addHook(Signatures::GameRenderer__renderCurrentFrame.result,
+	//	GameRenderer_renderCurrentFrame, "GameRenderer::_renderCurrentFrame");
 
 	Keyboard_feedHook = addHook(Signatures::Keyboard_feed.result, Keyboard_feed, "Keyboard::feed");
 
