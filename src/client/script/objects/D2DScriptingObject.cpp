@@ -4,6 +4,7 @@
 #include "../class/impl/JsRect.h"
 #include "../class/impl/JsVec2.h"
 #include "util/DxContext.h"
+#include <client/script/class/impl/JsTextureClass.h>
 
 void D2DScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(object, useCallback, L"use", this);
@@ -11,6 +12,7 @@ void D2DScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(object, drawRectCallback, L"drawRect", this);
 	Chakra::DefineFunc(object, drawTextCallback, L"drawText", this);
 	Chakra::DefineFunc(object, drawTextFullCallback, L"drawTextFull", this);
+	Chakra::DefineFunc(object, drawImageCallback, L"drawTexture", this);
 }
 
 void D2DScriptingObject::onRenderOverlay(Event& ev) {
@@ -158,6 +160,32 @@ JsValueRef D2DScriptingObject::drawTextFullCallback(JsValueRef callee, bool isCo
 	return Chakra::GetUndefined();
 }
 
+JsValueRef D2DScriptingObject::drawImageCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 6, true)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject }, { arguments[3], JsNumber }, {arguments[4], JsNumber}, { arguments[5], JsObject, true }})) return JS_INVALID_REFERENCE;
+
+	auto texture = JsTextureClass::Get(arguments[1]);
+	auto pos = JsVec2::ToVec2(arguments[2]);
+	auto sx = (float)Chakra::GetNumber(arguments[3]);
+	auto sy = (float)Chakra::GetNumber(arguments[4]);
+	auto color = d2d::Colors::WHITE;
+
+	if (auto jval = Chakra::TryGet(arguments, argCount, 5)) {
+		color = JsColor::ToColor(jval);
+	}
+	
+	auto thi = reinterpret_cast<D2DScriptingObject*>(callbackState);
+	if (thi->usingMinecraftRend() && thi->cachedCtx && texture && texture->getTexture()) {
+		MCDrawUtil dc{ thi->cachedCtx, Latite::get().getFont() };
+		dc.drawImage(*texture->getTexture(), pos, { sx, sy }, color);
+		return Chakra::GetUndefined();
+	}
+
+	thi->operations.push({ thi->matrix, OpDrawImage{texture, pos, sx, sy, color} });
+
+	return Chakra::GetUndefined();
+}
+
 void D2DScriptingObject::DrawVisitor::operator()(OpDrawRect& op) {
 	D2DUtil dc;
 	dc.drawRectangle(op.rc, op.col, op.thickness);
@@ -171,4 +199,11 @@ void D2DScriptingObject::DrawVisitor::operator()(OpFillRect& op) {
 void D2DScriptingObject::DrawVisitor::operator()(OpDrawText& op) {
 	D2DUtil dc;
 	dc.drawText(op.rect, op.text, op.col, op.font, op.size, op.alignment, op.vertAlign);
+}
+
+void D2DScriptingObject::DrawVisitor::operator()(OpDrawImage& op) {
+	if (!op.texture->getBitmap()) return;
+	D2DUtil dc;
+	//dc.drawText(op.rect, op.text, op.col, op.font, op.size, op.alignment, op.vertAlign);
+	dc.ctx->DrawBitmap(op.texture->getBitmap(), { op.pos.x, op.pos.y, op.pos.x + op.sx, op.pos.y + op.sy });
 }

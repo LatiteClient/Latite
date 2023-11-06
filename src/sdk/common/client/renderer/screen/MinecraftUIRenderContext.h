@@ -57,7 +57,7 @@ namespace SDK {
         virtual void drawDebugText(RectangleArea const&,  std::string const&,  Color const&,  float,  ui::TextAlignment,  TextMeasureData const&, CaretMeasureData const&) = 0; // 0x4
         virtual void drawText(class Font*, RectangleArea const&, std::string const&, Color const&, float, ui::TextAlignment, TextMeasureData const&, CaretMeasureData const&) = 0; // 0x5
         virtual void flushText(float) = 0; // 0x6
-        virtual void drawImage(TexturePtr const&, Vec2 const&, Vec2 const&, Vec2 const&, Vec2 const&) = 0; // 0x7
+        virtual void drawImage(TexturePtr const& texture, Vec2 const& pos, Vec2 const& size, Vec2 const& uvPos, Vec2 const& uvSize) = 0; // 0x7
         virtual void drawNineslice(TexturePtr const&, void* const&) = 0; // 0x8
         virtual void flushImages(Color const&, float, HashedString const&) = 0; // 0x9
         virtual void beginSharedMeshBatch(void*) = 0; // 0xA
@@ -79,8 +79,8 @@ namespace SDK {
         virtual void renderCustom(class CustomRenderComponent*, int, RectangleArea const&) = 0; // 0x1A
         virtual void cleanup() = 0; // 0x1B
         virtual void removePersistentMeshes() = 0; // 0x1C
-        virtual TexturePtr* getTexture(ResourceLocation const&, bool) = 0; // 0x1D
-        virtual TexturePtr* getZippedTexture(std::string const&, ResourceLocation const&, bool) = 0; // 0x1E
+        virtual TexturePtr* getTexture(TexturePtr* ptr, ResourceLocation const&, bool) = 0; // 0x1D
+        virtual TexturePtr* getZippedTexture(TexturePtr* ptr, std::string const&, ResourceLocation const&, bool) = 0; // 0x1E
         virtual void unloadTexture(ResourceLocation const&) = 0; // 0x1F
         virtual void getUITextureInfo(ResourceLocation const&, bool) = 0; // 0x20
         virtual void touchTexture(ResourceLocation const&) = 0; // 0x21

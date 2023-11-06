@@ -44,7 +44,7 @@ namespace SDK {
             textureData.reset();
         }
 
-        virtual ~TexturePtr() {
+        ~TexturePtr() {
         }
     };
 }

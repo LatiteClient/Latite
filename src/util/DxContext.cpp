@@ -269,6 +269,11 @@ void MCDrawUtil::drawVignette(d2d::Color const& innerCol, float fade) {
 	flush(false);
 }
 
+void MCDrawUtil::drawImage(SDK::TexturePtr& texture, Vec2 const& pos, Vec2 const& size, d2d::Color const& flushCol) {
+	this->renderCtx->drawImage(texture, { pos.x * this->guiScale, pos.y * guiScale }, { size.x * guiScale, size.y * guiScale }, { 0.f, 0.f }, { 1.f, 1.f });
+	this->renderCtx->flushImages(flushCol, 1.f, SDK::HashedString("ui_grayscale"));
+}
+
 void MCDrawUtil::fillPolygon(Vec2 const& center, float radius, int numSides, d2d::Color const& col) {
 	auto tess = scn->tess;
 	*scn->shaderColor = { 1.f,1.f,1.f,1.f };

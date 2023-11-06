@@ -456,6 +456,7 @@
     <ClInclude Include="src\client\script\class\impl\JsModuleClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsRect.h" />
     <ClInclude Include="src\client\script\class\impl\JsSettingClass.h" />
+    <ClInclude Include="src\client\script\class\impl\JsTextureClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsVec2.h" />
     <ClInclude Include="src\client\script\class\impl\JsVec3.h" />
     <ClInclude Include="src\client\script\class\JsClass.h" />
@@ -464,6 +465,7 @@
     <ClInclude Include="src\client\script\event\ScriptListener.h" />
     <ClInclude Include="src\client\script\feature\JsEvented.h" />
     <ClInclude Include="src\client\script\interop\classes\JsEntity.h" />
+    <ClInclude Include="src\client\script\interop\classes\JsTexture.h" />
     <ClInclude Include="src\client\script\JsScript.h" />
     <ClInclude Include="src\client\script\lib\JsLibrary.h" />
     <ClInclude Include="src\client\script\lib\libraries\Clipboard.h" />
@@ -657,6 +659,7 @@
     <ClCompile Include="src\client\script\event\ScriptListener.cpp" />
     <ClCompile Include="src\client\script\feature\JsEvented.cpp" />
     <ClCompile Include="src\client\script\interop\classes\JsEntity.cpp" />
+    <ClCompile Include="src\client\script\interop\classes\JsTexture.cpp" />
     <ClCompile Include="src\client\script\JsScript.cpp" />
     <ClCompile Include="src\client\script\lib\JsLibrary.cpp" />
     <ClCompile Include="src\client\script\lib\libraries\Clipboard.cpp" />

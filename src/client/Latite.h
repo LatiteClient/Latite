@@ -105,6 +105,8 @@ public:
 	int cInstOffs = 0;
 	int plrOffs2 = 0;
 	int plrOffs = 0;
+
+	void loadConfig(class SettingGroup& resolvedGroup);
 private:
 	bool downloadingAssets = false;
 	std::vector<std::string> latiteUsers;
@@ -150,8 +152,6 @@ private:
 	void onLeaveGame(class Event& ev);
 	void onRenderLayer(class Event& ev);
 	void onRenderOverlay(class Event& ev);
-
-	void loadConfig(class SettingGroup& resolvedGroup);
 
 	bool shouldEject = false;
 	bool hasInit = false;

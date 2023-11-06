@@ -179,7 +179,7 @@ bool Renderer::init(IDXGISwapChain* chain) {
 }
 
 HRESULT Renderer::reinit() {
-	releaseAllResources();
+	releaseAllResources(false);
     hasInit = false;
     return S_OK;
 }
@@ -240,7 +240,7 @@ void Renderer::render() {
 	this->hasCopiedBitmap = false;
 }
 
-void Renderer::releaseAllResources() {
+void Renderer::releaseAllResources(bool indep) {
 	RendererCleanupEvent ev{};
 	Eventing::get().dispatch(ev);
 
@@ -302,7 +302,7 @@ void Renderer::releaseAllResources() {
 
 	this->blurBuffers.clear();
 
-	releaseDeviceIndependentResources();
+	if (indep) releaseDeviceIndependentResources();
 }
 
 void Renderer::createDeviceIndependentResources() {

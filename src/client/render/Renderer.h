@@ -28,7 +28,7 @@ private:
 
 	std::wstring fontFamily = L"Segoe UI";
 	std::wstring fontFamily2 = L"Segoe UI";
-	void releaseAllResources();
+	void releaseAllResources(bool indep = true);
 
 	bool hasInit = false;
 	bool shouldReinit = false;

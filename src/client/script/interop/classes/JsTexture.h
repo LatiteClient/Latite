@@ -5,7 +5,7 @@
 
 class JsTexture {
 public:
-	JsTexture(std::wstring const& textureNameOrPath, bool isMinecraft);
+	JsTexture(std::wstring const& textureNameOrPath, bool gameTexture);
 
 	[[nodiscard]] bool isMinecraftTexture() {
 		return this->mcTexture.has_value();
@@ -14,6 +14,9 @@ public:
 	[[nodiscard]] bool hasTexture() {
 		return (mcTexture.has_value() && mcTexture->resourceLocation) || d2dTexture;
 	}
+
+	void loadMinecraft();
+	void reloadMinecraft();
 
 	std::filesystem::path tryGetRealPath(std::wstring const& oPath);
 
@@ -28,6 +31,8 @@ public:
 	}
 
 private:
+	bool gameTexture = false;
+	std::wstring nameOrPath;
 	ComPtr<ID2D1Bitmap> d2dTexture = nullptr;
 	std::optional<SDK::TexturePtr> mcTexture = std::nullopt;
 	bool failed = false;

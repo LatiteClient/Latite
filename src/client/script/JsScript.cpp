@@ -41,6 +41,7 @@
 #include "util/Logger.h"
 
 #include "ScriptCertificate.h"
+#include "class/impl/JsTextureClass.h"
 
 using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Web::Http;
@@ -328,6 +329,7 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsLocalPlayerClass>(this));
 	this->classes.push_back(std::make_shared<JsItem>(this));
 	this->classes.push_back(std::make_shared<JsItemStack>(this));
+	this->classes.push_back(std::make_shared<JsTextureClass>(this));
 
 	JsErrorCode err;
 	JsValueRef myScript;

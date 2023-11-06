@@ -9,6 +9,7 @@
 #include <variant>
 #include <shared_mutex>
 #include <queue>
+#include <client/script/interop/classes/JsTexture.h>
 
 class D2DScriptingObject : public ScriptingObject {
 public:
@@ -47,14 +48,19 @@ public:
 		Renderer::FontSelection font;
 		DWRITE_TEXT_ALIGNMENT alignment;
 		DWRITE_PARAGRAPH_ALIGNMENT vertAlign;
-
-
 		
 
 		OpDrawText(const d2d::Rect& rect, const std::wstring& text, float size, const d2d::Color& col, const Renderer::FontSelection& font, const DWRITE_TEXT_ALIGNMENT& alignment, const DWRITE_PARAGRAPH_ALIGNMENT& vertAlign)
 			: rect(rect), text(text), size(size), col(col), font(font), alignment(alignment), vertAlign(vertAlign)
 		{
 		}
+	};
+
+	struct OpDrawImage {
+		JsTexture* texture;
+		Vec2 pos;
+		float sx, sy;
+		d2d::Color col;
 	};
 
 	struct DrawOperation {
@@ -64,13 +70,14 @@ public:
 		};
 
 		D2D1::Matrix3x2F matrix;
-		std::variant<OpDrawRect, OpFillRect, OpDrawText> op;
+		std::variant<OpDrawRect, OpFillRect, OpDrawText, OpDrawImage> op;
 	};
 
 	struct DrawVisitor {
 		void operator()(OpDrawRect& op);
 		void operator()(OpFillRect& op);
 		void operator()(OpDrawText& op);
+		void operator()(OpDrawImage& op);
 	};
 
 	std::queue<DrawOperation> operations = {};
@@ -103,6 +110,8 @@ private:
 	static JsValueRef CALLBACK drawTextCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK drawTextFullCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK drawImageCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	std::shared_mutex mutex;
 };

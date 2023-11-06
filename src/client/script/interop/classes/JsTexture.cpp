@@ -2,21 +2,13 @@
 #include "JsTexture.h"
 #include "client/Latite.h"
 
-JsTexture::JsTexture(std::wstring const& textureNameOrPath, bool isMinecraft) {
-	this->mcTexture = SDK::TexturePtr{};
-	if (isMinecraft) {
-
-		// FIXME: I sure hope this object doesn't get destroyed by the time this function calls
-		Latite::get().queueForUIRender([this, textureNameOrPath](SDK::MinecraftUIRenderContext* ctx) {
-			ctx->getTexture(SDK::ResourceLocation(util::WStrToStr(textureNameOrPath), 0 /*0 = default minecraft texture*/), false /*not external*/);
-			});
-	}
-
+JsTexture::JsTexture(std::wstring const& textureNameOrPath, bool gameTexture) {
+	this->nameOrPath = textureNameOrPath;
+	this->gameTexture = gameTexture;
+	this->loadMinecraft();
 	auto path = this->tryGetRealPath(textureNameOrPath);
-	// FIXME: I sure hope this object doesn't get destroyed by the time this function calls
-	Latite::get().queueForUIRender([this, path](SDK::MinecraftUIRenderContext* ctx) {
-		ctx->getTexture(SDK::ResourceLocation(util::WStrToStr(path), 0 /*0 = default minecraft texture*/), false /*not external*/);
-		});
+
+	if (gameTexture) return;
 
 	// FIXME: same as above
 	Latite::get().queueForDXRender([this, path](ID2D1DeviceContext* ctx) {
@@ -52,6 +44,33 @@ JsTexture::JsTexture(std::wstring const& textureNameOrPath, bool isMinecraft) {
 			this->failed = true;
 		}
 		});
+}
+
+void JsTexture::loadMinecraft() {
+	mcTexture = SDK::TexturePtr{};
+	if (gameTexture) {
+		// FIXME: I sure hope this object doesn't get destroyed by the time this function calls
+		Latite::get().queueForUIRender([this](SDK::MinecraftUIRenderContext* ctx) {
+			ctx->getTexture(&this->mcTexture.value(), SDK::ResourceLocation(util::WStrToStr(nameOrPath), 0 /*0 = default minecraft texture*/), false /*not external*/);
+			});
+		return;
+	}
+
+	auto path = this->tryGetRealPath(nameOrPath);
+	// FIXME: I sure hope this object doesn't get destroyed by the time this function calls
+	Latite::get().queueForUIRender([this, path](SDK::MinecraftUIRenderContext* ctx) {
+		ctx->getTexture(&this->mcTexture.value(), SDK::ResourceLocation(util::WStrToStr(path), 2 /*2 = external texture*/), true /*external*/);
+		});
+}
+
+void JsTexture::reloadMinecraft() {
+	// very funny code
+	if (mcTexture.has_value()) {
+		mcTexture->~TexturePtr();
+	}
+	mcTexture = std::nullopt;
+
+	this->loadMinecraft();
 }
 
 std::filesystem::path JsTexture::tryGetRealPath(std::wstring const& oPath) {

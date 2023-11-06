@@ -97,6 +97,7 @@ public:
 	void flush(bool text = true, bool mesh = true) override;
 
 	void drawVignette(d2d::Color const& innerCol, float fade = 0.f);
+	void drawImage(SDK::TexturePtr& texture, Vec2 const& pos, Vec2 const& size, d2d::Color const& flushCol);
 	void fillPolygon(Vec2 const& center, float radius, int numSides, d2d::Color const& col);
 	void drawPolygon(Vec2 const& center, float radius, int numSides, d2d::Color const& col, float lineThickness = 1.f);
 	virtual void fillRectangle(RectF const& rect, d2d::Color const& color) override;
