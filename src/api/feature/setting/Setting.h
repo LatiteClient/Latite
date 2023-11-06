@@ -189,7 +189,7 @@ struct TextValue {
 	TextValue(std::wstring const& str) : str(str) {};
 
 	TextValue(nlohmann::json& js) {
-		str = js.get<std::wstring>();
+		str = util::StrToWStr(js.get<std::string>());
 	}
 
 	void store(nlohmann::json& jout) {

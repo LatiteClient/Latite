@@ -375,8 +375,10 @@ std::wstring Chakra::GetTypeName(JsValueType type) {
 		return L"boolean";
 	case JsValueType::JsSymbol:
 		return L"symbol";
+	case JsValueType::JsTypedArray:
+		return L"typed array";
 	default:
-		return L"<other type>";
+		return L"<unknown type>";
 	}
 }
 
