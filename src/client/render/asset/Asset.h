@@ -13,7 +13,7 @@ public:
 	void unload();
 	[[nodiscard]] ID2D1Bitmap* getBitmap() noexcept { return bitmap.Get(); }
 
-private:
+protected:
 	std::wstring relPath;
 	ComPtr<ID2D1Bitmap> bitmap;
 };

@@ -124,7 +124,7 @@ void Config::saveGroup(SettingGroup& group, json& j) {
 void Config::saveSetting(std::shared_ptr<Setting> set, nlohmann::json& jout) {
 	jout["name"] = set->name();
 	jout["type"] = (*set->value).index();
-	auto val = *set->value;
+	auto& val = *set->value;
 
 	std::visit([&](auto&& obj) {
 		nlohmann::json objc = json::object();

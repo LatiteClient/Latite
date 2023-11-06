@@ -25,7 +25,7 @@ protected:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 		auto thi = reinterpret_cast<JsVec2*>(callbackState);
 		auto vec2 = ToVec2(arguments[0]);
-		std::string add = std::format("{} (x={:.2}, y={:.2})", util::WStrToStr(thi->name), vec2.x, vec2.y);
+		std::string add = std::format("{:.2f}, (x={:.2f}, y={:.2f})", util::WStrToStr(thi->name), vec2.x, vec2.y);
 		return Chakra::MakeString(L"[object " + util::StrToWStr(add) + L"]");
 	}
 public:

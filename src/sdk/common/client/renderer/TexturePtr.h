@@ -8,12 +8,15 @@ namespace SDK {
         alignas(8) int type;
         std::string txt;
 
-        ResourceLocation(const char* text, int type) {
+        ResourceLocation(std::string const& text, int type) {
             txt = text;
             this->type = type;
         }
 
         ~ResourceLocation() = default;
+    private:
+        uint64_t mPathHash = 0;
+        uint64_t mFullHash = 0;
     };
 
     class BedrockTextureData {
@@ -33,33 +36,15 @@ namespace SDK {
 
     class TexturePtr {
     public:
-        std::shared_ptr<class BedrockTextureData> textureData;
+        std::shared_ptr<BedrockTextureData> textureData;
+        std::shared_ptr<ResourceLocation> resourceLocation;
 
         void clearTexture() {
+            resourceLocation.reset();
             textureData.reset();
         }
 
         virtual ~TexturePtr() {
-        }
-    };
-
-    class TexturePtr_New : public TexturePtr {
-    public:
-        std::shared_ptr<ResourceLocation> resourceLocation;
-    };
-
-    class TexturePtr_Old : public TexturePtr {
-    public:
-        ResourceLocation resourceLocation = ResourceLocation("", 0);
-    private:
-        [[maybe_unused]] char pad[20];//temp fix
-    public:
-        TexturePtr_Old() {
-            memset(this, 0x0, sizeof(TexturePtr_Old));
-            resourceLocation = ResourceLocation("", 0);
-        }
-
-        ~TexturePtr_Old() {
         }
     };
 }

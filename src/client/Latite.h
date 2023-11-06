@@ -36,28 +36,17 @@ public:
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);
 
-
-	void onUpdate(class Event& ev);
-	void onKey(class Event& ev);
-	void onClick(class Event& ev);
-	void onChar(class Event& ev);
-	void onRendererInit(class Event& ev);
-	void onRendererCleanup(class Event& ev);
-	void onFocusLost(class Event& ev);
-	void onSuspended(class Event& ev);
-	void onBobView(class Event& ev);
-	void onLeaveGame(class Event& ev);
-
-	void loadConfig(class SettingGroup& resolvedGroup);
-	void initAsset(int resource, std::wstring const& filename);
 	std::string getTextAsset(int resource);
 	void downloadChakraCore();
 	void initSettings();
 
+	void queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback);
+	void queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callback);
+
 	Latite() = default;
 	~Latite() = default;
 
-	static constexpr std::string_view version = "v2.0.0b7";
+	static constexpr std::string_view version = "v2.0.0b8";
 	HINSTANCE dllInst = NULL;
 	std::string gameVersion;
 
@@ -110,6 +99,8 @@ public:
 
 	void fetchLatiteUsers();
 
+	void initAsset(int resource, std::wstring const& filename);
+
 	int cInstOffs2 = 0;
 	int cInstOffs = 0;
 	int plrOffs2 = 0;
@@ -118,6 +109,9 @@ private:
 	bool downloadingAssets = false;
 	std::vector<std::string> latiteUsers;
 	std::vector<std::string> latiteUsersDirty;
+
+	std::queue<std::function<void(SDK::MinecraftUIRenderContext* ctx)>> uiRenderQueue;
+	std::queue<std::function<void(ID2D1DeviceContext* ctx)>> dxRenderQueue;
 
 	Timings timings{};
 
@@ -143,6 +137,21 @@ private:
 
 	void threadsafeInit();
 	void patchKey();
+
+	void onUpdate(class Event& ev);
+	void onKey(class Event& ev);
+	void onClick(class Event& ev);
+	void onChar(class Event& ev);
+	void onRendererInit(class Event& ev);
+	void onRendererCleanup(class Event& ev);
+	void onFocusLost(class Event& ev);
+	void onSuspended(class Event& ev);
+	void onBobView(class Event& ev);
+	void onLeaveGame(class Event& ev);
+	void onRenderLayer(class Event& ev);
+	void onRenderOverlay(class Event& ev);
+
+	void loadConfig(class SettingGroup& resolvedGroup);
 
 	bool shouldEject = false;
 	bool hasInit = false;

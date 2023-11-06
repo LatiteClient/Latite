@@ -424,6 +424,8 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getEventing().listen<ClickEvent>(this, (EventListenerFunc)&Latite::onClick, 2);
     Latite::getEventing().listen<BobMovementEvent>(this, (EventListenerFunc)&Latite::onBobView, 2);
     Latite::getEventing().listen<LeaveGameEvent>(this, (EventListenerFunc)&Latite::onLeaveGame, 2);
+    Latite::getEventing().listen<RenderLayerEvent>(this, (EventListenerFunc)&Latite::onRenderLayer, 2);
+    Latite::getEventing().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Latite::onRenderOverlay, 2);
 
     getHooks().init();
     Logger::Info(XOR_STRING("Initialized Hooks"));
@@ -580,6 +582,14 @@ void Latite::initSettings() {
         set->enumData->addEntry({ 1, "Noto Sans", "The smooth font (Noto Sans MS)" });
         this->getSettings().addSetting(set);
     }
+}
+
+void Latite::queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback) {
+    this->uiRenderQueue.push(callback);
+}
+
+void Latite::queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callback) {
+    this->dxRenderQueue.push(callback);
 }
 
 void Latite::initAsset(int resource, std::wstring const& filename) {
@@ -779,6 +789,27 @@ void Latite::onBobView(Event& ev) {
 
 void Latite::onLeaveGame(Event& ev) {
     getRenderer().clearTextCache();
+}
+
+void Latite::onRenderLayer(Event& evG) {
+    auto& ev = reinterpret_cast<RenderLayerEvent&>(evG);
+    while (!this->uiRenderQueue.empty()) {
+        auto& latest = this->uiRenderQueue.front();
+        latest(ev.getUIRenderContext());
+        this->uiRenderQueue.pop();
+    }
+    
+    ev.getUIRenderContext();
+}
+
+void Latite::onRenderOverlay(Event& evG) {
+    auto& ev = reinterpret_cast<RenderOverlayEvent&>(evG);
+
+    while (!this->dxRenderQueue.empty()) {
+        auto& latest = this->dxRenderQueue.front();
+        latest(ev.getDeviceContext());
+        this->dxRenderQueue.pop();
+    }
 }
 
 void Latite::loadConfig(SettingGroup& gr) {

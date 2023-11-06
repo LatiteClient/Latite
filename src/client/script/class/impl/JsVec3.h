@@ -25,7 +25,7 @@ private:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 		auto thi = reinterpret_cast<JsVec3*>(callbackState);
 		auto vec3 = ToVec3(arguments[0]);
-		std::string add = std::format("{} ({:.2}, {:.2} {:.2})", util::WStrToStr(thi->name), vec3.x, vec3.y, vec3.z);
+		std::string add = std::format("{} ({:.2f}, {:.2f}, {:.2f})", util::WStrToStr(thi->name), vec3.x, vec3.y, vec3.z);
 		return Chakra::MakeString(L"[object " + util::StrToWStr(add) + L"]");
 	}
 public:
