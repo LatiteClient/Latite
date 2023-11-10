@@ -467,7 +467,7 @@
     <ClInclude Include="src\client\script\feature\JsEvented.h" />
     <ClInclude Include="src\client\script\interop\classes\JsEntity.h" />
     <ClInclude Include="src\client\script\interop\classes\JsTexture.h" />
-    <ClInclude Include="src\client\script\JsScript.h" />
+    <ClInclude Include="src\client\script\JsPlugin.h" />
     <ClInclude Include="src\client\script\lib\JsLibrary.h" />
     <ClInclude Include="src\client\script\lib\libraries\Clipboard.h" />
     <ClInclude Include="src\client\script\lib\libraries\Filesystem.h" />
@@ -499,6 +499,7 @@
     <ClInclude Include="src\sdk\common\client\renderer\screen\ScreenContext.h" />
     <ClInclude Include="src\sdk\common\client\renderer\Tessellator.h" />
     <ClInclude Include="src\sdk\common\client\renderer\TexturePtr.h" />
+    <ClInclude Include="src\sdk\common\client\util\JpegCommentWriter.h" />
     <ClInclude Include="src\sdk\common\entity\component\MoveInputComponent.h" />
     <ClInclude Include="src\sdk\common\network\Packet.h" />
     <ClInclude Include="src\sdk\common\network\PacketSender.h" />
@@ -520,6 +521,7 @@
     <ClInclude Include="src\sdk\common\world\level\block\BlockLegacy.h" />
     <ClInclude Include="src\sdk\common\world\level\HitResult.h" />
     <ClInclude Include="src\sdk\deps\Application\AppPlatform.h" />
+    <ClInclude Include="src\sdk\deps\CoreGraphics\ImageBuffer.h" />
     <ClInclude Include="src\sdk\deps\Core\StringUtils.h" />
     <ClInclude Include="src\sdk\misc\ClickMap.h" />
     <ClInclude Include="src\sdk\signature\storage.h" />
@@ -689,6 +691,7 @@
     <ClCompile Include="src\sdk\common\client\renderer\MaterialPtr.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\MeshUtils.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\Tessellator.cpp" />
+    <ClCompile Include="src\sdk\common\client\util\JpegCommentWriter.cpp" />
     <ClCompile Include="src\sdk\common\network\packet\CommandRequestPacket.cpp" />
     <ClCompile Include="src\sdk\common\network\packet\TextPacket.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\Actor.cpp" />

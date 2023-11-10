@@ -8,7 +8,7 @@
 #include "ScriptingObject.h"
 #include "class/JsClass.h"
 
-class JsScript final {
+class JsPlugin final {
 	std::vector<std::shared_ptr<ScriptingObject>> objects;
 	std::vector<std::shared_ptr<JsClass>> classes;
 	bool trusted = false;
@@ -96,7 +96,7 @@ public:
 	std::vector<JsTimeout> timeouts = {};
 	std::vector<JsTimeout> intervals = {};
 
-	JsScript(std::wstring const& indexPath);
+	JsPlugin(std::wstring const& indexPath);
 	bool load();
 	[[nodiscard]] bool shouldRemove();
 	[[nodiscard]] bool isTrusted() { return trusted; }
@@ -127,11 +127,11 @@ public:
 
 	[[nodiscard]] std::wstring getCertificate();
 	[[nodiscard]] static std::optional<std::wstring> getHash(std::filesystem::path const& main);
-	[[nodiscard]] static JsScript* getThis();
+	[[nodiscard]] static JsPlugin* getThis();
 
 	static void __stdcall debugEventCallback(JsDiagDebugEvent debugEvent, JsValueRef eventData, void* callbackState);
 
 	JsErrorCode runScript();
 
-	~JsScript() { if (runtime != JS_INVALID_RUNTIME_HANDLE) unload(); }
+	~JsPlugin() { if (runtime != JS_INVALID_RUNTIME_HANDLE) unload(); }
 };

@@ -20,7 +20,7 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 {
 	if (args.empty()) return false;
 	if (!ScriptManager::scriptingSupported()) {
-		message("&eScripting is not supported!");
+		message("&eScripting/Plugins are not supported! Try restarting your game.");
 		return true;
 	}
 
@@ -58,9 +58,9 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 		auto& scr = args[1];
 		auto path = scr;
 		if (!std::filesystem::exists(path))
-			path = (util::GetLatitePath() / ("Scripts") / scr).string();
+			path = (util::GetLatitePath() / ("Plugins") / scr).string();
 		if (std::filesystem::exists(path)) {
-			std::filesystem::rename(path, util::GetLatitePath() / "Scripts" / "Startup" / (std::filesystem::path(path).filename().string()));
+			std::filesystem::rename(path, util::GetLatitePath() / "Plugins" / "Startup" / (std::filesystem::path(path).filename().string()));
 			message("Successfully moved script folder " + scr + " to startup.");
 			return true;
 		}

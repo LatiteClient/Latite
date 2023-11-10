@@ -29,10 +29,10 @@ using namespace winrt::Windows::Web::Http::Filters;
 ScriptManager::ScriptManager() {
 }
 
-std::shared_ptr<JsScript> ScriptManager::loadScript(std::wstring const& folderPath, bool run)
+std::shared_ptr<JsPlugin> ScriptManager::loadScript(std::wstring const& folderPath, bool run)
 {
 	auto& fPathW = folderPath;
-	auto scriptsPathW = util::GetLatitePath() / ("Scripts");
+	auto scriptsPathW = util::GetLatitePath() / ("Plugins");
 	auto scriptPath = scriptsPathW / fPathW / "index.js";
 	if (!std::filesystem::exists(scriptPath)) return nullptr;
 
@@ -43,7 +43,7 @@ std::shared_ptr<JsScript> ScriptManager::loadScript(std::wstring const& folderPa
 		}
 	}
 
-	auto myScript = std::make_shared<JsScript>(scriptPath);
+	auto myScript = std::make_shared<JsPlugin>(scriptPath);
 	myScript->relFolderPath = fPathW;
 	if (!myScript->load()) return nullptr;
 	myScript->loadScriptObjects();
@@ -74,7 +74,7 @@ std::shared_ptr<JsScript> ScriptManager::loadScript(std::wstring const& folderPa
 	return myScript;
 }
 
-std::shared_ptr<JsScript> ScriptManager::getScriptByName(std::wstring const& name)
+std::shared_ptr<JsPlugin> ScriptManager::getScriptByName(std::wstring const& name)
 {
 	for (auto& script : items) {
 		if (script->data.name == name) {
@@ -84,7 +84,7 @@ std::shared_ptr<JsScript> ScriptManager::getScriptByName(std::wstring const& nam
 	return nullptr;
 }
 
-void ScriptManager::popScript(std::shared_ptr<JsScript> ptr)
+void ScriptManager::popScript(std::shared_ptr<JsPlugin> ptr)
 {
 	for (auto it = items.begin(); it != items.end(); it++) {
 		if (*it == ptr) {
@@ -109,7 +109,7 @@ void ScriptManager::reportError(JsValueRef except, std::wstring filePath) {
 void ScriptManager::handleErrors(JsErrorCode code) {
 	JsContextRef ctx;
 	JS::JsGetCurrentContext(&ctx);
-	JsScript* script = JsScript::getThis();
+	JsPlugin* script = JsPlugin::getThis();
 	if (script) {
 		if (code == JsErrorScriptException) {
 			JsValueRef except;
@@ -129,7 +129,7 @@ bool ScriptManager::loadPrerunScripts()
 		return false;
 	}
 
-	auto prerunPath = util::GetLatitePath() / ("Scripts") / "Startup";
+	auto prerunPath = util::GetLatitePath() / ("Plugins") / "Startup";
 	std::filesystem::create_directory(prerunPath);
 
 	using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
@@ -222,7 +222,7 @@ std::optional<int> ScriptManager::installScript(std::string const& inName) {
 			return 0;
 		}
 	}
-	auto& arr = scriptsJson["scripts"];
+	auto& arr = scriptsJson["Plugins"];
 	for (auto& js : arr) {
 		auto name = js["name"].get<std::string>();
 		auto oName = js["name"].get<std::string>();
@@ -232,7 +232,7 @@ std::optional<int> ScriptManager::installScript(std::string const& inName) {
 		std::transform(name.begin(), name.end(), name.begin(), ::tolower);
 		if (in == name) {
 			message("Installing " + oName + " v" + js["version"].get<std::string>() + " by " + js["author"].get<std::string>());
-			std::filesystem::path path = util::GetLatitePath() / "Scripts" / "Startup" / woName;
+			std::filesystem::path path = util::GetLatitePath() / "Plugins" / "Startup" / woName;
 			std::filesystem::create_directories(path);
 			for (auto& fil : js["files"]) {
 				auto fws = util::StrToWStr(fil.get<std::string>());
@@ -252,7 +252,7 @@ std::optional<int> ScriptManager::installScript(std::string const& inName) {
 				ofs.close();
 			}
 			// generate certificate
-			auto cert = JsScript::getHash(path);
+			auto cert = JsPlugin::getHash(path);
 			if (cert) {
 #if LATITE_DEBUG
 				Logger::Info("Generated certificate {}", util::WStrToStr(cert.value()));
@@ -273,7 +273,7 @@ std::optional<int> ScriptManager::installScript(std::string const& inName) {
 
 void ScriptManager::init()
 {
-	auto scriptsPath = util::GetLatitePath() / ("Scripts");
+	auto scriptsPath = util::GetLatitePath() / ("Plugins");
 	std::filesystem::create_directory(scriptsPath);
 
 	initListeners();
@@ -303,7 +303,7 @@ void ScriptManager::initListeners()
 	eventListeners[L"unload-script"] = {};
 }
 
-void ScriptManager::unloadScript(std::shared_ptr<JsScript> ptr)
+void ScriptManager::unloadScript(std::shared_ptr<JsPlugin> ptr)
 {
 	Event::Value val{L"scriptName"};
 	val.name = L"scriptName";
@@ -333,7 +333,7 @@ void ScriptManager::unloadAll() {
 	}
 }
 
-bool ScriptManager::hasPermission(JsScript* script, Permission perm) {
+bool ScriptManager::hasPermission(JsPlugin* script, Permission perm) {
 	auto player = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!player) {
 #if LATITE_DEBUG

@@ -1,6 +1,6 @@
 #pragma once
 #include "../JsLibrary.h"
-#include "../../JsScript.h"
+#include "../../JsPlugin.h"
 
 #include <winrt/windows.storage.streams.h>
 

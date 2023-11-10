@@ -2,7 +2,7 @@
 #include "JsSettingClass.h"
 #include "JsColor.h"
 #include "JsVec2.h"
-#include "../../JsScript.h"
+#include "../../JsPlugin.h"
 
 JsValueRef JsSettingClass::getValueCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto thi = reinterpret_cast<JsSettingClass*>(callbackState);

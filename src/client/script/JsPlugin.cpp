@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "JsScript.h"
+#include "JsPlugin.h"
 #include <sstream>
 #include "util/Chakrautil.h"
 #include "util/Util.h"
@@ -48,13 +48,13 @@ using namespace winrt::Windows::Web::Http;
 using namespace winrt::Windows::Web::Http::Filters;
 
 
-void JsScript::checkTrusted() {
+void JsPlugin::checkTrusted() {
 	if (this->loadedScript._Starts_with(util::StrToWStr(XOR_STRING("\"notrust\"")))) {
 		trusted = false;
 		return;
 	}
 
-	auto hash = JsScript::getHash(std::filesystem::path(this->indexPath).parent_path());
+	auto hash = JsPlugin::getHash(std::filesystem::path(this->indexPath).parent_path());
 
 	if (hash) {
 #if LATITE_DEBUG
@@ -68,10 +68,10 @@ void JsScript::checkTrusted() {
 	trusted = false;
 }
 
-JsScript::JsScript(std::wstring const& indexPath) : indexPath(indexPath), ctx(JS_INVALID_REFERENCE), indexStream(), loadedScript(), runtime(JS_INVALID_RUNTIME_HANDLE){
+JsPlugin::JsPlugin(std::wstring const& indexPath) : indexPath(indexPath), ctx(JS_INVALID_REFERENCE), indexStream(), loadedScript(), runtime(JS_INVALID_RUNTIME_HANDLE){
 }
 
-bool JsScript::load() {
+bool JsPlugin::load() {
 	indexStream.open(indexPath);
 	if (indexStream.fail()) {
 		Logger::Warn("Could not open index path: {}", errno);
@@ -101,7 +101,7 @@ bool JsScript::load() {
 	return res;
 }
 
-bool JsScript::shouldRemove() {
+bool JsPlugin::shouldRemove() {
 	return false;
 }
 
@@ -119,7 +119,7 @@ namespace {
 		auto func = arguments[1];
 		auto num = Chakra::GetNumber(arguments[2]);
 
-		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
+		JsPlugin* thi = reinterpret_cast<JsPlugin*>(callbackState);
 		auto& tim = thi->timeouts.emplace_back(static_cast<int>(thi->timeouts.size() + 1), static_cast<long long>(num), func);
 		JsValueRef ret;
 		JS::JsIntToNumber(tim.id, &ret);
@@ -139,7 +139,7 @@ namespace {
 		auto func = arguments[1];
 		auto num = Chakra::GetNumber(arguments[2]);
 
-		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
+		JsPlugin* thi = reinterpret_cast<JsPlugin*>(callbackState);
 		auto& tim = thi->intervals.emplace_back(static_cast<int>(thi->intervals.size() + 1), static_cast<long long>(num), func);
 		JsValueRef ret;
 		JS::JsIntToNumber(tim.id, &ret);
@@ -183,7 +183,7 @@ namespace {
 	JsValueRef CALLBACK loadModule(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount,
 		void* callbackState) {
-		auto thi = reinterpret_cast<JsScript*>(callbackState);
+		auto thi = reinterpret_cast<JsPlugin*>(callbackState);
 
 		JsValueRef undef;
 
@@ -213,7 +213,7 @@ namespace {
 			isNet = true;
 		}
 
-		auto path = isNet ? wPath : (util::GetLatitePath() / ("Scripts")).wstring() + L"\\" + thi->relFolderPath + L"\\" + wPath;
+		auto path = isNet ? wPath : (util::GetLatitePath() / ("Plugins")).wstring() + L"\\" + thi->relFolderPath + L"\\" + wPath;
 		if (!isNet && !path.ends_with(L".js")) {
 			path += L".js";
 		}
@@ -297,7 +297,7 @@ namespace {
 	}
 }
 
-void JsScript::loadJSApi() {
+void JsPlugin::loadJSApi() {
 	JS::JsSetCurrentContext(ctx);
 	JsValueRef res;
 	auto err = JS::JsRunScript(util::StrToWStr(Latite::get().getTextAsset(JS_LATITEAPI)).c_str(), ++sCtx, L"latiteapi.js", &res);
@@ -307,7 +307,7 @@ void JsScript::loadJSApi() {
 	}
 }
 
-void JsScript::loadScriptObjects() {
+void JsPlugin::loadScriptObjects() {
 	JS::JsSetCurrentContext(ctx);
 	int i = 0;
 	this->objects.clear();
@@ -403,7 +403,7 @@ void JsScript::loadScriptObjects() {
 	JS::JsRelease(globalObj, nullptr);
 }
 
-void JsScript::fetchScriptData() {
+void JsPlugin::fetchScriptData() {
 	JS::JsSetCurrentContext(ctx);
 	JsValueRef globalObj;
 	JS::JsGetGlobalObject(&globalObj);
@@ -422,7 +422,7 @@ void JsScript::fetchScriptData() {
 	Chakra::Release(globalObj);
 }
 
-void JsScript::unload() {
+void JsPlugin::unload() {
 	JS::JsSetCurrentContext(JS_INVALID_REFERENCE);
 	JS::JsDisableRuntimeExecution(runtime);
 	JS::JsCollectGarbage(runtime);
@@ -430,7 +430,7 @@ void JsScript::unload() {
 	runtime = JS_INVALID_RUNTIME_HANDLE;
 }
 
-void JsScript::handleAsyncOperations() {
+void JsPlugin::handleAsyncOperations() {
 	for (size_t i = 0; i < pendingOperations.size();) {
 		auto ptr = pendingOperations[i];
 		if (ptr->flagDone) {
@@ -461,7 +461,7 @@ void JsScript::handleAsyncOperations() {
 	}
 }
 
-std::wstring JsScript::getCertificate() {
+std::wstring JsPlugin::getCertificate() {
 	std::wifstream ifs(std::filesystem::path(this->indexPath).parent_path() / XOR_STRING("certificate"));
 	if (ifs.fail()) {
 #if LATITE_DEBUG
@@ -475,7 +475,7 @@ std::wstring JsScript::getCertificate() {
 	return wss.str();
 }
 
-std::optional<std::wstring> JsScript::getHash(std::filesystem::path const& main) {
+std::optional<std::wstring> JsPlugin::getHash(std::filesystem::path const& main) {
 	using winrt::Windows::Security::Cryptography::Core::HashAlgorithmProvider;
 	using winrt::Windows::Security::Cryptography::CryptographicBuffer;
 	using winrt::Windows::Security::Cryptography::BinaryStringEncoding;
@@ -527,28 +527,28 @@ std::optional<std::wstring> JsScript::getHash(std::filesystem::path const& main)
 	return std::nullopt;
 }
 
-JsScript* JsScript::getThis() {
-	JsScript* ret = nullptr;
+JsPlugin* JsPlugin::getThis() {
+	JsPlugin* ret = nullptr;
 	JsContextRef ct;
 	JS::JsGetCurrentContext(&ct);
 	JS::JsGetContextData(ct, reinterpret_cast<void**>(&ret));
 	return ret;
 }
 
-void __stdcall JsScript::debugEventCallback(JsDiagDebugEvent debugEvent, JsValueRef eventData, void* callbackState) {
+void __stdcall JsPlugin::debugEventCallback(JsDiagDebugEvent debugEvent, JsValueRef eventData, void* callbackState) {
 }
 
-JsErrorCode JsScript::runScript() {
+JsErrorCode JsPlugin::runScript() {
 	JS::JsSetCurrentContext(ctx);
 	this->checkTrusted();
 #if LATITE_DEBUG
 	Logger::Info("isTrusted = {}", this->isTrusted());
 #endif
-	auto err = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(indexPath)), (util::GetLatitePath() / "Scripts" / relFolderPath / "index.js").wstring().c_str(), nullptr);
+	auto err = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(indexPath)), (util::GetLatitePath() / "Plugins" / relFolderPath / "index.js").wstring().c_str(), nullptr);
 	return err;
 }
 
-JsValueRef JsScript::AsyncOperation::call() {
+JsValueRef JsPlugin::AsyncOperation::call() {
 	JS::JsSetCurrentContext(this->ctx);
 	JsValueRef obj;
 	this->args.insert(this->args.begin(), this->callback);

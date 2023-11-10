@@ -84,7 +84,7 @@
     <ClInclude Include="src\api\feature\module\ModuleManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\client\script\JsScript.h">
+    <ClInclude Include="src\client\script\JsPlugin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\script\ScriptManager.h">
@@ -729,6 +729,12 @@
     <ClInclude Include="src\client\feature\module\impl\hud\ArmorHUD.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\sdk\deps\CoreGraphics\ImageBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\client\util\JpegCommentWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1110,6 +1116,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\module\impl\hud\ArmorHUD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sdk\common\client\util\JpegCommentWriter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

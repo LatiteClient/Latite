@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "JsPlayerClass.h"
 #include "JsItemStack.h"
-#include "../../../JsScript.h"
+#include "../../../JsPlugin.h"
 
 JsValueRef JsPlayerClass::playerGetName(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	JsEntity* ent = nullptr;

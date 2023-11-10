@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "GameScriptingObject.h"
-#include "../JsScript.h"
+#include "../JsPlugin.h"
 #include "client/script/class/impl/JsVec2.h"
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/client/game/MinecraftGame.h"

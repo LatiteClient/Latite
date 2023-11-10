@@ -8,12 +8,12 @@ bool SignCommand::execute(std::string const label, std::vector<std::string> args
 	// in case this somehow doesn't get optimized away
 #if LATITE_DEBUG
 	if (args.empty()) return false;
-	auto path = util::GetLatitePath() / "Scripts" / args[0];
+	auto path = util::GetLatitePath() / "Plugins" / args[0];
 	if (!std::filesystem::exists(path)) {
 		message("Could not find script " + path.string(), true);
 		return true;
 	}
-	auto cert = JsScript::getHash(path);
+	auto cert = JsPlugin::getHash(path);
 	if (cert) {
 #if LATITE_DEBUG
 		message(std::format("Generated certificate {}", util::WStrToStr(cert.value())));

@@ -2,7 +2,7 @@
 #include "../JsLibrary.h"
 #include <functional>
 #include <thread>
-#include "../../JsScript.h"
+#include "../../JsPlugin.h"
 #include <winrt/windows.storage.streams.h>
 
 class Clipboard : public JsLibrary {

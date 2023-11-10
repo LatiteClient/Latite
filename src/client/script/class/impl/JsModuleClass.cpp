@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "JsModuleClass.h"
 #include "JsSettingClass.h"
-#include "../../JsScript.h"
+#include "../../JsPlugin.h"
 
 #include "client/feature/module/script/JsHudModule.h"
 

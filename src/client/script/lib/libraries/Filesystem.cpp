@@ -2,7 +2,7 @@
 #include "Filesystem.h"
 #include <filesystem>
 #include <fstream>
-#include "../../JsScript.h"
+#include "../../JsPlugin.h"
 #include "util/ChakraUtil.h"
 
 JsValueRef Filesystem::initialize(JsValueRef parent) {
@@ -25,7 +25,7 @@ std::wstring Filesystem::getPath(std::wstring relPath) {
 		}
 	}
 	catch (...) {}
-	return util::GetLatitePath() / "Scripts" / owner->relFolderPath / relPath;
+	return util::GetLatitePath() / "Plugins" / owner->relFolderPath / relPath;
 }
 
 namespace {
@@ -43,7 +43,7 @@ JsValueRef Filesystem::write(JsValueRef callee, bool isConstructor, JsValueRef* 
 	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsTypedArray}, {arguments[3], JsFunction}})) return undef;
 
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
-	auto op = std::make_shared<FSAsyncOperation>(arguments[3], [](JsScript::AsyncOperation* op_) {
+	auto op = std::make_shared<FSAsyncOperation>(arguments[3], [](JsPlugin::AsyncOperation* op_) {
 		auto op = reinterpret_cast<FSAsyncOperation*>(op_);
 		auto& arguments = op->params;
 		auto thi = reinterpret_cast<Filesystem*>(op->param);
@@ -88,7 +88,7 @@ JsValueRef Filesystem::read(JsValueRef callee, bool isConstructor, JsValueRef* a
 	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsFunction} })) return undef;
 
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
-	auto op = std::make_shared<FSAsyncOperation>(arguments[2], [](JsScript::AsyncOperation* op_) {
+	auto op = std::make_shared<FSAsyncOperation>(arguments[2], [](JsPlugin::AsyncOperation* op_) {
 		auto op = reinterpret_cast<FSAsyncOperation*>(op_);
 		std::ifstream ifs;
 		std::wstringstream wss;
