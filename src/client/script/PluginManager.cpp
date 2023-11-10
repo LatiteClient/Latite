@@ -1,6 +1,6 @@
 #include "pch.h"
 // brace yourselves
-#include "ScriptManager.h"
+#include "PluginManager.h"
 #include "client/Latite.h"
 #include "client/misc/ClientMessageSink.h"
 #include "client/event/Eventing.h"
@@ -26,10 +26,10 @@ using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Web::Http;
 using namespace winrt::Windows::Web::Http::Filters;
 
-ScriptManager::ScriptManager() {
+PluginManager::PluginManager() {
 }
 
-std::shared_ptr<JsPlugin> ScriptManager::loadScript(std::wstring const& folderPath, bool run)
+std::shared_ptr<JsPlugin> PluginManager::loadScript(std::wstring const& folderPath, bool run)
 {
 	auto& fPathW = folderPath;
 	auto scriptsPathW = util::GetLatitePath() / ("Plugins");
@@ -74,7 +74,7 @@ std::shared_ptr<JsPlugin> ScriptManager::loadScript(std::wstring const& folderPa
 	return myScript;
 }
 
-std::shared_ptr<JsPlugin> ScriptManager::getScriptByName(std::wstring const& name)
+std::shared_ptr<JsPlugin> PluginManager::getScriptByName(std::wstring const& name)
 {
 	for (auto& script : items) {
 		if (script->data.name == name) {
@@ -84,7 +84,7 @@ std::shared_ptr<JsPlugin> ScriptManager::getScriptByName(std::wstring const& nam
 	return nullptr;
 }
 
-void ScriptManager::popScript(std::shared_ptr<JsPlugin> ptr)
+void PluginManager::popScript(std::shared_ptr<JsPlugin> ptr)
 {
 	for (auto it = items.begin(); it != items.end(); it++) {
 		if (*it == ptr) {
@@ -95,7 +95,7 @@ void ScriptManager::popScript(std::shared_ptr<JsPlugin> ptr)
 	}
 }
 
-void ScriptManager::reportError(JsValueRef except, std::wstring filePath) {
+void PluginManager::reportError(JsValueRef except, std::wstring filePath) {
 	auto str = util::WStrToStr(Chakra::ToString(except));
 
 	std::stringstream ss;
@@ -106,7 +106,7 @@ void ScriptManager::reportError(JsValueRef except, std::wstring filePath) {
 	Chakra::Release(except);
 }
 
-void ScriptManager::handleErrors(JsErrorCode code) {
+void PluginManager::handleErrors(JsErrorCode code) {
 	JsContextRef ctx;
 	JS::JsGetCurrentContext(&ctx);
 	JsPlugin* script = JsPlugin::getThis();
@@ -122,7 +122,7 @@ void ScriptManager::handleErrors(JsErrorCode code) {
 	}
 }
 
-bool ScriptManager::loadPrerunScripts()
+bool PluginManager::loadPrerunScripts()
 {
 	if (!scriptingSupported()) {
 		Logger::Warn("Scripting is not supported");
@@ -143,7 +143,7 @@ bool ScriptManager::loadPrerunScripts()
 	return true;
 }
 
-void ScriptManager::runScriptingOperations()
+void PluginManager::runScriptingOperations()
 {
 	if (!scriptingSupported()) return;
 
@@ -184,7 +184,7 @@ void ScriptManager::runScriptingOperations()
 	dispatchEvent(ev);
 }
 
-std::optional<int> ScriptManager::installScript(std::string const& inName) {
+std::optional<int> PluginManager::installScript(std::string const& inName) {
 	std::wstring registry = L"https://raw.githubusercontent.com/LatiteScripting/Scripts/master/Scripts";
 	std::wstring jsonPath = registry + L"/scripts.json";
 	nlohmann::json scriptsJson;
@@ -271,7 +271,7 @@ std::optional<int> ScriptManager::installScript(std::string const& inName) {
 	return 0;
 }
 
-void ScriptManager::init()
+void PluginManager::init()
 {
 	auto scriptsPath = util::GetLatitePath() / ("Plugins");
 	std::filesystem::create_directory(scriptsPath);
@@ -284,7 +284,7 @@ void ScriptManager::init()
 	//this->objects.push_back(std::make_shared<Graphics3DScriptingObject>(id++));
 }
 
-void ScriptManager::initListeners()
+void PluginManager::initListeners()
 {
 	eventListeners[L"world-tick"] = {};
 	eventListeners[L"join-game"] = {};
@@ -303,7 +303,7 @@ void ScriptManager::initListeners()
 	eventListeners[L"unload-script"] = {};
 }
 
-void ScriptManager::unloadScript(std::shared_ptr<JsPlugin> ptr)
+void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr)
 {
 	Event::Value val{L"scriptName"};
 	val.name = L"scriptName";
@@ -327,13 +327,13 @@ void ScriptManager::unloadScript(std::shared_ptr<JsPlugin> ptr)
 	}
 }
 
-void ScriptManager::unloadAll() {
+void PluginManager::unloadAll() {
 	for (auto& s : this->items) {
 		popScript(s);
 	}
 }
 
-bool ScriptManager::hasPermission(JsPlugin* script, Permission perm) {
+bool PluginManager::hasPermission(JsPlugin* script, Permission perm) {
 	auto player = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!player) {
 #if LATITE_DEBUG
@@ -350,17 +350,17 @@ bool ScriptManager::hasPermission(JsPlugin* script, Permission perm) {
 	return false;
 }
 
-bool ScriptManager::scriptingSupported() {
+bool PluginManager::scriptingSupported() {
 	return JS::JsAddRef;
 }
 
-void ScriptManager::uninitialize() {
+void PluginManager::uninitialize() {
 	for (auto& script : this->items) {
 		popScript(script);
 	}
 }
 
-bool ScriptManager::dispatchEvent(Event& ev)
+bool PluginManager::dispatchEvent(Event& ev)
 {
 	for (auto& lis : eventListeners) {
 		if (lis.first == ev.type) {

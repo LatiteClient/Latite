@@ -29,7 +29,7 @@ JsValueRef JsPlayerClass::playerGetSelectedItem(JsValueRef callee, bool isConstr
 	if (ent && ent->validate() && ent->getEntity()->isPlayer()) {
 		if (ent->level != JsEntity::AccessLevel::Restricted) {
 			auto supp = static_cast<SDK::Player*>(ent->getEntity())->supplies;
-			return JsScript::getThis()->getClass<JsItemStack>()->construct(supp->inventory->getItem(supp->selectedSlot), false);
+			return JsPlugin::getThis()->getClass<JsItemStack>()->construct(supp->inventory->getItem(supp->selectedSlot), false);
 		}
 		else {
 			Chakra::ThrowError(L"Access denied - cannot use getHoldingItem");

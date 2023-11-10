@@ -30,7 +30,7 @@ protected:
 public:
 	inline static const wchar_t* class_name = L"Setting";
 
-	JsSettingClass(class JsScript* owner) : JsWrapperClass(owner, class_name) {
+	JsSettingClass(class JsPlugin* owner) : JsWrapperClass(owner, class_name) {
 		createConstructor(jsConstructor, this);
 	}
 

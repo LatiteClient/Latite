@@ -18,7 +18,7 @@ public:
 	void render(DrawUtil& dc, bool, bool) override;
 	void preRender(bool mcRend, bool isPreview, bool isEditor) override;
 
-	JsScript* script = nullptr;
+	JsPlugin* script = nullptr;
 private:
 	std::string displayName;
 

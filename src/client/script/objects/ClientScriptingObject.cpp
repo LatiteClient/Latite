@@ -3,7 +3,7 @@
 #include "util/Util.h"
 #include "util/ChakraUtil.h"
 #include "client/Latite.h"
-#include "client/script/ScriptManager.h"
+#include "client/script/PluginManager.h"
 #include "client/feature/command/CommandManager.h"
 #include "client/feature/module/ModuleManager.h"
 #include "../class/impl/game/JsItemStack.h"
@@ -22,7 +22,7 @@ JsValueRef ClientScriptingObject::registerEventCallback(JsValueRef callee, bool 
 	JS::JsStringToPointer(arguments[1], &myS, &sze);
 	std::wstring wstr(myS);
 
-	for (auto& lis : Latite::getScriptManager().eventListeners) {
+	for (auto& lis : Latite::getPluginManager().eventListeners) {
 		if (lis.first == wstr) {
 			JsContextRef ct;
 			JS::JsGetCurrentContext(&ct);
@@ -70,7 +70,7 @@ JsValueRef ClientScriptingObject::getCmgrCallback(JsValueRef callee, bool isCons
 }
 
 JsValueRef ClientScriptingObject::testCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState){
-	return JsScript::getThis()->getClass<JsItemStack>()->construct(SDK::ClientInstance::get()->getLocalPlayer()->supplies->inventory->getItem(0), false);
+	return JsPlugin::getThis()->getClass<JsItemStack>()->construct(SDK::ClientInstance::get()->getLocalPlayer()->supplies->inventory->getItem(0), false);
 }
 
 void ClientScriptingObject::initModuleManager() {
@@ -184,7 +184,7 @@ JsValueRef ClientScriptingObject::mmgrGetModuleByName(JsValueRef callee, bool is
 
 	JsContextRef ctx;
 	JS::JsGetCurrentContext(&ctx);
-	JsScript* script = JsScript::getThis();
+	JsPlugin* script = JsPlugin::getThis();
 	if (script && mod) {
 		auto cl = script->getClass<JsModuleClass>();
 		if (!cl) {
@@ -215,7 +215,7 @@ JsValueRef ClientScriptingObject::mmgrForEachModule(JsValueRef callee, bool isCo
 	auto thi = reinterpret_cast<ClientScriptingObject*>(callbackState);
 	JsContextRef ctx;
 	JS::JsGetCurrentContext(&ctx);
-	JsScript* script = JsScript::getThis();
+	JsPlugin* script = JsPlugin::getThis();
 	
 	auto cl = script->getClass<JsModuleClass>();
 	if (!cl) {
@@ -226,7 +226,7 @@ JsValueRef ClientScriptingObject::mmgrForEachModule(JsValueRef callee, bool isCo
 	Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> modul) {
 		JsValueRef r[2] = { arguments[0], cl->construct(reinterpret_cast<JsModule*>(modul.get()), false) };
 		JsValueRef res;
-		Latite::getScriptManager().handleErrors(Chakra::CallFunction(arguments[1], r, 2, &res));
+		Latite::getPluginManager().handleErrors(Chakra::CallFunction(arguments[1], r, 2, &res));
 		Chakra::Release(res);
 		Chakra::Release(r[1]);
 		return false;

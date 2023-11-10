@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "PacketHooks.h"
-#include "client/script/ScriptManager.h"
+#include "client/script/PluginManager.h"
 
 namespace {
     std::shared_ptr<Hook> SetTitlePacketRead;
@@ -10,7 +10,7 @@ namespace {
 void* PacketHooks::SetTitlePacket_readExtended(SDK::SetTitlePacket* pkt, void* b, void* c) {
     auto res = SetTitlePacketRead->oFunc<decltype(&SetTitlePacket_readExtended)>()(pkt, b, c);
     {
-        auto v1 = ScriptManager::Event::Value(L"type");
+        auto v1 = PluginManager::Event::Value(L"type");
 
         switch (pkt->type) {
         case SDK::TitleType::Clear:
@@ -44,11 +44,11 @@ void* PacketHooks::SetTitlePacket_readExtended(SDK::SetTitlePacket* pkt, void* b
             v1.val = L"unknown";
             break;
         }
-        auto v2 = ScriptManager::Event::Value(L"text");
+        auto v2 = PluginManager::Event::Value(L"text");
         v2.val = util::StrToWStr(pkt->text.getCStr());
 
-        ScriptManager::Event ev(L"title", {v1, v2}, true);
-        if (Latite::getScriptManager().dispatchEvent(ev)) {
+        PluginManager::Event ev(L"title", {v1, v2}, true);
+        if (Latite::getPluginManager().dispatchEvent(ev)) {
             pkt->type = SDK::TitleType::Clear;
         }
     }
@@ -62,7 +62,7 @@ void* PacketHooks::TextPacket_read(SDK::TextPacket* pkt, void* b, void* c) {
         JS::JsGetCurrentContext(&ctx);
         if (ctx != 0) { // This is the jankiest way possible to see if its the server or not
 
-            ScriptManager::Event::Value typ{L"type"};
+            PluginManager::Event::Value typ{L"type"};
             typ.val = L"Unknown";
             switch (pkt->type) {
             case SDK::TextPacketType::RAW:
@@ -97,22 +97,22 @@ void* PacketHooks::TextPacket_read(SDK::TextPacket* pkt, void* b, void* c) {
                 break;
             }
 
-            ScriptManager::Event::Value val{L"message"};
+            PluginManager::Event::Value val{L"message"};
             val.val = util::StrToWStr(pkt->str);
 
-            ScriptManager::Event::Value val2{L"sender"};
+            PluginManager::Event::Value val2{L"sender"};
             val2.val = util::StrToWStr(pkt->source);
 
-            ScriptManager::Event::Value val3{L"xuid"};
+            PluginManager::Event::Value val3{L"xuid"};
             val3.val = util::StrToWStr(pkt->xboxUserId);
 
-            ScriptManager::Event::Value isChat{L"isChat"};
+            PluginManager::Event::Value isChat{L"isChat"};
             isChat.val = (pkt->type == SDK::TextPacketType::CHAT || pkt->type == SDK::TextPacketType::RAW
                 || pkt->type == SDK::TextPacketType::SYSTEM_MESSAGE || pkt->type == SDK::TextPacketType::WHISPER
                 || pkt->type == SDK::TextPacketType::OBJECT_WHISPER || pkt->type == SDK::TextPacketType::ANNOUNCEMENT);
 
-            ScriptManager::Event ev{L"receive-chat", { typ, val, val2, val3, isChat }, false};
-            if (Latite::getScriptManager().dispatchEvent(ev)) {
+            PluginManager::Event ev{L"receive-chat", { typ, val, val2, val3, isChat }, false};
+            if (Latite::getPluginManager().dispatchEvent(ev)) {
                 pkt->type = SDK::TextPacketType::JUKEBOX_POPUP;
                 pkt->str.setString("");
                 pkt->source.setString("");

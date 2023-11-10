@@ -7,7 +7,7 @@
 
 #include "client/Latite.h"
 #include "client/misc/ClientMessageSink.h"
-#include "ScriptManager.h"
+#include "PluginManager.h"
 
 #include <winrt/base.h>
 #include <winrt/Windows.Foundation.h>
@@ -301,7 +301,7 @@ void JsPlugin::loadJSApi() {
 	JS::JsSetCurrentContext(ctx);
 	JsValueRef res;
 	auto err = JS::JsRunScript(util::StrToWStr(Latite::get().getTextAsset(JS_LATITEAPI)).c_str(), ++sCtx, L"latiteapi.js", &res);
-	Latite::getScriptManager().handleErrors(err);
+	Latite::getPluginManager().handleErrors(err);
 	if (!err) {
 		JS::JsRelease(res, nullptr);
 	}
@@ -552,6 +552,6 @@ JsValueRef JsPlugin::AsyncOperation::call() {
 	JS::JsSetCurrentContext(this->ctx);
 	JsValueRef obj;
 	this->args.insert(this->args.begin(), this->callback);
-	Latite::getScriptManager().handleErrors(Chakra::CallFunction(this->callback, this->args.data(), static_cast<unsigned short>(this->args.size()), &obj));
+	Latite::getPluginManager().handleErrors(Chakra::CallFunction(this->callback, this->args.data(), static_cast<unsigned short>(this->args.size()), &obj));
 	return obj;
 }

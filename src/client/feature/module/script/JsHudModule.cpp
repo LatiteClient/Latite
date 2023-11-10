@@ -6,7 +6,7 @@ JsHUDModule::JsHUDModule(std::string const& name, std::string const& displayName
 	JS::JsAddRef(object, nullptr);
 	JS::JsGetCurrentContext(&this->ctx);
 
-	script = JsScript::getThis();
+	script = JsPlugin::getThis();
 
 	this->eventListeners[L"enable"] = {};
 	this->eventListeners[L"disable"] = {};

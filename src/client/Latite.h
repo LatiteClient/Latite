@@ -27,7 +27,7 @@ public:
 	[[nodiscard]] static class Renderer& getRenderer() noexcept;
 	[[nodiscard]] static class ScreenManager& getScreenManager() noexcept;
 	[[nodiscard]] static class Assets& getAssets() noexcept;
-	[[nodiscard]] static class ScriptManager& getScriptManager() noexcept;
+	[[nodiscard]] static class PluginManager& getPluginManager() noexcept;
 	[[nodiscard]] static class Keyboard& getKeyboard() noexcept;
 
 	[[nodiscard]] Timings& getTimings() noexcept { return timings; }

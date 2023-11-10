@@ -16,8 +16,8 @@ void __fastcall ScreenViewHooks::setupAndRender(SDK::ScreenView* view, void* ctx
 	Eventing::get().dispatch(ev);
 
 	if (view->visualTree->rootControl->name == "debug_screen") {
-		ScriptManager::Event ev{L"render2d", {}, false};
-		Latite::getScriptManager().dispatchEvent(ev);
+		PluginManager::Event ev{L"render2d", {}, false};
+		Latite::getPluginManager().dispatchEvent(ev);
 	}
 
 	RenderGameEvent evt{ };

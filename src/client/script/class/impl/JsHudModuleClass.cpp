@@ -13,7 +13,7 @@ JsValueRef JsHudModuleClass::hudModuleGetRect(JsValueRef callee, bool isConstruc
 		return Chakra::GetUndefined();
 	}
 
-	return JsScript::getThis()->getClass<JsRect>()->construct(mod->getRectNonScaled());
+	return JsPlugin::getThis()->getClass<JsRect>()->construct(mod->getRectNonScaled());
 }
 
 JsValueRef JsHudModuleClass::hudModuleSetRect(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)

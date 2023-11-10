@@ -4,7 +4,7 @@
 #include "client/misc/ClientMessageSink.h"
 #include "client/feature/command/commandmanager.h"
 #include "client/event/Eventing.h"
-#include "client/script/ScriptManager.h"
+#include "client/script/PluginManager.h"
 
 namespace {
 	std::shared_ptr<Hook> Level_tickHook;
@@ -33,8 +33,8 @@ void GenericHooks::Level_tick(SDK::Level* level) {
 		Latite::getClientMessageSink().doPrint(100);
 	}
 	
-	ScriptManager::Event sEv{L"world-tick", {}, false};
-	Latite::getScriptManager().dispatchEvent(sEv);
+	PluginManager::Event sEv{L"world-tick", {}, false};
+	Latite::getPluginManager().dispatchEvent(sEv);
 
 	return Level_tickHook->oFunc<decltype(&Level_tick)>()(level);
 }
@@ -49,10 +49,10 @@ void* GenericHooks::ChatScreenController_sendChatMessage(void* controller, std::
 	if (Eventing::get().dispatch(ev)) return nullptr;
 
 	{
-		ScriptManager::Event::Value val{L"message"};
+		PluginManager::Event::Value val{L"message"};
 		val.val = util::StrToWStr(message);
-		ScriptManager::Event sev{L"send-chat", { val }, true};
-		if (Latite::getScriptManager().dispatchEvent(sev)) return nullptr;
+		PluginManager::Event sev{L"send-chat", { val }, true};
+		if (Latite::getPluginManager().dispatchEvent(sev)) return nullptr;
 	}
 
 	return ChatScreenController_sendChatMesageHook->oFunc<decltype(&ChatScreenController_sendChatMessage)>()(controller, message);
@@ -73,13 +73,13 @@ void GenericHooks::Keyboard_feed(int key, bool isDown) {
 	if (Eventing::get().dispatch(ev)) return;
 
 	{
-		ScriptManager::Event::Value val{L"isDown"};
+		PluginManager::Event::Value val{L"isDown"};
 		val.val = isDown;
 
-		ScriptManager::Event::Value val3{L"keyCode"};
+		PluginManager::Event::Value val3{L"keyCode"};
 		val3.val = static_cast<double>(key);
 
-		ScriptManager::Event::Value val2{L"keyAsChar"};
+		PluginManager::Event::Value val2{L"keyAsChar"};
 
 		std::string str = "";
 		if (key > 31 && key < 128) {
@@ -87,8 +87,8 @@ void GenericHooks::Keyboard_feed(int key, bool isDown) {
 		}
 		val2.val = util::StrToWStr(str);
 
-		ScriptManager::Event sEv{L"key-press", { val, val2, val3 }, true};
-		if (Latite::getScriptManager().dispatchEvent(sEv)) return;
+		PluginManager::Event sEv{L"key-press", { val, val2, val3 }, true};
+		if (Latite::getPluginManager().dispatchEvent(sEv)) return;
 	}
 
 	return Keyboard_feedHook->oFunc<decltype(&Keyboard_feed)>()(key, isDown);
@@ -101,20 +101,20 @@ void GenericHooks::onClick(ClickMap* map, char clickType, char isDownWheelDelta,
 	if (clickType > 0) {
 		Vec2& mousePos = SDK::ClientInstance::get()->cursorPos;
 
-		ScriptManager::Event::Value val{L"mouseX"};
+		PluginManager::Event::Value val{L"mouseX"};
 		val.val = static_cast<double>(mousePos.x);
 
-		ScriptManager::Event::Value val2{L"mouseY"};
+		PluginManager::Event::Value val2{L"mouseY"};
 		val2.val = static_cast<double>(mousePos.y);
 
-		ScriptManager::Event::Value val3{L"isDown"};
+		PluginManager::Event::Value val3{L"isDown"};
 		val3.val = static_cast<bool>(isDownWheelDelta);
 
-		ScriptManager::Event::Value val4{L"button"};
+		PluginManager::Event::Value val4{L"button"};
 		val4.val = static_cast<double>(clickType);
 
-		ScriptManager::Event ev{L"click", { val, val2, val3, val4 }, true};
-		if (Latite::getScriptManager().dispatchEvent(ev)) return;
+		PluginManager::Event ev{L"click", { val, val2, val3, val4 }, true};
+		if (Latite::getPluginManager().dispatchEvent(ev)) return;
 	}
 
 	return OnClickHook->oFunc<decltype(&onClick)>()(map, clickType, isDownWheelDelta, a4, a5, a6, a7, a8);
@@ -212,16 +212,16 @@ void __fastcall GenericHooks::CameraViewBob(void* a, void* b, void* c) {
 bool GenericHooks::Level_initialize(SDK::Level* obj, void* palette, void* settings, void* tickRange, void* experiments, uint64_t a6) {
 	auto o = Level_initializeHook->oFunc<decltype(&Level_initialize)>()(obj, palette, settings, tickRange, experiments, a6);
 	if (obj->isClientSide()) {
-		ScriptManager::Event ev{L"join-game", {}, false};
-		Latite::getScriptManager().dispatchEvent(ev);
+		PluginManager::Event ev{L"join-game", {}, false};
+		Latite::getPluginManager().dispatchEvent(ev);
 	}
 	return o;
 }
 
 void* GenericHooks::Level_startLeaveGame(SDK::Level* obj) {
 	if (obj->isClientSide()) {
-		ScriptManager::Event ev{L"leave-game", {}, false};
-		Latite::getScriptManager().dispatchEvent(ev);
+		PluginManager::Event ev{L"leave-game", {}, false};
+		Latite::getPluginManager().dispatchEvent(ev);
 	}
 
 	LeaveGameEvent ev{};

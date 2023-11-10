@@ -87,7 +87,7 @@
     <ClInclude Include="src\client\script\JsPlugin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\client\script\ScriptManager.h">
+    <ClInclude Include="src\client\script\PluginManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\sdk\common\world\Minecraft.h">
@@ -878,7 +878,7 @@
     <ClCompile Include="src\client\hook\impl\AppPlatformHooks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\client\script\JsScript.cpp">
+    <ClCompile Include="src\client\script\JsPlugin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\util\ChakraUtil.cpp">
@@ -896,7 +896,7 @@
     <ClCompile Include="src\client\script\ScriptingObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\client\script\ScriptManager.cpp">
+    <ClCompile Include="src\client\script\PluginManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\command\impl\ScriptCommand.cpp">

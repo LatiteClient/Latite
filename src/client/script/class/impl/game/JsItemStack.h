@@ -41,7 +41,7 @@ protected:
 	}
 public:
 	inline static const wchar_t* class_name = L"ItemStack";
-	JsItemStack(class JsScript* owner) : JsWrapperClass(owner, class_name) {
+	JsItemStack(class JsPlugin* owner) : JsWrapperClass(owner, class_name) {
 		createConstructor(jsNoConstructor, this);
 	}
 

@@ -5,16 +5,16 @@
 #include <queue>
 #include <variant>
 
-class ScriptManager final : public Listener, public Manager<class JsScript> {
+class PluginManager final : public Listener, public Manager<class JsPlugin> {
 private:
-	std::queue<std::shared_ptr<class JsScript>> scriptCheckQueue = {};
+	std::queue<std::shared_ptr<class JsPlugin>> scriptCheckQueue = {};
 public:
-	ScriptManager();
+	PluginManager();
 
-	std::shared_ptr<class JsScript> loadScript(std::wstring const& folderPath, bool run = true);
-	std::shared_ptr<class JsScript> getScriptByName(std::wstring const& name);
+	std::shared_ptr<class JsPlugin> loadPlugin(std::wstring const& folderPath, bool run = true);
+	std::shared_ptr<class JsPlugin> getPluginByName(std::wstring const& name);
 
-	void popScript(std::shared_ptr<JsScript> ptr);
+	void popScript(std::shared_ptr<JsPlugin> ptr);
 	void reportError(JsValueRef except, std::wstring filePath);
 	void handleErrors(JsErrorCode code);
 	bool loadPrerunScripts();
@@ -23,7 +23,7 @@ public:
 
 	void init();
 	void initListeners();
-	void unloadScript(std::shared_ptr<JsScript> ptr);
+	void unloadScript(std::shared_ptr<JsPlugin> ptr);
 	void unloadAll();
 
 	enum class Permission {
@@ -31,7 +31,7 @@ public:
 		Operator,
 	};
 
-	bool hasPermission(JsScript* script, Permission perm);
+	bool hasPermission(JsPlugin* script, Permission perm);
 	static bool scriptingSupported();
 
 	using event_callback_t = void(__fastcall*)(JsValueRef func);

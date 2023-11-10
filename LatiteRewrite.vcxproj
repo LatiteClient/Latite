@@ -477,7 +477,7 @@
     <ClInclude Include="src\client\script\objects\GameScriptingObject.h" />
     <ClInclude Include="src\client\script\ScriptCertificate.h" />
     <ClInclude Include="src\client\script\ScriptingObject.h" />
-    <ClInclude Include="src\client\script\ScriptManager.h" />
+    <ClInclude Include="src\client\script\PluginManager.h" />
     <ClInclude Include="src\client\ui\TextBox.h" />
     <ClInclude Include="src\sdk\common\client\game\FontRepository.h" />
     <ClInclude Include="src\sdk\common\client\gui\controls\UIControl.h" />
@@ -664,7 +664,7 @@
     <ClCompile Include="src\client\script\feature\JsEvented.cpp" />
     <ClCompile Include="src\client\script\interop\classes\JsEntity.cpp" />
     <ClCompile Include="src\client\script\interop\classes\JsTexture.cpp" />
-    <ClCompile Include="src\client\script\JsScript.cpp" />
+    <ClCompile Include="src\client\script\JsPlugin.cpp" />
     <ClCompile Include="src\client\script\lib\JsLibrary.cpp" />
     <ClCompile Include="src\client\script\lib\libraries\Clipboard.cpp" />
     <ClCompile Include="src\client\script\lib\libraries\Filesystem.cpp" />
@@ -673,7 +673,7 @@
     <ClCompile Include="src\client\script\objects\D2DScriptingObject.cpp" />
     <ClCompile Include="src\client\script\objects\GameScriptingObject.cpp" />
     <ClCompile Include="src\client\script\ScriptingObject.cpp" />
-    <ClCompile Include="src\client\script\ScriptManager.cpp" />
+    <ClCompile Include="src\client\script\PluginManager.cpp" />
     <ClCompile Include="src\client\ui\TextBox.cpp" />
     <ClCompile Include="src\pch.cpp">
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MultiProcessorCompilation>

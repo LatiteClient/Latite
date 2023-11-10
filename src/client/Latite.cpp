@@ -8,7 +8,7 @@
 
 #include "feature/module/ModuleManager.h"
 #include "feature/command/CommandManager.h"
-#include "script/ScriptManager.h"
+#include "script/PluginManager.h"
 
 #include "config/ConfigManager.h"
 #include "misc/ClientMessageSink.h"
@@ -63,7 +63,7 @@ namespace {
     alignas(LatiteHooks) char hooks[sizeof(LatiteHooks)] = {};
     alignas(ScreenManager) char scnMgrBuf[sizeof(ScreenManager)] = {};
     alignas(Assets) char assetsBuf[sizeof(Assets)] = {};
-    alignas(ScriptManager) char scriptMgrBuf[sizeof(ScriptManager)] = {};
+    alignas(PluginManager) char scriptMgrBuf[sizeof(PluginManager)] = {};
     alignas(Keyboard) char keyboardBuf[sizeof(Keyboard)] = {};
 
     bool hasInjected = false;
@@ -208,7 +208,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (configMgrBuf) ConfigManager();
     new (hooks) LatiteHooks();
     new (scnMgrBuf) ScreenManager(); // needs to be before renderer
-    new (scriptMgrBuf) ScriptManager();
+    new (scriptMgrBuf) PluginManager();
     new (rendererBuf) Renderer();
     new (assetsBuf) Assets();
 
@@ -324,7 +324,7 @@ BOOL WINAPI DllMain(
         Latite::getRenderer().~Renderer();
         Latite::getAssets().~Assets();
         Latite::getScreenManager().~ScreenManager();
-        Latite::getScriptManager().~ScriptManager();
+        Latite::getPluginManager().~PluginManager();
         Latite::get().~Latite();
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
@@ -374,8 +374,8 @@ Assets& Latite::getAssets() noexcept {
     return *std::launder(reinterpret_cast<Assets*>(assetsBuf));
 }
 
-ScriptManager& Latite::getScriptManager() noexcept {
-    return *std::launder(reinterpret_cast<ScriptManager*>(scriptMgrBuf));
+PluginManager& Latite::getPluginManager() noexcept {
+    return *std::launder(reinterpret_cast<PluginManager*>(scriptMgrBuf));
 }
 
 Keyboard& Latite::getKeyboard() noexcept {
@@ -433,7 +433,7 @@ void Latite::initialize(HINSTANCE hInst) {
     getHooks().enable();
     Logger::Info(XOR_STRING("Enabled Hooks"));
 
-    Latite::getScriptManager().init();
+    Latite::getPluginManager().init();
     Logger::Info(XOR_STRING("Script manager initialized."));
 
     // doesn't work, maybe it's stored somewhere else too
@@ -451,7 +451,7 @@ void Latite::threadsafeInit() {
     std::string vstr(this->version);
     auto ws = util::StrToWStr(XOR_STRING("Latite Client ") + vstr);
     app.Title(ws);
-    Latite::getScriptManager().loadPrerunScripts();
+    Latite::getPluginManager().loadPrerunScripts();
     Logger::Info(XOR_STRING("Loaded startup scripts"));
     if (!Latite::getConfigManager().loadMaster()) {
         Logger::Fatal(XOR_STRING("Could not load master config!"));
@@ -686,7 +686,7 @@ void Latite::onUpdate(Event& evGeneric) {
         hasInit = true;
     }
     getKeyboard().findTextInput();
-    Latite::getScriptManager().runScriptingOperations();
+    Latite::getPluginManager().runScriptingOperations();
 
     static bool lastDX11 = std::get<BoolValue>(this->useDX11);
     if (std::get<BoolValue>(useDX11) != lastDX11) {

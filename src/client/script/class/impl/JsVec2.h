@@ -31,7 +31,7 @@ protected:
 public:
 	inline static const wchar_t* class_name = L"Vector2";
 
-	JsVec2(class JsScript* owner) : JsClass(owner, class_name) {
+	JsVec2(class JsPlugin* owner) : JsClass(owner, class_name) {
 		createConstructor(jsConstructor, this);
 	}
 

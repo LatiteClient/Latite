@@ -28,7 +28,7 @@ JsValueRef Network::get(JsValueRef callee, bool isConstructor, JsValueRef* argum
 	auto ws = Chakra::GetString(arguments[1]);
 	
 	auto thi = reinterpret_cast<Network*>(callbackState);
-	auto op = std::make_shared<NetAsyncOperation>(arguments[3], [](JsScript::AsyncOperation* op_) {
+	auto op = std::make_shared<NetAsyncOperation>(arguments[3], [](JsPlugin::AsyncOperation* op_) {
 		auto op = reinterpret_cast<NetAsyncOperation*>(op_);
 		auto http = HttpClient();
 

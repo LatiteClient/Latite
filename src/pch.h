@@ -56,7 +56,7 @@ using namespace std::chrono_literals;
 // Client
 #include "client/hook/Hook.h"
 #include "client/script/JsPlugin.h"
-#include "client/script/ScriptManager.h"
+#include "client/script/PluginManager.h"
 #include "client/ui/TextBox.h"
 #include "client/misc/Timings.h"
 #include "client/misc/ClientMessageSink.h"

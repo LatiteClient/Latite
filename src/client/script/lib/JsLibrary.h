@@ -4,13 +4,13 @@
 
 class JsLibrary {
 public:
-	JsLibrary(class JsScript* owner, std::wstring const& inclName) : includeName(inclName), owner(owner) {}
+	JsLibrary(class JsPlugin* owner, std::wstring const& inclName) : includeName(inclName), owner(owner) {}
 
 	virtual JsValueRef initialize(JsValueRef parentObj) = 0;
 	virtual bool shouldInclude(std::wstring const& str) {
 		return this->includeName == str;
 	}
 protected:
-	class JsScript* owner;
+	class JsPlugin* owner;
 	std::wstring includeName;
 };

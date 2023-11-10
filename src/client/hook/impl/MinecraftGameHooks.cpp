@@ -3,7 +3,7 @@
 #include "client/event/impl/AppSuspendedEvent.h"
 #include "client/event/impl/UpdateEvent.h"
 #include "client/event/Eventing.h"
-#include "client/script/ScriptManager.h"
+#include "client/script/PluginManager.h"
 #include "client/Latite.h"
 
 namespace {
@@ -15,8 +15,8 @@ void* MinecraftGameHooks::onAppSuspended(SDK::MinecraftGame* game,void*a,void*b,
 	AppSuspendedEvent ev{};
 	Eventing::get().dispatch(ev);
 	{
-		ScriptManager::Event sev{L"app-suspended", {}, false};
-		Latite::getScriptManager().dispatchEvent(sev);
+		PluginManager::Event sev{L"app-suspended", {}, false};
+		Latite::getPluginManager().dispatchEvent(sev);
 	}
 
 	return onAppSuspendedHook->oFunc<decltype(&onAppSuspended)>()(game,a,b,c);
@@ -28,8 +28,8 @@ void* __fastcall MinecraftGameHooks::_update(SDK::MinecraftGame* game) {
 	Eventing::get().dispatch(ev);
 
 	{
-		ScriptManager::Event sev{L"renderDX", {}, false};
-		Latite::getScriptManager().dispatchEvent(sev);
+		PluginManager::Event sev{L"renderDX", {}, false};
+		Latite::getPluginManager().dispatchEvent(sev);
 	}
 	return ret;
 }

@@ -62,7 +62,7 @@ protected:
 public:
 	inline static const wchar_t* class_name = L"Texture";
 
-	JsTextureClass(class JsScript* owner) : JsWrapperClass(owner, class_name) {
+	JsTextureClass(class JsPlugin* owner) : JsWrapperClass(owner, class_name) {
 		createConstructor(jsConstructor, this);
 	}
 

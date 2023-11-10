@@ -51,7 +51,7 @@ protected:
 public:
 	inline static const wchar_t* class_name = L"Module";
 
-	JsModuleClass(class JsScript* owner, const wchar_t* name = class_name, bool defConstruct = true) : JsWrapperClass(owner, name) {
+	JsModuleClass(class JsPlugin* owner, const wchar_t* name = class_name, bool defConstruct = true) : JsWrapperClass(owner, name) {
 		if (defConstruct) createConstructor(jsConstructor, this);
 	}
 

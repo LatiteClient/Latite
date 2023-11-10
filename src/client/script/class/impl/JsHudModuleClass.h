@@ -19,7 +19,7 @@ public:
 
 	inline static const wchar_t* class_name = L"HudModule";
 
-	JsHudModuleClass(JsScript* owner, const wchar_t* name = class_name) : JsModuleClass(owner, name, false) {
+	JsHudModuleClass(JsPlugin* owner, const wchar_t* name = class_name) : JsModuleClass(owner, name, false) {
 		createConstructor(jsConstructor2, this);
 	}
 
