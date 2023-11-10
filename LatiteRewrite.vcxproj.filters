@@ -720,6 +720,15 @@
     <ClInclude Include="src\util\DrawUtil3D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\script\class\impl\JsTextureClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\script\interop\classes\JsTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\hud\ArmorHUD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1095,6 +1104,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\util\DrawUtil3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\script\interop\classes\JsTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\hud\ArmorHUD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

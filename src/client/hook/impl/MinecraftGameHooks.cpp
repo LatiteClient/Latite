@@ -14,6 +14,11 @@ namespace {
 void* MinecraftGameHooks::onAppSuspended(SDK::MinecraftGame* game,void*a,void*b,void*c) {
 	AppSuspendedEvent ev{};
 	Eventing::get().dispatch(ev);
+	{
+		ScriptManager::Event sev{L"app-suspended", {}, false};
+		Latite::getScriptManager().dispatchEvent(sev);
+	}
+
 	return onAppSuspendedHook->oFunc<decltype(&onAppSuspended)>()(game,a,b,c);
 }
 

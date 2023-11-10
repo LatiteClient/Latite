@@ -85,3 +85,11 @@ float SDK::Actor::getSaturation() {
 	return 20.f;
 	return getAttribute(SDK::Attributes::Saturation)->value;
 }
+
+SDK::ItemStack* SDK::Actor::getArmor(int armorSlot) {
+	if (internalVers >= V1_20_40) {
+		return this->armorContainer->getItem(armorSlot);
+	}
+
+	return memory::callVirtual<ItemStack*>(this, mvGetOffset<0x7C, 0xB5, 0xCC, 0xCD>());
+}

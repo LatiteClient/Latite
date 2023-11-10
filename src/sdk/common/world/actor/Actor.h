@@ -16,10 +16,13 @@ namespace SDK {
 		MVCLASS_FIELD(StateVectorComponent*, stateVector, 0x2A0, 0, 0x350);
 		MVCLASS_FIELD(AABBShapeComponent*, aabbShape, 0x2A8, 0, 0x358);
 		MVCLASS_FIELD(MovementInterpolatorComponent*, movementInterpolator, 0x2B0, 0, 0x360);
-		CLASS_FIELD(MolangVariableMap, molangVariableMap, 0x450)
+		CLASS_FIELD(MolangVariableMap, molangVariableMap, 0x450);
 
 		// 1.19.51 only
 		CLASS_FIELD(class Level*, level_1_19_51, 0x310);
+
+		// 1.20.40+ only
+		CLASS_FIELD(class Inventory*, armorContainer, 0x428); // xref: Actor::getArmor(ArmorSlot)
 
 		AABB& getBoundingBox();
 		Vec2& getRot();
@@ -36,5 +39,6 @@ namespace SDK {
 		float getHealth();
 		float getHunger();
 		float getSaturation();
+		class ItemStack* getArmor(int armorSlot);
 	};
 }

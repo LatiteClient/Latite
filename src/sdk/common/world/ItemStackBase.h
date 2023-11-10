@@ -19,8 +19,19 @@ namespace SDK {
 		std::vector<class BlockLegacy*> canDestroy;
 		uintptr_t blockingTick[3]; // Tick
 
+		// TODO: update this
+
 		std::string getHoverName();
-		short getDamageValue();
+
+		short getDamageValue() {
+			if (!item) return 0;
+			return getItem()->getDamageValue(this->tag.get());
+		}
+
+		Item* getItem() {
+			if (!item) return nullptr;
+			return *item;
+		}
 
 		virtual ~ItemStackBase() = 0;
 	};

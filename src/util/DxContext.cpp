@@ -5,6 +5,8 @@
 #include "sdk/common/client/renderer/Tessellator.h"
 #include "sdk/common/client/renderer/MeshUtils.h"
 #include "sdk/common/client/renderer/MaterialPtr.h"
+#include <sdk/common/client/renderer/game/BaseActorRenderContext.h>
+#include <sdk/common/client/renderer/ItemRenderer.h>
 
 D2D1_RECT_F D2DUtil::getRect(RectF const& rc)  {
 	return D2D1::RectF(rc.left, rc.top, rc.right, rc.bottom);
@@ -271,7 +273,32 @@ void MCDrawUtil::drawVignette(d2d::Color const& innerCol, float fade) {
 
 void MCDrawUtil::drawImage(SDK::TexturePtr& texture, Vec2 const& pos, Vec2 const& size, d2d::Color const& flushCol) {
 	this->renderCtx->drawImage(texture, { pos.x * this->guiScale, pos.y * guiScale }, { size.x * guiScale, size.y * guiScale }, { 0.f, 0.f }, { 1.f, 1.f });
-	this->renderCtx->flushImages(flushCol, 1.f, SDK::HashedString("ui_grayscale"));
+	this->renderCtx->flushImages(flushCol, 1.f, SDK::HashedString("ui_grayscale") /*random hashed string*/);
+}
+
+d2d::Rect MCDrawUtil::drawItem(SDK::ItemStack* item, Vec2 const& pos, float sizeModifier, float opacity) {
+	SDK::BaseActorRenderContext ctx = SDK::BaseActorRenderContext{this->renderCtx->screenContext, this->renderCtx->cinst, this->renderCtx->cinst->minecraftGame};
+	
+	auto it = item->getItem();
+
+	auto oPickup = item->showPickup;
+	item->showPickup = false;
+
+	ctx.itemRenderer->renderGuiItemNew(&ctx, item, 0, pos.x * guiScale, pos.y * guiScale, opacity, sizeModifier / guiScale, 0.f, false);
+	if (it && it->isGlint(item)) {
+		ctx.itemRenderer->renderGuiItemNew(&ctx, item, 0, pos.x * guiScale, pos.y * guiScale, opacity, sizeModifier / guiScale, 0.f, true);
+	}
+
+	item->showPickup = false;
+
+	constexpr float itemSize = 16.f;
+
+	return {
+		pos.x,
+		pos.y,
+		pos.x + itemSize * sizeModifier,
+		pos.y + itemSize * sizeModifier
+	};
 }
 
 void MCDrawUtil::fillPolygon(Vec2 const& center, float radius, int numSides, d2d::Color const& col) {

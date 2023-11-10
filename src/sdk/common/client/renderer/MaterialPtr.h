@@ -10,5 +10,6 @@ namespace SDK {
 
 		// TODO: construct own materials
 		static MaterialPtr* getUIColor();
+		static MaterialPtr* getUITextureAndColor();
 	};
 }

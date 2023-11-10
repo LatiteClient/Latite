@@ -6,3 +6,7 @@ SDK::MaterialPtr* SDK::MaterialPtr::getUIColor() {
     return reinterpret_cast<SDK::MaterialPtr*>(Signatures::Misc::uiColorMaterial.result);
 }
 
+SDK::MaterialPtr* SDK::MaterialPtr::getUITextureAndColor() {
+    return reinterpret_cast<SDK::MaterialPtr**>(Signatures::Misc::uiColorMaterial.scan_result)[4];
+}
+

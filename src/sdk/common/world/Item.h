@@ -13,11 +13,23 @@ namespace SDK {
 		CLASS_FIELD(HashedString, _namespace, 0xF0); // minecraft
 		CLASS_FIELD(HashedString, namespacedId, 0x118); // minecraft:bow 
 
-		int getMaxUseDuration(class ItemStack* item) {
+		int getMaxUseDuration(class ItemStackBase* item) {
 			if (internalVers > V1_19_41) {
 				return memory::callVirtual<int>(this, 6, item);
 			}
 			return memory::callVirtual<int>(this, 4, item);
+		}
+
+		bool isGlint(class ItemStackBase* item) {
+			return memory::callVirtual<bool>(this, mvGetOffset<0x32, 0x2B, 0x32>(), item);
+		}
+
+		int getMaxDamage() {
+			return memory::callVirtual<int>(this, mvGetOffset<0x2F, 0x28, 0x2F>());
+		}
+
+		short getDamageValue(class CompoundTag* tag) {
+			return memory::callVirtual<short>(this, mvGetOffset<0x6B, 0x65, 0x6B>(), tag);
 		}
 
 		virtual ~Item() = 0;

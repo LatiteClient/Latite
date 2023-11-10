@@ -27,6 +27,7 @@
 #include "impl/hud/Keystrokes.h"
 #include "impl/hud/BreakIndicator.h"
 #include "impl/hud/HealthWarning.h"
+#include "impl/hud/ArmorHUD.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
 
@@ -59,6 +60,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<BreakIndicator>());
 	this->items.push_back(std::make_shared<BehindYou>());
 	this->items.push_back(std::make_shared<ChunkBorders>());
+	this->items.push_back(std::make_shared<ArmorHUD>());
 
 	for (auto& mod : items) {
 		mod->onInit();
