@@ -106,8 +106,9 @@ protected:
 	std::vector<std::shared_ptr<ScriptingObject>> objects;
 	std::vector<std::shared_ptr<JsClass>> classes;
 
-	std::vector<std::shared_ptr<AsyncOperation>> pendingOperations;
 public:
+	std::vector<std::shared_ptr<AsyncOperation>> pendingOperations;
+
 	JsSourceContext sCtx = (JsSourceContext)0;
 
 	std::vector<JsTimeout> timeouts = {};

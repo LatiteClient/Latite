@@ -45,7 +45,7 @@ std::shared_ptr<JsPlugin> PluginManager::loadPlugin(std::wstring const& folderPa
 
 	for (auto& scr : this->items) {
 		if (scr->getRelFolderPath() == fPathW) {
-			Latite::getClientMessageSink().push(util::Format(std::format("Plugin {} is already loaded.", util::WStrToStr(scr->data.name))));
+			Latite::getClientMessageSink().push(util::Format(std::format("Plugin {} is already loaded.", util::WStrToStr(scr->getName()))));
 			return nullptr;
 		}
 	}
@@ -55,13 +55,12 @@ std::shared_ptr<JsPlugin> PluginManager::loadPlugin(std::wstring const& folderPa
 	this->items.push_back(myScript);
 
 	if (run) {
-		myScript->fetchScriptData();
 		Event::Value val{L"scriptName"};
-		val.val= myScript->data.name;
+		val.val= myScript->getName();
 		Event::Value val2{L"scriptVersion"};
-		val2.val = myScript->data.version;
+		val2.val = myScript->getVersion();
 		Event::Value val3{L"scriptAuthor"};
-		val3.val = myScript->data.author;
+		val3.val = myScript->getAuthor();
 		Event newEv{ L"load-script", {val, val2, val3}, false };
 		dispatchEvent(newEv);
 	}
@@ -71,7 +70,7 @@ std::shared_ptr<JsPlugin> PluginManager::loadPlugin(std::wstring const& folderPa
 std::shared_ptr<JsPlugin> PluginManager::getPluginByName(std::wstring const& name)
 {
 	for (auto& script : items) {
-		if (script->data.name == name) {
+		if (script->getFolderName() == name) {
 			return script;
 		}
 	}
@@ -130,7 +129,7 @@ bool PluginManager::loadPrerunScripts()
 	for (auto& dirEntry : recursive_directory_iterator(prerunPath)) {
 		if (dirEntry.is_directory()) {
 			if (std::filesystem::exists(dirEntry.path().string() + "\\index.js")) {
-				loadPlugin(std::wstring(L"Startup") + L"\\" + dirEntry.path().filename().wstring(), true);
+				loadPlugin(getUserPrerunDir().filename().wstring() + L"\\" + dirEntry.path().filename().wstring(), true);
 			}
 		}
 	}
@@ -303,7 +302,7 @@ void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr)
 {
 	Event::Value val{L"scriptName"};
 	val.name = L"scriptName";
-	val.val = ptr->data.name;
+	val.val = ptr->getName();
 	Event newEv{ L"unload-script", {val}, false };
 	dispatchEvent(newEv);
 

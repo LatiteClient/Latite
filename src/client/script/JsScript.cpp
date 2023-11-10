@@ -352,7 +352,6 @@ namespace {
 		}
 
 		auto wPath = Chakra::GetString(arguments[1]);
-		bool isNet = false;
 
 		for (auto& lib : thi->libraries) {
 			if (lib->shouldInclude(wPath)) {
@@ -368,86 +367,23 @@ namespace {
 		//	isNet = true;
 		//}
 
-		auto path = isNet ? wPath : (thi->getFolderPath() / wPath).wstring();
-		if (!isNet && !path.ends_with(L".js")) {
-			path += L".js";
+		if (!wPath.ends_with(L".js")) {
+			wPath += L".js";
 		}
 
-		if (!isNet && !std::filesystem::exists(path) || std::filesystem::is_directory(path)) {
-			Chakra::ThrowError(L"Invalid filepath '" + path + L"'");
+		auto path = thi->getPlugin()->getPath() / wPath;
+
+		if (!std::filesystem::exists(path) || std::filesystem::is_directory(path)) {
+			Chakra::ThrowError(L"Invalid filepath '" + path.wstring() + L"'");
 			return undef;
 		}
 
-		std::wstringstream buffer;
-		if (!isNet) {
-			std::wifstream myIfs;
-			myIfs.open(path);
-			buffer << myIfs.rdbuf();
-			myIfs.close();
-		}
-		else {
-			HttpClient httpClient{};
-			std::wstring str = path;
-
-			winrt::Windows::Foundation::Uri requestUri(str);
-
-			HttpRequestMessage request(HttpMethod::Get(), requestUri);
-
-			try {
-				auto operation = httpClient.SendRequestAsync(request);
-				auto response = operation.get();
-
-				if (response.StatusCode() == HttpStatusCode::Ok)
-				{
-					auto cont = response.Content();
-					auto op = cont.ReadAsStringAsync();
-					buffer << op.get().c_str();
-				}
-				else
-				{
-					Chakra::ThrowError(L"Unable to fetch script from web, Http error: " + std::to_wstring((int32_t)response.StatusCode()));
-					return undef;
-				}
-			}
-			catch (winrt::hresult_error& er) {
-				Chakra::ThrowError(er.message().c_str());
-			}
-		}
-		std::wstring loadedScript = /*L"\"use strict;\"\n" + */buffer.str();
-		// prep
-
-		JsPropertyIdRef modId;
-
-		JsValueRef res;
-		auto err = JS::JsRunScript(loadedScript.c_str(), ++thi->sCtx, path.c_str(), &res);
-		JS::JsGetPropertyIdFromName(L"exports", &modId);
-		JsValueRef modulesObj;
-		JsValueRef global;
-		JS::JsGetGlobalObject(&global);
-		JS::JsGetProperty(global, modId, &modulesObj);
-		if (err) {
-			Chakra::Release(global);
-			Chakra::Release(modulesObj);
-			Chakra::Release(res);
-
-			if (err == JsErrorScriptException) {
-				JsValueRef except;
-				JS::JsGetAndClearException(&except);
-				auto str = Chakra::ToString(except);
-				Chakra::ThrowError(L"Error loading script: " + str);
-			}
-			else {
-				Chakra::ThrowError(L"Error loading script. JsErrorCode: " + err);
-			}
-
-			return undef;
+		auto mod = thi->getPlugin()->loadOrFindModule(wPath);
+		if (!mod) {
+			Chakra::ThrowError(L"Unable to load module " + wPath);
+			return Chakra::GetUndefined();
 		}
 
-		// handle modulesObj
-
-		Chakra::Release(global);
-		Chakra::Release(modulesObj);
-		Chakra::Release(res);
-		return modulesObj;
+		return mod->getModuleExports();
 	}
 }

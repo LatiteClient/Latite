@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "GameScriptingObject.h"
-#include "../JsPlugin.h"
+#include "../JsScript.h"
 #include "client/script/class/impl/JsVec2.h"
 #include "sdk/common/client/game/ClientInstance.h"
 #include "sdk/common/client/game/MinecraftGame.h"
@@ -76,7 +76,7 @@ JsValueRef GameScriptingObject::worldGetEntList(JsValueRef callee, bool isConstr
 		return Chakra::GetUndefined();
 	}
 
-	JsPlugin* scr = JsScript::getThis();
+	JsPlugin* scr = JsScript::getThis()->getPlugin();
 
 	if (!Latite::getPluginManager().hasPermission(scr, PluginManager::Permission::Operator)) {
 		Chakra::ThrowError(util::StrToWStr(XOR_STRING("No permission to use getEntityList here")));
@@ -92,7 +92,7 @@ JsValueRef GameScriptingObject::worldGetEntList(JsValueRef callee, bool isConstr
 	for (auto& ent : entList) {
 		JsValueRef db;
 		JS::JsDoubleToNumber(static_cast<double>(idx), &db);
-		JsPlugin* script = JsScript::getThis();
+		JsScript* script = JsScript::getThis();
 
 		auto entc = script->getClass<JsEntityClass>();
 		auto plrc = script->getClass<JsPlayerClass>();
@@ -115,7 +115,7 @@ JsValueRef GameScriptingObject::worldGetEntCount(JsValueRef callee, bool isConst
 		return Chakra::GetUndefined();
 	}
 
-	JsPlugin* scr = JsScript::getThis();
+	JsScript* scr = JsScript::getThis();
 
 	auto lvl = SDK::ClientInstance::get()->minecraft->getLevel();
 	auto entList = lvl->getRuntimeActorList();
@@ -123,7 +123,7 @@ JsValueRef GameScriptingObject::worldGetEntCount(JsValueRef callee, bool isConst
 }
 
 JsValueRef GameScriptingObject::getMousePosCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	JsPlugin* script = JsScript::getThis();
+	JsScript* script = JsScript::getThis();
 
 	auto vec2 = script->getClass<JsVec2>();
 	if (vec2) {
@@ -150,7 +150,7 @@ JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConst
 	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
 	if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsString} })) return JS_INVALID_REFERENCE;
 
-	JsPlugin* script = JsScript::getThis();
+	JsPlugin* script = JsScript::getThis()->getPlugin();
 	
 	if (Latite::getPluginManager().hasPermission(script, PluginManager::Permission::SendChat)) {
 		auto lp = SDK::ClientInstance::get()->getLocalPlayer();
@@ -198,7 +198,7 @@ JsValueRef GameScriptingObject::playSoundUI(JsValueRef callee, bool isConstructo
 JsValueRef GameScriptingObject::getLocalPlayerCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!lp) return Chakra::GetNull();
-	JsPlugin* script = JsScript::getThis();
+	JsScript* script = JsScript::getThis();
 
 	auto cl = script->getClass<JsLocalPlayerClass>();
 	return cl->construct(new JsEntity(1, JsEntity::AccessLevel::LocalPlayer), true);

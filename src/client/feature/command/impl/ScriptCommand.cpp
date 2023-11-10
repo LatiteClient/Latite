@@ -29,7 +29,7 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 		auto res = Latite::getPluginManager().loadPlugin(util::StrToWStr(args[1]), true);
 		if (res) {
 			std::wstringstream ss;
-			ss << "Loaded plugin " << res->data.name << " " << res->data.version << "!";
+			ss << "Loaded plugin " << res->getName() << " " << res->getVersion() << "!";
 			message(util::WStrToStr(ss.str()));
 		}
 		else {
@@ -60,7 +60,7 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 		if (!std::filesystem::exists(path))
 			path = (util::GetLatitePath() / ("Plugins") / scr).string();
 		if (std::filesystem::exists(path)) {
-			std::filesystem::rename(path, util::GetLatitePath() / "Plugins" / "Startup" / (std::filesystem::path(path).filename().string()));
+			std::filesystem::rename(path, PluginManager::getUserPrerunDir() / (std::filesystem::path(path).filename().string()));
 			message("Successfully moved plugin folder " + scr + " to startup.");
 			return true;
 		}
@@ -71,7 +71,7 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 	else if (args[0] == "reload") {
 		if (args.size() != 2) return false;
 		if (auto script = Latite::getPluginManager().getPluginByName(util::StrToWStr(args[1]))) {
-			auto path = script->relFolderPath;
+			auto path = script->getRelFolderPath();
 			Latite::getPluginManager().unloadScript(script);
 			auto sc = Latite::getPluginManager().loadPlugin(path, true);
 			if (sc) message("Successfully reloaded plugin.");

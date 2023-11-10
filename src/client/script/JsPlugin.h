@@ -19,6 +19,11 @@ public:
 	[[nodiscard]] std::wstring getRelFolderPath() { return relFolderPath; }
 	[[nodiscard]] std::wstring getFolderName() { return path.filename(); }
 
+	[[nodiscard]] std::wstring getName() { return name; }
+	[[nodiscard]] std::wstring getAuthor() { return author; }
+	[[nodiscard]] std::wstring getVersion() { return version; }
+	[[nodiscard]] std::wstring getDescription() { return description; }
+
 	inline static constexpr std::wstring_view MAIN_SCRIPT_NAME = L"main.js";
 	
 	JsPlugin(std::wstring const& relativePath);

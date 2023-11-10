@@ -122,6 +122,14 @@ std::shared_ptr<JsScript> JsPlugin::loadOrFindModule(std::wstring name) {
 	auto path = getPath() / name;
 	if (std::filesystem::exists(name)) path = name;
 
+	for (auto& scr : this->scripts) {
+		if (scr->getPath() == path) {
+			Logger::Info("Already found module {}", util::WStrToStr(name));
+			return scr;
+		}
+	}
+	Logger::Info("Loading module {}", util::WStrToStr(name));
+
 	auto scr = std::make_shared<JsScript>(path);
 	scr->load();
 	JsValueRef global;
