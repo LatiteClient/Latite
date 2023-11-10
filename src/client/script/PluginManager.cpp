@@ -124,7 +124,6 @@ bool PluginManager::loadPrerunScripts()
 
 	auto prerunPath = getUserPrerunDir();
 	std::filesystem::create_directory(prerunPath);
-
 	using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
 	for (auto& dirEntry : recursive_directory_iterator(prerunPath)) {
 		if (dirEntry.is_directory()) {

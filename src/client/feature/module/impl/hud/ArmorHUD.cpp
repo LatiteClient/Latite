@@ -153,7 +153,7 @@ d2d::Rect ArmorHUD::drawItem(MCDrawUtil& dc, Vec2 pos, SDK::ItemStack* stack, fl
 
 	if (stack->itemCount > 1) {
 		std::wstring st = std::to_wstring(stack->itemCount);
-		float textSize = 30.f;
+		float textSize = 25.f;
 		dc.drawText(rc, st, std::get<ColorValue>(txtColor).color1, Renderer::FontSelection::SegoeRegular,
 			textSize, DWRITE_TEXT_ALIGNMENT_TRAILING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 	}

@@ -200,6 +200,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(BaseActorRenderContext_BaseActorRenderContext),
         MVSIG(ItemRenderer_renderGuiItemNew),
         MVSIG(Actor_getAttribute),
+        MVSIG(UIControl_setPosition),
             };
     
     new (mmgrBuf) ModuleManager;

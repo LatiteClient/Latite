@@ -1,4 +1,5 @@
 #pragma once
+#include <util/XorString.h>
 
 // 1.20.40.1
 class Signatures {
@@ -216,6 +217,10 @@ public:
 	inline static SigImpl Actor_getAttribute{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? 48 8d 54 24 ? f3 0f 10 b0",
 		"Actor::getAttribute"};
+
+	inline static SigImpl UIControl_setPosition{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? f3 0f 58 73 ? f3 0f 58 7b ? f3 0f 11 7c 24 ? f3 0f 11 74 24 ? 48 8b cb",
+		"UIControl::setPosition"};
 };
 
 // after adding sigs here, add them in latite.cpp

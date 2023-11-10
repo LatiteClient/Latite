@@ -28,6 +28,7 @@
 #include "impl/hud/BreakIndicator.h"
 #include "impl/hud/HealthWarning.h"
 #include "impl/hud/ArmorHUD.h"
+#include "impl/hud/MovablePaperdoll.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
 
@@ -61,6 +62,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<BehindYou>());
 	this->items.push_back(std::make_shared<ChunkBorders>());
 	this->items.push_back(std::make_shared<ArmorHUD>());
+	this->items.push_back(std::make_shared<MovablePaperdoll>());
 
 	for (auto& mod : items) {
 		mod->onInit();

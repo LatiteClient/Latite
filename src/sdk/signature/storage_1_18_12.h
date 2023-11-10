@@ -183,6 +183,10 @@ public:
 		"ItemRenderer::renderGuiItemNew"};
 
 	inline static SigImpl Actor_getAttribute{};
+
+	inline static SigImpl UIControl_setPosition{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5c 24 ? 48 89 6c 24 ? 48 89 74 24 ? 57 48 83 ec ? 0f 29 74 24 ? 0f 29 7c 24 ? 48 8b 05",
+		"UIControl::setPosition"};
 };
 
 // after adding sigs here, add them in latite.cpp

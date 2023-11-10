@@ -284,9 +284,9 @@ d2d::Rect MCDrawUtil::drawItem(SDK::ItemStack* item, Vec2 const& pos, float size
 	auto oPickup = item->showPickup;
 	item->showPickup = false;
 
-	ctx.itemRenderer->renderGuiItemNew(&ctx, item, 0, pos.x * guiScale, pos.y * guiScale, opacity, sizeModifier / guiScale, 0.f, false);
+	ctx.itemRenderer->renderGuiItemNew(&ctx, item, 0, pos.x * guiScale, pos.y * guiScale, opacity, (sizeModifier * guiScale) * 3.f, 0.f, false);
 	if (it && it->isGlint(item)) {
-		ctx.itemRenderer->renderGuiItemNew(&ctx, item, 0, pos.x * guiScale, pos.y * guiScale, opacity, sizeModifier / guiScale, 0.f, true);
+		ctx.itemRenderer->renderGuiItemNew(&ctx, item, 0, pos.x * guiScale, pos.y * guiScale, opacity, (sizeModifier * guiScale) * 3.f, 0.f, true);
 	}
 
 	item->showPickup = false;
@@ -296,8 +296,8 @@ d2d::Rect MCDrawUtil::drawItem(SDK::ItemStack* item, Vec2 const& pos, float size
 	return {
 		pos.x,
 		pos.y,
-		pos.x + itemSize * sizeModifier,
-		pos.y + itemSize * sizeModifier
+		pos.x + ((itemSize) * sizeModifier) / guiScale,
+		pos.y + ((itemSize) * sizeModifier) / guiScale
 	};
 }
 

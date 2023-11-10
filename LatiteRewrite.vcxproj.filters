@@ -738,6 +738,9 @@
     <ClInclude Include="src\client\script\JsScript.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\hud\MovablePaperdoll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1125,6 +1128,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\script\JsScript.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sdk\common\client\gui\controls\UIControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\hud\MovablePaperdoll.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

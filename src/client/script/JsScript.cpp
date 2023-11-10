@@ -41,6 +41,9 @@ using namespace winrt::Windows::Web::Http;
 
 
 bool JsScript::load() {
+	auto res = JS::JsCreateContext(plugin->getRuntime(), &this->ctx) == JsNoError;
+	if (!res) return false;
+
 	loadScriptObjects();
 	loadJSApi();
 
@@ -59,7 +62,6 @@ bool JsScript::load() {
 	this->libraries.push_back(std::make_shared<Network>(this));
 	this->libraries.push_back(std::make_shared<Clipboard>(this));
 
-	auto res = JS::JsCreateContext(plugin->getRuntime(), &this->ctx) == JsNoError;
 	JS::JsSetContextData(ctx, this);
 	JS::JsSetCurrentContext(ctx);
 
@@ -297,27 +299,8 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsTextureClass>(this));
 
 	JsErrorCode err;
-	JsValueRef myScript;
-	err = JS::JsCreateObject(&myScript);
 
-	Chakra::SetPropertyString(myScript, L"name", this->relFolderPath, true);
-	Chakra::SetPropertyString(myScript, L"author", L"", true);
-	Chakra::SetPropertyString(myScript, L"version", L"0.0.1", true);
-
-
-	// Name
-	JsPropertyIdRef clientObjId;
-	err = JS::JsGetPropertyIdFromName(L"script", &clientObjId);
-	JsValueRef globalObj;
-	err = JS::JsGetGlobalObject(&globalObj);
-	err = JS::JsSetProperty(globalObj, clientObjId, myScript, false);
-	err = JS::JsRelease(globalObj, nullptr);
-
-	//JsPropertyIdRef modId;
-	//JS::JsGetPropertyIdFromName(L"exports", &modId);
-	//JsValueRef modulesObj;
-	//JS::JsCreateObject(&modulesObj);
-	//JS::JsSetProperty(globalObj, modId, modulesObj, true);
+	JsValueRef globalObj = Chakra::GetGlobalObject();
 
 	// require();
 	{
@@ -363,7 +346,5 @@ void JsScript::loadScriptObjects() {
 		JS::JsSetProperty(globalObj, propId, obj->object, false);
 	}
 
-	JS::JsRelease(myScript, nullptr);
-	//JS::JsRelease(modulesObj, nullptr);
 	JS::JsRelease(globalObj, nullptr);
 }

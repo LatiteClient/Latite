@@ -56,7 +56,15 @@ bool JsPlugin::load() {
 		return false;
 	}
 
+	if (JS::JsCreateRuntime(JsRuntimeAttributeNone, nullptr, &this->runtime) != JsNoError) return false;
+
 	this->mainScript = loadAndRunScript(std::wstring(MAIN_SCRIPT_NAME.data(), MAIN_SCRIPT_NAME.size()));
+	
+	if (mainScript == nullptr) {
+		JS::JsDisableRuntimeExecution(this->runtime);
+		JS::JsDisposeRuntime(this->runtime);
+		this->runtime = JS_INVALID_RUNTIME_HANDLE;
+	}
 	return mainScript != nullptr;
 }
 
@@ -144,6 +152,7 @@ std::shared_ptr<JsScript> JsPlugin::loadOrFindModule(std::wstring name) {
 
 	Chakra::SetProperty(modObj, L"exports", exportsObj);
 	Chakra::SetProperty(global, L"module", modObj);
+	Chakra::SetProperty(global, L"exports", exportsObj); // So the object.setproperty(exports, esmodule)... works
 
 	auto err = scr->runScript();
 
