@@ -74,7 +74,7 @@ void JsTexture::reloadMinecraft() {
 }
 
 std::filesystem::path JsTexture::tryGetRealPath(std::wstring const& oPath) {
-	auto scriptPath = std::filesystem::path(JsPlugin::getThis()->indexPath).parent_path();
+	auto scriptPath = std::filesystem::path(JsScript::getThis()->indexPath).parent_path();
 	if (std::filesystem::exists(scriptPath / oPath)) return scriptPath / oPath;
 	return oPath;
 }

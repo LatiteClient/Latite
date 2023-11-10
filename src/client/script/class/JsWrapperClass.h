@@ -21,7 +21,7 @@ protected:
 		return Chakra::MakeString(L"[object " + util::StrToWStr(add) + L"]");
 	}
 public:
-	JsWrapperClass(class JsPlugin* owner, const wchar_t* className) : JsClass(owner, className) {}
+	JsWrapperClass(class JsScript* owner, const wchar_t* className) : JsClass(owner, className) {}
 
 	virtual JsValueRef construct(T* ptr, bool del) {
 		JsValueRef obj;

@@ -5,7 +5,7 @@
 class JsEntityClass : public JsWrapperClass<JsEntity> {
 public:
 	inline static const wchar_t* class_name = L"Entity";
-	JsEntityClass(class JsPlugin* owner, const wchar_t* name = class_name) : JsWrapperClass(owner, name) {
+	JsEntityClass(class JsScript* owner, const wchar_t* name = class_name) : JsWrapperClass(owner, name) {
 		createConstructor(jsNoConstructor, this);
 	}
 

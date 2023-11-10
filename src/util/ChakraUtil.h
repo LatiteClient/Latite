@@ -70,6 +70,7 @@ public:
 	static JsValueRef GetTrue();
 	static JsValueRef GetFalse();
 	static JsValueRef GetNull();
+	static JsValueRef GetGlobalObject();
 
 	[[deprecated]] static void HandleErrors(JsErrorCode err);
 

@@ -29,38 +29,32 @@ using namespace winrt::Windows::Web::Http::Filters;
 PluginManager::PluginManager() {
 }
 
-std::shared_ptr<JsPlugin> PluginManager::loadScript(std::wstring const& folderPath, bool run)
+std::filesystem::path PluginManager::getUserDir() {
+	return util::GetLatitePath() / "Plugins";
+}
+
+std::filesystem::path PluginManager::getUserPrerunDir() {
+	return getUserDir() / "Startup";
+}
+
+std::shared_ptr<JsPlugin> PluginManager::loadPlugin(std::wstring const& folderPath, bool run)
 {
 	auto& fPathW = folderPath;
-	auto scriptsPathW = util::GetLatitePath() / ("Plugins");
-	auto scriptPath = scriptsPathW / fPathW / "index.js";
+	auto scriptPath = getUserDir() / fPathW;
 	if (!std::filesystem::exists(scriptPath)) return nullptr;
 
 	for (auto& scr : this->items) {
-		if (scr->relFolderPath == fPathW) {
-			Latite::getClientMessageSink().push(util::Format(std::format("Script {} is already loaded.", util::WStrToStr(scr->data.name))));
+		if (scr->getRelFolderPath() == fPathW) {
+			Latite::getClientMessageSink().push(util::Format(std::format("Plugin {} is already loaded.", util::WStrToStr(scr->data.name))));
 			return nullptr;
 		}
 	}
 
 	auto myScript = std::make_shared<JsPlugin>(scriptPath);
-	myScript->relFolderPath = fPathW;
 	if (!myScript->load()) return nullptr;
-	myScript->loadScriptObjects();
-	myScript->loadJSApi();
 	this->items.push_back(myScript);
 
 	if (run) {
-		auto err = myScript->runScript();
-		if (err != JsNoError) {
-			if (err == JsErrorScriptException) {
-				JsValueRef except;
-				JS::JsGetAndClearException(&except);
-				reportError(except, myScript->indexPath);
-			}
-			popScript(myScript);
-			return nullptr;
-		}
 		myScript->fetchScriptData();
 		Event::Value val{L"scriptName"};
 		val.val= myScript->data.name;
@@ -74,7 +68,7 @@ std::shared_ptr<JsPlugin> PluginManager::loadScript(std::wstring const& folderPa
 	return myScript;
 }
 
-std::shared_ptr<JsPlugin> PluginManager::getScriptByName(std::wstring const& name)
+std::shared_ptr<JsPlugin> PluginManager::getPluginByName(std::wstring const& name)
 {
 	for (auto& script : items) {
 		if (script->data.name == name) {
@@ -99,7 +93,7 @@ void PluginManager::reportError(JsValueRef except, std::wstring filePath) {
 	auto str = util::WStrToStr(Chakra::ToString(except));
 
 	std::stringstream ss;
-	ss << util::WStrToStr(filePath) << ": " << str;
+	ss << "&c" << util::WStrToStr(filePath) << ": " << str;
 
 	Latite::getClientMessageSink().display(util::Format(ss.str()));
 	// not sure if you release the exception or not, will do it anyway
@@ -109,7 +103,7 @@ void PluginManager::reportError(JsValueRef except, std::wstring filePath) {
 void PluginManager::handleErrors(JsErrorCode code) {
 	JsContextRef ctx;
 	JS::JsGetCurrentContext(&ctx);
-	JsPlugin* script = JsPlugin::getThis();
+	JsScript* script = JsScript::getThis();
 	if (script) {
 		if (code == JsErrorScriptException) {
 			JsValueRef except;
@@ -129,14 +123,14 @@ bool PluginManager::loadPrerunScripts()
 		return false;
 	}
 
-	auto prerunPath = util::GetLatitePath() / ("Plugins") / "Startup";
+	auto prerunPath = getUserPrerunDir();
 	std::filesystem::create_directory(prerunPath);
 
 	using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
 	for (auto& dirEntry : recursive_directory_iterator(prerunPath)) {
 		if (dirEntry.is_directory()) {
 			if (std::filesystem::exists(dirEntry.path().string() + "\\index.js")) {
-				loadScript(std::wstring(L"Startup") + L"\\" + dirEntry.path().filename().wstring(), true);
+				loadPlugin(std::wstring(L"Startup") + L"\\" + dirEntry.path().filename().wstring(), true);
 			}
 		}
 	}
@@ -147,34 +141,36 @@ void PluginManager::runScriptingOperations()
 {
 	if (!scriptingSupported()) return;
 
-	for (auto& scr : this->items) {
-		scr->handleAsyncOperations();
+	for (auto& plug : this->items) {
+		plug->handleAsyncOperations();
 
-		// timeouts
-		for (auto it = scr->timeouts.begin(); it != scr->timeouts.end();) {
-			auto now = std::chrono::system_clock::now();
-			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - it->createTime);
-			if (duration.count() > it->time) {
-				JS::JsSetCurrentContext(it->context);
-				JsValueRef res;
-				handleErrors(Chakra::CallFunction(it->callback, &it->callback, 1, &res));
-				JS::JsRelease(res, nullptr);
-				scr->timeouts.erase(it);
-				continue;
+		for (auto& scr : plug->getScripts()) {
+			// timeouts
+			for (auto it = scr->timeouts.begin(); it != scr->timeouts.end();) {
+				auto now = std::chrono::system_clock::now();
+				auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - it->createTime);
+				if (duration.count() > it->time) {
+					JS::JsSetCurrentContext(it->context);
+					JsValueRef res;
+					handleErrors(Chakra::CallFunction(it->callback, &it->callback, 1, &res));
+					JS::JsRelease(res, nullptr);
+					scr->timeouts.erase(it);
+					continue;
+				}
+				++it;
 			}
-			++it;
-		}
 
-		// intervals
-		for (auto& tim : scr->intervals) {
-			auto now = std::chrono::system_clock::now();
-			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - tim.createTime);
-			if (duration.count() > tim.time) {
-				JS::JsSetCurrentContext(tim.context);
-				JsValueRef res;
-				handleErrors(Chakra::CallFunction(tim.callback, &tim.callback, 1, &res));
-				JS::JsRelease(res, nullptr);
-				tim.createTime = now;
+			// intervals
+			for (auto& tim : scr->intervals) {
+				auto now = std::chrono::system_clock::now();
+				auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - tim.createTime);
+				if (duration.count() > tim.time) {
+					JS::JsSetCurrentContext(tim.context);
+					JsValueRef res;
+					handleErrors(Chakra::CallFunction(tim.callback, &tim.callback, 1, &res));
+					JS::JsRelease(res, nullptr);
+					tim.createTime = now;
+				}
 			}
 		}
 	}
@@ -232,7 +228,7 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 		std::transform(name.begin(), name.end(), name.begin(), ::tolower);
 		if (in == name) {
 			message("Installing " + oName + " v" + js["version"].get<std::string>() + " by " + js["author"].get<std::string>());
-			std::filesystem::path path = util::GetLatitePath() / "Plugins" / "Startup" / woName;
+			std::filesystem::path path = getUserPrerunDir() / woName;
 			std::filesystem::create_directories(path);
 			for (auto& fil : js["files"]) {
 				auto fws = util::StrToWStr(fil.get<std::string>());
@@ -273,7 +269,7 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 
 void PluginManager::init()
 {
-	auto scriptsPath = util::GetLatitePath() / ("Plugins");
+	auto scriptsPath = getUserDir();
 	std::filesystem::create_directory(scriptsPath);
 
 	initListeners();
@@ -314,14 +310,16 @@ void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr)
 	for (auto& ev : this->eventListeners) {
 		if (ev.second.size() > 0)
 			for (auto it = ev.second.begin(); it != ev.second.end();) {
-				if (it->second == ptr->ctx) {
-					JS::JsSetCurrentContext(it->second);
-					unsigned int refCount;
-					JS::JsRelease(it->first, &refCount);
-					ev.second.erase(it);
-				}
-				else {
-					++it;
+				for (auto& scr : ptr->getScripts()) {
+					if (it->second == scr->getContext()) {
+						JS::JsSetCurrentContext(it->second);
+						unsigned int refCount;
+						JS::JsRelease(it->first, &refCount);
+						ev.second.erase(it);
+					}
+					else {
+						++it;
+					}
 				}
 			}
 	}

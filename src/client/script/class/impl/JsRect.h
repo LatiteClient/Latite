@@ -32,7 +32,7 @@ protected:
 public:
 	inline static const wchar_t* class_name = L"Rect";
 
-	JsRect(class JsPlugin* owner) : JsClass(owner, class_name) {
+	JsRect(class JsScript* owner) : JsClass(owner, class_name) {
 		createConstructor(jsConstructor, this);
 	}
 

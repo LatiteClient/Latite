@@ -8,7 +8,7 @@
 class Filesystem : public JsLibrary {
 public:
 	JsValueRef initialize(JsValueRef parent) override;
-	Filesystem(JsPlugin* owner) : JsLibrary(owner, L"filesystem") {}
+	Filesystem(JsScript* owner) : JsLibrary(owner, L"filesystem") {}
 private:
 
 
@@ -36,7 +36,7 @@ private:
 		}
 	};*/
 
-	class FSAsyncOperation : public JsPlugin::AsyncOperation {
+	class FSAsyncOperation : public JsScript::AsyncOperation {
 	public:
 		
 
@@ -49,7 +49,7 @@ private:
 		virtual void getArgs() override;
 
 		FSAsyncOperation(JsValueRef callback, decltype(initFunc) initFunc, void* param)
-			: JsPlugin::AsyncOperation(true, callback, initFunc, param), err(0), data(std::nullopt)
+			: JsScript::AsyncOperation(true, callback, initFunc, param), err(0), data(std::nullopt)
 		{
 		}
 	};

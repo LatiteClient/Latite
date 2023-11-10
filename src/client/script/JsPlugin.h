@@ -7,131 +7,49 @@
 #include "lib/JsLibrary.h"
 #include "ScriptingObject.h"
 #include "class/JsClass.h"
+#include "JsScript.h"
 
 class JsPlugin final {
-	std::vector<std::shared_ptr<ScriptingObject>> objects;
-	std::vector<std::shared_ptr<JsClass>> classes;
-	bool trusted = false;
-	void checkTrusted();
 public:
-	JsContextRef ctx;
 	JsSourceContext sCtx = 1;
-	JsRuntimeHandle runtime;
-	std::string runError = "";
-
-	std::wstring indexPath;
-	std::wstring relFolderPath;
-	std::wifstream indexStream;
-	std::wstring loadedScript;
-
-	std::vector<JsValueRef> ownedEvents;
-	std::vector<std::shared_ptr<JsLibrary>> libraries;
-
-	struct ScriptDefinedData {
-		std::wstring name;
-		std::wstring version;
-		std::wstring author;
-		std::wstring description;
-	} data;
-
-	class AsyncOperation {
-	public:
-		bool flagDone = false;
-		bool hasCleared = false;
-		bool shouldRemove = false;
-		JsContextRef ctx = JS_INVALID_REFERENCE;
-		JsValueRef callback = JS_INVALID_REFERENCE;
-		std::vector<JsValueRef> args;
-		void(*initFunc)(AsyncOperation*);
-		//std::function<void(AsyncOperation& op)> checkFunc;
-		std::chrono::system_clock::time_point createTime = {};
-		void* param;
-		std::vector<JsValueRef> params;
-		std::shared_ptr<std::thread> thr = nullptr;
-
-		JsValueRef call();
-		virtual void getArgs() {};
-
-		AsyncOperation(bool shouldRemove, JsValueRef callback, decltype(initFunc) initFunc, void* param = nullptr) : shouldRemove(shouldRemove), args({}), callback(callback), initFunc(initFunc),
-			createTime(std::chrono::system_clock::now()), param(param), params({}) {
-			JS::JsGetCurrentContext(&ctx);
-			JS::JsAddRef(callback, nullptr);
-
-			for (auto& arg : this->params) {
-				JS::JsRelease(arg, nullptr);
-			}
-		}
-
-		void run() {
-			thr = std::make_shared<std::thread>(std::thread(initFunc, this));
-			thr->detach();
-		}
-
-		~AsyncOperation() {
-			JS::JsRelease(callback, nullptr);
-		}
-	};
-
-	struct JsTimeout {
-		std::chrono::system_clock::time_point createTime = {};
-		long long time;
-		int id;
-		JsValueRef callback;
-		JsContextRef context;
-
-		JsTimeout(int id, long long time, JsValueRef callback)
-			: createTime(std::chrono::system_clock::now()),
-			id(id), time(time), callback(callback) {
-			JS::JsAddRef(callback, nullptr);
-			JS::JsGetCurrentContext(&context);
-		}
-
-		~JsTimeout() {
-			JS::JsRelease(callback, nullptr);
-			JS::JsRelease(context, nullptr);
-		}
-	};
-
-	std::vector<std::shared_ptr<AsyncOperation>> pendingOperations;
-	std::vector<JsTimeout> timeouts = {};
-	std::vector<JsTimeout> intervals = {};
-
-	JsPlugin(std::wstring const& indexPath);
-	bool load();
-	[[nodiscard]] bool shouldRemove();
 	[[nodiscard]] bool isTrusted() { return trusted; }
+	[[nodiscard]] JsRuntimeHandle getRuntime() { return runtime; }
+	[[nodiscard]] std::filesystem::path getMainIndexPath() { return mainScript->getPath(); }
+	[[nodiscard]] std::filesystem::path getPath() { return path; }
+	[[nodiscard]] std::wstring getRelFolderPath() { return relFolderPath; }
+	[[nodiscard]] std::wstring getFolderName() { return path.filename(); }
+
+	inline static constexpr std::wstring_view MAIN_SCRIPT_NAME = L"main.js";
 	
-	template <typename T>
-	[[nodiscard]] T* getClass() {
-		for (auto& cl : this->classes) {
-			if (cl->getName() == T::class_name) return reinterpret_cast<T*>(cl.get());
-		}
-		//Logger::Fatal("Could not find scripting class {}!", T::class_name);
-		return nullptr;
-	}
+	JsPlugin(std::wstring const& relativePath);
 
-	template <typename T>
-	[[nodiscard]] T* getObject() {
-		for (auto& cl : this->objects) {
-			if (cl->id == T::objectID) return reinterpret_cast<T*>(cl.get());
-		}
-		//Logger::Fatal("Could not find scripting object {}!", T::class_name);
-		return nullptr;
-	}
-
-	void loadJSApi();
-	void loadScriptObjects();
-	void fetchScriptData();
+	bool load();
 	void unload();
 	void handleAsyncOperations();
+	bool fetchPluginData();
+
+	std::shared_ptr<JsScript> loadAndRunScript(std::wstring relPath);
+	std::shared_ptr<JsScript> loadOrFindModule(std::wstring name);
 
 	[[nodiscard]] std::wstring getCertificate();
 	[[nodiscard]] static std::optional<std::wstring> getHash(std::filesystem::path const& main);
-	[[nodiscard]] static JsPlugin* getThis();
 
-	static void __stdcall debugEventCallback(JsDiagDebugEvent debugEvent, JsValueRef eventData, void* callbackState);
-
-	JsErrorCode runScript();
+	std::vector<std::shared_ptr<JsScript>>& getScripts() { return scripts; }
 
 	~JsPlugin() { if (runtime != JS_INVALID_RUNTIME_HANDLE) unload(); }
+private:
+	bool trusted = false;
+	void checkTrusted();
+
+	std::vector<std::shared_ptr<JsScript>> scripts;
+	std::shared_ptr<JsScript> mainScript;
+	std::wstring name;
+	std::wstring author;
+	std::wstring description;
+	std::wstring version;
+
+	JsRuntimeHandle runtime;
+
+	std::filesystem::path path;
+	std::wstring relFolderPath;
 };

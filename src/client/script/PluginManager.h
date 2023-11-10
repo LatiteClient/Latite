@@ -11,6 +11,9 @@ private:
 public:
 	PluginManager();
 
+	static std::filesystem::path getUserDir();
+	static std::filesystem::path getUserPrerunDir();
+
 	std::shared_ptr<class JsPlugin> loadPlugin(std::wstring const& folderPath, bool run = true);
 	std::shared_ptr<class JsPlugin> getPluginByName(std::wstring const& name);
 

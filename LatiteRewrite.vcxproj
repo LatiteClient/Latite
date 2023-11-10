@@ -468,6 +468,7 @@
     <ClInclude Include="src\client\script\interop\classes\JsEntity.h" />
     <ClInclude Include="src\client\script\interop\classes\JsTexture.h" />
     <ClInclude Include="src\client\script\JsPlugin.h" />
+    <ClInclude Include="src\client\script\JsScript.h" />
     <ClInclude Include="src\client\script\lib\JsLibrary.h" />
     <ClInclude Include="src\client\script\lib\libraries\Clipboard.h" />
     <ClInclude Include="src\client\script\lib\libraries\Filesystem.h" />
@@ -665,6 +666,7 @@
     <ClCompile Include="src\client\script\interop\classes\JsEntity.cpp" />
     <ClCompile Include="src\client\script\interop\classes\JsTexture.cpp" />
     <ClCompile Include="src\client\script\JsPlugin.cpp" />
+    <ClCompile Include="src\client\script\JsScript.cpp" />
     <ClCompile Include="src\client\script\lib\JsLibrary.cpp" />
     <ClCompile Include="src\client\script\lib\libraries\Clipboard.cpp" />
     <ClCompile Include="src\client\script\lib\libraries\Filesystem.cpp" />

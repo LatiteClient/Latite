@@ -8,7 +8,7 @@
 class Clipboard : public JsLibrary {
 public:
 	JsValueRef initialize(JsValueRef parent) override;
-	Clipboard(JsPlugin* owner) : JsLibrary(owner, L"clipboard") {}
+	Clipboard(JsScript* owner) : JsLibrary(owner, L"clipboard") {}
 private:
 	static JsValueRef CALLBACK get(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount,

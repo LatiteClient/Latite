@@ -4,7 +4,7 @@
 class JsLocalPlayerClass : public JsPlayerClass {
 public:
 	inline static const wchar_t* class_name = L"LocalPlayer";
-	JsLocalPlayerClass(class JsPlugin* owner) : JsPlayerClass(owner, class_name) {
+	JsLocalPlayerClass(class JsScript* owner) : JsPlayerClass(owner, class_name) {
 	}
 
 	void prepareFunctions() override {

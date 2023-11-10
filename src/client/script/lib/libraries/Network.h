@@ -6,11 +6,11 @@
 
 class Network : public JsLibrary {
 public:
-	Network(class JsPlugin* owner) : JsLibrary(owner, L"http") { }
+	Network(class JsScript* owner) : JsLibrary(owner, L"http") { }
 
 	JsValueRef initialize(JsValueRef parent) override;
 
-	class NetAsyncOperation : public JsPlugin::AsyncOperation {
+	class NetAsyncOperation : public JsScript::AsyncOperation {
 	public:
 		std::wstring url = L"";
 
@@ -21,7 +21,7 @@ public:
 		virtual void getArgs() override;
 
 		NetAsyncOperation(JsValueRef callback, decltype(initFunc) initFunc, void* param)
-			: JsPlugin::AsyncOperation(true, callback, initFunc, param), err(0), data(std::nullopt)
+			: JsScript::AsyncOperation(true, callback, initFunc, param), err(0), data(std::nullopt)
 		{
 		}
 	};

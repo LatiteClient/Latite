@@ -5,15 +5,7 @@
 #include "util/Util.h"
 #include "resource.h"
 
-#include "client/Latite.h"
-#include "client/misc/ClientMessageSink.h"
 #include "PluginManager.h"
-
-#include <winrt/base.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Web.Http.h>
-#include <winrt/windows.security.cryptography.h>
-#include <winrt/windows.security.cryptography.core.h>
 
 #include "Lib/Libraries/Filesystem.h"
 #include "Lib/Libraries/Network.h"
@@ -21,27 +13,10 @@
 
 #include "objects/ClientScriptingObject.h"
 
-#include "class/impl/JsVec2.h"
-#include "class/impl/JsVec3.h"
-#include "class/impl/JsRect.h"
-#include "class/impl/JsColor.h"
-#include "class/impl/JsModuleClass.h"
-#include "class/impl/JsHudModuleClass.h"
-#include "class/impl/JsSettingClass.h"
-#include "class/impl/JsCommandClass.h"
-#include "class/impl/game/JsEntityClass.h"
-#include "class/impl/game/JsPlayerClass.h"
-#include "class/impl/game/JsLocalPlayerClass.h"
-#include "class/impl/game/JsItem.h"
-#include "class/impl/game/JsItemStack.h"
-
-#include "objects/GameScriptingObject.h"
-#include "objects/D2DScriptingObject.h"
 #include "util/XorString.h"
 #include "util/Logger.h"
 
 #include "ScriptCertificate.h"
-#include "class/impl/JsTextureClass.h"
 
 using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Web::Http;
@@ -49,12 +24,12 @@ using namespace winrt::Windows::Web::Http::Filters;
 
 
 void JsPlugin::checkTrusted() {
-	if (this->loadedScript._Starts_with(util::StrToWStr(XOR_STRING("\"notrust\"")))) {
-		trusted = false;
-		return;
-	}
+	//if (this->loadedScript._Starts_with(util::StrToWStr(XOR_STRING("\"notrust\"")))) {
+	//	trusted = false;
+	//	return;
+	//}
 
-	auto hash = JsPlugin::getHash(std::filesystem::path(this->indexPath).parent_path());
+	auto hash = JsPlugin::getHash(getPath());
 
 	if (hash) {
 #if LATITE_DEBUG
@@ -68,358 +43,21 @@ void JsPlugin::checkTrusted() {
 	trusted = false;
 }
 
-JsPlugin::JsPlugin(std::wstring const& indexPath) : indexPath(indexPath), ctx(JS_INVALID_REFERENCE), indexStream(), loadedScript(), runtime(JS_INVALID_RUNTIME_HANDLE){
+JsPlugin::JsPlugin(std::wstring const& relPath) {
+	this->path = this->path / relPath;
+	this->relFolderPath = relPath;
+
+	this->name = getFolderName();
 }
 
+
 bool JsPlugin::load() {
-	indexStream.open(indexPath);
-	if (indexStream.fail()) {
-		Logger::Warn("Could not open index path: {}", errno);
+	if (!std::filesystem::exists(path / MAIN_SCRIPT_NAME)) {
 		return false;
 	}
 
-	std::wstringstream buffer;
-	buffer << indexStream.rdbuf();
-	this->loadedScript = /*L"\"use strict\";" + */buffer.str();
-	this->indexStream.close();
-
-	this->libraries.push_back(std::make_shared<Filesystem>(this));
-	this->libraries.push_back(std::make_shared<Network>(this));
-	this->libraries.push_back(std::make_shared<Clipboard>(this));
-
-	if (JS::JsCreateRuntime(
-		JsRuntimeAttributeNone,
-		nullptr, &runtime)) return false;
-	auto res = JS::JsCreateContext(runtime, &this->ctx) == JsNoError;
-	JS::JsSetContextData(ctx, this);
-	JS::JsSetCurrentContext(ctx);
-
-	if (GetModuleHandleA("Chakra.dll")) {
-		Chakra::pass("JsStartDebugging")();
-	}
-
-	return res;
-}
-
-bool JsPlugin::shouldRemove() {
-	return false;
-}
-
-namespace {
-	JsValueRef CALLBACK setTimeoutCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState) {
-		if (!Chakra::VerifyArgCount(argCount, 3)) return Chakra::GetUndefined();
-		auto sz = Chakra::VerifyParameters({ {arguments[1], JsValueType::JsFunction}, {arguments[2], JsValueType::JsNumber} });
-		if (!sz) {
-			Chakra::ThrowError(sz.str);
-			return Chakra::GetUndefined();
-		}
-
-		auto func = arguments[1];
-		auto num = Chakra::GetNumber(arguments[2]);
-
-		JsPlugin* thi = reinterpret_cast<JsPlugin*>(callbackState);
-		auto& tim = thi->timeouts.emplace_back(static_cast<int>(thi->timeouts.size() + 1), static_cast<long long>(num), func);
-		JsValueRef ret;
-		JS::JsIntToNumber(tim.id, &ret);
-		return ret;
-	}
-
-	JsValueRef CALLBACK setIntervalCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState) {
-		if (!Chakra::VerifyArgCount(argCount, 3)) return Chakra::GetUndefined();
-		auto sz = Chakra::VerifyParameters({ {arguments[1], JsValueType::JsFunction}, {arguments[2], JsValueType::JsNumber} });
-		if (!sz) {
-			Chakra::ThrowError(sz.str);
-			return Chakra::GetUndefined();
-		}
-
-		auto func = arguments[1];
-		auto num = Chakra::GetNumber(arguments[2]);
-
-		JsPlugin* thi = reinterpret_cast<JsPlugin*>(callbackState);
-		auto& tim = thi->intervals.emplace_back(static_cast<int>(thi->intervals.size() + 1), static_cast<long long>(num), func);
-		JsValueRef ret;
-		JS::JsIntToNumber(tim.id, &ret);
-		return ret;
-	}
-
-	JsValueRef CALLBACK sleepCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState) {
-		if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
-		std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<long long>(Chakra::GetNumber(arguments[1]))));
-		return Chakra::GetUndefined();
-	}
-	JsValueRef CALLBACK printCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState) {
-
-		JsValueRef undef;
-
-		JS::JsGetUndefinedValue(&undef);
-
-		for (unsigned short arg = 1; arg < argCount; arg++) {
-			auto myRef = arguments[arg];
-
-			JsValueRef myString;
-			JS::JsConvertValueToString(myRef, &myString);
-
-			const wchar_t* result;
-			size_t len;
-			JS::JsStringToPointer(myString, &result, &len);
-
-			std::string fs = util::WStrToStr(result);
-			Latite::getClientMessageSink().display(fs);
-
-			JS::JsRelease(myString, nullptr);
-		}
-
-		return undef;
-	}
-
-	JsValueRef CALLBACK loadModule(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState) {
-		auto thi = reinterpret_cast<JsPlugin*>(callbackState);
-
-		JsValueRef undef;
-
-		JS::JsGetUndefinedValue(&undef);
-
-		if (!Chakra::VerifyArgCount(argCount, 2)) return undef;
-		auto sz = Chakra::VerifyParameters({ {arguments[1], JsValueType::JsString} });
-		if (!sz) {
-			Chakra::ThrowError(sz.str);
-			return undef;
-		}
-
-		auto wPath = Chakra::GetString(arguments[1]);
-		bool isNet = false;
-
-		for (auto& lib : thi->libraries) {
-			if (lib->shouldInclude(wPath)) {
-				JsValueRef global;
-				JS::JsGetGlobalObject(&global);
-				auto jsLib = lib->initialize(global);
-				JS::JsRelease(global, nullptr);
-				return jsLib;
-			}
-		}
-
-		if (wPath.starts_with(L"http") || wPath.starts_with(L"https")) {
-			isNet = true;
-		}
-
-		auto path = isNet ? wPath : (util::GetLatitePath() / ("Plugins")).wstring() + L"\\" + thi->relFolderPath + L"\\" + wPath;
-		if (!isNet && !path.ends_with(L".js")) {
-			path += L".js";
-		}
-
-		if (!isNet && !std::filesystem::exists(path) || std::filesystem::is_directory(path)) {
-			Chakra::ThrowError(L"Invalid filepath '" + path + L"'");
-			return undef;
-		}
-
-		std::wstringstream buffer;
-		if (!isNet) {
-			std::wifstream myIfs;
-			myIfs.open(path);
-			buffer << myIfs.rdbuf();
-			myIfs.close();
-		}
-		else {
-			HttpClient httpClient{};
-			std::wstring str = path;
-
-			winrt::Windows::Foundation::Uri requestUri(str);
-
-			HttpRequestMessage request(HttpMethod::Get(), requestUri);
-
-			try {
-				auto operation = httpClient.SendRequestAsync(request);
-				auto response = operation.get();
-
-				if (response.StatusCode() == HttpStatusCode::Ok)
-				{
-					auto cont = response.Content();
-					auto op = cont.ReadAsStringAsync();
-					buffer << op.get().c_str();
-				}
-				else
-				{
-					Chakra::ThrowError(L"Unable to fetch script from web, Http error: " + std::to_wstring((int32_t)response.StatusCode()));
-					return undef;
-				}
-			}
-			catch (winrt::hresult_error& er) {
-				Chakra::ThrowError(er.message().c_str());
-			}
-		}
-		std::wstring loadedScript = /*L"\"use strict;\"\n" + */buffer.str();
-		// prep
-
-		JsPropertyIdRef modId;
-
-		JsValueRef res;
-		auto err = JS::JsRunScript(loadedScript.c_str(), ++thi->sCtx, path.c_str(), &res);
-		JS::JsGetPropertyIdFromName(L"exports", &modId);
-		JsValueRef modulesObj;
-		JsValueRef global;
-		JS::JsGetGlobalObject(&global);
-		JS::JsGetProperty(global, modId, &modulesObj);
-		if (err) {
-			Chakra::Release(global);
-			Chakra::Release(modulesObj);
-			Chakra::Release(res);
-
-			if (err == JsErrorScriptException) {
-				JsValueRef except;
-				JS::JsGetAndClearException(&except);
-				auto str = Chakra::ToString(except);
-				Chakra::ThrowError(L"Error loading script: " + str);
-			}
-			else {
-				Chakra::ThrowError(L"Error loading script. JsErrorCode: " + err);
-			}
-
-			return undef;
-		}
-
-		// handle modulesObj
-
-		Chakra::Release(global);
-		Chakra::Release(modulesObj);
-		Chakra::Release(res);
-		return modulesObj;
-	}
-}
-
-void JsPlugin::loadJSApi() {
-	JS::JsSetCurrentContext(ctx);
-	JsValueRef res;
-	auto err = JS::JsRunScript(util::StrToWStr(Latite::get().getTextAsset(JS_LATITEAPI)).c_str(), ++sCtx, L"latiteapi.js", &res);
-	Latite::getPluginManager().handleErrors(err);
-	if (!err) {
-		JS::JsRelease(res, nullptr);
-	}
-}
-
-void JsPlugin::loadScriptObjects() {
-	JS::JsSetCurrentContext(ctx);
-	int i = 0;
-	this->objects.clear();
-	this->objects.push_back(std::make_shared<ClientScriptingObject>(i++));
-	this->objects.push_back(std::make_shared<GameScriptingObject>(i++));
-	this->objects.push_back(std::make_shared<D2DScriptingObject>(i++));
-
-	this->classes.clear();
-	this->classes.push_back(std::make_shared<JsVec2>(this));
-	this->classes.push_back(std::make_shared<JsVec3>(this));
-	this->classes.push_back(std::make_shared<JsRect>(this));
-	this->classes.push_back(std::make_shared<JsColor>(this));
-	this->classes.push_back(std::make_shared<JsModuleClass>(this));
-	this->classes.push_back(std::make_shared<JsHudModuleClass>(this));
-	this->classes.push_back(std::make_shared<JsSettingClass>(this));
-	this->classes.push_back(std::make_shared<JsCommandClass>(this));
-	this->classes.push_back(std::make_shared<JsEntityClass>(this));
-	this->classes.push_back(std::make_shared<JsPlayerClass>(this));
-	this->classes.push_back(std::make_shared<JsLocalPlayerClass>(this));
-	this->classes.push_back(std::make_shared<JsItem>(this));
-	this->classes.push_back(std::make_shared<JsItemStack>(this));
-	this->classes.push_back(std::make_shared<JsTextureClass>(this));
-
-	JsErrorCode err;
-	JsValueRef myScript;
-	err = JS::JsCreateObject(&myScript);
-
-	Chakra::SetPropertyString(myScript, L"name", this->relFolderPath, true);
-	Chakra::SetPropertyString(myScript, L"author", L"", true);
-	Chakra::SetPropertyString(myScript, L"version", L"0.0.1", true);
-
-
-	// Name
-	JsPropertyIdRef clientObjId;
-	err = JS::JsGetPropertyIdFromName(L"script", &clientObjId);
-	JsValueRef globalObj;
-	err = JS::JsGetGlobalObject(&globalObj);
-	err = JS::JsSetProperty(globalObj, clientObjId, myScript, false);
-	err = JS::JsRelease(globalObj, nullptr);
-
-	JsPropertyIdRef modId;
-	JS::JsGetPropertyIdFromName(L"exports", &modId);
-	JsValueRef modulesObj;
-	JS::JsCreateObject(&modulesObj);
-	JS::JsSetProperty(globalObj, modId, modulesObj, true);
-
-	// require();
-	{
-		Chakra::DefineFunc(globalObj, loadModule, L"require", this);
-	}
-
-	// sleep()
-	{
-		Chakra::DefineFunc(globalObj, sleepCallback, L"sleep");
-	}
-
-	// setTimeout()
-	{
-		Chakra::DefineFunc(globalObj, setTimeoutCallback, L"setTimeout", this);
-	}
-
-	// setInterval()
-	{
-		Chakra::DefineFunc(globalObj, setIntervalCallback, L"setInterval", this);
-	}
-
-	{ // Log Func
-		JsValueRef myPrint;
-		err = JS::JsCreateFunction(printCallback, nullptr, &myPrint);
-
-		JsPropertyIdRef propId;
-		err = JS::JsGetPropertyIdFromName(L"log", &propId);
-		err = JS::JsSetProperty(myScript, propId, myPrint, false);
-
-		err = JS::JsRelease(myPrint, nullptr);
-	}
-
-	for (auto& cl : classes) {
-		Chakra::SetPropertyObject(globalObj, cl->getName(), cl->getConstructor());
-		cl->createPrototype();
-		cl->prepareFunctions();
-	}
-
-	for (auto& obj : objects) {
-		obj->initialize(ctx, globalObj);
-		JsPropertyIdRef propId;
-		JS::JsGetPropertyIdFromName(obj->objName, &propId);
-		JS::JsSetProperty(globalObj, propId, obj->object, false);
-	}
-
-	JS::JsRelease(myScript, nullptr);
-	JS::JsRelease(modulesObj, nullptr);
-	JS::JsRelease(globalObj, nullptr);
-}
-
-void JsPlugin::fetchScriptData() {
-	JS::JsSetCurrentContext(ctx);
-	JsValueRef globalObj;
-	JS::JsGetGlobalObject(&globalObj);
-
-	JsPropertyIdRef scriptObjId;
-	JS::JsGetPropertyIdFromName(L"script", &scriptObjId);
-
-	JsValueRef script;
-	JS::JsGetProperty(globalObj, scriptObjId, &script);
-
-	this->data.name = Chakra::GetStringProperty(script, L"name");
-	this->data.author = Chakra::GetStringProperty(script, L"author");
-	this->data.version = Chakra::GetStringProperty(script, L"version");
-
-	Chakra::Release(script);
-	Chakra::Release(globalObj);
+	this->mainScript = loadAndRunScript(std::wstring(MAIN_SCRIPT_NAME.data(), MAIN_SCRIPT_NAME.size()));
+	return mainScript != nullptr;
 }
 
 void JsPlugin::unload() {
@@ -431,38 +69,88 @@ void JsPlugin::unload() {
 }
 
 void JsPlugin::handleAsyncOperations() {
-	for (size_t i = 0; i < pendingOperations.size();) {
-		auto ptr = pendingOperations[i];
-		if (ptr->flagDone) {
-			ptr->getArgs();
-			ptr->call();
-			if (ptr->shouldRemove) {
-				pendingOperations.erase(pendingOperations.begin() + i);
-				continue;
-			}
-		}
-		++i;
-	}
-	return;
-
-
-	for (auto it = pendingOperations.begin(); it != pendingOperations.end();) {
-		auto ptr = it->get();
-		if (ptr->flagDone) {
-			ptr->thr->join();
-			ptr->getArgs();
-			ptr->call();
-			if (ptr->shouldRemove) {
-				pendingOperations.erase(it);
-				continue;
-			}
-		}
-		++it;
+	for (auto& scr : this->scripts) {
+		scr->handleAsyncOperations();
 	}
 }
 
+bool JsPlugin::fetchPluginData() {
+	std::ifstream ifs{this->getPath() / "plugin.json"};
+	if (ifs.fail()) {
+		return false;
+	}
+
+	json manifest;
+	try {
+		manifest = json::parse(ifs);
+	}
+	catch (json::parse_error& er) {
+		return false;
+	}
+
+	if (!manifest.is_object()) return false;
+
+	auto& name = manifest["name"];
+	auto& author = manifest["author"];
+	auto& version = manifest["version"];
+	auto& desc = manifest["description"];
+
+	if (name.is_string()) this->name = util::StrToWStr(name.get<std::string>());
+	if (author.is_string()) this->author = util::StrToWStr(author.get<std::string>());
+	if (version.is_string()) this->version = util::StrToWStr(version.get<std::string>());
+	if (desc.is_string()) this->description = util::StrToWStr(desc.get<std::string>());
+
+	return true;
+}
+
+std::shared_ptr<JsScript> JsPlugin::loadAndRunScript(std::wstring relPath) {
+	auto scr = std::make_shared<JsScript>(this->getPath() / relPath);
+	scr->load();
+	auto err = scr->runScript();
+	if (err != JsNoError) {
+		if (err == JsErrorScriptException) {
+			JsValueRef except;
+			JS::JsGetAndClearException(&except);
+			Latite::getPluginManager().reportError(except, scr->getPlugin()->getFolderName() + L"/" + scr->getPath().filename().wstring());
+		}
+		return nullptr;
+	}
+	return scr;
+}
+
+std::shared_ptr<JsScript> JsPlugin::loadOrFindModule(std::wstring name) {
+	auto path = getPath() / name;
+	if (std::filesystem::exists(name)) path = name;
+
+	auto scr = std::make_shared<JsScript>(path);
+	scr->load();
+	JsValueRef global;
+	JS::JsGetGlobalObject(&global); // this doesn't add a reference that needs to be freed
+
+	JsValueRef modObj;
+	JS::JsCreateObject(&modObj);
+
+	JsValueRef exportsObj;
+	JS::JsCreateObject(&exportsObj);
+
+	Chakra::SetProperty(modObj, L"exports", exportsObj);
+	Chakra::SetProperty(global, L"module", modObj);
+
+	auto err = scr->runScript();
+
+	if (err != JsNoError) {
+		if (err == JsErrorScriptException) {
+			JsValueRef except;
+			JS::JsGetAndClearException(&except);
+			Latite::getPluginManager().reportError(except, scr->getPlugin()->getFolderName() + L"/" + scr->getPath().filename().wstring());
+		}
+		return nullptr;
+	}
+	return scr;
+}
+
 std::wstring JsPlugin::getCertificate() {
-	std::wifstream ifs(std::filesystem::path(this->indexPath).parent_path() / XOR_STRING("certificate"));
+	std::wifstream ifs(getPath() / XOR_STRING("certificate"));
 	if (ifs.fail()) {
 #if LATITE_DEBUG
 		Logger::Info("Failed to get certificate");
@@ -527,28 +215,8 @@ std::optional<std::wstring> JsPlugin::getHash(std::filesystem::path const& main)
 	return std::nullopt;
 }
 
-JsPlugin* JsPlugin::getThis() {
-	JsPlugin* ret = nullptr;
-	JsContextRef ct;
-	JS::JsGetCurrentContext(&ct);
-	JS::JsGetContextData(ct, reinterpret_cast<void**>(&ret));
-	return ret;
-}
 
-void __stdcall JsPlugin::debugEventCallback(JsDiagDebugEvent debugEvent, JsValueRef eventData, void* callbackState) {
-}
-
-JsErrorCode JsPlugin::runScript() {
-	JS::JsSetCurrentContext(ctx);
-	this->checkTrusted();
-#if LATITE_DEBUG
-	Logger::Info("isTrusted = {}", this->isTrusted());
-#endif
-	auto err = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(indexPath)), (util::GetLatitePath() / "Plugins" / relFolderPath / "index.js").wstring().c_str(), nullptr);
-	return err;
-}
-
-JsValueRef JsPlugin::AsyncOperation::call() {
+JsValueRef JsScript::AsyncOperation::call() {
 	JS::JsSetCurrentContext(this->ctx);
 	JsValueRef obj;
 	this->args.insert(this->args.begin(), this->callback);

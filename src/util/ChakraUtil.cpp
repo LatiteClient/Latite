@@ -104,7 +104,7 @@ JsErrorCode Chakra::CallFunction(JsValueRef func, JsValueRef* arguments, unsigne
 JsValueRef Chakra::GetProperty(JsValueRef obj, std::wstring name) {
 	JsPropertyIdRef propId;
 	JS::JsGetPropertyIdFromName(name.c_str(), &propId);
-	JsValueRef ret;
+	JsValueRef ret = JS_INVALID_REFERENCE;
 	JS::JsGetProperty(obj, propId, &ret);
 	return ret;
 }
@@ -222,6 +222,12 @@ JsValueRef Chakra::GetNull() {
 	JsValueRef ret;
 	JS::JsGetNullValue(&ret);
 	return ret;
+}
+
+JsValueRef Chakra::GetGlobalObject() {
+	JsValueRef global;
+	JS::JsGetGlobalObject(&global);
+	return global;
 }
 
 void Chakra::HandleErrors(JsErrorCode err) {
