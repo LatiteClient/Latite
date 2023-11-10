@@ -26,7 +26,7 @@ public:
 	[[nodiscard]] std::filesystem::path getPath() { return path; }
 	[[nodiscard]] std::filesystem::path getFolderPath() { return path.parent_path(); }
 	[[nodiscard]] JsContextRef getContext() { return ctx; }
-	[[nodisacrd]] JsValueRef getModuleExports();
+	[[nodiscard]] JsValueRef getModuleExports();
 
 	struct ScriptDefinedData {
 		std::wstring name;
@@ -127,7 +127,6 @@ private:
 
 	void loadJSApi();
 	void loadScriptObjects();
-	void fetchScriptDataDEPRECATED();
 
 public:
 	[[nodiscard]] static JsScript* getThis();

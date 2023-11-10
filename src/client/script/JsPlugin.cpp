@@ -84,7 +84,8 @@ bool JsPlugin::fetchPluginData() {
 	try {
 		manifest = json::parse(ifs);
 	}
-	catch (json::parse_error& er) {
+	catch (json::parse_error& e) {
+		Logger::Warn("Parse Error when loading plugin: {}", e.what());
 		return false;
 	}
 
@@ -104,7 +105,7 @@ bool JsPlugin::fetchPluginData() {
 }
 
 std::shared_ptr<JsScript> JsPlugin::loadAndRunScript(std::wstring relPath) {
-	auto scr = std::make_shared<JsScript>(this->getPath() / relPath);
+	auto scr = std::make_shared<JsScript>(this, this->getPath() / relPath);
 	scr->load();
 	auto err = scr->runScript();
 	if (err != JsNoError) {
@@ -130,7 +131,7 @@ std::shared_ptr<JsScript> JsPlugin::loadOrFindModule(std::wstring name) {
 	}
 	Logger::Info("Loading module {}", util::WStrToStr(name));
 
-	auto scr = std::make_shared<JsScript>(path);
+	auto scr = std::make_shared<JsScript>(this, path);
 	scr->load();
 	JsValueRef global;
 	JS::JsGetGlobalObject(&global); // this doesn't add a reference that needs to be freed

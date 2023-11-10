@@ -70,122 +70,6 @@ bool JsScript::load() {
 	return res;
 }
 
-
-void JsScript::loadScriptObjects() {
-	JS::JsSetCurrentContext(ctx);
-	int i = 0;
-	this->objects.clear();
-	this->objects.push_back(std::make_shared<ClientScriptingObject>(i++));
-	this->objects.push_back(std::make_shared<GameScriptingObject>(i++));
-	this->objects.push_back(std::make_shared<D2DScriptingObject>(i++));
-
-	this->classes.clear();
-	this->classes.push_back(std::make_shared<JsVec2>(this));
-	this->classes.push_back(std::make_shared<JsVec3>(this));
-	this->classes.push_back(std::make_shared<JsRect>(this));
-	this->classes.push_back(std::make_shared<JsColor>(this));
-	this->classes.push_back(std::make_shared<JsModuleClass>(this));
-	this->classes.push_back(std::make_shared<JsHudModuleClass>(this));
-	this->classes.push_back(std::make_shared<JsSettingClass>(this));
-	this->classes.push_back(std::make_shared<JsCommandClass>(this));
-	this->classes.push_back(std::make_shared<JsEntityClass>(this));
-	this->classes.push_back(std::make_shared<JsPlayerClass>(this));
-	this->classes.push_back(std::make_shared<JsLocalPlayerClass>(this));
-	this->classes.push_back(std::make_shared<JsItem>(this));
-	this->classes.push_back(std::make_shared<JsItemStack>(this));
-	this->classes.push_back(std::make_shared<JsTextureClass>(this));
-
-	JsErrorCode err;
-	JsValueRef myScript;
-	err = JS::JsCreateObject(&myScript);
-
-	Chakra::SetPropertyString(myScript, L"name", this->relFolderPath, true);
-	Chakra::SetPropertyString(myScript, L"author", L"", true);
-	Chakra::SetPropertyString(myScript, L"version", L"0.0.1", true);
-
-
-	// Name
-	JsPropertyIdRef clientObjId;
-	err = JS::JsGetPropertyIdFromName(L"script", &clientObjId);
-	JsValueRef globalObj;
-	err = JS::JsGetGlobalObject(&globalObj);
-	err = JS::JsSetProperty(globalObj, clientObjId, myScript, false);
-	err = JS::JsRelease(globalObj, nullptr);
-
-	//JsPropertyIdRef modId;
-	//JS::JsGetPropertyIdFromName(L"exports", &modId);
-	//JsValueRef modulesObj;
-	//JS::JsCreateObject(&modulesObj);
-	//JS::JsSetProperty(globalObj, modId, modulesObj, true);
-
-	// require();
-	{
-		Chakra::DefineFunc(globalObj, loadModule, L"require", this);
-	}
-
-	// sleep()
-	{
-		Chakra::DefineFunc(globalObj, sleepCallback, L"sleep");
-	}
-
-	// setTimeout()
-	{
-		Chakra::DefineFunc(globalObj, setTimeoutCallback, L"setTimeout", this);
-	}
-
-	// setInterval()
-	{
-		Chakra::DefineFunc(globalObj, setIntervalCallback, L"setInterval", this);
-	}
-
-	{ // Log Func
-		JsValueRef myPrint;
-		err = JS::JsCreateFunction(clientMessageCallback, nullptr, &myPrint);
-
-		JsPropertyIdRef propId;
-		err = JS::JsGetPropertyIdFromName(L"clientMessage", &propId);
-		err = JS::JsSetProperty(Chakra::GetGlobalObject(), propId, myPrint, false);
-
-		err = JS::JsRelease(myPrint, nullptr);
-	}
-
-	for (auto& cl : classes) {
-		Chakra::SetPropertyObject(globalObj, cl->getName(), cl->getConstructor());
-		cl->createPrototype();
-		cl->prepareFunctions();
-	}
-
-	for (auto& obj : objects) {
-		obj->initialize(ctx, globalObj);
-		JsPropertyIdRef propId;
-		JS::JsGetPropertyIdFromName(obj->objName, &propId);
-		JS::JsSetProperty(globalObj, propId, obj->object, false);
-	}
-
-	JS::JsRelease(myScript, nullptr);
-	//JS::JsRelease(modulesObj, nullptr);
-	JS::JsRelease(globalObj, nullptr);
-}
-
-void JsScript::fetchScriptDataDEPRECATED() {
-	JS::JsSetCurrentContext(ctx);
-	JsValueRef globalObj;
-	JS::JsGetGlobalObject(&globalObj);
-
-	JsPropertyIdRef scriptObjId;
-	JS::JsGetPropertyIdFromName(L"script", &scriptObjId);
-
-	JsValueRef script;
-	JS::JsGetProperty(globalObj, scriptObjId, &script);
-
-	this->data.name = Chakra::GetStringProperty(script, L"name");
-	this->data.author = Chakra::GetStringProperty(script, L"author");
-	this->data.version = Chakra::GetStringProperty(script, L"version");
-
-	Chakra::Release(script);
-	Chakra::Release(globalObj);
-}
-
 JsValueRef JsScript::getModuleExports() {
 	auto mod = Chakra::GetProperty(Chakra::GetGlobalObject(), L"module");
 	if (mod != JS_INVALID_REFERENCE) {
@@ -386,4 +270,100 @@ namespace {
 
 		return mod->getModuleExports();
 	}
+}
+
+void JsScript::loadScriptObjects() {
+	JS::JsSetCurrentContext(ctx);
+	int i = 0;
+	this->objects.clear();
+	this->objects.push_back(std::make_shared<ClientScriptingObject>(i++));
+	this->objects.push_back(std::make_shared<GameScriptingObject>(i++));
+	this->objects.push_back(std::make_shared<D2DScriptingObject>(i++));
+
+	this->classes.clear();
+	this->classes.push_back(std::make_shared<JsVec2>(this));
+	this->classes.push_back(std::make_shared<JsVec3>(this));
+	this->classes.push_back(std::make_shared<JsRect>(this));
+	this->classes.push_back(std::make_shared<JsColor>(this));
+	this->classes.push_back(std::make_shared<JsModuleClass>(this));
+	this->classes.push_back(std::make_shared<JsHudModuleClass>(this));
+	this->classes.push_back(std::make_shared<JsSettingClass>(this));
+	this->classes.push_back(std::make_shared<JsCommandClass>(this));
+	this->classes.push_back(std::make_shared<JsEntityClass>(this));
+	this->classes.push_back(std::make_shared<JsPlayerClass>(this));
+	this->classes.push_back(std::make_shared<JsLocalPlayerClass>(this));
+	this->classes.push_back(std::make_shared<JsItem>(this));
+	this->classes.push_back(std::make_shared<JsItemStack>(this));
+	this->classes.push_back(std::make_shared<JsTextureClass>(this));
+
+	JsErrorCode err;
+	JsValueRef myScript;
+	err = JS::JsCreateObject(&myScript);
+
+	Chakra::SetPropertyString(myScript, L"name", this->relFolderPath, true);
+	Chakra::SetPropertyString(myScript, L"author", L"", true);
+	Chakra::SetPropertyString(myScript, L"version", L"0.0.1", true);
+
+
+	// Name
+	JsPropertyIdRef clientObjId;
+	err = JS::JsGetPropertyIdFromName(L"script", &clientObjId);
+	JsValueRef globalObj;
+	err = JS::JsGetGlobalObject(&globalObj);
+	err = JS::JsSetProperty(globalObj, clientObjId, myScript, false);
+	err = JS::JsRelease(globalObj, nullptr);
+
+	//JsPropertyIdRef modId;
+	//JS::JsGetPropertyIdFromName(L"exports", &modId);
+	//JsValueRef modulesObj;
+	//JS::JsCreateObject(&modulesObj);
+	//JS::JsSetProperty(globalObj, modId, modulesObj, true);
+
+	// require();
+	{
+		Chakra::DefineFunc(globalObj, loadModule, L"require", this);
+	}
+
+	// sleep()
+	{
+		Chakra::DefineFunc(globalObj, sleepCallback, L"sleep");
+	}
+
+	// setTimeout()
+	{
+		Chakra::DefineFunc(globalObj, setTimeoutCallback, L"setTimeout", this);
+	}
+
+	// setInterval()
+	{
+		Chakra::DefineFunc(globalObj, setIntervalCallback, L"setInterval", this);
+	}
+
+	{ // Log Func
+		JsValueRef myPrint;
+		err = JS::JsCreateFunction(clientMessageCallback, nullptr, &myPrint);
+
+		JsPropertyIdRef propId;
+		err = JS::JsGetPropertyIdFromName(L"clientMessage", &propId);
+		err = JS::JsSetProperty(Chakra::GetGlobalObject(), propId, myPrint, false);
+
+		err = JS::JsRelease(myPrint, nullptr);
+	}
+
+	for (auto& cl : classes) {
+		Chakra::SetPropertyObject(globalObj, cl->getName(), cl->getConstructor());
+		cl->createPrototype();
+		cl->prepareFunctions();
+	}
+
+	for (auto& obj : objects) {
+		obj->initialize(ctx, globalObj);
+		JsPropertyIdRef propId;
+		JS::JsGetPropertyIdFromName(obj->objName, &propId);
+		JS::JsSetProperty(globalObj, propId, obj->object, false);
+	}
+
+	JS::JsRelease(myScript, nullptr);
+	//JS::JsRelease(modulesObj, nullptr);
+	JS::JsRelease(globalObj, nullptr);
 }

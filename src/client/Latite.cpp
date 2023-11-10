@@ -799,8 +799,6 @@ void Latite::onRenderLayer(Event& evG) {
         latest(ev.getUIRenderContext());
         this->uiRenderQueue.pop();
     }
-    
-    ev.getUIRenderContext();
 }
 
 void Latite::onRenderOverlay(Event& evG) {
