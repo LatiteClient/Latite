@@ -157,4 +157,4 @@ private:
 	bool hasInit = false;
 };
 
-//extern "C" __declspec(dllexport) char* LatiteGetVersionsSupported();
+extern "C" __declspec(dllexport) char* LatiteGetServerStatus();

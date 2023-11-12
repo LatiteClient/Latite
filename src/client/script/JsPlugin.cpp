@@ -115,6 +115,20 @@ bool JsPlugin::fetchPluginData() {
 std::shared_ptr<JsScript> JsPlugin::loadAndRunScript(std::wstring relPath) {
 	auto scr = std::make_shared<JsScript>(this, this->getPath() / relPath);
 	scr->load();
+
+	JsValueRef global;
+	JS::JsGetGlobalObject(&global); // this doesn't add a reference that needs to be freed
+
+	JsValueRef modObj;
+	JS::JsCreateObject(&modObj);
+
+	JsValueRef exportsObj;
+	JS::JsCreateObject(&exportsObj);
+
+	Chakra::SetProperty(modObj, L"exports", exportsObj);
+	Chakra::SetProperty(global, L"module", modObj);
+	Chakra::SetProperty(global, L"exports", exportsObj); // So the object.setproperty(exports, esmodule)... works
+
 	auto err = scr->runScript();
 	if (err != JsNoError) {
 		if (err == JsErrorScriptException) {

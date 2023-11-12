@@ -69,6 +69,10 @@ namespace {
     bool hasInjected = false;
 }
 
+namespace shared {
+    std::array<char, 100> serverStatus = {};
+}
+
 #define MVSIG(...) ([]() -> std::pair<SigImpl*, SigImpl*> {\
 if (SDK::internalVers == SDK::VLATEST) return {&Signatures::__VA_ARGS__, &Signatures::__VA_ARGS__};\
 if (SDK::internalVers == SDK::V1_20_30) { return {&Signatures_1_20_30::__VA_ARGS__, &Signatures::__VA_ARGS__}; } \
@@ -291,7 +295,10 @@ BOOL WINAPI DllMain(
     DWORD fdwReason,     // reason for calling function
     LPVOID)  // reserved
 {
+    if (GetModuleHandleA("Minecraft.Windows.exe") != GetModuleHandleA(NULL)) return TRUE;
+
     if (fdwReason == DLL_PROCESS_ATTACH) {
+
         if (hasInjected) {
             FreeLibrary(hinstDLL);
             return TRUE;
@@ -700,6 +707,35 @@ void Latite::onUpdate(Event& evGeneric) {
         }
         lastDX11 = std::get<BoolValue>(useDX11);
     }
+
+    {
+        static auto time = std::chrono::steady_clock::now();
+        auto now = std::chrono::steady_clock::now();
+        if (std::chrono::duration_cast<std::chrono::seconds>(now - time) > 5s) {
+
+            std::string newServerStatus = "menus";
+            auto lp = SDK::ClientInstance::get()->getLocalPlayer();
+            auto rak = SDK::RakNetConnector::get();
+
+            if (lp) {
+                if (rak && !rak->ipAddress.empty()) {
+                    newServerStatus = "server";
+                    if (!rak->featuredServer.empty()) newServerStatus = "server: " + rak->featuredServer;
+                    else if (!rak->dns.empty()) newServerStatus = "server: " + rak->dns + (rak->port == 19132 ? "" : ":" + std::to_string(rak->port));
+                    // Don't show non-dns ips (1.1.1.1) for privacy
+                }
+                else {
+                    newServerStatus = "world: " + SDK::ClientInstance::get()->minecraft->getLevel()->name;
+                }
+            }
+
+            if (newServerStatus.size() > shared::serverStatus.max_size()) { // make sure there are no buffer overflows
+                newServerStatus = newServerStatus.substr(0, shared::serverStatus.max_size() - 2);
+            }
+            strcpy_s(shared::serverStatus.data(), shared::serverStatus.max_size(), newServerStatus.c_str());
+            time = now;
+        }
+    }
 }
 
 void Latite::onKey(Event& evGeneric) {
@@ -824,6 +860,6 @@ void Latite::loadConfig(SettingGroup& gr) {
         });
 }
 
-//char* LatiteGetVersionsSupported() {
-//    return nullptr;
-//}
+char* LatiteGetServerStatus() {
+    return shared::serverStatus.data();
+}
