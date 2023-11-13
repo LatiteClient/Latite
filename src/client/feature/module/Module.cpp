@@ -18,6 +18,7 @@ void Module::loadConfig(SettingGroup& resolvedGroup) {
 std::shared_ptr<Setting> Module::addSetting(std::string const& internalName, std::string const& disp, std::string const& desc, ValueType& val, Setting::Condition condition) {
 	auto set = std::make_shared<Setting>(internalName, disp, desc, condition);
 	set->value = &val;
+	set->defaultValue = val;
 	settings->addSetting(set);
 	return set;
 }
@@ -26,6 +27,7 @@ std::shared_ptr<Setting> Module::addEnumSetting(std::string const& internalName,
 	auto set = std::make_shared<Setting>(internalName, displayName, desc, condition);
 	set->enumData = &dat;
 	set->value = dat.getValue();
+	set->defaultValue = EnumValue(0); // harcoded
 	settings->addSetting(set);
 	return set;
 }
@@ -37,6 +39,7 @@ std::shared_ptr<Setting> Module::addSliderSetting(std::string const& internalNam
 	set->min = min;
 	set->max = max;
 	set->interval = interval;
+	set->defaultValue = val;
 	settings->addSetting(set);
 	return set;
 }

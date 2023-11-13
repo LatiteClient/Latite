@@ -536,6 +536,11 @@ void Latite::initSettings() {
         this->getSettings().addSetting(set);
     }
     {
+        auto set = std::make_shared<Setting>("ejectKey", "Eject Key", "The key used to uninject the client");
+        set->value = &this->ejectKey;
+        this->getSettings().addSetting(set);
+    }
+    {
         auto set = std::make_shared<Setting>("menuBlurEnabled", "Menu Blur", "Whether blur is enabled or disabled for the menu");
         set->value = &this->menuBlurEnabled;
         this->getSettings().addSetting(set);

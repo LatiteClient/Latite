@@ -17,6 +17,8 @@
 
 #include "../ScreenManager.h"
 
+#include <type_traits>
+
 #ifdef min
 #undef min
 #undef max
@@ -496,6 +498,14 @@ void ClickGUI::onRender(Event&) {
 				float textHeight = 0.4f * modHeight;
 			float rlBounds = modWidth * 0.04561f;
 
+			// toggle width/height
+
+			float togglePad = modHeight * 0.249f;
+			float toggleWidth = modWidth * 0.143f;
+
+			RectF toggleRect = { modRect.right - togglePad - toggleWidth, modRect.top + togglePad,
+			modRect.right - togglePad, modRect.bottom - togglePad };
+
 			// module settings calculations
 			dc.ctx->SetTarget(shadowBitmap.Get());
 			bool renderExtended = (mod.lerpArrowRot < 0.98f);
@@ -512,6 +522,25 @@ void ClickGUI::onRender(Event&) {
 					modRectActual.bottom = descTextRect.bottom;
 
 					dc.drawText(descTextRect, util::StrToWStr(mod.description), d2d::Color(1.f, 1.f, 1.f, 0.57f), FontSelection::SegoeRegular, textSizeDesc, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+					{
+						// Reset Button
+						RectF resetRect = { toggleRect.left, descTextRect.top, toggleRect.right, descTextRect.top + toggleRect.getHeight() };
+
+						dc.drawRoundedRectangle(resetRect, d2d::Color::RGB(0xFB, 0x36, 0x36), resetRect.getHeight() * (0.223f), 0.5f, DrawUtil::OutlinePosition::Inside);
+					
+						dc.drawText(resetRect, L"Reset", d2d::Color::RGB(0xFB, 0x36, 0x36), Renderer::FontSelection::SegoeRegular, resetRect.getHeight() * 0.6f,
+							DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+
+						if (resetRect.contains(cursorPos) && justClicked[0]) {
+							mod.mod->settings->forEach([&](std::shared_ptr<Setting> set) {
+								std::visit([set](auto& obj) {
+									obj = std::get<std::remove_reference_t<decltype(obj)>>(set->defaultValue);
+									}, * set->value);
+								});
+						}
+					}
 
 					float padToSetting = 0.014184f * rect.getHeight();
 					float settingPadY = padToSetting * 2.5f;
@@ -565,11 +594,6 @@ void ClickGUI::onRender(Event&) {
 				dc.ctx->PopAxisAlignedClip();
 			}
 
-			float togglePad = modHeight * 0.249f;
-			float toggleWidth = modWidth * 0.143f;
-			RectF toggleRect = { modRect.right - togglePad - toggleWidth, modRect.top + togglePad,
-			modRect.right - togglePad, modRect.bottom - togglePad };
-
 			// text
 			auto textRect = modRect;
 			textRect.left += modRect.getWidth() / 6.f;
@@ -577,7 +601,6 @@ void ClickGUI::onRender(Event&) {
 
 			// toggle
 			{
-
 				bool selecToggle;
 				if (selecToggle = this->shouldSelect(toggleRect, cursorPos)) {
 					if (justClicked[0]) {

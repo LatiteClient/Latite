@@ -17,6 +17,8 @@ using namespace winrt::Windows::Storage;
 
 FARPROC Chakra::pass(const char* name)
 {
+	if (GetModuleHandleA(0) != GetModuleHandleA("Minecraft.Windows.exe")) return 0;
+
 	if (!mod) {
 		mod = GetModuleHandleA("Chakra.dll");
 
