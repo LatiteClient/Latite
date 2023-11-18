@@ -230,7 +230,7 @@ void Renderer::render() {
 	RenderOverlayEvent ev{ d2dCtx.Get() };
 	Eventing::get().dispatch(ev);
 
-	d2dCtx->EndDraw();
+	ThrowIfFailed(d2dCtx->EndDraw());
 
 	if (gameDevice12) {
 		d3d11On12Device->ReleaseWrappedResources(&d3d11Targets[idx], 1);
@@ -306,6 +306,7 @@ void Renderer::releaseAllResources(bool indep) {
 }
 
 void Renderer::createDeviceIndependentResources() {
+	ThrowIfFailed(-1);
 	ThrowIfFailed(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory), reinterpret_cast<IUnknown**>(dWriteFactory.GetAddressOf())));
 	ThrowIfFailed(D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory3), (void**)d2dFactory.GetAddressOf()));
 	float fontSize = 10.f;

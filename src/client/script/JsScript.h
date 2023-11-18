@@ -95,10 +95,11 @@ public:
 
 	
 
-	JsScript(class JsPlugin* plugin, std::filesystem::path const& path);
+	JsScript(class JsPlugin* plugin, std::filesystem::path const& path, std::wstring const& relPath);
 
 	bool load();
 	JsErrorCode runScript();
+	JsErrorCode compileScript();
 
 protected:
 	class JsPlugin* plugin;
@@ -119,6 +120,7 @@ public:
 private:
 
 	std::filesystem::path path;
+	std::wstring relPath;
 	std::wstring relFolderPath;
 	std::wstring loadedScript;
 	std::wifstream stream;

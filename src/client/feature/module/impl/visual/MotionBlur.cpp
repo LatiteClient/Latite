@@ -55,11 +55,17 @@ void MotionBlur::onRender(Event& genericEv) {
 
 void MotionBlur::onCleanup(Event&) {
 	//auto& ev = reinterpret_cast<RendererCleanupEvent&>(genericEv);
-	SafeRelease(&mbBitmap);
-	SafeRelease(&oBitmap);
+	//SafeRelease(&mbBitmap);
+	//SafeRelease(&oBitmap);
+
+	for (auto& bmp : this->motionBlurList) {
+		if (bmp) bmp->Release();
+	}
+
+	motionBlurList.clear();
 }
 
 void MotionBlur::onRendererInit(Event& genericEv) {
-	this->mbBitmap = Latite::getRenderer().getCopiedBitmap();
-	this->oBitmap = Latite::getRenderer().getCopiedBitmap();
+	//this->mbBitmap = Latite::getRenderer().getCopiedBitmap();
+	//this->oBitmap = Latite::getRenderer().getCopiedBitmap();
 }

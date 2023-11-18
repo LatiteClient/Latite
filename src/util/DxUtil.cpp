@@ -5,7 +5,11 @@ void util::doThrowIfFailed(HRESULT hr, int line, std::string func) {
 	if (FAILED(hr)) {
 		std::stringstream ss;
 		_com_error err(hr);
-		ss << "DX assertion failed: " << func << ":" << line << "\n HRESULT: " << std::hex << hr << "\n\n" << util::WStrToStr(err.ErrorMessage()) << ")";
+		ss << "Assertion failed: " << func << ":" << line << "\nHRESULT: "
+			<< std::hex << hr << "\n\n" << util::WStrToStr(err.ErrorMessage()) << ")";
+
+		ss << "\nCPU: " << util::GetProcessorInfo() << "\nGPU: " << reinterpret_cast<const char*>(Signatures::GpuInfo.result);
+
 		Logger::Fatal(ss.str());
 #ifndef DEBUG
 		// Set a breakpoint on this line to catch Win32 API errors.

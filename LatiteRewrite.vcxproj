@@ -458,6 +458,7 @@
     <ClInclude Include="src\client\script\class\impl\JsModuleClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsRect.h" />
     <ClInclude Include="src\client\script\class\impl\JsSettingClass.h" />
+    <ClInclude Include="src\client\script\class\impl\JsTextModuleClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsTextureClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsVec2.h" />
     <ClInclude Include="src\client\script\class\impl\JsVec3.h" />

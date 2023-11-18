@@ -80,7 +80,8 @@ JsValueRef JsScript::getModuleExports() {
 	return JS_INVALID_REFERENCE;
 }
 
-JsScript::JsScript(JsPlugin* plugin, std::filesystem::path const& path) : plugin(plugin), path(path) {
+JsScript::JsScript(JsPlugin* plugin, std::filesystem::path const& path, std::wstring const& relPath)
+	: plugin(plugin), path(path), relPath(relPath) {
 	this->relFolderPath = plugin->getRelFolderPath();
 }
 
@@ -123,6 +124,27 @@ JsErrorCode JsScript::runScript() {
 	//Logger::Info("isTrusted = {}", this->isTrusted());
 #endif
 	auto err = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(this->path.wstring())), this->path.wstring().c_str(), nullptr);
+	return err;
+}
+
+JsErrorCode JsScript::compileScript() {
+	constexpr size_t cBufSize = 32768;
+	unsigned int bufferSize = cBufSize;
+	BYTE* scriptBuf = new BYTE[cBufSize];
+
+	auto err = JS::JsSerializeScript(loadedScript.c_str(), scriptBuf, &bufferSize);
+
+	auto objFolder = this->getPlugin()->getPath() / "obj";
+	std::filesystem::create_directory(objFolder);
+
+	auto objPath = objFolder / (this->relPath.substr(0, relPath.size() - 3) /*remove .js*/ + L".obj");
+
+	std::ofstream ofs{objPath};
+	for (int i = 0; i < bufferSize; ++i) {
+		ofs << (char)scriptBuf[i];
+	}
+
+	delete[] scriptBuf;
 	return err;
 }
 
@@ -289,6 +311,7 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsColor>(this));
 	this->classes.push_back(std::make_shared<JsModuleClass>(this));
 	this->classes.push_back(std::make_shared<JsHudModuleClass>(this));
+	//this->classes.push_back(std::make_shared<JsTextModuleClass>(this));
 	this->classes.push_back(std::make_shared<JsSettingClass>(this));
 	this->classes.push_back(std::make_shared<JsCommandClass>(this));
 	this->classes.push_back(std::make_shared<JsEntityClass>(this));

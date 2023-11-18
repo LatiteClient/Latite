@@ -15,6 +15,7 @@ JsValueRef Filesystem::initialize(JsValueRef parent) {
 	Chakra::DefineFunc(ret, readSync, L"readSync", this);
 	Chakra::DefineFunc(ret, existsSync, L"existsSync", this);
 	Chakra::DefineFunc(ret, createDirectorySync, L"createDirectorySync", this);
+	Chakra::DefineFunc(ret, appendSync, L"appendSync", this);
 	return ret;
 }
 
@@ -137,7 +138,7 @@ JsValueRef Filesystem::writeSync(JsValueRef callee, bool isConstructor, JsValueR
 		JS::JsGetTypedArrayStorage(arguments[2], &buf, &bufSize, nullptr, nullptr);
 
 		for (size_t i = 0; i < bufSize; i++) {
-			ofs << buf[bufSize];
+			ofs << (char)buf[bufSize];
 		}
 	}
 	ofs.close();
@@ -200,6 +201,32 @@ JsValueRef Filesystem::createDirectorySync(JsValueRef callee, bool isConstructor
 		return ret;
 	}
 	return ret;
+}
+
+JsValueRef Filesystem::appendSync(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	auto undef = Chakra::GetUndefined();
+	if (!Chakra::VerifyArgCount(argCount, 3)) return undef;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsTypedArray} })) return undef;
+
+	auto thi = reinterpret_cast<Filesystem*>(callbackState);
+
+	std::wofstream ofs;
+	ofs.open(thi->getPath(Chakra::GetString(arguments[1])), std::ios::app);
+	if (ofs.fail()) {
+		throwFsError();
+		return undef;
+	}
+	else {
+		BYTE* buf;
+		unsigned int bufSize;
+		JS::JsGetTypedArrayStorage(arguments[2], &buf, &bufSize, nullptr, nullptr);
+
+		for (size_t i = 0; i < bufSize; i++) {
+			ofs << (char)buf[bufSize];
+		}
+	}
+	ofs.close();
+	return undef;
 }
 
 void Filesystem::FSAsyncOperation::getArgs() {

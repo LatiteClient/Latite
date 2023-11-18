@@ -113,7 +113,7 @@ bool JsPlugin::fetchPluginData() {
 }
 
 std::shared_ptr<JsScript> JsPlugin::loadAndRunScript(std::wstring relPath) {
-	auto scr = std::make_shared<JsScript>(this, this->getPath() / relPath);
+	auto scr = std::make_shared<JsScript>(this, this->getPath() / relPath, relPath);
 	scr->load();
 
 	JsValueRef global;
@@ -125,11 +125,12 @@ std::shared_ptr<JsScript> JsPlugin::loadAndRunScript(std::wstring relPath) {
 	JsValueRef exportsObj;
 	JS::JsCreateObject(&exportsObj);
 
-	Chakra::SetProperty(modObj, L"exports", exportsObj);
 	Chakra::SetProperty(global, L"module", modObj);
 	Chakra::SetProperty(global, L"exports", exportsObj); // So the object.setproperty(exports, esmodule)... works
 
-	auto err = scr->runScript();
+	Chakra::SetProperty(modObj, L"exports", Chakra::GetProperty(modObj, L"exports")); // This should just reference module.exports, but idk
+
+	auto err = scr->compileScript();//scr->runScript();
 	if (err != JsNoError) {
 		if (err == JsErrorScriptException) {
 			JsValueRef except;
@@ -153,7 +154,7 @@ std::shared_ptr<JsScript> JsPlugin::loadOrFindModule(std::wstring name) {
 	}
 	Logger::Info("Loading module {}", util::WStrToStr(name));
 
-	auto scr = std::make_shared<JsScript>(this, path);
+	auto scr = std::make_shared<JsScript>(this, path, name);
 	scr->load();
 	JsValueRef global;
 	JS::JsGetGlobalObject(&global); // this doesn't add a reference that needs to be freed
@@ -164,9 +165,10 @@ std::shared_ptr<JsScript> JsPlugin::loadOrFindModule(std::wstring name) {
 	JsValueRef exportsObj;
 	JS::JsCreateObject(&exportsObj);
 
-	Chakra::SetProperty(modObj, L"exports", exportsObj);
 	Chakra::SetProperty(global, L"module", modObj);
 	Chakra::SetProperty(global, L"exports", exportsObj); // So the object.setproperty(exports, esmodule)... works
+
+	Chakra::SetProperty(modObj, L"exports", Chakra::GetProperty(modObj, L"exports")); // This should just reference module.exports, but idk
 
 	auto err = scr->runScript();
 

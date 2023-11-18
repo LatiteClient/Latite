@@ -74,4 +74,11 @@ private:
 	static JsValueRef CALLBACK createDirectorySync(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount,
 		void* callbackState);
+	static JsValueRef CALLBACK append(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount,
+		void* callbackState);
+	static JsValueRef CALLBACK appendSync(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount,
+		void* callbackState);
+	
 };
