@@ -159,9 +159,9 @@ std::filesystem::path util::GetLatitePath() {
 
 std::wstring util::StrToWStr(std::string const& s) {
 	int slength = static_cast<int>(s.length()) + 1;
-	int len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
+	int len = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), slength, 0, 0);
 	wchar_t* buf = new wchar_t[len];
-	MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
+	MultiByteToWideChar(CP_UTF8, 0, s.c_str(), slength, buf, len);
 	std::wstring r(buf);
 	delete[] buf;
 	return r;
