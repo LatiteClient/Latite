@@ -251,12 +251,3 @@ std::optional<std::wstring> JsPlugin::getHash(std::filesystem::path const& main)
 	}
 	return std::nullopt;
 }
-
-
-JsValueRef JsScript::AsyncOperation::call() {
-	JS::JsSetCurrentContext(this->ctx);
-	JsValueRef obj;
-	this->args.insert(this->args.begin(), this->callback);
-	Latite::getPluginManager().handleErrors(Chakra::CallFunction(this->callback, this->args.data(), static_cast<unsigned short>(this->args.size()), &obj));
-	return obj;
-}

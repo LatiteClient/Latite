@@ -131,7 +131,16 @@ JsValueRef ClientScriptingObject::mmgrRegisterModuleCallback(JsValueRef callee, 
 		return undefined;
 	}
 
-	Latite::getModuleManager().registerScriptModule(mod);
+	if (Latite::getModuleManager().registerScriptModule(mod)) {
+		JsScript::getThis()->addResource(JsScript::Resource{ mod, [](void* obj) {
+			if (!Latite::getModuleManager().deregisterScriptModule(reinterpret_cast<JsModule*>(obj))) {
+				Logger::Warn("Module is already deregistered");
+			}
+
+			// hoepfully this doesnt double delete...
+			delete reinterpret_cast<JsModule*>(obj);
+			}});
+	}
 
 	return undefined;
 }
@@ -158,7 +167,8 @@ JsValueRef ClientScriptingObject::mmgrDeregisterModuleCallback(JsValueRef callee
 		return undefined;
 	}
 
-	Latite::getModuleManager().deregisterScriptModule(mod);
+	//Latite::getModuleManager().deregisterScriptModule(mod);
+	JsScript::getThis()->removeResource(mod); // this should deregister it I think
 
 	return undefined;
 }
@@ -187,10 +197,6 @@ JsValueRef ClientScriptingObject::mmgrGetModuleByName(JsValueRef callee, bool is
 	JsScript* script = JsScript::getThis();
 	if (script && mod) {
 		auto cl = script->getClass<JsModuleClass>();
-		if (!cl) {
-			Chakra::ThrowError(L"INTERNAL ERROR: could not find Module class");
-			return JS_INVALID_REFERENCE;
-		}
 		auto r = cl->construct(reinterpret_cast<JsModule*>(mod.get()), false);
 		return r;
 	}
@@ -256,7 +262,16 @@ JsValueRef ClientScriptingObject::cmgrRegisterCommandCallback(JsValueRef callee,
 		return undefined;
 	}
 
-	Latite::getCommandManager().registerScriptCommand(cmd);
+	if (Latite::getCommandManager().registerScriptCommand(cmd)) {
+		JsScript::getThis()->addResource(JsScript::Resource{ cmd, [](void* obj) {
+			if (!Latite::getCommandManager().deregisterScriptCommand(reinterpret_cast<JsCommand*>(obj))) {
+				Logger::Warn("Script is already deregistered");
+			}
+
+			// hoepfully this doesnt double delete...
+			delete reinterpret_cast<JsCommand*>(obj);
+			}});
+	}
 	return undefined;
 }
 
@@ -278,7 +293,8 @@ JsValueRef ClientScriptingObject::cmgrDeregisterCommandCallback(JsValueRef calle
 
 	JS::JsGetExternalData(arguments[1], reinterpret_cast<void**>(&cmd));
 
-	Latite::getCommandManager().deregisterScriptCommand(cmd);
+	//Latite::getCommandManager().deregisterScriptCommand(cmd);
+	JsScript::getThis()->removeResource(cmd);
 
 	return undefined;
 }

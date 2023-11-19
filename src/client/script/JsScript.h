@@ -101,6 +101,23 @@ public:
 	JsErrorCode runScript();
 	JsErrorCode compileScript();
 
+	struct Resource {
+		void* ptr;
+		std::function<void(void* object)> finalize;
+
+		Resource(void* ptr, decltype(finalize) finalizer) : ptr(ptr), finalize(finalizer) {}
+
+		~Resource() {
+			finalize(ptr);
+		}
+	};
+
+	void addResource(Resource const& res) { this->resources.push_back(res); };
+	void removeResource(void* object) { 
+		for (auto it = resources.begin(); it != resources.end(); ++it) {
+			if (it->ptr == object) resources.erase(it);
+		}
+	}
 protected:
 	class JsPlugin* plugin;
 
@@ -126,6 +143,7 @@ private:
 	std::wifstream stream;
 
 	std::vector<JsValueRef> ownedEvents;
+	std::vector<Resource> resources;
 
 	void loadJSApi();
 	void loadScriptObjects();
