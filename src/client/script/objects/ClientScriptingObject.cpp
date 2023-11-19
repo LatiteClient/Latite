@@ -132,14 +132,14 @@ JsValueRef ClientScriptingObject::mmgrRegisterModuleCallback(JsValueRef callee, 
 	}
 
 	if (Latite::getModuleManager().registerScriptModule(mod)) {
-		JsScript::getThis()->addResource(JsScript::Resource{ mod, [](void* obj) {
+		JsScript::getThis()->addResource(mod, [](void* obj) {
 			if (!Latite::getModuleManager().deregisterScriptModule(reinterpret_cast<JsModule*>(obj))) {
 				Logger::Warn("Module is already deregistered");
 			}
 
 			// hoepfully this doesnt double delete...
 			delete reinterpret_cast<JsModule*>(obj);
-			}});
+			});
 	}
 
 	return undefined;
@@ -263,14 +263,14 @@ JsValueRef ClientScriptingObject::cmgrRegisterCommandCallback(JsValueRef callee,
 	}
 
 	if (Latite::getCommandManager().registerScriptCommand(cmd)) {
-		JsScript::getThis()->addResource(JsScript::Resource{ cmd, [](void* obj) {
+		JsScript::getThis()->addResource(cmd, [](void* obj) {
 			if (!Latite::getCommandManager().deregisterScriptCommand(reinterpret_cast<JsCommand*>(obj))) {
 				Logger::Warn("Script is already deregistered");
 			}
 
 			// hoepfully this doesnt double delete...
 			delete reinterpret_cast<JsCommand*>(obj);
-			}});
+			});
 	}
 	return undefined;
 }

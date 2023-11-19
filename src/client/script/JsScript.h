@@ -112,7 +112,7 @@ public:
 		}
 	};
 
-	void addResource(Resource const& res) { this->resources.push_back(res); };
+	void addResource(void* object, decltype(Resource::finalize) finalizer) { this->resources.emplace_back(object, finalizer); };
 	void removeResource(void* object) { 
 		for (auto it = resources.begin(); it != resources.end(); ++it) {
 			if (it->ptr == object) resources.erase(it);
