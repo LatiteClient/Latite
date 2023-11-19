@@ -130,7 +130,7 @@ std::shared_ptr<JsScript> JsPlugin::loadAndRunScript(std::wstring relPath) {
 
 	Chakra::SetProperty(modObj, L"exports", Chakra::GetProperty(modObj, L"exports")); // This should just reference module.exports, but idk
 
-	auto err = scr->compileScript();//scr->runScript();
+	auto err = scr->runScript();
 	if (err != JsNoError) {
 		if (err == JsErrorScriptException) {
 			JsValueRef except;
@@ -139,6 +139,8 @@ std::shared_ptr<JsScript> JsPlugin::loadAndRunScript(std::wstring relPath) {
 		}
 		return nullptr;
 	}
+
+	this->scripts.push_back(scr);
 	return scr;
 }
 
@@ -180,6 +182,7 @@ std::shared_ptr<JsScript> JsPlugin::loadOrFindModule(std::wstring name) {
 		}
 		return nullptr;
 	}
+	this->scripts.push_back(scr);
 	return scr;
 }
 

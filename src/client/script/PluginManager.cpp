@@ -83,7 +83,6 @@ void PluginManager::popScript(std::shared_ptr<JsPlugin> ptr)
 		if (*it == ptr) {
 			unloadScript(*it);
 			items.erase(it);
-			return;
 		}
 	}
 }
@@ -297,8 +296,7 @@ void PluginManager::initListeners()
 	eventListeners[L"unload-script"] = {};
 }
 
-void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr)
-{
+void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr) {
 	Event::Value val{L"scriptName"};
 	val.name = L"scriptName";
 	val.val = ptr->getName();

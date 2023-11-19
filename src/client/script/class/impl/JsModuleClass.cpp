@@ -7,7 +7,7 @@
 
 JsValueRef JsModuleClass::moduleIsEnabled(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
 {
-	JsModule* mod;
+	JsModule* mod = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&mod));
 	if (mod) {
 		return mod->isEnabled() ? Chakra::GetTrue() : Chakra::GetFalse();
@@ -21,7 +21,7 @@ JsValueRef JsModuleClass::moduleSetEnabled(JsValueRef callee, bool isConstructor
 	if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
 	if (!Chakra::VerifyParameters({ {arguments[1], JsBoolean } })) return JS_INVALID_REFERENCE;
 
-	JsModule* mod;
+	JsModule* mod = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&mod));
 	if (mod) {
 		mod->setEnabled(Chakra::GetBool(arguments[1]));
@@ -33,7 +33,7 @@ JsValueRef JsModuleClass::moduleSetEnabled(JsValueRef callee, bool isConstructor
 
 JsValueRef JsModuleClass::moduleIsBlocked(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
 {
-	JsModule* mod;
+	JsModule* mod = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&mod));
 	if (mod) {
 		return mod->isBlocked() ? Chakra::GetTrue() : Chakra::GetFalse();
@@ -48,7 +48,7 @@ JsValueRef JsModuleClass::moduleSetOnEvent(JsValueRef callee, bool isConstructor
 
 	if (!Chakra::VerifyParameters({ {arguments[1], JsString }, {arguments[2], JsFunction} })) return JS_INVALID_REFERENCE;
 
-	JsModule* mod;
+	JsModule* mod = nullptr;
 	JsHUDModule* hMod = nullptr;
 	//JsTextModule* tMod = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&mod));
@@ -90,7 +90,7 @@ JsValueRef JsModuleClass::moduleSetOnEvent(JsValueRef callee, bool isConstructor
 }
 
 JsValueRef JsModuleClass::moduleGetSettings(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	JsModule* mod;
+	JsModule* mod = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&mod));
 	if (mod) {
 		JsValueRef array;

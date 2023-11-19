@@ -45,7 +45,7 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 		}
 		else {
 			if (auto script = Latite::getPluginManager().getPluginByName(util::StrToWStr(args[1]))) {
-				Latite::getPluginManager().unloadScript(script);
+				Latite::getPluginManager().popScript(script);
 				message("Successfully unloaded plugin.");
 				return true;
 			}
@@ -65,20 +65,20 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 			return true;
 		}
 
-		message("Unknown plugin " + args[1], true);
+		message("Cannot find plugin " + args[1], true);
 		return true;
 	}
 	else if (args[0] == "reload") {
 		if (args.size() != 2) return false;
 		if (auto script = Latite::getPluginManager().getPluginByName(util::StrToWStr(args[1]))) {
 			auto path = script->getRelFolderPath();
-			Latite::getPluginManager().unloadScript(script);
+			Latite::getPluginManager().popScript(script);
 			auto sc = Latite::getPluginManager().loadPlugin(path, true);
 			if (sc) message("Successfully reloaded plugin.");
 			else message("Could not reload plugin properly.", true);
 			return true;
 		}
-		message("Unknown plugin " + args[1], true);
+		message("Plugin " + args[1] + " is not loaded", true);
 		return true;
 
 	}

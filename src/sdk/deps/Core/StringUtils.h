@@ -23,6 +23,21 @@ namespace SDK {
 			string = str;
 		}
 
+		HashedString(HashedString const& that) {
+			this->string = that.string;
+			this->hash = that.hash;
+			this->idk = nullptr;
+		}
+
+		HashedString& operator=(HashedString const& right) {
+			this->string = right.string;
+			this->hash = right.hash;
+			this->idk = nullptr;
+			return *this;
+		}
+
+		HashedString() = default;
+
 		bool operator==(uint64_t right) {
 			return right == hash;
 		}

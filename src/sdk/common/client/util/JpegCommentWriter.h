@@ -1,4 +1,6 @@
 #pragma once
+#include <sdk/common/client/renderer/MaterialPtr.h>
+
 namespace SDK {
 	namespace cg {
 		class ImageBuffer;
@@ -9,9 +11,12 @@ namespace SDK {
 	public:
 
 		// ui_texture_and_color
-		class MaterialPtr* material;
+		MaterialPtr material;
+	private:
+		//size_t trap[69] = { 0xdeadc0de };
+	public:
 
-		JpegCommentWriter(MaterialPtr* mat) : material(mat) {}
+		JpegCommentWriter(MaterialPtr* mat) : material(*mat) {}
 
 		void _drawImage(ScreenContext* scn, cg::ImageBuffer* image);
 	};

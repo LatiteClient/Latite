@@ -15,9 +15,9 @@ public:
 	void onEnable() override;
 	void onDisable() override;
 	bool shouldHoldToToggle() override;
+	JsValueRef object = JS_INVALID_REFERENCE;
 private:
 	std::string displayName;
 
-	JsValueRef object = JS_INVALID_REFERENCE;
 	JsContextRef ctx = JS_INVALID_REFERENCE;
 };

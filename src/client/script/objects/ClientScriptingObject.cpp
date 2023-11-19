@@ -122,7 +122,7 @@ JsValueRef ClientScriptingObject::mmgrRegisterModuleCallback(JsValueRef callee, 
 		return undefined;
 	}
 
-	JsModule* mod;
+	JsModule* mod = nullptr;
 
 	JS::JsGetExternalData(arguments[1], reinterpret_cast<void**>(&mod));
 
@@ -149,7 +149,7 @@ JsValueRef ClientScriptingObject::mmgrDeregisterModuleCallback(JsValueRef callee
 		return undefined;
 	}
 
-	JsModule* mod;
+	JsModule* mod = nullptr;
 
 	JS::JsGetExternalData(arguments[1], reinterpret_cast<void**>(&mod));
 

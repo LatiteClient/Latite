@@ -136,8 +136,8 @@ JsValueRef D2DScriptingObject::drawTextFullCallback(JsValueRef callee, bool isCo
 	auto text = Chakra::GetString(arguments[2]);
 	auto size = static_cast<float>(Chakra::GetNumber(arguments[3]));
 	auto color = JsColor::ToColor(arguments[4]);
-	auto align = Chakra::GetInt(arguments[4]);
-	auto vertAlign = Chakra::GetInt(arguments[5]);
+	auto align = Chakra::GetInt(arguments[5]);
+	auto vertAlign = Chakra::GetInt(arguments[6]);
 
 	if ((align > 2 || align < 0) || (vertAlign > 2 || vertAlign < 0)) {
 		Chakra::ThrowError(L"Invalid text alignment");

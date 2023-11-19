@@ -18,6 +18,7 @@ public:
 			}
 		}
 		this->items.push_back(std::shared_ptr<JsCommand>(cmd));
+		JS::JsAddRef(cmd->obj, nullptr);
 		return true;
 	}
 
