@@ -75,6 +75,7 @@ namespace shared {
 
 #define MVSIG(...) ([]() -> std::pair<SigImpl*, SigImpl*> {\
 if (SDK::internalVers == SDK::VLATEST) return {&Signatures::__VA_ARGS__, &Signatures::__VA_ARGS__};\
+if (SDK::internalVers == SDK::V1_20_40) { return {&Signatures_1_20_40::__VA_ARGS__, &Signatures::__VA_ARGS__}; } \
 if (SDK::internalVers == SDK::V1_20_30) { return {&Signatures_1_20_30::__VA_ARGS__, &Signatures::__VA_ARGS__}; } \
 if (SDK::internalVers == SDK::V1_19_51) { return {&Signatures_1_19_51::__VA_ARGS__, &Signatures::__VA_ARGS__}; } \
 return {&Signatures_1_18_12::__VA_ARGS__, &Signatures::__VA_ARGS__}; }\
@@ -258,11 +259,13 @@ DWORD __stdcall startThread(HINSTANCE dll) {
             else {
                 wnd->show();
                 wnd->runMessagePump();
+                Logger::Fatal("{}", XOR_STRING("Please look at the pinned message in #status in the Latite Discord to setup Beta."));
             }
         }
         else {
             wnd->show();
             wnd->runMessagePump();
+            Logger::Fatal("{}", XOR_STRING("Please look at the pinned message in #status in the Latite Discord to setup Beta."));
         }
         wnd->destroy();
     }
@@ -648,6 +651,7 @@ std::string Latite::getTextAsset(int resource) {
 
 namespace {
     winrt::Windows::Foundation::IAsyncAction doDownloadAssets() {
+        co_return;
 //#ifndef LATITE_PUBLIC
         Logger::Info("Downloading ChakraCore");
 //#endif

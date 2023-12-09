@@ -1,8 +1,8 @@
 #pragma once
 #include <util/XorString.h>
 
-// 1.20.50
-class Signatures {
+// 1.20.40.1
+class Signatures_1_20_40 {
 public:
 	struct Offset {
 		inline static SigImpl MinecraftGame_cursorGrabbed{[](memory::signature_store& store, uintptr_t) { return store.ref(2); },

@@ -79,10 +79,11 @@ std::shared_ptr<JsPlugin> PluginManager::getPluginByName(std::wstring const& nam
 
 void PluginManager::popScript(std::shared_ptr<JsPlugin> ptr)
 {
-	for (auto it = items.begin(); it != items.end(); it++) {
+	for (auto it = items.begin(); it != items.end(); ++it) {
 		if (*it == ptr) {
 			unloadScript(*it);
 			items.erase(it);
+			return;
 		}
 	}
 }
