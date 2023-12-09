@@ -14,6 +14,6 @@ namespace SDK {
 
 	class GameSession {
 	public:
-		MVCLASS_FIELD(Level**, level, 0x28 /*1.20.40*/, 0x20, 0x20, 0x20);
+		MVCLASS_FIELD(Level**, level, 0x30, 0x28 /*1.20.40*/, 0x20, 0x20, 0x20);
 	};
 }
