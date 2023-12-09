@@ -223,6 +223,12 @@ public:
 	inline static SigImpl UIControl_setPosition{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? f3 0f 58 73 ? f3 0f 58 7b ? f3 0f 11 7c 24 ? f3 0f 11 74 24 ? 48 8b cb",
 		"UIControl::setPosition"};
+
+	inline static SigImpl MinecraftGame_getPrimaryClientInstance{[](memory::signature_store&, uintptr_t res) { return res; },
+		"40 53 48 83 ec ? 48 8b da 48 8b 91 ? ? ? ? 48 8b ca",
+		"MinecraftGame::getPrimaryClientInstance"};
+
+	//40 53 48 83 ec ? 48 8b da 48 8b 91 ? ? ? ? 48 8b ca
 };
 
 // after adding sigs here, add them in latite.cpp

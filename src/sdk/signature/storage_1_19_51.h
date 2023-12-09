@@ -203,6 +203,9 @@ public:
 	inline static SigImpl UIControl_setPosition{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? 0f 28 ce f3 0f 59 4f",
 		"UIControl::setPosition"};
+
+	inline static SigImpl MinecraftGame_getPrimaryClientInstance{};
+
 };
 
 

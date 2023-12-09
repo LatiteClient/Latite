@@ -26,7 +26,8 @@ std::optional<errno_t> Config::load() {
 	try {
 		obj = json::parse(ifs);
 	}
-	catch (json::parse_error&) {
+	catch (json::parse_error& e) {
+		Logger::Fatal("Config loading error: {}", e.what());
 		return 0;
 	}
 

@@ -35,7 +35,6 @@ SDK::ClientInstance* SDK::ClientInstance::get() {
             instance = (*mcgame)->getPrimaryClientInstance();
         }
     }
-    Logger::Fatal("{}", XOR_STRING("ERROR: Could not find CI!"));
     return instance;
 }
 

@@ -21,8 +21,6 @@ namespace SDK {
 			return reinterpret_cast<FontRepository*>(fontRepo);
 		}
 
-		class ClientInstance* getPrimaryClientInstance() {
-			return memory::callVirtual<ClientInstance*>(this, 0x2);
-		}
+		class ClientInstance* getPrimaryClientInstance();
 	};
 }
