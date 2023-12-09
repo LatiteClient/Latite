@@ -131,8 +131,10 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int deadCount = 0;
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
-        { "1.20.41", SDK::VLATEST },
-        { "1.20.40", SDK::VLATEST },
+        { "1.20.51", SDK::VLATEST },
+        { "1.20.50", SDK::VLATEST },
+        { "1.20.41", SDK::V1_20_40 },
+        { "1.20.40", SDK::V1_20_40 },
         { "1.20.32", SDK::V1_20_30 },
         { "1.20.31", SDK::V1_20_30 },
         { "1.20.30", SDK::V1_20_30 },
@@ -160,6 +162,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     Logger::Info(XOR_STRING("Minecraft SDK version {}"), SDK::internalVers);
 
     std::vector<std::pair<SigImpl*, SigImpl*>> sigList = {
+        MVSIG(Misc::minecraftGamePointer),
         MVSIG(Misc::clientInstance),
         MVSIG(Keyboard_feed),
         MVSIG(LevelRenderer_renderLevel),

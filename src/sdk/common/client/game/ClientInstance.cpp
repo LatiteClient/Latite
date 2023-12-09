@@ -6,25 +6,36 @@ SDK::ClientInstance* SDK::ClientInstance::instance = nullptr;
 
 SDK::ClientInstance* SDK::ClientInstance::get() {
     if (!instance) {
-        static auto sig = Signatures::Misc::clientInstance.result;
-        uintptr_t evalPtr = *reinterpret_cast<uintptr_t*>(sig);
-        if (!evalPtr) return nullptr;
-        evalPtr = *reinterpret_cast<uintptr_t*>(evalPtr);
+        if (Signatures::Misc::clientInstance.result) {
+            static auto sig = Signatures::Misc::clientInstance.result;
+            uintptr_t evalPtr = *reinterpret_cast<uintptr_t*>(sig);
+            if (!evalPtr) return nullptr;
+            evalPtr = *reinterpret_cast<uintptr_t*>(evalPtr);
 
 #ifdef LATITE_BETA
-        int offs = Latite::get().cInstOffs + 0x10;
-        if (SDK::internalVers == V1_19_51) {
-            offs = Latite::get().cInstOffs2 + 0x10;
-        }
+            int offs = Latite::get().cInstOffs + 0x10;
+            if (SDK::internalVers == V1_19_51) {
+                offs = Latite::get().cInstOffs2 + 0x10;
+            }
 #else
-        int offs = 0x58;
-        if (SDK::internalVers == SDK::V1_19_51) offs = 0x48;
+            int offs = 0x58;
+            if (SDK::internalVers == SDK::V1_19_51) offs = 0x48;
 #endif
 
-        evalPtr = *reinterpret_cast<uintptr_t*>(evalPtr + offs);
-        if (SDK::internalVers > SDK::V1_19_51) instance = *reinterpret_cast<ClientInstance**>(evalPtr);
-        else instance = reinterpret_cast<ClientInstance*>(evalPtr);
+            evalPtr = *reinterpret_cast<uintptr_t*>(evalPtr + offs);
+            if (SDK::internalVers > SDK::V1_19_51) instance = *reinterpret_cast<ClientInstance**>(evalPtr);
+            else instance = reinterpret_cast<ClientInstance*>(evalPtr);
+        }
+        else {
+            MinecraftGame** mcgame = reinterpret_cast<MinecraftGame**>(Signatures::Misc::minecraftGamePointer.result);
+            if (!*mcgame) {
+                return nullptr;
+            }
+
+            instance = (*mcgame)->getPrimaryClientInstance();
+        }
     }
+    Logger::Fatal("{}", XOR_STRING("ERROR: Could not find CI!"));
     return instance;
 }
 
