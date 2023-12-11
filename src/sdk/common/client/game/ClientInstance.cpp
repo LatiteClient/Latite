@@ -42,7 +42,10 @@ SDK::BlockSource* SDK::ClientInstance::getRegion() {
     if (SDK::internalVers == SDK::V1_18_12 || SDK::internalVers == SDK::V1_19_51) {
         return memory::callVirtual<BlockSource*>(this, 0x17);
     }
-    return memory::callVirtual<BlockSource*>(this, 0x1A);
+    if (SDK::internalVers < SDK::V1_20_50) {
+        return memory::callVirtual<BlockSource*>(this, 0x1A);
+    }
+    return memory::callVirtual<BlockSource*>(this, 0x1B);
 }
 
 
@@ -50,7 +53,11 @@ SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
 #ifdef LATITE_BETA
     int offs = Latite::get().plrOffs;
     if (SDK::internalVers <= V1_19_51) {
-        offs = Latite::get().cInstOffs2;
+        offs = Latite::get().plrOffs2;
+    }
+
+    if (SDK::internalVers >= SDK::V1_20_50) {
+        offs++; // 0x1C instead of 0x1B
     }
 
     return memory::callVirtual<LocalPlayer*>(this, offs);
@@ -58,7 +65,10 @@ SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
     if (SDK::internalVers == SDK::V1_18_12 || SDK::internalVers == SDK::V1_19_51) {
         return memory::callVirtual<LocalPlayer*>(this, 0x18);
     }
-    return memory::callVirtual<LocalPlayer*>(this, 0x1B);
+    if (SDK::internalVers < SDK::V1_20_50) {
+        return memory::callVirtual<LocalPlayer*>(this, 0x1B);
+    }
+    return memory::callVirtual<LocalPlayer*>(this, 0x1C);
 #endif
 }
 

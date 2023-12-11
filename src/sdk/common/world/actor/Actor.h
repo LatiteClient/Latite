@@ -11,7 +11,7 @@ namespace SDK {
 
 		CLASS_FIELD(EntityContext, entityContext, 0x8);
 		MVCLASS_FIELD(int32_t, ticksExisted, 0x200, 0x2A8, 0x24C);
-		MVCLASS_FIELD(int32_t, invulnerableTime, 0x204, 0x2AC, 0x250);
+		MVCLASS_FIELD(int32_t, invulnerableTime, 0x204, 0x2AC, 0x250); // Mob::hurtEffects
 		MVCLASS_FIELD(std::shared_ptr<class Dimension>, dimension, 0x250, 0x360, 0x300);
 		MVCLASS_FIELD(StateVectorComponent*, stateVector, 0x2A0, 0, 0x350);
 		MVCLASS_FIELD(AABBShapeComponent*, aabbShape, 0x2A8, 0, 0x358);

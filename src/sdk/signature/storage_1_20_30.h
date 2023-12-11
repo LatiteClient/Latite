@@ -43,6 +43,8 @@ public:
 			// last 4 bytes is the hash of the component
 			"40 53 48 83 EC ? 48 8B DA BA 14 14 A1 3C",
 			"ActorRuntimeIDComponent"};
+
+		inline static SigImpl actorTypeComponent{};
 	};
 
 	struct Vtable {

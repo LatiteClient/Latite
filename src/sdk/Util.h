@@ -34,6 +34,7 @@ namespace SDK {
 	extern inline const int mvGetOffset() {
 		switch (SDK::internalVers) {
 		case SDK::V1_20_50:
+		default:
 			return offs_1_20_50;
 		case SDK::V1_20_40:
 			return offs_1_20_40;
@@ -44,12 +45,6 @@ namespace SDK {
 			break;
 		case SDK::V1_18_12:
 			return offs_1_18_12;
-		default:
-			// Don't want to do anything in release mode so we don't bloat the compiled code too much
-#ifdef LATITE_DEBUG
-			__debugbreak();
-#endif
-			return 0;
 		}
 	}
 
@@ -57,6 +52,7 @@ namespace SDK {
 	extern inline const int mvGetOffset() {
 		switch (SDK::internalVers) {
 		case SDK::V1_20_40:
+		default:
 			return offs_1_20_40;
 		case SDK::V1_20_30:
 			return offs_1_20_30;
@@ -65,12 +61,6 @@ namespace SDK {
 			break;
 		case SDK::V1_18_12:
 			return offs_1_18_12;
-		default:
-			// Don't want to do anything in release mode so we don't bloat the compiled code too much
-#ifdef LATITE_DEBUG
-			__debugbreak();
-#endif
-			return 0;
 		}
 	}
 
@@ -78,8 +68,8 @@ namespace SDK {
 	template <int offs_1_20_30, int offs_1_18_12, int offs_1_19_51>
 	extern inline const int mvGetOffset() {
 		switch (SDK::internalVers) {
-		case SDK::VLATEST:
 		case SDK::V1_20_30:
+		default:
 			return offs_1_20_30;
 			break;
 		case SDK::V1_19_51:
@@ -88,12 +78,6 @@ namespace SDK {
 		case SDK::V1_18_12:
 			return offs_1_18_12;
 			break;
-		default:
-			// Don't want to do anything in release mode so we don't bloat the compiled code too much
-#ifdef LATITE_DEBUG
-			__debugbreak();
-#endif
-			return 0;
 		}
 	}
 }

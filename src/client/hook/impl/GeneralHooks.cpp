@@ -188,16 +188,16 @@ void GenericHooks::MovePlayer(uintptr_t** a1, void* a2, uintptr_t* a3, uintptr_t
 	char a17,
 	char a18,
 	char a19) {
-	SDK::MoveInputComponent* hand = SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent();
-	{
-		BeforeMoveEvent ev{ hand };
-		if (Eventing::get().dispatch(ev)) return;
-	}
-	MovePlayerHook->oFunc<decltype(&MovePlayer)>()(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a15, a15, a16, a17, a18, a19);
-	{
-		AfterMoveEvent ev{ hand };
-		Eventing::get().dispatch(ev);
-	}
+	//SDK::MoveInputComponent* hand = SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent();
+	//{
+	//	BeforeMoveEvent ev{ hand };
+	//	if (Eventing::get().dispatch(ev)) return;
+	//}
+	//MovePlayerHook->oFunc<decltype(&MovePlayer)>()(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a15, a15, a16, a17, a18, a19);
+	//{
+	//	AfterMoveEvent ev{ hand };
+	//	Eventing::get().dispatch(ev);
+	//}
 }
 
 void __fastcall GenericHooks::CameraViewBob(void* a, void* b, void* c) {

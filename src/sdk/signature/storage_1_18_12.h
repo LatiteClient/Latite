@@ -47,6 +47,7 @@ public:
 	struct Components {
 		inline static SigImpl moveInputComponent{};
 		inline static SigImpl runtimeIDComponent{};
+		inline static SigImpl actorTypeComponent{};
 	};
 
 	inline static SigImpl LevelRenderer_renderLevel{[](memory::signature_store&, uintptr_t res) { return res; },

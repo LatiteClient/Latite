@@ -62,7 +62,7 @@ namespace SDK {
 			ImageBuffer(int imageWidth, int imageHeight) : mStorage{ (imageWidth * imageHeight) * 4 /*Im assuming its ARGB/RGBA so 4 bytes per pixel?*/} {
 				mImageDescription.mWidth = (float)imageWidth;
 				mImageDescription.mHeight = (float)imageHeight;
-				mImageDescription.mArraySize = mStorage.size;
+				mImageDescription.mArraySize = (int)mStorage.size;
 			}
 
 			~ImageBuffer() {}
