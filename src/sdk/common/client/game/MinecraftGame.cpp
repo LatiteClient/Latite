@@ -12,8 +12,9 @@ bool SDK::MinecraftGame::isCursorGrabbed() {
 
 SDK::ClientInstance* SDK::MinecraftGame::getPrimaryClientInstance() {
     //19AAAB62768
-    ClientInstance** inst;
-    reinterpret_cast<void* (*)(MinecraftGame*, ClientInstance**&)>(Signatures::MinecraftGame_getPrimaryClientInstance.result)((MinecraftGame*)((uintptr_t)this + 0x48), inst);
+    // actually a NonOwnerPointer
+    std::shared_ptr<ClientInstance*> inst = nullptr;
+    reinterpret_cast<void* (*)(MinecraftGame*, std::shared_ptr<ClientInstance*>&)>(Signatures::MinecraftGame_getPrimaryClientInstance.result)((MinecraftGame*)((uintptr_t)this + 0x48), inst);
     if (inst) return *inst;
     return nullptr;
 }

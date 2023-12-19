@@ -27,6 +27,7 @@ SDK::ClientInstance* SDK::ClientInstance::get() {
             else instance = reinterpret_cast<ClientInstance*>(evalPtr);
         }
         else {
+            // IMinecraftGame
             MinecraftGame** mcgame = reinterpret_cast<MinecraftGame**>(Signatures::Misc::minecraftGamePointer.result);
             if (!*mcgame) {
                 return nullptr;

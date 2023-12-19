@@ -25,7 +25,7 @@ SDK::MoveInputComponent* SDK::Player::getMoveInputComponent() {
 
 	using try_get_t = SDK::MoveInputComponent* (__fastcall*)(uintptr_t a1, uint32_t* a2);
 	static auto func = reinterpret_cast<try_get_t>(Signatures::Components::moveInputComponent.result);
-	return func(entityContext.registry->basicRegistry, &entityContext.id);
+	return func(entityContext.getBasicRegistry(), &entityContext.getId());
 }
 
 std::string SDK::Player::getXUID() {

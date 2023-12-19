@@ -48,12 +48,12 @@ int64_t SDK::Actor::getRuntimeID() {
 	if (internalVers < V1_19_51) {
 		return util::directAccess<int64_t>(this, 0x550);
 	}
-	return *reinterpret_cast<int64_t * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::runtimeIDComponent.result)(entityContext.registry->basicRegistry, &entityContext.id);
+	return *reinterpret_cast<int64_t * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::runtimeIDComponent.result)(entityContext.getBasicRegistry(), &entityContext.getId());
 }
 
 uint8_t SDK::Actor::getEntityTypeID() {
 	if (internalVers >= V1_20_50) {
-		return static_cast<uint8_t>(*reinterpret_cast<uint32_t * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::runtimeIDComponent.result)(entityContext.registry->basicRegistry, &entityContext.id));
+		return static_cast<uint8_t>(*reinterpret_cast<uint32_t * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::runtimeIDComponent.result)(entityContext.getBasicRegistry(), &entityContext.getId()));
 	}
 
 	return memory::callVirtual<int>(this, mvGetOffset<0x64, 0x97, 0xAA, 0xAC>());

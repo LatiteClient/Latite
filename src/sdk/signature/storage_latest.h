@@ -22,10 +22,8 @@ public:
 		inline static SigImpl clientInstance{};
 
 		inline static SigImpl minecraftGamePointer {[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-			// god what a fat signature
 			"48 89 0d ? ? ? ? 48 8b 00",
 			"MinecraftGame"};
-		//
 		inline static SigImpl clickMap{[](memory::signature_store& store, uintptr_t) { return store.deref(2); },
 			"8b 0d ? ? ? ? 49 2b c7",
 			"ClickMap"};
