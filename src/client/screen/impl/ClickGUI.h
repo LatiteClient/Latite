@@ -74,6 +74,7 @@ private:
 		float arrowRot = 180.f;
 		float lerpArrowRot = 1.f;
 		float lerpToggle = 0.f;
+		float lerpHover = 0.f;
 		Color toggleColorOn = {};
 		Color toggleColorOff = {};
 		std::optional<d2d::Rect> modRect = std::nullopt;

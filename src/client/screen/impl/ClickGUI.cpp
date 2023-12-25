@@ -257,7 +257,7 @@ void ClickGUI::onRender(Event&) {
 		if (shouldSelect(searchRect, cursorPos)) {
 			cursor = Cursor::IBeam;
 			shouldArrow = false;
-			
+
 		}
 
 		if (justClicked[0]) {
@@ -306,7 +306,7 @@ void ClickGUI::onRender(Event&) {
 				Vec2 ts = dc.getTextSize(searchTextBox.getText().substr(0, searchTextBox.getCaretLocation()), Renderer::FontSelection::SegoeRegular, searchRect.getHeight() / 2.f);
 				RectF textSearchRect = { searchRect.left + 5.f + searchRect.getHeight(), searchRect.top, searchRect.right - 5.f + searchRect.getHeight(), searchRect.bottom };
 				d2d::Rect blinkerRect = { textSearchRect.left + ts.x, searchRect.top + 3.f, textSearchRect.left + ts.x + 2.f, searchRect.bottom - 3.f };
-				if (searchTextBox.isSelected() && searchTextBox.shouldBlink() ) dc.fillRectangle(blinkerRect, d2d::Color::RGB(0xB9, 0xB9, 0xB9));
+				if (searchTextBox.isSelected() && searchTextBox.shouldBlink()) dc.fillRectangle(blinkerRect, d2d::Color::RGB(0xB9, 0xB9, 0xB9));
 				dc.drawText(textSearchRect, searchStr, d2d::Color::RGB(0xB9, 0xB9, 0xB9), FontSelection::SegoeRegular, searchRect.getHeight() / 2.f, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, false);
 				dc.ctx->DrawBitmap(Latite::getAssets().searchIcon.getBitmap(), { searchRect.left + 10.f, searchRect.top + 6.f, searchRect.left - 3.f + searchRect.getHeight(), searchRect.top + searchRect.getHeight() - 6.f });
 			}
@@ -340,14 +340,14 @@ void ClickGUI::onRender(Event&) {
 				settings.forEach([&](std::shared_ptr<Setting> set) {
 					if (setPos.y <= rect.bottom) {
 						if (set->shouldRender(settings) && (set->value->index() == (size_t)Setting::Type::Key || set->value->index() == (size_t)Setting::Type::Enum || set->value->index() == (size_t)Setting::Type::Color)) {
-						setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth) + (setting_height_relative * rect.getHeight());
-					}
+							setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth) + (setting_height_relative * rect.getHeight());
+						}
 					}
 					});
 			}
 
 			// bool settings
-			setPos = { rect.left + rect.getWidth() * ( 1.3f / 3.f ), searchRect.bottom + padToSettings };
+			setPos = { rect.left + rect.getWidth() * (1.3f / 3.f), searchRect.bottom + padToSettings };
 			{
 				// go through all bool settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
@@ -359,17 +359,24 @@ void ClickGUI::onRender(Event&) {
 
 					});
 			}
-		} else if (tab == MODULES) {
+		}
+		else if (tab == MODULES) {
 
 			// all, game, hud, etc buttons
-			static std::vector<std::tuple<std::wstring, ClickGUI::ModTab, d2d::Color>> modTabs = { {L"All", ALL, searchCol }, {L"Game", GAME, searchCol}, {L"HUD", HUD, searchCol }, { L"Script", SCRIPT, searchCol } };
+			static std::vector<std::tuple<std::wstring, ClickGUI::ModTab, d2d::Color, float>> modTabs = { {L"All", ALL, searchCol, 0.f }, {L"Game", GAME, searchCol, 0.f }, {L"HUD", HUD, searchCol, 0.f }, { L"Plugins", SCRIPT, searchCol, 0.f } };
 
 			float nodeWidth = guiWidth * 0.083f;
 
 			RectF nodeRect = { searchRect.right + gaps, searchRect.top, searchRect.right + gaps + nodeWidth, searchRect.bottom };
+			float pressDownHeight = searchRect.getHeight() / 10.f;
 
 			for (auto& pair : modTabs) {
-				bool contains = shouldSelect(nodeRect, cursorPos);
+				RectF renderTabRect = nodeRect;
+
+				float pressDownTranslate = pressDownHeight * std::get<3>(pair);
+				renderTabRect = renderTabRect.translate(0.f, pressDownTranslate);
+
+				bool contains = shouldSelect(renderTabRect, cursorPos);
 				std::get<2>(pair) = util::LerpColorState(std::get<2>(pair), searchCol + 0.2f, searchCol, contains);
 
 				if (justClicked[0] && contains) {
@@ -377,21 +384,27 @@ void ClickGUI::onRender(Event&) {
 					playClickSound();
 				}
 
-				dc.ctx->SetTarget(shadowBitmap.Get());
-				D2D1_ROUNDED_RECT rr;
+				std::get<3>(pair) = std::lerp(std::get<3>(pair), ((contains && mouseButtons[0]) || modTab == std::get<1>(pair)) ? 1.f : 0.f, Latite::getRenderer().getDeltaTime() / 5.f);
+
+
+				contains = shouldSelect(renderTabRect, cursorPos);
+
+				if (pressDownTranslate < 0.01f) dc.ctx->SetTarget(shadowBitmap.Get());
+				D2D1_ROUNDED_RECT rr{};
 				rr.radiusX = searchRound;
 				rr.radiusY = searchRound;
-				rr.rect = nodeRect.get();
+				rr.rect = renderTabRect.get();
 				auto solidBrush = rend.getSolidBrush();
 				if (this->modTab == std::get<1>(pair)) {
-					solidBrush->SetColor((std::get<2>(pair) + 0.3f).get());
+					solidBrush->SetColor((std::get<2>(pair) - 0.1f).get());
 				}
 				else {
 					solidBrush->SetColor(std::get<2>(pair).get());
 				}
 				dc.ctx->FillRoundedRectangle(rr, rend.getSolidBrush());
 
-				dc.drawText(nodeRect, std::get<0>(pair), {1.f, 1.f, 1.f, 0.8f}, FontSelection::SegoeRegular, nodeRect.getHeight() / 2.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+				float baseColor = 1.f - (0.1f * std::get<3>(pair));
+				dc.drawText(renderTabRect, std::get<0>(pair), { baseColor, baseColor, baseColor, 0.8f }, FontSelection::SegoeRegular, nodeRect.getHeight() / 2.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 				dc.ctx->SetTarget(myBitmap);
 
 				auto oWidth = nodeRect.getWidth() + gaps;
@@ -420,7 +433,7 @@ void ClickGUI::onRender(Event&) {
 		float y = searchRect.bottom + padFromSearchBar;
 		// TODO: clipping
 		dc.ctx->PushAxisAlignedClip({ rect.left, y, rect.right, rect.bottom }, D2D1_ANTIALIAS_MODE_ALIASED);
-		modClip = { rect.left, y, rect.right, rect.bottom};
+		modClip = { rect.left, y, rect.right, rect.bottom };
 
 		float yStart = y -= this->lerpScroll;
 
@@ -485,6 +498,9 @@ void ClickGUI::onRender(Event&) {
 			if (!mod.shouldRender) continue;
 			Vec2 pos = { x, y + columnOffs[i] };
 			RectF modRect = { pos.x, pos.y, pos.x + modWidth, pos.y + modHeight };
+
+			float maxHoverOffset = modRect.getHeight() / 10.f;
+			modRect = modRect.translate(0.f, -(maxHoverOffset * mod.lerpHover));
 			RectF modRectActual = modRect;
 
 			if (mod.modRect.has_value()) {
@@ -496,170 +512,172 @@ void ClickGUI::onRender(Event&) {
 
 			{
 				float textHeight = 0.4f * modHeight;
-			float rlBounds = modWidth * 0.04561f;
+				float rlBounds = modWidth * 0.04561f;
 
-			// toggle width/height
+				// toggle width/height
 
-			float togglePad = modHeight * 0.249f;
-			float toggleWidth = modWidth * 0.143f;
+				float togglePad = modHeight * 0.249f;
+				float toggleWidth = modWidth * 0.143f;
 
-			RectF toggleRect = { modRect.right - togglePad - toggleWidth, modRect.top + togglePad,
-			modRect.right - togglePad, modRect.bottom - togglePad };
+				RectF toggleRect = { modRect.right - togglePad - toggleWidth, modRect.top + togglePad,
+				modRect.right - togglePad, modRect.bottom - togglePad };
 
-			// module settings calculations
-			dc.ctx->SetTarget(shadowBitmap.Get());
-			bool renderExtended = (mod.lerpArrowRot < 0.98f);
-			if (renderExtended) {
+				// module settings calculations
+				dc.ctx->SetTarget(shadowBitmap.Get());
+				bool renderExtended = (mod.lerpArrowRot < 0.98f);
+				if (renderExtended) {
 
-				// clipping pane
-				{
-					dc.ctx->Clear();
-
-					float textSizeDesc = textHeight * 0.72f;
-					float descTextPad = textSizeDesc / 3.f;
-					RectF descTextRect = { modRect.left + rlBounds, modRect.bottom, modRect.right - rlBounds, modRect.bottom + textSizeDesc + descTextPad };
-					descTextRect.bottom = descTextRect.top + dc.getTextSize(util::StrToWStr(mod.description), Renderer::FontSelection::SegoeRegular, textSizeDesc).y + descTextPad;
-					modRectActual.bottom = descTextRect.bottom;
-
-					dc.drawText(descTextRect, util::StrToWStr(mod.description), d2d::Color(1.f, 1.f, 1.f, 0.57f), FontSelection::SegoeRegular, textSizeDesc, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-
+					// clipping pane
 					{
-						// Reset Button
-						RectF resetRect = { toggleRect.left, descTextRect.top, toggleRect.right, descTextRect.top + toggleRect.getHeight() };
+						dc.ctx->Clear();
 
-						dc.drawRoundedRectangle(resetRect, d2d::Color::RGB(0xFB, 0x36, 0x36), resetRect.getHeight() * (0.223f), 0.5f, DrawUtil::OutlinePosition::Inside);
-					
-						dc.drawText(resetRect, L"Reset", d2d::Color::RGB(0xFB, 0x36, 0x36), Renderer::FontSelection::SegoeRegular, resetRect.getHeight() * 0.6f,
-							DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+						float textSizeDesc = textHeight * 0.72f;
+						float descTextPad = textSizeDesc / 3.f;
+						RectF descTextRect = { modRect.left + rlBounds, modRect.bottom, modRect.right - rlBounds, modRect.bottom + textSizeDesc + descTextPad };
+						descTextRect.bottom = descTextRect.top + dc.getTextSize(util::StrToWStr(mod.description), Renderer::FontSelection::SegoeRegular, textSizeDesc).y + descTextPad;
+						modRectActual.bottom = descTextRect.bottom;
+
+						dc.drawText(descTextRect, util::StrToWStr(mod.description), d2d::Color(1.f, 1.f, 1.f, 0.57f), FontSelection::SegoeRegular, textSizeDesc, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+						{
+							// Reset Button
+							RectF resetRect = { toggleRect.left, descTextRect.top, toggleRect.right, descTextRect.top + toggleRect.getHeight() };
+
+							dc.drawRoundedRectangle(resetRect, d2d::Color::RGB(0xFB, 0x36, 0x36), resetRect.getHeight() * (0.223f), 0.5f, DrawUtil::OutlinePosition::Inside);
+
+							dc.drawText(resetRect, L"Reset", d2d::Color::RGB(0xFB, 0x36, 0x36), Renderer::FontSelection::SegoeRegular, resetRect.getHeight() * 0.6f,
+								DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 
-						if (resetRect.contains(cursorPos) && justClicked[0]) {
-							mod.mod->settings->forEach([&](std::shared_ptr<Setting> set) {
-								std::visit([set](auto& obj) {
-									obj = std::get<std::remove_reference_t<decltype(obj)>>(set->defaultValue);
-									}, * set->value);
-								});
-						}
-					}
-
-					float padToSetting = 0.014184f * rect.getHeight();
-					float settingPadY = padToSetting * 2.5f;
-					float settingHeight = rect.getHeight() * setting_height_relative;
-
-					modRectActual.bottom += padToSetting;
-					mod.mod->settings->forEach([&](std::shared_ptr<Setting> set) {
-						if (set->visible) {
-							if (modRectActual.bottom <= rect.bottom) {
-								if (set->shouldRender(*mod.mod->settings.get())) {
-									float newY = drawSetting(set.get(), mod.mod->settings.get(), { descTextRect.left, modRectActual.bottom }, dc, descTextRect.getWidth(), 0.25f);
-									modRectActual.bottom = (newY - modRectActual.bottom) > 2.f ? (newY + setting_height_relative * rect.getHeight() * 1.6f) : modRectActual.bottom;
-								}
+							if (resetRect.contains(cursorPos) && justClicked[0]) {
+								mod.mod->settings->forEach([&](std::shared_ptr<Setting> set) {
+									std::visit([set](auto& obj) {
+										obj = std::get<std::remove_reference_t<decltype(obj)>>(set->defaultValue);
+										}, *set->value);
+									});
 							}
 						}
-						});
 
-					if (mod.mod->isHud()) {
-						auto rMod = static_cast<HUDModule*>(mod.mod.get());
+						float padToSetting = 0.014184f * rect.getHeight();
+						float settingPadY = padToSetting * 2.5f;
+						float settingHeight = rect.getHeight() * setting_height_relative;
 
-						RectF box = { modRectActual.left, modRectActual.bottom,
-						modRectActual.right, modRectActual.bottom + mod.previewSize.y };
+						modRectActual.bottom += padToSetting;
+						mod.mod->settings->forEach([&](std::shared_ptr<Setting> set) {
+							if (set->visible) {
+								if (modRectActual.bottom <= rect.bottom) {
+									if (set->shouldRender(*mod.mod->settings.get())) {
+										float newY = drawSetting(set.get(), mod.mod->settings.get(), { descTextRect.left, modRectActual.bottom }, dc, descTextRect.getWidth(), 0.25f);
+										modRectActual.bottom = (newY - modRectActual.bottom) > 2.f ? (newY + setting_height_relative * rect.getHeight() * 1.6f) : modRectActual.bottom;
+									}
+								}
+							}
+							});
 
-						Vec2 drawPos = box.center(mod.previewSize);
-						auto real = RectF(drawPos.x, drawPos.y, 0, 0);
-						D2D1::Matrix3x2F oTrans;
-						dc.ctx->GetTransform(&oTrans);
-						dc.ctx->SetTransform(D2D1::Matrix3x2F::Scale(1.f, 1.f) * D2D1::Matrix3x2F::Translation(drawPos.x, drawPos.y));
-						float oSize = rMod->getScale();
-						rMod->render(dc, true, false);
-						mod.previewSize = rMod->getRectNonScaled().getSize();
-						dc.ctx->SetTransform(oTrans);
-						modRectActual.bottom += box.getHeight() * 1.25f;
+						if (mod.mod->isHud()) {
+							auto rMod = static_cast<HUDModule*>(mod.mod.get());
+
+							RectF box = { modRectActual.left, modRectActual.bottom,
+							modRectActual.right, modRectActual.bottom + mod.previewSize.y };
+
+							Vec2 drawPos = box.center(mod.previewSize);
+							auto real = RectF(drawPos.x, drawPos.y, 0, 0);
+							D2D1::Matrix3x2F oTrans;
+							dc.ctx->GetTransform(&oTrans);
+							dc.ctx->SetTransform(D2D1::Matrix3x2F::Scale(1.f, 1.f) * D2D1::Matrix3x2F::Translation(drawPos.x, drawPos.y));
+							float oSize = rMod->getScale();
+							rMod->render(dc, true, false);
+							mod.previewSize = rMod->getRectNonScaled().getSize();
+							dc.ctx->SetTransform(oTrans);
+							modRectActual.bottom += box.getHeight() * 1.25f;
+						}
 					}
 				}
-			}
-			dc.ctx->SetTarget(myBitmap);
+				dc.ctx->SetTarget(myBitmap);
 
-			if (renderExtended) {
-				modRectActual.bottom = (modRect.bottom + (modRectActual.getHeight() - modRect.getHeight()) * (1.f - mod.lerpArrowRot));
-				RectF clipRect = modRectActual;
-				clipRect.left -= 10.f;
-				clipRect.right += 10.f;
-				dc.ctx->PushAxisAlignedClip(clipRect.get(), D2D1_ANTIALIAS_MODE_ALIASED);
-			}
-			dc.fillRoundedRectangle(modRectActual, d2d::Color::RGB(0x44, 0x44, 0x44).asAlpha(0.22f), .22f * modHeight);
-			dc.drawRoundedRectangle(modRectActual, d2d::Color(Latite::get().getAccentColor().color1).asAlpha(1.f * mod.lerpToggle), .22f * modHeight, 1.f, DrawUtil::OutlinePosition::Inside);;
-			if (renderExtended) {
-
-				dc.ctx->DrawBitmap(shadowBitmap.Get());
-				dc.ctx->PopAxisAlignedClip();
-			}
-
-			// text
-			auto textRect = modRect;
-			textRect.left += modRect.getWidth() / 6.f;
-			dc.drawText(textRect, util::StrToWStr(mod.name), { 1.f, 1.f, 1.f, 1.f }, FontSelection::SegoeLight, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-
-			// toggle
-			{
-				bool selecToggle;
-				if (selecToggle = this->shouldSelect(toggleRect, cursorPos)) {
-					if (justClicked[0]) {
-						mod.mod->setEnabled(!mod.mod->isEnabled());
-						playClickSound();
-					}
+				if (renderExtended) {
+					modRectActual.bottom = (modRect.bottom + (modRectActual.getHeight() - modRect.getHeight()) * (1.f - mod.lerpArrowRot));
+					RectF clipRect = modRectActual;
+					clipRect.left -= 10.f;
+					clipRect.right += 10.f;
+					dc.ctx->PushAxisAlignedClip(clipRect.get(), D2D1_ANTIALIAS_MODE_ALIASED);
 				}
-				static auto offCol = d2d::Color::RGB(0x63, 0x63, 0x63);
+				dc.fillRoundedRectangle(modRectActual, d2d::Color::RGB(0x44, 0x44, 0x44).asAlpha(0.22f), .22f * modHeight);
+				dc.drawRoundedRectangle(modRectActual, d2d::Color(Latite::get().getAccentColor().color1).asAlpha(1.f * mod.lerpToggle), .22f * modHeight, 1.f, DrawUtil::OutlinePosition::Inside);;
+				if (renderExtended) {
 
-				mod.toggleColorOn = util::LerpColorState(mod.toggleColorOn, d2d::Color(Latite::get().getAccentColor().color1) + 0.2f, d2d::Color(Latite::get().getAccentColor().color1), selecToggle);
-				mod.toggleColorOff = util::LerpColorState(mod.toggleColorOff, offCol + 0.2f, offCol, selecToggle);
+					dc.ctx->DrawBitmap(shadowBitmap.Get());
+					dc.ctx->PopAxisAlignedClip();
+				}
 
-				//float aTogglePadY = toggleRect.getHeight() * 0.15f;
-				float radius = toggleRect.getHeight() * 0.35f;
-				float circleOffs = toggleWidth * 0.27f;
+				// text
+				auto textRect = modRect;
+				textRect.left += modRect.getWidth() / 6.f;
+				dc.drawText(textRect, util::StrToWStr(mod.name), { 1.f, 1.f, 1.f, 1.f }, FontSelection::SegoeLight, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
-				dc.fillRoundedRectangle(toggleRect, mod.mod->isEnabled() ? mod.toggleColorOn : mod.toggleColorOff, toggleRect.getHeight() / 2.f);
-				Vec2 center{ toggleRect.left + circleOffs, toggleRect.centerY() };
-				Vec2 center2 = center;
-				center2.x = toggleRect.right - circleOffs;
-				float onDist = center2.x - center.x;
-
-				mod.lerpToggle = std::lerp(mod.lerpToggle, mod.mod->isEnabled() ? 1.f : 0.f, Latite::getRenderer().getDeltaTime() * 0.3f);
-
-				center.x += onDist * mod.lerpToggle;
-
-				dc.brush->SetColor((d2d::Color(0xB9, 0xB9, 0xB9)).get());
-				dc.ctx->FillEllipse(D2D1::Ellipse({ center.x, center.y }, radius, radius), dc.brush);
-			}
-
-
-			// arrow
-			{
-				RectF rc = { modRect.left + (modRect.getHeight() * 0.4f),
-					modRect.top + (modRect.getHeight() * 0.4f), modRect.left + modRect.getHeight() * 0.70f, modRect.bottom - modRect.getHeight() * 0.4f };
-
-				if (this->shouldSelect(modRect, cursorPos) && !shouldSelect(toggleRect, cursorPos)) {
-					if (justClicked[0]) {
-						mod.isExtended = !mod.isExtended;
-						//playClickSound();
+				// toggle
+				{
+					bool selecToggle;
+					if (selecToggle = this->shouldSelect(toggleRect, cursorPos)) {
+						if (justClicked[0]) {
+							mod.mod->setEnabled(!mod.mod->isEnabled());
+							playClickSound();
+						}
 					}
+					static auto offCol = d2d::Color::RGB(0x63, 0x63, 0x63);
+
+					mod.toggleColorOn = util::LerpColorState(mod.toggleColorOn, d2d::Color(Latite::get().getAccentColor().color1) + 0.2f, d2d::Color(Latite::get().getAccentColor().color1), selecToggle);
+					mod.toggleColorOff = util::LerpColorState(mod.toggleColorOff, offCol + 0.2f, offCol, selecToggle);
+
+					//float aTogglePadY = toggleRect.getHeight() * 0.15f;
+					float radius = toggleRect.getHeight() * 0.35f;
+					float circleOffs = toggleWidth * 0.27f;
+
+					dc.fillRoundedRectangle(toggleRect, mod.mod->isEnabled() ? mod.toggleColorOn : mod.toggleColorOff, toggleRect.getHeight() / 2.f);
+					Vec2 center{ toggleRect.left + circleOffs, toggleRect.centerY() };
+					Vec2 center2 = center;
+					center2.x = toggleRect.right - circleOffs;
+					float onDist = center2.x - center.x;
+
+					mod.lerpToggle = std::lerp(mod.lerpToggle, mod.mod->isEnabled() ? 1.f : 0.f, Latite::getRenderer().getDeltaTime() * 0.3f);
+
+					center.x += onDist * mod.lerpToggle;
+
+					dc.brush->SetColor((d2d::Color(0xB9, 0xB9, 0xB9)).get());
+					dc.ctx->FillEllipse(D2D1::Ellipse({ center.x, center.y }, radius, radius), dc.brush);
 				}
 
 
-				D2D1::Matrix3x2F oMatr;
-				dc.ctx->GetTransform(&oMatr);
-				float toLerp = mod.isExtended ? 0.f : 1.f;
-				dc.ctx->SetTransform(D2D1::Matrix3x2F::Rotation((1.f - mod.lerpArrowRot) * 180.f, { rc.centerX(), rc.centerY() }) * oMatr);
-				mod.lerpArrowRot = std::lerp(mod.lerpArrowRot, toLerp, Latite::getRenderer().getDeltaTime() * 0.3f);
-				// icon
-				dc.ctx->DrawBitmap(Latite::getAssets().arrowIcon.getBitmap(), rc.get());
-				dc.ctx->SetTransform(oMatr);
-			}
+				// arrow
+				{
+					RectF rc = { modRect.left + (modRect.getHeight() * 0.4f),
+						modRect.top + (modRect.getHeight() * 0.4f), modRect.left + modRect.getHeight() * 0.70f, modRect.bottom - modRect.getHeight() * 0.4f };
 
-		}
-	end:
-		columnOffs[i] += modRectActual.getHeight() - modRect.getHeight();
-		// set mod rect
+					if (this->shouldSelect(modRect, cursorPos) && !shouldSelect(toggleRect, cursorPos)) {
+						if (justClicked[0]) {
+							mod.isExtended = !mod.isExtended;
+							//playClickSound();
+						}
+					}
+
+
+					D2D1::Matrix3x2F oMatr;
+					dc.ctx->GetTransform(&oMatr);
+					float toLerp = mod.isExtended ? 0.f : 1.f;
+					dc.ctx->SetTransform(D2D1::Matrix3x2F::Rotation((1.f - mod.lerpArrowRot) * 180.f, { rc.centerX(), rc.centerY() }) * oMatr);
+					mod.lerpArrowRot = std::lerp(mod.lerpArrowRot, toLerp, Latite::getRenderer().getDeltaTime() * 0.3f);
+					// icon
+					dc.ctx->DrawBitmap(Latite::getAssets().arrowIcon.getBitmap(), rc.get());
+					dc.ctx->SetTransform(oMatr);
+				}
+
+			}
+		end:
+			columnOffs[i] += modRectActual.getHeight() - modRect.getHeight();
+			// set mod rect
 			mod.modRect = modRectActual;
+
+			mod.lerpHover = std::lerp(mod.lerpHover, shouldSelect(modRectActual, cursorPos), Latite::getRenderer().getDeltaTime() / 5.f);
 
 			// scrolling max
 			float scrollYNew = std::max(0.f, (modRectActual.bottom + padFromSearchBar) - rect.bottom) + lerpScroll;
@@ -713,7 +731,7 @@ void ClickGUI::onInit(Event&) {
 
 	dc->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, pixelFormat), shadowBitmap.GetAddressOf());
 	dc->CreateEffect(CLSID_D2D1Composite, compositeEffect.GetAddressOf());
-	
+
 }
 
 void ClickGUI::onCleanup(Event&) {
@@ -896,7 +914,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 			if (contains || shouldSelect(textRect, cursorPos)) tooltip = desc;
 		return checkboxRect.bottom;
 	}
-		break;
+	break;
 	case Setting::Type::Key:
 	{
 		RectF keyRect = { pos.x, pos.y, pos.x + checkboxSize * 2.f, pos.y + checkboxSize };
@@ -932,7 +950,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 		auto ts = dc.getTextSize(text, FontSelection::SegoeRegular, textSize * 0.9f) + Vec2(8.f, 0.f);
 		if (ts.x > keyRect.getWidth()) keyRect.right = keyRect.left + (ts.x);
 
-		
+
 		dc.fillRoundedRectangle(keyRect, Color(set->rendererInfo.col), round);
 
 		dc.drawText(keyRect, text, d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::SegoeRegular, textSize * 0.9f,
@@ -947,7 +965,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 			activeSetting = 0;
 			capturedKey = 0;
 		}
-		
+
 
 		float padToName = 0.006335f * rect.getWidth();
 		float newX = keyRect.right + padToName;
@@ -1018,7 +1036,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 
 		RectF textRect = { enumRect.right + padToName, enumRect.top, newX + (size - rem), enumRect.bottom };
 
-		dc.drawText(textRect, util::StrToWStr(set->getDisplayName()), {1.f, 1.f, 1.f, 1.f}, FontSelection::SegoeRegular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(textRect, util::StrToWStr(set->getDisplayName()), { 1.f, 1.f, 1.f, 1.f }, FontSelection::SegoeRegular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		if (!set->desc().empty())
 			if (shouldSelect(textRect, cursorPos)) tooltip = util::StrToWStr(set->desc());
 
@@ -1051,7 +1069,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 
 		RectF textRect = { colRect.right + padToName, colRect.top, pos.x + size, colRect.bottom };
 		dc.drawText(textRect, name, { 1.f, 1.f, 1.f, 1.f }, FontSelection::SegoeSemilight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-		
+
 		ComPtr<ID2D1LinearGradientBrush> gradientBrush;
 		ComPtr<ID2D1GradientStopCollection> gradientStopCollection;
 
@@ -1066,10 +1084,10 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 			0.f, col.asAlpha(1.f).get(),
 			1.f, col.get()
 		};
-		
+
 		dc.ctx->CreateGradientStopCollection(stops, _countof(stops), gradientStopCollection.GetAddressOf());
 		dc.ctx->CreateLinearGradientBrush(prop, gradientStopCollection.Get(), gradientBrush.GetAddressOf());
-		
+
 		gradientBrush->SetStartPoint({ colRect.left, textRect.centerY() });
 		gradientBrush->SetEndPoint({ colRect.right, textRect.centerY() });
 		ComPtr<ID2D1GradientStopCollection> stopCol;
@@ -1084,7 +1102,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 
 		dc.fillRoundedRectangle(colRect, gradientBrush.Get(), round);
 		dc.drawRoundedRectangle(colRect, gradientBrush.Get(), round, 1.f, DrawUtil::OutlinePosition::Inside);
-		
+
 		if (shouldSelect(colRect, cursorPos)) {
 			if (justClicked[0]) {
 				playClickSound();
@@ -1120,7 +1138,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 
 		float sliderTop = textRect.top + sliderHeight * 0.16f;
 		RectF sliderRect = { textRect.right, sliderTop, textRect.left + size - (0.1947f * size), sliderTop + sliderHeight };
-		
+
 		float innerPad = 0.2f * sliderRect.getHeight();
 		RectF innerSliderRect = { sliderRect.left + innerPad, sliderRect.top + innerPad, sliderRect.right - innerPad, sliderTop + (rect.getHeight() * 0.017730f) - innerPad };
 
@@ -1182,9 +1200,9 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 
 		dc.brush->SetColor(d2d::Color(0xB9, 0xB9, 0xB9).get());
 		dc.ctx->FillEllipse(D2D1::Ellipse({ innerSliderRect.right, sliderRect.centerY() }, sliderRect.getHeight() * 0.6f, sliderRect.getHeight() * 0.6f), dc.brush);
-		return rtTextRect.top + dc.getTextSize(namew.str(), Renderer::FontSelection::SegoeSemilight, textSz, false, true, Vec2{rtTextRect.getWidth(), rtTextRect.getHeight()}).y;
+		return rtTextRect.top + dc.getTextSize(namew.str(), Renderer::FontSelection::SegoeSemilight, textSz, false, true, Vec2{ rtTextRect.getWidth(), rtTextRect.getHeight() }).y;
 	}
-		break;
+	break;
 	default:
 		return pos.y;
 	}
@@ -1395,12 +1413,12 @@ void ClickGUI::drawColorPicker() {
 					txt = txt.substr(1);
 				}
 				if (txt.size() == 6)
-				try {
+					try {
 					newCol = d2d::Color::Hex(txt);
 				}
 				catch (...) {
 				}
-				
+
 				auto newHSV = util::ColorToHSV(newCol);
 				colorPicker.svModX = newHSV.s;
 				colorPicker.svModY = 1.f - newHSV.v;
@@ -1417,13 +1435,13 @@ void ClickGUI::drawColorPicker() {
 	}
 
 	float ellipseRadius = 0.75f * alphaBar.getHeight();
-	
+
 
 	// sv
 	if (colorPicker.isEditingSV || (justClicked[0] && boxRect.contains(cursorPos))) {
 		colorPicker.svModX = std::max(std::min(cursorPos.x - boxRect.left, boxRect.getWidth()) / boxRect.getWidth(), 0.f);
 		colorPicker.svModY = std::max(std::min(cursorPos.y - boxRect.top, boxRect.getHeight()) / boxRect.getHeight(), 0.f);
-		
+
 		colorPicker.isEditingSV = true;
 	}
 
@@ -1436,7 +1454,7 @@ void ClickGUI::drawColorPicker() {
 	// alpha
 	if (colorPicker.isEditingOpacity || (justClicked[0] && alphaBar.contains(cursorPos))) {
 		colorPicker.opacityMod = std::max(std::min(cursorPos.x - alphaBar.left, alphaBar.getWidth()) / alphaBar.getWidth(), 0.f);
-		
+
 		float val = colorPicker.opacityMod;
 
 		float interval = 0.05f;
@@ -1465,7 +1483,7 @@ void ClickGUI::drawColorPicker() {
 
 	// SV
 	{
-		auto ellipse = D2D1::Ellipse({ boxRect.left + (hueBar.getWidth() * colorPicker.svModX), boxRect.top + (boxRect.getHeight() * colorPicker.svModY)}, ellipseRadius, ellipseRadius);
+		auto ellipse = D2D1::Ellipse({ boxRect.left + (hueBar.getWidth() * colorPicker.svModX), boxRect.top + (boxRect.getHeight() * colorPicker.svModY) }, ellipseRadius, ellipseRadius);
 		dc.brush->SetColor(col.asAlpha(1.f).get());
 		dc.ctx->FillEllipse(ellipse, dc.brush);
 		dc.brush->SetColor(D2D1::ColorF(D2D1::ColorF::White));
@@ -1491,7 +1509,7 @@ void ClickGUI::drawColorPicker() {
 		dc.ctx->DrawEllipse(ellipse, dc.brush, ellipseRadius / 2.f);
 	}
 
-	
+
 	cPickerRect.bottom = alphaBar.bottom + remPad * 2.f;
 
 	dc.ctx->SetTarget(Latite::getRenderer().getBitmap());
@@ -1500,7 +1518,7 @@ void ClickGUI::drawColorPicker() {
 
 	dc.fillRoundedRectangle(cPickerRect, d2d::Color::RGB(0x7, 0x7, 0x7).asAlpha(0.8f), 19.f * adaptedScale);
 	dc.drawRoundedRectangle(cPickerRect, d2d::Color::RGB(0, 0, 0).asAlpha(0.28f), 19.f * adaptedScale, 4.f * adaptedScale, DrawUtil::OutlinePosition::Outside);
-	
+
 	// x button
 	float xWidth = 0.06f * rectWidth;
 	RectF xRect = { cPickerRect.right - xWidth * 2.f, cPickerRect.top + xWidth, cPickerRect.right - xWidth, cPickerRect.top + xWidth * 2.f };
@@ -1546,7 +1564,7 @@ void ClickGUI::onDisable() {
 	activeSetting = nullptr;
 	searchTextBox.reset();
 	searchTextBox.setSelected(false);
-	
+
 	for (auto& tb : this->settingBoxes) {
 		tb.second->setSelected(false);
 	}

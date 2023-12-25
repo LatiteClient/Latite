@@ -34,7 +34,7 @@ void HUDEditor::onRender(Event& ev) {
 
 	if (isActive()) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
-			if (mod->isHud()) {
+			if (mod->isHud() && mod->isEnabled()) {
 				auto rMod = reinterpret_cast<HUDModule*>(mod.get());
 				if (mcRenderer || rMod->forceMinecraftRenderer()) maskRects.push_back(rMod->getRect());
 				if (rMod->isActive()) return;

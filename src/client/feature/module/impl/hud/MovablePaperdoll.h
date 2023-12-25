@@ -14,4 +14,7 @@ public:
 private:
 	ValueType alwaysShow = BoolValue(false);
 	SDK::UIControl* hudPlayer;
+
+	Vec2 newPos = {};
+	Vec2 newSize = {};
 };

@@ -11,31 +11,7 @@ MovablePaperdoll::MovablePaperdoll() : HUDModule("Paperdoll", "Movable Paperdoll
 	listen<RenderLayerEvent>((EventListenerFunc)&MovablePaperdoll::onRenderLayer, true, 10 /*need to overpower the hud renderer*/);
 }
 
-void MovablePaperdoll::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
-	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
-	if (!lp) return;
-
-	float guiScale = SDK::ClientInstance::get()->getGuiData()->guiScale;
-
-	if (hudPlayer) {
-		hudPlayer->position = { rect.left / guiScale, rect.top / guiScale };
-		hudPlayer->bounds = { getScale() * 15.f, getScale() * 15.f };
-		this->rect.right = rect.left + 15.f * guiScale;
-		this->rect.bottom = rect.top + 30.f * guiScale;
-
-		if (std::get<BoolValue>(alwaysShow)) {
-			auto comp = (SDK::CustomRenderComponent*)hudPlayer->uiComponents[4];
-			if (auto rnd = comp->rend) {
-				if (rnd) {
-					rnd->timeToClose = 1.f;
-				}
-			}
-		}
-	}
-	else {
-		this->rect.right = rect.left + 15.f * guiScale;
-		this->rect.bottom = rect.top + 30.f * guiScale;
-	}
+void MovablePaperdoll::render(DrawUtil& ctx, bool, bool) {
 }
 
 void MovablePaperdoll::onRenderLayer(Event& evG) {
@@ -47,9 +23,36 @@ void MovablePaperdoll::onRenderLayer(Event& evG) {
 		return;
 	}
 
-	if (!hudPlayer && this->isActive() && this->isEnabled()) {
+	if (this->isActive() && this->isEnabled()) {
 		if (ev.getScreenView()->visualTree->rootControl->name == XOR_STRING("hud_screen")) {
 			this->hudPlayer = ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName(XOR_STRING("hud_player"));
+
+			auto lp = SDK::ClientInstance::get()->getLocalPlayer();
+			if (!lp) return;
+
+			float guiScale = SDK::ClientInstance::get()->getGuiData()->guiScale;
+
+			if (hudPlayer) {
+				hudPlayer->position = { rect.left / guiScale, rect.top / guiScale };
+
+				hudPlayer->bounds = { getScale() * 15.f, getScale() * 15.f };
+
+				this->rect.right = rect.left + 15.f * guiScale;
+				this->rect.bottom = rect.top + 30.f * guiScale;
+
+				if (std::get<BoolValue>(alwaysShow)) {
+					auto comp = (SDK::CustomRenderComponent*)hudPlayer->uiComponents[4];
+					if (auto rnd = comp->rend) {
+						if (rnd) {
+							rnd->timeToClose = 1.f;
+						}
+					}
+				}
+			}
+			else {
+				this->rect.right = rect.left + 15.f * guiScale;
+				this->rect.bottom = rect.top + 30.f * guiScale;
+			}
 		}
 	}
 }
