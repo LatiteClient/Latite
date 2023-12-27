@@ -708,7 +708,7 @@ void Latite::onUpdate(Event& evGeneric) {
     static auto lastSend = now;
     
     if (std::get<BoolValue>(broadcastUsage)) {
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSend) > 30000ms) {
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSend) > 10s) {
             this->fetchLatiteUsers();
             lastSend = now;
         }
