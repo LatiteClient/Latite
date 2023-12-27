@@ -22,6 +22,7 @@ namespace {
 	std::shared_ptr<Hook> ViewBobHook;
 	std::shared_ptr<Hook> Level_initializeHook;
 	std::shared_ptr<Hook> Level_startLeaveGameHook;
+	std::shared_ptr<Hook> RenderEntityHook;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -231,6 +232,17 @@ void* GenericHooks::Level_startLeaveGame(SDK::Level* obj) {
 	return Level_startLeaveGameHook->oFunc<decltype(&Level_startLeaveGame)>()(obj);
 }
 
+void* GenericHooks::ActorRenderDispatcher_render(void* obj, SDK::BaseActorRenderContext* barc, SDK::Actor* entity,
+	Vec3& pos3, Vec3 const& pos2, void* unk, bool affectedByLighting) {
+
+	if (entity) {
+		AfterRenderEntityEvent ev{ entity, pos3 };
+		Eventing::get().dispatch(ev);
+	}
+
+	return RenderEntityHook->oFunc<decltype(&ActorRenderDispatcher_render)>()(obj, barc, entity, pos3, pos2, unk, affectedByLighting);
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
 	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
@@ -267,4 +279,6 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 		Level_initializeHook = addHook(reinterpret_cast<uintptr_t*>(Signatures::Vtable::Level.result)[1], Level_initialize, "Level::initialize");
 		Level_startLeaveGameHook = addHook(reinterpret_cast<uintptr_t*>(Signatures::Vtable::Level.result)[2], Level_startLeaveGame, "Level::startLeaveGame");
 	}
+
+	RenderEntityHook = addHook(Signatures::ActorRenderDispatcher_render.result, ActorRenderDispatcher_render, "ActorRenderDispatcher::render");
 }

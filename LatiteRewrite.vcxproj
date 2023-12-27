@@ -321,6 +321,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="deps\include\vhook\vtable_hook.h" />
+    <ClInclude Include="src\client\event\impl\AfterEntityRenderEvent.h" />
     <ClInclude Include="src\client\event\impl\HideHandEvent.h" />
     <ClInclude Include="src\client\event\impl\PerspectiveEvent.h" />
     <ClInclude Include="src\client\event\impl\SensitivityEvent.h" />

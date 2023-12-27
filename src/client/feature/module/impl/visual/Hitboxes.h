@@ -3,11 +3,17 @@
 
 class Hitboxes : public Module {
 public:
+	void onEntityRender(Event& evG);
 
+	Hitboxes();
+	virtual ~Hitboxes() = default;
+
+private:
 	EnumData mode;
 	static constexpr int mode_bounding_box = 0;
 	static constexpr int mode_hitbox = 1;
 
+	ValueType transparent = BoolValue(true);
 	ValueType boxColor = ColorValue(1.f, 1.f, 1.f, 1.f);
 
 	ValueType showEyeLine = BoolValue(true);
@@ -21,7 +27,4 @@ public:
 
 	ValueType localPlayer = BoolValue(true);
 	ValueType items = BoolValue(true);
-
-	Hitboxes();
-	virtual ~Hitboxes() = default;
 };

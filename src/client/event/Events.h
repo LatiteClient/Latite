@@ -1,4 +1,5 @@
 #pragma once
+#include "impl/AfterEntityRenderEvent.h"
 #include "impl/AfterMoveEvent.h"
 #include "impl/AppSuspendedEvent.h"
 #include "impl/AveragePingEvent.h"

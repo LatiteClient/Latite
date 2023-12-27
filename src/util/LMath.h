@@ -59,6 +59,10 @@ struct Vec3 final {
 		return { right.x + x, right.y + y, right.z + z };
 	}
 
+	constexpr Vec3 operator*(float right) const {
+		return { x * right, y * right, z * right };
+	}
+
 	inline float distance(Vec3& vec) {
 		return static_cast<float>(std::sqrt(std::pow(x - vec.x, 2) + std::pow(y - vec.y, 2) + std::pow(z - vec.z, 2)));
 	}
@@ -80,6 +84,19 @@ struct AABB final {
 	Vec3 lower, higher;
 
 	constexpr AABB(Vec3 lower, Vec3 higher) : lower(lower), higher(higher) {}
+
+	Vec3 getCenter() {
+		return (lower + higher) * 0.5f;
+	}
+
+	void rebase(Vec3 newV) {
+		Vec3 cent = getCenter();
+
+		Vec3 diff = higher - cent;
+
+		this->lower = newV - diff;
+		this->higher = newV + diff;
+	}
 };
 
 struct Color {

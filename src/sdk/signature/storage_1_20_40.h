@@ -226,7 +226,12 @@ public:
 		"e8 ? ? ? ? f3 0f 58 73 ? f3 0f 58 7b ? f3 0f 11 7c 24 ? f3 0f 11 74 24 ? 48 8b cb",
 		"UIControl::setPosition"};
 
+
 	inline static SigImpl MinecraftGame_getPrimaryClientInstance{};
+
+	inline static SigImpl ActorRenderDispatcher_render{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? 44 0f 28 54 24 ? 4c 8d 9c 24 ? ? ? ? 49 8b 5b ? 49 8b 6b",
+		"ActorRenderDispatcher::render"};
 };
 
 // after adding sigs here, add them in latite.cpp

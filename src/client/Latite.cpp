@@ -211,6 +211,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(UIControl_setPosition),
         MVSIG(MinecraftGame_getPrimaryClientInstance),
         MVSIG(Components::actorTypeComponent),
+        MVSIG(ActorRenderDispatcher_render),
     };
     
     new (mmgrBuf) ModuleManager;

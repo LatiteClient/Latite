@@ -3,6 +3,7 @@
 #include "sdk/common/world/level/Level.h"
 #include "util/Util.h"
 #include "sdk/misc/ClickMap.h"
+#include <sdk/common/client/renderer/game/BaseActorRenderContext.h>
 
 class GenericHooks : public HookGroup {
     static void __fastcall Level_tick(SDK::Level* level);
@@ -38,6 +39,8 @@ class GenericHooks : public HookGroup {
     static void __fastcall CameraViewBob(void*, void*, void*);
     static bool Level_initialize(SDK::Level* obj, void* palette, void* settings, void* tickRange, void* experiments, uint64_t a6);
     static void* Level_startLeaveGame(SDK::Level* obj);
+    static void* ActorRenderDispatcher_render(void* obj, SDK::BaseActorRenderContext* barc, SDK::Actor* entity, Vec3& pos3, Vec3 const& pos2, void* unk, bool affectedByLighting);
+
 public:
     GenericHooks();
 };

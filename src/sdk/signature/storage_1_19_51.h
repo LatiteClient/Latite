@@ -209,6 +209,10 @@ public:
 
 	inline static SigImpl MinecraftGame_getPrimaryClientInstance{};
 
+	inline static SigImpl ActorRenderDispatcher_render{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? 48 8b 4c 24 ? 48 33 cc e8 ? ? ? ? 48 8b 9c 24 ? ? ? ? 48 83 c4 ? 41 5e 5f 5e c3 cc cc cc cc cc 40 55",
+		"ActorRenderDispatcher::render"};
+
 };
 
 

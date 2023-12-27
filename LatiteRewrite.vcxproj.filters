@@ -747,6 +747,9 @@
     <ClInclude Include="src\sdk\signature\storage_1_20_40.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\event\impl\AfterEntityRenderEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
