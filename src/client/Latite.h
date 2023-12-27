@@ -46,7 +46,7 @@ public:
 	Latite() = default;
 	~Latite() = default;
 
-	static constexpr std::string_view version = "v2.0.0b9";
+	static constexpr std::string_view version = "v2.0.0b10";
 	HINSTANCE dllInst = NULL;
 	std::string gameVersion;
 
@@ -130,6 +130,8 @@ private:
 	ValueType minimalViewBob = BoolValue(false);
 	ValueType minecraftRenderer = BoolValue(false);
 	ValueType textShadow = BoolValue(true);
+	ValueType broadcastUsage = BoolValue(true);
+
 	EnumData mcRendFont;
 
 	std::vector<ui::TextBox*> textBoxes;

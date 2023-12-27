@@ -52,7 +52,7 @@ struct Vec3 final {
 	//constexpr Vec3(struct Vec3i const& vec);
 
 	constexpr Vec3 operator-(Vec3 const& right) const {
-		return { right.x - x, right.y - y, right.z - z };
+		return { x - right.x, y - right.y, z - right.z };
 	}
 
 	constexpr Vec3 operator+(Vec3 const& right) const {

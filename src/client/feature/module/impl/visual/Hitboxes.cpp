@@ -97,7 +97,7 @@ void Hitboxes::onEntityRender(Event& evG) {
 	}
 }
 Hitboxes::Hitboxes() : Module("Hitboxes", "Hitboxes", "Shows entity bounding boxes.", GAME) {
-	addSetting("transparent", "Transparent", "Whether or not the hitboxes are transparent.", boxColor);
+	addSetting("transparent", "Transparent", "Whether or not the hitboxes are transparent.", transparent);
 	addSetting("boxColor", "Box", "The hitbox color.", boxColor);
 	addSetting("showEyeLine", "Show Eye Line", "Whether or not to show the eye line.", this->showEyeLine);
 	addSetting("eyeLine", "Eye Line", "The eye line color.", this->eyeColor, "showEyeLine"_istrue);

@@ -512,27 +512,31 @@ void Latite::fetchLatiteUsers() {
         return;
     }
 
-    std::string str = XOR_STRING("https://latiteserver-1-s4535035.deta.app/users");
+    std::string str = XOR_STRING("https://lafa-1-f2031735.deta.app/users");
 
     winrt::Windows::Foundation::Uri requestUri(util::StrToWStr(str));
 
     auto name = util::StrToWStr(lp->playerName);
 
-    auto content = HttpStringContent(L"{\"name\":\"" + name + L"\"}");
+    auto content = HttpStringContent(util::StrToWStr(XOR_STRING("{\"name\":\"")) + name + util::StrToWStr(XOR_STRING("\"}")));
     std::string medType = XOR_STRING("application/json");
     content.Headers().ContentType().MediaType(util::StrToWStr(medType));
     auto usersDirty = &this->latiteUsersDirty;
     client.PostAsync(requestUri, content).Completed([usersDirty](winrt::Windows::Foundation::IAsyncOperationWithProgress<HttpResponseMessage, HttpProgress> task, winrt::Windows::Foundation::AsyncStatus status) {
         if (status == winrt::Windows::Foundation::AsyncStatus::Completed) {
-            auto res = task.GetResults();
-            if (res.IsSuccessStatusCode()) {
-                auto cont = res.Content();
-                auto str = cont.ReadAsStringAsync().get();
-                auto json = nlohmann::json::parse(util::WStrToStr(str.c_str()));
-                usersDirty->clear();
-                for (auto& item : json) {
-                    usersDirty->push_back(item.get<std::string>());
+            try {
+                auto res = task.GetResults();
+                if (res.IsSuccessStatusCode()) {
+                    auto cont = res.Content();
+                    auto str = cont.ReadAsStringAsync().get();
+                    auto json = nlohmann::json::parse(util::WStrToStr(str.c_str()));
+                    usersDirty->clear();
+                    for (auto& item : json) {
+                        usersDirty->push_back(item.get<std::string>());
+                    }
                 }
+            }
+            catch (winrt::hresult_error&) {
             }
         }
         });
@@ -603,6 +607,12 @@ void Latite::initSettings() {
         set->value = set->enumData->getValue();
         set->enumData->addEntry({ 0, "Default", "The Minecraft font" });
         set->enumData->addEntry({ 1, "Noto Sans", "The smooth font (Noto Sans MS)" });
+        this->getSettings().addSetting(set);
+    }
+
+    {
+        auto set = std::make_shared<Setting>("broadcastClientUsage", "Latite Client Presence", "If you leave this on, others with Latite will see that you are using Latite and you will see other people who use Latite.");
+        set->value = &this->broadcastUsage;
         this->getSettings().addSetting(set);
     }
 }
@@ -694,15 +704,17 @@ void Latite::downloadChakraCore() {
 void Latite::onUpdate(Event& evGeneric) {
     auto& ev = reinterpret_cast<UpdateEvent&>(evGeneric);
     timings.update();
-    //auto now = std::chrono::system_clock::now();
-    //static auto lastSend = now;
-    //
-    //if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSend) > 30000ms) {
-    //    this->fetchLatiteUsers();
-    //    lastSend = now;
-    //}
-    //
-    //latiteUsers = latiteUsersDirty;
+    auto now = std::chrono::system_clock::now();
+    static auto lastSend = now;
+    
+    if (std::get<BoolValue>(broadcastUsage)) {
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSend) > 30000ms) {
+            this->fetchLatiteUsers();
+            lastSend = now;
+        }
+    }
+    
+    latiteUsers = latiteUsersDirty;
 
     if (!hasInit) {
         threadsafeInit();
