@@ -529,10 +529,17 @@ void Latite::fetchLatiteUsers() {
                 if (res.IsSuccessStatusCode()) {
                     auto cont = res.Content();
                     auto str = cont.ReadAsStringAsync().get();
-                    auto json = nlohmann::json::parse(util::WStrToStr(str.c_str()));
-                    usersDirty->clear();
-                    for (auto& item : json) {
-                        usersDirty->push_back(item.get<std::string>());
+
+                    nlohmann::json json;
+                    try {
+
+                        json = nlohmann::json::parse(util::WStrToStr(str.c_str()));
+                    }
+                    catch (nlohmann::json::parse_error&) {
+                        usersDirty->clear();
+                        for (auto& item : json) {
+                            usersDirty->push_back(item.get<std::string>());
+                        }
                     }
                 }
             }
@@ -708,10 +715,10 @@ void Latite::onUpdate(Event& evGeneric) {
     static auto lastSend = now;
     
     if (std::get<BoolValue>(broadcastUsage)) {
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSend) > 10s) {
-            this->fetchLatiteUsers();
-            lastSend = now;
-        }
+        //if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSend) > 10s) {
+        //    this->fetchLatiteUsers();
+        //    lastSend = now;
+        //}
     }
     
     latiteUsers = latiteUsersDirty;

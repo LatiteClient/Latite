@@ -89,13 +89,6 @@ JsValueRef Filesystem::read(JsValueRef callee, bool isConstructor, JsValueRef* a
 	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsFunction} })) return undef;
 
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
-	auto path = thi->getPath(Chakra::GetString(arguments[1]));
-	if (std::filesystem::is_directory(path)) {
-		Chakra::ThrowError(L"Filesystem read: File is a directory");
-		return JS_INVALID_REFERENCE;
-	}
-
-	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 	auto op = std::make_shared<FSAsyncOperation>(arguments[2], [](JsScript::AsyncOperation* op_) {
 		auto op = reinterpret_cast<FSAsyncOperation*>(op_);
 		std::ifstream ifs;
@@ -117,7 +110,7 @@ JsValueRef Filesystem::read(JsValueRef callee, bool isConstructor, JsValueRef* a
 		op->flagDone = true;
 		}, thi);
 
-	op->path = path;
+	op->path = thi->getPath(Chakra::GetString(arguments[1]));
 	op->data = std::vector<uint8_t>();
 	op->run();
 
@@ -156,16 +149,10 @@ JsValueRef Filesystem::readSync(JsValueRef callee, bool isConstructor, JsValueRe
 	auto ret = Chakra::GetUndefined();
 	if (!Chakra::VerifyArgCount(argCount, 2)) return ret;
 	if (!Chakra::VerifyParameters({ {arguments[1], JsString} })) return ret;
-	auto thi = reinterpret_cast<Filesystem*>(callbackState);
-	auto path = thi->getPath(Chakra::GetString(arguments[1]));
-	if (std::filesystem::is_directory(path)) {
-		Chakra::ThrowError(L"Filesystem readSync: File is a directory");
-		return JS_INVALID_REFERENCE;
-	}
-
 	std::ifstream ifs;
+	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 
-	ifs.open(path, std::ios::binary | std::ios::ate);
+	ifs.open(thi->getPath(Chakra::GetString(arguments[1])), std::ios::binary | std::ios::ate);
 
 	if (ifs.fail()) {
 		throwFsError();
