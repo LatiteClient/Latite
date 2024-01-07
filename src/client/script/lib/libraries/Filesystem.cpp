@@ -95,7 +95,6 @@ JsValueRef Filesystem::read(JsValueRef callee, bool isConstructor, JsValueRef* a
 		return JS_INVALID_REFERENCE;
 	}
 
-	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 	auto op = std::make_shared<FSAsyncOperation>(arguments[2], [](JsScript::AsyncOperation* op_) {
 		auto op = reinterpret_cast<FSAsyncOperation*>(op_);
 		std::ifstream ifs;
