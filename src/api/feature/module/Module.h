@@ -30,6 +30,7 @@ public:
 	[[nodiscard]] KeyValue getKeybind() { return std::get<KeyValue>(key); }
 	[[nodiscard]] bool isEnabled() { return std::get<BoolValue>(enabled); };
 	[[nodiscard]] bool isHud() { return hud; };
+	[[nodiscard]] bool isTextual() { return textual; };
 	[[nodiscard]] bool isVisible() { return visible; };
 	[[nodiscard]] bool isBlocked() { return blocked; };
 	void setEnabled(bool b) { std::get<BoolValue>(enabled) = b; }
