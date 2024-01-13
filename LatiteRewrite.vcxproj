@@ -410,6 +410,7 @@
     <ClInclude Include="src\client\feature\module\impl\visual\ChunkBorders.h" />
     <ClInclude Include="src\client\feature\module\impl\visual\Hitboxes.h" />
     <ClInclude Include="src\client\feature\module\script\JsHudModule.h" />
+    <ClInclude Include="src\client\feature\module\script\JsTextModule.h" />
     <ClInclude Include="src\client\feature\module\TextModule.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\InputLagTest.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\Screenshot.h" />
@@ -632,6 +633,7 @@
     <ClCompile Include="src\client\feature\module\impl\game\Zoom.cpp" />
     <ClCompile Include="src\client\feature\module\Module.cpp" />
     <ClCompile Include="src\client\feature\module\script\JsHudModule.cpp" />
+    <ClCompile Include="src\client\feature\module\script\JsTextModule.cpp" />
     <ClCompile Include="src\client\feature\module\TextModule.cpp" />
     <ClCompile Include="src\client\hook\Hook.cpp" />
     <ClCompile Include="src\client\hook\Hooks.cpp" />

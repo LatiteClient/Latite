@@ -56,6 +56,10 @@ bool JsPlugin::load() {
 		return false;
 	}
 
+	if (!fetchPluginData()) {
+		Logger::Warn("Could not load plugin metadata from the plugin.json");
+	}
+
 	if (JS::JsCreateRuntime(JsRuntimeAttributeNone, nullptr, &this->runtime) != JsNoError) return false;
 
 	this->mainScript = loadAndRunScript(std::wstring(MAIN_SCRIPT_NAME.data(), MAIN_SCRIPT_NAME.size()));

@@ -750,6 +750,9 @@
     <ClInclude Include="src\client\event\impl\AfterEntityRenderEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\feature\module\script\JsTextModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1143,6 +1146,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\module\impl\hud\MovablePaperdoll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\script\JsTextModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -54,6 +54,7 @@ void JsHUDModule::render(DrawUtil& dc, bool isDefault, bool isEditor) {
 }
 
 void JsHUDModule::preRender(bool mcRend, bool isPreview, bool isEditor) {
+	JS::JsSetCurrentContext(ctx);
 	auto obj = script->getObject<D2DScriptingObject>();
 	bool oMinecraftRend = obj->usingMinecraftRend();
 	obj->setUseMinecraftRend(mcRend);
