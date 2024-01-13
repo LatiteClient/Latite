@@ -3,13 +3,13 @@
 
 BowIndicator::BowIndicator() : TextModule("BowIndicator", "Bow Indicator", "Shows bow chargedness", HUD, 400.f, 0, true) {
 	addSetting("visual", "Visual Indicator", "To show a bar instead of text", this->visual);
-	addSetting("bgCol", "Color", "The indicator foreground color", this->indicatorCol2);
+	addSetting("fgCol", "Color", "The indicator foreground color", this->indicatorCol2);
 	addSetting("bgCol", "Background Color", "The indicator background color", this->indicatorCol);
 	addSetting("horizontal", "Horizontal", "Whether it's horizontal or not", this->horizontal, "visual"_istrue);
 
 	addSliderSetting("size", "Size", "The size of the indicator", indicatorSize, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
 	addSliderSetting("width", "Width", "The width of the indicator", indicatorWidth, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
-	addSliderSetting("rad", "Radius", "The radius of the indicator", indicatorRad, FloatValue(0.f), FloatValue(5.f), FloatValue(2.5f), "visual"_istrue);
+	addSliderSetting("rad", "Radius", "The radius of the indicator", indicatorRad, FloatValue(0.f), FloatValue(5.f), FloatValue(1.f), "visual"_istrue);
 }
 
 BowIndicator::~BowIndicator() {
