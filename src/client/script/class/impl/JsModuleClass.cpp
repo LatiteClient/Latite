@@ -54,7 +54,7 @@ JsValueRef JsModuleClass::moduleSetOnEvent(JsValueRef callee, bool isConstructor
 	JsTextModule* tMod = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&mod));
 	if (mod->isHud()) hMod = reinterpret_cast<JsHUDModule*>(mod);
-	if (mod->is()) tMod = reinterpret_cast<JsTextModule*>(mod);
+	if (mod->isTextual()) tMod = reinterpret_cast<JsTextModule*>(mod);
 	if (!mod) {
 		Chakra::ThrowError(L"Object is not a module");
 		return Chakra::GetUndefined();
