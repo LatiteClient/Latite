@@ -51,7 +51,6 @@ bool JsHUDModule::shouldHoldToToggle() {
 
 void JsHUDModule::render(DrawUtil& dc, bool isDefault, bool isEditor) {
 	JS::JsSetCurrentContext(ctx);
-	auto obj = script->getObject<D2DScriptingObject>();
 }
 
 void JsHUDModule::preRender(bool mcRend, bool isPreview, bool isEditor) {

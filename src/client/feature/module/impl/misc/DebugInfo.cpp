@@ -8,7 +8,7 @@
 
 #include "sdk/common/world/level/HitResult.h"
 
-DebugInfo::DebugInfo() : Module("DebugInfo", "Java Debug Info", "See some craaazy info (send help)", GAME, VK_F3) {
+DebugInfo::DebugInfo() : Module("DebugInfo", "Java Debug Info", "See information similar to Java", GAME, VK_F3) {
     listen<RenderOverlayEvent>((EventListenerFunc)&DebugInfo::onRenderOverlay);
     listen<DrawHUDModulesEvent>((EventListenerFunc)&DebugInfo::onRenderHUDModules, false, 2);
 }
@@ -80,8 +80,6 @@ namespace {
         return cpuInfo;
     }
     std::string getRenderPerfInfo() {
-#define CHKVEC(x) if (x.)
-#define GETFPS(x) x, (x / 1000.f)
         static std::vector<float> arpPerf = {};
         static std::vector<float> d2dPerf = {};
         static std::vector<float> d3dPerf = {};

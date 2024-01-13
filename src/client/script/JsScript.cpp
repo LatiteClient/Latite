@@ -22,6 +22,8 @@
 #include "class/impl/JsColor.h"
 #include "class/impl/JsModuleClass.h"
 #include "class/impl/JsHudModuleClass.h"
+#include "class/impl/JsTextModuleClass.h"
+#include "class/impl/JsTextureClass.h"
 #include "class/impl/JsSettingClass.h"
 #include "class/impl/JsCommandClass.h"
 #include "class/impl/game/JsEntityClass.h"
@@ -34,7 +36,7 @@
 #include "objects/D2DScriptingObject.h"
 #include "util/XorString.h"
 #include "util/Logger.h"
-#include "class/impl/JsTextureClass.h"
+
 #include <resource.h>
 
 using namespace winrt::Windows::Web::Http;
@@ -311,7 +313,7 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsColor>(this));
 	this->classes.push_back(std::make_shared<JsModuleClass>(this));
 	this->classes.push_back(std::make_shared<JsHudModuleClass>(this));
-	//this->classes.push_back(std::make_shared<JsTextModuleClass>(this));
+	this->classes.push_back(std::make_shared<JsTextModuleClass>(this));
 	this->classes.push_back(std::make_shared<JsSettingClass>(this));
 	this->classes.push_back(std::make_shared<JsCommandClass>(this));
 	this->classes.push_back(std::make_shared<JsEntityClass>(this));

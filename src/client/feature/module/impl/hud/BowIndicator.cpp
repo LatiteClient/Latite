@@ -7,9 +7,10 @@ BowIndicator::BowIndicator() : TextModule("BowIndicator", "Bow Indicator", "Show
 	addSetting("bgCol", "Background Color", "The indicator background color", this->indicatorCol);
 	addSetting("horizontal", "Horizontal", "Whether it's horizontal or not", this->horizontal, "visual"_istrue);
 
-	addSliderSetting("size", "Size", "The size of the indicator", indicatorSize, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
+	addSliderSetting("size", "Length", "The length of the indicator", indicatorSize, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
 	addSliderSetting("width", "Width", "The width of the indicator", indicatorWidth, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
 	addSliderSetting("rad", "Radius", "The radius of the indicator", indicatorRad, FloatValue(0.f), FloatValue(5.f), FloatValue(1.f), "visual"_istrue);
+	addSliderSetting("padding", "Padding", "The padding of the indicator", padding, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f), "visual"_istrue);
 }
 
 BowIndicator::~BowIndicator() {
@@ -38,10 +39,12 @@ void BowIndicator::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 		dc.fillRoundedRectangle(rc, std::get<ColorValue>(indicatorCol).color1, rad);
 
 		d2d::Rect fillRc = rc;
-		fillRc.left += 6;
-		fillRc.top += 6;
-		fillRc.right -= 6;
-		fillRc.bottom -= 6;
+
+		float pad = std::get<FloatValue>(padding);
+		fillRc.left += pad;
+		fillRc.top += pad;
+		fillRc.right -= pad;
+		fillRc.bottom -= pad;
 
 		if (horiz) {
 			fillRc.right = fillRc.left + fillRc.getWidth() * percent.value();
