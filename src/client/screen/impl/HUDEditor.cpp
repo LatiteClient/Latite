@@ -126,12 +126,14 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 					auto rMod = reinterpret_cast<HUDModule*>(mod.get());
 
 					if (rMod->getCategory() == Module::SCRIPT) {
-						auto jsRMod = reinterpret_cast<JsHUDModule*>(mod.get());
+						if (!rMod->isTextual()) {
+							auto jsRMod = reinterpret_cast<JsHUDModule*>(mod.get());
 
-						auto oMat = jsRMod->script->getObject<D2DScriptingObject>()->getMatrix();
-						jsRMod->script->getObject<D2DScriptingObject>()->setMatrix(D2D1::Matrix3x2F::Scale(rMod->getScale(), rMod->getScale()) * D2D1::Matrix3x2F::Translation(rMod->getRect().left, rMod->getRect().top));
-						rMod->preRender(mcRenderer, false, isActive());
-						jsRMod->script->getObject<D2DScriptingObject>()->setMatrix(oMat);
+							auto oMat = jsRMod->script->getObject<D2DScriptingObject>()->getMatrix();
+							jsRMod->script->getObject<D2DScriptingObject>()->setMatrix(D2D1::Matrix3x2F::Scale(rMod->getScale(), rMod->getScale()) * D2D1::Matrix3x2F::Translation(rMod->getRect().left, rMod->getRect().top));
+							rMod->preRender(mcRenderer, false, isActive());
+							jsRMod->script->getObject<D2DScriptingObject>()->setMatrix(oMat);
+						}
 					}
 				}
 				});
