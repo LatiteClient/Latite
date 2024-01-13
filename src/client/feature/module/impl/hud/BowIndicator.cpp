@@ -72,7 +72,6 @@ std::optional<float> BowIndicator::getBowCharge(SDK::ItemStack* slot) {
 	if (item->id.hash == "bow"_fnv64 /*bow*/ || item->id.hash == "crossbow"_fnv64 /*crossbow*/ || item->id.hash == "trident"_fnv64) {
 		int useDur = SDK::ClientInstance::get()->getLocalPlayer()->getItemUseDuration();
 		if (useDur) {
-			Logger::Info("{}", useDur);
 			auto mxu = item->getMaxUseDuration(slot);
 			float diff = static_cast<float>(item->getMaxUseDuration(slot) - useDur);
 			return (std::min)((std::max)(diff / 20.f, 0.f), 1.f);

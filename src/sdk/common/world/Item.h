@@ -14,6 +14,10 @@ namespace SDK {
 		CLASS_FIELD(HashedString, namespacedId, 0x118); // minecraft:bow 
 
 		int getMaxUseDuration(class ItemStackBase* item) {
+			if (internalVers >= V1_20_50) {
+				return memory::callVirtual<int>(this, 5, item);
+			}
+
 			if (internalVers > V1_19_41) {
 				return memory::callVirtual<int>(this, 6, item);
 			}
