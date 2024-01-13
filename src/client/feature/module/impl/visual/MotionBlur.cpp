@@ -37,6 +37,7 @@ void MotionBlur::onRender(Event& genericEv) {
 					ctx->DrawBitmap(grainOfSalt, &rc, std::get<FloatValue>(antiBleed));
 				}
 			}
+			ctx->Flush();
 			SafeRelease(&motionBlurList.front());
 			motionBlurList.erase(motionBlurList.begin());
 		}

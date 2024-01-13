@@ -2,10 +2,14 @@
 #include "BowIndicator.h"
 
 BowIndicator::BowIndicator() : TextModule("BowIndicator", "Bow Indicator", "Shows bow chargedness", HUD, 400.f, 0, true) {
-	//addSetting("visual", "Visual Indicator", "To show a bar instead of text", this->visual);
-	//addSetting("horizontal", "Horizontal", "Whether it's horizontal or not", this->horizontal, "visual"_istrue);
-	//addSliderSetting("size", "Size", "The size of the indicator", indicatorSize, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
-	//addSliderSetting("width", "Width", "The width of the indicator", indicatorWidth, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
+	addSetting("visual", "Visual Indicator", "To show a bar instead of text", this->visual);
+	addSetting("bgCol", "Color", "The indicator foreground color", this->indicatorCol2);
+	addSetting("bgCol", "Background Color", "The indicator background color", this->indicatorCol);
+	addSetting("horizontal", "Horizontal", "Whether it's horizontal or not", this->horizontal, "visual"_istrue);
+
+	addSliderSetting("size", "Size", "The size of the indicator", indicatorSize, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
+	addSliderSetting("width", "Width", "The width of the indicator", indicatorWidth, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
+	addSliderSetting("rad", "Radius", "The radius of the indicator", indicatorRad, FloatValue(0.f), FloatValue(5.f), FloatValue(2.5f), "visual"_istrue);
 }
 
 BowIndicator::~BowIndicator() {
@@ -34,6 +38,11 @@ void BowIndicator::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 		dc.fillRoundedRectangle(rc, std::get<ColorValue>(indicatorCol).color1, rad);
 
 		d2d::Rect fillRc = rc;
+		fillRc.left += 6;
+		fillRc.top += 6;
+		fillRc.right -= 6;
+		fillRc.bottom -= 6;
+
 		if (horiz) {
 			fillRc.right = fillRc.left + fillRc.getWidth() * percent.value();
 		}
@@ -59,9 +68,11 @@ std::wstringstream BowIndicator::text(bool, bool) {
 std::optional<float> BowIndicator::getBowCharge(SDK::ItemStack* slot) {
 	if (!slot->item) return std::nullopt;
 	auto item = *slot->item;
-	if (item->id.hash == 0xd8d9a7186bad3c2f /*bow*/ || item->id.hash == 0xf53d301813cb9fb1 /*crossbow*/) {
+
+	if (item->id.hash == "bow"_fnv64 /*bow*/ || item->id.hash == "crossbow"_fnv64 /*crossbow*/ || item->id.hash == "trident"_fnv64) {
 		int useDur = SDK::ClientInstance::get()->getLocalPlayer()->getItemUseDuration();
 		if (useDur) {
+			Logger::Info("{}", useDur);
 			auto mxu = item->getMaxUseDuration(slot);
 			float diff = static_cast<float>(item->getMaxUseDuration(slot) - useDur);
 			return (std::min)((std::max)(diff / 20.f, 0.f), 1.f);

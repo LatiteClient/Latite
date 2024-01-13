@@ -14,9 +14,8 @@ void Hitboxes::onEntityRender(Event& evG) {
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	auto entt = ev.getEntity();
 
-	if (!std::get<BoolValue>(localPlayer) && entt == lp) return;
+	if (entt == lp) return;
 	if (!std::get<BoolValue>(items) && entt->getEntityTypeID() == 64) return;
-	//if (entt->isInvisible() && (!SDK::RakNetConnector::Get() || !SDK::RakNetConnector::get()->ipAddress.empty())) return;
 
 	Vec3 newPos = { std::lerp(entt->getPosOld().x, entt->getPos().x, SDK::ClientInstance::get()->minecraft->timer->alpha),
 	std::lerp(entt->getPosOld().y, entt->getPos().y, SDK::ClientInstance::get()->minecraft->timer->alpha) ,
@@ -27,28 +26,11 @@ void Hitboxes::onEntityRender(Event& evG) {
 	Vec3 rebasePos = newPos.operator-({ 0.f, eyeOffset, 0.f }).operator+({ 0.f, (bb.higher .y - bb.lower.y) / 2.f, 0.f });
 	bb.rebase(rebasePos);
 
-#if DEBUG
-	if (mode.is(mode_hitbox)) {
-		float lowY = bb.lower.y;
-		bb = { bb.getCenter(), bb.getCenter() };
-		bb.lower.y = lowY;
-		bb.higher.y = lowY;
-
-		auto hitbox = entt->getHitbox();
-
-		bb.low = { bb.lower.x - hitbox.x / 2.f, lowY, bb.lower.z - hitbox.x / 2.f };
-		bb.higher = { bb.higher.x + hitbox.x / 2.f, lowY + hitbox.y, bb.higher.z + hitbox.x / 2.f };
-	}
-#endif
-
 	bool willShowLine = std::get<BoolValue>(showLine) && (!entt->isPlayer() || (!SDK::RakNetConnector::get() || SDK::RakNetConnector::get()->ipAddress.empty()) || entt == lp);
-
-	//if (willShowLine || std::get<BoolValue>(showHelper)) immediate = false; // performance improvements
 
 	auto boxCol = std::get<ColorValue>(boxColor).color1;
 	auto lineCol = std::get<ColorValue>(lineColor).color1;
 	auto eyeCol = std::get<ColorValue>(eyeColor).color1;
-
 
 	dc.drawBox(bb, boxCol);
 	float eyePos = newPos.y;
@@ -59,22 +41,12 @@ void Hitboxes::onEntityRender(Event& evG) {
 		eyeLine = bb.lower.y + (bb.higher.y - bb.lower.y) * 0.85f;
 	}
 
-
 	if (std::get<BoolValue>(showEyeLine)) {
 		dc.drawQuad(Vec3(bb.lower.x, eyeLine, bb.lower.z), Vec3(bb.higher.x, eyeLine, bb.lower.z),
 			Vec3(bb.higher.x, eyeLine, bb.higher.z), Vec3(bb.lower.x, eyeLine, bb.higher.z), eyeCol);
 
 		if (!willShowLine) dc.flush();
 	}
-
-	//if (showHelper) {
-	//	if (!willShowLine) immediate = (true);
-	//
-	//	float myClamp = std::clamp(lp->getPos().y, bb.lower.y, bb.higher.y);
-	//
-	//	dc.drawQuad(Vec3(bb.lower.x, myClamp, bb.lower.z), Vec3(bb.higher.x, myClamp, bb.lower.z),
-	//		Vec3(bb.higher.x, myClamp, bb.higher.z), Vec3(bb.lower.x, myClamp, bb.higher.z), helperLineColor.getColor());
-	//}
 
 	if (willShowLine) {
 		float calcYaw = (entt->getRot().y + 90) * (pi_f / 180);
@@ -103,7 +75,6 @@ Hitboxes::Hitboxes() : Module("Hitboxes", "Hitboxes", "Shows entity bounding box
 	addSetting("eyeLine", "Eye Line", "The eye line color.", this->eyeColor, "showEyeLine"_istrue);
 	addSetting("showLookingAt", "Show Looking At", "Whether or not to show the looking at line.", this->showLine);
 	addSetting("lookingAt", "Looking At", "Looking At color", this->lineColor, "showLookingAt"_istrue);
-	addSetting("thirdPerson", "Show 3rd Person", "Show your own hitbox in 3rd person", this->localPlayer);
 	addSetting("items", "Items", "Show item hitboxes", items);
 
 	listen<AfterRenderEntityEvent>((EventListenerFunc)&Hitboxes::onEntityRender, false);

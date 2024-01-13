@@ -10,19 +10,24 @@ public:
 	explicit Module(std::string const& name, std::string const& displayName, std::string const& description, Category category,
 		int keybind = 0, bool hud = false, bool visible = true) : IModule(name, description, displayName, category, visible) {
 		this->hud = hud;
-			{
-				auto set = std::make_shared<Setting>("enabled", "Enabled", "Whether the module is on or not");
-				set->value = &enabled;
-				set->visible = false;
 
-				settings->addSetting(set);
-			}
-			if (keybind != 1) {
-				auto set = std::make_shared<Setting>("key", "Key", "The keybind of the module");
-				set->value = &key;
+		key = KeyValue(keybind);
 
-				settings->addSetting(set);
-			}
+		{
+			auto set = std::make_shared<Setting>("enabled", "Enabled", "Whether the module is on or not");
+			set->value = &enabled;
+			set->visible = false;
+			set->defaultValue = BoolValue(false);
+
+			settings->addSetting(set);
+		}
+		if (keybind != 1) {
+			auto set = std::make_shared<Setting>("key", "Key", "The keybind of the module");
+			set->value = &key;
+			set->defaultValue = KeyValue(keybind);
+
+			settings->addSetting(set);
+		}
 	}
 
 	~Module() {

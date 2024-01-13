@@ -33,7 +33,6 @@ FARPROC Chakra::pass(const char* name)
 		std::filesystem::create_directory(latitePath / "Assets");
 
 		if (std::filesystem::exists(assetsPath / "ChakraCore.dll")) {
-			Logger::Info("ChakraCore found. Loading ChakraCore.dll..");
 			if (!mod) mod = LoadLibraryW((util::GetLatitePath() / "Assets" / "ChakraCore.dll").wstring().c_str());
 		}
 

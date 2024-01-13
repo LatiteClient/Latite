@@ -551,9 +551,12 @@ void ClickGUI::onRender(Event&) {
 
 							if (resetRect.contains(cursorPos) && justClicked[0]) {
 								mod.mod->settings->forEach([&](std::shared_ptr<Setting> set) {
-									std::visit([set](auto& obj) {
-										obj = std::get<std::remove_reference_t<decltype(obj)>>(set->defaultValue);
-										}, *set->value);
+									*set->value = set->defaultValue;
+									//std::visit([set](auto& obj) {
+									//	static_assert(false, "");
+									//	obj = std::get<std::remove_reference_t<decltype(obj)>>(set->defaultValue);
+									//	}, *set->value);
+									//});
 									});
 							}
 						}
@@ -677,7 +680,7 @@ void ClickGUI::onRender(Event&) {
 			// set mod rect
 			mod.modRect = modRectActual;
 
-			mod.lerpHover = std::lerp(mod.lerpHover, shouldSelect(modRectActual, cursorPos), Latite::getRenderer().getDeltaTime() / 5.f);
+			mod.lerpHover = std::lerp(mod.lerpHover, shouldSelect(modRectActual, cursorPos) ? 1.f : 0.f, Latite::getRenderer().getDeltaTime() / 5.f);
 
 			// scrolling max
 			float scrollYNew = std::max(0.f, (modRectActual.bottom + padFromSearchBar) - rect.bottom) + lerpScroll;
