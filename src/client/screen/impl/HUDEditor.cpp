@@ -16,6 +16,7 @@
 #include "sdk/common/client/gui/controls/VisualTree.h"
 #include "sdk/common/client/gui/controls/UIControl.h"
 #include <client/script/objects/D2DScriptingObject.h>
+#include <client/feature/module/script/JsTextModule.h>
 
 
 HUDEditor::HUDEditor() : dragMod(nullptr) {

@@ -212,6 +212,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(MinecraftGame_getPrimaryClientInstance),
         MVSIG(Components::actorTypeComponent),
         MVSIG(ActorRenderDispatcher_render),
+        MVSIG(LevelRendererPlayer_renderOutlineSelection),
     };
     
     new (mmgrBuf) ModuleManager;

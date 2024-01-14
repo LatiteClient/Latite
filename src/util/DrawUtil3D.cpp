@@ -65,6 +65,47 @@ void MCDrawUtil3D::drawQuad(Vec3 a, Vec3 b, Vec3 c, Vec3 d, d2d::Color const& co
 	tess->vertex(a.x, a.y, a.z);
 }
 
+void MCDrawUtil3D::fillQuad(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4, d2d::Color const& color) {
+	auto scn = screenContext;
+	
+	auto tess = scn->tess;
+	*scn->shaderColor = Color(1.f, 1.f, 1.f, 1.f);
+	tess->begin(SDK::Primitive::Quad, 4); // linestrip
+	tess->color(color);
+	auto& origin = levelRenderer->getLevelRendererPlayer()->getOrigin();
+	Vec3 a = p1;
+	Vec3 b = p2;
+	Vec3 c = p3;
+	Vec3 d = p4;
+
+	a.x -= origin.x;
+	a.y -= origin.y;
+	a.z -= origin.z;
+
+	b.x -= origin.x;
+	b.y -= origin.y;
+	b.z -= origin.z;
+
+	c.x -= origin.x;
+	c.y -= origin.y;
+	c.z -= origin.z;
+
+	d.x -= origin.x;
+	d.y -= origin.y;
+	d.z -= origin.z;
+
+	tess->vertex(a.x, a.y, a.z);
+	tess->vertex(b.x, b.y, b.z);
+	tess->vertex(c.x, c.y, c.z);
+	tess->vertex(d.x, d.y, d.z);
+
+	// render other side
+	tess->vertex(d.x, d.y, d.z);
+	tess->vertex(c.x, c.y, c.z);
+	tess->vertex(b.x, b.y, b.z);
+	tess->vertex(a.x, a.y, a.z);
+}
+
 void MCDrawUtil3D::drawBox(AABB const& bb, d2d::Color const& color) {
 	auto scn = screenContext;
 	auto tess = scn->tess;

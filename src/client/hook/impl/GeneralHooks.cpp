@@ -23,6 +23,7 @@ namespace {
 	std::shared_ptr<Hook> Level_initializeHook;
 	std::shared_ptr<Hook> Level_startLeaveGameHook;
 	std::shared_ptr<Hook> RenderEntityHook;
+	std::shared_ptr<Hook> OutlineSelectionHook;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -243,6 +244,13 @@ void* GenericHooks::ActorRenderDispatcher_render(void* obj, SDK::BaseActorRender
 	return RenderEntityHook->oFunc<decltype(&ActorRenderDispatcher_render)>()(obj, barc, entity, pos3, pos2, unk, affectedByLighting);
 }
 
+void GenericHooks::LevelRendererPlayer_renderOutlineSelection(SDK::LevelRendererPlayer* obj, SDK::ScreenContext* scn, void* block, void* region, BlockPos pos) {
+	OutlineSelectionEvent ev{ pos };
+	if (!Eventing::get().dispatch(ev)) {
+		OutlineSelectionHook->oFunc<decltype(&LevelRendererPlayer_renderOutlineSelection)>()(obj, scn, block, region, pos);
+	}
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
 	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
@@ -281,4 +289,7 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	}
 
 	RenderEntityHook = addHook(Signatures::ActorRenderDispatcher_render.result, ActorRenderDispatcher_render, "ActorRenderDispatcher::render");
+	
+
+	OutlineSelectionHook = addHook(Signatures::LevelRendererPlayer_renderOutlineSelection.result, LevelRendererPlayer_renderOutlineSelection, "LevelRendererPlayer::renderOutlineSelection");
 }

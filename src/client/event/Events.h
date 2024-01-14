@@ -15,6 +15,7 @@
 #include "impl/HideHandEvent.h"
 #include "impl/KeyUpdateEvent.h"
 #include "impl/LeaveGameEvent.h"
+#include "impl/OutlineSelectionEvent.h"
 #include "impl/OverlayColorEvent.h"
 #include "impl/PerspectiveEvent.h"
 #include "impl/RendererCleanupEvent.h"

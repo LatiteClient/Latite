@@ -320,6 +320,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\client\event\impl\OutlineSelectionEvent.h" />
+    <ClInclude Include="src\client\feature\module\impl\visual\BlockOutline.h" />
     <ClInclude Include="deps\include\vhook\vtable_hook.h" />
     <ClInclude Include="src\client\event\impl\AfterEntityRenderEvent.h" />
     <ClInclude Include="src\client\event\impl\HideHandEvent.h" />
@@ -586,6 +588,7 @@
     <Text Include="src\util\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\client\feature\module\impl\visual\BlockOutline.cpp" />
     <ClCompile Include="deps\include\vhook\vtable_hook.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\BehindYou.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\ArmorHUD.cpp" />

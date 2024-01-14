@@ -15,6 +15,7 @@
 #include "impl/visual/Hitboxes.h"
 #include "impl/visual/ChunkBorders.h"
 #include "impl/visual/Hitboxes.h"
+#include "impl/visual/BlockOutline.h"
 
 #include "impl/hud/FPSCounter.h"
 #include "impl/hud/CPSCounter.h"
@@ -65,6 +66,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<ArmorHUD>());
 	this->items.push_back(std::make_shared<MovablePaperdoll>());
 	this->items.push_back(std::make_shared<Hitboxes>());
+	this->items.push_back(std::make_shared<BlockOutline>());
 
 	for (auto& mod : items) {
 		mod->onInit();

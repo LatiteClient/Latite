@@ -236,6 +236,10 @@ public:
 		"e8 ? ? ? ? 44 0f 28 54 24 ? 4c 8d 9c 24 ? ? ? ? 49 8b 5b ? 49 8b 6b",
 		"ActorRenderDispatcher::render"};
 
+	inline static SigImpl LevelRendererPlayer_renderOutlineSelection{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? 48 83 c4 ? 41 5f 41 5e 41 5d 5e 5d c3 0f b6 84 24",
+		"LevelRendererPlayer::renderOutlineSelection"};
+
 
 	//40 53 48 83 ec ? 48 8b da 48 8b 91 ? ? ? ? 48 8b ca
 };
