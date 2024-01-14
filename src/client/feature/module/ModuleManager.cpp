@@ -31,6 +31,7 @@
 #include "impl/hud/HealthWarning.h"
 #include "impl/hud/ArmorHUD.h"
 #include "impl/hud/MovablePaperdoll.h"
+#include "impl/hud/MovableScoreboard.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
 
@@ -67,6 +68,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<MovablePaperdoll>());
 	this->items.push_back(std::make_shared<Hitboxes>());
 	this->items.push_back(std::make_shared<BlockOutline>());
+	this->items.push_back(std::make_shared<MovableScoreboard>());
 
 	for (auto& mod : items) {
 		mod->onInit();
