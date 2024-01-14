@@ -6,6 +6,7 @@ BowIndicator::BowIndicator() : TextModule("BowIndicator", "Bow Indicator", "Show
 	addSetting("fgCol", "Color", "The indicator foreground color", this->indicatorCol2);
 	addSetting("bgCol", "Background Color", "The indicator background color", this->indicatorCol);
 	addSetting("horizontal", "Horizontal", "Whether it's horizontal or not", this->horizontal, "visual"_istrue);
+	addSetting("hideWhenCharged", "Hide when charged", "Hide indicator when itm is almost fully charged", this->hideWhenCharged, "visual"_istrue);
 
 	addSliderSetting("size", "Length", "The length of the indicator", indicatorSize, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
 	addSliderSetting("width", "Width", "The width of the indicator", indicatorWidth, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
@@ -36,6 +37,10 @@ void BowIndicator::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	rect.bottom = rect.top + rc.getHeight();
 
 	if (auto percent = getBowCharge(slot)) {
+		if (std::get<BoolValue>(hideWhenCharged) && percent > 0.95f) {
+			return;
+		}
+
 		dc.fillRoundedRectangle(rc, std::get<ColorValue>(indicatorCol).color1, rad);
 
 		d2d::Rect fillRc = rc;
