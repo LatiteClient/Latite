@@ -9,6 +9,7 @@ public:
 private:
 	ValueType renderThrough = BoolValue(false);
 	ValueType transparent = BoolValue(true);
+	ValueType outlineVanilla = BoolValue(false);
 
 	ValueType outline = BoolValue(true);
 	ValueType outlineColor = ColorValue(0.f, 0.f, 0.f);

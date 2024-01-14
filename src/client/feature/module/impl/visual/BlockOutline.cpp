@@ -8,7 +8,8 @@ BlockOutline::BlockOutline() : Module("BlockOutline", "Block Overlay", "Changes 
 	addSetting("renderThrough", "Render Through", "Whether to render the outline through blocks or not", this->renderThrough);
 	addSetting("transparent", "Transparent", "Whether or not to have a transparent overlay", this->transparent, "renderThrough"_isfalse);
 	
-	addSetting("outline", "Outline", "Render an outline", this->outline);
+	addSetting("vanillaOutline", "Vanilla Outline", "Keep the vanilla outline.", this->outlineVanilla);
+	addSetting("outline", "Outline", "Render an outline", this->outline, "vanillaOutline"_isfalse);
 	addSetting("outlineColor", "Outline Color", "The outline color", this->outlineColor, "outline");
 
 	addSetting("overlay", "Overlay", "Render an overlay", this->overlay);
@@ -20,7 +21,8 @@ BlockOutline::BlockOutline() : Module("BlockOutline", "Block Overlay", "Changes 
 
 void BlockOutline::onOutlineSelection(Event& evG) {
 	auto& ev = reinterpret_cast<OutlineSelectionEvent&>(evG);
-	ev.setCancelled();
+	if (!std::get<BoolValue>(outlineVanilla))
+		ev.setCancelled();
 
 	auto hitResult = SDK::ClientInstance::get()->minecraft->getLevel()->getHitResult();
 
