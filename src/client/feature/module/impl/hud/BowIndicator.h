@@ -13,7 +13,7 @@ private:
 	ValueType indicatorWidth = FloatValue(30.f);
 	ValueType indicatorCol = ColorValue({ 0.1f, 0.1f, 0.1f, 0.8f });
 	ValueType indicatorCol2 = ColorValue({ 0.1f, 0.6f, 0.1f, 1.f });
-	ValueType indicatorRad = FloatValue(5.f);
+	ValueType indicatorRad = FloatValue(0.f);
 	ValueType padding = FloatValue(6.f);
 
 	void render(DrawUtil& dc, bool isDefault, bool inEditor) override;
