@@ -13,7 +13,7 @@ public:
 		: Module(name, displayName, description, category, keybind, true), resizable(resizable) {
 		
 		addSetting("pos", "Position", "", storedPos);
-		addSliderSetting("scale", "Size", "", scale, FloatValue(min_scale), FloatValue(max_scale), FloatValue(0.05f));
+		if (resizable) addSliderSetting("scale", "Size", "", scale, FloatValue(min_scale), FloatValue(max_scale), FloatValue(0.05f));
 		addSetting("forceMinecraftRend", "Force Minecraft Renderer", "Whether or not to use the Minecraft renderer for this module.", forceMCRend);
 	}
 
@@ -39,6 +39,8 @@ public:
 	
 	void setScale(float f) { std::get<FloatValue>(scale) = f; }
 	void setRect(d2d::Rect const& rc) { this->rect = rc; }
+
+	bool isResizable() { return resizable; }
 
 protected:
 	d2d::Rect rect = {};

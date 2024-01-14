@@ -108,8 +108,11 @@ void HUDEditor::onClick(Event& evGeneric) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 			if (!mod->isHud()) return;
 			auto hudMod = reinterpret_cast<HUDModule*>(mod.get());
+
 			if (!hudMod->isActive()) return;
+			if (!hudMod->isResizable()) return;
 			if (!shouldSelect(hudMod->getRect(), SDK::ClientInstance::get()->cursorPos)) return;
+
 			hudMod->setScale(std::clamp(hudMod->getScale() - static_cast<float>(ev.getWheelDelta()) / 1000.f, HUDModule::min_scale, HUDModule::max_scale));
 			});
 		ev.setCancelled(true);
