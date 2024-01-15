@@ -8,6 +8,7 @@
 #include "sdk/common/client/player/LocalPlayer.h"
 #include "sdk/common/world/Minecraft.h"
 #include "client/Latite.h"
+#include <client/input/Keyboard.h>
 #include "client/script/PluginManager.h"
 #include "util/Logger.h"
 #include "sdk/common/network/packet/TextPacket.h"
@@ -29,6 +30,7 @@ void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 
 	Chakra::DefineFunc(object, getConnectedServerCallback, L"getServer");
 	Chakra::DefineFunc(object, getConnectedFeaturedServerCallback, L"getFeaturedServer");
+	Chakra::DefineFunc(object, getInputBinding, L"getInputBinding");
 }
 
 void GameScriptingObject::createWorldObject() {
@@ -133,6 +135,16 @@ JsValueRef GameScriptingObject::getMousePosCallback(JsValueRef callee, bool isCo
 	// could not find Vector2
 	__debugbreak();
 	return Chakra::GetUndefined();
+}
+
+JsValueRef GameScriptingObject::getInputBinding(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	auto handler = SDK::ClientInstance::get()->inputHandler;
+	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsString} })) return JS_INVALID_REFERENCE;
+
+
+	auto key = Latite::getKeyboard().getMappedKey(util::WStrToStr(Chakra::GetString(arguments[1])));
+	return Chakra::MakeInt(key);
 }
 
 JsValueRef GameScriptingObject::getWorldCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
