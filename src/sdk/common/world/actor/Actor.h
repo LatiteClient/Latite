@@ -16,7 +16,7 @@ namespace SDK {
 		MVCLASS_FIELD(StateVectorComponent*, stateVector, 0x2C8, 0x2A0, 0x2A0, 0, 0x350);
 		MVCLASS_FIELD(AABBShapeComponent*, aabbShape, 0x2D0, 0x2A8, 0x2A8, 0, 0x358);
 		MVCLASS_FIELD(MovementInterpolatorComponent*, movementInterpolator, 0x2D8, 0x2B0, 0x2B0, 0, 0x360);
-		CLASS_FIELD(MolangVariableMap, molangVariableMap, 0x450);
+		MVCLASS_FIELD(MolangVariableMap, molangVariableMap, 0x478, 0x450, 0, 0, 0);
 
 		// 1.19.51 only
 		CLASS_FIELD(class Level*, level_1_19_51, 0x310);
