@@ -675,11 +675,6 @@ std::string Latite::getTextAsset(int resource) {
 
 namespace {
     winrt::Windows::Foundation::IAsyncAction doDownloadAssets() {
-        co_return;
-//#ifndef LATITE_PUBLIC
-        Logger::Info("Downloading ChakraCore");
-//#endif
-
         auto http = HttpClient();
 
         auto folderPath = util::GetLatitePath() / "Assets";
@@ -704,8 +699,8 @@ namespace {
 
 void Latite::downloadChakraCore() {
     if (!downloadingAssets) {
-        doDownloadAssets();
         this->downloadingAssets = true;
+        doDownloadAssets();
     }
 }
 
