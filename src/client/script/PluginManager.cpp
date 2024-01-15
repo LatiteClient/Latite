@@ -295,6 +295,7 @@ void PluginManager::initListeners()
 	eventListeners[L"app-suspended"] = {};
 	eventListeners[L"load-script"] = {};
 	eventListeners[L"unload-script"] = {};
+	eventListeners[L"text-input"] = {};
 }
 
 void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr) {

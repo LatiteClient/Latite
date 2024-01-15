@@ -34,8 +34,8 @@ bool OptionHooks::Options_getHideHand(void* options) {
 	return o;
 }
 
-float OptionHooks::Options_getSensitivity(void* options, unsigned int a2) {
-	auto o = getSensitivityHook->oFunc<decltype(&Options_getSensitivity)>()(options, a2);
+float OptionHooks::Options_getSensitivity(void* options, unsigned int a2, int a3, int a4, int a5) {
+	auto o = getSensitivityHook->oFunc<decltype(&Options_getSensitivity)>()(options, a2, a3, a4, a5);
 	SensitivityEvent ev{ o };
 	Eventing::get().dispatch(ev);
 	return o;

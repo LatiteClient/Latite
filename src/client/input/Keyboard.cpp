@@ -82,8 +82,18 @@ int Keyboard::getMappedKey(std::string const& name) {
 }
 
 void Keyboard::onChar(wchar_t ch, bool isChar) {
-	CharEvent ev{ ch, isChar };
-	Eventing::get().dispatch(ev);
+	bool cancel = false;
+	if (isChar) {
+		PluginManager::Event::Value val{L"characters"};
+		val.val = std::wstring(1, ch);
+		PluginManager::Event sEv{L"text-input", {val}, true};
+		cancel = Latite::getPluginManager().dispatchEvent(sEv);
+	}
+
+	if (!cancel) {
+		CharEvent ev{ ch, isChar };
+		Eventing::get().dispatch(ev);
+	}
 }
 
 void Keyboard::onKey(Event& evGeneric) {
