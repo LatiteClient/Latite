@@ -12,6 +12,7 @@ JsTextModule::JsTextModule(std::string const& name,
 	this->eventListeners[L"disable"] = {};
 	this->eventListeners[L"get-hold-to-toggle"] = {};
 	this->eventListeners[L"render"] = {};
+	this->eventListeners[L"text"] = {};
 }
 
 
@@ -61,7 +62,13 @@ void JsTextModule::preRender(bool mcRend, bool isPreview, bool isEditor) {
 	JS::JsSetCurrentContext(ctx);
 
 	{
-		Event ev{ L"text", { isPreview ? Chakra::GetTrue() : Chakra::GetFalse(), isEditor ? Chakra::GetTrue() : Chakra::GetFalse()} };
+		//JsValueRef isPreviewBool;
+		//JS::JsBoolToBoolean(isPreview, &isPreviewBool);
+		//
+		//JsValueRef isEditorBool;
+		//JS::JsBoolToBoolean(isEditor, &isEditorBool);
+
+		Event ev{ L"text", {} };
 		auto ret = dispatchEvent(ev.name, ev);
 		if (ret != JS_INVALID_REFERENCE) {
 			const wchar_t* b;
@@ -74,14 +81,5 @@ void JsTextModule::preRender(bool mcRend, bool isPreview, bool isEditor) {
 			}
 			Chakra::Release(ret);
 		}
-	}
-
-	{
-		auto obj = script->getObject<D2DScriptingObject>();
-		bool oMinecraftRend = obj->usingMinecraftRend();
-		obj->setUseMinecraftRend(mcRend);
-		Event ev{ L"render", { isPreview ? Chakra::GetTrue() : Chakra::GetFalse(), isEditor ? Chakra::GetTrue() : Chakra::GetFalse()} };
-		dispatchEvent(ev.name, ev);
-		obj->setUseMinecraftRend(oMinecraftRend);
 	}
 }

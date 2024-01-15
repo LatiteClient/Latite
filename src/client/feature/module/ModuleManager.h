@@ -16,6 +16,8 @@ public:
 				return false;
 			}
 		}
+
+		mod->onInit();
 		this->items.push_back(std::shared_ptr<JsModule>(mod));
 		JS::JsAddRef(mod->object, nullptr);
 		return true;

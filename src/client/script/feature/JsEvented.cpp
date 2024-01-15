@@ -10,14 +10,6 @@ JsValueRef JsEvented::dispatchEvent(std::wstring name, Event& ev) {
 		ev.arguments.insert(ev.arguments.begin(), evs.first);
 		JsValueRef val;
 
-		for (int argu = 0; auto & arg : ev.arguments) {
-			if (Chakra::GetRefCount(arg) == 0) {
-				Logger::Warn("refCount for argument {} is 0!", argu);
-			}
-
-			++argu;
-		}
-
 		Latite::getPluginManager().handleErrors(Chakra::CallFunction(evs.first, ev.arguments.data(), static_cast<unsigned short>(ev.arguments.size()), &val));
 		return val;
 	}
