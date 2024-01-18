@@ -533,7 +533,7 @@ void ClickGUI::onRender(Event&) {
 
 						float textSizeDesc = textHeight * 0.72f;
 						float descTextPad = textSizeDesc / 3.f;
-						RectF descTextRect = { modRect.left + rlBounds, modRect.bottom, modRect.right - rlBounds, modRect.bottom + textSizeDesc + descTextPad };
+						RectF descTextRect = { modRect.left + rlBounds, modRect.bottom, toggleRect.left, modRect.bottom + textSizeDesc + descTextPad };
 						descTextRect.bottom = descTextRect.top + dc.getTextSize(util::StrToWStr(mod.description), Renderer::FontSelection::SegoeRegular, textSizeDesc).y + descTextPad;
 						modRectActual.bottom = descTextRect.bottom;
 
