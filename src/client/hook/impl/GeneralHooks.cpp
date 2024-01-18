@@ -71,8 +71,7 @@ void* GenericHooks::GameRenderer_renderCurrentFrame(void* rend) {
 }
 
 void GenericHooks::Keyboard_feed(int key, bool isDown) {
-	KeyUpdateEvent ev{key, isDown};
-	if (Eventing::get().dispatch(ev)) return;
+	
 
 	{
 		PluginManager::Event::Value val{L"isDown"};
@@ -93,12 +92,13 @@ void GenericHooks::Keyboard_feed(int key, bool isDown) {
 		if (Latite::getPluginManager().dispatchEvent(sEv)) return;
 	}
 
+	KeyUpdateEvent ev{ key, isDown };
+	if (Eventing::get().dispatch(ev)) return;
+
 	return Keyboard_feedHook->oFunc<decltype(&Keyboard_feed)>()(key, isDown);
 }
 
 void GenericHooks::onClick(ClickMap* map, char clickType, char isDownWheelDelta, uintptr_t a4, int16_t a5, int16_t a6, int16_t a7, char a8) {
-	ClickEvent ev{ clickType, isDownWheelDelta };
-	if (Eventing::get().dispatch(ev)) return;
 
 	if (clickType > 0) {
 		Vec2& mousePos = SDK::ClientInstance::get()->cursorPos;
@@ -118,6 +118,9 @@ void GenericHooks::onClick(ClickMap* map, char clickType, char isDownWheelDelta,
 		PluginManager::Event ev{L"click", { val, val2, val3, val4 }, true};
 		if (Latite::getPluginManager().dispatchEvent(ev)) return;
 	}
+
+	ClickEvent ev{ clickType, isDownWheelDelta };
+	if (Eventing::get().dispatch(ev)) return;
 
 	return OnClickHook->oFunc<decltype(&onClick)>()(map, clickType, isDownWheelDelta, a4, a5, a6, a7, a8);
 }

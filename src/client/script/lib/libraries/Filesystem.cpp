@@ -60,6 +60,7 @@ JsValueRef Filesystem::write(JsValueRef callee, bool isConstructor, JsValueRef* 
 			}
 		}
 		ofs.close();
+		ofs.flush();
 		op->err = errn;
 		op->flagDone = true;
 		}, thi);
@@ -148,6 +149,7 @@ JsValueRef Filesystem::writeSync(JsValueRef callee, bool isConstructor, JsValueR
 		}
 	}
 	ofs.close();
+	ofs.flush();
 	return undef;
 }
 

@@ -45,5 +45,5 @@ OptionHooks::OptionHooks() {
 	getGammaHook = addHook(Signatures::Options_getGamma.result, Options_getGamma, "Options::getGamma");
 	getPerspectiveHook = addHook(Signatures::Options_getPerspective.result, Options_getPerspective, "Options::getPerspective");
 	getHideHandHook = addHook(Signatures::Options_getHideHand.result, Options_getHideHand, "Options::getHideHand");
-	getSensitivityHook = addHook(Signatures::Options_getSensitivity.result, Options_getSensitivity, "Options::getSensitivity");
+	//getSensitivityHook = addHook(Signatures::Options_getSensitivity.result, Options_getSensitivity, "Options::getSensitivity");
 }
