@@ -131,6 +131,7 @@ JsValueRef JsModuleClass::moduleAddBoolSetting(JsValueRef callee, bool isConstru
 	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
 
 	*set->value = BoolValue(Chakra::GetBool(arguments[4]));
+	set->defaultValue = BoolValue(Chakra::GetBool(arguments[4]));;
 
 	auto setClass = thi->owner->getClass<JsSettingClass>();
 	mod->settings->addSetting(set);
@@ -169,6 +170,7 @@ JsValueRef JsModuleClass::moduleAddNumberSetting(JsValueRef callee, bool isConst
 	set->min = FloatValue(min);
 	set->max = FloatValue(max);
 	set->interval = FloatValue(intr);
+	set->defaultValue = *set->value;
 
 	auto setClass = thi->owner->getClass<JsSettingClass>();
 	mod->settings->addSetting(set);
@@ -196,6 +198,7 @@ JsValueRef JsModuleClass::moduleAddKeySetting(JsValueRef callee, bool isConstruc
 	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
 
 	*set->value = KeyValue(Chakra::GetInt(arguments[4]));
+	set->defaultValue = *set->value;
 
 	auto setClass = thi->owner->getClass<JsSettingClass>();
 	mod->settings->addSetting(set);
@@ -223,6 +226,7 @@ JsValueRef JsModuleClass::moduleAddTextSetting(JsValueRef callee, bool isConstru
 	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
 
 	*set->value = TextValue(Chakra::GetString(arguments[4]));
+	set->defaultValue = *set->value;
 
 	auto setClass = thi->owner->getClass<JsSettingClass>();
 	mod->settings->addSetting(set);
