@@ -56,7 +56,7 @@ public:
 	}
 
 	JsValueRef construct(JsModule* mod, bool finalize) {
-		auto obj = __super::construct(mod, finalize);
+		auto obj = __super::construct(mod, false); // TODO: auto finalize when not registered
 
 		Chakra::SetPropertyNumber(obj, L"key", static_cast<double>(mod->getKeybind()));
 		Chakra::SetPropertyString(obj, L"name", util::StrToWStr(mod->name()));

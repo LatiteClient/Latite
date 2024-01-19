@@ -8,12 +8,12 @@ public:
 	}
 
 	~JsEvented() {
-		for (auto& ev : this->eventListeners) {
-			for (auto& lis : ev.second) {
-				JS::JsSetCurrentContext(lis.second);
-				JS::JsRelease(lis.first, nullptr);
-			}
-		}
+		//for (auto& ev : this->eventListeners) {
+		//	for (auto& lis : ev.second) {
+		//		JS::JsSetCurrentContext(lis.second);
+		//		JS::JsRelease(lis.first, nullptr);
+		//	}
+		//}
 	}
 
 	struct Event {
