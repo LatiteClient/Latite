@@ -75,6 +75,24 @@ bool JsScript::load() {
 }
 
 JsValueRef JsScript::getModuleExports() {
+	auto global = Chakra::GetGlobalObject();
+	auto objectClass = Chakra::GetProperty(global, L"Object");
+	auto keysFunc = Chakra::GetProperty(objectClass, L"keys");
+
+	auto exp = Chakra::GetProperty(global, L"exports");
+	if (exp != JS_INVALID_REFERENCE) {
+		JsValueRef result;
+		JsValueRef args[] = {objectClass, exp};
+		Chakra::CallFunction(keysFunc, args, 2, &result);
+
+		auto length = Chakra::GetInt(Chakra::GetProperty(result, L"length"));
+		Chakra::Release(result);
+
+		if (length > 0) {
+			return exp;
+		}
+	}
+
 	auto mod = Chakra::GetProperty(Chakra::GetGlobalObject(), L"module");
 	if (mod != JS_INVALID_REFERENCE) {
 		return Chakra::GetProperty(mod, L"exports");
@@ -125,8 +143,15 @@ JsErrorCode JsScript::runScript() {
 #if LATITE_DEBUG
 	//Logger::Info("isTrusted = {}", this->isTrusted());
 #endif
-	auto err = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(this->path.wstring())), this->path.wstring().c_str(), nullptr);
-	return err;
+
+	JsErrorCode code = JsNoError;
+	try {
+		 code = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(this->path.wstring())), this->path.wstring().c_str(), nullptr);
+	}
+	catch (std::exception& e) {
+		//Latite::getClientMessageSink().push("Exception while loading script " + path.string() + ": " + e.what());
+	}
+	return code;
 }
 
 JsErrorCode JsScript::compileScript() {
