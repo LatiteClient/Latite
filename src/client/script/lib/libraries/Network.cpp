@@ -14,9 +14,9 @@ JsValueRef Network::initialize(JsValueRef parent) {
     JsValueRef obj;
     JS::JsCreateObject(&obj);
 
-	Chakra::DefineFunc(obj, get, L"get", this);
-	Chakra::DefineFunc(obj, getSync, L"getSync", this);
-	Chakra::DefineFunc(obj, postSync, L"postSync", this);
+	Chakra::DefineFunc(obj, get, L"getAsync", this);
+	Chakra::DefineFunc(obj, getSync, L"get", this);
+	Chakra::DefineFunc(obj, postSync, L"post", this);
 
     return obj;
 }
