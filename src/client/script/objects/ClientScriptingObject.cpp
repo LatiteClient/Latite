@@ -96,13 +96,13 @@ void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 
 	initModuleManager();
 	Chakra::DefineFunc(moduleManager, mmgrRegisterModuleCallback, L"registerModule");
-	Chakra::DefineFunc(moduleManager, mmgrDeregisterModuleCallback, L"deregisterModule");
+	//Chakra::DefineFunc(moduleManager, mmgrDeregisterModuleCallback, L"deregisterModule");
 	Chakra::DefineFunc(moduleManager, mmgrGetModuleByName, L"getModuleByName");
 	Chakra::DefineFunc(moduleManager, mmgrForEachModule, L"forEachModule");
 
 	initCommandManager();
 	Chakra::DefineFunc(commandManager, cmgrRegisterCommandCallback, L"registerCommand");
-	Chakra::DefineFunc(commandManager, cmgrDeregisterCommandCallback, L"deregisterCommand");
+	//Chakra::DefineFunc(commandManager, cmgrDeregisterCommandCallback, L"deregisterCommand");
 	Chakra::DefineFunc(commandManager, cmgrGetPrefixCallback, L"getPrefix");
 
 	Chakra::SetPropertyString(object, L"version", util::StrToWStr(std::string(Latite::version.data(), Latite::version.size())));
