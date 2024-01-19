@@ -9,13 +9,13 @@ JsValueRef Filesystem::initialize(JsValueRef parent) {
 	JsValueRef ret;
 	JS::JsCreateObject(&ret);
 
-	Chakra::DefineFunc(ret, write, L"write", this);
-	Chakra::DefineFunc(ret, writeSync, L"writeSync", this);
-	Chakra::DefineFunc(ret, read, L"read", this);
-	Chakra::DefineFunc(ret, readSync, L"readSync", this);
-	Chakra::DefineFunc(ret, existsSync, L"existsSync", this);
-	Chakra::DefineFunc(ret, createDirectorySync, L"createDirectorySync", this);
-	Chakra::DefineFunc(ret, appendSync, L"appendSync", this);
+	Chakra::DefineFunc(ret, write, L"writeAsync", this);
+	Chakra::DefineFunc(ret, writeSync, L"write", this);
+	Chakra::DefineFunc(ret, read, L"readAsync", this);
+	Chakra::DefineFunc(ret, readSync, L"read", this);
+	Chakra::DefineFunc(ret, existsSync, L"exists", this);
+	Chakra::DefineFunc(ret, createDirectorySync, L"createDirectory", this);
+	Chakra::DefineFunc(ret, appendSync, L"append", this);
 	return ret;
 }
 
