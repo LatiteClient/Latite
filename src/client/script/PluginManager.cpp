@@ -34,7 +34,7 @@ std::filesystem::path PluginManager::getUserDir() {
 }
 
 std::filesystem::path PluginManager::getUserPrerunDir() {
-	return getUserDir() / "Startup";
+	return getUserDir();
 }
 
 std::shared_ptr<JsPlugin> PluginManager::loadPlugin(std::wstring const& folderPath, bool run)
