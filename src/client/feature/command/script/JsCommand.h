@@ -14,9 +14,7 @@ public:
 	}
 
 	~JsCommand() {
-		JS::JsRelease(obj, nullptr);
-		// yes, we release it twice (crazy stuff)
-		JS::JsRelease(obj, nullptr);
+		// FIXME: check if this actually doesnt cause a memory leak..
 	}
 
 	virtual bool execute(std::string const label, std::vector<std::string> args) override;

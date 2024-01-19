@@ -9,7 +9,8 @@ public:
 		std::string const& desc, int key);
 
 	~JsModule() {
-		JS::JsRelease(object, nullptr);
+		// FIXME: check if no leak
+		//JS::JsRelease(object, nullptr);
 	}
 
 	void onEnable() override;

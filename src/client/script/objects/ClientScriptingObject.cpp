@@ -138,7 +138,7 @@ JsValueRef ClientScriptingObject::mmgrRegisterModuleCallback(JsValueRef callee, 
 			}
 
 			// hoepfully this doesnt double delete...
-			delete reinterpret_cast<JsModule*>(obj);
+			//delete reinterpret_cast<JsModule*>(obj);
 			});
 	}
 
@@ -269,7 +269,7 @@ JsValueRef ClientScriptingObject::cmgrRegisterCommandCallback(JsValueRef callee,
 			}
 
 			// hoepfully this doesnt double delete...
-			delete reinterpret_cast<JsCommand*>(obj);
+			//delete reinterpret_cast<JsCommand*>(obj);
 			});
 	}
 	return undefined;
