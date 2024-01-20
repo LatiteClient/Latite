@@ -309,7 +309,7 @@ void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr) {
 			while (it != ev.second.end()) {
 				auto& scr = ptr->getScripts();
 				auto removeIt = std::remove_if(scr.begin(), scr.end(), [&](const auto& script) {
-					return it->second == script->getContext();
+					return !script || it->second == script->getContext();
 					});
 
 				if (removeIt != scr.end()) {
