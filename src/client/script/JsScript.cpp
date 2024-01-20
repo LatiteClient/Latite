@@ -75,11 +75,18 @@ bool JsScript::load() {
 }
 
 JsValueRef JsScript::getModuleExports() {
+
+	JsContextRef oCtx;
+	JS::JsGetCurrentContext(&oCtx);
+
+	JS::JsSetCurrentContext(this->ctx);
 	auto global = Chakra::GetGlobalObject();
 	auto objectClass = Chakra::GetProperty(global, L"Object");
 	auto keysFunc = Chakra::GetProperty(objectClass, L"keys");
 
 	auto exp = Chakra::GetProperty(global, L"exports");
+	JS::JsSetCurrentContext(oCtx);
+
 	if (exp != JS_INVALID_REFERENCE) {
 		JsValueRef result;
 		JsValueRef args[] = {objectClass, exp};
@@ -93,7 +100,7 @@ JsValueRef JsScript::getModuleExports() {
 		}
 	}
 
-	auto mod = Chakra::GetProperty(Chakra::GetGlobalObject(), L"module");
+	auto mod = Chakra::GetProperty(global, L"module");
 	if (mod != JS_INVALID_REFERENCE) {
 		return Chakra::GetProperty(mod, L"exports");
 	}

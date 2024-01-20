@@ -304,20 +304,25 @@ void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr) {
 	dispatchEvent(newEv);
 
 	for (auto& ev : this->eventListeners) {
-		if (ev.second.size() > 0)
-			for (auto it = ev.second.begin(); it != ev.second.end();) {
-				for (auto& scr : ptr->getScripts()) {
-					if (it->second == scr->getContext()) {
-						JS::JsSetCurrentContext(it->second);
-						unsigned int refCount;
-						JS::JsRelease(it->first, &refCount);
-						ev.second.erase(it);
-					}
-					else {
-						++it;
-					}
+		if (ev.second.size() > 0) {
+			auto it = ev.second.begin();
+			while (it != ev.second.end()) {
+				auto& scr = ptr->getScripts();
+				auto removeIt = std::remove_if(scr.begin(), scr.end(), [&](const auto& script) {
+					return it->second == script->getContext();
+					});
+
+				if (removeIt != scr.end()) {
+					JS::JsSetCurrentContext(it->second);
+					unsigned int refCount;
+					JS::JsRelease(it->first, &refCount);
+					ev.second.erase(it);
+				}
+				else {
+					++it;
 				}
 			}
+		}
 	}
 }
 
