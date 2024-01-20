@@ -720,7 +720,7 @@ void ClickGUI::onRender(Event&) {
 	dc.ctx->SetTransform(oTransform);
 
 	dc.ctx->SetTarget(Latite::getRenderer().getBitmap());
-	dc.ctx->DrawImage(myBitmap);
+	//dc.ctx->DrawImage(myBitmap);
 
 	if (shouldArrow) cursor = Cursor::Arrow;
 }
