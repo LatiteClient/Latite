@@ -14,6 +14,7 @@ public:
 private:
 	void onRenderLevel(Event& ev);
 	void onKeyUpdate(Event& ev);
+	void onClickUpdate(Event& ev);
 	void onCinematicCamera(Event& ev);
 	void onHideHand(Event& ev);
 	void onSensitivity(Event& ev);
@@ -26,6 +27,7 @@ private:
 	ValueType hideHand = BoolValue(true);
 	ValueType dpiAdjust = BoolValue(true);
 
+	float zoomModifier;
 	float activeModifier = 1.f;
 	float modifyTo = 1.f;
 	bool shouldZoom = false;

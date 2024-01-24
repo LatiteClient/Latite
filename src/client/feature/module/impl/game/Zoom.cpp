@@ -14,6 +14,7 @@ Zoom::Zoom() : Module("Zoom", "Zoom", "Zooms like OptiFine", GAME, nokeybind) {
 
 	listen<RenderLevelEvent>((EventListenerFunc)&Zoom::onRenderLevel);
 	listen<KeyUpdateEvent>((EventListenerFunc)&Zoom::onKeyUpdate);
+	listen<ClickEvent>((EventListenerFunc)&Zoom::onClickUpdate);
 	listen<CinematicCameraEvent>((EventListenerFunc)&Zoom::onCinematicCamera);
 	listen<HideHandEvent>((EventListenerFunc)&Zoom::onHideHand);
 	listen<SensitivityEvent>((EventListenerFunc)&Zoom::onSensitivity);
@@ -22,7 +23,7 @@ Zoom::Zoom() : Module("Zoom", "Zoom", "Zooms like OptiFine", GAME, nokeybind) {
 void Zoom::onRenderLevel(Event& evGeneric) {
 	auto& ev = reinterpret_cast<RenderLevelEvent&>(evGeneric);
 
-	modifyTo = shouldZoom ? std::get<FloatValue>(modifier).value : 1.f;
+	modifyTo = shouldZoom ? std::get<FloatValue>(modifier).value + zoomModifier : 1.f;
 
 	// partial ticks
 	float alpha = Latite::getRenderer().getDeltaTime();
@@ -42,6 +43,18 @@ void Zoom::onKeyUpdate(Event& evGeneric) {
 	if (ev.inUI()) return;
 	if (ev.getKey() == std::get<KeyValue>(this->zoomKey)) {
 		this->shouldZoom = ev.isDown();
+	}
+}
+
+void Zoom::onClickUpdate(Event& evGeneric) {
+	auto& ev = reinterpret_cast<ClickEvent&>(evGeneric);
+
+	zoomModifier = std::clamp(static_cast<int>(zoomModifier), 0, 50);
+
+	if (ev.getMouseButton() == 4 /* scroll */ && this->shouldZoom) {
+		// later half of this line clamps scrolling
+		zoomModifier += static_cast<float>(ev.getWheelDelta()) < 0 ? -5 : 5;
+		ev.setCancelled(true);
 	}
 }
 
