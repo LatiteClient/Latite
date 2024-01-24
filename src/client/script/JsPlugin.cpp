@@ -73,11 +73,13 @@ bool JsPlugin::load() {
 }
 
 void JsPlugin::unload() {
-	JS::JsSetCurrentContext(JS_INVALID_REFERENCE);
-	JS::JsDisableRuntimeExecution(runtime);
-	JS::JsCollectGarbage(runtime);
-	JS::JsDisposeRuntime(runtime);
-	runtime = JS_INVALID_RUNTIME_HANDLE;
+	if (runtime != JS_INVALID_RUNTIME_HANDLE) {
+		JS::JsSetCurrentContext(JS_INVALID_REFERENCE);
+		JS::JsDisableRuntimeExecution(runtime);
+		JS::JsCollectGarbage(runtime);
+		JS::JsDisposeRuntime(runtime);
+		runtime = JS_INVALID_RUNTIME_HANDLE;
+	}
 }
 
 void JsPlugin::handleAsyncOperations() {

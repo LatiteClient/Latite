@@ -66,9 +66,13 @@ protected:
 	std::array<bool, 3> activeMouseButtons = {};
 	std::array<bool, 3> justClicked = {};
 
-	std::optional<std::wstring> tooltip;
 	void playClickSound();
+
+	void setTooltip(std::optional<std::wstring> newTooltip);
 private:
+	std::optional<std::wstring> tooltip;
+	std::optional<std::wstring> oldTooltip;
+	std::chrono::system_clock::time_point lastTooltipChange;
 
 	bool closing = false;
 

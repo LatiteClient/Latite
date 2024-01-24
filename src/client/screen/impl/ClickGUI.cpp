@@ -210,7 +210,7 @@ void ClickGUI::onRender(Event&) {
 				dc.ctx->DrawBitmap(Latite::getAssets().hudEditIcon.getBitmap(), hudEditRect);
 
 				if (shouldSelect(hudEditRect, cursorPos)) {
-					tooltip = L"Open the HUD editor";
+					setTooltip(L"Open the HUD editor");
 					if (justClicked[0]) {
 						playClickSound();
 						close();
@@ -227,7 +227,7 @@ void ClickGUI::onRender(Event&) {
 				settingsRect = { right - setSize, hudEditRect.bottom - setSize, right, hudEditRect.bottom };
 
 				if (shouldSelect(settingsRect, cursorPos)) {
-					tooltip = L"Open general client settings";
+					setTooltip(L"Open general client settings");
 					if (justClicked[0]) {
 						playClickSound();
 						this->tab = SETTINGS;
@@ -914,7 +914,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 		dc.drawText(textRect, disp, { 1.f, 1.f, 1.f, 1.f }, FontSelection::SegoeSemilight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		auto desc = util::StrToWStr(set->desc());
 		if (!desc.empty())
-			if (contains || shouldSelect(textRect, cursorPos)) tooltip = desc;
+			if (contains || shouldSelect(textRect, cursorPos)) setTooltip(desc);
 		return checkboxRect.bottom;
 	}
 	break;
@@ -980,9 +980,9 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 		auto disp = util::StrToWStr(set->getDisplayName());
 		dc.drawText(textRect, disp, { 1.f, 1.f, 1.f, 1.f }, FontSelection::SegoeSemilight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		if (!set->desc().empty())
-			if (shouldSelect(textRect, cursorPos)) tooltip = util::StrToWStr(set->desc());
+			if (shouldSelect(textRect, cursorPos)) setTooltip(util::StrToWStr(set->desc()));
 		if (shouldSelect(keyRect, cursorPos)) {
-			tooltip = L"Right click to reset";
+			setTooltip(L"Right click to reset");
 			if (justClicked[0]) {
 				if (!this->activeSetting) activeSetting = set;
 				playClickSound();
@@ -1041,13 +1041,13 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 
 		dc.drawText(textRect, util::StrToWStr(set->getDisplayName()), { 1.f, 1.f, 1.f, 1.f }, FontSelection::SegoeRegular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		if (!set->desc().empty())
-			if (shouldSelect(textRect, cursorPos)) tooltip = util::StrToWStr(set->desc());
+			if (shouldSelect(textRect, cursorPos)) setTooltip(util::StrToWStr(set->desc()));
 
 		if (shouldSelect(enumRect, cursorPos)) {
 			if (set->enumData->getSelectedDesc().size() > 0) {
-				tooltip = util::StrToWStr(set->enumData->getSelectedDesc());
+				setTooltip(util::StrToWStr(set->enumData->getSelectedDesc()));
 			}
-			else tooltip = util::StrToWStr(set->enumData->getSelectedName());
+			else setTooltip(util::StrToWStr(set->enumData->getSelectedName()));
 		}
 
 		if (shouldSelect(enumRect, cursorPos)) {

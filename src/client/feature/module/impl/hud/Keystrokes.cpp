@@ -125,10 +125,13 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 		pos.y += pad;
 		d2d::Rect spaceBox = { 0.f, pos.y, pos.x, pos.y + std::get<FloatValue>(spaceSize) };
 		dc.fillRoundedRectangle(spaceBox, keystrokes[5].col, rad);
+		dc.flush(false);
+
 		if (std::get<BoolValue>(border)) dc.drawRoundedRectangle(spaceBox, std::get<ColorValue>(borderColor).color1, rad, std::get<FloatValue>(borderLength));
 		Vec2 center = spaceBox.center({ 1.f * std::get<FloatValue>(keystrokeSize), 1 });
 		dc.fillRectangle({ center.x, center.y, center.x + (1.f * std::get<FloatValue>(keystrokeSize)), center.y + 1 }, keystrokes[5].textCol);
 		pos.y += spaceBox.getHeight();
+		dc.flush(false);
 	}
 
 	if (std::get<BoolValue>(shiftKey)) {

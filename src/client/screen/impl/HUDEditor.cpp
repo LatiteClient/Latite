@@ -271,6 +271,7 @@ void HUDEditor::renderModule(HUDModule* mod, SDK::MinecraftUIRenderContext* ctx)
 			MCDrawUtil dc{ ctx, Latite::get().getFont() };
 			if (hovering) mod->renderSelected(dc);
 			mod->renderPost(dc);
+			dc.flush();
 		}
 		else {
 			D2DUtil dc;

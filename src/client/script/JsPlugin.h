@@ -53,7 +53,7 @@ private:
 	std::wstring description;
 	std::wstring version;
 
-	JsRuntimeHandle runtime;
+	JsRuntimeHandle runtime = JS_INVALID_RUNTIME_HANDLE;
 
 	std::filesystem::path path;
 	std::wstring relFolderPath;

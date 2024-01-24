@@ -48,6 +48,10 @@ void Screen::playClickSound() {
 	util::PlaySoundUI("random.click");
 }
 
+void Screen::setTooltip(std::optional<std::wstring> newTooltip) {
+	this->tooltip = newTooltip;
+}
+
 void Screen::onClick(Event& evGeneric) {
 	auto& ev = reinterpret_cast<ClickEvent&>(evGeneric);
 	if (ev.getMouseButton() > 0) {
@@ -63,24 +67,39 @@ void Screen::onClick(Event& evGeneric) {
 }
 
 void Screen::onRenderOverlay(Event& ev) {
-	if (this->isActive())
+	if (this->isActive()) {
 		for (size_t i = 0; i < justClicked.size(); i++) {
 			justClicked[i] = this->activeMouseButtons[i];
 			this->activeMouseButtons[i] = false;
 		}
 
+		if (this->tooltip != oldTooltip) {
+			this->lastTooltipChange = std::chrono::system_clock::now();
+			oldTooltip = tooltip;
+		}
+	}
+
+
 	if (isActive() && this->tooltip.has_value()) {
-		D2DUtil dc;
-		Vec2& mousePos = SDK::ClientInstance::get()->cursorPos;
-		d2d::Rect textRect = dc.getTextRect(this->tooltip.value(), Renderer::FontSelection::SegoeRegular, 15.f, 8.f);
-		textRect.setPos(mousePos);
-		auto height = textRect.getHeight() * 0.9f;
-		textRect.top -= height;
-		textRect.bottom -= height;
-		textRect.left += 5.f;
-		textRect.right += 5.f;
-		dc.fillRectangle(textRect, d2d::Color(0.f, 0.f, 0.f, 0.6f));
-		dc.drawText(textRect, this->tooltip.value(), d2d::Color(1.f, 1.f, 1.f, 0.8f), Renderer::FontSelection::SegoeRegular, 15.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		
+
+		auto now = std::chrono::system_clock::now();
+		if (now - lastTooltipChange >= 500ms) {
+			D2DUtil dc;
+			Vec2& mousePos = SDK::ClientInstance::get()->cursorPos;
+			d2d::Rect textRect = dc.getTextRect(this->tooltip.value(), Renderer::FontSelection::SegoeRegular, 15.f, 8.f);
+			textRect.setPos(mousePos);
+			auto height = textRect.getHeight() * 0.9f;
+			textRect.top -= height;
+			textRect.bottom -= height;
+			textRect.left += 5.f;
+			textRect.right += 5.f;
+
+			float rad = height * 0.25f;
+			dc.fillRoundedRectangle(textRect, d2d::Color(0.f, 0.f, 0.f, 0.6f), rad);
+			dc.drawRoundedRectangle(textRect, d2d::Color(0.9f, 0.9f, 0.9f, 1.f), rad, 1.f);
+			dc.drawText(textRect, this->tooltip.value(), d2d::Color(1.f, 1.f, 1.f, 0.8f), Renderer::FontSelection::SegoeRegular, 15.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		}
 	}
 	this->tooltip = std::nullopt;
 }
