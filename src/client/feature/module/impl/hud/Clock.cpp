@@ -3,6 +3,7 @@
 
 Clock::Clock() : TextModule("Clock", "Clock", "Shows the current time.", HUD) {
     addSetting("militaryTime", "24-hour time", "Display the time in 24-hour format.", this->militaryTime);
+    addSetting("showSeconds", "Show seconds", "Display time with seconds", this->showSeconds);
     addSetting("showDate", "Show date", "Display the current date along with the time", this->showDate);
 }
 
@@ -15,10 +16,18 @@ std::string Clock::getTimeString() {
     std::string date;
 
     if (std::get<BoolValue>(this->militaryTime)) {
-        time = std::format("{:02}:{:02}", now.tm_hour, now.tm_min);
+        if (std::get<BoolValue>(this->showSeconds)) {
+            time = std::format("{:02}:{:02}:{:02}", now.tm_hour, now.tm_min, now.tm_sec);
+        } else {
+            time = std::format("{:02}:{:02}", now.tm_hour, now.tm_min);
+        }
     }
     else {
-        time = std::format("{}:{:02} {}", (now.tm_hour + 11) % 12 + 1, now.tm_min, now.tm_hour < 12 ? "AM" : "PM");
+        if (std::get<BoolValue>(this->showSeconds)) {
+            time = std::format("{}:{:02}:{:02} {}", (now.tm_hour + 11) % 12 + 1, now.tm_min, now.tm_sec, now.tm_hour < 12 ? "AM" : "PM");
+        } else {
+            time = std::format("{}:{:02} {}", (now.tm_hour + 11) % 12 + 1, now.tm_min, now.tm_hour < 12 ? "AM" : "PM");
+        }
     }
 
     if (std::get<BoolValue>(this->showDate)) {
