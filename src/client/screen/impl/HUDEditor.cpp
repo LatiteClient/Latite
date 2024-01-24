@@ -53,6 +53,7 @@ void HUDEditor::onRender(Event& ev) {
 
 		for (auto& control : maskRects) {
 			auto bmp = Latite::getRenderer().getCopiedBitmap(control);
+			Latite::getRenderer().getDeviceContext()->Flush();
 
 			dc.ctx->DrawBitmap(bmp);
 
