@@ -41,6 +41,7 @@ class GenericHooks : public HookGroup {
     static void* Level_startLeaveGame(SDK::Level* obj);
     static void* ActorRenderDispatcher_render(void* obj, SDK::BaseActorRenderContext* barc, SDK::Actor* entity, Vec3& pos3, Vec3 const& pos2, void* unk, bool affectedByLighting);
     static void LevelRendererPlayer_renderOutlineSelection(SDK::LevelRendererPlayer* obj, SDK::ScreenContext* scn, void* block, void* region, BlockPos pos);
+    static void* hkRenderGuiItemNew(void* obj, SDK::BaseActorRenderContext* baseActorRenderContext, SDK::ItemStack* itemStack, int mode, float x, float y, float opacity, float scale, float a9, bool ench);
 
 public:
     GenericHooks();

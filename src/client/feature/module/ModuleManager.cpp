@@ -3,7 +3,10 @@
 #include "impl/misc/TestModule.h"
 #include "impl/misc/Screenshot.h"
 #include "impl/misc/DebugInfo.h"
+#include "impl/misc/Nickname.h"
+#include "impl/misc/ItemTweaks.h"
 
+#include "impl/misc/DebugInfo.h"
 #include "impl/game/Zoom.h"
 #include "impl/game/CinematicCamera.h"
 #include "impl/game/ToggleSprintSneak.h"
@@ -69,6 +72,8 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<Hitboxes>());
 	this->items.push_back(std::make_shared<BlockOutline>());
 	this->items.push_back(std::make_shared<MovableScoreboard>());
+	this->items.push_back(std::make_shared<Nickname>());
+	this->items.push_back(std::make_shared<ItemTweaks>());
 
 	for (auto& mod : items) {
 		mod->onInit();

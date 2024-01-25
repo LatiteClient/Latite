@@ -107,6 +107,8 @@ public:
 	int plrOffs = 0;
 
 	void loadConfig(class SettingGroup& resolvedGroup);
+
+	static bool isMainThread() { return std::this_thread::get_id() == gameThreadId; }
 private:
 	bool downloadingAssets = false;
 	std::vector<std::string> latiteUsers;
@@ -116,6 +118,7 @@ private:
 	std::queue<std::function<void(ID2D1DeviceContext* ctx)>> dxRenderQueue;
 
 	Timings timings{};
+	static std::optional<std::thread::id> gameThreadId;
 
 	ValueType commandPrefix = TextValue(L".");
 	ValueType menuKey = KeyValue('M');

@@ -24,6 +24,7 @@ namespace {
 	std::shared_ptr<Hook> Level_startLeaveGameHook;
 	std::shared_ptr<Hook> RenderEntityHook;
 	std::shared_ptr<Hook> OutlineSelectionHook;
+	std::shared_ptr<Hook> RenderGuiItemNewHook;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -252,6 +253,18 @@ void GenericHooks::LevelRendererPlayer_renderOutlineSelection(SDK::LevelRenderer
 	if (!Eventing::get().dispatch(ev)) {
 		OutlineSelectionHook->oFunc<decltype(&LevelRendererPlayer_renderOutlineSelection)>()(obj, scn, block, region, pos);
 	}
+}
+
+void* GenericHooks::hkRenderGuiItemNew(void* obj, SDK::BaseActorRenderContext* baseActorRenderContext, SDK::ItemStack* itemStack, int mode, float x, float y, float opacity, float scale, float a9, bool ench) {
+	auto retAddy = (void*)(Signatures::ItemRenderer_renderGuiItemNew.scan_result + 5); // JMP + jump location
+	if (_ReturnAddress() == retAddy) {
+		RenderGuiItemEvent ev{ itemStack };
+		if (Eventing::get().dispatch(ev)) {
+			// cancelled
+			return nullptr;
+		}
+	}
+	return RenderGuiItemNewHook->oFunc<decltype(&hkRenderGuiItemNew)>()(obj, baseActorRenderContext, itemStack, mode, x, y, opacity, scale, a9, ench);
 }
 
 GenericHooks::GenericHooks() : HookGroup("General") {

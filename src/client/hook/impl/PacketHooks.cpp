@@ -60,6 +60,7 @@ void* PacketHooks::TextPacket_read(SDK::TextPacket* pkt, void* b, void* c) {
     {
         JsContextRef ctx;
         JS::JsGetCurrentContext(&ctx);
+
         if (ctx != 0) { // This is the jankiest way possible to see if its the server or not
 
             PluginManager::Event::Value typ{L"type"};
@@ -117,6 +118,11 @@ void* PacketHooks::TextPacket_read(SDK::TextPacket* pkt, void* b, void* c) {
                 pkt->str.setString("");
                 pkt->source.setString("");
             }
+        }
+        
+        if (Latite::isMainThread()) {
+            ClientTextEvent ev{ pkt };
+            Eventing::get().dispatch(ev);
         }
     }
     return res;

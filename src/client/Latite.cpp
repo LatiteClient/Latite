@@ -461,7 +461,7 @@ void Latite::initialize(HINSTANCE hInst) {
 }
 
 void Latite::threadsafeInit() {
-
+    this->gameThreadId = std::this_thread::get_id();
     // TODO: latite beta only
     //if (SDK::ClientInstance::get()->minecraftGame->xuid.size() > 0) wnd->postXUID();
 

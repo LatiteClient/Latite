@@ -762,6 +762,12 @@
     <ClInclude Include="src\client\feature\module\impl\hud\MovableScoreboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\misc\Nickname.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\event\impl\ClientTextEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1164,6 +1170,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\module\impl\hud\MovableScoreboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\misc\Nickname.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
