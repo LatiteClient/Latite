@@ -4,7 +4,7 @@
 Nickname::Nickname() : Module("Nickname", "Nickname", "Sets your nickname in the chat.", GAME) {
 	addSetting("nick", "Nickname", "Your new nickname.", this->nickname);
 
-    listen<ClientTextEvent>((EventListenerFunc)Nickname::onClientTextPacket);
+    listen<ClientTextEvent>((EventListenerFunc)&Nickname::onClientTextPacket);
 }
 
 void Nickname::onClientTextPacket(Event& evG) {
