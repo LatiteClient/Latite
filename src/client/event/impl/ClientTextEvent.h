@@ -10,6 +10,10 @@ protected:
 	SDK::TextPacket* textPacket;
 public:
 
+	SDK::TextPacket* getTextPacket() {
+		return textPacket;
+	}
+
 	ClientTextEvent(SDK::TextPacket* textPacket)
 		: textPacket(textPacket)
 	{

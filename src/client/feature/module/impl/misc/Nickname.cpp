@@ -7,7 +7,9 @@ Nickname::Nickname() : Module("Nickname", "Nickname", "Sets your nickname in the
     listen<ClientTextEvent>((EventListenerFunc)Nickname::onClientTextPacket);
 }
 
-void Nickname::onClientTextPacket(SDK::TextPacket* textPacket) {
+void Nickname::onClientTextPacket(Event& evG) {
+    auto textPacket = reinterpret_cast<ClientTextEvent&>(evG).getTextPacket();
+
     if (!SDK::ClientInstance::get()->getLocalPlayer()) return;
 
     auto message = textPacket->str.str();

@@ -320,10 +320,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\client\event\impl\AttackEvent.h" />
     <ClInclude Include="src\client\event\impl\ClientTextEvent.h" />
     <ClInclude Include="src\client\event\impl\OutlineSelectionEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderGuiItemEvent.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\MovableScoreboard.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\ReachDisplay.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\ItemTweaks.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\Nickname.h" />
     <ClInclude Include="src\client\feature\module\impl\visual\BlockOutline.h" />
@@ -594,6 +596,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\client\feature\module\impl\hud\MovableScoreboard.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\ReachDisplay.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\ItemTweaks.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\Nickname.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\BlockOutline.cpp" />

@@ -25,6 +25,7 @@ namespace {
 	std::shared_ptr<Hook> RenderEntityHook;
 	std::shared_ptr<Hook> OutlineSelectionHook;
 	std::shared_ptr<Hook> RenderGuiItemNewHook;
+	std::shared_ptr<Hook> AttackHooks;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -267,6 +268,9 @@ void* GenericHooks::hkRenderGuiItemNew(void* obj, SDK::BaseActorRenderContext* b
 	return RenderGuiItemNewHook->oFunc<decltype(&hkRenderGuiItemNew)>()(obj, baseActorRenderContext, itemStack, mode, x, y, opacity, scale, a9, ench);
 }
 
+void GenericHooks::hkAttack(SDK::GameMode* obj, SDK::Actor* entity) {
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
 	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
@@ -308,4 +312,10 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	
 
 	OutlineSelectionHook = addHook(Signatures::LevelRendererPlayer_renderOutlineSelection.result, LevelRendererPlayer_renderOutlineSelection, "LevelRendererPlayer::renderOutlineSelection");
+}
+
+void GenericHooks::initPlayer(SDK::LocalPlayer* plr) {
+	auto vft = *reinterpret_cast<uintptr_t*>(plr);
+
+
 }

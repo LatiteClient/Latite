@@ -7,7 +7,7 @@ public:
 	Nickname();
 	virtual ~Nickname() = default;
 
-	void onClientTextPacket(SDK::TextPacket* textPacket);
+	void onClientTextPacket(Event& evG);
 private:
 	ValueType nickname = TextValue(L"Nickname");
 };
