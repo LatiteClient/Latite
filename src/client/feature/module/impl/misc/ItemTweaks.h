@@ -8,4 +8,7 @@ public:
 	void onItemRender(Event& ev);
 
 	virtual ~ItemTweaks() = default; // TODO: warn when no virtual destructor in virtual class
+
+private:
+	ValueType disableFlyingItemAnimation = BoolValue(false);
 };

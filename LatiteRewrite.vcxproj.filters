@@ -768,6 +768,12 @@
     <ClInclude Include="src\client\event\impl\ClientTextEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\misc\ItemTweaks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\event\impl\RenderGuiItemEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1173,6 +1179,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\module\impl\misc\Nickname.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\misc\ItemTweaks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
