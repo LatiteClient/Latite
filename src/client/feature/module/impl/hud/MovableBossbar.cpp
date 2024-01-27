@@ -7,6 +7,7 @@
 
 
 MovableBossbar::MovableBossbar() : HUDModule("MovableBossbar", "Movable Bossbar", "Be able to the bossbar!", HUD) {
+	listen<RenderLayerEvent>((EventListenerFunc)&MovableBossbar::onRenderLayer, true, 10 /*need to overpower the hud renderer*/);
 }
 
 void MovableBossbar::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
