@@ -15,16 +15,11 @@ void Nickname::onClientTextPacket(Event& evG) {
     auto message = textPacket->str.str();
     auto source = textPacket->source.str();
 
-    auto replaceAll = [](std::string& s, std::string x, std::string y) {
-        size_t pos = 0;
-        while (pos += y.length()) {
-            pos = s.find(x, pos);
-            if (pos == std::string::npos) {
-                break;
-            }
-
-            s.replace(pos, x.length(), y);
-        }
+    auto replaceAll = [](std::string& s, std::string from, std::string to) {
+        if (!from.empty())
+            for (size_t pos = 0; (pos = s.find(from, pos)) != std::string::npos; pos += to.size())
+                s.replace(pos, from.size(), to);
+        return s;
     };
 
     std::string newName = util::WStrToStr(std::get<TextValue>(this->nickname).str);

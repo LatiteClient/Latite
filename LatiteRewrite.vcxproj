@@ -324,6 +324,7 @@
     <ClInclude Include="src\client\event\impl\ClientTextEvent.h" />
     <ClInclude Include="src\client\event\impl\OutlineSelectionEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderGuiItemEvent.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\MovableBossbar.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\MovableScoreboard.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\ReachDisplay.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\ItemTweaks.h" />
@@ -434,6 +435,7 @@
     <ClInclude Include="src\client\hook\Hooks.h" />
     <ClInclude Include="src\client\hook\impl\AppPlatformHooks.h" />
     <ClInclude Include="src\client\hook\impl\DXHooks.h" />
+    <ClInclude Include="src\client\hook\impl\PlayerHooks.h" />
     <ClInclude Include="src\client\hook\impl\GeneralHooks.h" />
     <ClInclude Include="src\client\hook\impl\LevelRendererHooks.h" />
     <ClInclude Include="src\client\hook\impl\MinecraftGameHooks.h" />
@@ -595,6 +597,7 @@
     <Text Include="src\util\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\client\feature\module\impl\hud\MovableBossbar.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\MovableScoreboard.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\ReachDisplay.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\ItemTweaks.cpp" />
@@ -658,6 +661,7 @@
     <ClCompile Include="src\client\hook\impl\MinecraftGameHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\OptionHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\PacketHooks.cpp" />
+    <ClCompile Include="src\client\hook\impl\PlayerHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\RenderControllerHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\ScreenViewHooks.cpp" />
     <ClCompile Include="src\client\input\Keyboard.cpp" />

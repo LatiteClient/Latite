@@ -1,5 +1,5 @@
 #pragma once
-#include "../Hooks.h"
+#include "../Hook.h"
 #include "sdk/common/network/packet/SetTitlePacket.h"
 #include "sdk/common/network/packet/TextPacket.h"
 

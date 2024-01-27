@@ -97,6 +97,14 @@ struct AABB final {
 		this->lower = newV - diff;
 		this->higher = newV + diff;
 	}
+
+	Vec3 closestPoint(Vec3 const& to) {
+		return {
+			std::clamp(to.x, lower.x, higher.x),
+			std::clamp(to.y, lower.y, higher.y),
+			std::clamp(to.z, lower.z, higher.z),
+		};
+	}
 };
 
 struct Color {

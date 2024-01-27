@@ -1,5 +1,5 @@
 #pragma once
-#include "../Hooks.h"
+#include "../Hook.h"
 #include "util/Util.h"
 
 class RenderControllerHooks : public HookGroup {

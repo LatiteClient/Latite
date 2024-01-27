@@ -9,6 +9,10 @@ private:
 	SDK::Actor* entity;
 public:
 
+	SDK::Actor* getActor() {
+		return entity;
+	}
+
 	AttackEvent(SDK::Actor* entity)
 		: entity(entity)
 	{

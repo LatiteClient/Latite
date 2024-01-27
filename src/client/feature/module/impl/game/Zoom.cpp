@@ -22,8 +22,10 @@ Zoom::Zoom() : Module("Zoom", "Zoom", "Zooms like OptiFine", GAME, nokeybind) {
 
 void Zoom::onRenderLevel(Event& evGeneric) {
 	auto& ev = reinterpret_cast<RenderLevelEvent&>(evGeneric);
+	if (!shouldZoom)
+		zoomModifier = 0.f;
 
-	modifyTo = shouldZoom ? std::get<FloatValue>(modifier).value + zoomModifier : 1.f;
+	modifyTo = std::clamp(shouldZoom ? std::get<FloatValue>(modifier).value + zoomModifier : 1.f, 1.f, 60.f);
 
 	// partial ticks
 	float alpha = Latite::getRenderer().getDeltaTime();
@@ -49,11 +51,9 @@ void Zoom::onKeyUpdate(Event& evGeneric) {
 void Zoom::onClickUpdate(Event& evGeneric) {
 	auto& ev = reinterpret_cast<ClickEvent&>(evGeneric);
 
-	zoomModifier = std::clamp(static_cast<int>(zoomModifier), 0, 50);
-
 	if (ev.getMouseButton() == 4 /* scroll */ && this->shouldZoom) {
 		// later half of this line clamps scrolling
-		zoomModifier += static_cast<float>(ev.getWheelDelta()) < 0 ? -5 : 5;
+		zoomModifier += static_cast<float>(ev.getWheelDelta()) < 0 ? -1 : 1;
 		ev.setCancelled(true);
 	}
 }

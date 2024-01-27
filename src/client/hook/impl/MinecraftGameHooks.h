@@ -1,5 +1,5 @@
 #pragma once
-#include "../Hooks.h"
+#include "../Hook.h"
 #include "sdk/common/client/game/MinecraftGame.h"
 
 class MinecraftGameHooks : public HookGroup {

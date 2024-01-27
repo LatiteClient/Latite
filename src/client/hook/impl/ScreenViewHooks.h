@@ -1,5 +1,5 @@
 #pragma once
-#include "../Hooks.h"
+#include "../Hook.h"
 #include "sdk/common/client/gui/ScreenView.h"
 
 class ScreenViewHooks : public HookGroup {

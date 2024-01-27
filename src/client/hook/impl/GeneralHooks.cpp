@@ -5,6 +5,8 @@
 #include "client/feature/command/commandmanager.h"
 #include "client/event/Eventing.h"
 #include "client/script/PluginManager.h"
+#include "../Hooks.h"
+#include "PlayerHooks.h"
 
 namespace {
 	std::shared_ptr<Hook> Level_tickHook;
@@ -25,7 +27,6 @@ namespace {
 	std::shared_ptr<Hook> RenderEntityHook;
 	std::shared_ptr<Hook> OutlineSelectionHook;
 	std::shared_ptr<Hook> RenderGuiItemNewHook;
-	std::shared_ptr<Hook> AttackHooks;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -35,6 +36,13 @@ void GenericHooks::Level_tick(SDK::Level* level) {
 		TickEvent ev(level);
 		Latite::getEventing().dispatch(ev);
 		Latite::getClientMessageSink().doPrint(100);
+
+		auto lp = SDK::ClientInstance::get()->getLocalPlayer();
+		static bool playerInitialized = false;
+		if (!playerInitialized && lp) {
+			Latite::getHooks().get<PlayerHooks>().init(lp);
+			playerInitialized = true;
+		}
 	}
 	
 	PluginManager::Event sEv{L"world-tick", {}, false};
@@ -268,9 +276,6 @@ void* GenericHooks::hkRenderGuiItemNew(void* obj, SDK::BaseActorRenderContext* b
 	return RenderGuiItemNewHook->oFunc<decltype(&hkRenderGuiItemNew)>()(obj, baseActorRenderContext, itemStack, mode, x, y, opacity, scale, a9, ench);
 }
 
-void GenericHooks::hkAttack(SDK::GameMode* obj, SDK::Actor* entity) {
-}
-
 GenericHooks::GenericHooks() : HookGroup("General") {
 	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
 	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
@@ -312,10 +317,7 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	
 
 	OutlineSelectionHook = addHook(Signatures::LevelRendererPlayer_renderOutlineSelection.result, LevelRendererPlayer_renderOutlineSelection, "LevelRendererPlayer::renderOutlineSelection");
+
+	RenderGuiItemNewHook = addHook(Signatures::ItemRenderer_renderGuiItemNew.result, hkRenderGuiItemNew, "ItemRenderer::renderGuiItemNew");
 }
 
-void GenericHooks::initPlayer(SDK::LocalPlayer* plr) {
-	auto vft = *reinterpret_cast<uintptr_t*>(plr);
-
-
-}

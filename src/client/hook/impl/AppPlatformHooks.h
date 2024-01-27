@@ -1,5 +1,5 @@
 #pragma once
-#include "../Hooks.h"
+#include "../Hook.h"
 #include "sdk/deps/Application/AppPlatform.h"
 
 class AppPlatformHooks : public HookGroup {

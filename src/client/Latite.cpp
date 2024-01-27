@@ -219,7 +219,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (commandMgrBuf) CommandManager;
     new (mainSettingGroup) SettingGroup("global");
     new (configMgrBuf) ConfigManager();
-    new (hooks) LatiteHooks();
+
     new (scnMgrBuf) ScreenManager(); // needs to be before renderer
     new (scriptMgrBuf) PluginManager();
     new (rendererBuf) Renderer();
@@ -243,6 +243,10 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 #if LATITE_DEBUG
     Logger::Info("Resolved {} signatures ({} dead)", sigCount, deadCount);
 #endif
+
+    MH_Initialize();
+    new (hooks) LatiteHooks();
+
     new (keyboardBuf) Keyboard(reinterpret_cast<int*>(Signatures::KeyMap.result));
 
     Logger::Info(XOR_STRING("Waiting for user"));
@@ -446,7 +450,6 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getEventing().listen<RenderLayerEvent>(this, (EventListenerFunc)&Latite::onRenderLayer, 2);
     Latite::getEventing().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Latite::onRenderOverlay, 2);
 
-    getHooks().init();
     Logger::Info(XOR_STRING("Initialized Hooks"));
     getHooks().enable();
     Logger::Info(XOR_STRING("Enabled Hooks"));

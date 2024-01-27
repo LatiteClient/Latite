@@ -35,6 +35,8 @@
 #include "impl/hud/ArmorHUD.h"
 #include "impl/hud/MovablePaperdoll.h"
 #include "impl/hud/MovableScoreboard.h"
+#include "impl/hud/ReachDisplay.h"
+#include "impl/hud/MovableBossbar.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
 
@@ -74,6 +76,8 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<MovableScoreboard>());
 	this->items.push_back(std::make_shared<Nickname>());
 	this->items.push_back(std::make_shared<ItemTweaks>());
+	//this->items.push_back(std::make_shared<ReachDisplay>());
+	this->items.push_back(std::make_shared<MovableBossbar>());
 
 	for (auto& mod : items) {
 		mod->onInit();

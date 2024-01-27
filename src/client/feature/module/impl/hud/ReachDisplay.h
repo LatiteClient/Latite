@@ -10,5 +10,7 @@ public:
 	void onAttack(Event& ev);
 private:
 	float reach = 0.f;
+	ValueType decimals = FloatValue(3.f);
+
 	std::chrono::system_clock::time_point lastAttack{};
 };

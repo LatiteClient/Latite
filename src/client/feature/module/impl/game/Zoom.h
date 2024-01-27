@@ -27,7 +27,7 @@ private:
 	ValueType hideHand = BoolValue(true);
 	ValueType dpiAdjust = BoolValue(true);
 
-	float zoomModifier;
+	float zoomModifier = 0.f;
 	float activeModifier = 1.f;
 	float modifyTo = 1.f;
 	bool shouldZoom = false;

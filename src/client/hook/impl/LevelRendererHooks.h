@@ -1,5 +1,5 @@
 #pragma once
-#include "../Hooks.h"
+#include "../Hook.h"
 #include "sdk/common/client/renderer/game/LevelRenderer.h"
 
 class LevelRendererHooks : public HookGroup {

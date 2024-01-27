@@ -15,22 +15,6 @@
 
 using namespace std::chrono_literals;
 
-void LatiteHooks::init() {
-	MH_Initialize();
-
-	this->mutex.lock();
-	this->items.push_back(std::make_shared<DXHooks>());
-	this->items.push_back(std::make_shared<GenericHooks>());
-	this->items.push_back(std::make_shared<LevelRendererHooks>());
-	this->items.push_back(std::make_shared<OptionHooks>());
-	this->items.push_back(std::make_shared<AppPlatformHooks>());
-	this->items.push_back(std::make_shared<MinecraftGameHooks>());
-	this->items.push_back(std::make_shared<RenderControllerHooks>());
-	this->items.push_back(std::make_shared<ScreenViewHooks>());
-	this->items.push_back(std::make_shared<PacketHooks>());
-	this->mutex.unlock();
-}
-
 void LatiteHooks::uninit() {
 	MH_Uninitialize();
 }

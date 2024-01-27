@@ -2,6 +2,7 @@
 #include "impl/AfterEntityRenderEvent.h"
 #include "impl/AfterMoveEvent.h"
 #include "impl/AppSuspendedEvent.h"
+#include "impl/AttackEvent.h"
 #include "impl/AveragePingEvent.h"
 #include "impl/BeforeMoveEvent.h"
 #include "impl/BobMovementEvent.h"

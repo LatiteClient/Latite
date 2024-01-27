@@ -118,7 +118,7 @@ private:
 	std::queue<std::function<void(ID2D1DeviceContext* ctx)>> dxRenderQueue;
 
 	Timings timings{};
-	static std::optional<std::thread::id> gameThreadId;
+	inline static std::optional<std::thread::id> gameThreadId;
 
 	ValueType commandPrefix = TextValue(L".");
 	ValueType menuKey = KeyValue('M');
