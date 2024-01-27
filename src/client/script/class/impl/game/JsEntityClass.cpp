@@ -98,7 +98,7 @@ JsValueRef JsEntityClass::entityIsPlayer(JsValueRef callee, bool isConstructor, 
 JsValueRef JsEntityClass::entityAttack(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
-	if (ent && ent->validate()) {
+	if (ent && ent->validate() && ent->getEntity() != SDK::ClientInstance::get()->getLocalPlayer()) {
 		auto actor = ent->getEntity();
 		SDK::ClientInstance::get()->getLocalPlayer()->swing();
 		SDK::ClientInstance::get()->getLocalPlayer()->gameMode->attack(actor);
