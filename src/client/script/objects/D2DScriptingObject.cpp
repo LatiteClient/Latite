@@ -13,6 +13,10 @@ void D2DScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(object, drawTextCallback, L"drawText", this);
 	Chakra::DefineFunc(object, drawTextFullCallback, L"drawTextFull", this);
 	Chakra::DefineFunc(object, drawImageCallback, L"drawTexture", this);
+
+	Chakra::DefineFunc(object, getTextSize, L"getTextSize", this);
+	Chakra::DefineFunc(object, setClippingRect, L"setClipRect", this);
+	Chakra::DefineFunc(object, restoreClippingRect, L"restoreClipRect", this);
 }
 
 void D2DScriptingObject::onRenderOverlay(Event& ev) {
@@ -186,6 +190,79 @@ JsValueRef D2DScriptingObject::drawImageCallback(JsValueRef callee, bool isConst
 	return Chakra::GetUndefined();
 }
 
+JsValueRef D2DScriptingObject::getTextSize(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 4, true)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsString }, { arguments[2], JsNumber }, { arguments[3], JsNumber } })) return JS_INVALID_REFERENCE;
+
+	auto txt = Chakra::GetString(arguments[1]);
+	auto size = Chakra::GetNumber(arguments[2]);
+	auto obj = reinterpret_cast<D2DScriptingObject*>(callbackState);
+
+	Vec2 ts;
+	if (obj->usingMinecraftRend()) {
+		MCDrawUtil dc{ obj->cachedCtx, Latite::get().getFont() };
+		ts = dc.getTextSize(txt, Renderer::FontSelection::SegoeRegular, static_cast<float>(size));
+	}
+	else {
+		D2DUtil dc{};
+		ts = dc.getTextSize(txt, Renderer::FontSelection::SegoeRegular, size, true, false);
+	}
+	
+	return JsScript::getThis()->getClass<JsVec2>()->construct(ts);
+}
+
+JsValueRef D2DScriptingObject::setClippingRect(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
+	if (!Chakra::VerifyParameters({ {arguments[1], JsObject} })) return JS_INVALID_REFERENCE;
+
+	auto rc = JsRect::ToRect(arguments[1]);
+	auto thi = reinterpret_cast<D2DScriptingObject*>(callbackState);
+
+	if (thi->usingMinecraftRend()) {
+		auto guiScale = SDK::ClientInstance::get()->getGuiData()->guiScale;
+		SDK::RectangleArea rec = { rc.left / guiScale, rc.top / guiScale, rc.right / guiScale, rc.bottom / guiScale };
+		thi->cachedCtx->saveCurrentClippingRectangle();
+		thi->cachedCtx->setClippingRectangle(rec);
+		return Chakra::GetUndefined();
+	}
+
+	thi->operations.push({ thi->matrix, OpClip{true, rc} });
+	return Chakra::GetUndefined();
+}
+
+JsValueRef D2DScriptingObject::restoreClippingRect(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	auto thi = reinterpret_cast<D2DScriptingObject*>(callbackState);
+
+	if (thi->usingMinecraftRend()) {
+		auto guiScale = SDK::ClientInstance::get()->getGuiData()->guiScale;
+		thi->cachedCtx->restoreSavedClippingRectangle();
+		return Chakra::GetUndefined();
+	}
+
+	thi->operations.push({ thi->matrix, OpClip{false, {}} });
+	return Chakra::GetUndefined();
+}
+
+JsValueRef D2DScriptingObject::drawTriangle(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	return Chakra::GetUndefined();
+}
+
+JsValueRef D2DScriptingObject::fillTriangle(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	return JsValueRef();
+}
+
+JsValueRef D2DScriptingObject::drawCircle(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	return JsValueRef();
+}
+
+JsValueRef D2DScriptingObject::fillCircle(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	return JsValueRef();
+}
+
+JsValueRef D2DScriptingObject::drawLine(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	return JsValueRef();
+}
+
 void D2DScriptingObject::DrawVisitor::operator()(OpDrawRect& op) {
 	D2DUtil dc;
 	dc.drawRectangle(op.rc, op.col, op.thickness);
@@ -206,4 +283,14 @@ void D2DScriptingObject::DrawVisitor::operator()(OpDrawImage& op) {
 	D2DUtil dc;
 	//dc.drawText(op.rect, op.text, op.col, op.font, op.size, op.alignment, op.vertAlign);
 	dc.ctx->DrawBitmap(op.texture->getBitmap(), { op.pos.x, op.pos.y, op.pos.x + op.sx, op.pos.y + op.sy });
+}
+
+void D2DScriptingObject::DrawVisitor::operator()(OpClip& op) {
+	D2DUtil dc;
+	if (op.pushOrPop) {
+		dc.ctx->PushAxisAlignedClip(op.rect, D2D1_ANTIALIAS_MODE_ALIASED);
+	}
+	else {
+		dc.ctx->PopAxisAlignedClip();
+	}
 }

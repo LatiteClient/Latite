@@ -56,6 +56,11 @@ public:
 		}
 	};
 
+	struct OpClip {
+		bool pushOrPop;
+		d2d::Rect rect;
+	};
+
 	struct OpDrawImage {
 		JsTexture* texture;
 		Vec2 pos;
@@ -70,7 +75,7 @@ public:
 		};
 
 		D2D1::Matrix3x2F matrix;
-		std::variant<OpDrawRect, OpFillRect, OpDrawText, OpDrawImage> op;
+		std::variant<OpDrawRect, OpFillRect, OpDrawText, OpDrawImage, OpClip> op;
 	};
 
 	struct DrawVisitor {
@@ -78,6 +83,7 @@ public:
 		void operator()(OpFillRect& op);
 		void operator()(OpDrawText& op);
 		void operator()(OpDrawImage& op);
+		void operator()(OpClip& op);
 	};
 
 	std::queue<DrawOperation> operations = {};
@@ -113,5 +119,25 @@ private:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK drawImageCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	
+	static JsValueRef CALLBACK getTextSize(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+
+	static JsValueRef CALLBACK setClippingRect(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK restoreClippingRect(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+
+	static JsValueRef CALLBACK drawTriangle(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK fillTriangle(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK drawCircle(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK fillCircle(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK drawLine(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	
 	std::shared_mutex mutex;
 };

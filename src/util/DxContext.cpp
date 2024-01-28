@@ -454,7 +454,7 @@ void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color 
 }
 
 Vec2 MCDrawUtil::getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace, bool cache, std::optional<Vec2> bounds) {
-	return { this->font->getLineLength(util::WStrToStr(text), (size * guiScale) / this->font->getLineHeight(), trailingWhitespace) / guiScale, this->font->getLineHeight() * size * guiScale};
+	return { this->font->getLineLength(util::WStrToStr(text), (size * guiScale) / this->font->getLineHeight(), false) / guiScale, this->font->getLineHeight() * size * guiScale};
 }
 
 DrawUtil::RectF MCDrawUtil::getTextRect(std::wstring const& text, Renderer::FontSelection font, float size, float pad, bool cache) {
