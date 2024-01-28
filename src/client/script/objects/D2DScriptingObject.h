@@ -97,7 +97,7 @@ public:
 	[[nodiscard]] D2D1::Matrix3x2F getMatrix() { return matrix; }
 	void setMatrix(D2D1::Matrix3x2F const& matr) { matrix = matr; }
 private:
-	bool mcRend = false;
+	bool mcRend = true;
 	D2D1::Matrix3x2F matrix;
 	SDK::MinecraftUIRenderContext* cachedCtx = nullptr;
 

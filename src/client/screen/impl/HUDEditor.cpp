@@ -55,6 +55,7 @@ void HUDEditor::onRender(Event& ev) {
 			auto bmp = Latite::getRenderer().getCopiedBitmap(control);
 
 			dc.ctx->DrawBitmap(bmp);
+			Latite::getRenderer().getDeviceContext()->Flush();
 
 			bmp->Release();
 		}

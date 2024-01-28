@@ -90,9 +90,10 @@ void PluginManager::popScript(std::shared_ptr<JsPlugin> ptr)
 
 void PluginManager::reportError(JsValueRef except, std::wstring filePath) {
 	auto str = util::WStrToStr(Chakra::ToString(except));
+	auto stack = Chakra::GetStringProperty(except, L"stack");
 
 	std::stringstream ss;
-	ss << "&c" << util::WStrToStr(filePath) << ": " << str;
+	ss << "&c" << util::WStrToStr(stack);
 
 	Latite::getClientMessageSink().display(util::Format(ss.str()));
 	// not sure if you release the exception or not, will do it anyway
