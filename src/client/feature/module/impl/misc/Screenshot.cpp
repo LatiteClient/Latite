@@ -82,7 +82,7 @@ winrt::Windows::Foundation::IAsyncAction Screenshot::takeScreenshot(std::filesys
     ComPtr<ID2D1Bitmap1> bmp = Latite::getRenderer().getCopiedBitmap();
 
     auto ctx = Latite::getRenderer().getDeviceContext();
-    //ctx->Flush();// MC won't let me flush (???)s
+    ctx->Flush();// MC won't let me flush (???)s
 
     IRandomAccessStream raStream = file.OpenAsync(FileAccessMode::ReadWrite).get();
     ComPtr<IStream> stream;

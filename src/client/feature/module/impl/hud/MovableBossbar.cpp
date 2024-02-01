@@ -6,7 +6,7 @@
 #include <sdk/common/client/gui/controls/UIControl.h>
 
 
-MovableBossbar::MovableBossbar() : HUDModule("MovableBossbar", "Movable Bossbar", "Be able to the bossbar!", HUD) {
+MovableBossbar::MovableBossbar() : HUDModule("MovableBossbar", "Movable Bossbar", "Be able to the bossbar!", HUD, 0, false) {
 	listen<RenderLayerEvent>((EventListenerFunc)&MovableBossbar::onRenderLayer, true, 10 /*need to overpower the hud renderer*/);
 }
 
