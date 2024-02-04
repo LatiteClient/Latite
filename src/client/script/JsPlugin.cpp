@@ -164,6 +164,8 @@ std::shared_ptr<JsScript> JsPlugin::loadOrFindModule(std::wstring name) {
 
 	auto scr = std::make_shared<JsScript>(this, path, name);
 	scr->load();
+	this->scripts.push_back(scr);
+
 	JsValueRef global;
 	JS::JsGetGlobalObject(&global); // this doesn't add a reference that needs to be freed
 
@@ -188,7 +190,6 @@ std::shared_ptr<JsScript> JsPlugin::loadOrFindModule(std::wstring name) {
 		}
 		return nullptr;
 	}
-	this->scripts.push_back(scr);
 	return scr;
 }
 

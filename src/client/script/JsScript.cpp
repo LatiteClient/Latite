@@ -313,7 +313,7 @@ namespace {
 			wPath += L".js";
 		}
 
-		auto path = thi->getPlugin()->getPath() / wPath;
+		auto path = thi->getFolderPath() / wPath;
 
 		if (!std::filesystem::exists(path) || std::filesystem::is_directory(path)) {
 			Chakra::ThrowError(L"Invalid filepath '" + path.wstring() + L"'");
