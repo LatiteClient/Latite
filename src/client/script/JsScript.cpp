@@ -320,7 +320,7 @@ namespace {
 			return undef;
 		}
 
-		auto mod = thi->getPlugin()->loadOrFindModule(wPath);
+		auto mod = thi->getPlugin()->loadOrFindModule(thi, wPath);
 		if (!mod) {
 			Chakra::ThrowError(L"Unable to load module " + wPath);
 			return Chakra::GetUndefined();

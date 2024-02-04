@@ -150,12 +150,14 @@ std::shared_ptr<JsScript> JsPlugin::loadAndRunScript(std::wstring relPath) {
 	return scr;
 }
 
-std::shared_ptr<JsScript> JsPlugin::loadOrFindModule(std::wstring name) {
-	auto path = JsScript::getThis()->getFolderPath() / name;
+std::shared_ptr<JsScript> JsPlugin::loadOrFindModule(JsScript* script, std::wstring name) {
+	auto path = script->getFolderPath() / name;
 	if (std::filesystem::exists(name)) path = name;
 
 	for (auto& scr : this->scripts) {
-		if (scr->getPath() == path) {
+		auto absolutepath = std::filesystem::absolute(scr->getPath());
+		auto absolutepath2 = std::filesystem::absolute(path);
+		if (absolutepath == absolutepath2) {
 			Logger::Info("Already found module {}", util::WStrToStr(name));
 			return scr;
 		}

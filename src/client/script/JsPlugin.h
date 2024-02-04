@@ -34,7 +34,7 @@ public:
 	bool fetchPluginData();
 
 	std::shared_ptr<JsScript> loadAndRunScript(std::wstring relPath);
-	std::shared_ptr<JsScript> loadOrFindModule(std::wstring name);
+	std::shared_ptr<JsScript> loadOrFindModule(JsScript* script, std::wstring name);
 
 	[[nodiscard]] std::wstring getCertificate();
 	[[nodiscard]] static std::optional<std::wstring> getHash(std::filesystem::path const& main);
