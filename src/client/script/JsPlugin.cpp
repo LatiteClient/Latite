@@ -151,7 +151,7 @@ std::shared_ptr<JsScript> JsPlugin::loadAndRunScript(std::wstring relPath) {
 }
 
 std::shared_ptr<JsScript> JsPlugin::loadOrFindModule(std::wstring name) {
-	auto path = getPath() / name;
+	auto path = JsScript::getThis()->getFolderPath() / name;
 	if (std::filesystem::exists(name)) path = name;
 
 	for (auto& scr : this->scripts) {

@@ -37,7 +37,7 @@ void Screenshot::onKey(Event& evG) {
         queueToScreenshot = true;
         screenshotPath = util::GetLatitePath() / "Screenshots";
         std::filesystem::create_directory(screenshotPath);
-        shouldSleep = true;
+        //shouldSleep = true;
 	}
 }
 
@@ -79,7 +79,7 @@ winrt::Windows::Foundation::IAsyncAction Screenshot::takeScreenshot(std::filesys
     // file
     auto folder = co_await StorageFolder::GetFolderFromPathAsync(path.wstring());
     auto file = co_await folder.CreateFileAsync(L"screenshot.png", CreationCollisionOption::OpenIfExists);
-    ComPtr<ID2D1Bitmap1> bmp = Latite::getRenderer().getCopiedBitmap();
+    ComPtr<ID2D1Bitmap1> bmp = Latite::getRenderer().copyCurrentBitmap();
 
     auto ctx = Latite::getRenderer().getDeviceContext();
     ctx->Flush();// MC won't let me flush (???)s
@@ -151,6 +151,6 @@ winrt::Windows::Foundation::IAsyncAction Screenshot::takeScreenshot(std::filesys
         stream->Commit(STGC_DEFAULT)
     );
 
-    savedBitmap = std::move(bmp);
+    //savedBitmap = std::move(bmp);
     co_return;
 }
