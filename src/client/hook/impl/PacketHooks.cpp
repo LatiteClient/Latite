@@ -57,7 +57,7 @@ void* PacketHooks::SetTitlePacket_readExtended(SDK::SetTitlePacket* pkt, void* b
 
 void* PacketHooks::TextPacket_read(SDK::TextPacket* pkt, void* b, void* c) {
     auto res = TextPacketRead->oFunc<decltype(&TextPacket_read)>()(pkt, b, c);
-    {
+    if (PluginManager::scriptingSupported()) {
         JsContextRef ctx;
         JS::JsGetCurrentContext(&ctx);
 
@@ -119,12 +119,13 @@ void* PacketHooks::TextPacket_read(SDK::TextPacket* pkt, void* b, void* c) {
                 pkt->source.setString("");
             }
         }
-        
-        if (Latite::isMainThread()) {
-            ClientTextEvent ev{ pkt };
-            Eventing::get().dispatch(ev);
-        }
     }
+
+    if (Latite::isMainThread()) {
+        ClientTextEvent ev{ pkt };
+        Eventing::get().dispatch(ev);
+    }
+
     return res;
 }
 

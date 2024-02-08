@@ -360,8 +360,7 @@ void PluginManager::uninitialize() {
 	}
 }
 
-bool PluginManager::dispatchEvent(Event& ev)
-{
+bool PluginManager::dispatchEvent(Event& ev) {
 	for (auto& lis : eventListeners) {
 		if (lis.first == ev.type) {
 			for (auto& l : lis.second) {

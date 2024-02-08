@@ -155,7 +155,7 @@ JsErrorCode JsScript::runScript() {
 	try {
 		 code = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(this->path.wstring())), this->path.wstring().c_str(), nullptr);
 	}
-	catch (std::exception& e) {
+	catch (...) {
 		//Latite::getClientMessageSink().push("Exception while loading script " + path.string() + ": " + e.what());
 	}
 	return code;
