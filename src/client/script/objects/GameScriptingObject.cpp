@@ -164,7 +164,8 @@ JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConst
 
 	JsPlugin* script = JsScript::getThis()->getPlugin();
 	
-	if (Latite::getPluginManager().hasPermission(script, PluginManager::Permission::SendChat)) {
+	if (Latite::getPluginManager().hasPermission(script, PluginManager::Permission::SendChat)
+		&& Chakra::GetString(arguments[1]).size() < 250) {
 		auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 		if (lp) {
 			SDK::TextPacket tp{};
@@ -183,6 +184,11 @@ JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConst
 JsValueRef GameScriptingObject::executeCommand(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
 	if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsString} })) return JS_INVALID_REFERENCE;
+	auto str = util::WStrToStr(Chakra::GetString(arguments[1]));
+
+	if (str.size() > 250 || str.size() < 1 || str.at(0) != '/')
+		return Chakra::GetUndefined();
+
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (lp) {
 		auto str = util::WStrToStr(Chakra::GetString(arguments[1]));

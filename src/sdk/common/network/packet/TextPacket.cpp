@@ -8,6 +8,9 @@
 
 SDK::TextPacket::TextPacket() {
 	*reinterpret_cast<uintptr_t*>(this) = Signatures::Vtable::TextPacket.result;
+
+	memset(pad, 0x0, sizeof(pad));
+	memset(pad2, 0, sizeof(pad2));
 }
 
 void SDK::TextPacket::chat(String const& message) {

@@ -119,7 +119,7 @@ void PluginManager::handleErrors(JsErrorCode code) {
 bool PluginManager::loadPrerunScripts()
 {
 	if (!scriptingSupported()) {
-		Logger::Warn("Scripting is not supported");
+		Logger::Warn("Scripting is not supported. Please try restarting your game.");
 		return false;
 	}
 

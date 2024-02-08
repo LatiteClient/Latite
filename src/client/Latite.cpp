@@ -637,7 +637,7 @@ void Latite::queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callb
 }
 
 void Latite::initAsset(int resource, std::wstring const& filename) {
-#ifndef LATITE_PUBLIC
+#ifdef DEBUG
     Logger::Info("Getting asset: {} ({})", util::WStrToStr(filename), resource);
 #endif
 

@@ -29,7 +29,10 @@ namespace SDK {
 		alignas(8) bool translationNeeded = false;
 		String xboxUserId, platformChatId;
 		// theres probably more stuff
+	private:
+		[[maybe_unused]] char pad2[100];
 
+	public:
 		TextPacket();
 
 		void chat(String const& message);
