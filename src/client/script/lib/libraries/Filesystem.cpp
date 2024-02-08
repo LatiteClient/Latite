@@ -236,7 +236,7 @@ JsValueRef Filesystem::appendSync(JsValueRef callee, bool isConstructor, JsValue
 		JS::JsGetTypedArrayStorage(arguments[2], &buf, &bufSize, nullptr, nullptr);
 
 		for (size_t i = 0; i < bufSize; i++) {
-			ofs << (char)buf[bufSize];
+			ofs << (char)buf[i];
 		}
 	}
 	ofs.close();
