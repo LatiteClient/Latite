@@ -134,7 +134,7 @@ JsValueRef Filesystem::writeSync(JsValueRef callee, bool isConstructor, JsValueR
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 
 	std::wofstream ofs;
-	ofs.open(thi->getPath(Chakra::GetString(arguments[1])));
+	ofs.open(thi->getPath(Chakra::GetString(arguments[1])), std::ios::binary | std::ios::out);
 	if (ofs.fail()) {
 		throwFsError();
 		return undef;
@@ -225,7 +225,7 @@ JsValueRef Filesystem::appendSync(JsValueRef callee, bool isConstructor, JsValue
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 
 	std::wofstream ofs;
-	ofs.open(thi->getPath(Chakra::GetString(arguments[1])), std::ios::app);
+	ofs.open(thi->getPath(Chakra::GetString(arguments[1])), std::ios::app | std::ios::binary);
 	if (ofs.fail()) {
 		throwFsError();
 		return undef;
