@@ -46,8 +46,8 @@ namespace SDK {
 		struct ImageDescription {
 			float mWidth = 0.f;
 			float mHeight = 0.f;
-			int mTextureFormat = 0;
-			uint8_t mColorSpace = 0;
+			int mTextureFormat = 1;
+			uint8_t mColorSpace = 16;
 			bool mIsCubemap = false;
 			int mArraySize = 0;
 		};

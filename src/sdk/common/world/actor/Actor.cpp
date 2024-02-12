@@ -14,7 +14,7 @@ Vec2& SDK::Actor::getRot() {
 	if (internalVers < V1_19_51) {
 		return util::directAccess<Vec2>(this, 0x138);
 	}
-	return movementInterpolator->rotation;
+	return actorRotation->rotation;
 }
 
 Vec3& SDK::Actor::getVelocity() {
@@ -41,7 +41,8 @@ Vec3& SDK::Actor::getPosOld() {
 }
 
 int SDK::Actor::getCommandPermissionLevel() {
-	return memory::callVirtual<int>(this, mvGetOffset<0x7A, 0x7C, 0xB5, 0xCC, 0xCD>());
+	// @dump-wbds vtable Actor, getCommandPermissionLevel
+	return memory::callVirtual<int>(this, mvGetOffset<0x77, 0x7C, 0xB5, 0xCC, 0xCD>());
 }
 
 int64_t SDK::Actor::getRuntimeID() {
@@ -60,7 +61,8 @@ uint8_t SDK::Actor::getEntityTypeID() {
 }
 
 void SDK::Actor::swing() {
-	return memory::callVirtual<void>(this, SDK::mvGetOffset<0x84, 0x86, 0xC4, 0xDB, 0xDC>());
+	// @dump-wbds vtable Actor, swing
+	return memory::callVirtual<void>(this, SDK::mvGetOffset<0x81, 0x86, 0xC4, 0xDB, 0xDC>());
 }
 
 bool SDK::Actor::isPlayer() {
@@ -95,5 +97,5 @@ SDK::ItemStack* SDK::Actor::getArmor(int armorSlot) {
 		return this->armorContainer->getItem(armorSlot);
 	}
 
-	return memory::callVirtual<ItemStack*>(this, mvGetOffset<0x7C, 0xB5, 0xCC, 0xCD>());
+	return memory::callVirtual<ItemStack*>(this, mvGetOffset<0x71, 0xB5, 0xCC, 0xCD>());
 }

@@ -42,7 +42,7 @@ void TestModule::onRender(Event& evG) {
 	using namespace SDK;
 	auto scn = ev.getUIRenderContext()->screenContext;
 
-	auto jpegCommentWriter = std::make_unique<JpegCommentWriter>(MaterialPtr::getUITextureAndColor());
+	auto jpegCommentWriter = std::make_unique<JpegCommentWriter>(scn->tess, MaterialPtr::getUITextureAndColor());
 
 	cg::ImageBuffer img = cg::ImageBuffer(200, 200);
 	jpegCommentWriter->_drawImage(scn, &img);

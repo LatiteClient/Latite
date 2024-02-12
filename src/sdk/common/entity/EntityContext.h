@@ -49,7 +49,7 @@ namespace SDK {
 		Vec3 velocity; //0x0018
 	}; //Size: 0x0024
 
-	class MovementInterpolatorComponent
+	class ActorRotationComponent
 	{
 	public:
 		Vec2 rotation; //0x0000
