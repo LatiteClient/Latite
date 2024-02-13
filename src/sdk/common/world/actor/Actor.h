@@ -23,7 +23,7 @@ namespace SDK {
 
 		// 1.19.51 only
 		CLASS_FIELD(class Level*, level_1_19_51, 0x310)
-		// @-dump-wbds Actor::getArmorContainer, 3
+		// @dump-wbds Actor::getArmorContainer, 3
 		MVCLASS_FIELD(class Inventory*, armorContainer, 0x458, 0x428, 0, 0, 0); // xref: Actor::getArmor(ArmorSlot)
 
 		AABB& getBoundingBox();
