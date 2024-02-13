@@ -33,7 +33,7 @@ struct FloatValue {
 
 	FloatValue() { value = 0.f; }
 	FloatValue(float f) : value(f) {}
-	FloatValue(nlohmann::json& js) : value(js.get<float>()) {}
+	FloatValue(nlohmann::json& js) : value(js.is_number() ? js.get<float>() : 0) {}
 	operator decltype(value)() { return value; }
 
 	void store(nlohmann::json& jout) {
@@ -51,8 +51,8 @@ struct Vec2Value {
 	Vec2Value() { x = 0.f; y = 0.f; }
 	Vec2Value(float x, float y) : x(x), y(y) {}
 	Vec2Value(nlohmann::json& js) {
-		x = js["x"].get<float>();
-		y = js["y"].get<float>();
+		y = js["x"].is_number() ? js["x"].get<float>() : 0;
+		y = js["y"].is_number() ? js["y"].get<float>() : 0;
 	}
 
 	void store(nlohmann::json& jout) {

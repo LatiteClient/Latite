@@ -36,18 +36,18 @@ public:
 	struct Components {
 		inline static SigImpl moveInputComponent{[](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"40 53 48 83 EC ? 48 8B DA BA 2E CD 8B 46",
+			"48 89 5C 24 08 57 48 83 EC 30 48 8B DA BA 2E CD 8B 46",
 			"MoveInputComponent::try_get"};
 
 		inline static SigImpl runtimeIDComponent{[](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"40 53 48 83 EC ? 48 8B DA BA 14 14 A1 3C",
+			"48 89 5C 24 08 57 48 83 EC 30 48 8B DA BA 14 14 A1 3C",
 			"ActorRuntimeIDComponent"};
 		
 
 		inline static SigImpl actorTypeComponent{[](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"40 53 48 83 EC ? 48 8B DA BA 14 AD F3 51",
+			"48 89 5C 24 08 57 48 83 EC 30 48 8B DA BA 14 AD F3 51",
 			"ActorTypeComponent"}; //51F3AD14
 	};
 
@@ -104,7 +104,7 @@ public:
 		"ClientInstance::releaseCurosr"};
 
 	inline static SigImpl Level_tick{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8b ec 48 83 ec ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 45 ? 48 8b f9",
+		"e8 ? ? ? ? 48 8b 4b ? 48 85 c9 74 ? 48 8b 41 ? 48 83 c1 ? 48 8b 40",
 		"Level::tick"};
 
 	// callsites
@@ -133,7 +133,7 @@ public:
 	"SuspendGameRenderer
 	"unloadAllTextures""*/
 	inline static SigImpl MinecraftGame_onAppSuspended{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5c 24 ? 48 89 74 24 ? 48 89 7c 24 ? 55 41 54 41 55 41 56 41 57 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 4c 8b f9 4c 8d b1",
+		"48 89 5c 24 ? 48 89 74 24 ? 48 89 7c 24 ? 55 41 54 41 55 41 56 41 57 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 4c 8b e9 45 33 f6",
 		"MinecraftGame::onAppSuspended"};
 
 	inline static SigImpl RenderController_getOverlayColor{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
