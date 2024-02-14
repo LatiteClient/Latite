@@ -43,10 +43,10 @@ void GenericHooks::Level_tick(SDK::Level* level) {
 			Latite::getHooks().get<PlayerHooks>().init(lp);
 			playerInitialized = true;
 		}
+
+		PluginManager::Event sEv{L"world-tick", {}, false};
+		Latite::getPluginManager().dispatchEvent(sEv);
 	}
-	
-	PluginManager::Event sEv{L"world-tick", {}, false};
-	Latite::getPluginManager().dispatchEvent(sEv);
 
 	return Level_tickHook->oFunc<decltype(&Level_tick)>()(level);
 }
