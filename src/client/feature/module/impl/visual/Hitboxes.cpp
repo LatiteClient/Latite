@@ -14,6 +14,7 @@ void Hitboxes::onEntityRender(Event& evG) {
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	auto entt = ev.getEntity();
 
+	if (entt->isInvisible()) return;
 	if (entt == lp) return;
 	if (!std::get<BoolValue>(items) && entt->getEntityTypeID() == 64) return;
 

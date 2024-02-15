@@ -92,6 +92,11 @@ float SDK::Actor::getSaturation() {
 	return getAttribute(SDK::Attributes::Saturation)->value;
 }
 
+bool SDK::Actor::isInvisible() {
+	// @dump-wbds Actor, isInvisible
+	return memory::callVirtual<bool>(this, SDK::mvGetOffset<0x25, 0x25, 0x34, 0x3B, 0x3D>());
+}
+
 SDK::ItemStack* SDK::Actor::getArmor(int armorSlot) {
 	if (internalVers >= V1_20_40) {
 		return this->armorContainer->getItem(armorSlot);

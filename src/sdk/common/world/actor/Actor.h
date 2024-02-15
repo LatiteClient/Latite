@@ -41,6 +41,7 @@ namespace SDK {
 		float getHealth();
 		float getHunger();
 		float getSaturation();
+		bool isInvisible();
 		class ItemStack* getArmor(int armorSlot);
 	};
 }

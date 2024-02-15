@@ -13,7 +13,7 @@ private:
 	static constexpr int mode_bounding_box = 0;
 	static constexpr int mode_hitbox = 1;
 
-	ValueType transparent = BoolValue(true);
+	ValueType transparent = BoolValue(false);
 	ValueType boxColor = ColorValue(1.f, 1.f, 1.f, 1.f);
 
 	ValueType showEyeLine = BoolValue(true);
