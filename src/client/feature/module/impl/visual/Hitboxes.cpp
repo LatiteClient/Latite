@@ -44,8 +44,6 @@ void Hitboxes::onEntityRender(Event& evG) {
 	if (std::get<BoolValue>(showEyeLine)) {
 		dc.drawQuad(Vec3(bb.lower.x, eyeLine, bb.lower.z), Vec3(bb.higher.x, eyeLine, bb.lower.z),
 			Vec3(bb.higher.x, eyeLine, bb.higher.z), Vec3(bb.lower.x, eyeLine, bb.higher.z), eyeCol);
-
-		if (!willShowLine) dc.flush();
 	}
 
 	if (willShowLine) {
@@ -65,8 +63,8 @@ void Hitboxes::onEntityRender(Event& evG) {
 		BlockPos bp{ static_cast<int>((end.x)), static_cast<int>((end.y)), static_cast<int>((end.z)) };
 
 		dc.drawLine(begin, end, lineCol);
-		dc.flush();
 	}
+	dc.flush();
 }
 Hitboxes::Hitboxes() : Module("Hitboxes", "Hitboxes", "Shows entity bounding boxes.", GAME) {
 	addSetting("transparent", "Transparent", "Whether or not the hitboxes are transparent.", transparent);

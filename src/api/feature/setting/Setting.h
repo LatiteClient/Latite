@@ -51,7 +51,7 @@ struct Vec2Value {
 	Vec2Value() { x = 0.f; y = 0.f; }
 	Vec2Value(float x, float y) : x(x), y(y) {}
 	Vec2Value(nlohmann::json& js) {
-		y = js["x"].is_number() ? js["x"].get<float>() : 0;
+		x = js["x"].is_number() ? js["x"].get<float>() : 0;
 		y = js["y"].is_number() ? js["y"].get<float>() : 0;
 	}
 

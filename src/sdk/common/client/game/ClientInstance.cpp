@@ -80,7 +80,7 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
     case V1_19_51:
         return util::directAccess<GuiData*>(this, 0x500);
     default:
-        return util::directAccess<GuiData*>(this, 0x560);
+        return util::directAccess<GuiData*>(this, 0x558);
     }
     return nullptr;
 }
