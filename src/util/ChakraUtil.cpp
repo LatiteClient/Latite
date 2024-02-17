@@ -341,12 +341,13 @@ JsValueRef Chakra::GetUndefined() {
 }
 
 Chakra::Result Chakra::VerifyArgCount(unsigned short has, unsigned short expected, bool autoThrow, bool least) {
-	if (has != expected || (least && has > expected)) {
-		auto ws = L"Function does not take " + std::to_wstring(has - 1) + L" arguments";
-		if (autoThrow) Chakra::ThrowError(ws);
-		return { false, ws };
+	if (has == expected || (least && has > expected)) {
+		return { true, L"" };
 	}
-	return { true, L"" };
+
+	auto ws = L"Function does not take " + std::to_wstring(has - 1) + L" arguments";
+	if (autoThrow) Chakra::ThrowError(ws);
+	return { false, ws };
 }
 
 JsValueRef Chakra::GetTrue() {

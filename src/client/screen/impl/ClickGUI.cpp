@@ -831,7 +831,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 		RectF txtRc = rc;
 		RectF rightRc = rc;
 
-		txtRc.left += (rc.getWidth() * fTextWidth);
+		txtRc.left += (rc.getWidth() * (fTextWidth * 1.5f));
 		rightRc.right = txtRc.left;
 
 		d2d::Color col = d2d::Color::RGB(0x8D, 0x8D, 0x8D).asAlpha(0.11f);

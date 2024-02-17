@@ -229,7 +229,7 @@ public:
 		"UIControl::setPosition"};
 
 	inline static SigImpl MinecraftGame_getPrimaryClientInstance{[](memory::signature_store&, uintptr_t res) { return res; },
-		"40 53 48 83 ec ? 48 8b da 48 8b 91 ? ? ? ? 48 8b ca",
+		"48 89 5c 24 ? 48 89 74 24 ? 48 89 7c 24 ? 55 41 54 41 55 41 56 41 57 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 4c 8b e9 45 33 f6",
 		"MinecraftGame::getPrimaryClientInstance"};
 
 	inline static SigImpl ActorRenderDispatcher_render{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
