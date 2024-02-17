@@ -470,8 +470,19 @@ void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color 
 	renderCtx->drawText(this->font, getRect(rMod), util::WStrToStr(text), color, color.a, (SDK::ui::TextAlignment)alignment, SDK::TextMeasureData((size * guiScale) / this->font->getLineHeight(), Latite::get().shouldRenderTextShadows(), false), caretMeasure);
 }
 
+static size_t countof(auto str, auto ch) {
+	size_t c = 0;
+	for (auto& cha : str) {
+		if (cha == ch) ++c;
+	}
+	return c;
+}
+
 Vec2 MCDrawUtil::getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace, bool cache, std::optional<Vec2> bounds) {
-	return { this->font->getLineLength(util::WStrToStr(text), (size * guiScale) / this->font->getLineHeight(), false) / guiScale, this->font->getLineHeight() * size * guiScale};
+	float singleLineHeight = this->font->getLineHeight() * size * guiScale;
+	float totalHeight = (countof(text, '\n') + 1) * singleLineHeight;
+
+	return { this->font->getLineLength(util::WStrToStr(text), (size * guiScale) / this->font->getLineHeight(), false) / guiScale, totalHeight };
 }
 
 DrawUtil::RectF MCDrawUtil::getTextRect(std::wstring const& text, Renderer::FontSelection font, float size, float pad, bool cache) {
