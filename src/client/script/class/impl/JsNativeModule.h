@@ -24,11 +24,8 @@ public:
 	void prepareFunctions() override {
 		// static
 		Chakra::DefineFunc(constructor, getCallback, L"get", this);
-
-		Chakra::SetPropertyNumber(prototype, L"x", 0.0, true);
-		Chakra::SetPropertyNumber(prototype, L"y", 0.0, true);
-
 		Chakra::DefineFunc(prototype, defaultToString, L"toString", this);
+		Chakra::SetPropertyNumber(prototype, L"handle", 0.0);
 
 	};
 
