@@ -355,8 +355,8 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsItem>(this));
 	this->classes.push_back(std::make_shared<JsItemStack>(this));
 	this->classes.push_back(std::make_shared<JsTextureClass>(this));
-#ifdef DEBUG
-	this->classes.push_back(std::make_shared<JsTextureClass>(this));
+#ifdef LATITE_DEBUG
+	this->classes.push_back(std::make_shared<JsNativeModule>(this));
 #endif
 	JsErrorCode err;
 
