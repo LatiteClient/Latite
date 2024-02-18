@@ -3,6 +3,7 @@
 #include "util/LMath.h"
 #include "util/ChakraUtil.h"
 #include <array>
+#include <Mmsystem.h>
 
 class JsNativeModule : public JsWrapperClass<void> {
 protected:
@@ -15,7 +16,9 @@ public:
 
 	JsValueRef construct(void* mod, bool del) override {
 		JsValueRef obj;
-		JS::JsCreateObject(&obj);
+		JS::JsCreateExternalObject(mod, [](void*) {
+			}, &obj);
+
 		JS::JsSetPrototype(obj, getPrototype());
 		Chakra::SetPropertyNumber(obj, L"handle", (double)(uintptr_t)mod);
 		return obj;
@@ -25,6 +28,7 @@ public:
 		// static
 		Chakra::DefineFunc(constructor, getCallback, L"get", this);
 		Chakra::DefineFunc(prototype, defaultToString, L"toString", this);
+		Chakra::DefineFunc(prototype, callCallback, L"call", this);
 		Chakra::SetPropertyNumber(prototype, L"handle", 0.0);
 
 	};
@@ -64,7 +68,7 @@ public:
 		std::wstring name = Chakra::GetString(arguments[1]);
 		std::wstring type = Chakra::GetString(arguments[2]);
 
-		HMODULE mod = (HMODULE)Get(callee);
+		HMODULE mod = (HMODULE)Get(arguments[0]);
 		auto proc = GetProcAddress(mod, util::WStrToStr(name).c_str());
 		if (!proc) {
 			Chakra::ThrowError(L"Could not find function " + name);
