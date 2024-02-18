@@ -469,6 +469,7 @@
     <ClInclude Include="src\client\script\class\impl\JsColor.h" />
     <ClInclude Include="src\client\script\class\impl\JsHudModuleClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsModuleClass.h" />
+    <ClInclude Include="src\client\script\class\impl\JsNativeModule.h" />
     <ClInclude Include="src\client\script\class\impl\JsRect.h" />
     <ClInclude Include="src\client\script\class\impl\JsSettingClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsTextModuleClass.h" />

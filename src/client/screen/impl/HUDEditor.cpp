@@ -55,10 +55,10 @@ void HUDEditor::onRender(Event& ev) {
 			auto bmp = Latite::getRenderer().getCopiedBitmap(control);
 
 			dc.ctx->DrawBitmap(bmp);
-			Latite::getRenderer().getDeviceContext()->Flush();
 
 			bmp->Release();
 		}
+		Latite::getRenderer().getDeviceContext()->Flush();
 
 		auto& cursorPos = SDK::ClientInstance::get()->cursorPos;
 

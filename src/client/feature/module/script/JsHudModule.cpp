@@ -49,8 +49,7 @@ bool JsHUDModule::shouldHoldToToggle() {
 	return false;
 }
 
-void JsHUDModule::render(DrawUtil& dc, bool isDefault, bool isEditor) {
-	JS::JsSetCurrentContext(ctx);
+void JsHUDModule::render(DrawUtil&, bool, bool) {
 }
 
 void JsHUDModule::preRender(bool mcRend, bool isPreview, bool isEditor) {

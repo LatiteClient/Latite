@@ -144,7 +144,9 @@ BOOL __stdcall GenericHooks::hkLoadLibraryW(LPCWSTR lib) {
 }
 
 void* __fastcall GenericHooks::RakNetConnector_tick(void* connector) {
-	SDK::RakNetConnector::setInstance(reinterpret_cast<SDK::RakNetConnector*>(connector));
+	if (Latite::isMainThread()) {
+		SDK::RakNetConnector::setInstance(reinterpret_cast<SDK::RakNetConnector*>(connector));
+	}
 	return ConnectorTickHook->oFunc<decltype(&RakNetConnector_tick)>()(connector);
 }
 
