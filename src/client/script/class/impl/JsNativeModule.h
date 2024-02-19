@@ -80,10 +80,9 @@ public:
 		HMODULE mod = (HMODULE)Get(arguments[0]);
 		auto proc = GetProcAddress(mod, util::WStrToStr(name).c_str());
 
-		static std::array<FARPROC, 13> banList = {
+		static std::array<FARPROC, 15> banList = {
 			(FARPROC)VirtualProtect,
 			(FARPROC)VirtualProtectEx,
-			(FARPROC)GetProcAddress(GetModuleHandleA(XOR_STRING("Kernel32.dll")), XOR_STRING("VirtualProtectFromApp")),
 			(FARPROC)mouse_event,
 			(FARPROC)SendInput,
 			(FARPROC)CreateThread,
@@ -93,6 +92,10 @@ public:
 			(FARPROC)LoadLibraryW,
 			(FARPROC)LoadLibraryExA,
 			(FARPROC)LoadLibraryExW,
+			(FARPROC)GetModuleHandleA,
+			(FARPROC)GetModuleHandleExA,
+			(FARPROC)GetModuleHandleW,
+			(FARPROC)GetModuleHandleExW,
 		};
 
 		for (auto& banned : banList) {
