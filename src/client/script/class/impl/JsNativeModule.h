@@ -3,7 +3,6 @@
 #include "util/LMath.h"
 #include "util/ChakraUtil.h"
 #include <array>
-#include <Mmsystem.h>
 
 class JsNativeModule : public JsWrapperClass<void> {
 protected:
@@ -42,7 +41,17 @@ public:
 		std::wstring name = Chakra::GetString(arguments[1]);
 		auto thi = reinterpret_cast<JsWrapperClass*>(callbackState);
 
+		static std::array<HMODULE, 2> banList = {
+			GetModuleHandleA(NULL),
+			Latite::get().dllInst,
+		};
+
 		auto handle = GetModuleHandleW(name.c_str());
+		for (auto& ban : banList) {
+			if (handle == ban) {
+				handle = 0;
+			}
+		}
 
 		if (!handle) return Chakra::GetNull();
 		return thi->construct(handle, false);
@@ -70,6 +79,31 @@ public:
 
 		HMODULE mod = (HMODULE)Get(arguments[0]);
 		auto proc = GetProcAddress(mod, util::WStrToStr(name).c_str());
+
+		static std::array<FARPROC, 13> banList = {
+			(FARPROC)VirtualProtect,
+			(FARPROC)VirtualProtectEx,
+			(FARPROC)GetProcAddress(GetModuleHandleA(XOR_STRING("Kernel32.dll")), XOR_STRING("VirtualProtectFromApp")),
+			(FARPROC)mouse_event,
+			(FARPROC)SendInput,
+			(FARPROC)CreateThread,
+			(FARPROC)OpenProcess,
+			(FARPROC)OpenProcessToken,
+			(FARPROC)LoadLibraryA,
+			(FARPROC)LoadLibraryW,
+			(FARPROC)LoadLibraryExA,
+			(FARPROC)LoadLibraryExW,
+		};
+
+		for (auto& banned : banList) {
+			if (proc == banned) {
+#ifdef LATITE_DEBUG
+				Chakra::ThrowError(util::StrToWStr(XOR_STRING("You cannot use this function.")));
+#endif
+				return JS_INVALID_REFERENCE;
+			}
+		}
+
 		if (!proc) {
 			Chakra::ThrowError(L"Could not find function " + name);
 			return JS_INVALID_REFERENCE;
