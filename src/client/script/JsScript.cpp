@@ -293,11 +293,7 @@ namespace {
 		JS::JsGetUndefinedValue(&undef);
 
 		if (!Chakra::VerifyArgCount(argCount, 2)) return undef;
-		auto sz = Chakra::VerifyParameters({ {arguments[1], JsValueType::JsString} });
-		if (!sz) {
-			Chakra::ThrowError(sz.str);
-			return undef;
-		}
+		if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsString} })) { return undef; };
 
 		auto wPath = Chakra::GetString(arguments[1]);
 
@@ -333,6 +329,74 @@ namespace {
 		}
 
 		return mod->getModuleExports();
+	}
+
+	winrt::Windows::Foundation::IAsyncAction doRequestPermission(std::wstring const& str,
+		bool& result) {
+		winrt::Windows::UI::Popups::UICommand yesCommand;
+		yesCommand.Label(L"Grant permission");
+		auto yesId = yesCommand.Id();
+
+		winrt::Windows::UI::Popups::UICommand noCommand;
+		noCommand.Label(L"Do not grant permission");
+		auto noId = noCommand.Id();
+
+		winrt::Windows::UI::Popups::MessageDialog dialog(str, L"Permission Request");
+		winrt::Windows::UI::Core::CoreWindow::GetForCurrentThread().Activate();
+		dialog.DefaultCommandIndex(0);
+		dialog.CancelCommandIndex(1);
+		dialog.Commands().Append(noCommand);
+		dialog.Commands().Append(yesCommand);
+
+
+		auto res = co_await dialog.ShowAsync();
+
+		auto label = util::WStrToStr(res.Label().c_str());
+		if (label == "Grant permission") {
+			result = true;
+		}
+		else {
+			result = false;
+		}
+
+		co_return;
+	}
+
+	JsValueRef CALLBACK requestPermission(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount,
+		void* callbackState) {
+		auto thi = reinterpret_cast<JsScript*>(callbackState);
+		auto plugin = thi->getPlugin();
+
+		JsPlugin::UserPermission perm;
+
+		std::wstring request = Chakra::GetString(arguments[1]);
+		std::wstring reqMessage = L"Unknown permission.";
+
+		static std::wstring permSysAccess = util::StrToWStr(XOR_STRING("permission.system_access"));
+		static std::wstring sysAccessMessage = util::StrToWStr(XOR_STRING("This script is requesting the System Access permission.\n\nPlease make sure you trust this plugin!\nThis permission will give the plugin access to system functions, like playing system sounds, ejecting the CD drive, and many other things."));
+
+		if (request == permSysAccess) {
+			perm = JsPlugin::UserPermission::SYSTEM_ACCESS;
+		}
+		else {
+			Chakra::ThrowError(L"Unknown permission " + request);
+			return Chakra::GetUndefined();
+		}
+
+		if (!plugin->hasPermission(perm)) {
+			bool res = false;
+			doRequestPermission(reqMessage, res);
+			if (res) {
+				plugin->grantPermission(perm);
+				return Chakra::GetTrue();
+			}
+
+			return Chakra::GetFalse();
+		}
+
+		
+		return Chakra::GetTrue();
 	}
 }
 

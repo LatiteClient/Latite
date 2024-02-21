@@ -59,6 +59,11 @@ public:
 
 		return false;
 	}
+
+	void grantPermission(UserPermission permission) {
+		if (!hasPermission(permission))
+			userPermissions.push_back(permission);
+	}
 private:
 	bool trusted = false;
 	void checkTrusted();
