@@ -42,10 +42,28 @@ public:
 	std::vector<std::shared_ptr<JsScript>>& getScripts() { return scripts; }
 
 	~JsPlugin() { if (runtime != JS_INVALID_RUNTIME_HANDLE) unload(); }
+
+	enum class UserPermission {
+		SYSTEM_ACCESS
+	};
+
+	bool hasPermission(UserPermission permission) {
+		if (isTrusted())
+			return true;
+
+		for (auto perm : userPermissions) {
+			if (perm == permission) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 private:
 	bool trusted = false;
 	void checkTrusted();
 
+	std::vector<UserPermission> userPermissions;
 	std::vector<std::shared_ptr<JsScript>> scripts;
 	std::shared_ptr<JsScript> mainScript;
 	std::wstring name;

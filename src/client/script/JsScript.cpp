@@ -47,6 +47,11 @@ bool JsScript::load() {
 	auto res = JS::JsCreateContext(plugin->getRuntime(), &this->ctx) == JsNoError;
 	if (!res) return false;
 
+	data.name = this->getPlugin()->getName();
+	data.author = this->getPlugin()->getAuthor();
+	data.version = this->getPlugin()->getVersion();
+	data.description = this->getPlugin()->getDescription();
+
 	loadScriptObjects();
 	loadJSApi();
 
@@ -380,6 +385,19 @@ void JsScript::loadScriptObjects() {
 	// setInterval()
 	{
 		Chakra::DefineFunc(globalObj, setIntervalCallback, L"setInterval", this);
+	}
+
+	// Plugin
+	{
+		JsValueRef plugin;
+		JS::JsCreateObject(&plugin);
+
+		Chakra::SetPropertyString(plugin, L"name", data.name, true);
+		Chakra::SetPropertyString(plugin, L"author", data.author, true);
+		Chakra::SetPropertyString(plugin, L"description", data.description, true);
+		Chakra::SetPropertyString(plugin, L"version", data.version, true);
+
+		Chakra::SetProperty(globalObj, L"plugin", plugin, true);
 	}
 
 	{ // Log Func

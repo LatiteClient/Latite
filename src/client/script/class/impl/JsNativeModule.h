@@ -38,6 +38,10 @@ public:
 		if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
 		if (!Chakra::VerifyParameters({ {arguments[1], JsString} })) return JS_INVALID_REFERENCE;
 
+		if (!JsScript::getThis()->getPlugin()->hasPermission(JsPlugin::UserPermission::SYSTEM_ACCESS)) {
+			return Chakra::GetNull();
+		}
+
 		std::wstring name = Chakra::GetString(arguments[1]);
 		auto thi = reinterpret_cast<JsWrapperClass*>(callbackState);
 
