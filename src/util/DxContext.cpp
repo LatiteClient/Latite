@@ -178,7 +178,7 @@ Vec2 D2DUtil::getTextSize(std::wstring const& ws, Renderer::FontSelection font, 
 		layout->GetMetrics(&textMetrics);
 		layout->GetOverhangMetrics(&overhangs);
 		
-		float width = tw ? (textMetrics.widthIncludingTrailingWhitespace - overhangs.left) : ((textMetrics.layoutWidth) + overhangs.right) - (textMetrics.left - overhangs.left);
+		float width = tw ? textMetrics.widthIncludingTrailingWhitespace : textMetrics.width;
 		float height = textMetrics.height;
 		
 		return Vec2(width, height);
