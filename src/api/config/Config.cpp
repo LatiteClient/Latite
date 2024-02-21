@@ -89,6 +89,7 @@ void Config::addSetting(SettingGroup& group, nlohmann::json& obj) {
 		break;
 	case Setting::Type::Snap:
 		set->resolvedValue = SnapValue(jVal);
+		break;
 	default:
 		return;
 	}
