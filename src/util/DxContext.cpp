@@ -395,16 +395,9 @@ void MCDrawUtil::fillRoundedRectangle(RectF const& rc, d2d::Color const& col, fl
 
 void MCDrawUtil::drawRoundedRectangle(RectF rect, d2d::Color const& color, float radius, float lineThickness, OutlinePosition outPos) {
 	lineThickness *= guiScale;
-	
-	d2d::Rect original = rect;
-	rect = d2d::Rect(rect.left * guiScale - lineThickness / 2, rect.top * guiScale + lineThickness, rect.right * guiScale + lineThickness / 2, rect.bottom * guiScale + lineThickness);
+
+	rect = d2d::Rect(rect.left * guiScale, rect.top * guiScale, rect.right * guiScale, rect.bottom * guiScale);
 	radius *= guiScale;
-
-	radius += lineThickness;
-
-	rect = rect.translate(0.f, (rect.getHeight() * 0.1f));
-	original = original.translate(0.f, ((rect.getHeight() / guiScale) * 0.1f));
-	
 	int numSides = 20;
 	auto tess = scn->tess;
 	*scn->shaderColor = { 1.f,1.f,1.f,1.f };
@@ -412,10 +405,7 @@ void MCDrawUtil::drawRoundedRectangle(RectF rect, d2d::Color const& color, float
 	tess->begin(SDK::Primitive::Trianglestrip, ((numSides * 2) * 4) + 2);
 	tess->color(color);
 	float angle = (2.0f * pi_f) / static_cast<float>(numSides);
-
-	constexpr float shadowAlpha = 0.8f;
-
-	auto drawCorner = [color, tess, radius, angle, numSides, &rect, lineThickness](Vec2 const& center, float aMin, float aMax) {
+	auto drawCorner = [tess, radius, angle, numSides, &rect, lineThickness](Vec2 const& center, float aMin, float aMax) {
 		for (float i = 0; i <= static_cast<float>(numSides); ++i) {
 			float myAngle = angle * i;
 			if (myAngle < aMin || myAngle > aMax) continue;
@@ -426,9 +416,7 @@ void MCDrawUtil::drawRoundedRectangle(RectF rect, d2d::Color const& color, float
 			float innerX = center.x + (radius - lineThickness) * std::cos(myAngle);
 			float innerY = center.y + (radius - lineThickness) * std::sin(myAngle);
 
-			tess->color(color.asAlpha(0.f));
 			tess->vertex(x, y);
-			tess->color(color.asAlpha(shadowAlpha));
 			tess->vertex(innerX, innerY);
 		}
 	};
@@ -438,13 +426,8 @@ void MCDrawUtil::drawRoundedRectangle(RectF rect, d2d::Color const& color, float
 	drawCorner({ rect.right - radius, rect.bottom - radius }, LatiteMath::deg2rad(0.f), LatiteMath::deg2rad(90.f));
 	drawCorner({ rect.left + radius, rect.bottom - radius }, LatiteMath::deg2rad(90.f), LatiteMath::deg2rad(180.f));
 
-	tess->color(color.asAlpha(0.f));
 	tess->vertex(rect.left, rect.top + radius);
-	tess->color(color.asAlpha(shadowAlpha));
 	tess->vertex(rect.left + lineThickness, rect.top + radius);
-	flush(false);
-
-	fillRectangle(original, color.asAlpha(shadowAlpha));
 	flush(false);
 }
 
