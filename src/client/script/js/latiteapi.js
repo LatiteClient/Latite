@@ -58,7 +58,7 @@ Rect.prototype.getHeight = function () {
 };
 Rect.prototype.getWidth;
 
-eval("var TextColor = {}");
+TextColor = {};
 TextColor.FORMAT_CHAR = "\u00A7";
 TextColor.formatText = function (str) {
     return str.replace("&", TextColor.FORMAT_CHAR);
@@ -147,4 +147,11 @@ util = {
         }
         return buf;
     }
+};
+
+script = {
+    name: "",
+    author: "",
+    description: "",
+    log: clientMessage
 };
