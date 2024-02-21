@@ -228,6 +228,63 @@ struct EnumValue {
 	}
 };
 
+struct SnapValue {
+	enum Type : int {
+		Normal,
+		MCUI,
+		Module
+	};
+
+	enum Pos : int {
+		Right,
+		Middle,
+		Left
+	};
+
+	Type type = Normal;
+	Pos position = Right;
+	std::string mod = "";
+	int index = 0;
+	bool doSnapping = false;
+
+	SnapValue(nlohmann::json& js) {
+		if (js.contains("type")) {
+			doSnapping = true;
+			this->type = js["type"].get<SnapValue::Type>();
+			if (this->type == SnapValue::Module) {
+				this->mod = js["module"].get<std::string>();
+			}
+			this->index = js["idx"].get<int>();
+			this->position = js["pos"].get<SnapValue::Pos>();
+		}
+	}
+
+	SnapValue() = default;
+
+	void store(nlohmann::json& j) {
+		if (doSnapping) {
+			j["type"] = type;
+			if (type == SnapValue::Module) {
+				j["module"] = mod;
+			}
+			j["idx"] = index;
+			j["pos"] = position;
+		}
+	}
+
+	void snap(SnapValue::Type type, SnapValue::Pos pos, int idx, std::string mod = "") {
+		this->doSnapping = true;
+		this->type = type;
+		this->position = pos;
+		this->mod = mod;
+		this->index = idx;
+	}
+
+	int getInt() {
+		return 0;
+	}
+};
+
 using ValueType = std::variant<
 	BoolValue, 
 	FloatValue, 
@@ -236,7 +293,8 @@ using ValueType = std::variant<
 	ColorValue, 
 	Vec2Value, 
 	EnumValue,
-	TextValue>;
+	TextValue,
+	SnapValue>;
 
 class EnumEntry : public Feature {
 	std::string entryName;
@@ -304,7 +362,8 @@ public:
 		Color,
 		Vec2,
 		Enum,
-		Text
+		Text,
+		Snap
 	};
 
 	Setting(std::string const& internalName, std::string const& displayName, std::string const& description, Condition condition = Condition()) : settingName(internalName), displayName(displayName), description(description), condition(std::move(condition)) {}

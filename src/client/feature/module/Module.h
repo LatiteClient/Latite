@@ -41,7 +41,7 @@ public:
 
 	[[nodiscard]] virtual bool forceMinecraftRenderer() { return false; };
 
-	void loadConfig(SettingGroup& resolvedGroup) override;
+	virtual void loadConfig(SettingGroup& resolvedGroup) override;
 	std::shared_ptr<Setting> addSetting(std::string const& internalName, std::string const& displayName, std::string const& desc, ValueType& val, Setting::Condition condition = Setting::Condition());
 	std::shared_ptr<Setting> addEnumSetting(std::string const& internalName, std::string const& displayName, std::string const& desc, EnumData& dat, Setting::Condition condition = Setting::Condition());
 	std::shared_ptr<Setting> addSliderSetting(std::string const& internalName, std::string const& displayName, std::string const& desc, ValueType& val, ValueType min, ValueType max, ValueType interval, Setting::Condition condition = Setting::Condition());

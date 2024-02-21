@@ -31,3 +31,7 @@ void HUDModule::storePos(Vec2 const& ss) {
 d2d::Rect HUDModule::getRect() {
 	return { rect.left, rect.top, rect.left + ((rect.getWidth()) * getScale()), rect.top + ((rect.getHeight()) * getScale()) };
 }
+
+void HUDModule::loadConfig(SettingGroup& resolvedGroup) {
+	Module::loadConfig(resolvedGroup);
+}

@@ -12,7 +12,10 @@ public:
 		bool resizable = true)
 		: Module(name, displayName, description, category, keybind, true), resizable(resizable) {
 		
-		addSetting("pos", "Position", "", storedPos);
+		addSetting("pos", "Position", "<internal setting>", storedPos);
+		addSetting("snapX", "Snap X", "<internal setting>", snappingX);
+		addSetting("snapY", "Snap Y", "<internal setting>", snappingY);
+
 		if (resizable) addSliderSetting("scale", "Size", "", scale, FloatValue(min_scale), FloatValue(max_scale), FloatValue(0.05f));
 		addSetting("forceMinecraftRend", "Force Minecraft Renderer", "Whether or not to use the Minecraft renderer for this module.", forceMCRend);
 	}
@@ -51,61 +54,8 @@ protected:
 	bool active = true;
 public:
 	[[nodiscard]] virtual bool isActive() { return active; }
+	virtual void loadConfig(SettingGroup& resolvedGroup) override;
 
-	struct Snapping {
-		enum Type : int {
-			Normal,
-			MCUI,
-			Module
-		};
-
-		enum Pos : int {
-			Right,
-			Middle,
-			Left
-		};
-
-		bool doSnapping = false;
-		Type type = Normal;
-		Pos pos = Pos::Right;
-		std::string mod = "";
-		int idx = 0;
-
-		void snap(Type type, Pos pos, int idx, std::string mod = "") {
-			this->doSnapping = true;
-			this->type = type;
-			this->pos = pos;
-			this->mod = mod;
-			this->idx = idx;
-		}
-
-		nlohmann::json getJSON() {
-			nlohmann::json j = nlohmann::json::object();
-			if (doSnapping) {
-				j["type"] = type;
-				if (type == Module) {
-					j["module"] = mod;
-				}
-				j["idx"] = idx;
-				j["pos"] = pos;
-			}
-			return j;
-		}
-
-		void fromJSON(nlohmann::json& j) {
-			doSnapping = false;
-			if (j.contains("type")) {
-				doSnapping = true;
-				this->type = j["type"].get<Type>();
-				if (this->type == Module) {
-					this->mod = j["module"].get<std::string>();
-				}
-				this->idx = j["idx"].get<int>();
-				this->pos = j["pos"].get<Pos>();
-			}
-		}
-	};
-
-	Snapping snappingX = {};
-	Snapping snappingY = {};
+	ValueType snappingX = SnapValue{};
+	ValueType snappingY = SnapValue{};
 };

@@ -349,8 +349,11 @@ void HUDEditor::doSnapping(Vec2 const&) {
 		Color col = d2d::Color(0.5, 1.0, 1.0);
 		float thickness = 1.f;
 
-		dragMod->snappingX = HUDModule::Snapping();
-		dragMod->snappingY = HUDModule::Snapping();
+		dragMod->snappingX = SnapValue();
+		dragMod->snappingY = SnapValue();
+
+		auto& snapX = std::get<SnapValue>(dragMod->snappingX);
+		auto& snapY = std::get<SnapValue>(dragMod->snappingY);
 
 		for (int i = 0; i < snapLinesX.size(); i++) {
 			float snap = snapLinesX[i];
@@ -362,21 +365,21 @@ void HUDEditor::doSnapping(Vec2 const&) {
 			float thickness = pred.thickness;
 
 			if (std::abs(pos.x - pred.right) < snapRange) {
-				dragMod->snappingX.snap(HUDModule::Snapping::Normal, HUDModule::Snapping::Right, i);
+				snapX.snap(SnapValue::Normal, SnapValue::Right, i);
 				dc.brush->SetColor(col.get());
 				dc.ctx->DrawLine({ snap, 0 }, { snap, ss.y }, dc.brush, thickness);
 				dragMod->setPos({ snap, dragMod->getRect().getPos().y });
 			}
 
 			if (std::abs(pos.x - pred.middle) < snapRange) {
-				dragMod->snappingX.snap(HUDModule::Snapping::Normal, HUDModule::Snapping::Middle, i);
+				snapX.snap(SnapValue::Normal, SnapValue::Middle, i);
 				dc.brush->SetColor(col.get());
 				dc.ctx->DrawLine({ snap, 0 }, { snap, ss.y }, dc.brush, thickness);
 				dragMod->setPos({ pred.middle, dragMod->getRect().getPos().y });
 			}
 
 			if (std::abs(pos.x - pred.left) < snapRange) {
-				dragMod->snappingX.snap(HUDModule::Snapping::Normal, HUDModule::Snapping::Left, i);
+				snapX.snap(SnapValue::Normal, SnapValue::Left, i);
 				dc.brush->SetColor(col.get());
 				dc.ctx->DrawLine({ snap, 0 }, { snap, ss.y }, dc.brush, thickness);
 				dragMod->setPos({ pred.left, dragMod->getRect().getPos().y });
@@ -394,21 +397,21 @@ void HUDEditor::doSnapping(Vec2 const&) {
 
 
 			if (std::abs(pos.y - pred.right) < snapRange) {
-				dragMod->snappingY.snap(HUDModule::Snapping::Normal, HUDModule::Snapping::Right, i);
+				snapY.snap(SnapValue::Normal, SnapValue::Right, i);
 				dc.brush->SetColor(col.get());
 				dc.ctx->DrawLine({ 0.f, snap }, { ss.x, snap }, dc.brush, thickness);
 				dragMod->setPos({ dragMod->getRect().getPos().x, snap });
 			}
 
 			if (std::abs(pos.y - pred.middle) < snapRange) {
-				dragMod->snappingY.snap(HUDModule::Snapping::Normal, HUDModule::Snapping::Middle, i);
+				snapY.snap(SnapValue::Normal, SnapValue::Middle, i);
 				dc.brush->SetColor(col.get());
 				dc.ctx->DrawLine({ 0.f, snap }, { ss.x, snap }, dc.brush, thickness);
 				dragMod->setPos({ dragMod->getRect().getPos().x, pred.middle });
 			}
 
 			if (std::abs(pos.y - pred.left) < snapRange) {
-				dragMod->snappingY.snap(HUDModule::Snapping::Normal, HUDModule::Snapping::Left, i);
+				snapY.snap(SnapValue::Normal, SnapValue::Left, i);
 				dc.brush->SetColor(col.get());
 				dc.ctx->DrawLine({ 0.f, snap }, { ss.x, snap }, dc.brush, thickness);
 				dragMod->setPos({ dragMod->getRect().getPos().x, pred.left });
@@ -431,21 +434,21 @@ void HUDEditor::doSnapping(Vec2 const&) {
 			float thickness = pred.thickness;
 
 			if (std::abs(pos.x - pred.right) < 5.f) {
-				dragMod->snappingX.snap(HUDModule::Snapping::MCUI, HUDModule::Snapping::Right, i);
+				snapX.snap(SnapValue::MCUI, SnapValue::Right, i);
 				dc.brush->SetColor(col.get());
 				dc.ctx->DrawLine({ snap, 0 }, { snap, ss.y }, dc.brush, thickness);
 				dragMod->setPos({ snap, dragMod->getRect().getPos().y });
 			}
 
 			if (std::abs(pos.x - pred.middle) < 5.f) {
-				dragMod->snappingX.snap(HUDModule::Snapping::MCUI, HUDModule::Snapping::Middle, i);
+				snapX.snap(SnapValue::MCUI, SnapValue::Middle, i);
 				dc.brush->SetColor(col.get());
 				dc.ctx->DrawLine({ snap, 0 }, { snap, ss.y }, dc.brush, thickness);
 				dragMod->setPos({ pred.middle, dragMod->getRect().getPos().y });
 			}
 
 			if (std::abs(pos.x - pred.left) < 5.f) {
-				dragMod->snappingX.snap(HUDModule::Snapping::MCUI, HUDModule::Snapping::Left, i);
+				snapX.snap(SnapValue::MCUI, SnapValue::Left, i);
 				dc.brush->SetColor(col.get());
 				dc.ctx->DrawLine({ snap, 0 }, { snap, ss.y }, dc.brush, thickness);
 				dragMod->setPos({ pred.left, dragMod->getRect().getPos().y });
@@ -463,21 +466,21 @@ void HUDEditor::doSnapping(Vec2 const&) {
 			float thickness = pred.thickness;
 
 			if (std::abs(pos.y - pred.right) < 5.f) {
-				dragMod->snappingY.snap(HUDModule::Snapping::MCUI, HUDModule::Snapping::Right, i);
+				snapY.snap(SnapValue::MCUI, SnapValue::Right, i);
 				dc.brush->SetColor(col.get());
 				dc.ctx->DrawLine({ 0.f, snap }, { ss.x, snap }, dc.brush, thickness);
 				dragMod->setPos({ dragMod->getRect().getPos().x, snap });
 			}
 
 			if (std::abs(pos.y - pred.middle) < 5.f) {
-				dragMod->snappingY.snap(HUDModule::Snapping::MCUI, HUDModule::Snapping::Middle, i);
+				snapY.snap(SnapValue::MCUI, SnapValue::Middle, i);
 				dc.brush->SetColor(col.get());
 				dc.ctx->DrawLine({ 0.f, snap }, { ss.x, snap }, dc.brush, thickness);
 				dragMod->setPos({ dragMod->getRect().getPos().x, pred.middle });
 			}
 
 			if (std::abs(pos.y - pred.left) < 5.f) {
-				dragMod->snappingY.snap(HUDModule::Snapping::MCUI, HUDModule::Snapping::Left, i);
+				snapY.snap(SnapValue::MCUI, SnapValue::Left, i);
 				dc.brush->SetColor(col.get());
 				dc.ctx->DrawLine({ 0.f, snap }, { ss.x, snap }, dc.brush, thickness);
 				dragMod->setPos({ dragMod->getRect().getPos().x, pred.left });
@@ -491,13 +494,15 @@ void HUDEditor::doSnapping(Vec2 const&) {
 			if (mod->isHud() && mod->isEnabled()) {
 				auto rMod = static_cast<HUDModule*>(mod.get());
 				if (!rMod->isActive()) return;
+				auto& snapX = std::get<SnapValue>(rMod->snappingX);
+				auto& snapY = std::get<SnapValue>(rMod->snappingY);
 				auto pos = rMod->getRect().getPos();
-				if (rMod->snappingX.doSnapping) {
-					if (rMod->snappingX.type != HUDModule::Snapping::Module) {
-						auto type = rMod->snappingX.type;
-						using Snapping = HUDModule::Snapping;
-						auto place = rMod->snappingX.pos;
-						auto idx = rMod->snappingX.idx;
+				if (snapX.doSnapping) {
+					if (snapX.type != SnapValue::Module) {
+						auto type = snapX.type;
+						using Snapping = SnapValue;
+						auto place = snapX.position;
+						auto idx = snapX.index;
 
 						auto& vector = snapLinesX;
 						auto idk = snapLinesX[idx];
@@ -526,12 +531,12 @@ void HUDEditor::doSnapping(Vec2 const&) {
 					}
 				}
 				pos = rMod->getRect().getPos();
-				if (rMod->snappingY.doSnapping) {
-					auto type = rMod->snappingY.type;
-					if (rMod->snappingY.type != HUDModule::Snapping::Module) {
-						using Snapping = HUDModule::Snapping;
-						auto place = rMod->snappingY.pos;
-						auto idx = rMod->snappingY.idx;
+				if (snapY.doSnapping) {
+					auto type = snapY.type;
+					if (snapY.type != SnapValue::Module) {
+						using Snapping = SnapValue;
+						auto place = snapY.position;
+						auto idx = snapY.index;
 
 						auto& vector = snapLinesY;
 						auto idk = snapLinesY[idx];

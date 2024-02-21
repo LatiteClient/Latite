@@ -98,6 +98,11 @@ public:
 			(FARPROC)GetModuleHandleExW,
 		};
 
+		if (!proc) {
+			Chakra::ThrowError(L"Could not find function " + name);
+			return JS_INVALID_REFERENCE;
+		}
+
 		for (auto& banned : banList) {
 			if (proc == banned) {
 #ifdef LATITE_DEBUG
@@ -105,11 +110,6 @@ public:
 #endif
 				return JS_INVALID_REFERENCE;
 			}
-		}
-
-		if (!proc) {
-			Chakra::ThrowError(L"Could not find function " + name);
-			return JS_INVALID_REFERENCE;
 		}
 
 		std::array<void*, 10> args = {};
