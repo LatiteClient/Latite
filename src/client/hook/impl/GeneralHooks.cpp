@@ -158,6 +158,13 @@ int __fastcall GenericHooks::RakPeer_getAveragePing(void* obj, char* guidOrAddy)
 }
 
 void __fastcall GenericHooks::LocalPlayer_applyTurnDelta(void* obj, Vec2& rot) {
+	float oSens = 1.f;
+	SensitivityEvent sensEv{ oSens };
+	Eventing::get().dispatch(sensEv);
+
+	rot.x *= oSens;
+	rot.y *= oSens;
+
 	CinematicCameraEvent ev{false};
 	Eventing::get().dispatch(ev);
 
