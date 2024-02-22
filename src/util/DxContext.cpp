@@ -462,7 +462,7 @@ static size_t countof(auto str, auto ch) {
 }
 
 Vec2 MCDrawUtil::getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace, bool cache, std::optional<Vec2> bounds) {
-	float singleLineHeight = this->font->getLineHeight() * size * guiScale;
+	float singleLineHeight = size;
 	float totalHeight = (countof(text, '\n') + 1) * singleLineHeight;
 
 	return { this->font->getLineLength(util::WStrToStr(text), (size * guiScale) / this->font->getLineHeight(), false) / guiScale, totalHeight };
