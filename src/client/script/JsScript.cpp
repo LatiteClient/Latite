@@ -7,6 +7,12 @@
 #include <winrt/windows.security.cryptography.h>
 #include <winrt/windows.security.cryptography.core.h>
 
+
+#include <winrt/windows.foundation.collections.h>
+#include <winrt/Windows.UI.Core.h>
+#include <winrt/windows.ui.popups.h>
+#include <winrt/Windows.ApplicationModel.Core.h>
+
 #include "Lib/Libraries/Filesystem.h"
 #include "Lib/Libraries/Network.h"
 #include "Lib/Libraries/Clipboard.h"
@@ -332,7 +338,7 @@ namespace {
 	}
 
 	winrt::Windows::Foundation::IAsyncAction doRequestPermission(std::wstring const& str,
-		bool& result) {
+		JsPlugin::UserPermission perm) {
 		winrt::Windows::UI::Popups::UICommand yesCommand;
 		yesCommand.Label(L"Grant permission");
 		auto yesId = yesCommand.Id();
@@ -353,10 +359,7 @@ namespace {
 
 		auto label = util::WStrToStr(res.Label().c_str());
 		if (label == "Grant permission") {
-			result = true;
-		}
-		else {
-			result = false;
+			JsScript::getThis()->getPlugin()->grantPermission(perm);
 		}
 
 		co_return;
@@ -378,6 +381,7 @@ namespace {
 
 		if (request == permSysAccess) {
 			perm = JsPlugin::UserPermission::SYSTEM_ACCESS;
+			reqMessage = sysAccessMessage;
 		}
 		else {
 			Chakra::ThrowError(L"Unknown permission " + request);
@@ -385,18 +389,11 @@ namespace {
 		}
 
 		if (!plugin->hasPermission(perm)) {
-			bool res = false;
-			doRequestPermission(reqMessage, res);
-			if (res) {
-				plugin->grantPermission(perm);
-				return Chakra::GetTrue();
-			}
-
-			return Chakra::GetFalse();
+			doRequestPermission(reqMessage, perm);
 		}
 
 		
-		return Chakra::GetTrue();
+		return Chakra::GetUndefined();
 	}
 }
 
@@ -460,6 +457,8 @@ void JsScript::loadScriptObjects() {
 		Chakra::SetPropertyString(plugin, L"author", data.author, true);
 		Chakra::SetPropertyString(plugin, L"description", data.description, true);
 		Chakra::SetPropertyString(plugin, L"version", data.version, true);
+
+		Chakra::DefineFunc(plugin, requestPermission, L"requestPermission", this);
 
 		Chakra::SetProperty(globalObj, L"plugin", plugin, true);
 	}

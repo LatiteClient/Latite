@@ -221,6 +221,13 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 	//}
 }
 
+void HUDEditor::onKey(Event& evGeneric) {
+	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
+	if (ev.getKey() == VK_F11) return;
+
+	ev.setCancelled();
+}
+
 void HUDEditor::renderModules(SDK::MinecraftUIRenderContext* ctx, bool forceMinecraftOnly) {
 	if (!isActive()) {
 		DrawHUDModulesEvent ev{};
