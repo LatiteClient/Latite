@@ -57,7 +57,7 @@ bool JsPlugin::load() {
 	}
 
 	if (!fetchPluginData()) {
-		Logger::Warn("Could not load plugin metadata from the plugin.json");
+		Logger::Warn("Could not load plugin metadata from the plugin metadata file.");
 	}
 
 	if (JS::JsCreateRuntime(JsRuntimeAttributeNone, nullptr, &this->runtime) != JsNoError) return false;
@@ -89,7 +89,7 @@ void JsPlugin::handleAsyncOperations() {
 }
 
 bool JsPlugin::fetchPluginData() {
-	std::ifstream ifs{this->getPath() / "plugin.json"};
+	std::ifstream ifs{this->getPath() / PLUGIN_MANIFEST_FILE};
 	if (ifs.fail()) {
 		return false;
 	}

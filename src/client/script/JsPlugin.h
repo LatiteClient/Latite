@@ -25,6 +25,7 @@ public:
 	[[nodiscard]] std::wstring getDescription() { return description; }
 
 	inline static constexpr std::wstring_view MAIN_SCRIPT_NAME = L"main.js";
+	inline static constexpr std::wstring_view PLUGIN_MANIFEST_FILE = L"plugin.json";
 	
 	JsPlugin(std::wstring const& relativePath);
 

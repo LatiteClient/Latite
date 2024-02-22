@@ -37,14 +37,13 @@ std::filesystem::path PluginManager::getUserPrerunDir() {
 	return getUserDir();
 }
 
-std::shared_ptr<JsPlugin> PluginManager::loadPlugin(std::wstring const& folderPath, bool run)
-{
+std::shared_ptr<JsPlugin> PluginManager::loadPlugin(std::wstring const& folderPath, bool run) {
 	auto& fPathW = folderPath;
 	auto scriptPath = getUserDir() / fPathW;
 	if (!std::filesystem::exists(scriptPath)) return nullptr;
 
 	for (auto& scr : this->items) {
-		if (scr->getRelFolderPath() == fPathW) {
+		if (std::filesystem::absolute(scr->getPath()) == std::filesystem::absolute(scriptPath)) {
 			Latite::getClientMessageSink().push(util::Format(std::format("Plugin {} is already loaded.", util::WStrToStr(scr->getName()))));
 			return nullptr;
 		}
@@ -67,8 +66,7 @@ std::shared_ptr<JsPlugin> PluginManager::loadPlugin(std::wstring const& folderPa
 	return myScript;
 }
 
-std::shared_ptr<JsPlugin> PluginManager::getPluginByName(std::wstring const& name)
-{
+std::shared_ptr<JsPlugin> PluginManager::getPluginByName(std::wstring const& name) {
 	for (auto& script : items) {
 		if (script->getFolderName() == name) {
 			return script;
@@ -77,8 +75,7 @@ std::shared_ptr<JsPlugin> PluginManager::getPluginByName(std::wstring const& nam
 	return nullptr;
 }
 
-void PluginManager::popScript(std::shared_ptr<JsPlugin> ptr)
-{
+void PluginManager::popScript(std::shared_ptr<JsPlugin> ptr) {
 	for (auto it = items.begin(); it != items.end(); ++it) {
 		if (*it == ptr) {
 			unloadScript(*it);
@@ -125,10 +122,26 @@ bool PluginManager::loadPrerunScripts()
 
 	auto prerunPath = getUserPrerunDir();
 	std::filesystem::create_directory(prerunPath);
-	using recursive_directory_iterator = std::filesystem::recursive_directory_iterator;
-	for (auto& dirEntry : recursive_directory_iterator(prerunPath)) {
+	for (auto& dirEntry : std::filesystem::directory_iterator(prerunPath)) {
 		if (dirEntry.is_directory()) {
-			loadPlugin(dirEntry.path().filename().wstring(), true);
+			auto pluginJsonPath = dirEntry.path() / JsPlugin::PLUGIN_MANIFEST_FILE;
+			std::ifstream ifs{pluginJsonPath};
+
+			bool res = loadPlugin(dirEntry.path().filename().wstring(), true) == nullptr;
+			
+			if (!ifs.fail()) {
+				try {
+					auto json = json::parse(ifs);
+					ifs.close();
+
+					std::ofstream ofs{pluginJsonPath};
+					if (!ofs.fail()) {
+						json["lastLaunch"] = res;
+					}					
+				}
+				catch (nlohmann::json::parse_error&) {
+				}
+			}
 		}
 	}
 	return true;
