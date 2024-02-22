@@ -792,6 +792,9 @@
     <ClInclude Include="src\client\script\class\impl\JsNativeModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\sdk\common\entity\component\AttributesComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />

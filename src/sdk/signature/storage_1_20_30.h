@@ -45,6 +45,7 @@ public:
 			"ActorRuntimeIDComponent"};
 
 		inline static SigImpl actorTypeComponent{};
+		inline static SigImpl attributesComponent{};
 	};
 
 	struct Vtable {
@@ -215,7 +216,7 @@ public:
 		"e8 ? ? ? ? 48 81 c3 ? ? ? ? 4c 89 65",
 		"ItemRenderer::renderGuiItemNew"};
 
-	inline static SigImpl Actor_getAttribute{};
+	inline static SigImpl BaseAttributeMap_getInstance{};
 
 	inline static SigImpl UIControl_setPosition{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? f3 0f 58 73 ? f3 0f 58 7b ? f3 0f 11 7c 24 ? f3 0f 11 74 24 ? 48 8b cb",

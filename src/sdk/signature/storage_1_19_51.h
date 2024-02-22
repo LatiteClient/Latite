@@ -45,6 +45,7 @@ public:
 			"ActorRuntimeIDComponent"};
 
 		inline static SigImpl actorTypeComponent{};
+		inline static SigImpl attributesComponent{};
 
 	};
 
@@ -201,7 +202,7 @@ public:
 		"40 53 55 56 57 41 54 41 55 41 56 41 57 48 81 ec ? ? ? ? 0f 29 b4 24 ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 84 24 ? ? ? ? 45 8b e1",
 		"ItemRenderer::renderGuiItemNew"};
 
-	inline static SigImpl Actor_getAttribute{};
+	inline static SigImpl BaseAttributeMap_getInstance{};
 
 	inline static SigImpl UIControl_setPosition{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? 0f 28 ce f3 0f 59 4f",

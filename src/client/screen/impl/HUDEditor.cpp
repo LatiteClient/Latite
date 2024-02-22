@@ -25,6 +25,7 @@ HUDEditor::HUDEditor() : dragMod(nullptr) {
 	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&HUDEditor::onRender, 2, true);
 	Eventing::get().listen<RenderLayerEvent>(this, (EventListenerFunc)&HUDEditor::onRenderLayer, 1, true);
 	Eventing::get().listen<ClickEvent>(this, (EventListenerFunc)&HUDEditor::onClick);
+	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc)&HUDEditor::onKey);
 }
 
 void HUDEditor::onRender(Event& ev) {

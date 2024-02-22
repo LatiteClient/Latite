@@ -7,7 +7,7 @@ namespace SDK {
 	class AttributeInstance {
 	public:
 		// AttributeInstance::getCurrentValue
-		CLASS_FIELD(float, value, 0x84);
+		MVCLASS_FIELD(float, value, 0x88, 0x84, 0x84, 0x84);
 	};
 
 	class Attribute {
@@ -25,6 +25,6 @@ namespace SDK {
 	public:
 		inline static Attribute Hunger = Attribute(1, "minecraft:hunger");
 		inline static Attribute Saturation = Attribute(2, "minecraft:saturation");
-		inline static Attribute Health = Attribute(6, "minecraft:health");
+		inline static Attribute Health = Attribute(SDK::mvGetOffset<7, 6, 6, 6>(), "minecraft:health");
 	};
 }

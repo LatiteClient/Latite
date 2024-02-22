@@ -37,6 +37,8 @@ namespace SDK {
 		uint8_t getEntityTypeID();
 		void swing();
 		bool isPlayer();
+
+		class AttributesComponent* getAttributesComponent();
 		class AttributeInstance* getAttribute(class Attribute& attribute);
 		float getHealth();
 		float getHunger();

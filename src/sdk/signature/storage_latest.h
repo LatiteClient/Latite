@@ -49,6 +49,12 @@ public:
 			// last 4 bytes is the hash of the component
 			"48 89 5C 24 08 57 48 83 EC 30 48 8B DA BA 14 AD F3 51",
 			"ActorTypeComponent"}; //51F3AD14
+
+		inline static SigImpl attributesComponent{[](memory::signature_store&, uintptr_t res) { return res; },
+			// last 4 bytes is the hash of the component
+			"48 89 5C 24 08 57 48 83 EC 30 48 8B DA BA 44 94 B2 B6",
+			"AttributesComponent"};
+
 	};
 
 	struct Vtable {
@@ -218,9 +224,9 @@ public:
 		"ItemRenderer::renderGuiItemNew"};
 
 	// TODO: this is actually BaseAttributeMap::getInstance
-	inline static SigImpl Actor_getAttribute{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+	inline static SigImpl BaseAttributeMap_getInstance{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? 48 8d 54 24 ? f3 0f 10 b0",
-		"Actor::getAttribute"};
+		"BaseAttributeMap::getInstance"};
 
 	inline static SigImpl UIControl_setPosition{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? f3 0f 58 73 ? f3 0f 58 7b ? f3 0f 11 7c 24 ? f3 0f 11 74 24 ? 48 8b cb",

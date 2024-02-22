@@ -518,6 +518,7 @@
     <ClInclude Include="src\sdk\common\client\renderer\Tessellator.h" />
     <ClInclude Include="src\sdk\common\client\renderer\TexturePtr.h" />
     <ClInclude Include="src\sdk\common\client\util\JpegCommentWriter.h" />
+    <ClInclude Include="src\sdk\common\entity\component\AttributesComponent.h" />
     <ClInclude Include="src\sdk\common\entity\component\MoveInputComponent.h" />
     <ClInclude Include="src\sdk\common\network\Packet.h" />
     <ClInclude Include="src\sdk\common\network\PacketSender.h" />

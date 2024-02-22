@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "sdk/signature/storage.h"
 #include "sdk/common/world/Attribute.h"
+#include <sdk/common/entity/component/AttributesComponent.h>
 
 AABB& SDK::Actor::getBoundingBox() {
 	if (internalVers < V1_19_51) {
@@ -69,27 +70,37 @@ bool SDK::Actor::isPlayer() {
 	return getEntityTypeID() == 63;
 }
 
+SDK::AttributesComponent* SDK::Actor::getAttributesComponent() {
+	return reinterpret_cast<SDK::AttributesComponent * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::attributesComponent.result)(entityContext.getBasicRegistry(), &entityContext.getId());
+}
+
 SDK::AttributeInstance* SDK::Actor::getAttribute(SDK::Attribute& attribute) {
 	if (internalVers >= V1_20_40) {
-		return reinterpret_cast<AttributeInstance*(__fastcall*)(Actor*, Attribute&)>(Signatures::Actor_getAttribute.result)(this, attribute);
+		return getAttributesComponent()->baseAttributes.getInstance(attribute.mIDValue).value_or(nullptr);
 	}
 
 	return memory::callVirtual<SDK::AttributeInstance*>(this, SDK::mvGetOffset<0xB8, 0xCF, 0xD0>(), attribute);
 }
 
 float SDK::Actor::getHealth() {
-	return 20.f;
-	return getAttribute(SDK::Attributes::Health)->value;
+	auto attrib = getAttribute(SDK::Attributes::Health);
+	if (!attrib)
+		return 20.f;
+	return attrib->value;
 }
 
 float SDK::Actor::getHunger() {
-	return 20.f;
-	return getAttribute(SDK::Attributes::Hunger)->value;
+	auto attrib = getAttribute(SDK::Attributes::Hunger);
+	if (!attrib)
+		return 20.f;
+	return attrib->value;
 }
 
 float SDK::Actor::getSaturation() {
-	return 20.f;
-	return getAttribute(SDK::Attributes::Saturation)->value;
+	auto attrib = getAttribute(SDK::Attributes::Saturation);
+	if (!attrib)
+		return 20.f;
+	return attrib->value;
 }
 
 bool SDK::Actor::isInvisible() {
