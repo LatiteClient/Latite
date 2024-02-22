@@ -132,11 +132,12 @@ bool PluginManager::loadPrerunScripts()
 			if (!ifs.fail()) {
 				try {
 					auto json = json::parse(ifs);
+					json["lastLaunch"] = res;
 					ifs.close();
 
 					std::ofstream ofs{pluginJsonPath};
 					if (!ofs.fail()) {
-						json["lastLaunch"] = res;
+						ofs << std::setw(4) << json;
 					}					
 				}
 				catch (nlohmann::json::parse_error&) {
