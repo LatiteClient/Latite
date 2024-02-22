@@ -19,7 +19,7 @@ private:
 	ValueType mouseButtonHeight = FloatValue(30.f);
 	ValueType padding = FloatValue(3.f);
 	ValueType borderLength = FloatValue(2.f);
-	ValueType lerpSpeed = FloatValue(0.1f);
+	ValueType lerpSpeed = FloatValue(1.f);
 	ValueType radius = FloatValue(0.f);
 
 	ValueType borderColor = ColorValue(1.f, 1.f, 1.f, 0.5f);
