@@ -86,11 +86,10 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 		if (args.size() != 2) return false;
 		auto err = Latite::getPluginManager().installScript(args[1]);
 		if (err.has_value()) {
-			message("Could not install plugin (" + err.value() + std::string(")"), true);
 			return true;
 		}
-		message("plugin installed. Do &7" + Latite::getCommandManager().prefix + "plugin load &7Startup/" + args[1] + "&r to run the plugin.");
-		message("This plugin will load every time you load Minecraft. To disable this, move the plugin out of the &7Startup&r folder.");
+		message("plugin installed. Do &7" + Latite::getCommandManager().prefix + "plugin load &7" + args[1] + "&r to run the plugin.");
+		message("This plugin will load every time you load Minecraft.");
 		return true;
 	}
 	else {

@@ -178,15 +178,15 @@ void PluginManager::runScriptingOperations()
 }
 
 std::optional<int> PluginManager::installScript(std::string const& inName) {
-	std::wstring registry = L"https://raw.githubusercontent.com/LatiteScripting/Scripts/master/Scripts";
-	std::wstring jsonPath = registry + L"/scripts.json";
+	std::wstring registry = L"https://raw.githubusercontent.com/LatiteScripting/Scripts/master/Plugins";
+	std::wstring jsonPath = registry + L"/plugins.json";
 	nlohmann::json scriptsJson;
 
 	auto message = [](std::string const& msg, bool err = false) -> void {
 		if (err) {
-			Latite::getClientMessageSink().push(util::Format("[Script Installer] &c" + msg));
+			Latite::getClientMessageSink().push(util::Format("[&5Plugin Manager&r] &c") + msg);
 		}
-		else Latite::getClientMessageSink().push("[Script Installer] " + msg);
+		else Latite::getClientMessageSink().push(util::Format("[&5Plugin Manager&r] ") + msg);
 	};
 
 	auto http = HttpClient();
@@ -202,11 +202,17 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 			auto cont = response.Content();
 			auto strs = cont.ReadAsStringAsync().get();
 
-			try {
-				scriptsJson = nlohmann::json::parse(std::wstring(strs.c_str()));
+			if (response.IsSuccessStatusCode()) {
+				try {
+					scriptsJson = nlohmann::json::parse(std::wstring(strs.c_str()));
+				}
+				catch (nlohmann::json::parse_error& e) {
+					message("JSON error while installing plugin: " + std::string(e.what()), true);
+					return 0;
+				}
 			}
-			catch (nlohmann::json::parse_error& e) {
-				Latite::getClientMessageSink().push(std::string("JSON error while installing script: ") + e.what());
+			else {
+				message("Could not fetch the plugin list. Are you connected to the internet?", true);
 				return 0;
 			}
 		}
@@ -215,7 +221,7 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 			return 0;
 		}
 	}
-	auto& arr = scriptsJson["Plugins"];
+	auto& arr = scriptsJson["plugins"];
 	for (auto& js : arr) {
 		auto name = js["name"].get<std::string>();
 		auto oName = js["name"].get<std::string>();
@@ -224,7 +230,6 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 		std::transform(in.begin(), in.end(), in.begin(), ::tolower);
 		std::transform(name.begin(), name.end(), name.begin(), ::tolower);
 		if (in == name) {
-			message("Installing " + oName + " v" + js["version"].get<std::string>() + " by " + js["author"].get<std::string>());
 			std::filesystem::path path = getUserPrerunDir() / woName;
 			std::filesystem::create_directories(path);
 			for (auto& fil : js["files"]) {
@@ -246,7 +251,7 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 			}
 			// generate certificate
 			auto cert = JsPlugin::getHash(path);
-			if (cert) {
+			if (cert && !js.contains(XOR_STRING("doNotTrust"))) {
 #if LATITE_DEBUG
 				Logger::Info("Generated certificate {}", util::WStrToStr(cert.value()));
 #endif
@@ -255,7 +260,9 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 				ofs.flush(); // so we can access the certificate directly after
 			}
 			else {
+#if LATITE_DEBUG
 				Logger::Warn(XOR_STRING("Could not create certificate for script {}"), path.string());
+#endif
 			}
 			return std::nullopt;
 		}
