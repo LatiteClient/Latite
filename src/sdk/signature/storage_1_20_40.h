@@ -33,6 +33,9 @@ public:
 		inline static SigImpl uiColorMaterial{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8b 05 ? ? ? ? 48 85 c0 74 ? 48 83 78",
 			"UIFillColorMaterial"};
+		inline static SigImpl thirdPersonNametag{[](memory::signature_store&, uintptr_t res) { return res; },
+			"0f 84 ? ? ? ? 49 8b d6 48 8b ce e8 ? ? ? ? 84 c0 0f 84",
+			"ThirdPersonNametag"};
 	};
 
 	struct Components {

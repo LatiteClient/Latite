@@ -213,6 +213,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(ActorRenderDispatcher_render),
         MVSIG(LevelRendererPlayer_renderOutlineSelection),
         MVSIG(Components::attributesComponent),
+        MVSIG(Misc::thirdPersonNametag),
     };
     
     new (mmgrBuf) ModuleManager;

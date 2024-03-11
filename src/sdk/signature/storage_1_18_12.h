@@ -25,6 +25,7 @@ public:
 		inline static SigImpl uiColorMaterial{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8b 05 ? ? ? ? 48 85 c0 74 ? 48 83 78",
 			"UIFillColorMaterial"};
+		inline static SigImpl thirdPersonNametag{};
 	};
 
 	struct Vtable {
