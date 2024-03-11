@@ -6,7 +6,7 @@ static char originalBytes[instructionSize] = {};
 static void* instructionPointer = nullptr;
 
 void ThirdPersonNametag::onEnable() {
-    instructionPointer = reinterpret_cast<void*>(Signatures::Misc::thirdPersonNametag);
+    instructionPointer = reinterpret_cast<void*>(Signatures::Misc::thirdPersonNametag.result);
 
     if (instructionPointer) {
         memcpy(originalBytes, instructionPointer, instructionSize);
