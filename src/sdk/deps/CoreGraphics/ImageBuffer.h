@@ -59,7 +59,7 @@ namespace SDK {
 			mce::Blob mStorage;
 			ImageDescription mImageDescription{};
 
-			ImageBuffer(int imageWidth, int imageHeight) : mStorage{ (imageWidth * imageHeight) * 4 /*Im assuming its ARGB/RGBA so 4 bytes per pixel?*/} {
+			ImageBuffer(int imageWidth, int imageHeight) : mStorage{ size_t((imageWidth * imageHeight) * 4) /*Im assuming its ARGB/RGBA so 4 bytes per pixel?*/} {
 				mImageDescription.mWidth = (float)imageWidth;
 				mImageDescription.mHeight = (float)imageHeight;
 				mImageDescription.mArraySize = (int)mStorage.size;

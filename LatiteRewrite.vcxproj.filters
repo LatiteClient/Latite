@@ -795,6 +795,12 @@
     <ClInclude Include="src\sdk\common\entity\component\AttributesComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\game\ThirdPersonNametag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\game\EnvironmentChanger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1212,6 +1218,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\module\impl\hud\MovableBossbar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\game\ThirdPersonNametag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
