@@ -213,6 +213,9 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(ActorRenderDispatcher_render),
         MVSIG(LevelRendererPlayer_renderOutlineSelection),
         MVSIG(Components::attributesComponent),
+        MVSIG(Dimension_getSkyColor),
+        MVSIG(Dimension_getTimeOfDay),
+        MVSIG(Weather_tick),
     };
     
     new (mmgrBuf) ModuleManager;

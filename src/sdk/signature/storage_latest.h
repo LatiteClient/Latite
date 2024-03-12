@@ -243,6 +243,22 @@ public:
 	inline static SigImpl LevelRendererPlayer_renderOutlineSelection{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? 48 83 c4 ? 41 5f 41 5e 41 5d 5e 5d c3 0f b6 84 24",
 		"LevelRendererPlayer::renderOutlineSelection"};
+	
+	inline static SigImpl Dimension_getTimeOfDay{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? 0f 28 c8 0f 57 c0 f3 0f 59 0d ? ? ? ? f3 0f 58 c9",
+		"Dimension::getTimeOfDay"};
+	
+	inline static SigImpl Weather_tick{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? 0f 28 c8 0f 57 c0 f3 0f 59 0d ? ? ? ? f3 0f 58 c9",
+		"Weather::tick"};
+	
+	inline static SigImpl Dimension_getSkyColor{[](memory::signature_store&, uintptr_t res) { return res; },
+		"41 0F 10 08 48 8B C2 0F 28 D3",
+		"Dimension::getSkyColor"};
+	
+
+
+	//e8 ? ? ? ? 0f 28 c8 0f 57 c0 f3 0f 59 0d ? ? ? ? f3 0f 58 c9
 
 
 	//40 53 48 83 ec ? 48 8b da 48 8b 91 ? ? ? ? 48 8b ca

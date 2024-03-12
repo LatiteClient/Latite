@@ -201,6 +201,17 @@ public:
 	inline static SigImpl LevelRendererPlayer_renderOutlineSelection{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? 48 83 c4 ? 41 5f 41 5e 41 5d 5e 5d c3 0f b6 84 24",
 		"LevelRendererPlayer::renderOutlineSelection"};
+	
+	inline static SigImpl Dimension_getTimeOfDay{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"E8 ? ? ? ? 0F 28 C8 0F 57 C0 F3 0F 59 0D",
+		"Dimension::getTimeOfDay"};
+	inline static SigImpl Weather_tick{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? 0f 28 c8 0f 57 c0 f3 0f 59 0d ? ? ? ? f3 0f 58 c9",
+		"Weather::tick"};
+	
+	inline static SigImpl Dimension_getSkyColor{[](memory::signature_store&, uintptr_t res) { return res; },
+		"41 0f 10 08 48 8b c2",
+		"Dimension::getSkyColor"};
 };
 
 // after adding sigs here, add them in latite.cpp
