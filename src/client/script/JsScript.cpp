@@ -337,7 +337,7 @@ namespace {
 		return mod->getModuleExports();
 	}
 
-	winrt::Windows::Foundation::IAsyncAction doRequestPermission(std::wstring const& str,
+	winrt::Windows::Foundation::IAsyncAction doRequestPermission(JsPlugin* plugin, std::wstring const& str,
 		JsPlugin::UserPermission perm) {
 		winrt::Windows::UI::Popups::UICommand yesCommand;
 		yesCommand.Label(L"Grant permission");
@@ -357,9 +357,18 @@ namespace {
 
 		auto res = co_await dialog.ShowAsync();
 
-		auto label = util::WStrToStr(res.Label().c_str());
-		if (label == "Grant permission") {
-			JsScript::getThis()->getPlugin()->grantPermission(perm);
+		bool hasPlugin = false;
+		Latite::getPluginManager().forEach([plugin, &hasPlugin](std::shared_ptr<JsPlugin> plug) {
+			if (plug.get() == plugin) {
+				hasPlugin = true;
+			}
+			});
+
+		if (hasPlugin) {
+			auto label = util::WStrToStr(res.Label().c_str());
+			if (label == "Grant permission") {
+				plugin->grantPermission(perm);
+			}
 		}
 
 		co_return;
@@ -389,7 +398,7 @@ namespace {
 		}
 
 		if (!plugin->hasPermission(perm)) {
-			doRequestPermission(reqMessage, perm);
+			doRequestPermission(thi->getPlugin(), reqMessage, perm);
 		}
 
 		
@@ -421,9 +430,7 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsItem>(this));
 	this->classes.push_back(std::make_shared<JsItemStack>(this));
 	this->classes.push_back(std::make_shared<JsTextureClass>(this));
-#ifdef LATITE_DEBUG
 	this->classes.push_back(std::make_shared<JsNativeModule>(this));
-#endif
 	JsErrorCode err;
 
 	JsValueRef globalObj = Chakra::GetGlobalObject();

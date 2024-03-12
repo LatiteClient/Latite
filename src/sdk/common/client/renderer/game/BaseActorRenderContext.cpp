@@ -8,3 +8,6 @@ SDK::BaseActorRenderContext::BaseActorRenderContext(SDK::ScreenContext* ctx, SDK
 	static auto oFunc = reinterpret_cast<oFunc_t>(Signatures::BaseActorRenderContext_BaseActorRenderContext.result);
 	oFunc(this, ctx, cInst, game);
 }
+
+SDK::BaseActorRenderContext::~BaseActorRenderContext() {
+}

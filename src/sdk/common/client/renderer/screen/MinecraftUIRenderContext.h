@@ -50,13 +50,25 @@ namespace SDK {
         class ClientInstance* cinst;
         ScreenContext* screenContext;
 
+        void flushText(float lastFlush) {
+            if (internalVers >= V1_20_60) {
+                memory::callVirtual<void>(this, 6, 0, lastFlush);
+            }
+            else {
+                memory::callVirtual<void>(this, 6, lastFlush);
+            }
+        }
+
         virtual ~MinecraftUIRenderContext() = 0; // 0x0
         virtual void getLineLength(class Font*,  std::string const&,  float,  bool) = 0; // 0x1
         virtual float getTextAlpha() = 0; // 0x2
         virtual void setTextAlpha(float) = 0; // 0x3
         virtual void drawDebugText(RectangleArea const&,  std::string const&,  Color const&,  float,  ui::TextAlignment,  TextMeasureData const&, CaretMeasureData const&) = 0; // 0x4
         virtual void drawText(class Font*, RectangleArea const&, std::string const&, Color const&, float, ui::TextAlignment, TextMeasureData const&, CaretMeasureData const&) = 0; // 0x5
-        virtual void flushText(float) = 0; // 0x6
+        
+    private:
+        virtual void flushText_(float) = 0; // 0x6
+    public:
         virtual void drawImage(TexturePtr const& texture, Vec2 const& pos, Vec2 const& size, Vec2 const& uvPos, Vec2 const& uvSize) = 0; // 0x7
         virtual void drawNineslice(TexturePtr const&, void* const&) = 0; // 0x8
         virtual void flushImages(Color const&, float, HashedString const&) = 0; // 0x9
