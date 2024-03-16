@@ -27,6 +27,9 @@ namespace {
 	std::shared_ptr<Hook> RenderEntityHook;
 	std::shared_ptr<Hook> OutlineSelectionHook;
 	std::shared_ptr<Hook> RenderGuiItemNewHook;
+	std::shared_ptr<Hook> GetTimeOfDayHook;
+	std::shared_ptr<Hook> WeatherHook;
+	std::shared_ptr<Hook> FogColorHook;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -285,6 +288,34 @@ void* GenericHooks::hkRenderGuiItemNew(void* obj, SDK::BaseActorRenderContext* b
 	return RenderGuiItemNewHook->oFunc<decltype(&hkRenderGuiItemNew)>()(obj, baseActorRenderContext, itemStack, mode, x, y, opacity, scale, a9, ench);
 }
 
+float GenericHooks::hkGetTimeOfDay(SDK::Dimension* obj) {
+	auto o = GetTimeOfDayHook->oFunc<decltype(&hkGetTimeOfDay)>()(obj);
+	GetTimeEvent ev{o};
+	Eventing::get().dispatch(ev);
+
+	return ev.getTime();
+}
+
+void GenericHooks::hkWeatherTick(SDK::Weather* obj) {
+	WeatherEvent ev{};
+	Eventing::get().dispatch(ev);
+
+	if (!ev.shouldShowWeather()) {
+		obj->data = SDK::Weather::WeatherData{};
+	}
+
+	WeatherHook->oFunc<decltype(&hkWeatherTick)>()(obj);
+}
+
+Color* GenericHooks::hkGetFogColor(SDK::Dimension* obj, Color* out, SDK::Actor* ent, float f) {
+	FogColorHook->oFunc<decltype(&hkGetFogColor)>()(obj, out, ent, f);
+	
+	FogColorEvent ev{ out };
+	Eventing::get().dispatch(ev);
+
+	return out;
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
 	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
@@ -328,5 +359,12 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	OutlineSelectionHook = addHook(Signatures::LevelRendererPlayer_renderOutlineSelection.result, LevelRendererPlayer_renderOutlineSelection, "LevelRendererPlayer::renderOutlineSelection");
 
 	RenderGuiItemNewHook = addHook(Signatures::ItemRenderer_renderGuiItemNew.result, hkRenderGuiItemNew, "ItemRenderer::renderGuiItemNew");
+
+
+	FogColorHook = addHook(Signatures::Dimension_getSkyColor.result, hkGetFogColor, "Dimension::getFogColor");
+
+	GetTimeOfDayHook = addHook(Signatures::Dimension_getTimeOfDay.result, hkGetTimeOfDay, "Dimension::getTimeOfDay");
+
+	WeatherHook = addHook(Signatures::Weather_tick.result, hkWeatherTick, "Weather::tick");
 }
 

@@ -207,7 +207,7 @@ public:
 		"E8 ? ? ? ? 0F 28 C8 0F 57 C0 F3 0F 59 0D",
 		"Dimension::getTimeOfDay"};
 	inline static SigImpl Weather_tick{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"e8 ? ? ? ? 0f 28 c8 0f 57 c0 f3 0f 59 0d ? ? ? ? f3 0f 58 c9",
+		"e8 ? ? ? ? 48 8b 8f ? ? ? ? e8 ? ? ? ? 48 8b 8f ? ? ? ? 48 8b 01 48 8b 80",
 		"Weather::tick"};
 	
 	inline static SigImpl Dimension_getSkyColor{[](memory::signature_store&, uintptr_t res) { return res; },

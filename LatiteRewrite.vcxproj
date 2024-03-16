@@ -322,8 +322,11 @@
   <ItemGroup>
     <ClInclude Include="src\client\event\impl\AttackEvent.h" />
     <ClInclude Include="src\client\event\impl\ClientTextEvent.h" />
+    <ClInclude Include="src\client\event\impl\FogColorEvent.h" />
+    <ClInclude Include="src\client\event\impl\GetTimeEvent.h" />
     <ClInclude Include="src\client\event\impl\OutlineSelectionEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderGuiItemEvent.h" />
+    <ClInclude Include="src\client\event\impl\WeatherEvent.h" />
     <ClInclude Include="src\client\feature\module\impl\game\EnvironmentChanger.h" />
     <ClInclude Include="src\client\feature\module\impl\game\ThirdPersonNametag.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\MovableBossbar.h" />
@@ -541,6 +544,7 @@
     <ClInclude Include="src\sdk\common\world\level\block\Block.h" />
     <ClInclude Include="src\sdk\common\world\level\block\BlockLegacy.h" />
     <ClInclude Include="src\sdk\common\world\level\HitResult.h" />
+    <ClInclude Include="src\sdk\common\world\Weather.h" />
     <ClInclude Include="src\sdk\deps\Application\AppPlatform.h" />
     <ClInclude Include="src\sdk\deps\CoreGraphics\ImageBuffer.h" />
     <ClInclude Include="src\sdk\deps\Core\StringUtils.h" />
@@ -602,6 +606,7 @@
     <Text Include="src\util\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\client\feature\module\impl\game\EnvironmentChanger.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\ThirdPersonNametag.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\MovableBossbar.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\MovableScoreboard.cpp" />

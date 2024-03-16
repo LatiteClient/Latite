@@ -29,11 +29,11 @@ public:
 
 	[[nodiscard]] KeyValue getKeybind() { return std::get<KeyValue>(key); }
 	[[nodiscard]] bool isEnabled() { return std::get<BoolValue>(enabled); };
-	[[nodiscard]] bool isHud() { return hud; };
-	[[nodiscard]] bool isTextual() { return textual; };
-	[[nodiscard]] bool isVisible() { return visible; };
-	[[nodiscard]] bool isBlocked() { return blocked; };
-	void setEnabled(bool b) { b ? onEnable() : onDisable();  std::get<BoolValue>(enabled) = b; }
+	[[nodiscard]] bool isHud() const { return hud; };
+	[[nodiscard]] bool isTextual() const { return textual; };
+	[[nodiscard]] bool isVisible() const { return visible; };
+	[[nodiscard]] bool isBlocked() const { return blocked; };
+	void setEnabled(bool b) { b ? onEnable() : onDisable(); std::get<BoolValue>(enabled) = b; }
 
 	bool shouldListen() { return isEnabled(); }
 
