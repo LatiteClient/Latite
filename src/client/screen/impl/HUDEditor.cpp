@@ -168,6 +168,14 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 		keepModulesInBounds(SDK::ClientInstance::get()->getGuiData()->screenSize);
 	}
 
+	if (!SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
+		Latite::getModuleManager().forEach([](std::shared_ptr<IModule> mod) {
+			if (mod->isEnabled() && mod->shouldHoldToToggle()) {
+				mod->setEnabled(false);
+			}
+			});
+	}
+
 	//auto view = ev.getScreenView();
 	
 	//float uiscale = sdk::ClientInstance::get()->getGuiData()->guiScale;
@@ -225,6 +233,7 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 void HUDEditor::onKey(Event& evGeneric) {
 	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
 	if (ev.getKey() == VK_F11) return;
+	if (ev.getKey() == VK_ESCAPE) close();
 
 	ev.setCancelled();
 }

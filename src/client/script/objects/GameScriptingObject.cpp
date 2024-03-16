@@ -29,6 +29,7 @@ void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(object, getWorldCallback, L"getWorld", this);
 
 	Chakra::DefineFunc(object, getConnectedServerCallback, L"getServer");
+	Chakra::DefineFunc(object, getPortCallback, L"getPort");
 	Chakra::DefineFunc(object, getConnectedFeaturedServerCallback, L"getFeaturedServer");
 	Chakra::DefineFunc(object, getInputBinding, L"getInputBinding");
 }
@@ -242,4 +243,11 @@ JsValueRef GameScriptingObject::getConnectedFeaturedServerCallback(JsValueRef ca
 	JsValueRef ret;
 	JS::JsPointerToString(conn.c_str(), conn.size(), &ret);
 	return ret;
+}
+
+JsValueRef GameScriptingObject::getPortCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	auto rak = SDK::RakNetConnector::get();
+	if (!rak) return Chakra::MakeInt(0);
+
+	return Chakra::MakeInt(rak->port);
 }
