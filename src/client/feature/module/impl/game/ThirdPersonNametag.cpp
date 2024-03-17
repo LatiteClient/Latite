@@ -19,8 +19,11 @@ void ThirdPersonNametag::onEnable() {
 }
 
 void ThirdPersonNametag::onDisable() {
-    DWORD protect;
-    VirtualProtect(instructionPointer, instructionSize, PAGE_EXECUTE_READWRITE, &protect);
-    memcpy(instructionPointer, originalBytes, instructionSize);
-    VirtualProtect(instructionPointer, instructionSize, protect, &protect);
+
+    if (instructionPointer) {
+        DWORD protect;
+        VirtualProtect(instructionPointer, instructionSize, PAGE_EXECUTE_READWRITE, &protect);
+        memcpy(instructionPointer, originalBytes, instructionSize);
+        VirtualProtect(instructionPointer, instructionSize, protect, &protect);
+    }
 }

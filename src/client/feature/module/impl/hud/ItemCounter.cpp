@@ -53,7 +53,7 @@ ItemCounter::ItemCounter() : HUDModule("ItemCounter", "Item Counter", "Counts ce
 	addSetting("potions", "Potions", "", potions);
 	addSetting("arrows", "Arrows", "", arrow);
 	addSetting("crystals", "Crystals", "", crystals);
-	addSetting("totems", "Totems", "", arrow);
+	addSetting("totems", "Totems", "", totems);
 	addSetting("bottles", "XP Bottles", "", xpBottles);
 
 	counterList.emplace_back(potionT, potions, false, 0, "potion");
