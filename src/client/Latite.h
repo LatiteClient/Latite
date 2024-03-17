@@ -161,5 +161,3 @@ private:
 	bool shouldEject = false;
 	bool hasInit = false;
 };
-
-extern "C" __declspec(dllexport) char* LatiteGetServerStatus();

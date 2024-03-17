@@ -328,13 +328,17 @@
     <ClInclude Include="src\client\event\impl\SendPacketEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderGuiItemEvent.h" />
     <ClInclude Include="src\client\event\impl\WeatherEvent.h" />
+    <ClInclude Include="src\client\feature\command\impl\WaypointCommand.h" />
     <ClInclude Include="src\client\feature\module\impl\game\EnvironmentChanger.h" />
     <ClInclude Include="src\client\feature\module\impl\game\ThirdPersonNametag.h" />
+    <ClInclude Include="src\client\feature\module\impl\game\Waypoints.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\ItemCounter.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\MovableBossbar.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\MovableScoreboard.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\ReachDisplay.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\CommandShortcuts.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\ItemTweaks.h" />
+    <ClInclude Include="src\client\feature\module\impl\misc\JavaDrop.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\Nickname.h" />
     <ClInclude Include="src\client\feature\module\impl\visual\BlockOutline.h" />
     <ClInclude Include="deps\include\vhook\vtable_hook.h" />
@@ -610,11 +614,14 @@
   <ItemGroup>
     <ClCompile Include="src\client\feature\module\impl\game\EnvironmentChanger.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\ThirdPersonNametag.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\game\Waypoints.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\ItemCounter.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\MovableBossbar.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\MovableScoreboard.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\ReachDisplay.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\CommandShortcuts.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\ItemTweaks.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\misc\JavaDrop.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\Nickname.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\BlockOutline.cpp" />
     <ClCompile Include="deps\include\vhook\vtable_hook.cpp" />

@@ -744,7 +744,7 @@ void Latite::onUpdate(Event& evGeneric) {
         }
         lastDX11 = std::get<BoolValue>(useDX11);
     }
-
+#if 0
     {
         static auto time = std::chrono::steady_clock::now();
         auto now = std::chrono::steady_clock::now();
@@ -773,6 +773,7 @@ void Latite::onUpdate(Event& evGeneric) {
             time = now;
         }
     }
+#endif
 }
 
 void Latite::onKey(Event& evGeneric) {
@@ -895,8 +896,4 @@ void Latite::loadConfig(SettingGroup& gr) {
             }
             });
         });
-}
-
-char* LatiteGetServerStatus() {
-    return shared::serverStatus.data();
 }

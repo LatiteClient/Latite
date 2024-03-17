@@ -39,8 +39,11 @@ public:
 
 private:
 	void createWorldObject();
+	void createDimensionObject();
 
 	JsValueRef worldObj = JS_INVALID_REFERENCE;
+	JsValueRef dimensionObj = JS_INVALID_REFERENCE;
+
 	static JsValueRef CALLBACK worldGetName(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK worldGetPlayers(JsValueRef callee, bool isConstructor,
@@ -48,6 +51,11 @@ private:
 	static JsValueRef CALLBACK worldGetEntList(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK worldGetEntCount(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+
+	static JsValueRef CALLBACK dimensionGetName(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK dimensionGetBlock(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 public:
 	~GameScriptingObject() override {

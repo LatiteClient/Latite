@@ -40,6 +40,7 @@
 #include "impl/hud/MovableScoreboard.h"
 #include "impl/hud/ReachDisplay.h"
 #include "impl/hud/MovableBossbar.h"
+#include "impl/hud/ItemCounter.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
 
@@ -82,6 +83,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<ThirdPersonNametag>());
 	this->items.push_back(std::make_shared<EnvironmentChanger>());
 	this->items.push_back(std::make_shared<CommandShortcuts>());
+	this->items.push_back(std::make_shared<ItemCounter>());
 
 	for (auto& mod : items) {
 		mod->onInit();
