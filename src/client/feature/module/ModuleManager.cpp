@@ -6,6 +6,7 @@
 #include "impl/misc/Nickname.h"
 #include "impl/misc/ItemTweaks.h"
 #include "impl/misc/DebugInfo.h"
+#include "impl/misc/CommandShortcuts.h"
 
 #include "impl/game/Zoom.h"
 #include "impl/game/CinematicCamera.h"
@@ -80,6 +81,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<MovableBossbar>());
 	this->items.push_back(std::make_shared<ThirdPersonNametag>());
 	this->items.push_back(std::make_shared<EnvironmentChanger>());
+	this->items.push_back(std::make_shared<CommandShortcuts>());
 
 	for (auto& mod : items) {
 		mod->onInit();

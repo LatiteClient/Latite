@@ -325,6 +325,7 @@
     <ClInclude Include="src\client\event\impl\FogColorEvent.h" />
     <ClInclude Include="src\client\event\impl\GetTimeEvent.h" />
     <ClInclude Include="src\client\event\impl\OutlineSelectionEvent.h" />
+    <ClInclude Include="src\client\event\impl\SendPacketEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderGuiItemEvent.h" />
     <ClInclude Include="src\client\event\impl\WeatherEvent.h" />
     <ClInclude Include="src\client\feature\module\impl\game\EnvironmentChanger.h" />
@@ -332,6 +333,7 @@
     <ClInclude Include="src\client\feature\module\impl\hud\MovableBossbar.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\MovableScoreboard.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\ReachDisplay.h" />
+    <ClInclude Include="src\client\feature\module\impl\misc\CommandShortcuts.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\ItemTweaks.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\Nickname.h" />
     <ClInclude Include="src\client\feature\module\impl\visual\BlockOutline.h" />
@@ -611,6 +613,7 @@
     <ClCompile Include="src\client\feature\module\impl\hud\MovableBossbar.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\MovableScoreboard.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\ReachDisplay.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\misc\CommandShortcuts.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\ItemTweaks.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\Nickname.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\BlockOutline.cpp" />

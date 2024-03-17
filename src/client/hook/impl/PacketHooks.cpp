@@ -5,6 +5,7 @@
 namespace {
     std::shared_ptr<Hook> SetTitlePacketRead;
     std::shared_ptr<Hook> TextPacketRead;
+    std::shared_ptr<Hook> SendToServerHook;
 }
 
 void* PacketHooks::SetTitlePacket_readExtended(SDK::SetTitlePacket* pkt, void* b, void* c) {
@@ -126,6 +127,16 @@ void* PacketHooks::TextPacket_read(SDK::TextPacket* pkt, void* b, void* c) {
     return res;
 }
 
+void PacketHooks::PacketSender_sendToServer(SDK::PacketSender* sender, SDK::Packet* packet) {
+    SendPacketEvent ev{ packet };
+
+    if (Eventing::get().dispatch(ev)) {
+        return;
+    }
+    
+    SendToServerHook->oFunc<decltype(&PacketSender_sendToServer)>()(sender, packet);
+}
+
 PacketHooks::PacketHooks() {
     if (Signatures::Vtable::SetTitlePacket.result) {
         auto vfunc = reinterpret_cast<uintptr_t*>(Signatures::Vtable::SetTitlePacket.result);
@@ -136,4 +147,9 @@ PacketHooks::PacketHooks() {
         auto vfunc = reinterpret_cast<uintptr_t*>(Signatures::Vtable::TextPacket.result);
         TextPacketRead = addTableSwapHook((uintptr_t)(vfunc + 4), TextPacket_read, "TextPacket::read");
     }
+}
+
+void PacketHooks::initPacketSender(SDK::PacketSender* sender) {
+    uintptr_t* vtable = *reinterpret_cast<uintptr_t**>(sender);
+    SendToServerHook = addTableSwapHook((uintptr_t)(vtable + 2), PacketSender_sendToServer, "PacketSender::sendToServer");
 }
