@@ -283,6 +283,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ModuleOutputFile>$(TargetName)</ModuleOutputFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
