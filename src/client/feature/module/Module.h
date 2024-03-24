@@ -18,6 +18,9 @@ public:
 			set->value = &enabled;
 			set->visible = false;
 			set->defaultValue = BoolValue(false);
+			set->callback = [this](Setting& s) {
+				this->setEnabled(std::get<BoolValue>(*s.value));
+			};
 
 			settings->addSetting(set);
 		}

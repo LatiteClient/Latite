@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "JsHudModule.h"
 #include <client/script/objects/D2DScriptingObject.h>
+#include <client/script/JsScript.h>
 
 JsHUDModule::JsHUDModule(std::string const& name, std::string const& displayName, std::string const& desc, int key, bool resizable) : HUDModule(name, displayName, desc, SCRIPT, key, resizable) {
 	JS::JsAddRef(object, nullptr);

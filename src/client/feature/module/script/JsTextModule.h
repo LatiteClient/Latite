@@ -1,6 +1,7 @@
 #pragma once
 #include "client/script/feature/JsEvented.h"
-
+#include "client/script/JsScript.h"
+#include <client/feature/module/TextModule.h>
 
 class JsTextModule : public TextModule, public JsEvented {
 public:

@@ -41,6 +41,18 @@ void GenericHooks::Level_tick(SDK::Level* level) {
 		Latite::getClientMessageSink().doPrint(100);
 
 		auto lp = SDK::ClientInstance::get()->getLocalPlayer();
+		{
+			static SDK::LocalPlayer* lastLocalPlayer = lp;
+
+
+
+			// this is cringe and in extremely cases would not fire, but it doesn't require any new SDK..
+			if (lp && lp != lastLocalPlayer) {
+				PluginManager::Event sEv{ L"world-change", {}, false };
+				Latite::getPluginManager().dispatchEvent(sEv);
+			}
+		}
+
 		static bool playerInitialized = false;
 		if (!playerInitialized && lp) {
 			Latite::getHooks().get<PlayerHooks>().init(lp);
@@ -347,7 +359,7 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 		MoveInputHandler_tickHook = addHook(Signatures::MoveInputHandler_tick.result, MoveInputHandler_tick, "MoveInputHandler::tick");
 	}
 
-	ViewBobHook = addHook(Signatures::CameraViewBob.result, CameraViewBob, "`anonymous namespace'::_bobMovement");
+	//ViewBobHook = addHook(Signatures::CameraViewBob.result, CameraViewBob, "`anonymous namespace'::_bobMovement");
 	if (Signatures::Vtable::Level.result) {
 		Level_initializeHook = addHook(reinterpret_cast<uintptr_t*>(Signatures::Vtable::Level.result)[1], Level_initialize, "Level::initialize");
 		Level_startLeaveGameHook = addHook(reinterpret_cast<uintptr_t*>(Signatures::Vtable::Level.result)[2], Level_startLeaveGame, "Level::startLeaveGame");

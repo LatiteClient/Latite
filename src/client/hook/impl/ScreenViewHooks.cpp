@@ -7,6 +7,7 @@
 #include "sdk/common/client/gui/controls/VisualTree.h"
 #include "sdk/common/client/gui/controls/UIControl.h"
 #include "../Hooks.h"
+#include <client/script/PluginManager.h>
 
 namespace {
 	std::shared_ptr<Hook> setupAndRenderHook;

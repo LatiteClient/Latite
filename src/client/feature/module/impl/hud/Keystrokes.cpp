@@ -2,6 +2,7 @@
 #include "Keystrokes.h"
 #include "client/input/Keyboard.h"
 #include <array>
+#include <client/Latite.h>
 
 Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement keys", HUD) {
 	addSetting("mouseButtons", "Mouse Buttons", "Show mouse buttons", mouseButtons);

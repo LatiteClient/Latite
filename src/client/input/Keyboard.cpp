@@ -2,7 +2,9 @@
 #include "Keyboard.h"
 #include "client/event/impl/CharEvent.h"
 #include "sdk/common/client/input/ClientInputHandler.h"
+#include <client/script/PluginManager.h>
 #include <chrono>
+#include <client/Latite.h>
 
 Keyboard::Keyboard(int* gameKeyMap) : keyMap(gameKeyMap) {
 	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Keyboard::onKey, 4);

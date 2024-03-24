@@ -11,6 +11,7 @@
 
 #include <winrt/windows.storage.h>
 #include <winrt/windows.storage.streams.h>
+#include <util/DxContext.h>
 
 using namespace winrt;
 using namespace winrt::Windows::Web::Http;

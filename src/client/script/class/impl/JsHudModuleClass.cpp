@@ -3,6 +3,7 @@
 #include "client/feature/module/script/JsHudModule.h"
 #include "JsRect.h"
 #include "JsVec2.h"
+#include <client/script/JsScript.h>
 
 JsValueRef JsHudModuleClass::hudModuleGetRect(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
 {

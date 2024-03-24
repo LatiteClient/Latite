@@ -1,4 +1,8 @@
 #pragma once
+#include <memory>
+#include <functional>
+#include <util/ChakraUtil.h>
+
 class JsScript {
 public:
 	JsContextRef ctx;
@@ -121,8 +125,8 @@ public:
 protected:
 	class JsPlugin* plugin;
 
-	std::vector<std::shared_ptr<ScriptingObject>> objects;
-	std::vector<std::shared_ptr<JsClass>> classes;
+	std::vector<std::shared_ptr<class ScriptingObject>> objects;
+	std::vector<std::shared_ptr<class JsClass>> classes;
 
 public:
 	std::vector<std::shared_ptr<AsyncOperation>> pendingOperations;
@@ -131,7 +135,7 @@ public:
 
 	std::vector<JsTimeout> timeouts = {};
 	std::vector<JsTimeout> intervals = {};
-	std::vector<std::shared_ptr<JsLibrary>> libraries;
+	std::vector<std::shared_ptr<class JsLibrary>> libraries;
 
 	void handleAsyncOperations();
 private:

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "BehindYou.h"
 #include <client/input/Keyboard.h>
+#include <client/Latite.h>
 
 BehindYou::BehindYou() : Module("BehindYou", "Behind You", "Bind a perspective to a key!", GAME, nokeybind) {
 	pers.addEntry(EnumEntry{ 0, "Third Person Front" });

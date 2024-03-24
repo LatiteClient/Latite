@@ -599,9 +599,9 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("minViewBob", "Minimal View Bob", "Only bob the item in hand, not the camera");
-        set->value = &this->minimalViewBob;
-        this->getSettings().addSetting(set);
+        //auto set = std::make_shared<Setting>("minViewBob", "Minimal View Bob", "Only bob the item in hand, not the camera");
+        //set->value = &this->minimalViewBob;
+        //this->getSettings().addSetting(set);
     }
 
     {

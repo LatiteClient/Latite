@@ -257,6 +257,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <ModuleOutputFile>$(TargetName)</ModuleOutputFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -362,7 +363,6 @@
     <ClInclude Include="src\client\feature\module\impl\hud\MovablePaperdoll.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\DebugInfo.h" />
     <ClInclude Include="src\client\feature\module\impl\game\DynamicLight.h" />
-    <ClInclude Include="src\client\feature\module\impl\game\GUIScale.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\Clock.h" />
     <ClInclude Include="deps\include\chakra\ChakraCommon.h" />
     <ClInclude Include="deps\include\chakra\ChakraCommonWindows.h" />

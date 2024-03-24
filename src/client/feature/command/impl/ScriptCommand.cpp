@@ -5,8 +5,7 @@
 #include "json/json.hpp"
 #include "../CommandManager.h"
 #include "client/Latite.h"
-
-
+#include <client/script/JsPlugin.h>
 
 using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Web::Http;

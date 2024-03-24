@@ -9,14 +9,13 @@ namespace {
 	std::shared_ptr<Hook> renderLevelHook;
 }
 
-void* LevelRendererHooks::LevelRenderer_renderLevel(SDK::LevelRenderer* lvl, SDK::ScreenContext* scn, void* unk) {
+void LevelRendererHooks::LevelRenderer_renderLevel(SDK::LevelRenderer* lvl, SDK::ScreenContext* scn, void* unk) {
 	SDK::ScreenContext::instance3d = scn;
-	auto res = renderLevelHook->oFunc<decltype(&LevelRenderer_renderLevel)>()(lvl, scn, unk);
+	renderLevelHook->oFunc<decltype(&LevelRenderer_renderLevel)>()(lvl, scn, unk);
 	{
 		RenderLevelEvent ev{ lvl, scn };
 		Eventing::get().dispatch(ev);
 	}
-	return res;
 }
 
 LevelRendererHooks::LevelRendererHooks() {

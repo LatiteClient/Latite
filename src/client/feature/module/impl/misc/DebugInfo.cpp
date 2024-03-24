@@ -7,6 +7,7 @@
 #include "client/event/impl/RenderOverlayEvent.h"
 
 #include "sdk/common/world/level/HitResult.h"
+#include <util/DxContext.h>
 
 DebugInfo::DebugInfo() : Module("DebugInfo", "Java Debug Info", "See information similar to Java", GAME, VK_F3) {
     listen<RenderOverlayEvent>((EventListenerFunc)&DebugInfo::onRenderOverlay);

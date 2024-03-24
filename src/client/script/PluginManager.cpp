@@ -20,7 +20,7 @@
 #include <winrt/Windows.Web.Http.Headers.h>
 
 #include "util/XorString.h"
-
+#include "JsPlugin.h"
 
 using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Web::Http;

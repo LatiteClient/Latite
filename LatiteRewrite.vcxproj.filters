@@ -543,9 +543,6 @@
     <ClInclude Include="src\client\feature\module\impl\hud\Clock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\client\feature\module\impl\game\GUIScale.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\sdk\common\world\level\BlockSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>

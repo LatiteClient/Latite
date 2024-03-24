@@ -6,13 +6,9 @@ void Module::loadConfig(SettingGroup& resolvedGroup) {
 		this->settings->forEach([&](std::shared_ptr<Setting> modSet) {
 			if (modSet->name() == set->name()) {
 				std::visit([&](auto&& obj) {
-					if (modSet->value == &enabled) {
-						setEnabled(std::get<BoolValue>(*modSet->value));
-					}
-					else {
-						*modSet->value = obj;
-						modSet->update();
-					}
+
+					*modSet->value = obj;
+					modSet->update();
 					}, set->resolvedValue);
 			}
 			});

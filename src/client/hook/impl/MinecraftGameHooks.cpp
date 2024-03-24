@@ -22,8 +22,8 @@ void* MinecraftGameHooks::onAppSuspended(SDK::MinecraftGame* game,void*a,void*b,
 	return onAppSuspendedHook->oFunc<decltype(&onAppSuspended)>()(game,a,b,c);
 }
 
-void* __fastcall MinecraftGameHooks::_update(SDK::MinecraftGame* game) {
-	auto ret = _updateHook->oFunc<decltype(&_update)>()(game);
+void __fastcall MinecraftGameHooks::_update(SDK::MinecraftGame* game) {
+	_updateHook->oFunc<decltype(&_update)>()(game);
 	UpdateEvent ev{};
 	Eventing::get().dispatch(ev);
 
@@ -31,7 +31,6 @@ void* __fastcall MinecraftGameHooks::_update(SDK::MinecraftGame* game) {
 		PluginManager::Event sev{L"renderDX", {}, false};
 		Latite::getPluginManager().dispatchEvent(sev);
 	}
-	return ret;
 }
 
 MinecraftGameHooks::MinecraftGameHooks() {

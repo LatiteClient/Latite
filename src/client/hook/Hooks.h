@@ -18,12 +18,12 @@ class LatiteHooks final : public StaticManager<HookGroup,
 	LevelRendererHooks,
 	OptionHooks,
 	DXHooks,
+	PlayerHooks,
 	AppPlatformHooks,
 	MinecraftGameHooks,
 	RenderControllerHooks,
 	ScreenViewHooks,
-	PacketHooks,
-	PlayerHooks> {
+	PacketHooks> {
 public:
 	LatiteHooks() = default;
 	~LatiteHooks() = default;
