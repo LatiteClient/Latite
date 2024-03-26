@@ -1,17 +1,23 @@
 #include "pch.h"
 #include "BowIndicator.h"
 
-BowIndicator::BowIndicator() : TextModule("BowIndicator", "Bow Indicator", "Shows bow chargedness", HUD, 400.f, 0, true) {
+BowIndicator::BowIndicator() : TextModule("BowIndicator", "Bow Indicator", "Shows bow chargedness", HUD, 400.f, 0,
+                                          true) {
 	addSetting("visual", "Visual Indicator", "To show a bar instead of text", this->visual);
 	addSetting("fgCol", "Color", "The indicator foreground color", this->indicatorCol2);
 	addSetting("bgCol", "Background Color", "The indicator background color", this->indicatorCol);
 	addSetting("horizontal", "Horizontal", "Whether it's horizontal or not", this->horizontal, "visual"_istrue);
-	addSetting("hideWhenCharged", "Hide when charged", "Hide indicator when it is almost fully charged", this->hideWhenCharged, "visual"_istrue);
+	addSetting("hideWhenCharged", "Hide when charged", "Hide indicator when it is almost fully charged",
+	           this->hideWhenCharged, "visual"_istrue);
 
-	addSliderSetting("size", "Length", "The length of the indicator", indicatorSize, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
-	addSliderSetting("width", "Width", "The width of the indicator", indicatorWidth, FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
-	addSliderSetting("rad", "Radius", "The radius of the indicator", indicatorRad, FloatValue(0.f), FloatValue(5.f), FloatValue(1.f), "visual"_istrue);
-	addSliderSetting("padding", "Padding", "The padding of the indicator", padding, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f), "visual"_istrue);
+	addSliderSetting("size", "Length", "The length of the indicator", indicatorSize, FloatValue(0.f), FloatValue(200.f),
+	                 FloatValue(2.5f), "visual"_istrue);
+	addSliderSetting("width", "Width", "The width of the indicator", indicatorWidth, FloatValue(0.f), FloatValue(200.f),
+	                 FloatValue(2.5f), "visual"_istrue);
+	addSliderSetting("rad", "Radius", "The radius of the indicator", indicatorRad, FloatValue(0.f), FloatValue(5.f),
+	                 FloatValue(1.f), "visual"_istrue);
+	addSliderSetting("padding", "Padding", "The padding of the indicator", padding, FloatValue(0.f), FloatValue(20.f),
+	                 FloatValue(1.f), "visual"_istrue);
 }
 
 BowIndicator::~BowIndicator() {
@@ -30,7 +36,7 @@ void BowIndicator::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	float wid = std::get<FloatValue>(indicatorWidth);
 	float siz = std::get<FloatValue>(indicatorSize);
 
-	d2d::Rect rc = { 0.f, 0.f, horiz ? siz : wid, horiz ? wid : siz };
+	d2d::Rect rc = {0.f, 0.f, horiz ? siz : wid, horiz ? wid : siz};
 	float rad = std::get<FloatValue>(indicatorRad) / 10.f * (std::min)(rc.getWidth(), rc.getHeight());
 
 	rect.right = rect.left + rc.getWidth();
@@ -59,7 +65,6 @@ void BowIndicator::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 		}
 		dc.fillRoundedRectangle(fillRc, std::get<ColorValue>(indicatorCol2).color1, rad);
 	}
-
 }
 
 std::wstringstream BowIndicator::text(bool, bool) {
@@ -77,12 +82,21 @@ std::optional<float> BowIndicator::getBowCharge(SDK::ItemStack* slot) {
 	if (!slot->item) return std::nullopt;
 	auto item = *slot->item;
 
-	if (item->id.hash == "bow"_fnv64 /*bow*/ || item->id.hash == "crossbow"_fnv64 /*crossbow*/ || item->id.hash == "trident"_fnv64) {
+	if (item->id.hash == "bow"_fnv64 /*bow*/ || item->id.hash == "crossbow"_fnv64 /*crossbow*/ || item->id.hash ==
+		"trident"_fnv64) {
 		int useDur = SDK::ClientInstance::get()->getLocalPlayer()->getItemUseDuration();
 		if (useDur) {
 			auto mxu = item->getMaxUseDuration(slot);
+			float chargeTickSpeed;
+			if (item->id.hash == "crossbow"_fnv64) {
+				// FIXME: Account for Quick Charge enchantment
+				chargeTickSpeed = 20;
+			}
+			else if (item->id.hash == "trident"_fnv64) {
+				chargeTickSpeed = 10;
+			}
 			float diff = static_cast<float>(item->getMaxUseDuration(slot) - useDur);
-			return (std::min)((std::max)(diff / 20.f, 0.f), 1.f);
+			return (std::min)((std::max)(diff / chargeTickSpeed, 0.f), 1.f);
 		}
 	}
 	return std::nullopt;
