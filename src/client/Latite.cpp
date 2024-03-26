@@ -222,9 +222,9 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (mmgrBuf) ModuleManager;
     new (commandMgrBuf) CommandManager;
     new (mainSettingGroup) SettingGroup("global");
+    new (scnMgrBuf) ScreenManager(); // needs to be before renderer
     new (configMgrBuf) ConfigManager();
 
-    new (scnMgrBuf) ScreenManager(); // needs to be before renderer
     new (scriptMgrBuf) PluginManager();
     new (rendererBuf) Renderer();
     new (assetsBuf) Assets();
@@ -561,6 +561,9 @@ void Latite::initSettings() {
     {
         auto set = std::make_shared<Setting>("menuKey", "Menu Key", "The key used to open the menu");
         set->value = &this->menuKey;
+        set->callback = [this](Setting& set) {
+            Latite::getScreenManager().get<HUDEditor>().key = this->getMenuKey();
+        };
         this->getSettings().addSetting(set);
     }
     {
@@ -892,6 +895,7 @@ void Latite::loadConfig(SettingGroup& gr) {
             if (modSet->name() == set->name()) {
                 std::visit([&](auto&& obj) {
                     *modSet->value = obj;
+                    modSet->update();
                     }, set->resolvedValue);
             }
             });
