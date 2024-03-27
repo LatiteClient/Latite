@@ -87,7 +87,7 @@ std::optional<float> BowIndicator::getBowCharge(SDK::ItemStack* slot) {
 		int useDur = SDK::ClientInstance::get()->getLocalPlayer()->getItemUseDuration();
 		if (useDur) {
 			auto mxu = item->getMaxUseDuration(slot);
-			float chargeTickSpeed;
+			float chargeTickSpeed = 20.f;
 			if (item->id.hash == "crossbow"_fnv64) {
 				// FIXME: Account for Quick Charge enchantment
 				chargeTickSpeed = 20;
