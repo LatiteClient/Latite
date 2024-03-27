@@ -4,12 +4,23 @@
 #include <functional>
 
 namespace SDK {
+
+    struct Bounds {
+        BlockPos min;
+        BlockPos max;
+        BlockPos dim;
+        int area;
+        int volume;
+        int side;
+    };
+
     class BlockSource {
+    public:
         virtual ~BlockSource() = 0; // 0x0
-        virtual void getBlock(int, int, int) const = 0; // 0x1
-        virtual void getBlock(BlockPos const&) const = 0; // 0x2
-        virtual void getBlock(BlockPos const&, unsigned int) const = 0; // 0x3
-        virtual void getBlockEntity(BlockPos const&) const = 0; // 0x4
+        virtual SDK::Block* getBlock(int, int, int) const = 0; // 0x1
+        virtual SDK::Block* getBlock(BlockPos const&) const = 0; // 0x2
+        virtual SDK::Block* getBlock(BlockPos const&, unsigned int) const = 0; // 0x3
+        virtual void* getBlockEntity(BlockPos const&) const = 0; // 0x4
         virtual void getExtraBlock(BlockPos const&) const = 0; // 0x5
         virtual void getLiquidBlock(BlockPos const&) const = 0; // 0x6
         virtual bool hasBlock(BlockPos const&) const = 0; // 0x7
@@ -17,7 +28,7 @@ namespace SDK {
         virtual void containsMaterial(AABB const&, int matType) const = 0; // 0x9
         virtual void getMaterial(BlockPos const&) const = 0; // 0xA
         virtual void getMaterial(int, int, int) const = 0; // 0xB
-        virtual bool hasChunksAt(struct Bounds const&, bool) const = 0; // 0xC
+        virtual bool hasChunksAt(Bounds const&, bool) const = 0; // 0xC
         virtual bool hasChunksAt(BlockPos const&, int, bool) const = 0; // 0xD
         virtual bool hasChunksAt(AABB const&, bool) const = 0; // 0xE
         virtual void getDimensionId() const = 0; // 0xF
@@ -36,7 +47,7 @@ namespace SDK {
         virtual void getDimension() const = 0; // 0x1C
         virtual void getDimensionConst() const = 0; // 0x1D
         virtual void getDimension() = 0; // 0x1E
-        virtual void getChunkAt(BlockPos const&) const = 0; // 0x1F
+        virtual void* getChunkAt(BlockPos const&) const = 0; // 0x1F
         virtual void getILevel() const = 0; // 0x20
         virtual void fetchAABBs(AABB const&, bool) = 0; // 0x21
         virtual void fetchCollisionShapes(AABB const&, float*, bool, class IActorMovementProxy*) = 0; // 0x22

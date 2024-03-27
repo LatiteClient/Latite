@@ -828,6 +828,9 @@
     <ClInclude Include="src\client\feature\module\impl\hud\ItemCounter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\script\class\impl\game\JsBlock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />

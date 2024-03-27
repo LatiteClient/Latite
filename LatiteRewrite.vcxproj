@@ -472,6 +472,7 @@
     <ClInclude Include="src\client\screen\Screen.h" />
     <ClInclude Include="src\client\screen\ScreenManager.h" />
     <ClInclude Include="src\client\feature\module\script\JsModule.h" />
+    <ClInclude Include="src\client\script\class\impl\game\JsBlock.h" />
     <ClInclude Include="src\client\script\class\impl\game\JsEntityClass.h" />
     <ClInclude Include="src\client\script\class\impl\game\JsInventory.h" />
     <ClInclude Include="src\client\script\class\impl\game\JsItem.h" />

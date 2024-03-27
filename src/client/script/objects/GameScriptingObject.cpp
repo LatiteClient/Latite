@@ -7,6 +7,8 @@
 #include "sdk/common/client/renderer/game/LevelRenderer.h"
 #include "sdk/common/client/player/LocalPlayer.h"
 #include "sdk/common/world/Minecraft.h"
+#include "sdk/common/world/level/BlockSource.h"
+
 #include "client/Latite.h"
 #include <client/input/Keyboard.h>
 #include "client/script/PluginManager.h"
@@ -17,6 +19,7 @@
 #include "../class/impl/game/JsPlayerClass.h"
 #include "../class/impl/game/JsLocalPlayerClass.h"
 #include <sdk/common/network/packet/CommandRequestPacket.h>
+#include <client/script/class/impl/game/JsBlock.h>
 
 void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	this->createWorldObject();
@@ -27,6 +30,7 @@ void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(object, sendChatCallback, L"sendChatMessage");
 	Chakra::DefineFunc(object, executeCommand, L"executeCommand");
 	Chakra::DefineFunc(object, getWorldCallback, L"getWorld", this);
+	Chakra::DefineFunc(object, getDimensionCallback, L"getDimension", this);
 
 	Chakra::DefineFunc(object, getConnectedServerCallback, L"getServer");
 	Chakra::DefineFunc(object, getPortCallback, L"getPort");
@@ -37,10 +41,17 @@ void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 void GameScriptingObject::createWorldObject() {
 	JS::JsCreateObject(&worldObj);
 	JS::JsAddRef(worldObj, nullptr); // never forget to add a refernce to an object that isn't set !!
+
+	JS::JsCreateObject(&dimensionObj);
+	JS::JsAddRef(dimensionObj, nullptr);
+
 	Chakra::DefineFunc(worldObj, worldGetEntList, L"getEntities", this);
 	Chakra::DefineFunc(worldObj, worldGetEntCount, L"getEntityCount", this);
 	Chakra::DefineFunc(worldObj, worldGetPlayers, L"getPlayers", this);
 	Chakra::DefineFunc(worldObj, worldGetName, L"getName", this);
+
+	Chakra::DefineFunc(dimensionObj, dimensionGetBlock, L"getBlock", this);
+	Chakra::DefineFunc(dimensionObj, dimensionGetName, L"getName", this);
 }
 
 JsValueRef GameScriptingObject::worldGetName(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
@@ -75,7 +86,7 @@ JsValueRef GameScriptingObject::worldGetPlayers(JsValueRef callee, bool isConstr
 
 JsValueRef GameScriptingObject::worldGetEntList(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
-		Chakra::ThrowError(L"World is not allowed to be used here");
+		Chakra::ThrowError(L"World is not available");
 		return Chakra::GetUndefined();
 	}
 
@@ -114,7 +125,7 @@ JsValueRef GameScriptingObject::worldGetEntList(JsValueRef callee, bool isConstr
 
 JsValueRef GameScriptingObject::worldGetEntCount(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
-		Chakra::ThrowError(L"World is not allowed to be used here");
+		Chakra::ThrowError(L"World is not available");
 		return Chakra::GetUndefined();
 	}
 
@@ -123,6 +134,49 @@ JsValueRef GameScriptingObject::worldGetEntCount(JsValueRef callee, bool isConst
 	auto lvl = SDK::ClientInstance::get()->minecraft->getLevel();
 	auto entList = lvl->getRuntimeActorList();
 	return Chakra::MakeInt(static_cast<int>(entList.size()));
+}
+
+JsValueRef GameScriptingObject::dimensionGetName(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
+		Chakra::ThrowError(L"Dimension is not available");
+		return Chakra::GetUndefined();
+	}
+
+	auto& dim = SDK::ClientInstance::get()->getLocalPlayer()->dimension;
+	return Chakra::MakeString(util::StrToWStr(dim->dimensionName));
+}
+
+JsValueRef GameScriptingObject::dimensionGetBlock(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 4)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsNumber}, {arguments[2], JsValueType::JsNumber}, {arguments[3], JsValueType::JsNumber} })) return JS_INVALID_REFERENCE;
+	
+	int x = Chakra::GetInt(arguments[1]);
+	int y = Chakra::GetInt(arguments[2]);
+	int z = Chakra::GetInt(arguments[3]);
+
+	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
+		Chakra::ThrowError(L"Dimension is not available");
+		return Chakra::GetUndefined();
+	}
+
+	JsScript* scr = JsScript::getThis();
+	if (!Latite::getPluginManager().hasPermission(scr->getPlugin(), PluginManager::Permission::Operator)) {
+		Chakra::ThrowError(util::StrToWStr(XOR_STRING("No permission to use getBlock here")));
+		return JS_INVALID_REFERENCE;
+	}
+
+	auto reg = SDK::ClientInstance::get()->getRegion();
+	if (!reg) {
+		return Chakra::GetNull();
+	}
+
+	auto block = reg->getBlock(x, y, z);
+
+	if (!block) {
+		return Chakra::GetNull();
+	}
+	
+	return scr->getClass<JsBlock>()->construct(block, false);
 }
 
 JsValueRef GameScriptingObject::getMousePosCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
@@ -153,6 +207,13 @@ JsValueRef GameScriptingObject::getWorldCallback(JsValueRef callee, bool isConst
 	JsContextRef ct;
 	JS::JsGetCurrentContext(&ct);
 	return reinterpret_cast<GameScriptingObject*>(callbackState)->worldObj;
+}
+
+JsValueRef GameScriptingObject::getDimensionCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!SDK::ClientInstance::get()->minecraft->getLevel()) return Chakra::GetNull();
+	JsContextRef ct;
+	JS::JsGetCurrentContext(&ct);
+	return reinterpret_cast<GameScriptingObject*>(callbackState)->dimensionObj;
 }
 
 JsValueRef GameScriptingObject::isInUICallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {

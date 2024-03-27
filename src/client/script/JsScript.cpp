@@ -38,6 +38,7 @@
 #include "class/impl/game/JsLocalPlayerClass.h"
 #include "class/impl/game/JsItem.h"
 #include "class/impl/game/JsItemStack.h"
+#include "class/impl/game/JsBlock.h"
 
 #include "objects/GameScriptingObject.h"
 #include "objects/D2DScriptingObject.h"
@@ -431,6 +432,7 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsItemStack>(this));
 	this->classes.push_back(std::make_shared<JsTextureClass>(this));
 	this->classes.push_back(std::make_shared<JsNativeModule>(this));
+	this->classes.push_back(std::make_shared<JsBlock>(this));
 	JsErrorCode err;
 
 	JsValueRef globalObj = Chakra::GetGlobalObject();

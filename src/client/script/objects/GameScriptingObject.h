@@ -25,6 +25,8 @@ class GameScriptingObject : public ScriptingObject {
 
 	static JsValueRef CALLBACK getWorldCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK getDimensionCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK isLocalWorldCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK isInUICallback(JsValueRef callee, bool isConstructor,
@@ -39,7 +41,6 @@ public:
 
 private:
 	void createWorldObject();
-	void createDimensionObject();
 
 	JsValueRef worldObj = JS_INVALID_REFERENCE;
 	JsValueRef dimensionObj = JS_INVALID_REFERENCE;
