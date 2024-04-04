@@ -20,13 +20,16 @@ void Graphics3DScriptingObject::onRenderLevel(Event& evG) {
 	screenContext = ev.getScreenContext();
 	levelRenderer = ev.getLevelRenderer();
 
+	*screenContext->shaderColor = { 1.f, 1.f, 1.f, 1.f };
+
 	for (auto& command : commands) {
 		auto tess = screenContext->tess;
 		tess->begin(command.primitive, command.vertexBuffer.size());
-		
+		auto origin = levelRenderer->getLevelRendererPlayer()->getOrigin();
+
 		for (auto& vertex : command.vertexBuffer) {
 			tess->color(vertex.color);
-			tess->vertex(vertex.position.x, vertex.position.y, vertex.position.z);
+			tess->vertex(vertex.position.x - origin.x, vertex.position.y - origin.y, vertex.position.z - origin.z);
 		}
 
 		SDK::MeshHelpers::renderMeshImmediately(screenContext, tess, command.renderThrough ? levelRenderer->getLevelRendererPlayer()->getSelectionBoxMaterial() : SDK::MaterialPtr::getUIColor());
@@ -41,7 +44,6 @@ JsValueRef Graphics3DScriptingObject::drawLineCallback(JsValueRef callee, bool i
 	auto obj = reinterpret_cast<Graphics3DScriptingObject*>(callbackState);
 	obj->currentCommand.primitive = SDK::Primitive::Linestrip;
 
-	auto col = JsColor::ToColor(arguments[3]);
 	auto p1 = JsVec3::ToVec3(arguments[1]);
 	auto p2 = JsVec3::ToVec3(arguments[2]);
 
@@ -53,11 +55,10 @@ JsValueRef Graphics3DScriptingObject::drawLineCallback(JsValueRef callee, bool i
 
 JsValueRef Graphics3DScriptingObject::drawTriangleCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 4)) return JS_INVALID_REFERENCE;
-	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject }, { arguments[3], JsObject }, { arguments[4], JsObject } })) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject }, { arguments[3], JsObject } })) return JS_INVALID_REFERENCE;
 	auto obj = reinterpret_cast<Graphics3DScriptingObject*>(callbackState);
 	obj->currentCommand.primitive = SDK::Primitive::Trianglestrip;
 
-	auto col = JsColor::ToColor(arguments[4]);
 	auto p1 = JsVec3::ToVec3(arguments[1]);
 	auto p2 = JsVec3::ToVec3(arguments[2]);
 	auto p3 = JsVec3::ToVec3(arguments[3]);
@@ -75,7 +76,6 @@ JsValueRef Graphics3DScriptingObject::drawQuadCallback(JsValueRef callee, bool i
 	auto obj = reinterpret_cast<Graphics3DScriptingObject*>(callbackState);
 	obj->currentCommand.primitive = SDK::Primitive::Quad;
 
-	auto col = JsColor::ToColor(arguments[5]);
 	auto p1 = JsVec3::ToVec3(arguments[1]);
 	auto p2 = JsVec3::ToVec3(arguments[2]);
 	auto p3 = JsVec3::ToVec3(arguments[3]);
@@ -90,10 +90,16 @@ JsValueRef Graphics3DScriptingObject::drawQuadCallback(JsValueRef callee, bool i
 }
 
 JsValueRef Graphics3DScriptingObject::finishCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyParameters({ { Chakra::TryGet(arguments, argCount, 1), JsNumber, true }})) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { Chakra::TryGet(arguments, argCount, 1), JsBoolean, true }})) return JS_INVALID_REFERENCE;
 	
 	auto obj = reinterpret_cast<Graphics3DScriptingObject*>(callbackState);
+	auto val = Chakra::TryGet(arguments, argCount, 1);
+
+	if (val) {
+		obj->currentCommand.renderThrough = !Chakra::GetBool(val);
+	}
 	obj->commands.push_back(obj->currentCommand);
+	obj->currentCommand.reset();
 
 	return Chakra::GetUndefined();
 }

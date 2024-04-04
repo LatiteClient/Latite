@@ -42,12 +42,10 @@ public:
 		if (block->legacyBlock) {
 			Chakra::SetPropertyString(obj, L"name", util::StrToWStr(block->legacyBlock->namespacedId));
 			Chakra::SetPropertyString(obj, L"translateName", util::StrToWStr(block->legacyBlock->translateName.getString()));
-			Chakra::SetPropertyString(obj, L"itemGroupName", util::StrToWStr(block->legacyBlock->itemGroup));
 		}
 		else {
 			Chakra::SetPropertyString(obj, L"name", L"air");
 			Chakra::SetPropertyString(obj, L"translateName", L"tile.air");
-			Chakra::SetPropertyString(obj, L"itemGroupName", L"");
 		}
 		return obj;
 	}

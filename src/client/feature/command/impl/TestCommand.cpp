@@ -51,7 +51,13 @@ bool TestCommand::execute(std::string const label, std::vector<std::string> args
 
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!lp) return true;
-	Logger::Info("{} {} {}", lp->getHealth(), lp->getHunger(), lp->getSaturation());
+	//Logger::Info("{} {} {}", lp->getHealth(), lp->getHunger(), lp->getSaturation());
+	
+	if (args.size() < 1) return false;
+
+	SDK::LevelRendererPlayer::selecOffset = std::stoull(args.at(0), 0, 16);
+
+
 
 	return true;
 }
