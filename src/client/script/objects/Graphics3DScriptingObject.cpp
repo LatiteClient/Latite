@@ -34,8 +34,8 @@ void Graphics3DScriptingObject::onRenderLevel(Event& evG) {
 }
 
 JsValueRef Graphics3DScriptingObject::drawLineCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyArgCount(argCount, 4)) return JS_INVALID_REFERENCE;
-	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject }, { arguments[3], JsObject }})) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyArgCount(argCount, 3)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject }})) return JS_INVALID_REFERENCE;
 	auto obj = reinterpret_cast<Graphics3DScriptingObject*>(callbackState);
 	obj->currentCommand.primitive = SDK::Primitive::Linestrip;
 
@@ -43,14 +43,14 @@ JsValueRef Graphics3DScriptingObject::drawLineCallback(JsValueRef callee, bool i
 	auto p1 = JsVec3::ToVec3(arguments[1]);
 	auto p2 = JsVec3::ToVec3(arguments[2]);
 
-	obj->currentCommand.vertexBuffer.push_back(Vertex{ col, p1 });
-	obj->currentCommand.vertexBuffer.push_back(Vertex{ col, p2 });
+	obj->currentCommand.vertexBuffer.push_back(Vertex{ obj->primaryColor.value_or(obj->colors[0]), p1 });
+	obj->currentCommand.vertexBuffer.push_back(Vertex{ obj->primaryColor.value_or(obj->colors[1]), p2 });
 
 	return Chakra::GetUndefined();
 }
 
 JsValueRef Graphics3DScriptingObject::drawTriangleCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyArgCount(argCount, 5)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyArgCount(argCount, 4)) return JS_INVALID_REFERENCE;
 	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject }, { arguments[3], JsObject }, { arguments[4], JsObject } })) return JS_INVALID_REFERENCE;
 	auto obj = reinterpret_cast<Graphics3DScriptingObject*>(callbackState);
 	obj->currentCommand.primitive = SDK::Primitive::Trianglestrip;
@@ -60,16 +60,16 @@ JsValueRef Graphics3DScriptingObject::drawTriangleCallback(JsValueRef callee, bo
 	auto p2 = JsVec3::ToVec3(arguments[2]);
 	auto p3 = JsVec3::ToVec3(arguments[3]);
 
-	obj->currentCommand.vertexBuffer.push_back(Vertex{ col, p1 });
-	obj->currentCommand.vertexBuffer.push_back(Vertex{ col, p2 });
-	obj->currentCommand.vertexBuffer.push_back(Vertex{ col, p3 });
+	obj->currentCommand.vertexBuffer.push_back(Vertex{ obj->primaryColor.value_or(obj->colors[0]), p1 });
+	obj->currentCommand.vertexBuffer.push_back(Vertex{ obj->primaryColor.value_or(obj->colors[1]), p2 });
+	obj->currentCommand.vertexBuffer.push_back(Vertex{ obj->primaryColor.value_or(obj->colors[2]), p3 });
 
 	return Chakra::GetUndefined();
 }
 
 JsValueRef Graphics3DScriptingObject::drawQuadCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyArgCount(argCount, 6)) return JS_INVALID_REFERENCE;
-	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject }, { arguments[3], JsObject }, { arguments[4], JsObject } })) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyArgCount(argCount, 5)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject }, { arguments[3], JsObject } })) return JS_INVALID_REFERENCE;
 	auto obj = reinterpret_cast<Graphics3DScriptingObject*>(callbackState);
 	obj->currentCommand.primitive = SDK::Primitive::Quad;
 
@@ -79,10 +79,10 @@ JsValueRef Graphics3DScriptingObject::drawQuadCallback(JsValueRef callee, bool i
 	auto p3 = JsVec3::ToVec3(arguments[3]);
 	auto p4 = JsVec3::ToVec3(arguments[4]);
 
-	obj->currentCommand.vertexBuffer.push_back(Vertex{ col, p1 });
-	obj->currentCommand.vertexBuffer.push_back(Vertex{ col, p2 });
-	obj->currentCommand.vertexBuffer.push_back(Vertex{ col, p3 });
-	obj->currentCommand.vertexBuffer.push_back(Vertex{ col, p4 });
+	obj->currentCommand.vertexBuffer.push_back(Vertex{ obj->primaryColor.value_or(obj->colors[0]), p1 });
+	obj->currentCommand.vertexBuffer.push_back(Vertex{ obj->primaryColor.value_or(obj->colors[1]), p2 });
+	obj->currentCommand.vertexBuffer.push_back(Vertex{ obj->primaryColor.value_or(obj->colors[2]), p3 });
+	obj->currentCommand.vertexBuffer.push_back(Vertex{ obj->primaryColor.value_or(obj->colors[3]), p4 });
 
 	return Chakra::GetUndefined();
 }
@@ -92,6 +92,33 @@ JsValueRef Graphics3DScriptingObject::finishCallback(JsValueRef callee, bool isC
 	
 	auto obj = reinterpret_cast<Graphics3DScriptingObject*>(callbackState);
 	obj->commands.push_back(obj->currentCommand);
+
+	return Chakra::GetUndefined();
+}
+
+JsValueRef Graphics3DScriptingObject::setColorCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsObject } })) return JS_INVALID_REFERENCE;
+	auto obj = reinterpret_cast<Graphics3DScriptingObject*>(callbackState);
+
+	auto col = JsColor::ToColor(arguments[1]);
+	obj->primaryColor = col;
+
+	return Chakra::GetUndefined();
+}
+
+JsValueRef Graphics3DScriptingObject::setColorsCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 5)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsObject } })) return JS_INVALID_REFERENCE;
+
+	auto obj = reinterpret_cast<Graphics3DScriptingObject*>(callbackState);
+
+	auto col = JsColor::ToColor(arguments[1]);
+	auto col1 = JsColor::ToColor(arguments[2]);
+	auto col2 = JsColor::ToColor(arguments[3]);
+	auto col3 = JsColor::ToColor(arguments[4]);
+	obj->primaryColor = std::nullopt;
+	obj->colors = { col, col1, col2, col3 };
 
 	return Chakra::GetUndefined();
 }

@@ -58,6 +58,9 @@ private:
 
 	std::vector<DrawCommand> commands = {};
 
+	std::optional<Color> primaryColor = std::nullopt;
+	std::array<Color, 4> colors = {};
+
 	static JsValueRef CALLBACK drawLineCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK drawTriangleCallback(JsValueRef callee, bool isConstructor,
@@ -65,5 +68,9 @@ private:
 	static JsValueRef CALLBACK drawQuadCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK finishCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK setColorCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK setColorsCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 };
