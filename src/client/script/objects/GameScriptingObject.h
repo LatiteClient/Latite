@@ -60,6 +60,5 @@ private:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 public:
 	~GameScriptingObject() override {
-		//JS::JsRelease(worldObj, nullptr);
 	}
 };

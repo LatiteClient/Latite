@@ -40,10 +40,10 @@ void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 
 void GameScriptingObject::createWorldObject() {
 	JS::JsCreateObject(&worldObj);
-	JS::JsAddRef(worldObj, nullptr); // never forget to add a refernce to an object that isn't set !!
+	//JS::JsAddRef(worldObj, nullptr); // never forget to add a refernce to an object that isn't set !!
 
 	JS::JsCreateObject(&dimensionObj);
-	JS::JsAddRef(dimensionObj, nullptr);
+	//JS::JsAddRef(dimensionObj, nullptr);
 
 	Chakra::DefineFunc(worldObj, worldGetEntList, L"getEntities", this);
 	Chakra::DefineFunc(worldObj, worldGetEntCount, L"getEntityCount", this);
@@ -52,6 +52,9 @@ void GameScriptingObject::createWorldObject() {
 
 	Chakra::DefineFunc(dimensionObj, dimensionGetBlock, L"getBlock", this);
 	Chakra::DefineFunc(dimensionObj, dimensionGetName, L"getName", this);
+
+	Chakra::SetProperty(Chakra::GetGlobalObject(), L"world", worldObj);
+	Chakra::SetProperty(Chakra::GetGlobalObject(), L"dimension", dimensionObj);
 }
 
 JsValueRef GameScriptingObject::worldGetName(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
@@ -203,14 +206,14 @@ JsValueRef GameScriptingObject::getInputBinding(JsValueRef callee, bool isConstr
 }
 
 JsValueRef GameScriptingObject::getWorldCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!SDK::ClientInstance::get()->minecraft->getLevel()) return Chakra::GetNull();
+	//if (!SDK::ClientInstance::get()->minecraft->getLevel()) return Chakra::GetNull();
 	JsContextRef ct;
 	JS::JsGetCurrentContext(&ct);
 	return reinterpret_cast<GameScriptingObject*>(callbackState)->worldObj;
 }
 
 JsValueRef GameScriptingObject::getDimensionCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!SDK::ClientInstance::get()->minecraft->getLevel()) return Chakra::GetNull();
+	//if (!SDK::ClientInstance::get()->minecraft->getLevel()) return Chakra::GetNull();
 	JsContextRef ct;
 	JS::JsGetCurrentContext(&ct);
 	return reinterpret_cast<GameScriptingObject*>(callbackState)->dimensionObj;

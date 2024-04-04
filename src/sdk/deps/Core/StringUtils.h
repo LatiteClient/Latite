@@ -6,19 +6,21 @@
 namespace SDK {
 	class HashedString {
 	public:
-		int64_t hash;
 	private:
 		std::string string;
-		void* idk;
+	public:
+		int64_t hash;
+	private:
+		HashedString* lastCompare;
 
 	public:
-		HashedString(int64_t hash, std::string text) : hash(hash), string(text.c_str()), idk(nullptr) {};
+		HashedString(int64_t hash, std::string text) : hash(hash), string(text.c_str()), lastCompare(nullptr) {};
 
 		std::string getString() {
 			return string;
 		}
 
-		HashedString(std::string const& str) : string(str.c_str()), idk(nullptr) {
+		HashedString(std::string const& str) : string(str.c_str()), lastCompare(nullptr) {
 			hash = util::fnv1a_64(str);
 			string = str;
 		}
@@ -26,13 +28,13 @@ namespace SDK {
 		HashedString(HashedString const& that) {
 			this->string = that.string;
 			this->hash = that.hash;
-			this->idk = nullptr;
+			this->lastCompare = nullptr;
 		}
 
 		HashedString& operator=(HashedString const& right) {
 			this->string = right.string;
 			this->hash = right.hash;
-			this->idk = nullptr;
+			this->lastCompare = nullptr;
 			return *this;
 		}
 
