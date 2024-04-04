@@ -11,10 +11,10 @@ protected:
 		auto thi = reinterpret_cast<JsBlock*>(callbackState);
 		SDK::Block* block = Get(arguments[0]);
 
-		std::wstring id = L"air";
+		std::string id = "air";
 
 		if (block->legacyBlock) {
-			id = util::StrToWStr(block->legacyBlock->namespacedId);
+			id = block->legacyBlock->namespacedId;
 		}
 
 		std::string add = std::format("{} ({})", util::WStrToStr(thi->name), id);
