@@ -6,6 +6,8 @@
 #include <client/script/class/impl/JsVec3.h>
 
 void Graphics3DScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
+	Chakra::DefineFunc(object, setColorCallback, L"setColor", this);
+	Chakra::DefineFunc(object, setColorsCallback, L"setColors", this);
 	Chakra::DefineFunc(object, drawLineCallback, L"drawLine", this);
 	Chakra::DefineFunc(object, drawTriangleCallback, L"drawTriangle", this);
 	Chakra::DefineFunc(object, drawQuadCallback, L"drawQuad", this);
