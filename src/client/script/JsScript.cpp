@@ -42,6 +42,7 @@
 
 #include "objects/GameScriptingObject.h"
 #include "objects/D2DScriptingObject.h"
+#include "objects/Graphics3DScriptingObject.h"
 #include "util/XorString.h"
 #include "util/Logger.h"
 
@@ -414,6 +415,7 @@ void JsScript::loadScriptObjects() {
 	this->objects.push_back(std::make_shared<ClientScriptingObject>(i++));
 	this->objects.push_back(std::make_shared<GameScriptingObject>(i++));
 	this->objects.push_back(std::make_shared<D2DScriptingObject>(i++));
+	this->objects.push_back(std::make_shared<Graphics3DScriptingObject>(i++));
 
 	this->classes.clear();
 	this->classes.push_back(std::make_shared<JsVec2>(this));

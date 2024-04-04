@@ -62,7 +62,6 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<Clock>());
 	this->items.push_back(std::make_shared<BowIndicator>());
 	this->items.push_back(std::make_shared<GuiscaleChanger>());
-	this->items.push_back(std::make_shared<Screenshot>());
 	this->items.push_back(std::make_shared<DebugInfo>());
 	this->items.push_back(std::make_shared<TabList>());
 	this->items.push_back(std::make_shared<Keystrokes>());
