@@ -723,7 +723,6 @@
     <ClCompile Include="src\client\script\objects\D2DScriptingObject.cpp" />
     <ClCompile Include="src\client\script\objects\GameScriptingObject.cpp" />
     <ClCompile Include="src\client\script\objects\Graphics3DScriptingObject.cpp" />
-    <ClCompile Include="src\client\script\objects\Graphics3DScriptingObject.h" />
     <ClCompile Include="src\client\script\ScriptingObject.cpp" />
     <ClCompile Include="src\client\script\PluginManager.cpp" />
     <ClCompile Include="src\client\ui\TextBox.cpp" />
