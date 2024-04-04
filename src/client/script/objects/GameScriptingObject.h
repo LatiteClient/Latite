@@ -45,6 +45,8 @@ private:
 	JsValueRef worldObj = JS_INVALID_REFERENCE;
 	JsValueRef dimensionObj = JS_INVALID_REFERENCE;
 
+	static JsValueRef CALLBACK worldExists(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK worldGetName(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK worldGetPlayers(JsValueRef callee, bool isConstructor,

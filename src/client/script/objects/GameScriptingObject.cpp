@@ -45,16 +45,22 @@ void GameScriptingObject::createWorldObject() {
 	JS::JsCreateObject(&dimensionObj);
 	//JS::JsAddRef(dimensionObj, nullptr);
 
+	Chakra::DefineFunc(worldObj, worldExists, L"exists", this);
 	Chakra::DefineFunc(worldObj, worldGetEntList, L"getEntities", this);
 	Chakra::DefineFunc(worldObj, worldGetEntCount, L"getEntityCount", this);
 	Chakra::DefineFunc(worldObj, worldGetPlayers, L"getPlayers", this);
 	Chakra::DefineFunc(worldObj, worldGetName, L"getName", this);
 
+	Chakra::DefineFunc(dimensionObj, worldExists, L"exists", this);
 	Chakra::DefineFunc(dimensionObj, dimensionGetBlock, L"getBlock", this);
 	Chakra::DefineFunc(dimensionObj, dimensionGetName, L"getName", this);
 
 	Chakra::SetProperty(Chakra::GetGlobalObject(), L"world", worldObj);
 	Chakra::SetProperty(Chakra::GetGlobalObject(), L"dimension", dimensionObj);
+}
+
+JsValueRef GameScriptingObject::worldExists(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	return SDK::ClientInstance::get()->minecraft->getLevel() ? Chakra::GetTrue() : Chakra::GetFalse();
 }
 
 JsValueRef GameScriptingObject::worldGetName(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
