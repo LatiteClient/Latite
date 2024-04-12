@@ -20,6 +20,8 @@ public:
 		Chakra::DefineFunc(prototype, defaultToString, L"toString", this);
 		Chakra::DefineFunc(prototype, entityIsValid, L"isValid", this);
 		Chakra::DefineFunc(prototype, entityGetPos, L"getPosition", this);
+		Chakra::DefineFunc(prototype, entityGetPosPrev, L"getPreviousPosition", this);
+		Chakra::DefineFunc(prototype, entityGetPosInterpolated, L"getPositionInterpolated", this);
 		Chakra::DefineFunc(prototype, entityGetRot, L"getRotation", this);
 		Chakra::DefineFunc(prototype, entityIsPlayer, L"isPlayer", this);
 		Chakra::DefineFunc(prototype, entityIsLocalPlayer, L"isLocalPlayer", this);
@@ -61,5 +63,9 @@ private:
 	static JsValueRef CALLBACK entityGetVariable(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK entitySetVariable(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK entityGetPosInterpolated(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK entityGetPosPrev(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 };

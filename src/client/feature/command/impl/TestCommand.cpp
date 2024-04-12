@@ -55,7 +55,7 @@ bool TestCommand::execute(std::string const label, std::vector<std::string> args
 	
 	if (args.size() < 1) return false;
 
-	SDK::LevelRendererPlayer::selecOffset = std::stoull(args.at(0), 0, 16);
+	//SDK::LevelRendererPlayer::selecOffset = std::stoull(args.at(0), 0, 16);
 
 
 

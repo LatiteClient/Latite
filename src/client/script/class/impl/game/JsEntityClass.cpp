@@ -229,3 +229,49 @@ JsValueRef JsEntityClass::entitySetVariable(JsValueRef callee, bool isConstructo
 	Chakra::ThrowError(L"Invalid entity");
 	return JS_INVALID_REFERENCE;
 }
+
+JsValueRef JsEntityClass::entityGetPosInterpolated(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	JsEntity* ent = nullptr;
+	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
+	if (ent && ent->validate()) {
+		auto actor = ent->getEntity();
+		if (ent->level != JsEntity::AccessLevel::Restricted || SDK::ClientInstance::get()->getLocalPlayer()->getCommandPermissionLevel() > 1) {
+			auto thi = reinterpret_cast<JsEntityClass*>(callbackState);
+			auto cl = thi->owner->getClass<JsVec3>();
+
+			auto alpha = SDK::ClientInstance::get()->minecraft->timer->alpha;
+			auto& pos = actor->getPos();
+			auto& posOld = actor->getPosOld();
+
+			Vec3 interPos = { std::lerp(posOld.x, pos.x, alpha), std::lerp(posOld.y, pos.y, alpha), std::lerp(posOld.z, pos.z, alpha) };
+			return cl->construct(interPos);
+		}
+		else {
+			Chakra::ThrowError(L"Access denied, cannot use getPositionInterpolated");
+			return Chakra::GetUndefined();
+		}
+	}
+	Chakra::ThrowError(L"Invalid entity");
+	return Chakra::GetUndefined();
+}
+
+JsValueRef JsEntityClass::entityGetPosPrev(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	JsEntity* ent = nullptr;
+	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
+	if (ent && ent->validate()) {
+		auto actor = ent->getEntity();
+		if (ent->level != JsEntity::AccessLevel::Restricted || SDK::ClientInstance::get()->getLocalPlayer()->getCommandPermissionLevel() > 1) {
+			auto thi = reinterpret_cast<JsEntityClass*>(callbackState);
+			auto cl = thi->owner->getClass<JsVec3>();
+
+			auto ret = cl->construct(actor->getPosOld());
+			return ret;
+		}
+		else {
+			Chakra::ThrowError(L"Access denied, cannot use getPreviousPosition");
+			return Chakra::GetUndefined();
+		}
+	}
+	Chakra::ThrowError(L"Invalid entity");
+	return Chakra::GetUndefined();
+}

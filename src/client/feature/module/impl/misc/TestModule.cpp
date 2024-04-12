@@ -27,7 +27,7 @@ TestModule::TestModule() : Module("TestModule", "TestModule", "Module for testin
 	addEnumSetting("test", "Test", "Gaming", this->testEnum);
 	
 	this->listen<TickEvent>(&TestModule::onTick);
-	this->listen<RenderLayerEvent>(&TestModule::onRender);
+	this->listen<RenderLayerEvent>(&TestModule::onRender, true);
 	this->listen<KeyUpdateEvent>(&TestModule::onKey);
 }
 
@@ -35,7 +35,19 @@ void TestModule::onTick(Event& evGeneric) {
 }
 
 void TestModule::onRender(Event& evG) {
-	
+	return;
+
+	static bool enable = isEnabled();
+	static Vec2 storedVector = {};
+
+	if (!isEnabled()) {
+		enable = false;
+		storedVector = SDK::ClientInstance::get()->getLocalPlayer()->getRot();
+		return;
+	}
+
+	SDK::ClientInstance::get()->getLocalPlayer()->getRot() = storedVector;
+	return;
 	
 	auto& ev = reinterpret_cast<RenderLayerEvent&>(evG);
 	
@@ -50,6 +62,7 @@ void TestModule::onRender(Event& evG) {
 
 void TestModule::onKey(Event& ev)
 {
+	return;
 	[[maybe_unused]] auto& kev = reinterpret_cast<KeyUpdateEvent&>(ev);
 	if (kev.getKey() == 'K') {
 		auto lp = SDK::ClientInstance::get()->getLocalPlayer();
