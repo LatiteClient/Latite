@@ -4,6 +4,36 @@
 #include "util/FNV32.h"
 
 namespace SDK {
+	class FNVString {
+	public:
+		int64_t hash;
+	private:
+		std::string string;
+	public:
+		FNVString(int64_t hash, std::string text) : hash(hash), string(text.c_str()) {};
+
+
+		bool operator==(uint64_t right) {
+			return right == hash;
+		}
+
+		bool operator==(std::string const& right) {
+			return string == right;
+		}
+
+		bool operator!=(uint64_t right) {
+			return !operator==(right);
+		}
+
+		bool operator!=(std::string const& right) {
+			return !operator==(right);
+		}
+
+		std::string getString() {
+			return string;
+		}
+	};
+
 	class HashedString {
 	public:
 	private:

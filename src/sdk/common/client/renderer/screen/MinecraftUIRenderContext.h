@@ -52,7 +52,7 @@ namespace SDK {
 
         void flushText(float lastFlush) {
             if (internalVers >= V1_20_60) {
-                memory::callVirtual<void>(this, 6, 0, lastFlush);
+                memory::callVirtual<void>(this, 6, lastFlush);
             }
             else {
                 memory::callVirtual<void>(this, 6, lastFlush);

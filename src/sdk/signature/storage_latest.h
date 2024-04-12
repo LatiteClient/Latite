@@ -68,8 +68,11 @@ public:
 		inline static SigImpl CommandRequestPacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8d 05 ? ? ? ? 48 89 73 ? 48 89 43 ? c7 43 ? ? ? ? ? c7 43 ? ? ? ? ? 66 89 73 ? 48 89 73 ? 89 73 ? 0f 11 43 ? 48 89 73 ? 48 c7 43 ? ? ? ? ? 40 88 73 ? 40 88 73 ? 48 89 73",
 			"const TextPacket::`vftable'"};
+
+		// "Client%d camera ticking system"
+		// 1st of 3 data LEA's
 		inline static SigImpl Level{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-			"48 8d 05 ? ? ? ? 48 89 07 48 8d 05 ? ? ? ? 48 89 47 ? 48 8d 05 ? ? ? ? 48 89 47 ? 33 c0",
+			"48 8d 05 ? ? ? ? 48 89 03 48 8d 05 ? ? ? ? 48 89 43 ? 48 8d 05 ? ? ? ? 48 89 43 ? 33 c0",
 			"const Level::`vftable'"};
 		inline static SigImpl SetTitlePacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8d 05 ? ? ? ? 48 89 01 89 51 ? 48 83 c1 ? 0f 57 c0 0f 11 01 48 89 79",
@@ -111,17 +114,15 @@ public:
 		"40 53 48 83 EC ?? 48 8B 01 48 8B D9 48 8B 80 ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 84 C0 74 ?? 48 8B 8B ?? ?? ?? ?? 48 8B 01 48 8B 80 ?? ?? ?? ?? 48 83 C4 ?? 5B 48 FF 25 ?? ?? ?? ?? 48 83 C4 ?? 5B C3 48 89 5C 24",
 		"ClientInstance::releaseCurosr"};
 
-	// "Client%d camera ticking system"
-	// 1st of 3 data LEA's
-	inline static SigImpl Level_tick{[](memory::signature_store& stor, uintptr_t res) { return stor.deref(3); },
-		"48 8d 05 ? ? ? ? 48 89 03 48 8d 05 ? ? ? ? 48 89 43 ? 48 8d 05 ? ? ? ? 48 89 43 ? 33 c0",
-		"Level::tick"};
+	inline static SigImpl Level_tick{ [](memory::signature_store& stor, uintptr_t res) { return stor.deref(1); },
+		"e8 ? ? ? ? 48 8b 4b ? 48 85 c9 74 ? 48 8b 41 ? 48 83 c1 ? 48 8b 40",
+		"Level::tick" };
 
 	// callsites
 
 	inline static SigImpl ChatScreenController_sendChatMessage{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? 3c ? 75 ? 48 8b 8b",
-		"ChatScreenController::sendChatMessage"};
+		"ClientInstanceScreenModel::sendChatMessage"};
 
 	inline static SigImpl GameRenderer__renderCurrentFrame{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"e8 ? ? ? ? 90 48 8d 8d ? ? ? ? e8 ? ? ? ? 90 48 8d 8d ? ? ? ? e8 ? ? ? ? 48 8b 86",
@@ -243,7 +244,7 @@ public:
 		"MinecraftGame::getPrimaryClientInstance"};
 
 	inline static SigImpl ActorRenderDispatcher_render{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"e8 ? ? ? ? 44 0f 28 54 24 ? 4c 8d 9c 24 ? ? ? ? 49 8b 5b ? 49 8b 6b",
+		"e8 ? ? ? ? 44 0f 28 54 24 ? 4c 8d 9c 24 ? ? ? ? 41 0f 28 73",
 		"ActorRenderDispatcher::render"};
 
 	inline static SigImpl LevelRendererPlayer_renderOutlineSelection{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
