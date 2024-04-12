@@ -46,7 +46,7 @@ SDK::BlockSource* SDK::ClientInstance::getRegion() {
     if (SDK::internalVers < SDK::V1_20_50) {
         return memory::callVirtual<BlockSource*>(this, 0x1A);
     }
-    return memory::callVirtual<BlockSource*>(this, 0x1B);
+    return memory::callVirtual<BlockSource*>(this, 0x1C);
 }
 
 
@@ -69,7 +69,7 @@ SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
     if (SDK::internalVers < SDK::V1_20_50) {
         return memory::callVirtual<LocalPlayer*>(this, 0x1B);
     }
-    return memory::callVirtual<LocalPlayer*>(this, 0x1C);
+    return memory::callVirtual<LocalPlayer*>(this, 0x1D);
 #endif
 }
 
