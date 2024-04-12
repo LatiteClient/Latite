@@ -36,10 +36,9 @@ namespace SDK {
 
 	class HashedString {
 	public:
+		int64_t hash;
 	private:
 		std::string string;
-	public:
-		int64_t hash;
 	private:
 		HashedString* lastCompare;
 
