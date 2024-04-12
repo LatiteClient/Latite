@@ -1,7 +1,7 @@
 #pragma once
 #include <util/XorString.h>
 
-// 1.20.60
+// 1.20.70
 class Signatures {
 public:
 	struct Offset {
