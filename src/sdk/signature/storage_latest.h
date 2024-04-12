@@ -184,7 +184,7 @@ public:
 
 	// see what accesses things in moveinputhandler
 	inline static SigImpl MovePlayer{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 74 24 ? 48 89 7c 24 ? 4c 89 64 24 ? 55 41 56 41 57 48 8d 6c 24 ? 48 81 ec ? ? ? ? 48 8b 7d",
+		"4c 89 4c 24 ? 48 89 54 24 ? 48 89 4c 24 ? 55 56 57 48 8d 6c 24",
 		"MovePlayer"};
 
 	inline static SigImpl MoveInputHandler_tick{};
