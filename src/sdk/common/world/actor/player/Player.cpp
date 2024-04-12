@@ -6,7 +6,7 @@
 #include "sdk/signature/storage.h"
 
 void SDK::Player::displayClientMessage(std::string const& message) {
-	memory::callVirtual<void>(this, mvGetOffset<0xE3, 0xEF, 0x15E, 0x184, 0x18A>(), message);
+	memory::callVirtual<void>(this, mvGetOffset<0xDC, 0xEF, 0x15E, 0x184, 0x18A>(), message);
 }
 
 SDK::MoveInputComponent* SDK::Player::getMoveInputComponent() {
@@ -29,5 +29,5 @@ SDK::MoveInputComponent* SDK::Player::getMoveInputComponent() {
 }
 
 std::string SDK::Player::getXUID() {
-	return memory::callVirtual<std::string>(this, SDK::mvGetOffset<0x104, 0x18C, 0x1B6, 0x1BC>());
+	return memory::callVirtual<std::string>(this, SDK::mvGetOffset<0xFD, 0x18C, 0x1B6, 0x1BC>());
 }
