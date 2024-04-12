@@ -6,7 +6,7 @@ class Signatures {
 public:
 	struct Offset {
 		inline static SigImpl MinecraftGame_cursorGrabbed{[](memory::signature_store& store, uintptr_t) { return store.ref(2); },
-			"80 b9 ? ? ? ? ? 0f 84 ? ? ? ? 48 8b 01 48 8b 80 ? ? ? ? ff 15 ? ? ? ? 48 85 c0",
+			"38 99 ? ? ? ? 0f 85 ? ? ? ? 48 83 c1",
 			"MinecraftGame->cursorGrabbed"};
 
 		inline static SigImpl LevelRendererPlayer_fovX{};
@@ -111,8 +111,10 @@ public:
 		"40 53 48 83 EC ?? 48 8B 01 48 8B D9 48 8B 80 ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 84 C0 74 ?? 48 8B 8B ?? ?? ?? ?? 48 8B 01 48 8B 80 ?? ?? ?? ?? 48 83 C4 ?? 5B 48 FF 25 ?? ?? ?? ?? 48 83 C4 ?? 5B C3 48 89 5C 24",
 		"ClientInstance::releaseCurosr"};
 
-	inline static SigImpl Level_tick{[](memory::signature_store& stor, uintptr_t res) { return stor.deref(1); },
-		"e8 ? ? ? ? 48 8b 4b ? 48 85 c9 74 ? 48 8b 41 ? 48 83 c1 ? 48 8b 40",
+	// "Client%d camera ticking system"
+	// 1st of 3 data LEA's
+	inline static SigImpl Level_tick{[](memory::signature_store& stor, uintptr_t res) { return stor.deref(3); },
+		"48 8d 05 ? ? ? ? 48 89 03 48 8d 05 ? ? ? ? 48 89 43 ? 48 8d 05 ? ? ? ? 48 89 43 ? 33 c0",
 		"Level::tick"};
 
 	// callsites
