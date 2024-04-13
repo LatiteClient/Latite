@@ -217,6 +217,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Dimension_getTimeOfDay),
         MVSIG(Weather_tick),
         MVSIG(Misc::thirdPersonNametag),
+        MVSIG(ItemStackBase_getDamageValue),
     };
     
     new (mmgrBuf) ModuleManager;

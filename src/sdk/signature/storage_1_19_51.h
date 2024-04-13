@@ -231,6 +231,9 @@ public:
 	inline static SigImpl Dimension_getSkyColor{[](memory::signature_store&, uintptr_t res) { return res; },
 		"41 0f 10 08 48 8b c2",
 		"Dimension::getSkyColor"};
+	inline static SigImpl ItemStackBase_getDamageValue{ [](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5c 24 ? 57 48 83 ec ? 48 8b da 48 85 d2",
+		"ItemStackBase::getDamageValue" };
 };
 
 

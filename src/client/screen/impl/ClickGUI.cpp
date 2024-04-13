@@ -431,6 +431,7 @@ void ClickGUI::onRender(Event&) {
 		float xStart = rect.left + modulePad;
 		float x = xStart;
 		float y = searchRect.bottom + padFromSearchBar;
+		float modStartTop = y;
 		// TODO: clipping
 		dc.ctx->PushAxisAlignedClip({ rect.left, y, rect.right, rect.bottom }, D2D1_ANTIALIAS_MODE_ALIASED);
 		modClip = { rect.left, y, rect.right, rect.bottom };
@@ -498,6 +499,10 @@ void ClickGUI::onRender(Event&) {
 			if (!mod.shouldRender) continue;
 			Vec2 pos = { x, y + columnOffs[i] };
 			RectF modRect = { pos.x, pos.y, pos.x + modWidth, pos.y + modHeight };
+
+			if (jumpModule.has_value() && mod.name == *jumpModule) {
+				scroll = pos.y - modStartTop;
+			}
 
 			float maxHoverOffset = modRect.getHeight() / 10.f;
 			modRect = modRect.translate(0.f, -(maxHoverOffset * mod.lerpHover));
@@ -704,6 +709,7 @@ void ClickGUI::onRender(Event&) {
 	}
 
 	modClip = std::nullopt;
+	jumpModule = std::nullopt;
 
 	if (colorPicker.setting) {
 		drawColorPicker();

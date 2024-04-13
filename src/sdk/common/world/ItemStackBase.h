@@ -1,6 +1,7 @@
 #pragma once
 #include <chrono>
 #include "Item.h"
+#include <sdk/signature/storage.h>
 
 namespace SDK {
 	class ItemStackBase {
@@ -24,8 +25,10 @@ namespace SDK {
 		std::string getHoverName();
 
 		short getDamageValue() {
-			if (!item) return 0;
-			return getItem()->getDamageValue(this->tag.get());
+			//if (!item) return 0;
+			
+			return reinterpret_cast<short(*)(ItemStackBase*)>(Signatures::ItemStackBase_getDamageValue.result)(this);
+			//return getItem()->getDamageValue(this->tag.get());
 		}
 
 		Item* getItem() {

@@ -23,6 +23,8 @@ public:
 	bool shouldSelect(d2d::Rect rc, Vec2 const& pt) override;
 
 	void drawColorPicker();
+
+	void jumpToModule(std::string const& name) { jumpModule = name; }
 protected:
 	void onEnable(bool ignoreAnims) override;
 	void onDisable() override;
@@ -97,5 +99,6 @@ private:
 	float scroll = 0.f;
 	float lerpScroll = 0.f;
 
+	std::optional<std::string> jumpModule;
 	ComPtr<ID2D1Effect> compositeEffect;
 };

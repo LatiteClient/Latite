@@ -106,19 +106,27 @@ void HUDEditor::onRender(Event& ev) {
 
 void HUDEditor::onClick(Event& evGeneric) {
 	auto& ev = reinterpret_cast<ClickEvent&>(evGeneric);
-	if (ev.getMouseButton() == 4) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 			if (!mod->isHud()) return;
 			auto hudMod = reinterpret_cast<HUDModule*>(mod.get());
 
 			if (!hudMod->isActive()) return;
-			if (!hudMod->isResizable()) return;
+			
 			if (!shouldSelect(hudMod->getRect(), SDK::ClientInstance::get()->cursorPos)) return;
-
-			hudMod->setScale(std::clamp(hudMod->getScale() - static_cast<float>(ev.getWheelDelta()) / 1000.f, HUDModule::min_scale, HUDModule::max_scale));
+			
+			if (ev.getMouseButton() == 4) {
+				if (!hudMod->isResizable()) return;
+				hudMod->setScale(std::clamp(hudMod->getScale() - static_cast<float>(ev.getWheelDelta()) / 1000.f, HUDModule::min_scale, HUDModule::max_scale));
+			}
+			else if (ev.getMouseButton() == 3) {
+				hudMod->setEnabled(false);
+			}
+			else if (ev.getMouseButton() == 2) {
+				Latite::getScreenManager().get<ClickGUI>().jumpToModule(hudMod->name());
+				Latite::getScreenManager().showScreen<ClickGUI>(true);
+			}
 			});
 		ev.setCancelled(true);
-	}
 }
 
 void HUDEditor::onRenderLayer(Event& evGeneric) {
