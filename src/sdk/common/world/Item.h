@@ -3,6 +3,7 @@
 #include "sdk/deps/Core/StringUtils.h"
 #include "sdk/Util.h"
 #include "api/memory/Memory.h"
+#include <sdk/signature/storage.h>
 
 namespace SDK {
 	class Item {
@@ -35,7 +36,7 @@ namespace SDK {
 		short getDamageValue(class CompoundTag* tag) {
 			// TODO: fix this
 			if (internalVers >= V1_20_50) {
-				return 0;
+				return reinterpret_cast<short(*)(Item*, CompoundTag*)>(Signatures::ItemStackBase_getDamageValue.result)(this, tag);
 			}
 
 			return memory::callVirtual<short>(this, mvGetOffset<0x6B, 0x65, 0x6B>(), tag);

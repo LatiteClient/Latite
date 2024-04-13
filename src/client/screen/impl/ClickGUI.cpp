@@ -500,8 +500,9 @@ void ClickGUI::onRender(Event&) {
 			Vec2 pos = { x, y + columnOffs[i] };
 			RectF modRect = { pos.x, pos.y, pos.x + modWidth, pos.y + modHeight };
 
-			if (jumpModule.has_value() && mod.name == *jumpModule) {
+			if (jumpModule.has_value() && mod.mod->name() == *jumpModule) {
 				scroll = pos.y - modStartTop;
+				mod.isExtended = true;
 			}
 
 			float maxHoverOffset = modRect.getHeight() / 10.f;
