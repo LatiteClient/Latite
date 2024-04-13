@@ -21,12 +21,12 @@ std::unordered_map<UUID, SDK::PlayerListEntry>* SDK::Level::getPlayerList() {
 }
 
 SDK::HitResult* SDK::Level::getHitResult() {
-	static int index = mvGetOffset<0x12A, 0x12E, 0x12E, 0x139, 0x148>();
+	static int index = mvGetOffset<0x12B, 0x12E, 0x12E, 0x139, 0x148>();
 	return memory::callVirtual<HitResult*>(this, index);
 }
 
 SDK::HitResult* SDK::Level::getLiquidHitResult() {
-	static int index = mvGetOffset<0x12B, 0x12F, 0x12F, 0x13A, 0x149>();
+	static int index = mvGetOffset<0x12C, 0x12F, 0x12F, 0x13A, 0x149>();
 	return reinterpret_cast<SDK::HitResult*>(memory::callVirtual<uintptr_t>(this, index)) /*sizeof hitResult (0x60) / 8*/;
 }
 
