@@ -191,8 +191,8 @@ JsValueRef D2DScriptingObject::drawImageCallback(JsValueRef callee, bool isConst
 }
 
 JsValueRef D2DScriptingObject::getTextSize(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyArgCount(argCount, 4, true)) return JS_INVALID_REFERENCE;
-	if (!Chakra::VerifyParameters({ { arguments[1], JsString }, { arguments[2], JsNumber }, { arguments[3], JsNumber } })) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyArgCount(argCount, 3, true)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsString }, { arguments[2], JsNumber } })) return JS_INVALID_REFERENCE;
 
 	auto txt = Chakra::GetString(arguments[1]);
 	auto size = Chakra::GetNumber(arguments[2]);
