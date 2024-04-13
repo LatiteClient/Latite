@@ -6,9 +6,9 @@
 namespace SDK {
 	class FNVString {
 	public:
+		std::string string;
 		int64_t hash;
 	private:
-		std::string string;
 	public:
 		FNVString(int64_t hash, std::string text) : hash(hash), string(text.c_str()) {};
 

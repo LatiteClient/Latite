@@ -9,9 +9,9 @@ namespace SDK {
 	public:
 		std::string atlas; // atlas.items
 		CLASS_FIELD(std::string, translateName, 0xA8); // item.bow
-		CLASS_FIELD(FNVString, id, 0xC8); // bow
-		CLASS_FIELD(FNVString, _namespace, 0xF0); // minecraft
-		CLASS_FIELD(FNVString, namespacedId, 0x118); // minecraft:bow 
+		CLASS_FIELD(HashedString, id, 0xC8); // bow
+		CLASS_FIELD(HashedString, _namespace, 0xF0); // minecraft
+		CLASS_FIELD(HashedString, namespacedId, 0x118); // minecraft:bow 
 
 		int getMaxUseDuration(class ItemStackBase* item) {
 			if (internalVers >= V1_20_50) {
@@ -29,7 +29,7 @@ namespace SDK {
 		}
 
 		int getMaxDamage() {
-			return memory::callVirtual<int>(this, mvGetOffset<0x21, 0x2F, 0x2F, 0x28, 0x2F>());
+			return memory::callVirtual<int>(this, mvGetOffset<0x22, 0x2F, 0x2F, 0x28, 0x2F>());
 		}
 
 		short getDamageValue(class CompoundTag* tag) {
