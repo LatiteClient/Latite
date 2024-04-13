@@ -11,6 +11,14 @@ namespace {
 
 void LevelRendererHooks::LevelRenderer_renderLevel(SDK::LevelRenderer* lvl, SDK::ScreenContext* scn, void* unk) {
 	SDK::ScreenContext::instance3d = scn;
+
+	{
+		PluginManager::Event ev{ L"render3d", {}, true };
+		if (Latite::getPluginManager().dispatchEvent(ev)) {
+			return;
+		}
+	}
+
 	renderLevelHook->oFunc<decltype(&LevelRenderer_renderLevel)>()(lvl, scn, unk);
 	{
 		RenderLevelEvent ev{ lvl, scn };

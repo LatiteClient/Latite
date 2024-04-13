@@ -22,6 +22,6 @@ namespace SDK {
 		class HitResult* getLiquidHitResult();
 		bool isClientSide();
 
-		MVCLASS_FIELD(std::string, name, 0x650, 0x698, 0x678, 0x5B8, 0x548);
+		MVCLASS_FIELD(std::string, name, 0x6D0, 0x698, 0x678, 0x5B8, 0x548);
 	};
 }

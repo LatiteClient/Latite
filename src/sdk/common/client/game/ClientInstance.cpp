@@ -61,6 +61,10 @@ SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
         offs++; // 0x1C instead of 0x1B
     }
 
+    if (SDK::internalVers >= SDK::V1_20_71) {
+        offs++; // 0x1D instead of 0x1C
+    }
+
     return memory::callVirtual<LocalPlayer*>(this, offs);
 #else
     if (SDK::internalVers == SDK::V1_18_12 || SDK::internalVers == SDK::V1_19_51) {

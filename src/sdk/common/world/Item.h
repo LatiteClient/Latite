@@ -29,7 +29,7 @@ namespace SDK {
 		}
 
 		int getMaxDamage() {
-			return memory::callVirtual<int>(this, mvGetOffset<0x21, 0x2F, 0x2F, 0x28, 0x2F>());
+			return memory::callVirtual<int>(this, mvGetOffset<0x22, 0x2F, 0x2F, 0x28, 0x2F>());
 		}
 
 		short getDamageValue(class CompoundTag* tag) {
