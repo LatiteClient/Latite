@@ -89,21 +89,19 @@ void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 #endif
 
 	Chakra::DefineFunc(object, registerEventCallback, L"on");
-	Chakra::DefineFunc(object, runCommandCallback, L"runCommand");
-	Chakra::DefineFunc(object, showNotifCallback, L"showNotification");
-	Chakra::DefineFunc(object, getMmgrCallback, L"getModuleManager", this);
-	Chakra::DefineFunc(object, getCmgrCallback, L"getCommandManager", this);
+	Chakra::DefineFunc(object, runCommandCallback, XW("runCommand"));
+	Chakra::DefineFunc(object, showNotifCallback, XW("showNotification"));
+	Chakra::DefineFunc(object, getMmgrCallback, XW("getModuleManager"), this);
+	Chakra::DefineFunc(object, getCmgrCallback, XW("getCommandManager"), this);
 
 	initModuleManager();
-	Chakra::DefineFunc(moduleManager, mmgrRegisterModuleCallback, L"registerModule");
-	//Chakra::DefineFunc(moduleManager, mmgrDeregisterModuleCallback, L"deregisterModule");
-	Chakra::DefineFunc(moduleManager, mmgrGetModuleByName, L"getModuleByName");
-	Chakra::DefineFunc(moduleManager, mmgrForEachModule, L"forEachModule");
-
 	initCommandManager();
-	Chakra::DefineFunc(commandManager, cmgrRegisterCommandCallback, L"registerCommand");
-	//Chakra::DefineFunc(commandManager, cmgrDeregisterCommandCallback, L"deregisterCommand");
-	Chakra::DefineFunc(commandManager, cmgrGetPrefixCallback, L"getPrefix");
+
+	Chakra::DefineFunc(moduleManager, mmgrRegisterModuleCallback, XW("registerModule"));
+	Chakra::DefineFunc(moduleManager, mmgrGetModuleByName, XW("getModuleByName"));
+	Chakra::DefineFunc(moduleManager, mmgrForEachModule, XW("forEachModule"));
+	Chakra::DefineFunc(commandManager, cmgrRegisterCommandCallback, XW("registerCommand"));
+	Chakra::DefineFunc(commandManager, cmgrGetPrefixCallback, XW("getPrefix"));
 
 	Chakra::SetPropertyString(object, L"version", util::StrToWStr(std::string(Latite::version.data(), Latite::version.size())));
 }
@@ -225,7 +223,7 @@ JsValueRef ClientScriptingObject::mmgrForEachModule(JsValueRef callee, bool isCo
 	
 	auto cl = script->getClass<JsModuleClass>();
 	if (!cl) {
-		Chakra::ThrowError(L"INTERNAL ERROR: could not find Module class");
+		Chakra::ThrowError(XW("INTERNAL ERROR: could not find Module class"));
 		return JS_INVALID_REFERENCE;
 	}
 

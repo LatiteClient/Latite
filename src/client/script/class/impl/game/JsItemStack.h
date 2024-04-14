@@ -58,9 +58,9 @@ public:
 	}
 
 	void prepareFunctions() override {
-		Chakra::DefineFunc(prototype, toStringCallback, L"toString", this);
-		Chakra::DefineFunc(prototype, getDisplayNameCallback, L"getDisplayName", this);
-		Chakra::DefineFunc(prototype, getCountCallback, L"getCount", this);
-		Chakra::DefineFunc(prototype, getPickupTime, L"getPickupTime", this);
+		Chakra::DefineFunc(prototype, toStringCallback, XW("toString"), this);
+		Chakra::DefineFunc(prototype, getDisplayNameCallback, XW("getDisplayName"), this);
+		Chakra::DefineFunc(prototype, getCountCallback, XW("getCount"), this);
+		Chakra::DefineFunc(prototype, getPickupTime, XW("getPickupTime"), this);
 	};
 };

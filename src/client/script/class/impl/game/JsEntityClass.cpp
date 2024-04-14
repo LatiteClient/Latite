@@ -30,11 +30,11 @@ JsValueRef JsEntityClass::entityGetPos(JsValueRef callee, bool isConstructor, Js
 			return ret;
 		}
 		else {
-			Chakra::ThrowError(L"Access denied, cannot use getPosition");
+			Chakra::ThrowError(XW("Access denied, cannot use getPosition"));
 			return Chakra::GetUndefined();
 		}
 	}
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return Chakra::GetUndefined();
 }
 
@@ -51,11 +51,11 @@ JsValueRef JsEntityClass::entityGetRot(JsValueRef callee, bool isConstructor, Js
 			return ret;
 		}
 		else {
-			Chakra::ThrowError(L"Access denied, cannot use getRotation");
+			Chakra::ThrowError(XW("Access denied, cannot use getRotation"));
 			return Chakra::GetUndefined();
 		}
 	}
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return Chakra::GetUndefined();
 }
 
@@ -69,7 +69,7 @@ JsValueRef JsEntityClass::entityGetDimensionName(JsValueRef callee, bool isConst
 		JS::JsPointerToString(dim.c_str(), dim.size(), &dimension);
 		return dimension;
 	}
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return Chakra::GetUndefined();
 }
 
@@ -80,7 +80,7 @@ JsValueRef JsEntityClass::entityGetHurtTime(JsValueRef callee, bool isConstructo
 		auto actor = ent->getEntity();
 		return Chakra::MakeInt(actor->invulnerableTime);
 	}
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return Chakra::GetUndefined();
 }
 
@@ -91,7 +91,7 @@ JsValueRef JsEntityClass::entityIsPlayer(JsValueRef callee, bool isConstructor, 
 		auto actor = ent->getEntity();
 		return actor->isPlayer() ? Chakra::GetTrue() : Chakra::GetFalse();
 	}
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return Chakra::GetUndefined();
 }
 
@@ -104,7 +104,7 @@ JsValueRef JsEntityClass::entityAttack(JsValueRef callee, bool isConstructor, Js
 		SDK::ClientInstance::get()->getLocalPlayer()->gameMode->attack(actor);
 		return Chakra::GetUndefined();
 	}
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return Chakra::GetUndefined();
 }
 
@@ -115,7 +115,7 @@ JsValueRef JsEntityClass::entityGetType(JsValueRef callee, bool isConstructor, J
 		auto actor = ent->getEntity();
 		return Chakra::MakeInt(actor->getEntityTypeID());
 	}
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return Chakra::GetUndefined();
 }
 
@@ -125,7 +125,7 @@ JsValueRef JsEntityClass::entityIsLocalPlayer(JsValueRef callee, bool isConstruc
 	if (ent && ent->validate()) {
 		return Chakra::MakeInt(ent->runtimeId == 1);
 	}
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return JS_INVALID_REFERENCE;
 }
 
@@ -137,11 +137,11 @@ JsValueRef JsEntityClass::entityGetHealth(JsValueRef callee, bool isConstructor,
 			return Chakra::MakeDouble(static_cast<float>(ent->getEntity()->getHealth()));
 		}
 		else {
-			Chakra::ThrowError(L"Access denied, cannot use getHealth");
+			Chakra::ThrowError(XW("Access denied, cannot use getHealth"));
 			return JS_INVALID_REFERENCE;
 		}
 	}
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return JS_INVALID_REFERENCE;
 }
 
@@ -153,11 +153,11 @@ JsValueRef JsEntityClass::entityGetHunger(JsValueRef callee, bool isConstructor,
 			return Chakra::MakeDouble(static_cast<float>(ent->getEntity()->getHunger()));
 		}
 		else {
-			Chakra::ThrowError(L"Access denied, cannot use getHunger");
+			Chakra::ThrowError(XW("Access denied, cannot use getHunger"));
 			return JS_INVALID_REFERENCE;
 		}
 	}
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return JS_INVALID_REFERENCE;
 }
 
@@ -168,10 +168,10 @@ JsValueRef JsEntityClass::entityGetSaturation(JsValueRef callee, bool isConstruc
 		return Chakra::MakeDouble(static_cast<float>(ent->getEntity()->getSaturation()));
 	}
 	else {
-		Chakra::ThrowError(L"Access denied, cannot use getSaturation");
+		Chakra::ThrowError(XW("Access denied, cannot use getSaturation"));
 		return JS_INVALID_REFERENCE;
 	}
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return JS_INVALID_REFERENCE;
 }
 
@@ -199,7 +199,7 @@ JsValueRef JsEntityClass::entityGetVariable(JsValueRef callee, bool isConstructo
 		return Chakra::GetNull();
 	}
 
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return JS_INVALID_REFERENCE;
 }
 
@@ -226,7 +226,7 @@ JsValueRef JsEntityClass::entitySetVariable(JsValueRef callee, bool isConstructo
 		return Chakra::GetNull();
 	}
 
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return JS_INVALID_REFERENCE;
 }
 
@@ -247,11 +247,11 @@ JsValueRef JsEntityClass::entityGetPosInterpolated(JsValueRef callee, bool isCon
 			return cl->construct(interPos);
 		}
 		else {
-			Chakra::ThrowError(L"Access denied, cannot use getPositionInterpolated");
+			Chakra::ThrowError(XW("Access denied, cannot use getPositionInterpolated"));
 			return Chakra::GetUndefined();
 		}
 	}
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return Chakra::GetUndefined();
 }
 
@@ -268,10 +268,10 @@ JsValueRef JsEntityClass::entityGetPosPrev(JsValueRef callee, bool isConstructor
 			return ret;
 		}
 		else {
-			Chakra::ThrowError(L"Access denied, cannot use getPreviousPosition");
+			Chakra::ThrowError(XW("Access denied, cannot use getPreviousPosition"));
 			return Chakra::GetUndefined();
 		}
 	}
-	Chakra::ThrowError(L"Invalid entity");
+	Chakra::ThrowError(XW("Invalid entity"));
 	return Chakra::GetUndefined();
 }

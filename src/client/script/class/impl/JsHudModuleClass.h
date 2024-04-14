@@ -25,11 +25,11 @@ public:
 
 	void prepareFunctions() override {
 		__super::prepareFunctions();
-		Chakra::DefineFunc(prototype, hudModuleGetRect, L"getRect", this);
-		Chakra::DefineFunc(prototype, hudModuleSetRect, L"setRect", this);
-		Chakra::DefineFunc(prototype, hudModuleSetBounds, L"setBounds", this);
-		Chakra::DefineFunc(prototype, hudModuleGetSize, L"getSize", this);
-		Chakra::DefineFunc(prototype, hudModuleSetSize, L"setSize", this);
+		Chakra::DefineFunc(prototype, hudModuleGetRect, XW("getRect"), this);
+		Chakra::DefineFunc(prototype, hudModuleSetRect, XW("setRect"), this);
+		Chakra::DefineFunc(prototype, hudModuleSetBounds, XW("setBounds"), this);
+		Chakra::DefineFunc(prototype, hudModuleGetSize, XW("getSize"), this);
+		Chakra::DefineFunc(prototype, hudModuleSetSize, XW("setSize"), this);
 	};
 
 private:

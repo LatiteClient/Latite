@@ -7,16 +7,15 @@
 #include <client/script/class/impl/JsTextureClass.h>
 
 void D2DScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
-	Chakra::DefineFunc(object, useCallback, L"use", this);
-	Chakra::DefineFunc(object, fillRectCallback, L"fillRect", this);
-	Chakra::DefineFunc(object, drawRectCallback, L"drawRect", this);
-	Chakra::DefineFunc(object, drawTextCallback, L"drawText", this);
-	Chakra::DefineFunc(object, drawTextFullCallback, L"drawTextFull", this);
-	Chakra::DefineFunc(object, drawImageCallback, L"drawTexture", this);
-
-	Chakra::DefineFunc(object, getTextSize, L"getTextSize", this);
-	Chakra::DefineFunc(object, setClippingRect, L"setClipRect", this);
-	Chakra::DefineFunc(object, restoreClippingRect, L"restoreClipRect", this);
+	Chakra::DefineFunc(object, useCallback, XW("use"), this);
+	Chakra::DefineFunc(object, fillRectCallback, XW("fillRect"), this);
+	Chakra::DefineFunc(object, drawRectCallback, XW("drawRect"), this);
+	Chakra::DefineFunc(object, drawTextCallback, XW("drawText"), this);
+	Chakra::DefineFunc(object, drawTextFullCallback, XW("drawTextFull"), this);
+	Chakra::DefineFunc(object, drawImageCallback, XW("drawTexture"), this);
+	Chakra::DefineFunc(object, getTextSize, XW("getTextSize"), this);
+	Chakra::DefineFunc(object, setClippingRect, XW("setClipRect"), this);
+	Chakra::DefineFunc(object, restoreClippingRect, XW("restoreClipRect"), this);
 }
 
 void D2DScriptingObject::onRenderOverlay(Event& ev) {
@@ -144,7 +143,7 @@ JsValueRef D2DScriptingObject::drawTextFullCallback(JsValueRef callee, bool isCo
 	auto vertAlign = Chakra::GetInt(arguments[6]);
 
 	if ((align > 2 || align < 0) || (vertAlign > 2 || vertAlign < 0)) {
-		Chakra::ThrowError(L"Invalid text alignment");
+		Chakra::ThrowError(XW("Invalid text alignment"));
 		return Chakra::GetUndefined();
 	}
 

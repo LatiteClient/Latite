@@ -10,8 +10,8 @@ public:
 	void prepareFunctions() override {
 		__super::prepareFunctions();
 
-		Chakra::DefineFunc(prototype, getBreakProgress, L"getBreakProgress", this);
-		Chakra::DefineFunc(prototype, getLastBreakProgress, L"getLastBreakProgress", this);
+		Chakra::DefineFunc(prototype, getBreakProgress, XW("getBreakProgress"), this);
+		Chakra::DefineFunc(prototype, getLastBreakProgress, XW("getLastBreakProgress"), this);
 	}
 private:
 	static JsValueRef CALLBACK getBreakProgress(JsValueRef callee, bool isConstructor,

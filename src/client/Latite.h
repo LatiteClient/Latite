@@ -135,7 +135,7 @@ private:
 	ValueType minecraftRenderer = BoolValue(false);
 	ValueType textShadow = BoolValue(true);
 	ValueType broadcastUsage = BoolValue(true);
-	ValueType centerCrosshairHUD = BoolValue(false);
+	ValueType centerCursorMenus = BoolValue(false);
 
 	EnumData mcRendFont;
 

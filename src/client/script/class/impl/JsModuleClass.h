@@ -22,7 +22,7 @@ protected:
 		auto thi = reinterpret_cast<JsModuleClass*>(callbackState);
 		auto mod = Get(arguments[0]);
 		if (!mod) {
-			Chakra::ThrowError(L"Invalid module");
+			Chakra::ThrowError(XW("Invalid module"));
 			return JS_INVALID_REFERENCE;
 		}
 		std::string add = std::format("{} ({})", util::WStrToStr(thi->name), mod->name());
@@ -69,15 +69,15 @@ public:
 	}
 
 	void prepareFunctions() override {
-		Chakra::DefineFunc(prototype, toStringCallback, L"toString", this);
-		Chakra::DefineFunc(prototype, moduleIsEnabled, L"isEnabled", this);
-		Chakra::DefineFunc(prototype, moduleSetEnabled, L"setEnabled", this);
-		Chakra::DefineFunc(prototype, moduleIsBlocked, L"isBlocked", this);
-		Chakra::DefineFunc(prototype, moduleSetOnEvent, L"on", this);
-		Chakra::DefineFunc(prototype, moduleGetSettings, L"getSettings", this);
-		Chakra::DefineFunc(prototype, moduleAddBoolSetting, L"addBoolSetting", this);
-		Chakra::DefineFunc(prototype, moduleAddNumberSetting, L"addNumberSetting", this);
-		Chakra::DefineFunc(prototype, moduleAddKeySetting, L"addKeySetting", this);
-		Chakra::DefineFunc(prototype, moduleAddTextSetting, L"addTextSetting", this);
+		Chakra::DefineFunc(prototype, toStringCallback, XW("toString"), this);
+		Chakra::DefineFunc(prototype, moduleIsEnabled, XW("isEnabled"), this);
+		Chakra::DefineFunc(prototype, moduleSetEnabled, XW("setEnabled"), this);
+		Chakra::DefineFunc(prototype, moduleIsBlocked, XW("isBlocked"), this);
+		Chakra::DefineFunc(prototype, moduleSetOnEvent, XW("on"), this);
+		Chakra::DefineFunc(prototype, moduleGetSettings, XW("getSettings"), this);
+		Chakra::DefineFunc(prototype, moduleAddBoolSetting, XW("addBoolSetting"), this);
+		Chakra::DefineFunc(prototype, moduleAddNumberSetting, XW("addNumberSetting"), this);
+		Chakra::DefineFunc(prototype, moduleAddKeySetting, XW("addKeySetting"), this);
+		Chakra::DefineFunc(prototype, moduleAddTextSetting, XW("addTextSetting"), this);
 	};
 };

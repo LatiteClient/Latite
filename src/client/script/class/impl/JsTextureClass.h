@@ -76,8 +76,8 @@ public:
 		Chakra::DefineFunc(constructor, getCallback, L"get", this);
 
 		// Member functions
-		Chakra::DefineFunc(prototype, toStringCallback, L"toString", this);
-		Chakra::DefineFunc(prototype, reloadCallback, L"reload", this);
-		Chakra::DefineFunc(prototype, disposeCallback, L"dispose", this);
+		Chakra::DefineFunc(prototype, toStringCallback, XW("toString"), this);
+		Chakra::DefineFunc(prototype, reloadCallback, XW("reload"), this);
+		Chakra::DefineFunc(prototype, disposeCallback, XW("dispose"), this);
 	};
 };

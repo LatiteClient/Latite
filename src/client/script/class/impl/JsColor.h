@@ -51,7 +51,7 @@ public:
 		Chakra::SetPropertyNumber(prototype, L"r", 0.0, true);		Chakra::SetPropertyNumber(prototype, L"b", 0.0, true);
 		Chakra::SetPropertyNumber(prototype, L"a", 1.0, true);
 
-		Chakra::DefineFunc(prototype, toStringCallback, L"toString", this);
+		Chakra::DefineFunc(prototype, toStringCallback, XW("toString"), this);
 	};
 
 	static d2d::Color ToColor(JsValueRef obj) {

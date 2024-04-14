@@ -9,7 +9,7 @@ JsValueRef JsPlayerClass::playerGetName(JsValueRef callee, bool isConstructor, J
 	if (ent && ent->validate() && ent->getEntity()->isPlayer()) {
 		return Chakra::MakeString(util::StrToWStr(static_cast<SDK::Player*>(ent->getEntity())->playerName));
 	}
-	Chakra::ThrowError(L"Invalid player");
+	Chakra::ThrowError(XW("Invalid player"));
 	return JS_INVALID_REFERENCE;
 }
 
@@ -19,7 +19,7 @@ JsValueRef JsPlayerClass::playerGetXboxUserID(JsValueRef callee, bool isConstruc
 	if (ent && ent->validate() && ent->getEntity()->isPlayer()) {
 		return Chakra::MakeString(util::StrToWStr(static_cast<SDK::Player*>(ent->getEntity())->getXUID()));
 	}
-	Chakra::ThrowError(L"Invalid player");
+	Chakra::ThrowError(XW("Invalid player"));
 	return JS_INVALID_REFERENCE;
 }
 
@@ -32,11 +32,11 @@ JsValueRef JsPlayerClass::playerGetSelectedItem(JsValueRef callee, bool isConstr
 			return JsScript::getThis()->getClass<JsItemStack>()->construct(supp->inventory->getItem(supp->selectedSlot), false);
 		}
 		else {
-			Chakra::ThrowError(L"Access denied - cannot use getHoldingItem");
+			Chakra::ThrowError(XW("Access denied - cannot use getHoldingItem"));
 			return JS_INVALID_REFERENCE;
 		}
 	}
-	Chakra::ThrowError(L"Invalid player");
+	Chakra::ThrowError(XW("Invalid player"));
 	return JS_INVALID_REFERENCE;
 }
 
@@ -49,10 +49,10 @@ JsValueRef JsPlayerClass::playerGetSelectedSlot(JsValueRef callee, bool isConstr
 			return Chakra::MakeInt(supp->selectedSlot);
 		}
 		else {
-			Chakra::ThrowError(L"Access denied - cannot use getHoldingItem");
+			Chakra::ThrowError(XW("Access denied - cannot use getHoldingItem"));
 			return JS_INVALID_REFERENCE;
 		}
 	}
-	Chakra::ThrowError(L"Invalid player");
+	Chakra::ThrowError(XW("Invalid player"));
 	return JS_INVALID_REFERENCE;
 }

@@ -10,7 +10,7 @@ JsValueRef JsHudModuleClass::hudModuleGetRect(JsValueRef callee, bool isConstruc
 	JsHUDModule* mod;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&mod));
 	if (!mod) {
-		Chakra::ThrowError(L"Object is not a module");
+		Chakra::ThrowError(XW("Object is not a module"));
 		return Chakra::GetUndefined();
 	}
 

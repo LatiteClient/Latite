@@ -6,3 +6,5 @@
 #else
 #define XOR_STRING xorstr_
 #endif
+
+#define XW(x) util::StrToWStr(XOR_STRING(x))

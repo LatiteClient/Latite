@@ -469,7 +469,7 @@ void JsScript::loadScriptObjects() {
 		Chakra::SetPropertyString(plugin, L"description", data.description, true);
 		Chakra::SetPropertyString(plugin, L"version", data.version, true);
 
-		Chakra::DefineFunc(plugin, requestPermission, L"requestPermission", this);
+		Chakra::DefineFunc(plugin, requestPermission, XW("requestPermission"), this);
 
 		Chakra::SetProperty(globalObj, L"plugin", plugin, true);
 	}

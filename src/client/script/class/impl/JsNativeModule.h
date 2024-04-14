@@ -25,10 +25,10 @@ public:
 
 	void prepareFunctions() override {
 		// static
-		Chakra::DefineFunc(constructor, getCallback, L"get", this);
-		Chakra::DefineFunc(prototype, defaultToString, L"toString", this);
-		Chakra::DefineFunc(prototype, callCallback, L"call", this);
-		Chakra::SetPropertyNumber(prototype, L"handle", 0.0);
+		Chakra::DefineFunc(constructor, getCallback, XW("get"), this);
+		Chakra::DefineFunc(prototype, defaultToString, XW("toString"), this);
+		Chakra::DefineFunc(prototype, callCallback, XW("call"), this);
+		Chakra::SetPropertyNumber(prototype, XW("handle"), 0.0);
 
 	};
 
@@ -68,7 +68,7 @@ public:
 		if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsString} })) return JS_INVALID_REFERENCE;
 
 		if (argCount > 18) {
-			Chakra::ThrowError(L"NativeModule.call can only accept 15 native arguments.");
+			Chakra::ThrowError(XW("NativeModule.call can only accept 15 native arguments."));
 			return JS_INVALID_REFERENCE;
 		}
 
@@ -103,7 +103,7 @@ public:
 		};
 
 		if (!proc) {
-			Chakra::ThrowError(L"Could not find function " + name);
+			Chakra::ThrowError(XW("Could not find function ") + name);
 			return JS_INVALID_REFERENCE;
 		}
 

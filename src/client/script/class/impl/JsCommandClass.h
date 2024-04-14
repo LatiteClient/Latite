@@ -12,7 +12,7 @@ protected:
 		auto thi = reinterpret_cast<JsCommandClass*>(callbackState);
 		auto cmd = Get(arguments[0]);
 		if (!cmd) {
-			Chakra::ThrowError(L"Invalid command");
+			Chakra::ThrowError(XW("Invalid command"));
 			return JS_INVALID_REFERENCE;
 		}
 		std::string add = std::format("{} ({})", util::WStrToStr(thi->name), cmd->name());

@@ -4,7 +4,7 @@
 JsValueRef JsLocalPlayerClass::getBreakProgress(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!lp) {
-		Chakra::ThrowError(L"Invalid local player");
+		Chakra::ThrowError(XW("Invalid local player"));
 		return JS_INVALID_REFERENCE;
 	}
 	return Chakra::MakeDouble(lp->gameMode->breakProgress);
@@ -13,7 +13,7 @@ JsValueRef JsLocalPlayerClass::getBreakProgress(JsValueRef callee, bool isConstr
 JsValueRef JsLocalPlayerClass::getLastBreakProgress(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!lp) {
-		Chakra::ThrowError(L"Invalid local player");
+		Chakra::ThrowError(XW("Invalid local player"));
 		return JS_INVALID_REFERENCE;
 	}
 	return Chakra::MakeDouble(lp->gameMode->lastBreakProgress);

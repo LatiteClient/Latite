@@ -636,8 +636,8 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("centerCrosshair", "Center Crosshair in Menu", "Crosshair will be centered when you open the menu.");
-        set->value = &this->centerCrosshairHUD;
+        auto set = std::make_shared<Setting>("centerCursor", "Center cursor when opening UIs", "Crosshair will be centered when you open the menu.");
+        set->value = &this->centerCursorMenus;
         this->getSettings().addSetting(set);
     }
 }
@@ -657,8 +657,8 @@ void Latite::initAsset(int resource, std::wstring const& filename) {
 
     HRSRC hRes = FindResource((HMODULE)dllInst, MAKEINTRESOURCE(resource), RT_RCDATA);
     if (!hRes) {
-        Logger::Fatal("Could not find resource {}", util::WStrToStr(filename));
-        throw std::runtime_error("Could not find resource");
+        Logger::Fatal(XOR_STRING("Could not find resource {}"), util::WStrToStr(filename));
+        winrt::terminate();
         return;
     }
 
@@ -666,7 +666,7 @@ void Latite::initAsset(int resource, std::wstring const& filename) {
     DWORD hSize = SizeofResource((HMODULE)dllInst, hRes);
     char* hFinal = (char*)LockResource(hData);
 
-    auto path = util::GetLatitePath() / "Assets";
+    auto path = util::GetLatitePath() / XOR_STRING("Assets");
     std::filesystem::create_directory(path);
 
     auto fullPath = path / filename;
@@ -727,11 +727,11 @@ void Latite::onUpdate(Event& evGeneric) {
     auto now = std::chrono::system_clock::now();
     static auto lastSend = now;
 
-    if (SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed() && std::get<BoolValue>(centerCrosshairHUD)) {
+    if (SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed() && std::get<BoolValue>(centerCursorMenus)) {
         RECT r;
 
         if (!minecraftWindow) {
-            minecraftWindow = FindWindowA(NULL, "Minecraft");
+            minecraftWindow = FindWindowA(NULL, XOR_STRING("Minecraft"));
         }
 
         GetClientRect(minecraftWindow, &r);
