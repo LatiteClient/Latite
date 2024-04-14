@@ -243,9 +243,6 @@
     <ClInclude Include="src\util\DxUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sdk\signature\storage_1_18_12.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\sdk\signature\storage_latest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -331,9 +328,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\event\impl\AppSuspendedEvent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\sdk\signature\storage_1_19_51.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\screen\impl\HUDEditor.h">
@@ -496,9 +490,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\event\impl\CinematicCameraEvent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\sdk\signature\storage_1_16_40.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\feature\module\impl\game\ToggleSprintSneak.h">
@@ -699,9 +690,6 @@
     <ClInclude Include="src\sdk\common\util\MolangVariable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sdk\signature\storage_1_20_30.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\sdk\common\client\renderer\game\BaseActorRenderContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -739,9 +727,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\script\class\impl\JsTextModuleClass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\sdk\signature\storage_1_20_40.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\client\event\impl\AfterEntityRenderEvent.h">
@@ -831,6 +816,36 @@
     <ClInclude Include="src\client\script\class\impl\game\JsBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="deps\mnem\cpuid.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\mnem\scan\scanner_impls.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\include\mnemosyne\defines.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\include\mnemosyne\core\memory_range.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\include\mnemosyne\core\vfunc_index.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\include\mnemosyne\scan\scanner.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\include\mnemosyne\scan\signature.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\include\mnemosyne\mem\process.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\include\mnemosyne\internal\string_literal.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="deps\include\mnemosyne\internal\abi\microsoft\vfunc_index_impl.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -863,7 +878,7 @@
     <ClCompile Include="src\api\memory\memory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\api\scanner\scanner.cpp">
+    <ClCompile Include="src\api\scanner\legacyScanner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\command\Command.cpp">
@@ -1266,6 +1281,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\module\impl\hud\ItemCounter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\script\objects\Graphics3DScriptingObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\mnem\cpuid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\mnem\mnemosyne.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\mnem\os\win32\process.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\mnem\scan\scanner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="deps\mnem\scan\scanner_avx2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

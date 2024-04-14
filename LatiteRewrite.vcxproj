@@ -237,7 +237,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Dbghelp.lib;MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -264,7 +264,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Dbghelp.lib;MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -322,6 +322,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="deps\include\mnemosyne\core\memory_range.hpp" />
+    <ClInclude Include="deps\include\mnemosyne\core\vfunc_index.hpp" />
+    <ClInclude Include="deps\include\mnemosyne\defines.hpp" />
+    <ClInclude Include="deps\include\mnemosyne\internal\abi\microsoft\vfunc_index_impl.hpp" />
+    <ClInclude Include="deps\include\mnemosyne\internal\string_literal.hpp" />
+    <ClInclude Include="deps\include\mnemosyne\mem\process.hpp" />
+    <ClInclude Include="deps\include\mnemosyne\scan\scanner.hpp" />
+    <ClInclude Include="deps\include\mnemosyne\scan\signature.hpp" />
+    <ClInclude Include="deps\mnem\cpuid.hpp" />
+    <ClInclude Include="deps\mnem\scan\scanner_impls.hpp" />
     <ClInclude Include="src\client\event\impl\AttackEvent.h" />
     <ClInclude Include="src\client\event\impl\ClientTextEvent.h" />
     <ClInclude Include="src\client\event\impl\FogColorEvent.h" />
@@ -573,11 +583,6 @@
     <ClInclude Include="src\sdk\common\world\level\Level.h" />
     <ClInclude Include="src\sdk\common\world\Minecraft.h" />
     <ClInclude Include="src\sdk\common\world\Timer.h" />
-    <ClInclude Include="src\sdk\signature\storage_1_16_40.h" />
-    <ClInclude Include="src\sdk\signature\storage_1_18_12.h" />
-    <ClInclude Include="src\sdk\signature\storage_1_19_51.h" />
-    <ClInclude Include="src\sdk\signature\storage_1_20_30.h" />
-    <ClInclude Include="src\sdk\signature\storage_1_20_40.h" />
     <ClInclude Include="src\sdk\signature\storage_latest.h" />
     <ClInclude Include="src\sdk\String.h" />
     <ClInclude Include="src\sdk\Util.h" />
@@ -614,6 +619,11 @@
     <Text Include="src\util\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="deps\mnem\cpuid.cpp" />
+    <ClCompile Include="deps\mnem\mnemosyne.cpp" />
+    <ClCompile Include="deps\mnem\os\win32\process.cpp" />
+    <ClCompile Include="deps\mnem\scan\scanner.cpp" />
+    <ClCompile Include="deps\mnem\scan\scanner_avx2.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\EnvironmentChanger.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\ThirdPersonNametag.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\Waypoints.cpp" />
@@ -642,7 +652,7 @@
     <ClCompile Include="src\api\feature\setting\Setting.cpp" />
     <ClCompile Include="src\api\memory\memory.cpp" />
     <ClCompile Include="src\api\memory\signature\signature.cpp" />
-    <ClCompile Include="src\api\scanner\scanner.cpp" />
+    <ClCompile Include="src\api\scanner\legacyScanner.cpp" />
     <ClCompile Include="src\client\config\ConfigManager.cpp" />
     <ClCompile Include="src\client\feature\command\Command.cpp" />
     <ClCompile Include="src\client\feature\command\CommandManager.cpp" />

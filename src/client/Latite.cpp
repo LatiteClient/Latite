@@ -237,7 +237,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         auto res = entry.first->resolve();
         if (!res) {
 #if LATITE_DEBUG
-            Logger::Warn("Signature {} failed to resolve! Pattern: {}", entry.first->name, entry.first->signature);
+            Logger::Warn("Signature {} failed to resolve!", entry.first->name);
 #endif
             deadCount++;
         }
