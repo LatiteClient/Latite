@@ -74,11 +74,11 @@ namespace shared {
 }
 
 #define MVSIG(...) ([]() -> std::pair<SigImpl*, SigImpl*> {\
-if (SDK::internalVers == SDK::VLATEST) return {&Signatures::__VA_ARGS__, &Signatures::__VA_ARGS__};\
-if (SDK::internalVers == SDK::V1_20_40) { return {&Signatures_1_20_40::__VA_ARGS__, &Signatures::__VA_ARGS__}; } \
-if (SDK::internalVers == SDK::V1_20_30) { return {&Signatures_1_20_30::__VA_ARGS__, &Signatures::__VA_ARGS__}; } \
-if (SDK::internalVers == SDK::V1_19_51) { return {&Signatures_1_19_51::__VA_ARGS__, &Signatures::__VA_ARGS__}; } \
-return {&Signatures_1_18_12::__VA_ARGS__, &Signatures::__VA_ARGS__}; }\
+/*if (SDK::internalVers == SDK::VLATEST) */return {&Signatures::__VA_ARGS__, &Signatures::__VA_ARGS__}; }\
+/*if (SDK::internalVers == SDK::V1_20_40) { return {&Signatures_1_20_40::__VA_ARGS__, &Signatures::__VA_ARGS__}; }*/ \
+/*if (SDK::internalVers == SDK::V1_20_30) { return {&Signatures_1_20_30::__VA_ARGS__, &Signatures::__VA_ARGS__}; }*/ \
+/*if (SDK::internalVers == SDK::V1_19_51) { return {&Signatures_1_19_51::__VA_ARGS__, &Signatures::__VA_ARGS__}; }*/ \
+/*return {&Signatures_1_18_12::__VA_ARGS__, &Signatures::__VA_ARGS__}; }*/\
 )()
 
 namespace {
@@ -131,16 +131,18 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int deadCount = 0;
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
-        { "1.20.60", SDK::VLATEST },
-        { "1.20.41", SDK::V1_20_40 },
-        { "1.20.40", SDK::V1_20_40 },
-        { "1.20.32", SDK::V1_20_30 },
-        { "1.20.31", SDK::V1_20_30 },
-        { "1.20.30", SDK::V1_20_30 },
-        { "1.19.50", SDK::V1_19_51 },
-        { "1.19.51", SDK::V1_19_51 },
-        { "1.18.12", SDK::V1_18_12 },
-        { "1.18.10", SDK::V1_18_12 },
+        { "1.20.73", SDK::VLATEST },
+        { "1.20.72", SDK::VLATEST },
+        { "1.20.71", SDK::VLATEST },
+        //{ "1.20.41", SDK::V1_20_40 },
+        //{ "1.20.40", SDK::V1_20_40 },
+        //{ "1.20.32", SDK::V1_20_30 },
+        //{ "1.20.31", SDK::V1_20_30 },
+        //{ "1.20.30", SDK::V1_20_30 },
+        //{ "1.19.50", SDK::V1_19_51 },
+        //{ "1.19.51", SDK::V1_19_51 },
+        //{ "1.18.12", SDK::V1_18_12 },
+        //{ "1.18.10", SDK::V1_18_12 },
     };
 
     if (versNumMap.contains(Latite::get().gameVersion)) {
