@@ -119,6 +119,7 @@ private:
 
 	Timings timings{};
 	inline static std::optional<std::thread::id> gameThreadId;
+	inline static HWND minecraftWindow = 0;
 
 	ValueType commandPrefix = TextValue(L".");
 	ValueType menuKey = KeyValue('M');
@@ -134,6 +135,7 @@ private:
 	ValueType minecraftRenderer = BoolValue(false);
 	ValueType textShadow = BoolValue(true);
 	ValueType broadcastUsage = BoolValue(true);
+	ValueType centerCrosshairHUD = BoolValue(false);
 
 	EnumData mcRendFont;
 

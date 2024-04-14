@@ -634,6 +634,12 @@ void Latite::initSettings() {
         set->value = &this->broadcastUsage;
         this->getSettings().addSetting(set);
     }
+
+    {
+        auto set = std::make_shared<Setting>("centerCrosshair", "Center Crosshair in Menu", "Crosshair will be centered when you open the menu.");
+        set->value = &this->centerCrosshairHUD;
+        this->getSettings().addSetting(set);
+    }
 }
 
 void Latite::queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback) {
@@ -720,6 +726,17 @@ void Latite::onUpdate(Event& evGeneric) {
     timings.update();
     auto now = std::chrono::system_clock::now();
     static auto lastSend = now;
+
+    if (SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed() && std::get<BoolValue>(centerCrosshairHUD)) {
+        RECT r;
+
+        if (!minecraftWindow) {
+            minecraftWindow = FindWindowA(NULL, "Minecraft");
+        }
+
+        GetClientRect(minecraftWindow, &r);
+        SetCursorPos(r.left + r.right / 2, r.top + r.bottom / 2);
+    }
     
     if (std::get<BoolValue>(broadcastUsage)) {
         //if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSend) > 10s) {
