@@ -344,6 +344,7 @@
     <ClInclude Include="src\client\feature\module\impl\game\EnvironmentChanger.h" />
     <ClInclude Include="src\client\feature\module\impl\game\ThirdPersonNametag.h" />
     <ClInclude Include="src\client\feature\module\impl\game\Waypoints.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\Chat.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\ItemCounter.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\MovableBossbar.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\MovableScoreboard.h" />
@@ -627,6 +628,7 @@
     <ClCompile Include="src\client\feature\module\impl\game\EnvironmentChanger.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\ThirdPersonNametag.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\Waypoints.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\Chat.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\ItemCounter.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\MovableBossbar.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\MovableScoreboard.cpp" />

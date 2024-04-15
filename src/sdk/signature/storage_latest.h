@@ -268,6 +268,10 @@ public:
 		"48 89 5c 24 ? 57 48 83 ec ? 48 8b da 48 85 d2"_sig,
 		"ItemStackBase::getDamageValue" };
 
+	inline static SigImpl MinecraftPackets_createPacket{ [](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"e8 ? ? ? ? 90 48 8b 8d ? ? ? ? 48 85 c9 74 ? 48 83 c1"_sig,
+		"MinecraftPackets::createPacket" };
+
 	//48 89 5c 24 ? 57 48 83 ec ? 48 8b da 48 85 d2
 	
 

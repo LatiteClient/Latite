@@ -6,62 +6,74 @@ namespace {
     std::shared_ptr<Hook> SetTitlePacketRead;
     std::shared_ptr<Hook> TextPacketRead;
     std::shared_ptr<Hook> SendToServerHook;
+    std::shared_ptr<Hook> CreatePacketHook;
 }
 
-void* PacketHooks::SetTitlePacket_readExtended(SDK::SetTitlePacket* pkt, void* b, void* c) {
-    auto res = SetTitlePacketRead->oFunc<decltype(&SetTitlePacket_readExtended)>()(pkt, b, c);
-    {
-        auto v1 = PluginManager::Event::Value(L"type");
+void PacketHooks::PacketSender_sendToServer(SDK::PacketSender* sender, SDK::Packet* packet) {
+    SendPacketEvent ev{ packet };
 
-        switch (pkt->type) {
-        case SDK::TitleType::Clear:
-            v1.val = L"clear";
-            break;
-        case SDK::TitleType::Reset:
-            v1.val = L"reset";
-            break;
-        case SDK::TitleType::Title:
-            v1.val = L"title";
-            break;
-        case SDK::TitleType::Subtitle:
-            v1.val = L"subtitle";
-            break;
-        case SDK::TitleType::Actionbar:
-            v1.val = L"actionbar";
-            break;
-        case SDK::TitleType::Times:
-            v1.val = L"times";
-            break;
-        case SDK::TitleType::TitleRaw:
-            v1.val = L"titleraw";
-            break;
-        case SDK::TitleType::SubtitleRaw:
-            v1.val = L"subtitleraw";
-            break;
-        case SDK::TitleType::ActionbarRaw:
-            v1.val = L"actionbarraw";
-            break;
-        default:
-            v1.val = L"unknown";
-            break;
-        }
-        auto v2 = PluginManager::Event::Value(L"text");
-        v2.val = util::StrToWStr(pkt->text.getCStr());
-
-        PluginManager::Event ev(L"title", {v1, v2}, true);
-        if (Latite::getPluginManager().dispatchEvent(ev)) {
-            pkt->type = SDK::TitleType::Clear;
-        }
+    if (Eventing::get().dispatch(ev)) {
+        return;
     }
-    return res;
+    
+    SendToServerHook->oFunc<decltype(&PacketSender_sendToServer)>()(sender, packet);
 }
 
-void* PacketHooks::TextPacket_read(SDK::TextPacket* pkt, void* b, void* c) {
-    auto res = TextPacketRead->oFunc<decltype(&TextPacket_read)>()(pkt, b, c);
+std::shared_ptr<SDK::Packet> PacketHooks::MinecraftPackets_createPacket(SDK::PacketID packetId) {
+    auto genPacket = CreatePacketHook->oFunc<decltype(&MinecraftPackets_createPacket)>()(packetId);
 
-    if (PluginManager::scriptingSupported()) {
-        if (Latite::isMainThread()) {
-            PluginManager::Event::Value typ{L"type"};
+    if (Latite::isMainThread()) {
+        if (packetId == SDK::PacketID::SET_TITLE) {
+            auto pkt = std::static_pointer_cast<SDK::SetTitlePacket>(genPacket);
+            auto v1 = PluginManager::Event::Value(L"type");
+
+            switch (pkt->type) {
+            case SDK::TitleType::Clear:
+                v1.val = L"clear";
+                break;
+            case SDK::TitleType::Reset:
+                v1.val = L"reset";
+                break;
+            case SDK::TitleType::Title:
+                v1.val = L"title";
+                break;
+            case SDK::TitleType::Subtitle:
+                v1.val = L"subtitle";
+                break;
+            case SDK::TitleType::Actionbar:
+                v1.val = L"actionbar";
+                break;
+            case SDK::TitleType::Times:
+                v1.val = L"times";
+                break;
+            case SDK::TitleType::TitleRaw:
+                v1.val = L"titleraw";
+                break;
+            case SDK::TitleType::SubtitleRaw:
+                v1.val = L"subtitleraw";
+                break;
+            case SDK::TitleType::ActionbarRaw:
+                v1.val = L"actionbarraw";
+                break;
+            default:
+                v1.val = L"unknown";
+                break;
+            }
+            auto v2 = PluginManager::Event::Value(L"text");
+            v2.val = util::StrToWStr(pkt->text.getCStr());
+
+            PluginManager::Event ev(L"title", { v1, v2 }, true);
+            if (Latite::getPluginManager().dispatchEvent(ev)) {
+                pkt->type = SDK::TitleType::Clear;
+            }
+        }
+        else if (packetId == SDK::PacketID::TEXT) {
+            auto pkt = std::static_pointer_cast<SDK::TextPacket>(genPacket).get();
+
+            ClientTextEvent ev{ pkt };
+            Eventing::get().dispatch(ev);
+
+            PluginManager::Event::Value typ{ L"type" };
             typ.val = L"Unknown";
             switch (pkt->type) {
             case SDK::TextPacketType::RAW:
@@ -96,22 +108,22 @@ void* PacketHooks::TextPacket_read(SDK::TextPacket* pkt, void* b, void* c) {
                 break;
             }
 
-            PluginManager::Event::Value val{L"message"};
+            PluginManager::Event::Value val{ L"message" };
             val.val = util::StrToWStr(pkt->str);
 
-            PluginManager::Event::Value val2{L"sender"};
+            PluginManager::Event::Value val2{ L"sender" };
             val2.val = util::StrToWStr(pkt->source);
 
-            PluginManager::Event::Value val3{L"xuid"};
+            PluginManager::Event::Value val3{ L"xuid" };
             val3.val = util::StrToWStr(pkt->xboxUserId);
 
-            PluginManager::Event::Value isChat{L"isChat"};
+            PluginManager::Event::Value isChat{ L"isChat" };
             isChat.val = (pkt->type == SDK::TextPacketType::CHAT || pkt->type == SDK::TextPacketType::RAW
                 || pkt->type == SDK::TextPacketType::SYSTEM_MESSAGE || pkt->type == SDK::TextPacketType::WHISPER
                 || pkt->type == SDK::TextPacketType::OBJECT_WHISPER || pkt->type == SDK::TextPacketType::ANNOUNCEMENT);
 
-            PluginManager::Event ev{L"receive-chat", { typ, val, val2, val3, isChat }, false};
-            if (Latite::getPluginManager().dispatchEvent(ev)) {
+            PluginManager::Event sEv{ L"receive-chat", { typ, val, val2, val3, isChat }, false };
+            if (Latite::getPluginManager().dispatchEvent(sEv)) {
                 pkt->type = SDK::TextPacketType::JUKEBOX_POPUP;
                 pkt->str.setString("");
                 pkt->source.setString("");
@@ -119,34 +131,13 @@ void* PacketHooks::TextPacket_read(SDK::TextPacket* pkt, void* b, void* c) {
         }
     }
 
-    if (Latite::isMainThread()) {
-        ClientTextEvent ev{ pkt };
-        Eventing::get().dispatch(ev);
-    }
-
-    return res;
-}
-
-void PacketHooks::PacketSender_sendToServer(SDK::PacketSender* sender, SDK::Packet* packet) {
-    SendPacketEvent ev{ packet };
-
-    if (Eventing::get().dispatch(ev)) {
-        return;
-    }
-    
-    SendToServerHook->oFunc<decltype(&PacketSender_sendToServer)>()(sender, packet);
+    return genPacket;
 }
 
 PacketHooks::PacketHooks() {
-    if (Signatures::Vtable::SetTitlePacket.result) {
-        auto vfunc = reinterpret_cast<uintptr_t*>(Signatures::Vtable::SetTitlePacket.result);
-        SetTitlePacketRead = addTableSwapHook((uintptr_t)(vfunc + 4), SetTitlePacket_readExtended, "SetTitlePacket::readExtended");
-    }
-
-    if (Signatures::Vtable::TextPacket.result) {
-        auto vfunc = reinterpret_cast<uintptr_t*>(Signatures::Vtable::TextPacket.result);
-        TextPacketRead = addTableSwapHook((uintptr_t)(vfunc + 4), TextPacket_read, "TextPacket::read");
-    }
+    CreatePacketHook = addHook(Signatures::MinecraftPackets_createPacket.result,
+        MinecraftPackets_createPacket,
+        "MinecraftPackets::createPacket");
 }
 
 void PacketHooks::initPacketSender(SDK::PacketSender* sender) {

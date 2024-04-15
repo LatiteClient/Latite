@@ -220,6 +220,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Weather_tick),
         MVSIG(Misc::thirdPersonNametag),
         MVSIG(ItemStackBase_getDamageValue),
+        MVSIG(MinecraftPackets_createPacket),
     };
     
     new (mmgrBuf) ModuleManager;

@@ -81,11 +81,11 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.Windowed = TRUE;
 	
-	D3D_FEATURE_LEVEL lvl[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 };
+	D3D_FEATURE_LEVEL lvl[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1 };
 
 	D3D_FEATURE_LEVEL featureLevel;
-	ThrowIfFailed(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, lvl, 1, D3D11_SDK_VERSION,
-		&swapChainDesc, swapChain.GetAddressOf(), device.GetAddressOf(), &featureLevel, dctx.GetAddressOf()));
+	auto hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, lvl, 2, D3D11_SDK_VERSION,
+		&swapChainDesc, swapChain.GetAddressOf(), device.GetAddressOf(), &featureLevel, dctx.GetAddressOf());
 
 	uintptr_t* vftable = *reinterpret_cast<uintptr_t**>(swapChain.Get());
 	uintptr_t* cqueueVftable = nullptr;

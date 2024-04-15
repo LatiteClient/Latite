@@ -2,6 +2,8 @@
 namespace SDK {
 	enum class PacketID : int32_t {
 		NONE = 0,
+		TEXT = 0x9,
+		SET_TITLE = 0x58,
 		COMMAND_REQUEST = 0x4D,
 	};
 

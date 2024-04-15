@@ -846,6 +846,9 @@
     <ClInclude Include="deps\include\mnemosyne\internal\abi\microsoft\vfunc_index_impl.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\hud\Chat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1299,6 +1302,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="deps\mnem\scan\scanner_avx2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\hud\Chat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
