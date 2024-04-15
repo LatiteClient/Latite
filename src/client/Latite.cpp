@@ -221,6 +221,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Misc::thirdPersonNametag),
         MVSIG(ItemStackBase_getDamageValue),
         MVSIG(MinecraftPackets_createPacket),
+        MVSIG(GameMode_attack),
     };
     
     new (mmgrBuf) ModuleManager;

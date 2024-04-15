@@ -14,12 +14,13 @@ void PlayerHooks::hkGameModeAttack(SDK::GameMode* obj, SDK::Actor* entity) {
 }
 
 void PlayerHooks::init(SDK::LocalPlayer* lp) {
-	//uintptr_t* vtable = *reinterpret_cast<uintptr_t**>(lp);
-	//uintptr_t* gmTable = *reinterpret_cast<uintptr_t**>(lp->gameMode);
-	//
-	//GameModeAttackHook = this->addHook(gmTable[14], &hkGameModeAttack, "GameMode::attack");
+	uintptr_t* vtable = *reinterpret_cast<uintptr_t**>(lp);
+	uintptr_t* gmTable = *reinterpret_cast<uintptr_t**>(lp->gameMode);
+	
+	//GameModeAttackHook = this->addTableSwapHook((uintptr_t)(gmTable + 14), &hkGameModeAttack, "GameMode::attack");
 	//GameModeAttackHook->enable();
 }
 
 PlayerHooks::PlayerHooks() {
+	GameModeAttackHook = this->addHook(Signatures::GameMode_attack.result, &hkGameModeAttack, "GameMode::attack");
 }

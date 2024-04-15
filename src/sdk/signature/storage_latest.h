@@ -272,14 +272,9 @@ public:
 		"e8 ? ? ? ? 90 48 8b 8d ? ? ? ? 48 85 c9 74 ? 48 83 c1"_sig,
 		"MinecraftPackets::createPacket" };
 
-	//48 89 5c 24 ? 57 48 83 ec ? 48 8b da 48 85 d2
-	
-
-
-	//e8 ? ? ? ? 0f 28 c8 0f 57 c0 f3 0f 59 0d ? ? ? ? f3 0f 58 c9
-
-
-	//40 53 48 83 ec ? 48 8b da 48 8b 91 ? ? ? ? 48 8b ca
+	inline static SigImpl GameMode_attack{ [](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 56 48 8d 6c 24 ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 45 ? 48 8b f2 48 8b f9 45 33 f6 4c 89 75 ? 48 8d 4d ? e8 ? ? ? ? 90 c6 45"_sig,
+		"GameMode::attack" };
 };
 
 // after adding sigs here, add them in latite.cpp

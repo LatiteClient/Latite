@@ -78,7 +78,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<MovableScoreboard>());
 	this->items.push_back(std::make_shared<Nickname>());
 	//this->items.push_back(std::make_shared<ItemTweaks>());
-	//this->items.push_back(std::make_shared<ReachDisplay>());
+	this->items.push_back(std::make_shared<ReachDisplay>());
 	this->items.push_back(std::make_shared<MovableBossbar>());
 	this->items.push_back(std::make_shared<ThirdPersonNametag>());
 	this->items.push_back(std::make_shared<EnvironmentChanger>());
