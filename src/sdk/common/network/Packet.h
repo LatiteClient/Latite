@@ -3,6 +3,7 @@ namespace SDK {
 	enum class PacketID : uint8_t {
 		NONE = 0,
 		TEXT = 0x9,
+		CHANGE_DIMENSION = 0x3D,
 		TRANSFER = 0x55,
 		SET_TITLE = 0x58,
 		COMMAND_REQUEST = 0x4D,

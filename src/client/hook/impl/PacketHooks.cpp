@@ -40,7 +40,11 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 
 		auto packetId = packet->getID();
 
-		if (packetId == SDK::PacketID::TRANSFER) {
+		if (packetId == SDK::PacketID::CHANGE_DIMENSION) {
+			PluginManager::Event sEv{ XW("change-dimension"), {}, false };
+			Latite::getPluginManager().dispatchEvent(sEv);
+		}
+		else if (packetId == SDK::PacketID::TRANSFER) {
 			PluginManager::Event sEv{ XW("transfer"), {}, false };
 			Latite::getPluginManager().dispatchEvent(sEv);
 		} else if (packetId == SDK::PacketID::SET_TITLE) {
