@@ -54,7 +54,6 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<Fullbright>());
 	this->items.push_back(std::make_shared<MotionBlur>());
 	this->items.push_back(std::make_shared<HurtColor>());
-	//this->items.push_back(std::make_shared<Screenshot>());
 	this->items.push_back(std::make_shared<FPSCounter>());
 	this->items.push_back(std::make_shared<CPSCounter>());
 	this->items.push_back(std::make_shared<ServerDisplay>());
@@ -78,7 +77,6 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<BlockOutline>());
 	this->items.push_back(std::make_shared<MovableScoreboard>());
 	this->items.push_back(std::make_shared<Nickname>());
-	//this->items.push_back(std::make_shared<ItemTweaks>());
 	this->items.push_back(std::make_shared<ReachDisplay>());
 	this->items.push_back(std::make_shared<MovableBossbar>());
 	this->items.push_back(std::make_shared<ThirdPersonNametag>());
