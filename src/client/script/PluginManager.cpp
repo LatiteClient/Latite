@@ -316,6 +316,7 @@ void PluginManager::initListeners()
 	eventListeners[L"load-script"] = {};
 	eventListeners[L"unload-script"] = {};
 	eventListeners[L"text-input"] = {};
+	eventListeners[L"transfer"] = {};
 }
 
 void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr) {

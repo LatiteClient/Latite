@@ -21,6 +21,7 @@
 #include "impl/LeaveGameEvent.h"
 #include "impl/OutlineSelectionEvent.h"
 #include "impl/OverlayColorEvent.h"
+#include "impl/PacketReceiveEvent.h"
 #include "impl/PerspectiveEvent.h"
 #include "impl/RendererCleanupEvent.h"
 #include "impl/RenderGameEvent.h"

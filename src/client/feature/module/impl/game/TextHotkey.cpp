@@ -5,8 +5,8 @@
 TextHotkey::TextHotkey() : Module("TextHotkey", "Text/Command Hotkey", "Binds a chat message or a command to a text message.", GAME, nokeybind) {
 	addSetting("commandMode", "Command Mode", "Send a command instead of a chat message", this->commandMode);
 	addSetting("textKey", "Hotkey", "The hotkey to bind the text message or command to", this->textKey);
-	addSetting("text", "Text", "The text or command", this->textKey);
-	listen<KeyUpdateEvent>((EventListenerFunc)&onKey);
+	addSetting("text", "Text", "The text or command", this->textMessage);
+	listen<KeyUpdateEvent>((EventListenerFunc)&TextHotkey::onKey);
 }
 
 void TextHotkey::onKey(Event& evG) {

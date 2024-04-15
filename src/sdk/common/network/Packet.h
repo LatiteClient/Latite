@@ -1,14 +1,24 @@
 #pragma once
 namespace SDK {
-	enum class PacketID : int32_t {
+	enum class PacketID : uint8_t {
 		NONE = 0,
 		TEXT = 0x9,
+		TRANSFER = 0x55,
 		SET_TITLE = 0x58,
 		COMMAND_REQUEST = 0x4D,
+		TOAST_REQUEST = 0xBA,
+		COUNT,
 	};
 
 	class Packet {
-		char pad[0x28];
+	public:
+		int32_t priority = 2;
+		int32_t reliability = 1;
+		uint8_t subClientId = 0;
+		bool isHandled = false;
+		void* unknown = nullptr;
+		void*** handler = nullptr;
+		int32_t compressibility = 0;
 
 	public:
 		virtual ~Packet() {};
