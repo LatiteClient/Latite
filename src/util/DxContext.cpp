@@ -139,7 +139,7 @@ void D2DUtil::drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity) {
 	ctx->DrawImage(gaussianBlurEffect, D2D1::Point2F(0.f, 0.f), rc);
 }
 
-void D2DUtil::drawText(RectF const& rc, std::wstring const& ws, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment, bool cache)  {
+void D2DUtil::drawText(RectF const& rc, std::wstring const& ws, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment, bool cache, bool hyphen)  {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	brush->SetColor(color.get());
 	if (auto layout = Latite::getRenderer().getLayout(fmt.Get(), ws, cache)) {

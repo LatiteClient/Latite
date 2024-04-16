@@ -72,6 +72,9 @@ void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 		else if (tm - msg.timeCreated < 1s) {
 			msg.animation = sineCurve((float)std::chrono::duration_cast<std::chrono::milliseconds>(tm - msg.timeCreated).count() / 1000.f);
 		}
+		else {
+			msg.animation = 1.f;
+		}
 
 		std::wstring text = textWrap(ctx, util::StrToWStr(msg.content), textSize, windowWidth);
 		auto tSize = ctx.getTextSize(text, Renderer::FontSelection::SegoeRegular, textSize);
