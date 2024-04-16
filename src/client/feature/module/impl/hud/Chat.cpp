@@ -77,7 +77,7 @@ void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 		if (tm - msg.timeCreated > messageDuration) {
 			msg.animation = sineCurve(std::min(1.f, (1000.f / (float)std::chrono::duration_cast<std::chrono::milliseconds>(tm - msg.timeCreated - messageDuration).count()) - 1.f));
 		}
-		else if (tm - msg.timeCreated < messageAnimDuration && msg.animation < 0.99f) {
+		else if (tm - msg.timeCreated < messageAnimDuration && msg.duplicate < 2) {
 			msg.animation = sineCurve((float)std::chrono::duration_cast<std::chrono::milliseconds>(tm - msg.timeCreated).count() / std::chrono::duration_cast<std::chrono::milliseconds>(messageAnimDuration).count());
 		}
 		else {
@@ -133,28 +133,25 @@ void Chat::onRenderLayer(Event& evG) {
 	
 	auto& ev = reinterpret_cast<RenderLayerEvent&>(evG);
 
-	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
-		chatStack = nullptr;
-		return;
-	}
-
 	if (ev.getScreenView()->visualTree->rootControl->name == XOR_STRING("hud_screen")) {
-		static bool lastEnabled = false;
+		//static bool lastEnabled = false;
 
-		if (isEnabled() != lastEnabled) {
-			if (!chatStack) chatStack = ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName(XOR_STRING("chat_stack"));
-			if (isEnabled()) {
-				chatStack->position.x = SDK::ClientInstance::get()->getGuiData()->guiSize.x + 1000.f;
+		//if (isEnabled() != lastEnabled) {
+		chatStack = ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName(XOR_STRING("chat_panel"));
+		if (isEnabled()) {
+			if (chatStack->position.x < 20000) {
+				chatStack->position.x += 20000;
 			}
-			else {
-				chatStack->position.x = 0.f;
-			}
-			chatStack->getDescendants([](std::shared_ptr<SDK::UIControl> control) {
-				control->updatePos();
-				});
-
-			lastEnabled = isEnabled();
 		}
+		else if (chatStack->position.x > 20000) {
+			chatStack->position.x -= 20000;
+		}
+		chatStack->getDescendants([](std::shared_ptr<SDK::UIControl> control) {
+			control->updatePos();
+			});
+
+		//}
+		chatStack = nullptr;
 	}
 }
 
