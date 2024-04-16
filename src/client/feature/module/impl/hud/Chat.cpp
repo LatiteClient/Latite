@@ -39,8 +39,11 @@ void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 	float windowHeight = messageHeight * maxMessages;
 	auto tm = std::chrono::system_clock::now();
 
+	static constexpr auto messageDuration = 6s;
+	static constexpr auto messageAnimDuration = 1s;
+
 	for (auto& msg : messages) {
-		if (tm - msg.timeCreated >= 5s) {
+		if (tm - msg.timeCreated >= (messageDuration + messageAnimDuration)) {
 			messages.pop_back();
 		}
 	}
@@ -71,11 +74,11 @@ void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 			return sin(x * 0.5f * pi_f);
 		};
 
-		if (tm - msg.timeCreated > 6s) {
-			msg.animation = sineCurve(std::min(1.f, (1000.f / (float)std::chrono::duration_cast<std::chrono::milliseconds>(tm - msg.timeCreated - 6s).count()) - 1.f));
+		if (tm - msg.timeCreated > messageDuration) {
+			msg.animation = sineCurve(std::min(1.f, (1000.f / (float)std::chrono::duration_cast<std::chrono::milliseconds>(tm - msg.timeCreated - messageDuration).count()) - 1.f));
 		}
-		else if (tm - msg.timeCreated < 1s && msg.animation < 0.99f) {
-			msg.animation = sineCurve((float)std::chrono::duration_cast<std::chrono::milliseconds>(tm - msg.timeCreated).count() / 1000.f);
+		else if (tm - msg.timeCreated < messageAnimDuration && msg.animation < 0.99f) {
+			msg.animation = sineCurve((float)std::chrono::duration_cast<std::chrono::milliseconds>(tm - msg.timeCreated).count() / std::chrono::duration_cast<std::chrono::milliseconds>(messageAnimDuration).count());
 		}
 		else {
 			msg.animation = 1.f;
