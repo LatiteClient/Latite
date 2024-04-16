@@ -14,6 +14,9 @@ void ClientMessageSink::doPrint(int numMessages) {
 		auto cInst = SDK::ClientInstance::get();
 		auto lp = cInst->getLocalPlayer();
 		if (lp) {
+			LatiteClientMessageEvent ev{ msg };
+			Eventing::get().dispatch(ev);
+
 			lp->displayClientMessage(msg);
 			messages.erase(it);
 			continue;
@@ -34,6 +37,8 @@ void ClientMessageSink::display(std::string const& message) {
 	auto cInst = SDK::ClientInstance::get();
 	auto lp = cInst->getLocalPlayer();
 	if (lp) {
+		LatiteClientMessageEvent ev{ message };
+		Eventing::get().dispatch(ev);
 		lp->displayClientMessage(message);
 	}
 }

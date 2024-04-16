@@ -7,8 +7,11 @@ public:
 	virtual ~Chat() {};
 
 	void render(DrawUtil& ctx, bool isDefault, bool inEditor) override;
-	void onText(Event&);
+	virtual bool forceMinecraftRenderer() override { return true; }
 private:
+	void onText(Event&);
+	void onLatiteMessage(Event&);
+
 	struct ChatMessage {
 		std::chrono::system_clock::time_point timeCreated;
 		std::string content = "";
@@ -32,5 +35,5 @@ private:
 	EnumData anchorData;
 
 	float textSize = 30.f;
-	float messageHeight = textSize;
+	float messageHeight = textSize * 2;
 };

@@ -18,6 +18,7 @@
 #include "impl/GetTimeEvent.h"
 #include "impl/HideHandEvent.h"
 #include "impl/KeyUpdateEvent.h"
+#include "impl/LatiteClientMessageEvent.h"
 #include "impl/LeaveGameEvent.h"
 #include "impl/OutlineSelectionEvent.h"
 #include "impl/OverlayColorEvent.h"

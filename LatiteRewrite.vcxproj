@@ -336,6 +336,7 @@
     <ClInclude Include="src\client\event\impl\ClientTextEvent.h" />
     <ClInclude Include="src\client\event\impl\FogColorEvent.h" />
     <ClInclude Include="src\client\event\impl\GetTimeEvent.h" />
+    <ClInclude Include="src\client\event\impl\LatiteClientMessageEvent.h" />
     <ClInclude Include="src\client\event\impl\OutlineSelectionEvent.h" />
     <ClInclude Include="src\client\event\impl\PacketReceiveEvent.h" />
     <ClInclude Include="src\client\event\impl\SendPacketEvent.h" />

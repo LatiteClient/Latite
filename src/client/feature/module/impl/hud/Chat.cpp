@@ -3,6 +3,7 @@
 
 Chat::Chat() : HUDModule("Chat", "Chat", "A custom chat, replacing the vanilla chat.", HUD) {
 	listen<ClientTextEvent>((EventListenerFunc)&Chat::onText);
+	listen<LatiteClientMessageEvent>((EventListenerFunc)&Chat::onLatiteMessage);
 	
 	anchorData.addEntry(EnumEntry{ anchor_auto, "Auto" });
 	anchorData.addEntry(EnumEntry{ anchor_top, "Top" });
@@ -39,9 +40,27 @@ void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 		}
 	}
 
-
+	float y = windowHeight;
 	for (size_t i = 0; i < std::min(messages.size(), static_cast<size_t>(maxMessages)); i++) {
 		auto& msg = messages[i];
+
+		auto textWrap = [](DrawUtil& util, std::wstring txt, float tSize, float width) -> std::wstring {
+			std::wstring ret = txt;
+			std::wstring work = ret;
+
+			size_t retIndex = 1;
+			for (size_t i = retIndex; i < work.size(); i++) {
+				float size = util.getTextSize(work.substr(0, i), Renderer::FontSelection::SegoeRegular, tSize).x;
+				if (size > width) {
+					ret.insert(ret.begin() + (retIndex - 1), L'\n');
+					i = 1;
+					work = ret.substr(retIndex);
+				}
+				retIndex++;
+			}
+
+			return ret;
+			};
 
 		auto sineCurve = [](float x) {
 			return sin(x * 0.5f * pi_f);
@@ -53,18 +72,23 @@ void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 		else if (tm - msg.timeCreated < 1s) {
 			msg.animation = sineCurve((float)std::chrono::duration_cast<std::chrono::milliseconds>(tm - msg.timeCreated).count() / 1000.f);
 		}
-		
-		d2d::Rect tRect = { 0, rect.getHeight() - messageHeight * (i + 1),
-			rect.getWidth(), rect.getHeight() - messageHeight * i};
+
+		std::wstring text = textWrap(ctx, util::StrToWStr(msg.content), textSize, windowWidth);
+		auto tSize = ctx.getTextSize(text, Renderer::FontSelection::SegoeRegular, textSize);
+
+		d2d::Rect tRect = { 0, y - tSize.y,
+			windowWidth, y};
 
 		ctx.fillRectangle(tRect, bgCol.asAlpha(msg.animation * bgCol.a));
 
-		tRect = { (1.f - msg.animation) * -rect.getWidth(), rect.getHeight() - messageHeight * (i + 1),
-			rect.getWidth() * (msg.animation), rect.getHeight() - messageHeight * i };
+		tRect = { (1.f - msg.animation) * -windowWidth, y - tSize.y,
+			windowWidth * (msg.animation), y};
+
+		y -= tSize.y;
 
 		/*we will cache the message in d2d. it's more worth it*/
-		ctx.drawText(tRect, util::StrToWStr(msg.content), fgCol.asAlpha(msg.animation * fgCol.a), Renderer::FontSelection::SegoeRegular, textSize,
-			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, true);
+		ctx.drawText(tRect, text, fgCol.asAlpha(msg.animation * fgCol.a), Renderer::FontSelection::SegoeRegular, textSize,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, true);
 	}
 
 	rect.right = rect.left + windowWidth;
@@ -76,9 +100,14 @@ void Chat::onText(Event& evG) {
 	auto pkt = ev.getTextPacket();
 
 	std::string content = pkt->str;
-	if (pkt->type == SDK::TextPacketType::CHAT) {
+	if (pkt->source.textSize > 0) {
 		content = "<" + pkt->source.str() + "> " + content;
 	}
 
 	this->messages.emplace(messages.begin(), content);
+}
+
+void Chat::onLatiteMessage(Event& evG) {
+	auto& ev = reinterpret_cast<LatiteClientMessageEvent&>(evG);
+	this->messages.emplace(messages.begin(), ev.getMessage());
 }

@@ -263,21 +263,6 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 				ofs << strs.c_str();
 				ofs.close();
 			}
-			// generate certificate
-			auto cert = JsPlugin::getHash(path);
-			if (cert && !js.contains(XOR_STRING("doNotTrust"))) {
-#if LATITE_DEBUG
-				Logger::Info("Generated certificate {}", util::WStrToStr(cert.value()));
-#endif
-				std::wofstream ofs(path / XOR_STRING("certificate"));
-				ofs << cert.value();
-				ofs.flush(); // so we can access the certificate directly after
-			}
-			else {
-#if LATITE_DEBUG
-				Logger::Warn(XOR_STRING("Could not create certificate for script {}"), path.string());
-#endif
-			}
 			return std::nullopt;
 		}
 	}
