@@ -129,21 +129,24 @@ void Chat::onRenderLayer(Event& evG) {
 	// TODO: This method is very scuffed. A better method is to actually disable the rendering of the chat or to make the control invisible.
 	
 	auto& ev = reinterpret_cast<RenderLayerEvent&>(evG);
-	static bool lastEnabled = false;
 
-	if (isEnabled() != lastEnabled) {
-		auto chatStack = ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName(XOR_STRING("chat_stack"));
-		if (isEnabled()) {
-			chatStack->position.x = SDK::ClientInstance::get()->getGuiData()->guiSize.x + 1000.f;
-		}
-		else {
-			chatStack->position.x = 0.f;
-		}
-		chatStack->getDescendants([](std::shared_ptr<SDK::UIControl> control) {
-			control->updatePos();
-			});
+	if (ev.getScreenView()->visualTree->rootControl->name == XOR_STRING("hud_screen")) {
+		static bool lastEnabled = false;
 
-		lastEnabled = isEnabled();
+		if (isEnabled() != lastEnabled) {
+			auto chatStack = ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName(XOR_STRING("chat_stack"));
+			if (isEnabled()) {
+				chatStack->position.x = SDK::ClientInstance::get()->getGuiData()->guiSize.x + 1000.f;
+			}
+			else {
+				chatStack->position.x = 0.f;
+			}
+			chatStack->getDescendants([](std::shared_ptr<SDK::UIControl> control) {
+				control->updatePos();
+				});
+
+			lastEnabled = isEnabled();
+		}
 	}
 }
 
