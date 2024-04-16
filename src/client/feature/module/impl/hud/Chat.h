@@ -11,10 +11,14 @@ public:
 private:
 	void onText(Event&);
 	void onLatiteMessage(Event&);
+	void onRenderLayer(Event&);
+
+	void addMessage(std::string const& message);
 
 	struct ChatMessage {
 		std::chrono::system_clock::time_point timeCreated;
 		std::string content = "";
+		int duplicate = 1;
 		float animation = 0.f;
 
 		ChatMessage(std::string content) : content(std::move(content)) {
@@ -23,11 +27,12 @@ private:
 	};
 
 	std::vector<ChatMessage> messages;
-	int maxMessages = 10;
+	int maxMessages = 15;
 
 	ValueType chatWidth = FloatValue(500.f);
 	ValueType backgroundColor = ColorValue(0.f, 0.f, 0.f, 0.5f);
 	ValueType textColor = ColorValue(1.f, 1.f, 1.f, 1.f);
+	ValueType antiSpam = BoolValue(true);
 
 	static constexpr int anchor_auto = 0;
 	static constexpr int anchor_top = 0;
@@ -35,5 +40,5 @@ private:
 	EnumData anchorData;
 
 	float textSize = 30.f;
-	float messageHeight = textSize * 2;
+	float messageHeight = textSize;
 };

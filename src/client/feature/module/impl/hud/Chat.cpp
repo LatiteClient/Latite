@@ -1,9 +1,13 @@
 #include "pch.h"
 #include "Chat.h"
+#include <sdk/common/client/gui/ScreenView.h>
+#include <sdk/common/client/gui/controls/VisualTree.h>
+#include <sdk/common/client/gui/controls/UIControl.h>
 
-Chat::Chat() : HUDModule("Chat", "Chat", "A custom chat, replacing the vanilla chat.", HUD) {
+Chat::Chat() : HUDModule("Chat", "Custom Chat", "A custom chat, replacing the vanilla chat.", HUD) {
 	listen<ClientTextEvent>((EventListenerFunc)&Chat::onText);
 	listen<LatiteClientMessageEvent>((EventListenerFunc)&Chat::onLatiteMessage);
+	listen<RenderLayerEvent>((EventListenerFunc)&Chat::onRenderLayer, true);
 	
 	anchorData.addEntry(EnumEntry{ anchor_auto, "Auto" });
 	anchorData.addEntry(EnumEntry{ anchor_top, "Top" });
@@ -23,6 +27,7 @@ Chat::Chat() : HUDModule("Chat", "Chat", "A custom chat, replacing the vanilla c
 	addSliderSetting("chatWidth", "Chat Width", "", chatWidth, FloatValue(100.f), FloatValue(1000.f), FloatValue(10.f));
 	addSetting("backgroundColor", "Background Color", "The color of the background", backgroundColor);
 	addSetting("textColor", "Text Color", "The color of the text", textColor);
+	addSetting("antiSpam", "Anti Spam", "Prevent spam messages in chat.", antiSpam);
 	addEnumSetting("anchor", "Anchor", "How the chat window will be anchored", anchorData);
 }
 
@@ -66,17 +71,22 @@ void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 			return sin(x * 0.5f * pi_f);
 		};
 
-		if (tm - msg.timeCreated > 4s) {
-			msg.animation = sineCurve(std::min(1.f, (1000.f / (float)std::chrono::duration_cast<std::chrono::milliseconds>(tm - msg.timeCreated - 4s).count()) - 1.f));
+		if (tm - msg.timeCreated > 6s) {
+			msg.animation = sineCurve(std::min(1.f, (1000.f / (float)std::chrono::duration_cast<std::chrono::milliseconds>(tm - msg.timeCreated - 6s).count()) - 1.f));
 		}
-		else if (tm - msg.timeCreated < 1s) {
+		else if (tm - msg.timeCreated < 1s && msg.animation < 0.99f) {
 			msg.animation = sineCurve((float)std::chrono::duration_cast<std::chrono::milliseconds>(tm - msg.timeCreated).count() / 1000.f);
 		}
 		else {
 			msg.animation = 1.f;
 		}
 
-		std::wstring text = textWrap(ctx, util::StrToWStr(msg.content), textSize, windowWidth);
+		std::string content = msg.content;
+		if (msg.duplicate > 1) {
+			content += " \xC2\xA7\x37[" + std::to_string(msg.duplicate) + "]";
+		}
+
+		std::wstring text = textWrap(ctx, util::StrToWStr(content), textSize, windowWidth);
 		auto tSize = ctx.getTextSize(text, Renderer::FontSelection::SegoeRegular, textSize);
 
 		d2d::Rect tRect = { 0, y - tSize.y,
@@ -107,10 +117,49 @@ void Chat::onText(Event& evG) {
 		content = "<" + pkt->source.str() + "> " + content;
 	}
 
-	this->messages.emplace(messages.begin(), content);
+	addMessage(content);
 }
 
 void Chat::onLatiteMessage(Event& evG) {
 	auto& ev = reinterpret_cast<LatiteClientMessageEvent&>(evG);
-	this->messages.emplace(messages.begin(), ev.getMessage());
+	addMessage(ev.getMessage());
+}
+
+void Chat::onRenderLayer(Event& evG) {
+	// TODO: This method is very scuffed. A better method is to actually disable the rendering of the chat or to make the control invisible.
+	
+	auto& ev = reinterpret_cast<RenderLayerEvent&>(evG);
+	static bool lastEnabled = false;
+
+	if (isEnabled() != lastEnabled) {
+		auto chatStack = ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName(XOR_STRING("chat_stack"));
+		if (isEnabled()) {
+			chatStack->position.x = SDK::ClientInstance::get()->getGuiData()->guiSize.x + 1000.f;
+		}
+		else {
+			chatStack->position.x = 0.f;
+		}
+		chatStack->getDescendants([](std::shared_ptr<SDK::UIControl> control) {
+			control->updatePos();
+			});
+
+		lastEnabled = isEnabled();
+	}
+}
+
+void Chat::addMessage(std::string const& message) {
+	if (std::get<BoolValue>(antiSpam)) {
+		for (size_t i = 0; i < messages.size(); i++) {
+			if (messages[i].content == message) {
+				messages[i].duplicate++;
+				messages[i].timeCreated = std::chrono::system_clock::now();
+
+				// Put the message in the back of the message list.
+				std::swap(messages[i], messages[0]);
+				return;
+			}
+		}
+	}
+
+	messages.emplace(messages.begin(), message);
 }

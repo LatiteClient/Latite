@@ -431,7 +431,7 @@ void MCDrawUtil::drawRoundedRectangle(RectF rect, d2d::Color const& color, float
 	flush(false);
 }
 
-void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlign, bool cache) {
+void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlign, bool cache, bool hyphen) {
 	SDK::CaretMeasureData caretMeasure{};
 
 	float newTop = rc.top;
