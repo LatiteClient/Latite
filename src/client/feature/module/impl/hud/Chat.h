@@ -1,5 +1,6 @@
 #pragma once
 #include <client/feature/module/HUDModule.h>
+#include <sdk/common/client/gui/controls/UIControl.h>
 
 class Chat : public HUDModule {
 public:
@@ -38,6 +39,8 @@ private:
 	static constexpr int anchor_top = 0;
 	static constexpr int anchor_bottom = 1;
 	EnumData anchorData;
+
+	SDK::UIControl* chatStack = nullptr;
 
 	float textSize = 30.f;
 	float messageHeight = textSize;

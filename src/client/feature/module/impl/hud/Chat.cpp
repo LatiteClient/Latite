@@ -133,11 +133,16 @@ void Chat::onRenderLayer(Event& evG) {
 	
 	auto& ev = reinterpret_cast<RenderLayerEvent&>(evG);
 
+	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
+		chatStack = nullptr;
+		return;
+	}
+
 	if (ev.getScreenView()->visualTree->rootControl->name == XOR_STRING("hud_screen")) {
 		static bool lastEnabled = false;
 
 		if (isEnabled() != lastEnabled) {
-			auto chatStack = ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName(XOR_STRING("chat_stack"));
+			if (!chatStack) chatStack = ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName(XOR_STRING("chat_stack"));
 			if (isEnabled()) {
 				chatStack->position.x = SDK::ClientInstance::get()->getGuiData()->guiSize.x + 1000.f;
 			}
