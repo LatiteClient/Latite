@@ -157,7 +157,7 @@ void Chat::addMessage(std::string const& message) {
 				messages[i].duplicate++;
 				messages[i].timeCreated = std::chrono::system_clock::now();
 
-				// Put the message in the back of the message list.
+				// Put the message in the front of the message list.
 				std::swap(messages[i], messages[0]);
 				return;
 			}
