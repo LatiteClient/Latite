@@ -241,11 +241,8 @@ namespace {
 		JsValueRef* arguments, unsigned short argCount,
 		void* callbackState) {
 		if (!Chakra::VerifyArgCount(argCount, 3)) return Chakra::GetUndefined();
-		auto sz = Chakra::VerifyParameters({ {arguments[1], JsValueType::JsFunction}, {arguments[2], JsValueType::JsNumber} });
-		if (!sz) {
-			Chakra::ThrowError(sz.str);
-			return Chakra::GetUndefined();
-		}
+		if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsFunction}, {arguments[2], JsValueType::JsNumber} })) return JS_INVALID_REFERENCE;
+		
 
 		auto func = arguments[1];
 		auto num = Chakra::GetNumber(arguments[2]);
@@ -255,6 +252,38 @@ namespace {
 		JsValueRef ret;
 		JS::JsIntToNumber(tim.id, &ret);
 		return ret;
+	}
+
+	JsValueRef CALLBACK clearTimeoutCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount,
+		void* callbackState) {
+
+		if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
+		if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsNumber} })) return JS_INVALID_REFERENCE;
+
+		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
+		
+		std::remove_if(thi->timeouts.begin(), thi->timeouts.end(), [&](JsScript::JsTimeout& obj) -> bool {
+			return obj.id == Chakra::GetInt(arguments[1]);
+			});
+
+		return Chakra::GetUndefined();
+	}
+
+	JsValueRef CALLBACK clearIntervalCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount,
+		void* callbackState) {
+
+		if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
+		if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsNumber} })) return JS_INVALID_REFERENCE;
+
+		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
+
+		std::remove_if(thi->intervals.begin(), thi->intervals.end(), [&](JsScript::JsTimeout& obj) -> bool {
+			return obj.id == Chakra::GetInt(arguments[1]);
+			});
+
+		return Chakra::GetUndefined();
 	}
 
 	JsValueRef CALLBACK sleepCallback(JsValueRef callee, bool isConstructor,
@@ -459,19 +488,29 @@ void JsScript::loadScriptObjects() {
 		Chakra::DefineFunc(globalObj, setIntervalCallback, L"setInterval", this);
 	}
 
+	// clearTimeout()
+	{
+		Chakra::DefineFunc(globalObj, clearTimeoutCallback, L"clearTimeout", this);
+	}
+
+	// clearInterval()
+	{
+		Chakra::DefineFunc(globalObj, clearIntervalCallback, L"clearInterval", this);
+	}
+
 	// Plugin
 	{
 		JsValueRef plugin;
 		JS::JsCreateObject(&plugin);
 
-		Chakra::SetPropertyString(plugin, L"name", data.name, true);
-		Chakra::SetPropertyString(plugin, L"author", data.author, true);
-		Chakra::SetPropertyString(plugin, L"description", data.description, true);
-		Chakra::SetPropertyString(plugin, L"version", data.version, true);
+		Chakra::SetPropertyString(plugin, XW("name"), data.name, true);
+		Chakra::SetPropertyString(plugin, XW("author"), data.author, true);
+		Chakra::SetPropertyString(plugin, XW("description"), data.description, true);
+		Chakra::SetPropertyString(plugin, XW("version"), data.version, true);
 
 		Chakra::DefineFunc(plugin, requestPermission, XW("requestPermission"), this);
 
-		Chakra::SetProperty(globalObj, L"plugin", plugin, true);
+		Chakra::SetProperty(globalObj, XW("plugin"), plugin, true);
 	}
 
 	{ // Log Func

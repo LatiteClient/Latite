@@ -41,8 +41,8 @@ void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 	float windowHeight = messageHeight * maxMessages;
 	auto tm = std::chrono::system_clock::now();
 
-	auto messageDuration = std::chrono::seconds(static_cast<int64_t>(std::get<FloatValue>(this->messageDuration).value));
-	auto messageAnimDuration = std::chrono::seconds(static_cast<int64_t>(std::get<FloatValue>(this->animationSpeed).value));
+	auto messageDuration = std::chrono::milliseconds(static_cast<int64_t>(std::get<FloatValue>(this->messageDuration).value * 1000));
+	auto messageAnimDuration = std::chrono::milliseconds(static_cast<int64_t>(std::get<FloatValue>(this->animationSpeed).value * 1000));
 
 
 	for (auto& msg : messages) {
@@ -78,7 +78,7 @@ void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 		};
 
 		if (tm - msg.timeCreated > messageDuration) {
-			msg.animation = sineCurve(std::min(1.f, (1000.f / (float)std::chrono::duration_cast<std::chrono::milliseconds>(tm - msg.timeCreated - messageDuration).count()) - 1.f));
+			msg.animation = sineCurve(std::min(1.f, (messageAnimDuration.count() / (float)std::chrono::duration_cast<std::chrono::milliseconds>(tm - msg.timeCreated - messageDuration).count()) - 1.f));
 		}
 		else if (tm - msg.timeCreated < messageAnimDuration && msg.duplicate < 2) {
 			msg.animation = sineCurve((float)std::chrono::duration_cast<std::chrono::milliseconds>(tm - msg.timeCreated).count() / std::chrono::duration_cast<std::chrono::milliseconds>(messageAnimDuration).count());
