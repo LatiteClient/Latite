@@ -24,7 +24,10 @@ public:
 
 	void drawColorPicker();
 
-	void jumpToModule(std::string const& name) { jumpModule = name; }
+	void jumpToModule(std::string const& name) {
+		jumpModule = name;
+		modTab = ALL;
+	}
 protected:
 	void onEnable(bool ignoreAnims) override;
 	void onDisable() override;

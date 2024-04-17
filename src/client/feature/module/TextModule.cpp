@@ -31,8 +31,8 @@ void TextModule::onInit() {
 
 void TextModule::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	//dc.setTextShadow(textShadow);
-	int textPadding = static_cast<int>(std::get<FloatValue>(padX));
-	int textPaddingY = static_cast<int>(std::get<FloatValue>(padY) * 2.f);
+	int textPadding = std::get<BoolValue>(fillBg) ? static_cast<int>(std::get<FloatValue>(padX)) : 0;
+	int textPaddingY = std::get<BoolValue>(fillBg) ? static_cast<int>(std::get<FloatValue>(padY) * 2.f) : 0;
 
 	float textSize = std::get<FloatValue>(textSizeS);//this->getTextSize();
 
