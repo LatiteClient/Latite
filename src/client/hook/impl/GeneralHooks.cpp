@@ -30,6 +30,7 @@ namespace {
 	std::shared_ptr<Hook> GetTimeOfDayHook;
 	std::shared_ptr<Hook> WeatherHook;
 	std::shared_ptr<Hook> FogColorHook;
+	std::shared_ptr<Hook> AddMessageHook;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -328,6 +329,18 @@ Color* GenericHooks::hkGetFogColor(SDK::Dimension* obj, Color* out, SDK::Actor* 
 	return out;
 }
 
+void GenericHooks::hkAddMessage(SDK::GuiData* obj, void* msg, uint32_t profanityContext) {
+	// MessageContext
+	std::string& str = util::directAccess<std::string>(msg, 0x28);
+
+	ChatMessageEvent ev{ str };
+	if (Eventing::get().dispatch(ev)) {
+		return;
+	}
+
+	AddMessageHook->oFunc<decltype(&hkAddMessage)>()(obj, msg, profanityContext);
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
 	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
@@ -378,5 +391,7 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	GetTimeOfDayHook = addHook(Signatures::Dimension_getTimeOfDay.result, hkGetTimeOfDay, "Dimension::getTimeOfDay");
 
 	WeatherHook = addHook(Signatures::Weather_tick.result, hkWeatherTick, "Weather::tick");
+
+	AddMessageHook = addHook(Signatures::GuiData__addMessage.result, hkAddMessage, "GuiData::_addMessage");
 }
 

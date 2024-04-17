@@ -34,6 +34,9 @@ private:
 	ValueType backgroundColor = ColorValue(0.f, 0.f, 0.f, 0.5f);
 	ValueType textColor = ColorValue(1.f, 1.f, 1.f, 1.f);
 	ValueType antiSpam = BoolValue(true);
+	ValueType animations = BoolValue(true);
+	ValueType animationSpeed = FloatValue(1.f);
+	ValueType messageDuration = FloatValue(6.f);
 
 	static constexpr int anchor_auto = 0;
 	static constexpr int anchor_top = 0;

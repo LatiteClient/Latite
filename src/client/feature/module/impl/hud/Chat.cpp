@@ -5,9 +5,9 @@
 #include <sdk/common/client/gui/controls/UIControl.h>
 
 Chat::Chat() : HUDModule("Chat", "Custom Chat", "A custom chat, replacing the vanilla chat.", HUD) {
-	listen<ClientTextEvent>((EventListenerFunc)&Chat::onText);
-	listen<LatiteClientMessageEvent>((EventListenerFunc)&Chat::onLatiteMessage);
-	listen<RenderLayerEvent>((EventListenerFunc)&Chat::onRenderLayer, true);
+	listen<ChatMessageEvent>((EventListenerFunc)&Chat::onText);
+	//listen<LatiteClientMessageEvent>((EventListenerFunc)&Chat::onLatiteMessage);
+	//listen<RenderLayerEvent>((EventListenerFunc)&Chat::onRenderLayer, true);
 	
 	anchorData.addEntry(EnumEntry{ anchor_auto, "Auto" });
 	anchorData.addEntry(EnumEntry{ anchor_top, "Top" });
@@ -28,6 +28,8 @@ Chat::Chat() : HUDModule("Chat", "Custom Chat", "A custom chat, replacing the va
 	addSetting("backgroundColor", "Background Color", "The color of the background", backgroundColor);
 	addSetting("textColor", "Text Color", "The color of the text", textColor);
 	addSetting("antiSpam", "Anti Spam", "Prevent spam messages in chat.", antiSpam);
+	addSliderSetting("animSpeed", "Animation Time", "The speed of the animation", animationSpeed, FloatValue(0.f), FloatValue(5.f), FloatValue(0.1f));
+	addSliderSetting("messageDuration", "Message Duration", "The duration of the message, excluding the animation", messageDuration, FloatValue(1.f), FloatValue(15.f), FloatValue(0.5f));
 	addEnumSetting("anchor", "Anchor", "How the chat window will be anchored", anchorData);
 }
 
@@ -39,8 +41,9 @@ void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 	float windowHeight = messageHeight * maxMessages;
 	auto tm = std::chrono::system_clock::now();
 
-	static constexpr auto messageDuration = 6s;
-	static constexpr auto messageAnimDuration = 1s;
+	auto messageDuration = std::chrono::seconds(static_cast<int64_t>(std::get<FloatValue>(this->messageDuration).value));
+	auto messageAnimDuration = std::chrono::seconds(static_cast<int64_t>(std::get<FloatValue>(this->animationSpeed).value));
+
 
 	for (auto& msg : messages) {
 		if (tm - msg.timeCreated >= (messageDuration + messageAnimDuration)) {
@@ -112,15 +115,16 @@ void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 }
 
 void Chat::onText(Event& evG) {
-	auto& ev = reinterpret_cast<ClientTextEvent&>(evG);
-	auto pkt = ev.getTextPacket();
+	auto& ev = reinterpret_cast<ChatMessageEvent&>(evG);
+	//auto pkt = ev.getTextPacket();
 
-	std::string content = pkt->str;
-	if (pkt->source.textSize > 0) {
-		content = "<" + pkt->source.str() + "> " + content;
-	}
+	//std::string content = pkt->str;
+	//if (pkt->source.textSize > 0) {
+	//	content = "<" + pkt->source.str() + "> " + content;
+	//}
 
-	addMessage(content);
+	addMessage(ev.getMessage());
+	ev.setCancelled(true);
 }
 
 void Chat::onLatiteMessage(Event& evG) {

@@ -28,6 +28,7 @@ public:
 
 	[[nodiscard]] class JsPlugin* getPlugin() { return plugin; };
 	[[nodiscard]] std::filesystem::path getPath() { return path; }
+	[[nodiscard]] std::filesystem::path getRelativePath() { return relPath; }
 	[[nodiscard]] std::filesystem::path getFolderPath() { return path.parent_path(); }
 	[[nodiscard]] JsContextRef getContext() { return ctx; }
 	[[nodiscard]] JsValueRef getModuleExports();

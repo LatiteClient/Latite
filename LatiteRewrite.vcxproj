@@ -291,7 +291,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Dbghelp.lib;MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -333,6 +333,7 @@
     <ClInclude Include="deps\mnem\cpuid.hpp" />
     <ClInclude Include="deps\mnem\scan\scanner_impls.hpp" />
     <ClInclude Include="src\client\event\impl\AttackEvent.h" />
+    <ClInclude Include="src\client\event\impl\ChatMessageEvent.h" />
     <ClInclude Include="src\client\event\impl\ClientTextEvent.h" />
     <ClInclude Include="src\client\event\impl\FogColorEvent.h" />
     <ClInclude Include="src\client\event\impl\GetTimeEvent.h" />

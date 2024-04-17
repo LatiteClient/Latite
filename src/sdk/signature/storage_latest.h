@@ -275,6 +275,10 @@ public:
 	inline static SigImpl GameMode_attack{ [](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 56 48 8d 6c 24 ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 45 ? 48 8b f2 48 8b f9 45 33 f6 4c 89 75 ? 48 8d 4d ? e8 ? ? ? ? 90 c6 45"_sig,
 		"GameMode::attack" };
+
+	inline static SigImpl GuiData__addMessage{ [](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5c 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 45 8b e0 44 89 44 24"_sig,
+		"GuiData::_addMessage(MessageContext*, UIProfanityContext)" };
 };
 
 // after adding sigs here, add them in latite.cpp

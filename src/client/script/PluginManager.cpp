@@ -93,6 +93,8 @@ void PluginManager::reportError(JsValueRef except, std::wstring filePath) {
 	ss << "&c" << util::WStrToStr(stack);
 
 	Latite::getClientMessageSink().display(util::Format(ss.str()));
+	Logger::Info("(plugin/{}) ({}) {}", util::WStrToStr(JsScript::getThis()->getPlugin()->getName()), JsScript::getThis()->getRelativePath().string(), util::WStrToStr(stack));
+	
 	// not sure if you release the exception or not, will do it anyway
 	Chakra::Release(except);
 }
@@ -109,6 +111,7 @@ void PluginManager::handleErrors(JsErrorCode code) {
 		}
 		else if (code != JsNoError) {
 			Latite::getClientMessageSink().display(util::Format(std::format("&cA JS error occured in script {}: JsErrorCode {}", util::WStrToStr(script->data.name), (int)code)));
+			Logger::Info("(plugin/{}) ({}) Js ErrorCode: {:X}", util::WStrToStr(script->getPlugin()->getName()), script->getRelativePath().string(), (int)code);
 		}
 	}
 }

@@ -46,6 +46,7 @@ class GenericHooks : public HookGroup {
     static float hkGetTimeOfDay(SDK::Dimension* obj);
     static void hkWeatherTick(SDK::Weather* obj);
     static Color* hkGetFogColor(SDK::Dimension* obj, Color* out, SDK::Actor* ent, float f);
+    static void hkAddMessage(SDK::GuiData* obj, void* msg, uint32_t profanityContext);
 public:
     GenericHooks();
 };

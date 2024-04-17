@@ -8,6 +8,7 @@
 #include "impl/BobMovementEvent.h"
 #include "impl/CharEvent.h"
 #include "impl/ChatEvent.h"
+#include "impl/ChatMessageEvent.h"
 #include "impl/CinematicCameraEvent.h"
 #include "impl/ClickEvent.h"
 #include "impl/ClientTextEvent.h"
