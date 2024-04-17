@@ -31,6 +31,8 @@ Chat::Chat() : HUDModule("Chat", "Custom Chat", "A custom chat, replacing the va
 	addSliderSetting("animSpeed", "Animation Time", "The speed of the animation", animationSpeed, FloatValue(0.f), FloatValue(5.f), FloatValue(0.1f));
 	addSliderSetting("messageDuration", "Message Duration", "The duration of the message, excluding the animation", messageDuration, FloatValue(1.f), FloatValue(15.f), FloatValue(0.5f));
 	addEnumSetting("anchor", "Anchor", "How the chat window will be anchored", anchorData);
+	
+	showPreview = false;
 }
 
 void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {

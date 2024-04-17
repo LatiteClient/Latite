@@ -39,11 +39,12 @@ public:
 	[[nodiscard]] d2d::Rect getRect();
 	[[nodiscard]] d2d::Rect getRectNonScaled() { return rect; }
 	[[nodiscard]] virtual bool forceMinecraftRenderer() override { return std::get<BoolValue>(forceMCRend); }
-	
+	[[nodiscard]] bool isResizable() { return resizable; }
+	[[nodiscard]] bool isShowPreview() { return showPreview; }
+
 	void setScale(float f) { std::get<FloatValue>(scale) = f; }
 	void setRect(d2d::Rect const& rc) { this->rect = rc; }
 
-	bool isResizable() { return resizable; }
 
 protected:
 	d2d::Rect rect = {};
@@ -52,6 +53,7 @@ protected:
 	ValueType forceMCRend = BoolValue(false);
 	bool resizable;
 	bool active = true;
+	bool showPreview = true;
 public:
 	[[nodiscard]] virtual bool isActive() { return active; }
 	virtual void loadConfig(SettingGroup& resolvedGroup) override;

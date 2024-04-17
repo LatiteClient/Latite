@@ -583,7 +583,7 @@ void ClickGUI::onRender(Event&) {
 							}
 							});
 
-						if (mod.mod->isHud()) {
+						if (mod.mod->isHud() && static_cast<HUDModule*>(mod.mod.get())->isShowPreview()) {
 							auto rMod = static_cast<HUDModule*>(mod.mod.get());
 
 							RectF box = { modRectActual.left, modRectActual.bottom,
