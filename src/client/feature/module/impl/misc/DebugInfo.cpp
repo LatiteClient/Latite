@@ -9,7 +9,7 @@
 #include "sdk/common/world/level/HitResult.h"
 #include <util/DxContext.h>
 
-DebugInfo::DebugInfo() : Module("DebugInfo", "Java Debug Info", "See information similar to Java", GAME, VK_F3) {
+DebugInfo::DebugInfo() : Module("DebugInfo", "Java Debug Info", "Shows useful debugging information. Similar to Java Edition F3.", GAME, VK_F3) {
     listen<RenderOverlayEvent>((EventListenerFunc)&DebugInfo::onRenderOverlay);
     listen<DrawHUDModulesEvent>((EventListenerFunc)&DebugInfo::onRenderHUDModules, false, 2);
 }

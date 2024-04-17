@@ -2,7 +2,7 @@
 #include "ServerDisplay.h"
 #include "sdk/common/network/RakNetConnector.h"
 
-ServerDisplay::ServerDisplay() : TextModule("ServerDisplay", "Server Display", "Displays what server you are on", HUD, 400.f, 0, true) {
+ServerDisplay::ServerDisplay() : TextModule("ServerDisplay", "Server Display", "Displays the server connected to.", HUD, 400.f, 0, true) {
     port.addEntry({ port_mixed, "Non-Default" });
     port.addEntry({ port_constant, "Always"});
     port.addEntry({ port_none, "None" });
@@ -14,7 +14,7 @@ std::wstringstream ServerDisplay::text(bool isDefault, bool inEditor) {
     std::wstringstream wss;
     auto connector = SDK::RakNetConnector::get();
     if (connector && connector->ipAddress.size() > 0) {
-        if (!connector->featuredServer.empty()) {
+        if (!connector->featuredServer.empty() && std::get<BoolValue>(showServerName)) {
             wss << util::StrToWStr(connector->featuredServer);
         }
         else {

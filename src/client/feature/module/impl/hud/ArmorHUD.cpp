@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ArmorHUD.h"
 
-ArmorHUD::ArmorHUD() : HUDModule("ArmorHUD", "Armor HUD", "Shows items you're wearing", HUD) {
+ArmorHUD::ArmorHUD() : HUDModule("ArmorHUD", "Armor HUD", "Shows your armor and held items.", HUD) {
 	mode.addEntry(EnumEntry{ mode_vetical, "Vertical" });
 	mode.addEntry(EnumEntry{ mode_horizontal, "Horizontal" });
 	addEnumSetting("mode", "Mode", "Mode", mode);

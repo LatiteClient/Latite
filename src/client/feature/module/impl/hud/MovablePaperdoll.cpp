@@ -5,7 +5,7 @@
 #include <sdk/common/client/gui/controls/UIControl.h>
 #include <sdk/common/client/renderer/HudPlayerRenderer.h>
 
-MovablePaperdoll::MovablePaperdoll() : HUDModule("Paperdoll", "Movable Paperdoll", "Be able to move around the paper doll!", HUD) {
+MovablePaperdoll::MovablePaperdoll() : HUDModule("Paperdoll", "Movable Paperdoll", "Makes the paperdoll movable. Requires the paperdoll to be enabled via game options.", HUD) {
 	addSetting("alwaysShow", "Always Show", "Always show the paper doll.", alwaysShow);
 
 	listen<RenderLayerEvent>((EventListenerFunc)&MovablePaperdoll::onRenderLayer, true, 10 /*need to overpower the hud renderer*/);

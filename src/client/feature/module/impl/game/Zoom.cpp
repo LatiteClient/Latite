@@ -3,7 +3,7 @@
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
 
-Zoom::Zoom() : Module("Zoom", "Zoom", "Zooms like OptiFine", GAME, nokeybind) {
+Zoom::Zoom() : Module("Zoom", "Zoom", "Zooming in and out bound to a key.", GAME, nokeybind) {
 	addSetting("zoomKey", "Zoom Key", "The key to press to zoom", this->zoomKey);
 	addSliderSetting("modifier", "Modifier", "How far to zoom", this->modifier, FloatValue(1.f), FloatValue(50.f), FloatValue(1.f));
 	addSetting("animation", "Animation", "Whether to have a zoom animation or not", hasAnim);

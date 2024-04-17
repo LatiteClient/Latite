@@ -4,7 +4,7 @@
 #include <array>
 #include <client/Latite.h>
 
-Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement keys", HUD) {
+Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement keys and states.", HUD) {
 	addSetting("mouseButtons", "Mouse Buttons", "Show mouse buttons", mouseButtons);
 	addSetting("showCps", "CPS", "Show clicks per second", cps);
 	addSetting("spaceBar", "Space Bar", "Space bar", spaceBar);

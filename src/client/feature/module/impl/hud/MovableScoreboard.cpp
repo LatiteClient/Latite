@@ -5,7 +5,7 @@
 #include <sdk/common/client/gui/controls/VisualTree.h>
 #include <sdk/common/client/gui/controls/UIControl.h>
 
-MovableScoreboard::MovableScoreboard() : HUDModule("MovableScoreboard", "Movable Scoreboard", "Be able to move the scoreboard.", HUD, 0, false) {
+MovableScoreboard::MovableScoreboard() : HUDModule("MovableScoreboard", "Movable Scoreboard", "Makes the scoreboard movable.", HUD, 0, false) {
 	listen<RenderLayerEvent>((EventListenerFunc)&MovableScoreboard::onRenderLayer, true, 10 /*need to overpower the hud renderer*/);
 }
 

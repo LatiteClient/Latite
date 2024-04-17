@@ -3,7 +3,7 @@
 #include "client/event/Eventing.h"
 #include "client/event/impl/TickEvent.h"
 
-DynamicLight::DynamicLight() : Module("DynamicLight", "Dynamic Light", "Makes the item you're holding emit light", GAME) {
+DynamicLight::DynamicLight() : Module("DynamicLight", "Dynamic Light", "Makes the item you're holding emit light.", GAME) {
 	listen<TickEvent>((EventListenerFunc)&DynamicLight::onTick, true);
 }
 

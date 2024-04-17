@@ -2,7 +2,7 @@
 #include "CPSCounter.h"
 #include "client/Latite.h"
 
-CPSCounter::CPSCounter() : TextModule("CPS", "CPS Counter", "Shows your CPS", HUD, 400.f, 0, true /*cache CPS text*/) {
+CPSCounter::CPSCounter() : TextModule("CPS", "CPS Counter", "Shows your CPS (clicks per second).", HUD, 400.f, 0, true /*cache CPS text*/) {
 	mode.addEntry(EnumEntry(0, "Left", "Left"));
 	mode.addEntry(EnumEntry(1, "Right", "Right"));
 	mode.addEntry(EnumEntry(2, "Both", "Both"));

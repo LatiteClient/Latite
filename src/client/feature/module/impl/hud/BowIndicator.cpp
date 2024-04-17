@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "BowIndicator.h"
 
-BowIndicator::BowIndicator() : TextModule("BowIndicator", "Bow Indicator", "Shows bow chargedness", HUD, 400.f, 0,
+BowIndicator::BowIndicator() : TextModule("BowIndicator", "Bow Indicator", "Shows bow chargedness.", HUD, 400.f, 0,
                                           true) {
 	addSetting("visual", "Visual Indicator", "To show a bar instead of text", this->visual);
 	addSetting("fgCol", "Color", "The indicator foreground color", this->indicatorCol2);

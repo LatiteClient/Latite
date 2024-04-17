@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ItemTweaks.h"
 
-ItemTweaks::ItemTweaks() : Module("ItemTweaks", "Item Tweaks", "Tweaks/settings related to item rendering", GAME)  {
+ItemTweaks::ItemTweaks() : Module("ItemTweaks", "Item Tweaks", "Tweaks/settings related to item rendering.", GAME)  {
 	addSetting("disableFlyingItem", "Disable flying item animation", "Disables the animation when you shift click an item", this->disableFlyingItemAnimation);
 
 	listen<RenderGuiItemEvent>((EventListenerFunc)&ItemTweaks::onItemRender);
