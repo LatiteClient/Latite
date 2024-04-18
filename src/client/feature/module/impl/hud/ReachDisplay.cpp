@@ -5,8 +5,8 @@
 ReachDisplay::ReachDisplay() : TextModule("ReachDisplay", "Reach Display", "Displays your reach when attacking an entity.", HUD) {
 	listen<AttackEvent>((EventListenerFunc)&ReachDisplay::onAttack);
 
-	std::get<TextValue>(this->prefix) = "Reach: ";
-	std::get<TextValue>(this->suffix) = " blocks";
+	std::get<TextValue>(this->prefix) = std::wstring(L"Reach: ");
+	std::get<TextValue>(this->suffix) = std::wstring(L" blocks");
 
 	addSliderSetting("decimals", "Decimals", "The number of decimals in the reach number", this->decimals, FloatValue(0.f), FloatValue(6.f), FloatValue(1.f));
 }
