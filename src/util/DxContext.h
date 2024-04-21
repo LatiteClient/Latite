@@ -4,6 +4,8 @@
 #include "client/render/Renderer.h"
 #include "sdk/common/client/renderer/screen/MinecraftUIRenderContext.h"
 #include "sdk/common/client/gui/Font.h"
+#include <imgui/imgui.h>
+#include "ImRendererScreenContext.h"
 
 // Base DrawUtil class (provides no drawing implementation).
 class DrawUtil {
@@ -94,9 +96,10 @@ public:
 	SDK::MinecraftUIRenderContext* renderCtx;
 	SDK::ScreenContext* scn;
 	SDK::Font* font;
+	ImDrawList* drawList;
 	float guiScale = 1.f;
 
-	MCDrawUtil(SDK::MinecraftUIRenderContext* ctx, SDK::Font* font) : renderCtx(ctx), scn(renderCtx->screenContext), font(font), guiScale(SDK::ClientInstance::get()->getGuiData()->guiScaleFrac) {}
+	MCDrawUtil(SDK::MinecraftUIRenderContext* ctx, SDK::Font* font) : renderCtx(ctx), scn(renderCtx->screenContext), font(font), guiScale(SDK::ClientInstance::get()->getGuiData()->guiScaleFrac), drawList(ImRendererScreenContext::getDrawList()) {}
 	void flush(bool text = true, bool mesh = true) override;
 
 	void drawVignette(d2d::Color const& innerCol, float fade = 0.f);
