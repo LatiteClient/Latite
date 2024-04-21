@@ -529,8 +529,8 @@ void ClickGUI::onRender(Event&) {
 				modRect.right - togglePad, modRect.bottom - togglePad };
 
 				// module settings calculations
-				dc.ctx->SetTarget(shadowBitmap.Get());
-				bool renderExtended = (mod.lerpArrowRot < 0.98f);
+				dc.ctx->SetTarget(auxiliaryBitmap.Get());
+				bool renderExtended = (mod.lerpArrowRot < 0.995f);
 				if (renderExtended) {
 
 					// clipping pane
@@ -611,11 +611,13 @@ void ClickGUI::onRender(Event&) {
 					clipRect.right += 10.f;
 					dc.ctx->PushAxisAlignedClip(clipRect.get(), D2D1_ANTIALIAS_MODE_ALIASED);
 				}
+
+
 				dc.fillRoundedRectangle(modRectActual, d2d::Color::RGB(0x44, 0x44, 0x44).asAlpha(0.22f), .22f * modHeight);
 				dc.drawRoundedRectangle(modRectActual, d2d::Color(Latite::get().getAccentColor().color1).asAlpha(1.f * mod.lerpToggle), .22f * modHeight, 1.f, DrawUtil::OutlinePosition::Inside);;
 				if (renderExtended) {
 
-					dc.ctx->DrawBitmap(shadowBitmap.Get());
+					dc.ctx->DrawBitmap(auxiliaryBitmap.Get());
 					dc.ctx->PopAxisAlignedClip();
 				}
 
@@ -625,7 +627,18 @@ void ClickGUI::onRender(Event&) {
 				dc.drawText(textRect, util::StrToWStr(mod.name), { 1.f, 1.f, 1.f, 1.f }, FontSelection::SegoeLight, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 				// toggle
-				{
+				if (mod.mod->shouldHoldToToggle()) {
+					d2d::Color color = d2d::Color::RGB(0xD9, 0xD9, 0xD9, 30);
+
+					dc.fillRoundedRectangle(toggleRect, color, toggleRect.getHeight() / 4.f);
+					dc.drawText(toggleRect, util::StrToWStr(util::KeyToString(mod.mod->getKeybind())), {1.f, 1.f, 1.f, 1.f}, Renderer::FontSelection::SegoeRegular,
+						toggleRect.getHeight() / 2.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+					if (this->shouldSelect(toggleRect, cursorPos)) {
+						setTooltip(L"Enable this module using the keybind.");
+					}
+
+				} else {
 					bool selecToggle;
 					if (selecToggle = this->shouldSelect(toggleRect, cursorPos)) {
 						if (justClicked[0]) {
@@ -709,6 +722,10 @@ void ClickGUI::onRender(Event&) {
 		dc.ctx->PopAxisAlignedClip();
 	}
 
+	dc.ctx->SetTransform(oTransform);
+	dc.ctx->DrawImage(compositeEffect.Get());
+	dc.ctx->SetTransform(currentMatr);
+
 	modClip = std::nullopt;
 	jumpModule = std::nullopt;
 
@@ -740,6 +757,7 @@ void ClickGUI::onInit(Event&) {
 	auto dc = Latite::getRenderer().getDeviceContext();
 
 	dc->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, pixelFormat), shadowBitmap.GetAddressOf());
+	dc->CreateBitmap(bitmapSize, nullptr, 0, D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_TARGET, pixelFormat), auxiliaryBitmap.GetAddressOf());
 	dc->CreateEffect(CLSID_D2D1Composite, compositeEffect.GetAddressOf());
 
 }
@@ -747,6 +765,7 @@ void ClickGUI::onInit(Event&) {
 void ClickGUI::onCleanup(Event&) {
 	compositeEffect = nullptr;
 	shadowBitmap = nullptr;
+	auxiliaryBitmap = nullptr;
 }
 
 
@@ -1231,7 +1250,7 @@ bool ClickGUI::shouldSelect(d2d::Rect rc, Vec2 const& pt) {
 void ClickGUI::drawColorPicker() {
 	auto& cursorPos = SDK::ClientInstance::get()->cursorPos;
 	D2DUtil dc;
-	dc.ctx->SetTarget(shadowBitmap.Get());
+	dc.ctx->SetTarget(auxiliaryBitmap.Get());
 	dc.ctx->Clear();
 
 	float rectWidth = 0.2419f * rect.getWidth();
@@ -1540,7 +1559,7 @@ void ClickGUI::drawColorPicker() {
 	}
 
 	// inner contents
-	dc.ctx->DrawBitmap(shadowBitmap.Get());
+	dc.ctx->DrawBitmap(auxiliaryBitmap.Get());
 
 	RectF pickerTopBar = { cPickerRect.left, cPickerRect.top, cPickerRect.right, boxRect.top };
 

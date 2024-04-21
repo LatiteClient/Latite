@@ -54,6 +54,9 @@ private:
 	std::vector<ui::TextBox> pickerTextBoxes{};
 
 	ComPtr<ID2D1Bitmap1> shadowBitmap;
+	ComPtr<ID2D1Bitmap1> auxiliaryBitmap;
+	ComPtr<ID2D1Bitmap1> modHoverBitmap;
+	ComPtr<ID2D1ImageBrush> clipBrush;
 	std::optional<d2d::Rect> modClip = {};
 
 	enum Tab {
