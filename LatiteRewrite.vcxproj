@@ -332,15 +332,6 @@
     <ClInclude Include="deps\include\mnemosyne\scan\signature.hpp" />
     <ClInclude Include="deps\mnem\cpuid.hpp" />
     <ClInclude Include="deps\mnem\scan\scanner_impls.hpp" />
-    <ClInclude Include="C:\Users\xximr\Downloads\stb_image.h" />
-    <ClInclude Include="deps\include\imgui\imconfig.h" />
-    <ClInclude Include="deps\include\imgui\imgui.h" />
-    <ClInclude Include="deps\include\imgui\imgui_internal.h" />
-    <ClInclude Include="deps\include\imgui\imstb_rectpack.h" />
-    <ClInclude Include="deps\include\imgui\imstb_textedit.h" />
-    <ClInclude Include="deps\include\imgui\imstb_truetype.h" />
-    <ClInclude Include="deps\include\stb_image.h" />
-    <ClInclude Include="deps\include\stb_image_write.h" />
     <ClInclude Include="src\client\event\impl\AttackEvent.h" />
     <ClInclude Include="src\client\event\impl\ChatMessageEvent.h" />
     <ClInclude Include="src\client\event\impl\ClientTextEvent.h" />
@@ -607,7 +598,6 @@
     <ClInclude Include="src\util\FNV32.h" />
     <ClInclude Include="src\util\DxContext.h" />
     <ClInclude Include="src\util\DxUtil.h" />
-    <ClInclude Include="src\util\ImRendererScreenContext.h" />
     <ClInclude Include="src\util\Json.h" />
     <ClInclude Include="src\util\Logger.h" />
     <ClInclude Include="src\util\LMath.h" />
@@ -640,11 +630,6 @@
     <ClCompile Include="deps\mnem\os\win32\process.cpp" />
     <ClCompile Include="deps\mnem\scan\scanner.cpp" />
     <ClCompile Include="deps\mnem\scan\scanner_avx2.cpp" />
-    <ClCompile Include="deps\include\imgui\imgui.cpp" />
-    <ClCompile Include="deps\include\imgui\imgui_demo.cpp" />
-    <ClCompile Include="deps\include\imgui\imgui_draw.cpp" />
-    <ClCompile Include="deps\include\imgui\imgui_tables.cpp" />
-    <ClCompile Include="deps\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\EnvironmentChanger.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\TextHotkey.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\ThirdPersonNametag.cpp" />
@@ -790,7 +775,6 @@
     <ClCompile Include="src\util\DrawUtil3D.cpp" />
     <ClCompile Include="src\util\DxContext.cpp" />
     <ClCompile Include="src\util\DxUtil.cpp" />
-    <ClCompile Include="src\util\ImRendererScreenContext.cpp" />
     <ClCompile Include="src\util\Logger.cpp" />
     <ClCompile Include="src\util\Util.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\TabList.cpp" />
