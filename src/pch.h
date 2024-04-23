@@ -5,8 +5,6 @@
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include <imgui/imgui.h>
 
 #include <Windows.h>
 #include <iostream>
