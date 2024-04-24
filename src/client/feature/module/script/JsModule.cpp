@@ -12,21 +12,25 @@ JsModule::JsModule(std::string const& name, std::string const& displayName, std:
 
 void JsModule::onEnable()
 {
-	JS::JsSetCurrentContext(ctx);
-	Event ev{ L"enable", {  } };
-	auto ret = dispatchEvent(ev.name, ev);
-	if (ret != JS_INVALID_REFERENCE) {
-		Chakra::Release(ret);
-	}
+	// TODO: this function can be activated outside of the main JS thread. 
+
+	//JS::JsSetCurrentContext(ctx);
+	//Event ev{ L"enable", {  } };
+	//auto ret = dispatchEvent(ev.name, ev);
+	//if (ret != JS_INVALID_REFERENCE) {
+	//	Chakra::Release(ret);
+	//}
 }
 
 void JsModule::onDisable() {
-	JS::JsSetCurrentContext(ctx);
-	Event ev{ L"disable", {  } };
-	auto ret = dispatchEvent(ev.name, ev);
-	if (ret != JS_INVALID_REFERENCE) {
-		Chakra::Release(ret);
-	}
+	// TODO: this function can be activated outside of the main JS thread. 
+	// 
+	//JS::JsSetCurrentContext(ctx);
+	//Event ev{ L"disable", {  } };
+	//auto ret = dispatchEvent(ev.name, ev);
+	//if (ret != JS_INVALID_REFERENCE) {
+	//	Chakra::Release(ret);
+	//}
 }
 
 bool JsModule::shouldHoldToToggle() {
