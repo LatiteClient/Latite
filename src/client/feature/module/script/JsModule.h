@@ -21,4 +21,5 @@ private:
 	std::string displayName;
 
 	JsContextRef ctx = JS_INVALID_REFERENCE;
+	bool cacheHoldToToggle = false;
 };

@@ -30,12 +30,18 @@ void JsModule::onDisable() {
 }
 
 bool JsModule::shouldHoldToToggle() {
+
+	if (!Latite::isMainThread()) {
+		return cacheHoldToToggle;
+	}
+
 	JS::JsSetCurrentContext(ctx);
 	Event ev{ L"get-hold-to-toggle", {  } };
 	auto ret = dispatchEvent(ev.name, ev);
 	if (ret != JS_INVALID_REFERENCE) {
 		bool b;
 		if (JS::JsBooleanToBool(ret, &b) == JsNoError) {
+			cacheHoldToToggle = b;
 			return b;
 		}
 		else {
@@ -43,5 +49,6 @@ bool JsModule::shouldHoldToToggle() {
 		}
 		Chakra::Release(ret);
 	}
+	cacheHoldToToggle = false;
 	return false;
 }
