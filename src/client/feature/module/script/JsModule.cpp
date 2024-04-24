@@ -14,7 +14,7 @@ void JsModule::onEnable()
 {
 	// TODO: this function can be activated outside of the main JS thread. 
 
-	//JS::JsSetCurrentContext(ctx);
+	//Chakra::SetContext(ctx);
 	//Event ev{ L"enable", {  } };
 	//auto ret = dispatchEvent(ev.name, ev);
 	//if (ret != JS_INVALID_REFERENCE) {
@@ -25,7 +25,7 @@ void JsModule::onEnable()
 void JsModule::onDisable() {
 	// TODO: this function can be activated outside of the main JS thread. 
 	// 
-	//JS::JsSetCurrentContext(ctx);
+	//Chakra::SetContext(ctx);
 	//Event ev{ L"disable", {  } };
 	//auto ret = dispatchEvent(ev.name, ev);
 	//if (ret != JS_INVALID_REFERENCE) {
@@ -39,7 +39,7 @@ bool JsModule::shouldHoldToToggle() {
 		return cacheHoldToToggle;
 	}
 
-	JS::JsSetCurrentContext(ctx);
+	Chakra::SetContext(ctx);
 	Event ev{ L"get-hold-to-toggle", {  } };
 	auto ret = dispatchEvent(ev.name, ev);
 	if (ret != JS_INVALID_REFERENCE) {

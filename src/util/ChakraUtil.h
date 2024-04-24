@@ -31,6 +31,7 @@ public:
 			return success;
 		}
 	};
+	static void SetContext(JsContextRef context);
 
 	static void SetProperty(JsValueRef ref, std::wstring name, JsValueRef value, bool strict = false);
 	static void SetPropertyString(JsValueRef ref, std::wstring name, std::wstring value, bool strict = false);

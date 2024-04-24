@@ -45,6 +45,15 @@ FARPROC Chakra::pass(const char* name)
 	return GetProcAddress(mod, name);
 }
 
+void Chakra::SetContext(JsContextRef context) {
+	if (!Latite::isMainThread()) {
+		Logger::Fatal("{}", XOR_STRING("SetContext accessed outside of the main thread!!!"));
+		__debugbreak();
+	}
+
+	HandleErrors(JS::JsSetCurrentContext(context));
+}
+
 void Chakra::SetProperty(JsValueRef ref, std::wstring name, JsValueRef value, bool strict) {
 	JsPropertyIdRef propId;
 	JS::JsGetPropertyIdFromName(name.c_str(), &propId);

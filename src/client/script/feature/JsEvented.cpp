@@ -5,7 +5,7 @@
 
 JsValueRef JsEvented::dispatchEvent(std::wstring name, Event& ev) {
 	for (auto& evs : this->eventListeners[name]) {
-		JS::JsSetCurrentContext(evs.second);
+		Chakra::SetContext(evs.second);
 
 		ev.arguments.insert(ev.arguments.begin(), evs.first);
 		JsValueRef val;

@@ -16,7 +16,7 @@ JsHUDModule::JsHUDModule(std::string const& name, std::string const& displayName
 }
 
 void JsHUDModule::onEnable(){
-	JS::JsSetCurrentContext(ctx);
+	Chakra::SetContext(ctx);
 	Event ev{ L"enable", {  } };
 	auto ret = dispatchEvent(ev.name, ev);
 	if (ret != JS_INVALID_REFERENCE) {
@@ -25,7 +25,7 @@ void JsHUDModule::onEnable(){
 }
 
 void JsHUDModule::onDisable() {
-	JS::JsSetCurrentContext(ctx);
+	Chakra::SetContext(ctx);
 	Event ev{ L"disable", {  } };
 	auto ret = dispatchEvent(ev.name, ev);
 	if (ret != JS_INVALID_REFERENCE) {
@@ -34,7 +34,7 @@ void JsHUDModule::onDisable() {
 }
 
 bool JsHUDModule::shouldHoldToToggle() {
-	JS::JsSetCurrentContext(ctx);
+	Chakra::SetContext(ctx);
 	Event ev{ L"get-hold-to-toggle", {  } };
 	auto ret = dispatchEvent(ev.name, ev);
 	if (ret != JS_INVALID_REFERENCE) {
@@ -54,7 +54,7 @@ void JsHUDModule::render(DrawUtil&, bool, bool) {
 }
 
 void JsHUDModule::preRender(bool mcRend, bool isPreview, bool isEditor) {
-	JS::JsSetCurrentContext(ctx);
+	Chakra::SetContext(ctx);
 	auto obj = script->getObject<D2DScriptingObject>();
 	bool oMinecraftRend = obj->usingMinecraftRend();
 	obj->setUseMinecraftRend(mcRend);

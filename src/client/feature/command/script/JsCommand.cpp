@@ -7,7 +7,7 @@ bool JsCommand::execute(std::string const label, std::vector<std::string> args) 
 }
 
 bool JsCommand::tryRun(std::string const& label, std::vector<std::string> args, std::string const& line) {
-    JS::JsSetCurrentContext(ctx);
+    Chakra::SetContext(ctx);
     JsValueRef array;
     JS::JsCreateArray(static_cast<unsigned>(args.size()), &array);
     for (int i = 0; i < args.size(); i++) {

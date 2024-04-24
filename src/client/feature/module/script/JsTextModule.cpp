@@ -18,7 +18,7 @@ JsTextModule::JsTextModule(std::string const& name,
 
 
 void JsTextModule::onEnable() {
-	JS::JsSetCurrentContext(ctx);
+	Chakra::SetContext(ctx);
 	Event ev{ L"enable", {  } };
 	auto ret = dispatchEvent(ev.name, ev);
 	if (ret != JS_INVALID_REFERENCE) {
@@ -27,7 +27,7 @@ void JsTextModule::onEnable() {
 }
 
 void JsTextModule::onDisable() {
-	JS::JsSetCurrentContext(ctx);
+	Chakra::SetContext(ctx);
 	Event ev{ L"disable", {  } };
 	auto ret = dispatchEvent(ev.name, ev);
 	if (ret != JS_INVALID_REFERENCE) {
@@ -36,7 +36,7 @@ void JsTextModule::onDisable() {
 }
 
 bool JsTextModule::shouldHoldToToggle() {
-	JS::JsSetCurrentContext(ctx);
+	Chakra::SetContext(ctx);
 	Event ev{ L"get-hold-to-toggle", {  } };
 	auto ret = dispatchEvent(ev.name, ev);
 	if (ret != JS_INVALID_REFERENCE) {
@@ -53,13 +53,13 @@ bool JsTextModule::shouldHoldToToggle() {
 }
 
 std::wstringstream JsTextModule::text(bool isPreview, bool isEditor) {
-	JS::JsSetCurrentContext(ctx);
+	Chakra::SetContext(ctx);
 
 	return std::wstringstream() << cachedText;
 }
 
 void JsTextModule::preRender(bool mcRend, bool isPreview, bool isEditor) {
-	JS::JsSetCurrentContext(ctx);
+	Chakra::SetContext(ctx);
 
 	{
 		//JsValueRef isPreviewBool;

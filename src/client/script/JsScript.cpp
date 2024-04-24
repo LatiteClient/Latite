@@ -79,7 +79,7 @@ bool JsScript::load() {
 	this->libraries.push_back(std::make_shared<Clipboard>(this));
 
 	JS::JsSetContextData(ctx, this);
-	JS::JsSetCurrentContext(ctx);
+	Chakra::SetContext(ctx);
 
 	if (GetModuleHandleA("Chakra.dll")) {
 		Chakra::pass("JsStartDebugging")();
@@ -93,13 +93,13 @@ JsValueRef JsScript::getModuleExports() {
 	JsContextRef oCtx;
 	JS::JsGetCurrentContext(&oCtx);
 
-	JS::JsSetCurrentContext(this->ctx);
+	Chakra::SetContext(this->ctx);
 	auto global = Chakra::GetGlobalObject();
 	auto objectClass = Chakra::GetProperty(global, L"Object");
 	auto keysFunc = Chakra::GetProperty(objectClass, L"keys");
 
 	auto exp = Chakra::GetProperty(global, L"exports");
-	JS::JsSetCurrentContext(oCtx);
+	Chakra::SetContext(oCtx);
 
 	if (exp != JS_INVALID_REFERENCE) {
 		JsValueRef result;
@@ -159,7 +159,7 @@ void JsScript::handleAsyncOperations() {
 }
 
 JsErrorCode JsScript::runScript() {
-	JS::JsSetCurrentContext(ctx);
+	Chakra::SetContext(ctx);
 	//this->checkTrusted();
 #if LATITE_DEBUG
 	//Logger::Info("isTrusted = {}", this->isTrusted());
@@ -197,7 +197,7 @@ JsErrorCode JsScript::compileScript() {
 }
 
 void JsScript::loadJSApi() {
-	JS::JsSetCurrentContext(ctx);
+	Chakra::SetContext(ctx);
 	JsValueRef res;
 	auto err = JS::JsRunScript(util::StrToWStr(Latite::get().getTextAsset(JS_LATITEAPI)).c_str(), sCtx, L"latiteapi.js", &res);
 	Latite::getPluginManager().handleErrors(err);
@@ -438,7 +438,7 @@ namespace {
 }
 
 void JsScript::loadScriptObjects() {
-	JS::JsSetCurrentContext(ctx);
+	Chakra::SetContext(ctx);
 	int i = 0;
 	this->objects.clear();
 	this->objects.push_back(std::make_shared<ClientScriptingObject>(i++));
@@ -541,7 +541,7 @@ void JsScript::loadScriptObjects() {
 }
 
 JsValueRef JsScript::AsyncOperation::call() {
-	JS::JsSetCurrentContext(this->ctx);
+	Chakra::SetContext(this->ctx);
 	JsValueRef obj;
 	this->args.insert(this->args.begin(), this->callback);
 	Latite::getPluginManager().handleErrors(Chakra::CallFunction(this->callback, this->args.data(), static_cast<unsigned short>(this->args.size()), &obj));

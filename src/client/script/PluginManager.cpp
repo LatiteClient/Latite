@@ -164,7 +164,7 @@ void PluginManager::runScriptingOperations()
 				auto now = std::chrono::system_clock::now();
 				auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - it->createTime);
 				if (duration.count() > it->time) {
-					JS::JsSetCurrentContext(it->context);
+					Chakra::SetContext(it->context);
 					JsValueRef res;
 					handleErrors(Chakra::CallFunction(it->callback, &it->callback, 1, &res));
 					JS::JsRelease(res, nullptr);
@@ -179,7 +179,7 @@ void PluginManager::runScriptingOperations()
 				auto now = std::chrono::system_clock::now();
 				auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - tim.createTime);
 				if (duration.count() > tim.time) {
-					JS::JsSetCurrentContext(tim.context);
+					Chakra::SetContext(tim.context);
 					JsValueRef res;
 					handleErrors(Chakra::CallFunction(tim.callback, &tim.callback, 1, &res));
 					JS::JsRelease(res, nullptr);
@@ -325,7 +325,7 @@ void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr) {
 					});
 
 				if (removeIt != scr.end()) {
-					JS::JsSetCurrentContext(it->second);
+					Chakra::SetContext(it->second);
 					unsigned int refCount;
 					JS::JsRelease(it->first, &refCount);
 					ev.second.erase(it);
@@ -375,7 +375,7 @@ bool PluginManager::dispatchEvent(Event& ev) {
 	for (auto& lis : eventListeners) {
 		if (lis.first == ev.type) {
 			for (auto& l : lis.second) {
-				JS::JsSetCurrentContext(l.second);
+				Chakra::SetContext(l.second);
 				JsValueRef params[2] = {};
 				// create the obj
 				JS::JsGetUndefinedValue(params);

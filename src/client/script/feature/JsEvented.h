@@ -10,7 +10,7 @@ public:
 	~JsEvented() {
 		//for (auto& ev : this->eventListeners) {
 		//	for (auto& lis : ev.second) {
-		//		JS::JsSetCurrentContext(lis.second);
+		//		Chakra::SetContext(lis.second);
 		//		JS::JsRelease(lis.first, nullptr);
 		//	}
 		//}
