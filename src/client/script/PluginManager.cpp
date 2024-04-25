@@ -110,8 +110,8 @@ void PluginManager::handleErrors(JsErrorCode code) {
 			reportError(except, script->data.name);
 		}
 		else if (code != JsNoError) {
-			Latite::getClientMessageSink().display(util::Format(std::format("&cA JS error occured in script {}: JsErrorCode {}", util::WStrToStr(script->data.name), (int)code)));
-			Logger::Info("(plugin/{}) ({}) Js ErrorCode: {:X}", util::WStrToStr(script->getPlugin()->getName()), script->getRelativePath().string(), (int)code);
+			Latite::getClientMessageSink().display(util::Format(std::format("&cA JS error occured in script {}: JsErrorCode 0x{:X}", util::WStrToStr(script->data.name), (int)code)));
+			Logger::Info("(plugin/{}) ({}) Js ErrorCode: 0x{:X}", util::WStrToStr(script->getPlugin()->getName()), script->getRelativePath().string(), (int)code);
 		}
 	}
 }

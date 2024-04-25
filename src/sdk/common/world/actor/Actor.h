@@ -18,13 +18,13 @@ namespace SDK {
 		MVCLASS_FIELD(AABBShapeComponent*, aabbShape, 0x2A0, 0x2A8, 0x2A8, 0, 0x358);
 		MVCLASS_FIELD(ActorRotationComponent*, actorRotation, 0x2A8, 0x2B0, 0x2B0, 0, 0x360);
 		// @dump-wbds Actor::getMolangVariables, 3
-		MVCLASS_FIELD(MolangVariableMap, molangVariableMap, 0x448, 0x450, 0, 0, 0);
+		MVCLASS_FIELD(MolangVariableMap, molangVariableMap, 0x420, 0x450, 0, 0, 0);
 
 
 		// 1.19.51 only
 		CLASS_FIELD(class Level*, level_1_19_51, 0x310)
 		// @dump-wbds Actor::getArmorContainer, 3
-		MVCLASS_FIELD(class Inventory*, armorContainer, 0x420, 0x428, 0, 0, 0); // xref: Actor::getArmor(ArmorSlot)
+		MVCLASS_FIELD(class Inventory*, armorContainer, 0x0, 0x428, 0, 0, 0); // xref: Actor::getArmor(ArmorSlot)
 
 		AABB& getBoundingBox();
 		Vec2& getRot();
