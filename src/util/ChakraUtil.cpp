@@ -51,7 +51,11 @@ void Chakra::SetContext(JsContextRef context) {
 		__debugbreak();
 	}
 
-	HandleErrors(JS::JsSetCurrentContext(context));
+	auto error = JS::JsSetCurrentContext(context);
+
+	if (error != JsNoError) {
+		Logger::Warn("{}: {:X}", XOR_STRING("SetContext JsError", (int)error));
+	}
 }
 
 void Chakra::SetProperty(JsValueRef ref, std::wstring name, JsValueRef value, bool strict) {

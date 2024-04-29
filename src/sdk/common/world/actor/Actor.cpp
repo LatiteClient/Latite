@@ -43,7 +43,7 @@ Vec3& SDK::Actor::getPosOld() {
 
 int SDK::Actor::getCommandPermissionLevel() {
 	// @dump-wbds vtable Actor, getCommandPermissionLevel
-	return memory::callVirtual<int>(this, mvGetOffset<0x73, 0x7C, 0xB5, 0xCC, 0xCD>());
+	return memory::callVirtual<int>(this, mvGetOffset<0x6F, 0x7C, 0xB5, 0xCC, 0xCD>());
 }
 
 int64_t SDK::Actor::getRuntimeID() {
@@ -105,7 +105,7 @@ float SDK::Actor::getSaturation() {
 
 bool SDK::Actor::isInvisible() {
 	// @dump-wbds Actor, isInvisible
-	return memory::callVirtual<bool>(this, SDK::mvGetOffset<0x0, 0x25, 0x34, 0x3B, 0x3D>());
+	return memory::callVirtual<bool>(this, SDK::mvGetOffset<0x22, 0x25, 0x34, 0x3B, 0x3D>());
 }
 
 SDK::ItemStack* SDK::Actor::getArmor(int armorSlot) {
