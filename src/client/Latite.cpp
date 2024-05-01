@@ -131,9 +131,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int deadCount = 0;
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
-        { "1.20.73", SDK::VLATEST },
-        { "1.20.72", SDK::VLATEST },
-        { "1.20.71", SDK::VLATEST },
+        { "1.20.80", SDK::VLATEST },
         //{ "1.20.41", SDK::V1_20_40 },
         //{ "1.20.40", SDK::V1_20_40 },
         //{ "1.20.32", SDK::V1_20_30 },
@@ -146,8 +144,9 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     };
 
     if (versNumMap.contains(Latite::get().gameVersion)) {
-        auto vers =  versNumMap[Latite::get().gameVersion];
-        SDK::internalVers = vers;
+        // not needed as it will always just be latest
+        //auto vers =  versNumMap[Latite::get().gameVersion];
+        //SDK::internalVers = vers;
     }
     else {
         std::stringstream ss;
@@ -223,6 +222,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(MinecraftPackets_createPacket),
         MVSIG(GameMode_attack),
         MVSIG(GuiData__addMessage),
+        MVSIG(Actor_getArmor),
     };
     
     new (mmgrBuf) ModuleManager;

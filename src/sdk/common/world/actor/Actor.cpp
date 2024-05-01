@@ -109,6 +109,10 @@ bool SDK::Actor::isInvisible() {
 }
 
 SDK::ItemStack* SDK::Actor::getArmor(int armorSlot) {
+	if (internalVers >= V1_20_80) {
+		return reinterpret_cast<SDK::ItemStack * (*)(SDK::Actor*, int)>(Signatures::Actor_getArmor.result)(this, armorSlot);
+	}
+
 	if (internalVers >= V1_20_40) {
 		return this->armorContainer->getItem(armorSlot);
 	}
