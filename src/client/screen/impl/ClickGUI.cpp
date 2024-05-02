@@ -413,9 +413,6 @@ void ClickGUI::onRender(Event&) {
 
 			}
 		}
-		dc.ctx->SetTransform(oTransform);
-		dc.ctx->DrawImage(compositeEffect.Get());
-		dc.ctx->SetTransform(currentMatr);
 	}
 
 	// Panels
