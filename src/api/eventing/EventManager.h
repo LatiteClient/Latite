@@ -6,10 +6,7 @@
 class IEventManager {
 public:
 	template <typename T>
-	bool dispatch(T& ev) {
-		static_assert(std::is_convertible<T*, Event*>::value, "type must inherit from Event");
-		//static_assert(!(std::is_convertible<Event*, T*>::value), "type must not be an Event");
-
+	bool dispatch(T& ev) requires std::derived_from<T, Event> {
 		std::sort(listeners.begin(), listeners.end(), [](std::pair<uint32_t, EventListener> const& left,
 			std::pair<uint32_t, EventListener> const& right) {
 				return left.second.priority > right.second.priority;
@@ -33,9 +30,8 @@ public:
 	}
 
 	template <typename T>
-	void listen(Listener* ptr, EventListenerFunc listener, int priority = 0, bool callWhileInactive = false) {
+	void listen(Listener* ptr, EventListenerFunc listener, int priority = 0, bool callWhileInactive = false) requires std::derived_from<T, Event> {
 		mutex.lock();
-		static_assert(std::is_convertible<T*, Event*>::value, "type is not an Event");
 		listeners.push_back({ T::hash, EventListener{ listener, ptr, callWhileInactive, priority } });
 		mutex.unlock();
 	}
