@@ -34,12 +34,17 @@ void JsHUDModule::onDisable() {
 }
 
 bool JsHUDModule::shouldHoldToToggle() {
+	if (Latite::isMainThread()) {
+		return cachedHoldToToggle;
+	}
+
 	Chakra::SetContext(ctx);
 	Event ev{ L"get-hold-to-toggle", {  } };
 	auto ret = dispatchEvent(ev.name, ev);
 	if (ret != JS_INVALID_REFERENCE) {
 		bool b;
 		if (JS::JsBooleanToBool(ret, &b) == JsNoError) {
+			cachedHoldToToggle = b;
 			return b;
 		}
 		else {
@@ -47,6 +52,7 @@ bool JsHUDModule::shouldHoldToToggle() {
 		}
 		Chakra::Release(ret);
 	}
+	cachedHoldToToggle = false;
 	return false;
 }
 

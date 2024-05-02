@@ -22,6 +22,7 @@ public:
 	class JsScript* script = nullptr;
 private:
 	std::string displayName;
+	bool cachedHoldToToggle = false;
 
 	JsValueRef object = JS_INVALID_REFERENCE;
 	JsContextRef ctx = JS_INVALID_REFERENCE;
