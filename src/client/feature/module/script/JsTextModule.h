@@ -23,6 +23,7 @@ public:
 private:
 	std::string displayName;
 	std::wstring cachedText = L"";
+	bool cachedHoldToToggle = false;
 
 	JsValueRef object = JS_INVALID_REFERENCE;
 	JsContextRef ctx = JS_INVALID_REFERENCE;
