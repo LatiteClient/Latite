@@ -110,7 +110,12 @@ bool SDK::Actor::isInvisible() {
 
 SDK::ItemStack* SDK::Actor::getArmor(int armorSlot) {
 	if (internalVers >= V1_20_80) {
-		return reinterpret_cast<SDK::ItemStack * (*)(SDK::Actor*, int)>(Signatures::Actor_getArmor.result)(this, armorSlot);
+		// TODO: this is EXTREMELY scuffed
+		int& componentId = util::directAccess<int>(this, 0x18);
+		auto obj = reinterpret_cast<void* (*)(void* obj, int& id)>(Signatures::Components::actorEquipmentPersistentComponent.result)
+			(util::directAccess<void*>(this, 0x10), componentId);
+
+		return (*(SDK::ItemStack*(**)(LPVOID, int))(**(uintptr_t**)((uintptr_t)obj + 8) + 40i64))(*(LPVOID*)((uintptr_t)obj + 8), armorSlot);
 	}
 
 	if (internalVers >= V1_20_40) {

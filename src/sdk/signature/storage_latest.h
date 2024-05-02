@@ -60,6 +60,11 @@ public:
 			"48 89 5C 24 08 57 48 83 EC 30 48 8B DA BA 44 94 B2 B6"_sig,
 			"AttributesComponent"};
 
+		inline static SigImpl actorEquipmentPersistentComponent{ [](memory::signature_store&, uintptr_t res) { return res; },
+			// last 4 bytes is the hash of the component
+			"4C 8B 41 48 4C 8B C9 48 8B 41 50 4C 8B 51 68 49 2B C0 48 C1 F8 03 48 FF C8 25 36 48 C4 71"_sig,
+			"struct ActorEquipmentComponent" };
+
 	};
 
 	struct Vtable {

@@ -222,7 +222,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(MinecraftPackets_createPacket),
         MVSIG(GameMode_attack),
         MVSIG(GuiData__addMessage),
-        MVSIG(Actor_getArmor),
+        MVSIG(Components::actorEquipmentPersistentComponent),
     };
     
     new (mmgrBuf) ModuleManager;
