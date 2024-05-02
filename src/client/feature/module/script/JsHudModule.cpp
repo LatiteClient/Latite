@@ -34,7 +34,7 @@ void JsHUDModule::onDisable() {
 }
 
 bool JsHUDModule::shouldHoldToToggle() {
-	if (Latite::isMainThread()) {
+	if (!Latite::isMainThread()) {
 		return cachedHoldToToggle;
 	}
 
