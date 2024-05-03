@@ -138,7 +138,7 @@ void ArmorHUD::render(DrawUtil& ctxGeneric, bool isDefault, bool inEditor) {
 				add++;
 			}
 		}
-		rect.right = rect.left + (itemSize * static_cast<float>(numItems));
+		rect.right = rect.left + (itemSize * std::max(0.f, static_cast<float>(numItems)));
 		rect.bottom = rect.top + itemSize;
 	}
 

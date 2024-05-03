@@ -11,7 +11,7 @@ void Notifications::onRender(Event& evG) {
 	auto& ev = reinterpret_cast<RenderOverlayEvent&>(evG);
 
 	float transition = 300;
-	float stay = 2000;
+	float stay = 3000;
 
 	D2DUtil dc;
 	D2D1_SIZE_F ssize = Latite::getRenderer().getScreenSize();
@@ -25,7 +25,10 @@ void Notifications::onRender(Event& evG) {
 		auto now = std::chrono::system_clock::now();
 
 		auto& toast = toasts.front();
-		auto dur = static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(now - toast.createTime).count());
+		if (!toast.init) {
+			toast.initialize();
+		}
+			auto dur = static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(now - toast.createTime).count());
 		float transitionIn = std::max(0.F, transition - dur);
 		float maxDur = stay + transition * 2;
 		float transitionOut = static_cast<float>(stay + transition * 2) - transition;
@@ -45,9 +48,16 @@ void Notifications::onRender(Event& evG) {
 
 		auto textSize = dc.getTextSize(toast.message, font, fontSize);
 
-		auto rec = dc.getTextRect(toast.message, font, fontSize, 15.f);
-		dc.fillRoundedRectangle(rec, bgCol.asAlpha(opacity));
-		dc.drawRoundedRectangle(rec, outlineCol.asAlpha(opacity), rec.getHeight() / 2.f, 3);
+		float xPad = 80.f;
+		float yPad = 30.f;
+		float yOffset = 30.f * transl;
+
+		d2d::Rect rec = { ss.centerX(textSize.x + xPad), ss.top + yOffset, 0, ss.top + yOffset + textSize.y + yPad / 2 };
+		rec.right = rec.left + textSize.x + xPad / 2;
+
+
+		dc.fillRoundedRectangle(rec, bgCol.asAlpha(opacity * bgCol.a), rec.getHeight() / 3.f);
+		dc.drawRoundedRectangle(rec, outlineCol.asAlpha(opacity * outlineCol.a), rec.getHeight() / 3.f, 3, DrawUtil::OutlinePosition::Outside);
 
 		dc.drawText(rec, toast.message, textCol.asAlpha(opacity), font, fontSize, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 

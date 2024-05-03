@@ -11,7 +11,13 @@ private:
 
 	struct Toast {
 		std::wstring message;
-		std::chrono::system_clock::time_point createTime = std::chrono::system_clock::now();
+		bool init = false;
+		std::chrono::system_clock::time_point createTime;
+
+		void initialize() {
+			init = true;
+			createTime = std::chrono::system_clock::now();
+		}
 	};
 
 	std::queue<Toast> toasts;
