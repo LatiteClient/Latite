@@ -51,7 +51,7 @@ JsValueRef ClientScriptingObject::showNotifCallback(JsValueRef callee, bool isCo
 	if (!Chakra::VerifyArgCount(argCount, 2)) return undefined;
 	if (!Chakra::VerifyParameters({ {arguments[1], JsString} })) return undefined;
 
-	// TODO: notifications
+	Latite::getNotifications().push(Chakra::GetString(arguments[1]));
 	return undefined;
 }
 

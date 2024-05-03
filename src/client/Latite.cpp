@@ -65,6 +65,7 @@ namespace {
     alignas(Assets) char assetsBuf[sizeof(Assets)] = {};
     alignas(PluginManager) char scriptMgrBuf[sizeof(PluginManager)] = {};
     alignas(Keyboard) char keyboardBuf[sizeof(Keyboard)] = {};
+    alignas(Notifications) char notificaitonsBuf[sizeof(Notifications)] = {};
 
     bool hasInjected = false;
 }
@@ -90,6 +91,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (messageSinkBuf) ClientMessageSink;
     new (eventing) Eventing();
     new (latiteBuf) Latite;
+    new (notificaitonsBuf) Notifications;
 
     std::filesystem::create_directory(util::GetLatitePath());
     std::filesystem::create_directory(util::GetLatitePath() / "Assets");
@@ -357,6 +359,7 @@ BOOL WINAPI DllMain(
         Latite::getAssets().~Assets();
         Latite::getScreenManager().~ScreenManager();
         Latite::getPluginManager().~PluginManager();
+        Latite::getNotifications().~Notifications();
         Latite::get().~Latite();
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
@@ -412,6 +415,10 @@ PluginManager& Latite::getPluginManager() noexcept {
 
 Keyboard& Latite::getKeyboard() noexcept {
     return *std::launder(reinterpret_cast<Keyboard*>(keyboardBuf));
+}
+
+Notifications& Latite::getNotifications() noexcept {
+    return *std::launder(reinterpret_cast<Notifications*>(notificaitonsBuf));
 }
 
 std::optional<float> Latite::getMenuBlur() {

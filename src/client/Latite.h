@@ -4,6 +4,7 @@
 #include "api/feature/setting/Setting.h"
 #include <optional>
 #include "misc/Timings.h"
+#include "misc/Notifications.h"
 
 namespace ui {
 	class TextBox;
@@ -29,6 +30,7 @@ public:
 	[[nodiscard]] static class Assets& getAssets() noexcept;
 	[[nodiscard]] static class PluginManager& getPluginManager() noexcept;
 	[[nodiscard]] static class Keyboard& getKeyboard() noexcept;
+	[[nodiscard]] static class Notifications& getNotifications() noexcept;
 
 	[[nodiscard]] Timings& getTimings() noexcept { return timings; }
 	[[nodiscard]] std::string getCommandPrefix() { return util::WStrToStr(std::get<TextValue>(commandPrefix).str); }
@@ -46,7 +48,7 @@ public:
 	Latite() = default;
 	~Latite() = default;
 
-	static constexpr std::string_view version = "v2.0.0b17";
+	static constexpr std::string_view version = "v2.0.0b18";
 	HINSTANCE dllInst = NULL;
 	std::string gameVersion;
 

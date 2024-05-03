@@ -4,13 +4,16 @@
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
 #include "client/event/impl/DrawHUDModulesEvent.h"
-#include "client/event/impl/RenderOverlayEvent.h"
+#include "client/event/impl/RenderLayerEvent.h"
 
 #include "sdk/common/world/level/HitResult.h"
+#include "sdk/common/client/gui/ScreenView.h"
+#include "sdk/common/client/gui/controls/UIControl.h"
+#include "sdk/common/client/gui/controls/VisualTree.h"
 #include <util/DxContext.h>
 
 DebugInfo::DebugInfo() : Module("DebugInfo", "Java Debug Info", "Shows useful debugging information. Similar to Java Edition F3.", GAME, VK_F3) {
-    listen<RenderOverlayEvent>((EventListenerFunc)&DebugInfo::onRenderOverlay);
+    listen<RenderLayerEvent>((EventListenerFunc)&DebugInfo::onRenderOverlay);
     listen<DrawHUDModulesEvent>((EventListenerFunc)&DebugInfo::onRenderHUDModules, false, 2);
 }
 
@@ -108,32 +111,36 @@ namespace {
 #undef GETFPS
 
 void DebugInfo::onRenderOverlay(Event& evG) {
-    RenderOverlayEvent& ev = reinterpret_cast<RenderOverlayEvent&>(evG);
-    D2DUtil dc;
+    RenderLayerEvent& ev = reinterpret_cast<RenderLayerEvent&>(evG);
+    MCDrawUtil dc{ ev.getUIRenderContext(), Latite::get().getFont() };
 
     if (!SDK::ClientInstance::get()->getLocalPlayer()) return;
 
-    auto [width, height] = Latite::getRenderer().getScreenSize();
-    d2d::Rect rect = { 0.f, 0.f, width, height };
+    if (ev.getScreenView()->visualTree->rootControl->name == "hud_screen") {
+        auto [width, height] = SDK::ClientInstance::get()->getGuiData()->screenSize;
+        d2d::Rect rect = { 0.f, 0.f, width, height };
 
-    const std::wstring topLeftDebugInfo = util::StrToWStr(std::format("{}\n{}\n\n{}\n{}\n{}\n{}\n{}",
-        getMinecraftVersion(),
-        getFPS(),
-        getDimension(),
-        getCoordinates(),
-        getVelocity(),
-        getRotation(),
-        getLookingAt()));
-    const std::wstring topRightDebugInfo = util::StrToWStr(std::format("{}\n{}\n{}\n",
-        getMemUsage(),
-        getGpuInfo(),
-        getCpuInfo()));
+        const std::wstring topLeftDebugInfo = util::StrToWStr(std::format("{}\n{}\n\n{}\n{}\n{}\n{}",
+            getMinecraftVersion(),
+            getFPS(),
+            getDimension(),
+            getCoordinates(),
+            //getVelocity(),
+            getRotation(),
+            getLookingAt()));
+        const std::wstring topRightDebugInfo = util::StrToWStr(std::format("{}\n{}\n{}\n",
+            getMemUsage(),
+            getGpuInfo(),
+            getCpuInfo()));
 
-    dc.drawText(rect, topLeftDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular,
-        28, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
+        dc.drawText(rect, topLeftDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular,
+            28, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
 
-    dc.drawText(rect, topRightDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular,
-        28, DWRITE_TEXT_ALIGNMENT_TRAILING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
+        dc.drawText(rect, topRightDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular,
+            28, DWRITE_TEXT_ALIGNMENT_TRAILING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
+
+        dc.flush(true, false);
+    }
 }
 
 void DebugInfo::onRenderHUDModules(Event& evGeneric) {

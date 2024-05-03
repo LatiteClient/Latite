@@ -478,6 +478,7 @@
     <ClInclude Include="src\api\feature\module\ModuleManager.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\TestModule.h" />
     <ClInclude Include="src\client\feature\module\ModuleManager.h" />
+    <ClInclude Include="src\client\misc\Notifications.h" />
     <ClInclude Include="src\client\misc\Timings.h" />
     <ClInclude Include="src\client\render\Assets.h" />
     <ClInclude Include="src\client\render\asset\Asset.h" />
@@ -711,6 +712,7 @@
     <ClCompile Include="src\client\misc\ClientMessageSink.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\TestModule.cpp" />
     <ClCompile Include="src\client\feature\module\ModuleManager.cpp" />
+    <ClCompile Include="src\client\misc\Notifications.cpp" />
     <ClCompile Include="src\client\misc\Timings.cpp" />
     <ClCompile Include="src\client\render\Assets.cpp" />
     <ClCompile Include="src\client\render\asset\Asset.cpp" />
