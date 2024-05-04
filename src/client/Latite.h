@@ -169,6 +169,7 @@ private:
 	void onRenderLayer(class Event& ev);
 	void onRenderOverlay(class Event& ev);
 	void onPacketReceive(class Event& ev);
+	void onTick(class Event& ev);
 
 	bool shouldEject = false;
 	bool hasInit = false;
