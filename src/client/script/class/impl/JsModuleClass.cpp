@@ -5,6 +5,7 @@
 
 #include "client/feature/module/script/JsHudModule.h"
 #include <client/feature/module/script/JsTextModule.h>
+#include "JsColor.h"
 
 JsValueRef JsModuleClass::moduleIsEnabled(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
 {
@@ -226,6 +227,35 @@ JsValueRef JsModuleClass::moduleAddTextSetting(JsValueRef callee, bool isConstru
 	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
 
 	*set->value = TextValue(Chakra::GetString(arguments[4]));
+	set->defaultValue = *set->value;
+
+	auto setClass = thi->owner->getClass<JsSettingClass>();
+	mod->settings->addSetting(set);
+
+	return setClass->construct(set.get(), false /*do not destroy the setting once it goes out of scope, as module manager will handle that*/);
+}
+
+JsValueRef JsModuleClass::moduleAddColorSetting(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 5)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, { arguments[2], JsString}, {arguments[3], JsString}, {arguments[4], JsObject} })) return JS_INVALID_REFERENCE;
+
+	auto thi = reinterpret_cast<JsModuleClass*>(callbackState);
+
+	auto mod = Get(arguments[0]);
+
+	if (!mod) {
+		Chakra::ThrowError(L"Object is not a module");
+		return JS_INVALID_REFERENCE;
+	}
+
+	auto name = Chakra::GetString(arguments[1]);
+	auto disp = Chakra::GetString(arguments[2]);
+	auto desc = Chakra::GetString(arguments[3]);
+	auto col = JsColor::ToColor(arguments[4]);
+
+	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
+
+	*set->value = ColorValue(col.r, col.g, col.b, col.a);
 	set->defaultValue = *set->value;
 
 	auto setClass = thi->owner->getClass<JsSettingClass>();
