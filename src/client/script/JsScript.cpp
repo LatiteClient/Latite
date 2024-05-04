@@ -128,6 +128,7 @@ JsScript::JsScript(JsPlugin* plugin, std::filesystem::path const& path, std::wst
 
 
 void JsScript::handleAsyncOperations() {
+	Chakra::SetContext(this->ctx);
 	for (size_t i = 0; i < pendingOperations.size();) {
 		auto ptr = pendingOperations[i];
 		if (ptr->flagDone) {

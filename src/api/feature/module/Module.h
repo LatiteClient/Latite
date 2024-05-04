@@ -33,7 +33,16 @@ public:
 	[[nodiscard]] bool isTextual() const { return textual; };
 	[[nodiscard]] bool isVisible() const { return visible; };
 	[[nodiscard]] bool isBlocked() const { return blocked; };
-	void setEnabled(bool b) { b ? onEnable() : onDisable(); std::get<BoolValue>(enabled) = b; }
+	void setEnabled(bool b, bool blockedOverride = false) { if (!blockedOverride && isBlocked()) return; b ? onEnable() : onDisable(); std::get<BoolValue>(enabled) = b; }
+	void setBlocked(bool b) {
+		if (b) {
+			if (isEnabled()) {
+				setEnabled(false);
+			}
+		}
+
+		blocked = b;
+	}
 
 	bool shouldListen() { return isEnabled(); }
 

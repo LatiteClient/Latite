@@ -154,6 +154,8 @@ private:
 	void threadsafeInit();
 	void patchKey();
 
+	void updateModuleBlocking();
+
 	void onUpdate(class Event& ev);
 	void onKey(class Event& ev);
 	void onClick(class Event& ev);
@@ -166,6 +168,7 @@ private:
 	void onLeaveGame(class Event& ev);
 	void onRenderLayer(class Event& ev);
 	void onRenderOverlay(class Event& ev);
+	void onPacketReceive(class Event& ev);
 
 	bool shouldEject = false;
 	bool hasInit = false;

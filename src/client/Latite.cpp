@@ -46,6 +46,7 @@ using namespace winrt::Windows::Storage;
 #include "screen/ScreenManager.h"
 #include "render/Assets.h"
 #include "resource.h"
+#include "feature/module/impl/game/Freelook.h"
 
 int SDK::internalVers = SDK::VLATEST;
 
@@ -467,6 +468,7 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getEventing().listen<LeaveGameEvent>(this, (EventListenerFunc)&Latite::onLeaveGame, 2);
     Latite::getEventing().listen<RenderLayerEvent>(this, (EventListenerFunc)&Latite::onRenderLayer, 2);
     Latite::getEventing().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Latite::onRenderOverlay, 2);
+    Latite::getEventing().listen<PacketReceiveEvent>(this, (EventListenerFunc)&Latite::onPacketReceive, 2);
 
     Logger::Info(XOR_STRING("Initialized Hooks"));
     getHooks().enable();
@@ -523,6 +525,36 @@ void Latite::patchKey() {
     VirtualProtect(str, old_key.size(), oProt, &oProt);
 
     Logger::Info("Old and new keys patched");
+}
+
+
+static void blockModules(std::string_view moduleName, std::string_view serverName) {
+    auto inst = SDK::RakNetConnector::get();
+    if (inst->dns.find(serverName) != std::string::npos) {
+        Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
+            if (mod->name() == moduleName) {
+                mod->setBlocked(true);
+            }
+            });
+    }
+}
+
+void Latite::updateModuleBlocking() {
+    auto inst = SDK::RakNetConnector::get();
+    if (!inst) return;
+
+
+    if (inst->ipAddress.size() > 0) {
+        // scuffed but we don't have a proper static management system
+
+        static_assert(std::is_base_of_v<Module, Freelook>);
+
+        blockModules("Freelook", "hivebedrock");
+        blockModules("Freelook", "nethergames");
+    }
+    else {
+        
+    }
 }
 
 namespace {
@@ -748,6 +780,15 @@ void Latite::onUpdate(Event& evGeneric) {
     auto now = std::chrono::system_clock::now();
     static auto lastSend = now;
 
+    auto rak = SDK::RakNetConnector::get();
+
+    if (!rak || rak->ipAddress.empty()) {
+        //updateModuleBlocking();
+        getModuleManager().forEach([](std::shared_ptr<IModule> mod) {
+            mod->setBlocked(false);
+            });
+    }
+
     if (SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed() && std::get<BoolValue>(centerCursorMenus)) {
         RECT r;
 
@@ -925,6 +966,16 @@ void Latite::onRenderOverlay(Event& evG) {
         auto& latest = this->dxRenderQueue.front();
         latest(ev.getDeviceContext());
         this->dxRenderQueue.pop();
+    }
+}
+
+void Latite::onPacketReceive(Event& evG) {
+    auto& ev = reinterpret_cast<PacketReceiveEvent&>(evG);
+
+    auto pkt = ev.getPacket();
+
+    if (pkt->getID() == (SDK::PacketID)1) {
+        updateModuleBlocking();
     }
 }
 
