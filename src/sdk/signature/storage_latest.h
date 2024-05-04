@@ -290,7 +290,7 @@ public:
 		"e8 ? ? ? ? 48 85 c0 0f 84 ? ? ? ? 48 8b 08 48 8b 01 ba ? ? ? ? 48 8b 40 ? ff 15 ? ? ? ? 48 8b f8 80 78 ? ? 0f 84 ? ? ? ? 48 8b 40 ? 48 85 c0 0f 84"_sig,
 		"Actor::getArmor" };
 
-	inline static SigImpl _updatePlayer{ [](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+	inline static SigImpl _updatePlayer{ [](memory::signature_store&, uintptr_t res) { return res; },
 		"4c 8b dc 49 89 73 ? 49 89 7b"_sig,
 		"anonymous namespace::_updatePlayer" };
 };

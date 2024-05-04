@@ -344,13 +344,17 @@ void GenericHooks::hkAddMessage(SDK::GuiData* obj, void* msg, uint32_t profanity
 
 void GenericHooks::hkUpdatePlayer(SDK::CameraComponent* obj, void* a, void* b) {
 	UpdatePlayerCameraEvent ev{};
-	if (Eventing::get().dispatch(ev)) {
-		auto oAngles = util::QuaternionToRot(obj->lookAngles);
+	Eventing::get().dispatch(ev);
+
+	auto oAngles = util::QuaternionToRot(obj->lookAngles);
+	auto origAngles = obj->lookAngles;
+
+	if (ev.getNewRot()) {
+		obj->lookAngles = util::RotToQuaternion(*ev.getNewRot());
 		UpdatePlayerHook->oFunc<decltype(&hkUpdatePlayer)>()(obj, a, b);
-		obj->lookAngles = util::RotToQuaternion(oAngles);
+		obj->lookAngles = origAngles;
 		return;
 	}
-	
 	UpdatePlayerHook->oFunc<decltype(&hkUpdatePlayer)>()(obj, a, b);
 
 }

@@ -8,11 +8,18 @@ Freelook::Freelook() : Module("Freelook", "Freelook", "Look around freely.", GAM
 
 void Freelook::onCameraUpdate(Event& evG) {
 	auto& ev = reinterpret_cast<UpdatePlayerCameraEvent&>(evG);
-	
-	ev.setCancelled(true);
+
+	ev.setViewAngles(lastRot);
 }
 
 void Freelook::onPerspective(Event& evG) {
 	auto& ev = reinterpret_cast<PerspectiveEvent&>(evG);
 	ev.getView() = 1;
+}
+
+void Freelook::onEnable() {
+	lastRot = SDK::ClientInstance::get()->getLocalPlayer()->getRot();
+}
+
+void Freelook::onDisable() {
 }

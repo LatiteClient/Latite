@@ -9,5 +9,10 @@ public:
 	void onCameraUpdate(Event&);
 	void onPerspective(Event&);
 
+	void onEnable() override;
+	void onDisable() override;
 private:
+
+	Vec2 lastRot;
+	bool shouldHoldToToggle() override { return true; }
 };
