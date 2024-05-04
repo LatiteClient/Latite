@@ -96,7 +96,7 @@ void HUDEditor::onRender(Event& ev) {
 	}
 
 	if (isActive()) doDragging();
-	if (Latite::get().getDoSnapLines()) doSnapping(dragOffset);
+	doSnapping(dragOffset);
 	if (!mcRenderer) {
 		renderModules(nullptr);
 		keepModulesInBounds(Vec2(Latite::getRenderer().getScreenSize().width, Latite::getRenderer().getScreenSize().height));
@@ -371,7 +371,7 @@ void HUDEditor::doSnapping(Vec2 const&) {
 		if (rec.bottom > 0.f && rec.bottom < ss.y) snapLinesControlsY.push_back(rec.bottom);
 	}
 
-	if (isActive() && dragMod) {
+	if (isActive() && dragMod && Latite::get().getDoSnapLines()) {
 		auto pos = mousePos - dragOffset;
 
 		float snapRange = 10.f;
