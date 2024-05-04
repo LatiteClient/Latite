@@ -43,6 +43,7 @@ public:
 	void initSettings();
 
 	void queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback);
+	void queueForClientThread(std::function<void()> callback);
 	void queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callback);
 
 	Latite() = default;
@@ -122,6 +123,7 @@ private:
 
 	std::queue<std::function<void(SDK::MinecraftUIRenderContext* ctx)>> uiRenderQueue;
 	std::queue<std::function<void(ID2D1DeviceContext* ctx)>> dxRenderQueue;
+	std::queue<std::function<void()>> clientThreadQueue;
 
 	Timings timings{};
 	inline static std::optional<std::thread::id> gameThreadId;

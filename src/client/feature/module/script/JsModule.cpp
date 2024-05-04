@@ -10,27 +10,49 @@ JsModule::JsModule(std::string const& name, std::string const& displayName, std:
 	this->eventListeners[L"get-hold-to-toggle"] = {};
 }
 
-void JsModule::onEnable()
-{
-	// TODO: this function can be activated outside of the main JS thread. 
 
-	//Chakra::SetContext(ctx);
-	//Event ev{ L"enable", {  } };
-	//auto ret = dispatchEvent(ev.name, ev);
-	//if (ret != JS_INVALID_REFERENCE) {
-	//	Chakra::Release(ret);
-	//}
+void JsModule::onEnable() {
+
+	if (!Latite::isMainThread()) {
+		// hey lets hope that the js module doesnt disappear by the time this code executes
+		Latite::get().queueForClientThread([this]() {
+			Chakra::SetContext(ctx);
+			Event ev{ L"enable", {  } };
+			auto ret = dispatchEvent(ev.name, ev);
+			if (ret != JS_INVALID_REFERENCE) {
+				Chakra::Release(ret);
+			}
+			});
+		return;
+	}
+	Chakra::SetContext(ctx);
+	Event ev{ L"enable", {  } };
+	auto ret = dispatchEvent(ev.name, ev);
+	if (ret != JS_INVALID_REFERENCE) {
+		Chakra::Release(ret);
+	}
 }
 
 void JsModule::onDisable() {
-	// TODO: this function can be activated outside of the main JS thread. 
-	// 
-	//Chakra::SetContext(ctx);
-	//Event ev{ L"disable", {  } };
-	//auto ret = dispatchEvent(ev.name, ev);
-	//if (ret != JS_INVALID_REFERENCE) {
-	//	Chakra::Release(ret);
-	//}
+	if (!Latite::isMainThread()) {
+		// hey lets hope that the js module doesnt disappear by the time this code executes
+		Latite::get().queueForClientThread([this]() {
+			Chakra::SetContext(ctx);
+			Event ev{ L"disable", {  } };
+			auto ret = dispatchEvent(ev.name, ev);
+			if (ret != JS_INVALID_REFERENCE) {
+				Chakra::Release(ret);
+			}
+			});
+		return;
+	}
+
+	Chakra::SetContext(ctx);
+	Event ev{ L"disable", {  } };
+	auto ret = dispatchEvent(ev.name, ev);
+	if (ret != JS_INVALID_REFERENCE) {
+		Chakra::Release(ret);
+	}
 }
 
 bool JsModule::shouldHoldToToggle() {

@@ -15,7 +15,20 @@ JsHUDModule::JsHUDModule(std::string const& name, std::string const& displayName
 	this->eventListeners[L"render"] = {};
 }
 
-void JsHUDModule::onEnable(){
+void JsHUDModule::onEnable() {
+
+	if (!Latite::isMainThread()) {
+		// hey lets hope that the js module doesnt disappear by the time this code executes
+		Latite::get().queueForClientThread([this]() {
+			Chakra::SetContext(ctx);
+			Event ev{ L"enable", {  } };
+			auto ret = dispatchEvent(ev.name, ev);
+			if (ret != JS_INVALID_REFERENCE) {
+				Chakra::Release(ret);
+			}
+			});
+		return;
+	}
 	Chakra::SetContext(ctx);
 	Event ev{ L"enable", {  } };
 	auto ret = dispatchEvent(ev.name, ev);
@@ -25,6 +38,19 @@ void JsHUDModule::onEnable(){
 }
 
 void JsHUDModule::onDisable() {
+	if (!Latite::isMainThread()) {
+		// hey lets hope that the js module doesnt disappear by the time this code executes
+		Latite::get().queueForClientThread([this]() {
+			Chakra::SetContext(ctx);
+			Event ev{ L"disable", {  } };
+			auto ret = dispatchEvent(ev.name, ev);
+			if (ret != JS_INVALID_REFERENCE) {
+				Chakra::Release(ret);
+			}
+			});
+		return;
+	}
+
 	Chakra::SetContext(ctx);
 	Event ev{ L"disable", {  } };
 	auto ret = dispatchEvent(ev.name, ev);

@@ -535,8 +535,8 @@ static void blockModules(std::string_view moduleName, std::string_view serverNam
     std::vector<std::string> blockedList;
     if (inst->dns.find(serverName) != std::string::npos) {
         Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
-            if (mod->name() == moduleName) {
-                if (!mod->isBlocked()) {
+            if (!mod->isBlocked()) {
+                if (mod->name() == moduleName) {
                     blockedList.push_back(mod->getDisplayName());
                     mod->setBlocked(true);
                 }
@@ -570,6 +570,7 @@ void Latite::updateModuleBlocking() {
 
         blockModules("Freelook", "hivebedrock");
         blockModules("Freelook", "nethergames");
+        blockModules("Freelook", "galaxite");
     }
     else {
         
@@ -718,6 +719,10 @@ void Latite::queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* 
     this->uiRenderQueue.push(callback);
 }
 
+void Latite::queueForClientThread(std::function<void()> callback) {
+    this->clientThreadQueue.push(callback);
+}
+
 void Latite::queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callback) {
     this->dxRenderQueue.push(callback);
 }
@@ -798,6 +803,12 @@ void Latite::onUpdate(Event& evGeneric) {
     timings.update();
     auto now = std::chrono::system_clock::now();
     static auto lastSend = now;
+
+    while (!this->clientThreadQueue.empty()) {
+        auto& latest = this->clientThreadQueue.front();
+        latest();
+        this->clientThreadQueue.pop();
+    }
 
     auto rak = SDK::RakNetConnector::get();
 
