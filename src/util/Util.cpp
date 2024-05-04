@@ -405,6 +405,60 @@ Color util::HSVToColor(HSV const& hsv) {
 	return color;
 }
 
+Vec4 util::RotToQuaternion(Vec2 const& rot) {
+	constexpr float invRadDegrees = pi_f / 180.f;
+
+	float pitch = rot.x * invRadDegrees;
+	float yaw = rot.y * invRadDegrees;
+	float roll = 0.f;
+
+	float cx = std::cos(pitch * 0.5f);
+	float sx = std::sin(pitch * 0.5f);
+	float cy = std::cos(yaw * 0.5f);
+	float sy = std::sin(yaw * 0.5f);
+	float cz = std::cos(roll * 0.5f);
+	float sz = std::sin(roll * 0.5f);
+
+	return Vec4{
+		(cx * cy * sz) - (sx * sy * cz), // quat.x
+		(cx * cy * cz) + (sx * sy * sz), // quat.y
+		(sx * cy * cz) - (cx * sy * sz), // quat.z
+		(cx * sy * cz) + (sx * cy * sz)  // quat.w
+	};
+}
+
+Vec2 util::QuaternionToRot(const Vec4& quat) {
+	constexpr float radDegrees = 180.f / pi_f;
+
+	float pitch = 0.f;
+	float yaw = 0.f;
+	[[maybe_unused]] float roll = 0.f;
+
+	// roll (x-axis rotation)
+	float sinr_cosp = 2.f * (quat.x * quat.y + quat.z * quat.w);
+	float cosr_cosp = 1.f - (2.f * (quat.y * quat.y + quat.z * quat.z));
+	roll = std::atan2(sinr_cosp, cosr_cosp);
+
+	// pitch (y-axis rotation)
+	float sinp = 2.f * (quat.y * quat.w - quat.x * quat.z);
+	if (std::abs(sinp) >= 1.f) {
+		pitch = std::copysign(pi_f / 2.f, sinp);  // use 90 degrees if out of range
+	}
+	else {
+		pitch = std::asin(sinp);
+	}
+
+	// yaw (z-axis rotation)
+	float siny_cosp = 2.f * (quat.x * quat.w + quat.y * quat.z);
+	float cosy_cosp = 1.f - (2.f * (quat.z * quat.z + quat.w * quat.w));
+	yaw = std::atan2(siny_cosp, cosy_cosp);
+
+	return Vec2{
+		pitch * radDegrees,
+		yaw * radDegrees
+	};
+}
+
 void util::KeepInBounds(d2d::Rect& targ, d2d::Rect const& bounds) {
 	if (targ.left < bounds.left) {
 		Vec2 modPos = targ.getPos();

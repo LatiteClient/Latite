@@ -68,6 +68,13 @@ struct Vec3 final {
 	}
 };
 
+struct Vec4 final {
+	float x, y, z, w;
+
+	constexpr Vec4() : x(0.f), y(0.f), z(0.f), w(0.f) {}
+	constexpr Vec4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+};
+
 struct Vec3i final {
 	int x, y, z;
 

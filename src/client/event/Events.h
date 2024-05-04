@@ -35,4 +35,5 @@
 #include "impl/SensitivityEvent.h"
 #include "impl/TickEvent.h"
 #include "impl/UpdateEvent.h"
+#include "impl/UpdatePlayerCameraEvent.h"
 #include "impl/WeatherEvent.h"

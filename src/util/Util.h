@@ -32,6 +32,8 @@ namespace util {
 
 	extern struct HSV ColorToHSV(Color const& color);
 	extern Color HSVToColor(HSV const& hsv);
+	extern Vec4 RotToQuaternion(Vec2 const& rotatoin);
+	extern Vec2 QuaternionToRot(const Vec4& quat);
 
 	extern inline uintptr_t FindSignature(std::string_view signature) {
 		return memory::findSignature(signature, "Minecraft.Windows.exe");

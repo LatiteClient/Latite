@@ -5,6 +5,7 @@
 #include "sdk/misc/ClickMap.h"
 #include <sdk/common/client/renderer/game/BaseActorRenderContext.h>
 #include <sdk/common/world/Weather.h>
+#include <sdk/common/client/renderer/game/CameraComponent.h>
 
 class GenericHooks : public HookGroup {
     static void __fastcall Level_tick(SDK::Level* level);
@@ -47,6 +48,7 @@ class GenericHooks : public HookGroup {
     static void hkWeatherTick(SDK::Weather* obj);
     static Color* hkGetFogColor(SDK::Dimension* obj, Color* out, SDK::Actor* ent, float f);
     static void hkAddMessage(SDK::GuiData* obj, void* msg, uint32_t profanityContext);
+    static void hkUpdatePlayer(SDK::CameraComponent* obj, void* a, void* b);
 public:
     GenericHooks();
 };

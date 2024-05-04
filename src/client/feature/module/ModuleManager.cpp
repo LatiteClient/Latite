@@ -15,6 +15,7 @@
 #include "impl/game/ThirdPersonNametag.h"
 #include "impl/game/EnvironmentChanger.h"
 #include "impl/game/TextHotkey.h"
+#include "impl/game/Freelook.h"
 
 #include "impl/visual/Fullbright.h"
 #include "impl/visual/MotionBlur.h"
@@ -85,6 +86,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<ItemCounter>());
 	this->items.push_back(std::make_shared<Chat>());
 	this->items.push_back(std::make_shared<TextHotkey>());
+	this->items.push_back(std::make_shared<Freelook>());
 
 	for (auto& mod : items) {
 		mod->onInit();

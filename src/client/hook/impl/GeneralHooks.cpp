@@ -31,6 +31,7 @@ namespace {
 	std::shared_ptr<Hook> WeatherHook;
 	std::shared_ptr<Hook> FogColorHook;
 	std::shared_ptr<Hook> AddMessageHook;
+	std::shared_ptr<Hook> UpdatePlayerHook;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -341,6 +342,19 @@ void GenericHooks::hkAddMessage(SDK::GuiData* obj, void* msg, uint32_t profanity
 	AddMessageHook->oFunc<decltype(&hkAddMessage)>()(obj, msg, profanityContext);
 }
 
+void GenericHooks::hkUpdatePlayer(SDK::CameraComponent* obj, void* a, void* b) {
+	UpdatePlayerCameraEvent ev{};
+	if (Eventing::get().dispatch(ev)) {
+		auto oAngles = util::QuaternionToRot(obj->lookAngles);
+		UpdatePlayerHook->oFunc<decltype(&hkUpdatePlayer)>()(obj, a, b);
+		obj->lookAngles = util::RotToQuaternion(oAngles);
+		return;
+	}
+	
+	UpdatePlayerHook->oFunc<decltype(&hkUpdatePlayer)>()(obj, a, b);
+
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
 	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
@@ -379,19 +393,14 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	}
 
 	RenderEntityHook = addHook(Signatures::ActorRenderDispatcher_render.result, ActorRenderDispatcher_render, "ActorRenderDispatcher::render");
-	
-
 	OutlineSelectionHook = addHook(Signatures::LevelRendererPlayer_renderOutlineSelection.result, LevelRendererPlayer_renderOutlineSelection, "LevelRendererPlayer::renderOutlineSelection");
-
 	//RenderGuiItemNewHook = addHook(Signatures::ItemRenderer_renderGuiItemNew.result, hkRenderGuiItemNew, "ItemRenderer::renderGuiItemNew");
 
 
 	FogColorHook = addHook(Signatures::Dimension_getSkyColor.result, hkGetFogColor, "Dimension::getFogColor");
-
 	GetTimeOfDayHook = addHook(Signatures::Dimension_getTimeOfDay.result, hkGetTimeOfDay, "Dimension::getTimeOfDay");
-
 	WeatherHook = addHook(Signatures::Weather_tick.result, hkWeatherTick, "Weather::tick");
-
 	AddMessageHook = addHook(Signatures::GuiData__addMessage.result, hkAddMessage, "GuiData::_addMessage");
+	UpdatePlayerHook = addHook(Signatures::_updatePlayer.result, hkUpdatePlayer, "`anonymous namespace'::_updatePlayer");
 }
 
