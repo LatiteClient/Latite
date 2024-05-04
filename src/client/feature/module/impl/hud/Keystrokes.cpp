@@ -6,7 +6,7 @@
 
 Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement keys and states.", HUD) {
 	addSetting("mouseButtons", "Mouse Buttons", "Show mouse buttons", mouseButtons);
-	//addSetting("showCps", "CPS", "Show clicks per second", cps);
+	addSetting("showCps", "CPS", "Show clicks per second", cps);
 	addSetting("spaceBar", "Space Bar", "Space bar", spaceBar);
 	addSetting("border", "Border", "Border", border);
 	addSetting("showSneak", "Sneak Key", "Shows the sneak key", shiftKey);
@@ -114,6 +114,11 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 			dc.fillRoundedRectangle(mb, btn.col, rad);
 
 			std::wstring str = L"LMB";
+
+			if (std::get<BoolValue>(cps)) {
+				str += L"\n" + std::to_wstring(Latite::get().getTimings().getCPSL()) + L" CPS";
+			}
+
 			dc.drawText(mb, str, btn.textCol, Renderer::FontSelection::SegoeLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 			if (std::get<BoolValue>(border)) {
 				dc.drawRoundedRectangle(mb, std::get<ColorValue>(this->borderColor).color1, rad, std::get<FloatValue>(this->borderLength));
@@ -126,6 +131,11 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 
 			dc.fillRoundedRectangle(mb, btn.col, rad);
 			std::wstring str = L"RMB";
+
+			if (std::get<BoolValue>(cps)) {
+				str += L"\n" + std::to_wstring(Latite::get().getTimings().getCPSR()) + L" CPS";
+			}
+
 			dc.drawText(mb, str, btn.textCol, Renderer::FontSelection::SegoeLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 			if (std::get<BoolValue>(border)) {
 				dc.drawRoundedRectangle(mb, std::get<ColorValue>(this->borderColor).color1, rad, std::get<FloatValue>(this->borderLength));

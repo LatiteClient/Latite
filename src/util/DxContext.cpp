@@ -8,6 +8,14 @@
 #include <sdk/common/client/renderer/game/BaseActorRenderContext.h>
 #include <sdk/common/client/renderer/ItemRenderer.h>
 
+static size_t countof(auto str, auto ch) {
+	size_t c = 0;
+	for (auto cha : str) {
+		if (cha == ch) ++c;
+	}
+	return c;
+}
+
 D2D1_RECT_F D2DUtil::getRect(RectF const& rc)  {
 	return D2D1::RectF(rc.left, rc.top, rc.right, rc.bottom);
 }
@@ -435,14 +443,15 @@ void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color 
 	SDK::CaretMeasureData caretMeasure{};
 
 	float newTop = rc.top;
-	float vSize = (size * guiScale) / this->font->getLineHeight();
+	float vSize = (size * guiScale) / (this->font->getLineHeight());
+	float height = size * (countof(text, L'\n') + 1);
 
 	switch (verticalAlign) {
 	case DWRITE_PARAGRAPH_ALIGNMENT_CENTER:
-		newTop = rc.centerY(size * (10.f / this->font->getLineHeight()));
+		newTop = rc.centerY(height * (10.f / this->font->getLineHeight()));
 		break;
 	case DWRITE_PARAGRAPH_ALIGNMENT_FAR:
-		newTop = rc.bottom - (size);
+		newTop = rc.bottom - (height);
 		break;
 	case DWRITE_PARAGRAPH_ALIGNMENT_NEAR:
 		break;
@@ -451,14 +460,6 @@ void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color 
 	RectF rMod = rc;
 	rMod.top = newTop;
 	renderCtx->drawText(this->font, getRect(rMod), util::WStrToStr(text), color, color.a, (SDK::ui::TextAlignment)alignment, SDK::TextMeasureData((size * guiScale) / this->font->getLineHeight(), Latite::get().shouldRenderTextShadows(), false), caretMeasure);
-}
-
-static size_t countof(auto str, auto ch) {
-	size_t c = 0;
-	for (auto& cha : str) {
-		if (cha == ch) ++c;
-	}
-	return c;
 }
 
 Vec2 MCDrawUtil::getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace, bool cache, std::optional<Vec2> bounds) {
