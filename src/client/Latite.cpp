@@ -500,6 +500,8 @@ void Latite::threadsafeInit() {
     Latite::getRenderer().setShouldInit();
 
     Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
+
+    Latite::getNotifications().push(XW("Welcome to Latite Client"));
 }
 
 void Latite::patchKey() {
