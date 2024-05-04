@@ -59,8 +59,6 @@ bool JsTextModule::shouldHoldToToggle() {
 }
 
 std::wstringstream JsTextModule::text(bool isPreview, bool isEditor) {
-	Chakra::SetContext(ctx);
-
 	return std::wstringstream() << cachedText;
 }
 
