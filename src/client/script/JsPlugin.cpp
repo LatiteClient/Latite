@@ -74,7 +74,7 @@ bool JsPlugin::load() {
 
 void JsPlugin::unload() {
 	if (runtime != JS_INVALID_RUNTIME_HANDLE) {
-		Chakra::SetContext(JS_INVALID_REFERENCE);
+		JS::JsSetCurrentContext(JS_INVALID_REFERENCE);
 		JS::JsDisableRuntimeExecution(runtime);
 		JS::JsCollectGarbage(runtime);
 		JS::JsDisposeRuntime(runtime);

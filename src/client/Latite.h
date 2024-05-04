@@ -97,6 +97,10 @@ public:
 		return std::get<BoolValue>(textShadow);
 	}
 
+	[[nodiscard]] bool getDoSnapLines() {
+		return std::get<BoolValue>(snapLines);
+	}
+
 	[[nodiscard]] SDK::Font* getFont();
 
 	void fetchLatiteUsers();
@@ -138,6 +142,7 @@ private:
 	ValueType textShadow = BoolValue(true);
 	ValueType broadcastUsage = BoolValue(true);
 	ValueType centerCursorMenus = BoolValue(false);
+	ValueType snapLines = BoolValue(false);
 
 	EnumData mcRendFont;
 

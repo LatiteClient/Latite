@@ -10,8 +10,8 @@ namespace SDK {
 		Actor() = delete;
 
 		CLASS_FIELD(EntityContext, entityContext, 0x8);
-		MVCLASS_FIELD(int32_t, ticksExisted, 0x230, 0x200, 0x200, 0x2A8, 0x24C);
-		MVCLASS_FIELD(int32_t, invulnerableTime, 0x234, 0x204, 0x204, 0x2AC, 0x250); // Mob::hurtEffects
+		MVCLASS_FIELD(int32_t, ticksExisted, 0x210, 0x200, 0x200, 0x2A8, 0x24C);
+		MVCLASS_FIELD(int32_t, invulnerableTime, 0x214, 0x204, 0x204, 0x2AC, 0x250); // Mob::hurtEffects
 		// @dump-wbds Actor::getDimensionConst, 9, -8
 		MVCLASS_FIELD(std::shared_ptr<class Dimension>, dimension, 0x248, 0x250, 0x250, 0x360, 0x300);
 		MVCLASS_FIELD(StateVectorComponent*, stateVector, 0x298, 0x2A0, 0x2A0, 0, 0x350);

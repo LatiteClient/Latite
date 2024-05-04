@@ -6,7 +6,7 @@
 
 Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement keys and states.", HUD) {
 	addSetting("mouseButtons", "Mouse Buttons", "Show mouse buttons", mouseButtons);
-	addSetting("showCps", "CPS", "Show clicks per second", cps);
+	//addSetting("showCps", "CPS", "Show clicks per second", cps);
 	addSetting("spaceBar", "Space Bar", "Space bar", spaceBar);
 	addSetting("border", "Border", "Border", border);
 	addSetting("showSneak", "Sneak Key", "Shows the sneak key", shiftKey);
@@ -25,6 +25,8 @@ Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement
 	addSetting("unpressedCol", "Unpressed Color", "The key color when not pressed", unpressedColor);
 	addSetting("ptCol", "Pressed Text Color", "The text color when pressed", pressedTextColor);
 	addSetting("uptCol", "Unpressed Text Color", "The text color when not pressed", unpressedTextColor);
+
+	listen<ClickEvent>((EventListenerFunc)&Keystrokes::onClick);
 }
 
 Vec2 Keystrokes::drawKeystroke(DrawUtil& ctx, Vec2 const& pos, Keystroke& stroke) {
@@ -34,6 +36,17 @@ Vec2 Keystrokes::drawKeystroke(DrawUtil& ctx, Vec2 const& pos, Keystroke& stroke
 	if (std::get<BoolValue>(border)) ctx.drawRoundedRectangle(front, std::get<ColorValue>(borderColor).color1, std::get<FloatValue>(this->radius), std::get<FloatValue>(borderLength));
 	ctx.drawText(front, stroke.keyName, stroke.textCol, Renderer::FontSelection::SegoeLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	return { front.right - front.left, front.bottom - front.top };
+}
+
+void Keystrokes::onClick(Event& evG) {
+	auto& ev = reinterpret_cast<ClickEvent&>(evG);
+
+	if (ev.getMouseButton() == 1) {
+		primaryClickState = ev.isDown();
+	}
+	else if (ev.getMouseButton() == 2) {
+		secondaryClickState = ev.isDown();
+	}
 }
 
 void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
@@ -47,7 +60,7 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 	// W, S, A, D keys
 	// + sneak, space, LMB, RMB
 
-	static std::array<Stroke, 2> mouseButtons = { Stroke(ClickMap::get()->mouseButtons[1]), Stroke(ClickMap::get()->mouseButtons[2]) };
+	static std::array<Stroke, 2> mouseButtons = { Stroke(primaryClickState), Stroke(secondaryClickState) };
 
 	static std::array<Keystroke, 6> keystrokes = { Keystroke("forward", input->front), Keystroke("left", input->left),
 		Keystroke("back", input->back), Keystroke("right", input->right), Keystroke("sneak", input->sneak), Keystroke("jump", input->jump)};

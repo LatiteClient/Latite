@@ -48,4 +48,9 @@ private:
 	};
 
 	Vec2 drawKeystroke(DrawUtil& ctx, Vec2 const& pos, Keystroke& stroke);
+
+	void onClick(Event& evG);
+
+	bool primaryClickState = false;
+	bool secondaryClickState = false;
 };

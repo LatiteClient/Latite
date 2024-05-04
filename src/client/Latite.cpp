@@ -654,6 +654,12 @@ void Latite::initSettings() {
         set->value = &this->centerCursorMenus;
         this->getSettings().addSetting(set);
     }
+
+    {
+        auto set = std::make_shared<Setting>("snapLines", "Snap Lines", "Snap lines to help you align modules");
+        set->value = &this->snapLines;
+        this->getSettings().addSetting(set);
+    }
 }
 
 void Latite::queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback) {

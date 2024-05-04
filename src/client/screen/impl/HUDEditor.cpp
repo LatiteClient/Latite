@@ -38,7 +38,7 @@ void HUDEditor::onRender(Event& ev) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 			if (mod->isHud() && mod->isEnabled()) {
 				auto rMod = reinterpret_cast<HUDModule*>(mod.get());
-				if (mcRenderer || rMod->forceMinecraftRenderer()) maskRects.push_back(rMod->getRect());
+				if (Latite::get().getMenuBlur() && (mcRenderer || rMod->forceMinecraftRenderer())) maskRects.push_back(rMod->getRect());
 				if (rMod->isActive()) return;
 				addLayer(rMod->getRect());
 			}
@@ -96,10 +96,13 @@ void HUDEditor::onRender(Event& ev) {
 	}
 
 	if (isActive()) doDragging();
-	doSnapping(dragOffset);
+	if (Latite::get().getDoSnapLines()) doSnapping(dragOffset);
 	if (!mcRenderer) {
 		renderModules(nullptr);
 		keepModulesInBounds(Vec2(Latite::getRenderer().getScreenSize().width, Latite::getRenderer().getScreenSize().height));
+	}
+	else {
+		keepModulesInBounds(SDK::ClientInstance::get()->getGuiData()->screenSize);
 	}
 
 }
