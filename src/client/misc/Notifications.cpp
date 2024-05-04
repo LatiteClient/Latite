@@ -43,7 +43,7 @@ void Notifications::onRender(Event& evG) {
 		}
 		float opacity = transl;
 
-		const float fontSize = 30.f;
+		const float fontSize = 25.f;
 		const Renderer::FontSelection font = Renderer::FontSelection::SegoeLight;
 
 		auto textSize = dc.getTextSize(toast.message, font, fontSize);
@@ -52,7 +52,7 @@ void Notifications::onRender(Event& evG) {
 		float yPad = 30.f;
 		float yOffset = 30.f * transl;
 
-		d2d::Rect rec = { ss.centerX(textSize.x + xPad), ss.top + yOffset, 0, ss.top + yOffset + textSize.y + yPad / 2 };
+		d2d::Rect rec = { ss.centerX(textSize.x + xPad / 2), ss.top + yOffset, 0, ss.top + yOffset + textSize.y + yPad / 2 };
 		rec.right = rec.left + textSize.x + xPad / 2;
 
 

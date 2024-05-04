@@ -110,7 +110,7 @@ void ArmorHUD::render(DrawUtil& ctxGeneric, bool isDefault, bool inEditor) {
 
 					if (!isLeft) {
 						extra = 6.f;
-						dc.drawText(rc.translate(extra, 0.f), txt, std::get<ColorValue>(txtColor).color1, Renderer::FontSelection::SegoeRegular, textS, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+						dc.drawText({ rc.right + extra, rc.top, rect.getWidth(), rc.bottom}, txt, std::get<ColorValue>(txtColor).color1, Renderer::FontSelection::SegoeRegular, textS, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 						extra += textSize.x;
 					}
 					else {
@@ -124,7 +124,7 @@ void ArmorHUD::render(DrawUtil& ctxGeneric, bool isDefault, bool inEditor) {
 			}
 		}
 		rect.right = rect.left + itemSize + (isLeft ? highest : highest);
-		rect.bottom = rect.top + (itemSize * static_cast<float>(numItems));
+		rect.bottom = rect.top + (itemSize * std::max(1.f, static_cast<float>(numItems)));
 	}
 	else {
 		// render from side to side
@@ -135,10 +135,11 @@ void ArmorHUD::render(DrawUtil& ctxGeneric, bool isDefault, bool inEditor) {
 				Vec2 renderPos = pos;
 				renderPos.x += (itemSize * add);
 				drawItem(dc, renderPos, item, 1.f);
+				numItems++;
 				add++;
 			}
 		}
-		rect.right = rect.left + (itemSize * std::max(0.f, static_cast<float>(numItems)));
+		rect.right = rect.left + (itemSize * std::max(1.f, static_cast<float>(numItems)));
 		rect.bottom = rect.top + itemSize;
 	}
 

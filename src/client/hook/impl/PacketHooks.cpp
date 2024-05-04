@@ -32,7 +32,6 @@ std::shared_ptr<SDK::Packet> PacketHooks::MinecraftPackets_createPacket(SDK::Pac
 
 void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* networkIdentifier, void* netEventCallback, std::shared_ptr<SDK::Packet>& packet) {
 	auto& hook = PacketHookArray[(size_t)packet->getID()];
-	hook->oFunc<decltype(&PacketHandlerDispatcherInstance_handle)>()(instance, networkIdentifier, netEventCallback, packet);
 
 	if (Latite::isMainThread()) {
 		PacketReceiveEvent ev{ packet.get() };
@@ -146,7 +145,7 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 				|| pkt->type == SDK::TextPacketType::SYSTEM_MESSAGE || pkt->type == SDK::TextPacketType::WHISPER
 				|| pkt->type == SDK::TextPacketType::OBJECT_WHISPER || pkt->type == SDK::TextPacketType::ANNOUNCEMENT);
 
-			PluginManager::Event sEv{ L"receive-chat", { typ, val, val2, val3, isChat }, false };
+			PluginManager::Event sEv{ L"receive-chat", { typ, val, val2, val3, isChat }, true };
 			if (Latite::getPluginManager().dispatchEvent(sEv)) {
 				pkt->type = SDK::TextPacketType::JUKEBOX_POPUP;
 				pkt->str.setString("");
@@ -154,6 +153,7 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 			}
 		}
 	}
+	hook->oFunc<decltype(&PacketHandlerDispatcherInstance_handle)>()(instance, networkIdentifier, netEventCallback, packet);
 }
 
 PacketHooks::PacketHooks() {
