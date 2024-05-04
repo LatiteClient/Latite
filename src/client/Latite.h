@@ -49,7 +49,7 @@ public:
 	Latite() = default;
 	~Latite() = default;
 
-	static constexpr std::string_view version = "v2.0.0rc1";
+	static constexpr std::string_view version = "v2.0.0b19";
 	HINSTANCE dllInst = NULL;
 	std::string gameVersion;
 
