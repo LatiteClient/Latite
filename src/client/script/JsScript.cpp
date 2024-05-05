@@ -269,7 +269,7 @@ namespace {
 
 		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
 		
-		std::remove_if(thi->timeouts.begin(), thi->timeouts.end(), [&](std::shared_ptr<JsScript::JsTimeout>& obj) -> bool {
+		std::erase_if(thi->intervals, [&](std::shared_ptr<JsScript::JsTimeout>& obj) -> bool {
 			return obj->id == Chakra::GetInt(arguments[1]);
 			});
 
@@ -285,7 +285,7 @@ namespace {
 
 		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
 
-		std::remove_if(thi->intervals.begin(), thi->intervals.end(), [&](std::shared_ptr<JsScript::JsTimeout>& obj) -> bool {
+		std::erase_if(thi->intervals, [&](std::shared_ptr<JsScript::JsTimeout>& obj) -> bool {
 			return obj->id == Chakra::GetInt(arguments[1]);
 			});
 
