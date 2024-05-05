@@ -13,14 +13,18 @@ Hook::Hook(uintptr_t target, void* detour, std::string const& hookName, bool tab
 	if (tableSwap) {
 		auto res = vh::hook(reinterpret_cast<LPVOID*>(target), detour, &this->funcPtr);
 		if (res != 0) {
+#ifdef LATITE_DEBUG
 			Logger::Warn("Creation of hook {} failed with status {}", this->funcName, vh::status_to_string(res));
+#endif
 		}
 		return;
 	}
 
 	MH_STATUS res = MH_CreateHook(reinterpret_cast<LPVOID>(target), detour, &this->funcPtr);
 	if (res != MH_OK) {
+#ifdef LATITE_DEBUG
 		Logger::Warn("Creation of hook {} failed with status {}", this->funcName, MH_StatusToString(res));
+#endif
 	}
 }
 
