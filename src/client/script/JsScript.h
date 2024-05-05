@@ -134,8 +134,8 @@ public:
 
 	JsSourceContext sCtx = (JsSourceContext)0;
 
-	std::vector<JsTimeout> timeouts = {};
-	std::vector<JsTimeout> intervals = {};
+	std::vector<std::shared_ptr<JsTimeout>> timeouts = {};
+	std::vector<std::shared_ptr<JsTimeout>> intervals = {};
 	std::vector<std::shared_ptr<class JsLibrary>> libraries;
 
 	void handleAsyncOperations();

@@ -162,11 +162,11 @@ void PluginManager::runScriptingOperations()
 			// timeouts
 			for (auto it = scr->timeouts.begin(); it != scr->timeouts.end();) {
 				auto now = std::chrono::system_clock::now();
-				auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - it->createTime);
-				if (duration.count() > it->time) {
-					Chakra::SetContext(it->context);
+				auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - (*it)->createTime);
+				if (duration.count() > (*it)->time) {
+					Chakra::SetContext((*it)->context);
 					JsValueRef res;
-					handleErrors(Chakra::CallFunction(it->callback, &it->callback, 1, &res));
+					handleErrors(Chakra::CallFunction((*it)->callback, &(*it)->callback, 1, &res));
 					JS::JsRelease(res, nullptr);
 					scr->timeouts.erase(it);
 					continue;
@@ -177,13 +177,13 @@ void PluginManager::runScriptingOperations()
 			// intervals
 			for (auto& tim : scr->intervals) {
 				auto now = std::chrono::system_clock::now();
-				auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - tim.createTime);
-				if (duration.count() > tim.time) {
-					Chakra::SetContext(tim.context);
+				auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - tim->createTime);
+				if (duration.count() > tim->time) {
+					Chakra::SetContext(tim->context);
 					JsValueRef res;
-					handleErrors(Chakra::CallFunction(tim.callback, &tim.callback, 1, &res));
+					handleErrors(Chakra::CallFunction(tim->callback, &tim->callback, 1, &res));
 					JS::JsRelease(res, nullptr);
-					tim.createTime = now;
+					tim->createTime = now;
 				}
 			}
 		}

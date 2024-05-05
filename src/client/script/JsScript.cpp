@@ -232,9 +232,12 @@ namespace {
 		auto num = Chakra::GetNumber(arguments[2]);
 
 		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
-		auto& tim = thi->timeouts.emplace_back(static_cast<int>(thi->timeouts.size() + 1), static_cast<long long>(num), func);
+
+		auto tim = std::make_shared<JsScript::JsTimeout>(static_cast<int>(thi->timeouts.size() + 1), static_cast<long long>(num), func);
+		thi->timeouts.push_back(tim);
+		
 		JsValueRef ret;
-		JS::JsIntToNumber(tim.id, &ret);
+		JS::JsIntToNumber(tim->id, &ret);
 		return ret;
 	}
 
@@ -249,9 +252,11 @@ namespace {
 		auto num = Chakra::GetNumber(arguments[2]);
 
 		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
-		auto& tim = thi->intervals.emplace_back(static_cast<int>(thi->intervals.size() + 1), static_cast<long long>(num), func);
+		auto tim = std::make_shared<JsScript::JsTimeout>(static_cast<int>(thi->intervals.size() + 1), static_cast<long long>(num), func);
+		thi->timeouts.push_back(tim);
+		
 		JsValueRef ret;
-		JS::JsIntToNumber(tim.id, &ret);
+		JS::JsIntToNumber(tim->id, &ret);
 		return ret;
 	}
 
@@ -264,8 +269,8 @@ namespace {
 
 		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
 		
-		std::remove_if(thi->timeouts.begin(), thi->timeouts.end(), [&](JsScript::JsTimeout& obj) -> bool {
-			return obj.id == Chakra::GetInt(arguments[1]);
+		std::remove_if(thi->timeouts.begin(), thi->timeouts.end(), [&](std::shared_ptr<JsScript::JsTimeout>& obj) -> bool {
+			return obj->id == Chakra::GetInt(arguments[1]);
 			});
 
 		return Chakra::GetUndefined();
@@ -280,8 +285,8 @@ namespace {
 
 		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
 
-		std::remove_if(thi->intervals.begin(), thi->intervals.end(), [&](JsScript::JsTimeout& obj) -> bool {
-			return obj.id == Chakra::GetInt(arguments[1]);
+		std::remove_if(thi->intervals.begin(), thi->intervals.end(), [&](std::shared_ptr<JsScript::JsTimeout>& obj) -> bool {
+			return obj->id == Chakra::GetInt(arguments[1]);
 			});
 
 		return Chakra::GetUndefined();
