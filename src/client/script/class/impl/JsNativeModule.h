@@ -67,6 +67,11 @@ public:
 		if (!Chakra::VerifyArgCount(argCount, 3, true, true)) return JS_INVALID_REFERENCE;
 		if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsString} })) return JS_INVALID_REFERENCE;
 
+
+		Chakra::ThrowError(XW("NativeModule.call is currently disabled."));
+
+		return JS_INVALID_REFERENCE;
+		/*
 		if (argCount > 18) {
 			Chakra::ThrowError(XW("NativeModule.call can only accept 15 native arguments."));
 			return JS_INVALID_REFERENCE;
@@ -165,6 +170,6 @@ public:
 		// void
 		auto res = ((any_func_int64_t)proc)(args[0], args[1], args[2], args[3], args[4], args[5],
 			args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
-		return Chakra::GetUndefined();
+		return Chakra::GetUndefined();*/
 	}
 };

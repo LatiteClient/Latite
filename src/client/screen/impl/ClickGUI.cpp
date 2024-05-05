@@ -450,15 +450,15 @@ void ClickGUI::onRender(Event&) {
 			mods.clear();
 			// TODO: fetch all market scripts
 
-			auto plugins = Latite::getPluginManager().fetchPluginsFromMarket();
-			marketScriptCount = plugins.size();
-
-			for (auto& plug : plugins) {
-				ModContainer container{ util::WStrToStr(plug.name), "", plug.name, nullptr};
-				container.isMarketScript = true;
-
-				mods.emplace_back(container);
-			}
+			//auto plugins = Latite::getPluginManager().fetchPluginsFromMarket();
+			//marketScriptCount = plugins.size();
+			//
+			//for (auto& plug : plugins) {
+			//	ModContainer container{ util::WStrToStr(plug.name), "", plug.name, nullptr};
+			//	container.isMarketScript = true;
+			//
+			//	mods.emplace_back(container);
+			//}
 
 			Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 				if (mod->isVisible()) {

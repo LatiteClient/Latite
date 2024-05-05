@@ -13,7 +13,7 @@ Assets::Assets() {
 	allAssets.push_back(&this->cogIcon);
 	allAssets.push_back(&this->checkmarkIcon);
 	allAssets.push_back(&this->logoWhite);
-	allAssets.push_back(&this->document);
+	//allAssets.push_back(&this->document);
 }
 
 void Assets::loadAll() {
