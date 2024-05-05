@@ -64,8 +64,7 @@ void GenericHooks::Level_tick(SDK::Level* level) {
 		PluginManager::Event sEv{L"world-tick", {}, false};
 		Latite::getPluginManager().dispatchEvent(sEv);
 	}
-
-	return Level_tickHook->oFunc<decltype(&Level_tick)>()(level);
+	Level_tickHook->oFunc<decltype(&Level_tick)>()(level);
 }
 
 void* GenericHooks::ChatScreenController_sendChatMessage(void* controller, std::string& message) {

@@ -4,6 +4,7 @@
 class ReachDisplay : public TextModule {
 public:
 	ReachDisplay();
+	virtual ~ReachDisplay() {}
 
 	std::wstringstream text(bool isDefault, bool inEditor) override;
 

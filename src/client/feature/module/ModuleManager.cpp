@@ -44,6 +44,7 @@
 #include "impl/hud/MovableBossbar.h"
 #include "impl/hud/ItemCounter.h"
 #include "impl/hud/Chat.h"
+#include "impl/hud/ComboCounter.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
 
@@ -87,6 +88,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<Chat>());
 	this->items.push_back(std::make_shared<TextHotkey>());
 	this->items.push_back(std::make_shared<Freelook>());
+	this->items.push_back(std::make_shared<ComboCounter>());
 
 	for (auto& mod : items) {
 		mod->onInit();

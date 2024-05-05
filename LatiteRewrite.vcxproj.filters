@@ -867,6 +867,21 @@
     <ClInclude Include="src\client\misc\Notifications.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\event\impl\UpdatePlayerCameraEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\game\Freelook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\client\renderer\game\CameraComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\hud\ComboCounter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\network\packet\ActorEventPacket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1329,6 +1344,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\misc\Notifications.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\game\Freelook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\hud\ComboCounter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

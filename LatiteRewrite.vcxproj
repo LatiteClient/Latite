@@ -351,6 +351,7 @@
     <ClInclude Include="src\client\feature\module\impl\game\ThirdPersonNametag.h" />
     <ClInclude Include="src\client\feature\module\impl\game\Waypoints.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\Chat.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\ComboCounter.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\ItemCounter.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\MovableBossbar.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\MovableScoreboard.h" />
@@ -555,6 +556,7 @@
     <ClInclude Include="src\sdk\common\network\MinecraftPackets.h" />
     <ClInclude Include="src\sdk\common\network\Packet.h" />
     <ClInclude Include="src\sdk\common\network\PacketSender.h" />
+    <ClInclude Include="src\sdk\common\network\packet\ActorEventPacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\CommandRequestPacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\SetTitlePacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\TextPacket.h" />
@@ -640,6 +642,7 @@
     <ClCompile Include="src\client\feature\module\impl\game\ThirdPersonNametag.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\Waypoints.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\Chat.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\ComboCounter.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\ItemCounter.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\MovableBossbar.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\MovableScoreboard.cpp" />
