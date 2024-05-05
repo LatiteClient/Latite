@@ -7,6 +7,7 @@
 #include "sdk/common/client/renderer/MaterialPtr.h"
 #include <sdk/common/client/renderer/game/BaseActorRenderContext.h>
 #include <sdk/common/client/renderer/ItemRenderer.h>
+#include <ranges>
 
 static size_t countof(auto str, auto ch) {
 	size_t c = 0;
@@ -466,7 +467,17 @@ Vec2 MCDrawUtil::getTextSize(std::wstring const& text, Renderer::FontSelection f
 	float singleLineHeight = size;
 	float totalHeight = (countof(text, '\n') + 1) * singleLineHeight;
 
-	return { this->font->getLineLength(util::WStrToStr(text), (size * guiScale) / this->font->getLineHeight(), false) / guiScale, totalHeight };
+	float longest = 0.f;
+
+	for (auto line : text | std::views::split(L'\n')) {
+		std::wstring wline(line.begin(), line.end());
+		auto sz = this->font->getLineLength(util::WStrToStr(wline), (size * guiScale) / this->font->getLineHeight(), false) / guiScale;
+		if (sz > longest) {
+			longest = sz;
+		}
+	}
+
+	return { longest, totalHeight };
 }
 
 DrawUtil::RectF MCDrawUtil::getTextRect(std::wstring const& text, Renderer::FontSelection font, float size, float pad, bool cache) {
