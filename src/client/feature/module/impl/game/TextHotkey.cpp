@@ -12,7 +12,7 @@ TextHotkey::TextHotkey() : Module("TextHotkey", "Text/Command Hotkey", "Binds a 
 void TextHotkey::onKey(Event& evG) {
 	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evG);
 
-	if (ev.isDown() && ev.getKey() == std::get<KeyValue>(this->textKey)) {
+	if (ev.isDown() && ev.getKey() == std::get<KeyValue>(this->textKey) && ev.inUI()) {
 		auto now = std::chrono::system_clock::now();
 
 		if (now - lastSend > 2s) {

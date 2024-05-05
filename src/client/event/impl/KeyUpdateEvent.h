@@ -8,9 +8,9 @@ class KeyUpdateEvent : public Cancellable {
 public:
 	static const uint32_t hash = TOHASH(KeyUpdateEvent);
 
-	[[nodiscard]] int getKey() { return key; }
-	[[nodiscard]] int isDown() { return down; }
-	[[nodiscard]] int inUI() { return !SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed(); }
+	[[nodiscard]] int getKey() const { return key; }
+	[[nodiscard]] bool isDown() const { return down; }
+	[[nodiscard]] bool inUI() { return !SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed(); }
 
 	KeyUpdateEvent(int key, bool down) : key(key), down(down) {}
 private:
