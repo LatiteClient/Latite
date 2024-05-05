@@ -443,14 +443,26 @@ void ClickGUI::onRender(Event&) {
 		static std::vector<ModContainer> mods = {};
 
 		static size_t lastCount = 0;
+		static size_t marketScriptCount = 0;
+
 		if (mods.empty() || (Latite::getModuleManager().size() != lastCount)) {
 			lastCount = Latite::getModuleManager().size();
 			mods.clear();
 			// TODO: fetch all market scripts
 
+			auto plugins = Latite::getPluginManager().fetchPluginsFromMarket();
+			marketScriptCount = plugins.size();
+
+			for (auto& plug : plugins) {
+				ModContainer container{ util::WStrToStr(plug.name), "", plug.name, nullptr};
+				container.isMarketScript = true;
+
+				mods.emplace_back(container);
+			}
+
 			Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 				if (mod->isVisible()) {
-					ModContainer container{ mod->getDisplayName(), mod->desc(), mod };
+					ModContainer container{ mod->getDisplayName(), mod->desc(), L"", mod};
 					mods.emplace_back(container);
 				}
 				return false;
@@ -624,53 +636,57 @@ void ClickGUI::onRender(Event&) {
 				dc.drawText(textRect, util::StrToWStr(mod.name), { 1.f, 1.f, 1.f, 1.f }, FontSelection::SegoeLight, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 				// toggle
-				if (mod.mod->shouldHoldToToggle()) {
-					d2d::Color color = d2d::Color::RGB(0xD9, 0xD9, 0xD9, 30);
 
-					dc.fillRoundedRectangle(toggleRect, color, toggleRect.getHeight() / 4.f);
-					dc.drawText(toggleRect, util::StrToWStr(util::KeyToString(mod.mod->getKeybind())), {1.f, 1.f, 1.f, 1.f}, Renderer::FontSelection::SegoeRegular,
-						toggleRect.getHeight() / 2.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+				if (mod.mod) {
+					if (mod.mod->shouldHoldToToggle()) {
+						d2d::Color color = d2d::Color::RGB(0xD9, 0xD9, 0xD9, 30);
 
-					if (this->shouldSelect(toggleRect, cursorPos)) {
-						setTooltip(L"Enable this module using the keybind.");
-					}
+						dc.fillRoundedRectangle(toggleRect, color, toggleRect.getHeight() / 4.f);
+						dc.drawText(toggleRect, util::StrToWStr(util::KeyToString(mod.mod->getKeybind())), { 1.f, 1.f, 1.f, 1.f }, Renderer::FontSelection::SegoeRegular,
+							toggleRect.getHeight() / 2.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
-				} else {
-					bool selecToggle;
-					if (selecToggle = this->shouldSelect(toggleRect, cursorPos)) {
-						if (justClicked[0]) {
-							mod.mod->setEnabled(!mod.mod->isEnabled());
-							playClickSound();
+						if (this->shouldSelect(toggleRect, cursorPos)) {
+							setTooltip(L"Enable this module using the keybind.");
 						}
+
 					}
-					static auto offCol = d2d::Color::RGB(0x63, 0x63, 0x63);
+					else {
+						bool selecToggle;
+						if (selecToggle = this->shouldSelect(toggleRect, cursorPos)) {
+							if (justClicked[0]) {
+								mod.mod->setEnabled(!mod.mod->isEnabled());
+								playClickSound();
+							}
+						}
+						static auto offCol = d2d::Color::RGB(0x63, 0x63, 0x63);
 
-					mod.toggleColorOn = util::LerpColorState(mod.toggleColorOn, d2d::Color(Latite::get().getAccentColor().color1) + 0.2f, d2d::Color(Latite::get().getAccentColor().color1), selecToggle);
-					mod.toggleColorOff = util::LerpColorState(mod.toggleColorOff, offCol + 0.2f, offCol, selecToggle);
+						mod.toggleColorOn = util::LerpColorState(mod.toggleColorOn, d2d::Color(Latite::get().getAccentColor().color1) + 0.2f, d2d::Color(Latite::get().getAccentColor().color1), selecToggle);
+						mod.toggleColorOff = util::LerpColorState(mod.toggleColorOff, offCol + 0.2f, offCol, selecToggle);
 
-					//float aTogglePadY = toggleRect.getHeight() * 0.15f;
-					float radius = toggleRect.getHeight() * 0.35f;
-					float circleOffs = toggleWidth * 0.27f;
+						//float aTogglePadY = toggleRect.getHeight() * 0.15f;
+						float radius = toggleRect.getHeight() * 0.35f;
+						float circleOffs = toggleWidth * 0.27f;
 
-					dc.fillRoundedRectangle(toggleRect, mod.mod->isEnabled() ? mod.toggleColorOn : mod.toggleColorOff, toggleRect.getHeight() / 2.f);
-					Vec2 center{ toggleRect.left + circleOffs, toggleRect.centerY() };
-					Vec2 center2 = center;
-					center2.x = toggleRect.right - circleOffs;
-					float onDist = center2.x - center.x;
+						dc.fillRoundedRectangle(toggleRect, mod.mod->isEnabled() ? mod.toggleColorOn : mod.toggleColorOff, toggleRect.getHeight() / 2.f);
+						Vec2 center{ toggleRect.left + circleOffs, toggleRect.centerY() };
+						Vec2 center2 = center;
+						center2.x = toggleRect.right - circleOffs;
+						float onDist = center2.x - center.x;
 
-					mod.lerpToggle = std::lerp(mod.lerpToggle, mod.mod->isEnabled() ? 1.f : 0.f, Latite::getRenderer().getDeltaTime() * 0.3f);
+						mod.lerpToggle = std::lerp(mod.lerpToggle, mod.mod->isEnabled() ? 1.f : 0.f, Latite::getRenderer().getDeltaTime() * 0.3f);
 
-					center.x += onDist * mod.lerpToggle;
+						center.x += onDist * mod.lerpToggle;
 
-					dc.brush->SetColor((d2d::Color(0xB9, 0xB9, 0xB9)).get());
-					dc.ctx->FillEllipse(D2D1::Ellipse({ center.x, center.y }, radius, radius), dc.brush);
+						dc.brush->SetColor((d2d::Color(0xB9, 0xB9, 0xB9)).get());
+						dc.ctx->FillEllipse(D2D1::Ellipse({ center.x, center.y }, radius, radius), dc.brush);
+					}
 				}
 
-
-				// arrow
-				{
-					RectF rc = { modRect.left + (modRect.getHeight() * 0.4f),
+				RectF arrowRc = { modRect.left + (modRect.getHeight() * 0.4f),
 						modRect.top + (modRect.getHeight() * 0.4f), modRect.left + modRect.getHeight() * 0.70f, modRect.bottom - modRect.getHeight() * 0.4f };
+				// arrow
+				if (mod.mod) {
+					
 
 					if (this->shouldSelect(modRect, cursorPos) && !shouldSelect(toggleRect, cursorPos)) {
 						if (justClicked[0]) {
@@ -683,11 +699,16 @@ void ClickGUI::onRender(Event&) {
 					D2D1::Matrix3x2F oMatr;
 					dc.ctx->GetTransform(&oMatr);
 					float toLerp = mod.isExtended ? 0.f : 1.f;
-					dc.ctx->SetTransform(D2D1::Matrix3x2F::Rotation((1.f - mod.lerpArrowRot) * 180.f, { rc.centerX(), rc.centerY() }) * oMatr);
+					dc.ctx->SetTransform(D2D1::Matrix3x2F::Rotation((1.f - mod.lerpArrowRot) * 180.f, { arrowRc.centerX(), arrowRc.centerY() }) * oMatr);
 					mod.lerpArrowRot = std::lerp(mod.lerpArrowRot, toLerp, Latite::getRenderer().getDeltaTime() * 0.3f);
 					// icon
-					dc.ctx->DrawBitmap(Latite::getAssets().arrowIcon.getBitmap(), rc.get());
+					dc.ctx->DrawBitmap(Latite::getAssets().arrowIcon.getBitmap(), arrowRc.get());
 					dc.ctx->SetTransform(oMatr);
+				}
+				else if (mod.isMarketScript) {
+					dc.ctx->DrawBitmap(Latite::getAssets().document.getBitmap(), arrowRc.get());
+
+					// TODO
 				}
 
 			}

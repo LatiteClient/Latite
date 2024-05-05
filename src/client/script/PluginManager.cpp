@@ -195,8 +195,8 @@ void PluginManager::runScriptingOperations()
 }
 
 std::optional<int> PluginManager::installScript(std::string const& inName) {
-	std::wstring registry = L"https://raw.githubusercontent.com/LatiteScripting/Scripts/master/Plugins";
-	std::wstring jsonPath = registry + L"/plugins.json";
+	std::wstring registry = XW("https://raw.githubusercontent.com/LatiteScripting/Scripts/master/Plugins");
+	std::wstring jsonPath = registry + XW("/plugins.json");
 	nlohmann::json scriptsJson;
 
 	auto message = [](std::string const& msg, bool err = false) -> void {
@@ -271,6 +271,58 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 	}
 	message("Could not find script " + inName, true);
 	return 0;
+}
+
+std::vector<PluginManager::PluginInfo> PluginManager::fetchPluginsFromMarket() {
+	std::vector<PluginInfo> list = {};
+
+	std::wstring registry = XW("https://raw.githubusercontent.com/LatiteScripting/Scripts/master/Plugins");
+	std::wstring jsonPath = registry + XW("/plugins.json");
+	nlohmann::json scriptsJson;
+
+	auto http = HttpClient();
+	{
+		// get JSON
+		winrt::Windows::Foundation::Uri requestUri(jsonPath);
+
+		HttpRequestMessage request(HttpMethod::Get(), requestUri);
+
+		try {
+			auto operation = http.SendRequestAsync(request);
+			auto response = operation.get();
+			auto cont = response.Content();
+			auto strs = cont.ReadAsStringAsync().get();
+
+			if (response.IsSuccessStatusCode()) {
+				try {
+					scriptsJson = nlohmann::json::parse(std::wstring(strs.c_str()));
+				}
+				catch (nlohmann::json::parse_error& e) {
+					return list;
+				}
+			}
+			else {
+				return list;
+			}
+		}
+		catch (winrt::hresult_error const& err) {
+			Latite::getClientMessageSink().push(util::WStrToStr(err.message().c_str()));
+			return list;
+		}
+	}
+	auto& arr = scriptsJson["plugins"];
+
+	for (auto& plug : arr) {
+		std::wstring name = util::StrToWStr(plug["name"].get<std::string>());
+		list.push_back(PluginInfo{ name, name, L"", L"", L"" });
+	}
+
+	return list;
+}
+
+std::vector<PluginManager::PluginInfo> PluginManager::fetchPlugins() {
+	std::vector<PluginInfo> list = {};
+	return list;
 }
 
 void PluginManager::init()

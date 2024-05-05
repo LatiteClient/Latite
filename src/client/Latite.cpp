@@ -34,6 +34,10 @@
 #include <winrt/windows.ui.viewmanagement.h>
 #include <winrt/windows.storage.streams.h>
 
+#include <sdk/common/client/gui/ScreenView.h>
+#include <sdk/common/client/gui/controls/VisualTree.h>
+#include <sdk/common/client/gui/controls/UIControl.h>
+
 using namespace winrt;
 using namespace winrt::Windows::Web::Http;
 using namespace winrt::Windows::Web::Http::Filters;
@@ -697,9 +701,9 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("broadcastClientUsage", "Latite Client Presence", "If you leave this on, others with Latite will see that you are using Latite and you will see other people who use Latite.");
-        set->value = &this->broadcastUsage;
-        this->getSettings().addSetting(set);
+        //auto set = std::make_shared<Setting>("broadcastClientUsage", "Latite Client Presence", "If you leave this on, others with Latite will see that you are using Latite and you will see other people who use Latite.");
+        //set->value = &this->broadcastUsage;
+        //this->getSettings().addSetting(set);
     }
 
     {
@@ -986,6 +990,14 @@ void Latite::onRenderLayer(Event& evG) {
         auto& latest = this->uiRenderQueue.front();
         latest(ev.getUIRenderContext());
         this->uiRenderQueue.pop();
+    }
+
+    if (ev.getScreenView()->visualTree->rootControl->name == XOR_STRING("start_screen")) {
+        MCDrawUtil dc{ ev.getUIRenderContext(), SDK::ClientInstance::get()->minecraftGame->minecraftFont };
+        
+        auto& ss = SDK::ClientInstance::get()->getGuiData()->screenSize;
+        dc.drawText({ 0, 0, ss.x, ss.y }, util::StrToWStr(std::string(Latite::version)) + XW("\nlatite.net\ngithub.com/LatiteClient"), d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular, 30.f);
+        dc.flush(true, false);
     }
 }
 

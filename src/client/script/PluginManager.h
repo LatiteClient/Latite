@@ -24,6 +24,12 @@ public:
 	void runScriptingOperations();
 	std::optional<int> installScript(std::string const& name);
 
+	struct PluginInfo {
+		std::wstring id, name, author, version, desc;
+	};
+	std::vector<PluginInfo> fetchPluginsFromMarket();
+	std::vector<PluginInfo> fetchPlugins();
+
 	void init();
 	void initListeners();
 	void unloadScript(std::shared_ptr<JsPlugin> ptr);

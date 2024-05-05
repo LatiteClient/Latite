@@ -17,6 +17,7 @@ public:
 	Asset cogIcon{ L"cog.png" };
 	Asset checkmarkIcon{ L"checkmark.png" };
 	Asset logoWhite{ L"latitewhite.png" };
+	Asset document{ L"document.png" };
 
 	void loadAll();
 	void unloadAll();

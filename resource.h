@@ -24,5 +24,6 @@
 #define ICON_SEARCH 248
 #define ICON_X 247
 #define ICON_LOGOWHITE 246
+#define ICON_DOCUMENT 245
 
 #define JS_LATITEAPI 100
