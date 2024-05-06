@@ -39,13 +39,22 @@ HookGroup::HookGroup(std::string const& groupName)
 }
 
 std::shared_ptr<Hook> HookGroup::addHook(uintptr_t ptr, func_ptr_t detour, const char* name) {
+#ifdef LATITE_DEBUG
 	auto newHook = std::make_shared<Hook>(ptr, detour, name);
+#else
+	auto newHook = std::make_shared<Hook>(ptr, detour, "");
+#endif
 	hooks.emplace_back(newHook);
 	return newHook;
 }
 
 std::shared_ptr<Hook> HookGroup::addTableSwapHook(uintptr_t ptr, func_ptr_t detour, const char* name) {
+#ifdef LATITE_DEBUG
 	auto newHook = std::make_shared<Hook>(ptr, detour, name, true);
+#else
+	auto newHook = std::make_shared<Hook>(ptr, detour, "", true);
+
+#endif
 	hooks.emplace_back(newHook);
 	return newHook;
 }
