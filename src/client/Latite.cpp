@@ -509,7 +509,8 @@ void Latite::threadsafeInit() {
 
     Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
 
-    Latite::getNotifications().push(XW("Welcome to Latite Client"));
+    Latite::getNotifications().push(XW("Welcome to Latite Client!"));
+    Latite::getNotifications().push(L"Press " + util::StrToWStr(util::KeyToString(Latite::getMenuKey().value)) + L" in a world or server to open the mod menu.");
 }
 
 void Latite::patchKey() {
