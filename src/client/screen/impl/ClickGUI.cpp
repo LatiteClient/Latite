@@ -48,6 +48,37 @@ ClickGUI::ClickGUI() {
 }
 
 void ClickGUI::onRender(Event&) {
+	static std::vector<ModContainer> mods = {};
+
+	static size_t lastCount = 0;
+	static size_t marketScriptCount = 0;
+
+	if (mods.empty() || (Latite::getModuleManager().size() != lastCount)) {
+		lastCount = Latite::getModuleManager().size();
+		mods.clear();
+		// TODO: fetch all market scripts
+
+		//auto plugins = Latite::getPluginManager().fetchPluginsFromMarket();
+		//marketScriptCount = plugins.size();
+		//
+		//for (auto& plug : plugins) {
+		//	ModContainer container{ util::WStrToStr(plug.name), "", plug.name, nullptr};
+		//	container.isMarketScript = true;
+		//
+		//	mods.emplace_back(container);
+		//}
+
+		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
+			if (mod->isVisible()) {
+				ModContainer container{ mod->getDisplayName(), mod->desc(), L"", mod };
+				mods.emplace_back(container);
+			}
+			return false;
+			});
+	}
+
+	std::sort(mods.begin(), mods.end(), ModContainer::compare); // Sort modules
+
 	{
 		auto scn = Latite::getScreenManager().getActiveScreen();
 		if (!isActive() && (calcAnim < 0.03f)) {
@@ -438,38 +469,6 @@ void ClickGUI::onRender(Event&) {
 		this->scroll = std::clamp(scroll, 0.f, scrollMax);
 
 		lerpScroll = std::lerp(lerpScroll, scroll, Latite::getRenderer().getDeltaTime() / 5.f);
-
-		// Sort Modules
-		static std::vector<ModContainer> mods = {};
-
-		static size_t lastCount = 0;
-		static size_t marketScriptCount = 0;
-
-		if (mods.empty() || (Latite::getModuleManager().size() != lastCount)) {
-			lastCount = Latite::getModuleManager().size();
-			mods.clear();
-			// TODO: fetch all market scripts
-
-			//auto plugins = Latite::getPluginManager().fetchPluginsFromMarket();
-			//marketScriptCount = plugins.size();
-			//
-			//for (auto& plug : plugins) {
-			//	ModContainer container{ util::WStrToStr(plug.name), "", plug.name, nullptr};
-			//	container.isMarketScript = true;
-			//
-			//	mods.emplace_back(container);
-			//}
-
-			Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
-				if (mod->isVisible()) {
-					ModContainer container{ mod->getDisplayName(), mod->desc(), L"", mod};
-					mods.emplace_back(container);
-				}
-				return false;
-				});
-		}
-
-		std::sort(mods.begin(), mods.end(), ModContainer::compare); // Sort modules
 
 		//std::array<float, 3> 
 

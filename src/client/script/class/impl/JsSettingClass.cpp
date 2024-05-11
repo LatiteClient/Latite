@@ -67,41 +67,46 @@ JsValueRef JsSettingClass::setValueCallback(JsValueRef callee, bool isConstructo
 		if (argType == JsBoolean) {
 			std::get<BoolValue>(*set->value).value = Chakra::GetBool(setVal);
 		}
-		break;
+		return undef;
 	case Setting::Type::Int:
 		if (argType == JsNumber) {
 			std::get<IntValue>(*set->value).value = Chakra::GetInt(setVal);
 		}
-		break;
+		return undef;
 	case Setting::Type::Float:
 		if (argType == JsNumber) {
 			std::get<FloatValue>(*set->value).value = Chakra::GetNumber(setVal);
 		}
-		break;
+		return undef;
 	case Setting::Type::Text:
 		if (argType == JsString) {
 			std::get<TextValue>(*set->value).str = Chakra::GetString(setVal);
 		}
-		break;
+		return undef;
 
 	case Setting::Type::Color:
 		if (argType == JsObject) {
 			auto col = JsColor::ToColor(setVal);
 			std::get<ColorValue>(*set->value).color1 = StoredColor(col.r, col.g, col.b, col.a);
 		}
-		break;
+		return undef;
 	case Setting::Type::Enum:
 		if (argType == JsNumber) {
 			std::get<EnumValue>(*set->value).val = Chakra::GetInt(setVal);
 		}
-		break;
+		return undef;
+	case Setting::Type::Key:
+		if (argType == JsNumber) {
+			std::get<KeyValue>(*set->value).value = Chakra::GetInt(setVal);
+		}
+		return undef;
 	case Setting::Type::Vec2:
 		if (argType == JsObject) {
 			auto vec = JsVec2::ToVec2(setVal);
 			std::get<Vec2Value>(*set->value).x = vec.x;
 			std::get<Vec2Value>(*set->value).y = vec.y;
 		}
-		break;
+		return undef;
 	default:
 		Chakra::ThrowError(XW("Unsupported setting type for setValue"));
 		return JS_INVALID_REFERENCE;

@@ -269,9 +269,11 @@ void HUDEditor::renderModules(SDK::MinecraftUIRenderContext* ctx, bool forceMine
 		if (*lastScreenSize != guiData->screenSize) {
 			Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 				if (mod->isHud()) {
-					auto rMod = reinterpret_cast<HUDModule*>(mod.get());
-					rMod->storePos(*lastScreenSize);
-					rMod->loadStoredPosition();
+					HUDModule* rMod = reinterpret_cast<HUDModule*>(mod.get());
+					Vec2 oPos = rMod->getRect().getPos();
+					Vec2 oPercent = oPos / *lastScreenSize;
+					Vec2 new_ = guiData->screenSize * oPercent;
+					rMod->setPos(new_);
 				}
 				});
 		}
