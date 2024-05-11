@@ -824,16 +824,14 @@ void Latite::onUpdate(Event& evGeneric) {
             });
     }
 
-    if (SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed() && std::get<BoolValue>(centerCursorMenus)) {
-        RECT r;
-
-        if (!minecraftWindow) {
-            minecraftWindow = FindWindowA(NULL, XOR_STRING("Minecraft"));
-        }
-
-        GetClientRect(minecraftWindow, &r);
+    bool grabbed = SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed();
+    static bool lastGrabbed = grabbed;
+    if (std::get<BoolValue>(centerCursorMenus) && grabbed && !lastGrabbed) {
+        RECT r = { 0, 0, 0, 0 };
+        GetClientRect(FindWindowA(NULL, "Minecraft"), &r);
         SetCursorPos(r.left + r.right / 2, r.top + r.bottom / 2);
     }
+    lastGrabbed = grabbed;
     
     if (std::get<BoolValue>(broadcastUsage)) {
         //if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSend) > 10s) {

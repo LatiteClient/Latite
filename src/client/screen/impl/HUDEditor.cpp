@@ -259,6 +259,26 @@ void HUDEditor::renderModules(SDK::MinecraftUIRenderContext* ctx, bool forceMine
 		if (Eventing::get().dispatch(ev)) return; // if cancelled
 	}
 
+
+	auto guiData = SDK::ClientInstance::get()->getGuiData();
+
+	if (!lastScreenSize) {
+		lastScreenSize = guiData->screenSize;
+	}
+	else {
+		if (*lastScreenSize != guiData->screenSize) {
+			Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
+				if (mod->isHud()) {
+					auto rMod = reinterpret_cast<HUDModule*>(mod.get());
+					rMod->storePos(*lastScreenSize);
+					rMod->loadStoredPosition();
+				}
+				});
+		}
+	}
+
+	lastScreenSize = guiData->screenSize;
+
 	if (isActive() || SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 

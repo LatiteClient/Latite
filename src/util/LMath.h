@@ -39,6 +39,14 @@ struct Vec2 final {
 		return { x / right.x, y / right.y };
 	}
 
+	bool operator==(Vec2 const& right) const {
+		return x == right.x && y == right.y;
+	}
+
+	bool operator!=(Vec2 const& right) const {
+		return x != right.x || y != right.y;
+	}
+
 	[[nodiscard]] float magnitude() {
 		return static_cast<float>(std::sqrt(x * x + y * y));
 	}

@@ -43,5 +43,5 @@ JsValueRef JsLocalPlayerClass::getSelectedBlock(JsValueRef callee, bool isConstr
 		return Chakra::GetNull();
 	}
 
-	return JsScript::getThis()->getClass<JsVec3>()->construct(Vec3{hr->hitBlock.x, hr->hitBlock.y, hr->hitBlock.z});
+	return JsScript::getThis()->getClass<JsVec3>()->construct(Vec3{static_cast<float>(hr->hitBlock.x), static_cast<float>(hr->hitBlock.y), static_cast<float>(hr->hitBlock.z)});
 }
