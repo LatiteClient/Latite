@@ -137,25 +137,25 @@ public:
 		}
 
 
-		if (type == L"int64") {
+		if (type == XW("int64")) {
 			// int64_t
 			auto res = ((any_func_int64_t)proc)(args[0], args[1], args[2], args[3], args[4], args[5],
 				args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
 			return Chakra::MakeDouble(res);
 		}
-		else if (type == L"int32") {
+		else if (type == XW("int32")) {
 			// int
 			auto res = ((any_func_int32_t)proc)(args[0], args[1], args[2], args[3], args[4], args[5],
 				args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
 			return Chakra::MakeInt(res);
 		}
-		else if (type == L"float32") {
+		else if (type == XW("float32")) {
 			// float
 			auto res = ((any_func_float32_t)proc)(args[0], args[1], args[2], args[3], args[4], args[5],
 				args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
 			return Chakra::MakeDouble(res);
 		}
-		else if (type == L"float64") {
+		else if (type == XW("float64")) {
 			// double
 			auto res = ((any_func_float64_t)proc)(args[0], args[1], args[2], args[3], args[4], args[5],
 				args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
