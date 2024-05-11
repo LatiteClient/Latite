@@ -26,6 +26,7 @@ JsValueRef JsSettingClass::getValueCallback(JsValueRef callee, bool isConstructo
 		if (colClass) {
 			return colClass->construct(d2d::Color(std::get<ColorValue>(*set->value).color1));
 		}
+		break;
 	}
 	case Setting::Type::Vec2:
 	{
@@ -33,6 +34,7 @@ JsValueRef JsSettingClass::getValueCallback(JsValueRef callee, bool isConstructo
 		if (colClass) {
 			return colClass->construct(Vec2(std::get<Vec2Value>(*set->value).x, std::get<Vec2Value>(*set->value).y));
 		}
+		break;
 	}
 	case Setting::Type::Text:
 	{
@@ -41,6 +43,72 @@ JsValueRef JsSettingClass::getValueCallback(JsValueRef callee, bool isConstructo
 
 	}
 	return Chakra::GetNull();
+}
+
+JsValueRef JsSettingClass::setValueCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	auto thi = reinterpret_cast<JsSettingClass*>(callbackState);
+	auto set = Get(arguments[0]);
+
+	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
+
+	auto setVal = arguments[1];
+
+	JsValueType argType;
+	JS::JsGetValueType(setVal, &argType);
+
+	if (argType == JsNull || argType == JsUndefined) {
+		return Chakra::GetUndefined();
+	}
+
+	auto undef = Chakra::GetUndefined();
+
+	switch ((Setting::Type)set->value->index()) {
+	case Setting::Type::Bool:
+		if (argType == JsBoolean) {
+			std::get<BoolValue>(*set->value).value = Chakra::GetBool(setVal);
+		}
+		break;
+	case Setting::Type::Int:
+		if (argType == JsNumber) {
+			std::get<IntValue>(*set->value).value = Chakra::GetInt(setVal);
+		}
+		break;
+	case Setting::Type::Float:
+		if (argType == JsNumber) {
+			std::get<FloatValue>(*set->value).value = Chakra::GetNumber(setVal);
+		}
+		break;
+	case Setting::Type::Text:
+		if (argType == JsString) {
+			std::get<TextValue>(*set->value).str = Chakra::GetString(setVal);
+		}
+		break;
+
+	case Setting::Type::Color:
+		if (argType == JsObject) {
+			auto col = JsColor::ToColor(setVal);
+			std::get<ColorValue>(*set->value).color1 = StoredColor(col.r, col.g, col.b, col.a);
+		}
+		break;
+	case Setting::Type::Enum:
+		if (argType == JsNumber) {
+			std::get<EnumValue>(*set->value).val = Chakra::GetInt(setVal);
+		}
+		break;
+	case Setting::Type::Vec2:
+		if (argType == JsObject) {
+			auto vec = JsVec2::ToVec2(setVal);
+			std::get<Vec2Value>(*set->value).x = vec.x;
+			std::get<Vec2Value>(*set->value).y = vec.y;
+		}
+		break;
+	default:
+		Chakra::ThrowError(XW("Unsupported setting type for setValue"));
+		return JS_INVALID_REFERENCE;
+	}
+
+	Chakra::ThrowError(XW("Invalid type for setting type"));
+	return undef;
 }
 
 JsValueRef JsSettingClass::setCondition(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState){

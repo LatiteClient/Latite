@@ -25,6 +25,8 @@ protected:
 
 	static JsValueRef CALLBACK getValueCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK setValueCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK setCondition(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 public:
@@ -55,7 +57,8 @@ public:
 		Chakra::SetPropertyString(prototype, L"displayName", L"", true);
 
 		Chakra::DefineFunc(prototype, toStringCallback, L"toString", this);
-		Chakra::DefineFunc(prototype, getValueCallback, L"getValue", this);
-		Chakra::DefineFunc(prototype, setCondition, L"setCondition", this);
+		Chakra::DefineFunc(prototype, getValueCallback, XW("getValue"), this);
+		Chakra::DefineFunc(prototype, setValueCallback, XW("setValue"), this);
+		Chakra::DefineFunc(prototype, setCondition, XW("setCondition"), this);
 	};
 };

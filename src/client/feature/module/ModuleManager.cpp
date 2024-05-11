@@ -85,7 +85,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<EnvironmentChanger>());
 	this->items.push_back(std::make_shared<CommandShortcuts>());
 	this->items.push_back(std::make_shared<ItemCounter>());
-	this->items.push_back(std::make_shared<Chat>());
+	//this->items.push_back(std::make_shared<Chat>());
 	this->items.push_back(std::make_shared<TextHotkey>());
 	this->items.push_back(std::make_shared<Freelook>());
 	this->items.push_back(std::make_shared<ComboCounter>());
