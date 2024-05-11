@@ -64,7 +64,7 @@ JsValueRef Network::get(JsValueRef callee, bool isConstructor, JsValueRef* argum
 
 JsValueRef Network::getSync(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto ret = Chakra::GetUndefined();
-	if (!Chakra::VerifyArgCount(argCount, 3)) return ret;
+	if (!Chakra::VerifyArgCount(argCount, 2, true, true)) return ret;
 	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {Chakra::TryGet(arguments, argCount, 2), JsObject, true}} )) return ret;
 	auto ws = Chakra::GetString(arguments[1]);
 

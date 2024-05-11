@@ -11,7 +11,7 @@ using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Web::Http;
 using namespace winrt::Windows::Web::Http::Filters;
 
-ScriptCommand::ScriptCommand() : Command("plugin", "Do actions related to plugins/scripts", "\n$ load <folderPath>\n$ install <pluginName>\n$ unload <pluginName>\n$ reload <pluginName>\n$ startup <folderPath>\n$ unload all", {"script"})
+ScriptCommand::ScriptCommand() : Command("plugin", "Do actions related to plugins/scripts", "\n$ load <folderPath>\n$ install <pluginName>\n$ unload <pluginName>\n$ startup <folderPath>\n$ unload all", {"script"})
 {
 }
 
@@ -66,20 +66,6 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 
 		message("Cannot find plugin " + args[1], true);
 		return true;
-	}
-	else if (args[0] == "reload") {
-		if (args.size() != 2) return false;
-		if (auto script = Latite::getPluginManager().getPluginByName(util::StrToWStr(args[1]))) {
-			auto path = script->getRelFolderPath();
-			Latite::getPluginManager().popScript(script);
-			auto sc = Latite::getPluginManager().loadPlugin(path, true);
-			if (sc) message("Successfully reloaded plugin.");
-			else message("Could not reload plugin properly.", true);
-			return true;
-		}
-		message("Plugin " + args[1] + " is not loaded", true);
-		return true;
-
 	}
 	else if (args[0] == "install") {
 		if (args.size() != 2) return false;
