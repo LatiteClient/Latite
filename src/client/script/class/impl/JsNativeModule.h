@@ -4,6 +4,24 @@
 #include "util/ChakraUtil.h"
 #include <array>
 
+static std::array<FARPROC, 15> banList = {
+			(FARPROC)VirtualProtect,
+			(FARPROC)VirtualProtectEx,
+			(FARPROC)mouse_event,
+			(FARPROC)SendInput,
+			(FARPROC)CreateThread,
+			(FARPROC)OpenProcess,
+			(FARPROC)OpenProcessToken,
+			(FARPROC)LoadLibraryA,
+			(FARPROC)LoadLibraryW,
+			(FARPROC)LoadLibraryExA,
+			(FARPROC)LoadLibraryExW,
+			(FARPROC)GetModuleHandleA,
+			(FARPROC)GetModuleHandleExA,
+			(FARPROC)GetModuleHandleW,
+			(FARPROC)GetModuleHandleExW,
+};
+
 class JsNativeModule : public JsWrapperClass<void> {
 protected:
 public:
@@ -83,24 +101,6 @@ public:
 
 		HMODULE mod = (HMODULE)Get(arguments[0]);
 		auto proc = GetProcAddress(mod, util::WStrToStr(name).c_str());
-
-		static std::array<FARPROC, 15> banList = {
-			(FARPROC)VirtualProtect,
-			(FARPROC)VirtualProtectEx,
-			(FARPROC)mouse_event,
-			(FARPROC)SendInput,
-			(FARPROC)CreateThread,
-			(FARPROC)OpenProcess,
-			(FARPROC)OpenProcessToken,
-			(FARPROC)LoadLibraryA,
-			(FARPROC)LoadLibraryW,
-			(FARPROC)LoadLibraryExA,
-			(FARPROC)LoadLibraryExW,
-			(FARPROC)GetModuleHandleA,
-			(FARPROC)GetModuleHandleExA,
-			(FARPROC)GetModuleHandleW,
-			(FARPROC)GetModuleHandleExW,
-		};
 
 		if (!proc) {
 			Chakra::ThrowError(XW("Could not find function ") + name);

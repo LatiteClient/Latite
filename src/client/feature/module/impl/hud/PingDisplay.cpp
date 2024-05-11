@@ -15,7 +15,7 @@ std::wstringstream PingDisplay::text(bool isDefault, bool inEditor) {
 	int dPing = 0;
 
 	auto inst = SDK::RakNetConnector::get();
-	if (inst && inst->getPeer()) {
+	if (inst) {
 		dPing = ping;
 	}
 
