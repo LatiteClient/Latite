@@ -163,11 +163,11 @@ public:
 		case FontSelection::PrimaryLight:
 			return primaryLight.Get();
 		case FontSelection::SecondaryRegular:
-			return primaryFont.Get();
+			return secondaryFont.Get();
 		case FontSelection::SecondarySemilight:
-			return primarySemilight.Get();
+			return secondarySemilight.Get();
 		case FontSelection::SecondaryLight:
-			return primaryLight.Get();
+			return secondaryLight.Get();
 		default:
 			return nullptr;
 		}

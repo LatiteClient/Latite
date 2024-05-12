@@ -872,10 +872,6 @@ void Latite::onUpdate(Event& evGeneric) {
         lastDX11 = std::get<BoolValue>(useDX11);
     }
 
-    if (getRenderer().getFontFamily2() != std::get<TextValue>(secondaryFont).str) {
-        getRenderer().updateSecondaryFont(std::get<TextValue>(secondaryFont).str);
-        getNotifications().push(L"Updated font!");
-    }
 #if 0
     {
         static auto time = std::chrono::steady_clock::now();
@@ -1020,6 +1016,10 @@ void Latite::onRenderLayer(Event& evG) {
 
 void Latite::onRenderOverlay(Event& evG) {
     auto& ev = reinterpret_cast<RenderOverlayEvent&>(evG);
+
+    if (getRenderer().getFontFamily2() != std::get<TextValue>(secondaryFont).str) {
+        getRenderer().updateSecondaryFont(std::get<TextValue>(secondaryFont).str);
+    }
 
     while (!this->dxRenderQueue.empty()) {
         auto& latest = this->dxRenderQueue.front();
