@@ -30,6 +30,9 @@ private:
 	std::wstring fontFamily2 = L"Segoe UI";
 	void releaseAllResources(bool indep = true);
 
+	void createTextFormats();
+	void releaseTextFormats();
+
 	bool hasInit = false;
 	bool shouldReinit = false;
 	bool firstInit = false;
@@ -98,6 +101,14 @@ public:
 
 	void releaseDeviceIndependentResources();
 	void releaseDeviceResources();
+
+	void updateSecondaryFont(std::wstring family) {
+		fontFamily2 = std::move(family);
+
+		auto mutex = lock();
+		releaseTextFormats();
+		createTextFormats();
+	}
 
 	void setDevice11(ID3D11Device* dev) {
 		gameDevice11 = dev;
