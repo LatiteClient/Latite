@@ -370,7 +370,7 @@ void ClickGUI::onRender(Event&) {
 				// go through all enum settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
 					if (setPos.y <= rect.bottom) {
-						if (set->shouldRender(settings) && (set->value->index() == (size_t)Setting::Type::Key || set->value->index() == (size_t)Setting::Type::Enum || set->value->index() == (size_t)Setting::Type::Color)) {
+						if (set->shouldRender(settings) && (set->value->index() == (size_t)Setting::Type::Key || set->value->index() == (size_t)Setting::Type::Enum || set->value->index() == (size_t)Setting::Type::Color || set->value->index() == (size_t)Setting::Type::Text)) {
 							setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth) + (setting_height_relative * rect.getHeight());
 						}
 					}
