@@ -74,7 +74,7 @@ namespace {
         return std::format("Memory Usage: {:.2f} GB / {:.2f} GB", usedMemoryGB, totalMemoryGB);
     }
     std::string getGpuInfo() {
-        return std::format("Display: {} (DirectX{})", reinterpret_cast<const char*>(Signatures::GpuInfo.result), Latite::getRenderer().isDX11ByDefault() ? "11/10.1" : "12");
+        return std::format("Display: Unknown (DirectX{})", Latite::getRenderer().isDX11ByDefault() ? "11/10.1" : "12");
     }
     std::string getCpuInfo() {
         std::string cpuInfo = util::GetProcessorInfo();

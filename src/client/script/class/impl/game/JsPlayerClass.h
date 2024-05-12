@@ -18,6 +18,7 @@ public:
 		Chakra::DefineFunc(prototype, playerGetXboxUserID, XW("getXUID"));
 		Chakra::DefineFunc(prototype, playerGetSelectedItem, XW("getHoldingItem"));
 		Chakra::DefineFunc(prototype, playerGetSelectedSlot, XW("getSelectedSlot"));
+		Chakra::DefineFunc(prototype, playerGetInventorySlot, XW("getItem"));
 	}
 private:
 	static JsValueRef CALLBACK playerGetName(JsValueRef callee, bool isConstructor,
@@ -27,5 +28,7 @@ private:
 	static JsValueRef CALLBACK playerGetSelectedItem(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK playerGetSelectedSlot(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK playerGetInventorySlot(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 };

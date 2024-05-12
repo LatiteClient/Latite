@@ -413,6 +413,7 @@ void ClickGUI::onRender(Event&) {
 				if (justClicked[0] && contains) {
 					this->modTab = std::get<1>(pair);
 					playClickSound();
+					scroll = 0.f;
 				}
 
 				std::get<3>(pair) = std::lerp(std::get<3>(pair), ((contains && mouseButtons[0]) || modTab == std::get<1>(pair)) ? 1.f : 0.f, Latite::getRenderer().getDeltaTime() / 5.f);
