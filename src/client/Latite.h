@@ -145,6 +145,7 @@ private:
 	ValueType broadcastUsage = BoolValue(true);
 	ValueType centerCursorMenus = BoolValue(false);
 	ValueType snapLines = BoolValue(false);
+	ValueType secondaryFont = TextValue(L"Segoe UI");
 
 	EnumData mcRendFont;
 

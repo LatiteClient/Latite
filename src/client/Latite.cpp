@@ -681,22 +681,28 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("minecraftRenderer", "Use Minecraft Renderer", "Use the Minecraft renderer in the HUD.");
+        auto set = std::make_shared<Setting>("minecraftRenderer", "Use Minecraft Renderer", "Use the Minecraft renderer for all HUD modules.");
         set->value = &this->minecraftRenderer;
         this->getSettings().addSetting(set);
     }
 
     {
-        auto set = std::make_shared<Setting>("textShadow", "Text Shadows", "Whether to have text shadows or not with Minecraft renderer.", "minecraftRenderer"_istrue);
+        auto set = std::make_shared<Setting>("textShadow", "Minecraft Text Shadows", "Whether to have text shadows or not with Minecraft renderer.");
         set->value = &this->textShadow;
         this->getSettings().addSetting(set);
     }
 
     {
-        auto set = std::make_shared<Setting>("mcRendererFont", "HUD Font", "The HUD font", "minecraftRenderer"_istrue);
+        auto set = std::make_shared<Setting>("secondaryFont", "HUD font", "HUD Font when using non-minecraft renderer");
+        set->value = &this->secondaryFont;
+        this->getSettings().addSetting(set);
+    }
+
+    {
+        auto set = std::make_shared<Setting>("mcRendererFont", "Minecraft HUD font", "The HUD font with the Minecraft renderer.");
         set->enumData = &this->mcRendFont;
         set->value = set->enumData->getValue();
-        set->enumData->addEntry({ 0, "Default", "The Minecraft font" });
+        set->enumData->addEntry({ 0, "Default", "The default UI font (Mojangles by default)" });
         set->enumData->addEntry({ 1, "Noto Sans", "The smooth font (Noto Sans MS)" });
         this->getSettings().addSetting(set);
     }
@@ -864,6 +870,11 @@ void Latite::onUpdate(Event& evGeneric) {
             Latite::getRenderer().setShouldReinit();
         }
         lastDX11 = std::get<BoolValue>(useDX11);
+    }
+
+    if (getRenderer().getFontFamily2() != std::get<TextValue>(secondaryFont).str) {
+        getRenderer().updateSecondaryFont(std::get<TextValue>(secondaryFont).str);
+        getNotifications().push(L"Updated font!");
     }
 #if 0
     {
