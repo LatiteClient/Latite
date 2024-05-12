@@ -357,7 +357,7 @@ void ClickGUI::onRender(Event&) {
 				// go through all float settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
 					if (setPos.y <= rect.bottom) {
-						if (set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Float /* || set->value->index() == Setting::Type::Int*/) {
+						if (set->visible && set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Float /* || set->value->index() == Setting::Type::Int*/) {
 							setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth, 0.35f) + (setting_height_relative * rect.getHeight());
 						}
 					}
@@ -370,7 +370,7 @@ void ClickGUI::onRender(Event&) {
 				// go through all enum settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
 					if (setPos.y <= rect.bottom) {
-						if (set->shouldRender(settings) && (set->value->index() == (size_t)Setting::Type::Key || set->value->index() == (size_t)Setting::Type::Enum || set->value->index() == (size_t)Setting::Type::Color || set->value->index() == (size_t)Setting::Type::Text)) {
+						if (set->visible && set->shouldRender(settings) && (set->value->index() == (size_t)Setting::Type::Key || set->value->index() == (size_t)Setting::Type::Enum || set->value->index() == (size_t)Setting::Type::Color || set->value->index() == (size_t)Setting::Type::Text)) {
 							setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth) + (setting_height_relative * rect.getHeight());
 						}
 					}
@@ -383,7 +383,7 @@ void ClickGUI::onRender(Event&) {
 				// go through all bool settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
 					if (setPos.y <= rect.bottom) {
-						if (set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Bool /* || set->value->index() == Setting::Type::Enum*/) {
+						if (set->visible && set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Bool /* || set->value->index() == Setting::Type::Enum*/) {
 							setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth) + (setting_height_relative * rect.getHeight());
 						}
 					}
