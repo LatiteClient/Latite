@@ -44,7 +44,7 @@ void Notifications::onRender(Event& evG) {
 		float opacity = transl;
 
 		const float fontSize = 25.f;
-		const Renderer::FontSelection font = Renderer::FontSelection::SegoeLight;
+		const Renderer::FontSelection font = Renderer::FontSelection::PrimaryLight;
 
 		auto textSize = dc.getTextSize(toast.message, font, fontSize);
 

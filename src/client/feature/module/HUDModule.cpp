@@ -12,7 +12,7 @@ void HUDModule::renderFrame(DrawUtil& ctx) {
 }
 
 void HUDModule::renderPost(DrawUtil& ctx) {
-	ctx.drawText(getRect(), util::StrToWStr(this->getDisplayName()), d2d::Color(0.5F, 1.0F, 1.0F, 1.f), Renderer::FontSelection::SegoeLight,
+	ctx.drawText(getRect(), util::StrToWStr(this->getDisplayName()), d2d::Color(0.5F, 1.0F, 1.0F, 1.f), Renderer::FontSelection::PrimaryLight,
 		16.f);
 }
 

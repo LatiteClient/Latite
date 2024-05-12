@@ -58,14 +58,14 @@ void TextModule::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	if (std::get<BoolValue>(customSize)) {
 		d2d::Rect rc = d2d::Rect(0, 0, std::get<FloatValue>(bgX), std::get<FloatValue>(bgY));
 		if (!text.str().empty()) {
-			Vec2 ts = dc.getTextSize(str.c_str(), Renderer::FontSelection::Light2, textSize, false);
+			Vec2 ts = dc.getTextSize(str.c_str(), Renderer::FontSelection::SecondaryLight, textSize, false);
 			Vec2 drawPos = rc.center(ts);
 
 			rad = (std::get<FloatValue>(radius).value / 10.f) * (rc.getHeight() / 2.f);
 
 			if (std::get<BoolValue>(showOutline)) dc.drawRoundedRectangle(rc, realOCol, rad, std::get<FloatValue>(outlineThickness));
 			if (std::get<BoolValue>(fillBg)) dc.fillRoundedRectangle(rc, realCol, rad);
-			dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::Light2, textSize, align, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, !isDefault && !inEditor && cacheText);
+			dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::SecondaryLight, textSize, align, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, !isDefault && !inEditor && cacheText);
 		}
 		this->rect.right = rect.left + std::get<FloatValue>(bgX);
 		this->rect.bottom = rect.top + std::get<FloatValue>(bgY);
@@ -73,14 +73,14 @@ void TextModule::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	}
 	else {
 		Vec2 drawPos = { static_cast<float>(textPadding), static_cast<float>(textPaddingY) };
-		Vec2 ts = dc.getTextSize(str.c_str(), Renderer::FontSelection::Light2, textSize, false);
+		Vec2 ts = dc.getTextSize(str.c_str(), Renderer::FontSelection::SecondaryLight, textSize, false);
 		d2d::Rect rc = d2d::Rect(0, 0, ts.x + (textPadding * 2), ts.y + (textPaddingY * 2));
 
 		if (!text.str().empty()) {
 			rad = (std::get<FloatValue>(radius).value / 10.f) * (rc.getHeight() / 2.f);
 			if (std::get<BoolValue>(showOutline)) dc.drawRoundedRectangle(rc, realOCol, rad, std::get<FloatValue>(outlineThickness));
 			if (std::get<BoolValue>(fillBg)) dc.fillRoundedRectangle(rc, std::get<ColorValue>(bgColor).color1, rad);
-			dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::Light2, textSize, align, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, !isDefault && !inEditor && cacheText);
+			dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::SecondaryLight, textSize, align, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, !isDefault && !inEditor && cacheText);
 		}
 
 		this->rect.right = rect.left + rc.right;

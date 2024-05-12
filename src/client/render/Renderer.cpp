@@ -317,7 +317,7 @@ void Renderer::createDeviceIndependentResources() {
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
 		L"en-us",
-		this->segoe.GetAddressOf()));
+		this->primaryFont.GetAddressOf()));
 
 	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily.c_str(),
 		nullptr,
@@ -326,7 +326,7 @@ void Renderer::createDeviceIndependentResources() {
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
 		L"en-us",
-		this->segoeSemilight.GetAddressOf()));
+		this->primarySemilight.GetAddressOf()));
 
 	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily.c_str(),
 		nullptr,
@@ -335,36 +335,36 @@ void Renderer::createDeviceIndependentResources() {
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
 		L"en-us",
-		this->segoeLight.GetAddressOf()));
+		this->primaryLight.GetAddressOf()));
 
-	//ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
-	//	nullptr,
-	//	DWRITE_FONT_WEIGHT_NORMAL,
-	//	DWRITE_FONT_STYLE_NORMAL,
-	//	DWRITE_FONT_STRETCH_NORMAL,
-	//	fontSize,
-	//	L"en-us",
-	//	this->font2.GetAddressOf()));
-	//
-	//ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
-	//	nullptr,
-	//	DWRITE_FONT_WEIGHT_SEMI_LIGHT,
-	//	DWRITE_FONT_STYLE_NORMAL,
-	//	DWRITE_FONT_STRETCH_NORMAL,
-	//	fontSize,
-	//	L"en-us",
-	//	this->font2Semilight.GetAddressOf()));
-	//
-	//ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
-	//	nullptr,
-	//	DWRITE_FONT_WEIGHT_LIGHT,
-	//	DWRITE_FONT_STYLE_NORMAL,
-	//	DWRITE_FONT_STRETCH_NORMAL,
-	//	fontSize,
-	//	L"en-us",
-	//	this->font2Light.GetAddressOf()));
+	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
+		nullptr,
+		DWRITE_FONT_WEIGHT_NORMAL,
+		DWRITE_FONT_STYLE_NORMAL,
+		DWRITE_FONT_STRETCH_NORMAL,
+		fontSize,
+		L"en-us",
+		this->secondaryFont.GetAddressOf()));
+	
+	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
+		nullptr,
+		DWRITE_FONT_WEIGHT_SEMI_LIGHT,
+		DWRITE_FONT_STYLE_NORMAL,
+		DWRITE_FONT_STRETCH_NORMAL,
+		fontSize,
+		L"en-us",
+		this->secondarySemilight.GetAddressOf()));
+	
+	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
+		nullptr,
+		DWRITE_FONT_WEIGHT_LIGHT,
+		DWRITE_FONT_STYLE_NORMAL,
+		DWRITE_FONT_STRETCH_NORMAL,
+		fontSize,
+		L"en-us",
+		this->secondaryLight.GetAddressOf()));
 
-	//ThrowIfFailed(CoInitialize(nullptr));
+	ThrowIfFailed(CoInitialize(nullptr));
 
 	ThrowIfFailed(CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, __uuidof(IWICImagingFactory2), reinterpret_cast<void**>(this->wicFactory.GetAddressOf())));
 }
@@ -382,12 +382,12 @@ void Renderer::releaseDeviceIndependentResources() {
 	dWriteFactory = nullptr;
 	wicFactory = nullptr;
 	d2dFactory = nullptr;
-	segoe = nullptr;
-	segoeLight = nullptr;
-	segoeSemilight = nullptr;
-	font2 = nullptr;
-	font2Light = nullptr;
-	font2Semilight = nullptr;
+	primaryFont = nullptr;
+	primaryLight = nullptr;
+	primarySemilight = nullptr;
+	secondaryFont = nullptr;
+	secondaryLight = nullptr;
+	secondarySemilight = nullptr;
 }
 
 void Renderer::releaseDeviceResources() {

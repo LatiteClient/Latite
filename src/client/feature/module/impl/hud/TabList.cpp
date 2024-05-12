@@ -31,7 +31,7 @@ void TabList::onRenderOverlay(Event& evG) {
 		txt = util::StrToWStr(lvl->name);
 	}
 
-	constexpr auto font = Renderer::FontSelection::SegoeRegular;
+	constexpr auto font = Renderer::FontSelection::PrimaryRegular;
 	float sectionHeight = textP * 1.3f;
 
 	float logoSize = sectionHeight;

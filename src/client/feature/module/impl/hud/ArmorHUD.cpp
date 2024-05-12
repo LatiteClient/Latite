@@ -66,7 +66,7 @@ void ArmorHUD::render(DrawUtil& ctxGeneric, bool isDefault, bool inEditor) {
 
 					if (std::get<BoolValue>(percentage)) txt = std::to_wstring(static_cast<int>(static_cast<float>(dmg) / static_cast<float>(mdmg) * 100.f)) + L'%';
 
-					Vec2 textSize = dc.getTextSize(txt, Renderer::FontSelection::SegoeRegular, textS);
+					Vec2 textSize = dc.getTextSize(txt, Renderer::FontSelection::PrimaryRegular, textS);
 
 					if (!isLeft) {
 						extra = 6.f;
@@ -105,17 +105,17 @@ void ArmorHUD::render(DrawUtil& ctxGeneric, bool isDefault, bool inEditor) {
 				if (std::get<BoolValue>(showDamage) && mdmg > 0) {
 					std::wstring txt = std::to_wstring(dmg);
 					if (std::get<BoolValue>(percentage)) txt = std::to_wstring(static_cast<int>(static_cast<float>(dmg) / static_cast<float>(mdmg) * 100.f)) + L'%';
-					Vec2 textSize = dc.getTextSize(txt.c_str(), Renderer::FontSelection::SegoeRegular, textS);
+					Vec2 textSize = dc.getTextSize(txt.c_str(), Renderer::FontSelection::PrimaryRegular, textS);
 					auto y = rc.centerY(textSize.y);
 
 					if (!isLeft) {
 						extra = 6.f;
-						dc.drawText({ rc.right + extra, rc.top, rect.getWidth(), rc.bottom}, txt, std::get<ColorValue>(txtColor).color1, Renderer::FontSelection::SegoeRegular, textS, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+						dc.drawText({ rc.right + extra, rc.top, rect.getWidth(), rc.bottom}, txt, std::get<ColorValue>(txtColor).color1, Renderer::FontSelection::PrimaryRegular, textS, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 						extra += textSize.x;
 					}
 					else {
 						extra = 6.f;
-						dc.drawText(rc.translate(-rc.getWidth() - extra, 0.f), txt, std::get<ColorValue>(txtColor).color1, Renderer::FontSelection::SegoeRegular, textS, DWRITE_TEXT_ALIGNMENT_TRAILING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+						dc.drawText(rc.translate(-rc.getWidth() - extra, 0.f), txt, std::get<ColorValue>(txtColor).color1, Renderer::FontSelection::PrimaryRegular, textS, DWRITE_TEXT_ALIGNMENT_TRAILING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 						extra += textSize.x;
 					}
 				}
@@ -155,7 +155,7 @@ d2d::Rect ArmorHUD::drawItem(MCDrawUtil& dc, Vec2 pos, SDK::ItemStack* stack, fl
 	if (stack->itemCount > 1) {
 		std::wstring st = std::to_wstring(stack->itemCount);
 		float textSize = 25.f;
-		dc.drawText(rc, st, std::get<ColorValue>(txtColor).color1, Renderer::FontSelection::SegoeRegular,
+		dc.drawText(rc, st, std::get<ColorValue>(txtColor).color1, Renderer::FontSelection::PrimaryRegular,
 			textSize, DWRITE_TEXT_ALIGNMENT_TRAILING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 	}
 	return rc;

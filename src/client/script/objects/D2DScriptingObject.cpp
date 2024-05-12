@@ -121,13 +121,13 @@ JsValueRef D2DScriptingObject::drawTextCallback(JsValueRef callee, bool isConstr
 	auto thi = reinterpret_cast<D2DScriptingObject*>(callbackState);
 	if (thi->usingMinecraftRend() && thi->cachedCtx) {
 		MCDrawUtil dc{ thi->cachedCtx, Latite::get().getFont() };
-		dc.drawText(rc, text, color, Renderer::FontSelection::SegoeRegular, size, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
+		dc.drawText(rc, text, color, Renderer::FontSelection::PrimaryRegular, size, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
 		dc.flush(true, false);
 		return Chakra::GetUndefined();
 	}
 
 	auto mLock = thi->lock();
-	thi->operations.push({thi->matrix, OpDrawText(rc, text, size, color, Renderer::FontSelection::SegoeRegular, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR) });
+	thi->operations.push({thi->matrix, OpDrawText(rc, text, size, color, Renderer::FontSelection::PrimaryRegular, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR) });
 	return Chakra::GetUndefined();
 }
 
@@ -152,14 +152,14 @@ JsValueRef D2DScriptingObject::drawTextFullCallback(JsValueRef callee, bool isCo
 	auto thi = reinterpret_cast<D2DScriptingObject*>(callbackState);
 	if (thi->usingMinecraftRend() && thi->cachedCtx) {
 		MCDrawUtil dc{ thi->cachedCtx, Latite::get().getFont() };
-		dc.drawText(rect, text, color, Renderer::FontSelection::SegoeRegular, size, (DWRITE_TEXT_ALIGNMENT)align, (DWRITE_PARAGRAPH_ALIGNMENT)vertAlign, false);
+		dc.drawText(rect, text, color, Renderer::FontSelection::PrimaryRegular, size, (DWRITE_TEXT_ALIGNMENT)align, (DWRITE_PARAGRAPH_ALIGNMENT)vertAlign, false);
 		dc.flush(true, false);
 		return Chakra::GetUndefined();
 	}
 
 	auto thisptr = reinterpret_cast<D2DScriptingObject*>(callbackState);
 	auto mLock = thi->lock();
-	thisptr->operations.push({ thi->matrix, OpDrawText(rect, text, size, color, Renderer::FontSelection::SegoeRegular,(DWRITE_TEXT_ALIGNMENT)align, (DWRITE_PARAGRAPH_ALIGNMENT)vertAlign) });
+	thisptr->operations.push({ thi->matrix, OpDrawText(rect, text, size, color, Renderer::FontSelection::PrimaryRegular,(DWRITE_TEXT_ALIGNMENT)align, (DWRITE_PARAGRAPH_ALIGNMENT)vertAlign) });
 	return Chakra::GetUndefined();
 }
 
@@ -200,11 +200,11 @@ JsValueRef D2DScriptingObject::getTextSize(JsValueRef callee, bool isConstructor
 	Vec2 ts;
 	if (obj->usingMinecraftRend()) {
 		MCDrawUtil dc{ obj->cachedCtx, Latite::get().getFont() };
-		ts = dc.getTextSize(txt, Renderer::FontSelection::SegoeRegular, static_cast<float>(size));
+		ts = dc.getTextSize(txt, Renderer::FontSelection::PrimaryRegular, static_cast<float>(size));
 	}
 	else {
 		D2DUtil dc{};
-		ts = dc.getTextSize(txt, Renderer::FontSelection::SegoeRegular, size, true, false);
+		ts = dc.getTextSize(txt, Renderer::FontSelection::PrimaryRegular, size, true, false);
 	}
 	
 	return JsScript::getThis()->getClass<JsVec2>()->construct(ts);
