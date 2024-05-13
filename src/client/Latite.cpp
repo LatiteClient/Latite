@@ -574,7 +574,6 @@ void Latite::updateModuleBlocking() {
         static_assert(std::is_base_of_v<Module, Freelook>);
 
         blockModules("Freelook", "hivebedrock");
-        blockModules("Freelook", "nethergames");
         blockModules("Freelook", "galaxite");
     }
     else {
