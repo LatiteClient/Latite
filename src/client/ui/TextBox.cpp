@@ -65,11 +65,11 @@ void ui::TextBox::render(DrawUtil& dc, float rounding, d2d::Color backgroundColo
 
 	// draw text
 	float textSize = rect.getHeight() * 0.7f;
-	dc.drawText(rect, getText(), textColor, Renderer::FontSelection::SegoeRegular, textSize,
+	dc.drawText(rect, getText(), textColor, Renderer::FontSelection::PrimaryRegular, textSize,
 		DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, false); // Don't cache
 
 	// draw blinker
-	Vec2 ts = dc.getTextSize(text.substr(0, this->place), Renderer::FontSelection::SegoeRegular, textSize);
+	Vec2 ts = dc.getTextSize(text.substr(0, this->place), Renderer::FontSelection::PrimaryRegular, textSize);
 	d2d::Rect blinkerRect = { rect.left + ts.x, rect.top + 2.f, rect.left + ts.x + 2.f, rect.bottom - 2.f };
 	if (isSelected() && shouldBlink()) dc.fillRectangle(blinkerRect, textColor);
 }

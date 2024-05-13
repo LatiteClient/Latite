@@ -12,12 +12,16 @@ void HUDModule::renderFrame(DrawUtil& ctx) {
 }
 
 void HUDModule::renderPost(DrawUtil& ctx) {
-	ctx.drawText(getRect(), util::StrToWStr(this->getDisplayName()), d2d::Color(0.5F, 1.0F, 1.0F, 1.f), Renderer::FontSelection::SegoeLight,
+	ctx.drawText(getRect(), util::StrToWStr(this->getDisplayName()), d2d::Color(0.5F, 1.0F, 1.0F, 1.f), Renderer::FontSelection::PrimaryLight,
 		16.f);
 }
 
 void HUDModule::afterLoadConfig() {
-	auto ss = SDK::ClientInstance::get()->getGuiData()->screenSize;//Latite::getRenderer().getScreenSize();
+	loadStoredPosition();
+}
+
+void HUDModule::loadStoredPosition() {
+	auto ss = SDK::ClientInstance::get()->getGuiData()->screenSize;
 	auto& sp = std::get<Vec2Value>(this->storedPos);
 	setPos({ sp.x * ss.x, sp.y * ss.y });
 }

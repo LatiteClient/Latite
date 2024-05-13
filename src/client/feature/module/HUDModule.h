@@ -29,6 +29,7 @@ public:
 	virtual void renderFrame(DrawUtil& dc);
 	virtual void renderPost(DrawUtil& dc);
 	void afterLoadConfig() override;
+	void loadStoredPosition();
 	void storePos(Vec2 const& ss);
 
 	void setPos(Vec2 newPos) {

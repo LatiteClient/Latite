@@ -63,7 +63,7 @@ void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 
 			size_t retIndex = 1;
 			for (size_t i = retIndex; i < work.size(); i++) {
-				float size = util.getTextSize(work.substr(0, i), Renderer::FontSelection::SegoeRegular, tSize).x;
+				float size = util.getTextSize(work.substr(0, i), Renderer::FontSelection::PrimaryRegular, tSize).x;
 				if (size > width) {
 					ret.insert(ret.begin() + (retIndex - 1), L'\n');
 					i = 1;
@@ -95,7 +95,7 @@ void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 		}
 
 		std::wstring text = textWrap(ctx, util::StrToWStr(content), textSize, windowWidth);
-		auto tSize = ctx.getTextSize(text, Renderer::FontSelection::SegoeRegular, textSize);
+		auto tSize = ctx.getTextSize(text, Renderer::FontSelection::PrimaryRegular, textSize);
 
 		d2d::Rect tRect = { 0, y - tSize.y,
 			windowWidth, y};
@@ -108,7 +108,7 @@ void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 		y -= tSize.y;
 
 		/*we will cache the message in d2d. it's more worth it*/
-		ctx.drawText(tRect, text, fgCol.asAlpha(msg.animation * fgCol.a), Renderer::FontSelection::SegoeRegular, textSize,
+		ctx.drawText(tRect, text, fgCol.asAlpha(msg.animation * fgCol.a), Renderer::FontSelection::PrimaryRegular, textSize,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, true);
 	}
 

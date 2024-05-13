@@ -74,7 +74,7 @@ namespace {
         return std::format("Memory Usage: {:.2f} GB / {:.2f} GB", usedMemoryGB, totalMemoryGB);
     }
     std::string getGpuInfo() {
-        return std::format("Display: {} (DirectX{})", reinterpret_cast<const char*>(Signatures::GpuInfo.result), Latite::getRenderer().isDX11ByDefault() ? "11/10.1" : "12");
+        return std::format("Display: Unknown (DirectX{})", Latite::getRenderer().isDX11ByDefault() ? "11/10.1" : "12");
     }
     std::string getCpuInfo() {
         std::string cpuInfo = util::GetProcessorInfo();
@@ -133,10 +133,10 @@ void DebugInfo::onRenderOverlay(Event& evG) {
             getGpuInfo(),
             getCpuInfo()));
 
-        dc.drawText(rect, topLeftDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular,
+        dc.drawText(rect, topLeftDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular,
             28, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
 
-        dc.drawText(rect, topRightDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular,
+        dc.drawText(rect, topRightDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular,
             28, DWRITE_TEXT_ALIGNMENT_TRAILING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
 
         dc.flush(true, false);

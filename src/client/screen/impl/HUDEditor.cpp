@@ -89,7 +89,7 @@ void HUDEditor::onRender(Event& ev) {
 			dc.fillRoundedRectangle(btnRect, col, 20.f);
 			dc.drawRoundedRectangle(btnRect, outlineCol, 20.f, 2.f, DrawUtil::OutlinePosition::Outside);
 
-			dc.drawText(btnRect, L"Mod Settings", d2d::Color(0.9f, 0.9f, 0.9f, 1.f), Renderer::FontSelection::SegoeRegular, 20.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			dc.drawText(btnRect, L"Mod Settings", d2d::Color(0.9f, 0.9f, 0.9f, 1.f), Renderer::FontSelection::PrimaryRegular, 20.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		}
 
 		clearLayers();
@@ -258,6 +258,28 @@ void HUDEditor::renderModules(SDK::MinecraftUIRenderContext* ctx, bool forceMine
 		DrawHUDModulesEvent ev{};
 		if (Eventing::get().dispatch(ev)) return; // if cancelled
 	}
+
+
+	auto guiData = SDK::ClientInstance::get()->getGuiData();
+
+	if (!lastScreenSize) {
+		lastScreenSize = guiData->screenSize;
+	}
+	else {
+		if (*lastScreenSize != guiData->screenSize) {
+			Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
+				if (mod->isHud()) {
+					HUDModule* rMod = reinterpret_cast<HUDModule*>(mod.get());
+					Vec2 oPos = rMod->getRect().getPos();
+					Vec2 oPercent = oPos / *lastScreenSize;
+					Vec2 new_ = guiData->screenSize * oPercent;
+					rMod->setPos(new_);
+				}
+				});
+		}
+	}
+
+	lastScreenSize = guiData->screenSize;
 
 	if (isActive() || SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
 		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {

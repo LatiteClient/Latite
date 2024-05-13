@@ -24,8 +24,7 @@ void ReachDisplay::onAttack(Event& evG) {
 	auto hitResult = level->getHitResult(); // the exact point the player hit
 
 	auto hitPoint = hitResult->hitPos;
-	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 
-	reach = lp->getPos().distance(hitPoint);
+	reach = hitResult->start.distance(hitPoint);
 	lastAttack = std::chrono::system_clock::now();
 }

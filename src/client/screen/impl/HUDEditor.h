@@ -27,6 +27,7 @@ private:
 	float anim = 0.f;
 	Vec2 dragOffset = {};
 	std::vector<d2d::Rect> controls = {};
+	std::optional<Vec2> lastScreenSize = std::nullopt;
 
 	struct SnapLine {
 		float left, middle, right;

@@ -87,7 +87,7 @@ void Screen::onRenderOverlay(Event& ev) {
 		if (now - lastTooltipChange >= 500ms) {
 			D2DUtil dc;
 			Vec2& mousePos = SDK::ClientInstance::get()->cursorPos;
-			d2d::Rect textRect = dc.getTextRect(this->tooltip.value(), Renderer::FontSelection::SegoeRegular, 15.f, 8.f);
+			d2d::Rect textRect = dc.getTextRect(this->tooltip.value(), Renderer::FontSelection::PrimaryRegular, 15.f, 8.f);
 			textRect.setPos(mousePos);
 			auto height = textRect.getHeight() * 0.9f;
 			textRect.top -= height;
@@ -98,7 +98,7 @@ void Screen::onRenderOverlay(Event& ev) {
 			float rad = height * 0.25f;
 			dc.fillRoundedRectangle(textRect, d2d::Color(0.f, 0.f, 0.f, 0.6f), rad);
 			dc.drawRoundedRectangle(textRect, d2d::Color(0.9f, 0.9f, 0.9f, 1.f), rad, 1.f);
-			dc.drawText(textRect, this->tooltip.value(), d2d::Color(1.f, 1.f, 1.f, 0.8f), Renderer::FontSelection::SegoeRegular, 15.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			dc.drawText(textRect, this->tooltip.value(), d2d::Color(1.f, 1.f, 1.f, 0.8f), Renderer::FontSelection::PrimaryRegular, 15.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		}
 	}
 	this->tooltip = std::nullopt;

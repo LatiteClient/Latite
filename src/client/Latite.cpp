@@ -680,22 +680,28 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("minecraftRenderer", "Use Minecraft Renderer", "Use the Minecraft renderer in the HUD.");
+        auto set = std::make_shared<Setting>("minecraftRenderer", "Use Minecraft Renderer", "Use the Minecraft renderer for all HUD modules.");
         set->value = &this->minecraftRenderer;
         this->getSettings().addSetting(set);
     }
 
     {
-        auto set = std::make_shared<Setting>("textShadow", "Text Shadows", "Whether to have text shadows or not with Minecraft renderer.", "minecraftRenderer"_istrue);
+        auto set = std::make_shared<Setting>("textShadow", "Minecraft Text Shadows", "Whether to have text shadows or not with Minecraft renderer.");
         set->value = &this->textShadow;
         this->getSettings().addSetting(set);
     }
 
     {
-        auto set = std::make_shared<Setting>("mcRendererFont", "HUD Font", "The HUD font", "minecraftRenderer"_istrue);
+        auto set = std::make_shared<Setting>("secondaryFont", "HUD font", "HUD Font when using non-minecraft renderer");
+        set->value = &this->secondaryFont;
+        this->getSettings().addSetting(set);
+    }
+
+    {
+        auto set = std::make_shared<Setting>("mcRendererFont", "Minecraft HUD font", "The HUD font with the Minecraft renderer.");
         set->enumData = &this->mcRendFont;
         set->value = set->enumData->getValue();
-        set->enumData->addEntry({ 0, "Default", "The Minecraft font" });
+        set->enumData->addEntry({ 0, "Default", "The default UI font (Mojangles by default)" });
         set->enumData->addEntry({ 1, "Noto Sans", "The smooth font (Noto Sans MS)" });
         this->getSettings().addSetting(set);
     }
@@ -823,16 +829,19 @@ void Latite::onUpdate(Event& evGeneric) {
             });
     }
 
-    if (SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed() && std::get<BoolValue>(centerCursorMenus)) {
-        RECT r;
+    bool grabbed = SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed();
+    static bool lastGrabbed = grabbed;
 
-        if (!minecraftWindow) {
-            minecraftWindow = FindWindowA(NULL, XOR_STRING("Minecraft"));
-        }
+    if (!minecraftWindow) {
+        minecraftWindow = FindWindowA(NULL, XOR_STRING("Minecraft"));
+    }
 
+    if (std::get<BoolValue>(centerCursorMenus) && grabbed && !lastGrabbed) {
+        RECT r = { 0, 0, 0, 0 };
         GetClientRect(minecraftWindow, &r);
         SetCursorPos(r.left + r.right / 2, r.top + r.bottom / 2);
     }
+    lastGrabbed = grabbed;
     
     if (std::get<BoolValue>(broadcastUsage)) {
         //if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSend) > 10s) {
@@ -861,6 +870,7 @@ void Latite::onUpdate(Event& evGeneric) {
         }
         lastDX11 = std::get<BoolValue>(useDX11);
     }
+
 #if 0
     {
         static auto time = std::chrono::steady_clock::now();
@@ -996,13 +1006,19 @@ void Latite::onRenderLayer(Event& evG) {
         MCDrawUtil dc{ ev.getUIRenderContext(), SDK::ClientInstance::get()->minecraftGame->minecraftFont };
         
         auto& ss = SDK::ClientInstance::get()->getGuiData()->screenSize;
-        dc.drawText({ 0, 0, ss.x, ss.y }, util::StrToWStr(std::string(Latite::version)) + XW("\nlatite.net\ngithub.com/LatiteClient"), d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular, 30.f);
+        dc.drawText({ 0, 0, ss.x, ss.y }, XW("Latite Client ") + util::StrToWStr(std::string(Latite::version)), d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, 30.f);
+        dc.drawText({ 0, 30, ss.x, ss.y }, XW("latite.net"), d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, 30.f);
+        dc.drawText({ 0, 60, ss.x, ss.y }, XW("github.com/LatiteClient"), d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, 30.f);
         dc.flush(true, false);
     }
 }
 
 void Latite::onRenderOverlay(Event& evG) {
     auto& ev = reinterpret_cast<RenderOverlayEvent&>(evG);
+
+    if (getRenderer().getFontFamily2() != std::get<TextValue>(secondaryFont).str) {
+        getRenderer().updateSecondaryFont(std::get<TextValue>(secondaryFont).str);
+    }
 
     while (!this->dxRenderQueue.empty()) {
         auto& latest = this->dxRenderQueue.front();

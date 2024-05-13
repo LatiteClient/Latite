@@ -25,6 +25,7 @@ void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	this->createWorldObject();
 	Chakra::DefineFunc(object, getLocalPlayerCallback, XW("getLocalPlayer"));
 	Chakra::DefineFunc(object, getMousePosCallback, XW("getMousePos"));
+	Chakra::DefineFunc(object, getMousePosCallback, XW("getScreenSize"));
 	Chakra::DefineFunc(object, isInUICallback, XW("isInUI"));
 	Chakra::DefineFunc(object, playSoundUI, XW("playSoundUI"));
 	Chakra::DefineFunc(object, sendChatCallback, XW("sendChatMessage"));
@@ -196,6 +197,10 @@ JsValueRef GameScriptingObject::getMousePosCallback(JsValueRef callee, bool isCo
 	// could not find Vector2
 	__debugbreak();
 	return Chakra::GetUndefined();
+}
+
+JsValueRef GameScriptingObject::getScreenSizeCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	return JsScript::getThis()->getClass<JsVec2>()->construct(SDK::ClientInstance::get()->getGuiData()->screenSize);
 }
 
 JsValueRef GameScriptingObject::getInputBinding(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {

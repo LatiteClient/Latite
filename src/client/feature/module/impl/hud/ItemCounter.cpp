@@ -94,12 +94,12 @@ void ItemCounter::render(DrawUtil& ct, bool isDefault, bool inEditor) {
 
 			// here we go again
 			std::wstring txt = std::to_wstring(count);
-			Vec2 txtSize = dc.getTextSize(txt, Renderer::FontSelection::SegoeRegular, 30.f);
+			Vec2 txtSize = dc.getTextSize(txt, Renderer::FontSelection::PrimaryRegular, 30.f);
 			float y = rc.centerY(txtSize.y);
 
 			d2d::Rect textRect = { rc.right + 2.f, rc.top, rc.right + 2.f + txtSize.x, rc.bottom };
 
-			dc.drawText(textRect, txt.c_str(), d2d::Colors::WHITE, Renderer::FontSelection::SegoeRegular, 30.f, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			dc.drawText(textRect, txt.c_str(), d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, 30.f, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 			pos.y += 48.f;
 			renderedCounterList++;
 		}

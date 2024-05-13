@@ -49,7 +49,7 @@ public:
 	Latite() = default;
 	~Latite() = default;
 
-	static constexpr std::string_view version = "v2.0.0";
+	static constexpr std::string_view version = "v2.0.1rc1";
 	HINSTANCE dllInst = NULL;
 	std::string gameVersion;
 
@@ -145,6 +145,7 @@ private:
 	ValueType broadcastUsage = BoolValue(true);
 	ValueType centerCursorMenus = BoolValue(false);
 	ValueType snapLines = BoolValue(false);
+	ValueType secondaryFont = TextValue(L"Segoe UI");
 
 	EnumData mcRendFont;
 

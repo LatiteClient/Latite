@@ -4,6 +4,24 @@
 #include "util/ChakraUtil.h"
 #include <array>
 
+static std::array<FARPROC, 15> banList = {
+			(FARPROC)VirtualProtect,
+			(FARPROC)VirtualProtectEx,
+			(FARPROC)mouse_event,
+			(FARPROC)SendInput,
+			(FARPROC)CreateThread,
+			(FARPROC)OpenProcess,
+			(FARPROC)OpenProcessToken,
+			(FARPROC)LoadLibraryA,
+			(FARPROC)LoadLibraryW,
+			(FARPROC)LoadLibraryExA,
+			(FARPROC)LoadLibraryExW,
+			(FARPROC)GetModuleHandleA,
+			(FARPROC)GetModuleHandleExA,
+			(FARPROC)GetModuleHandleW,
+			(FARPROC)GetModuleHandleExW,
+};
+
 class JsNativeModule : public JsWrapperClass<void> {
 protected:
 public:
@@ -67,11 +85,6 @@ public:
 		if (!Chakra::VerifyArgCount(argCount, 3, true, true)) return JS_INVALID_REFERENCE;
 		if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsString} })) return JS_INVALID_REFERENCE;
 
-
-		Chakra::ThrowError(XW("NativeModule.call is currently disabled."));
-
-		return JS_INVALID_REFERENCE;
-		/*
 		if (argCount > 18) {
 			Chakra::ThrowError(XW("NativeModule.call can only accept 15 native arguments."));
 			return JS_INVALID_REFERENCE;
@@ -88,24 +101,6 @@ public:
 
 		HMODULE mod = (HMODULE)Get(arguments[0]);
 		auto proc = GetProcAddress(mod, util::WStrToStr(name).c_str());
-
-		static std::array<FARPROC, 15> banList = {
-			(FARPROC)VirtualProtect,
-			(FARPROC)VirtualProtectEx,
-			(FARPROC)mouse_event,
-			(FARPROC)SendInput,
-			(FARPROC)CreateThread,
-			(FARPROC)OpenProcess,
-			(FARPROC)OpenProcessToken,
-			(FARPROC)LoadLibraryA,
-			(FARPROC)LoadLibraryW,
-			(FARPROC)LoadLibraryExA,
-			(FARPROC)LoadLibraryExW,
-			(FARPROC)GetModuleHandleA,
-			(FARPROC)GetModuleHandleExA,
-			(FARPROC)GetModuleHandleW,
-			(FARPROC)GetModuleHandleExW,
-		};
 
 		if (!proc) {
 			Chakra::ThrowError(XW("Could not find function ") + name);
@@ -142,25 +137,25 @@ public:
 		}
 
 
-		if (type == L"int64") {
+		if (type == XW("int64")) {
 			// int64_t
 			auto res = ((any_func_int64_t)proc)(args[0], args[1], args[2], args[3], args[4], args[5],
 				args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
 			return Chakra::MakeDouble(res);
 		}
-		else if (type == L"int32") {
+		else if (type == XW("int32")) {
 			// int
 			auto res = ((any_func_int32_t)proc)(args[0], args[1], args[2], args[3], args[4], args[5],
 				args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
 			return Chakra::MakeInt(res);
 		}
-		else if (type == L"float32") {
+		else if (type == XW("float32")) {
 			// float
 			auto res = ((any_func_float32_t)proc)(args[0], args[1], args[2], args[3], args[4], args[5],
 				args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
 			return Chakra::MakeDouble(res);
 		}
-		else if (type == L"float64") {
+		else if (type == XW("float64")) {
 			// double
 			auto res = ((any_func_float64_t)proc)(args[0], args[1], args[2], args[3], args[4], args[5],
 				args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
@@ -170,6 +165,6 @@ public:
 		// void
 		auto res = ((any_func_int64_t)proc)(args[0], args[1], args[2], args[3], args[4], args[5],
 			args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
-		return Chakra::GetUndefined();*/
+		return Chakra::GetUndefined();
 	}
 };
