@@ -842,14 +842,14 @@ void Latite::onUpdate(Event& evGeneric) {
         SetCursorPos(r.left + r.right / 2, r.top + r.bottom / 2);
     }
     lastGrabbed = grabbed;
-    
+
     if (std::get<BoolValue>(broadcastUsage)) {
         //if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSend) > 10s) {
         //    this->fetchLatiteUsers();
         //    lastSend = now;
         //}
     }
-    
+
     latiteUsers = latiteUsersDirty;
 
     if (!hasInit) {
@@ -861,7 +861,7 @@ void Latite::onUpdate(Event& evGeneric) {
 
     static bool lastDX11 = std::get<BoolValue>(this->useDX11);
     if (std::get<BoolValue>(useDX11) != lastDX11) {
-        
+
         if (lastDX11) {
             Latite::getClientMessageSink().display(util::Format("&7Please restart your game to use DX12 again!"));
         }
@@ -1025,6 +1025,12 @@ void Latite::onRenderOverlay(Event& evG) {
         latest(ev.getDeviceContext());
         this->dxRenderQueue.pop();
     }
+
+    static auto time = std::chrono::steady_clock::now();
+    auto now = std::chrono::steady_clock::now();
+    if (std::chrono::duration_cast<std::chrono::seconds>(now - time) > 5s) {
+        Latite::writeServerIP();
+    }
 }
 
 void Latite::onPacketReceive(Event& evG) {
@@ -1047,4 +1053,37 @@ void Latite::loadConfig(SettingGroup& gr) {
             }
             });
         });
+}
+
+void Latite::writeServerIP() {
+    std::string server;
+    std::filesystem::path serverIPTextPath = util::GetLatitePath() / "Logs" / XOR_STRING("serverip.txt");
+
+    SDK::RakNetConnector* connector = SDK::RakNetConnector::get();
+    if (connector && !connector->ipAddress.empty()) {
+        server = connector->dns;
+    }
+    else {
+        server = "none";
+    }
+
+    std::ifstream ifs(serverIPTextPath);
+    std::stringstream buffer;
+    if (ifs.is_open()) {
+        buffer << ifs.rdbuf();
+        ifs.close();
+    }
+
+    std::string currentContent = buffer.str();
+
+    if (currentContent == server)
+        return;
+
+    std::ofstream ofs(serverIPTextPath, std::ios::trunc);
+    if (ofs.is_open()) {
+        if (!ofs.fail()) {
+            ofs << server;
+            ofs.close();
+        }
+    }
 }

@@ -106,6 +106,8 @@ public:
 
 	void fetchLatiteUsers();
 
+	void writeServerIP();
+
 	void initAsset(int resource, std::wstring const& filename);
 
 	int cInstOffs2 = 0;
