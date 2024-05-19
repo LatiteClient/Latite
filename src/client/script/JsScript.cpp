@@ -292,6 +292,26 @@ namespace {
 		return Chakra::GetUndefined();
 	}
 
+	JsValueRef CALLBACK getEnvCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount,
+		void* callbackState) {
+
+		if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
+		if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsString} })) return JS_INVALID_REFERENCE;
+
+		auto arg = Chakra::GetString(arguments[1]);
+
+		wchar_t* env;
+		size_t size;
+		if (!_wdupenv_s(&env, &size, arg.c_str()) && env) {
+			auto str = std::wstring(env, size);
+			delete env;
+			return Chakra::MakeString(str);
+		}
+		return Chakra::MakeString(L"");
+
+	}
+
 	JsValueRef CALLBACK sleepCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount,
 		void* callbackState) {
@@ -299,6 +319,7 @@ namespace {
 		std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<long long>(Chakra::GetNumber(arguments[1]))));
 		return Chakra::GetUndefined();
 	}
+
 	JsValueRef CALLBACK clientMessageCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount,
 		void* callbackState) {
@@ -528,6 +549,11 @@ void JsScript::loadScriptObjects() {
 		err = JS::JsSetProperty(Chakra::GetGlobalObject(), propId, myPrint, false);
 
 		err = JS::JsRelease(myPrint, nullptr);
+	}
+
+	{
+		// getEnv
+		Chakra::DefineFunc(globalObj, getEnvCallback, L"getEnvironmentVariable");
 	}
 
 	for (auto& cl : classes) {
