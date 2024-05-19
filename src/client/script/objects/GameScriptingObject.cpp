@@ -25,7 +25,7 @@ void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	this->createWorldObject();
 	Chakra::DefineFunc(object, getLocalPlayerCallback, XW("getLocalPlayer"));
 	Chakra::DefineFunc(object, getMousePosCallback, XW("getMousePos"));
-	Chakra::DefineFunc(object, getMousePosCallback, XW("getScreenSize"));
+	Chakra::DefineFunc(object, getScreenSizeCallback, XW("getScreenSize"));
 	Chakra::DefineFunc(object, isInUICallback, XW("isInUI"));
 	Chakra::DefineFunc(object, playSoundUI, XW("playSoundUI"));
 	Chakra::DefineFunc(object, sendChatCallback, XW("sendChatMessage"));
