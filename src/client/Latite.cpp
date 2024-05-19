@@ -1060,30 +1060,22 @@ void Latite::writeServerIP() {
     std::filesystem::path serverIPTextPath = util::GetLatitePath() / XOR_STRING("serverip.txt");
 
     SDK::RakNetConnector* connector = SDK::RakNetConnector::get();
-    if (connector && !connector->ipAddress.empty()) {
+    if (connector && !connector->dns.empty()) {
         server = connector->dns;
     }
     else {
         server = "none";
     }
 
-    std::ifstream ifs(serverIPTextPath);
-    std::stringstream buffer;
-    if (ifs.is_open()) {
-        buffer << ifs.rdbuf();
-        ifs.close();
-    }
-
-    std::string currentContent = buffer.str();
-
-    if (currentContent == server)
-        return;
-
-    std::ofstream ofs(serverIPTextPath, std::ios::trunc);
-    if (ofs.is_open()) {
-        if (!ofs.fail()) {
-            ofs << server;
-            ofs.close();
+    static std::string lastServer = "";
+    if (server != lastServer) {
+        std::ofstream ofs(serverIPTextPath, std::ios::trunc);
+        if (ofs.is_open()) {
+            if (!ofs.fail()) {
+                ofs << server;
+                ofs.close();
+            }
         }
     }
+    lastServer = server;
 }
