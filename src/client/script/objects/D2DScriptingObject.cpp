@@ -68,20 +68,31 @@ JsValueRef D2DScriptingObject::useCallback(JsValueRef callee, bool isConstructor
 
 JsValueRef D2DScriptingObject::fillRectCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 3, true)) return JS_INVALID_REFERENCE;
-	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject } })) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject }, { arguments[3], JsNumber, true }})) return JS_INVALID_REFERENCE;
 
 	auto rect = JsRect::ToRect(arguments[1]);
 	auto color = JsColor::ToColor(arguments[2]);
+	float radius = 0.f;
+
+	if (auto val = Chakra::TryGet(arguments, argCount, 3)) {
+		radius = Chakra::GetNumber(val);
+	}
 
 	auto thi = reinterpret_cast<D2DScriptingObject*>(callbackState);
 	if (thi->usingMinecraftRend() && thi->cachedCtx) {
 		MCDrawUtil dc{thi->cachedCtx, Latite::get().getFont()};
-		dc.fillRectangle(rect, color);
+
+		if (radius > 0.001f) {
+			dc.fillRoundedRectangle(rect, color, radius);
+		}
+		else {
+			dc.fillRectangle(rect, color);
+		}
 		return Chakra::GetUndefined();
 	}
 
 	auto mLock = thi->lock();
-	thi->operationsDirty.push_back({ thi->matrix, OpFillRect(rect, color) });
+	thi->operationsDirty.push_back({ thi->matrix, OpFillRect(rect, color, radius) });
 
 	return Chakra::GetUndefined();
 }
@@ -272,7 +283,13 @@ void D2DScriptingObject::DrawVisitor::operator()(OpDrawRect& op) {
 
 void D2DScriptingObject::DrawVisitor::operator()(OpFillRect& op) {
 	D2DUtil dc;
-	dc.fillRectangle(op.rc, op.col);
+
+	if (op.radius > 0.01f) {
+		dc.fillRoundedRectangle(op.rc, op.col, op.radius);
+	}
+	else {
+		dc.fillRectangle(op.rc, op.col);
+	}
 }
 
 void D2DScriptingObject::DrawVisitor::operator()(OpDrawText& op) {

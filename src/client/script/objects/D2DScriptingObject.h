@@ -35,9 +35,10 @@ public:
 	struct OpFillRect {
 		d2d::Rect rc;
 		d2d::Color col;
+		float radius;
 
-		OpFillRect(const d2d::Rect& rc, const d2d::Color& col)
-			: rc(rc), col(col) {
+		OpFillRect(const d2d::Rect& rc, const d2d::Color& col, float radius)
+			: rc(rc), col(col), radius(radius) {
 		}
 	};
 
