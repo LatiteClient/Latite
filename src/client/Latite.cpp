@@ -1057,7 +1057,7 @@ void Latite::loadConfig(SettingGroup& gr) {
 
 void Latite::writeServerIP() {
     std::string server;
-    std::filesystem::path serverIPTextPath = util::GetLatitePath() / "Logs" / XOR_STRING("serverip.txt");
+    std::filesystem::path serverIPTextPath = util::GetLatitePath() / XOR_STRING("serverip.txt");
 
     SDK::RakNetConnector* connector = SDK::RakNetConnector::get();
     if (connector && !connector->ipAddress.empty()) {

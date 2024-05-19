@@ -378,6 +378,7 @@ void Renderer::createDeviceIndependentResources() {
 	ThrowIfFailed(D2D1CreateFactory(D2D1_FACTORY_TYPE_MULTI_THREADED, __uuidof(ID2D1Factory3), (void**)d2dFactory.GetAddressOf()));
 	
 	createTextFormats();
+	CoInitialize(nullptr);
 	ThrowIfFailed(CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER, __uuidof(IWICImagingFactory2), reinterpret_cast<void**>(this->wicFactory.GetAddressOf())));
 }
 
