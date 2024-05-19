@@ -19,6 +19,7 @@ public:
 		objectID = id;
 		Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&D2DScriptingObject::onRenderOverlay, 0);
 		Eventing::get().listen<RenderLayerEvent>(this, (EventListenerFunc)&D2DScriptingObject::onRenderLayer, 0);
+		Eventing::get().listen<UpdateEvent>(this, (EventListenerFunc)&D2DScriptingObject::onUpdate, 0);
 	}
 
 	~D2DScriptingObject() {
@@ -86,7 +87,8 @@ public:
 		void operator()(OpClip& op);
 	};
 
-	std::queue<DrawOperation> operations = {};
+	std::vector<DrawOperation> operations = {};
+	std::vector<DrawOperation> operationsDirty = {};
 	std::shared_lock<std::shared_mutex> lock() {
 		return std::shared_lock<std::shared_mutex>(mutex);
 	}
@@ -95,6 +97,7 @@ public:
 
 	void onRenderOverlay(Event& ev);
 	void onRenderLayer(Event& ev);
+	void onUpdate(Event&);
 	void flushOverlay();
 
 	void setUseMinecraftRend(bool b) { mcRend = b; }

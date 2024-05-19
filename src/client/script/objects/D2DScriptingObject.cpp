@@ -28,16 +28,19 @@ void D2DScriptingObject::onRenderLayer(Event& evG) {
 	this->cachedCtx = ev.getUIRenderContext();
 }
 
+void D2DScriptingObject::onUpdate(Event&) {
+	auto lk = lock();
+	operations = operationsDirty;
+}
+
 void D2DScriptingObject::flushOverlay() {
-	while (!this->operations.empty()) {
-		auto& latest = operations.front();
+	for (auto& operation : operations) {
 		auto ctx = Latite::getRenderer().getDeviceContext();
 		D2D1::Matrix3x2F oMat;
 		ctx->GetTransform(&oMat);
-		ctx->SetTransform(latest.matrix);
-		std::visit(DrawVisitor{}, latest.op);
+		ctx->SetTransform(operation.matrix);
+		std::visit(DrawVisitor{}, operation.op);
 		ctx->SetTransform(oMat);
-		operations.pop();
 	}
 	Latite::getRenderer().getDeviceContext()->Flush();
 }
@@ -78,7 +81,7 @@ JsValueRef D2DScriptingObject::fillRectCallback(JsValueRef callee, bool isConstr
 	}
 
 	auto mLock = thi->lock();
-	thi->operations.push({ thi->matrix, OpFillRect(rect, color) });
+	thi->operationsDirty.push_back({ thi->matrix, OpFillRect(rect, color) });
 
 	return Chakra::GetUndefined();
 }
@@ -100,7 +103,7 @@ JsValueRef D2DScriptingObject::drawRectCallback(JsValueRef callee, bool isConstr
 	}
 
 	auto mLock = thi->lock();
-	thi->operations.push({thi->matrix, OpDrawRect(rect, color, thickness) });
+	thi->operationsDirty.push_back({thi->matrix, OpDrawRect(rect, color, thickness) });
 
 	return Chakra::GetUndefined();
 }
@@ -127,7 +130,7 @@ JsValueRef D2DScriptingObject::drawTextCallback(JsValueRef callee, bool isConstr
 	}
 
 	auto mLock = thi->lock();
-	thi->operations.push({thi->matrix, OpDrawText(rc, text, size, color, Renderer::FontSelection::PrimaryRegular, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR) });
+	thi->operationsDirty.push_back({thi->matrix, OpDrawText(rc, text, size, color, Renderer::FontSelection::PrimaryRegular, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR) });
 	return Chakra::GetUndefined();
 }
 
@@ -159,7 +162,7 @@ JsValueRef D2DScriptingObject::drawTextFullCallback(JsValueRef callee, bool isCo
 
 	auto thisptr = reinterpret_cast<D2DScriptingObject*>(callbackState);
 	auto mLock = thi->lock();
-	thisptr->operations.push({ thi->matrix, OpDrawText(rect, text, size, color, Renderer::FontSelection::PrimaryRegular,(DWRITE_TEXT_ALIGNMENT)align, (DWRITE_PARAGRAPH_ALIGNMENT)vertAlign) });
+	thisptr->operationsDirty.push_back({ thi->matrix, OpDrawText(rect, text, size, color, Renderer::FontSelection::PrimaryRegular,(DWRITE_TEXT_ALIGNMENT)align, (DWRITE_PARAGRAPH_ALIGNMENT)vertAlign) });
 	return Chakra::GetUndefined();
 }
 
@@ -184,7 +187,7 @@ JsValueRef D2DScriptingObject::drawImageCallback(JsValueRef callee, bool isConst
 		return Chakra::GetUndefined();
 	}
 
-	thi->operations.push({ thi->matrix, OpDrawImage{texture, pos, sx, sy, color} });
+	thi->operationsDirty.push_back({ thi->matrix, OpDrawImage{texture, pos, sx, sy, color} });
 
 	return Chakra::GetUndefined();
 }
@@ -225,7 +228,7 @@ JsValueRef D2DScriptingObject::setClippingRect(JsValueRef callee, bool isConstru
 		return Chakra::GetUndefined();
 	}
 
-	thi->operations.push({ thi->matrix, OpClip{true, rc} });
+	thi->operationsDirty.push_back({ thi->matrix, OpClip{true, rc} });
 	return Chakra::GetUndefined();
 }
 
@@ -238,7 +241,7 @@ JsValueRef D2DScriptingObject::restoreClippingRect(JsValueRef callee, bool isCon
 		return Chakra::GetUndefined();
 	}
 
-	thi->operations.push({ thi->matrix, OpClip{false, {}} });
+	thi->operationsDirty.push_back({ thi->matrix, OpClip{false, {}} });
 	return Chakra::GetUndefined();
 }
 
