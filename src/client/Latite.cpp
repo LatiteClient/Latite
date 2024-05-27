@@ -1001,16 +1001,6 @@ void Latite::onRenderLayer(Event& evG) {
         latest(ev.getUIRenderContext());
         this->uiRenderQueue.pop();
     }
-
-    if (ev.getScreenView()->visualTree->rootControl->name == XOR_STRING("start_screen")) {
-        MCDrawUtil dc{ ev.getUIRenderContext(), SDK::ClientInstance::get()->minecraftGame->minecraftFont };
-        
-        auto& ss = SDK::ClientInstance::get()->getGuiData()->screenSize;
-        dc.drawText({ 0, 0, ss.x, ss.y }, XW("Latite Client ") + util::StrToWStr(std::string(Latite::version)), d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, 30.f);
-        dc.drawText({ 0, 30, ss.x, ss.y }, XW("latite.net"), d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, 30.f);
-        dc.drawText({ 0, 60, ss.x, ss.y }, XW("github.com/LatiteClient"), d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, 30.f);
-        dc.flush(true, false);
-    }
 }
 
 void Latite::onRenderOverlay(Event& evG) {

@@ -15,7 +15,7 @@ float& SDK::LevelRendererPlayer::getFovX() {
     if (SDK::internalVers >= SDK::V1_20_50) return util::directAccess<float>(this, 0xDC0);
     if (SDK::internalVers == SDK::V1_18_12) return util::directAccess<float>(this, 0x1418);
     if (SDK::internalVers >= SDK::V1_20_30) return util::directAccess<float>(this, 0xDB8);
-        return util::directAccess<float>(this, Signatures::Offset::LevelRendererPlayer_fovX.result);
+    return util::directAccess<float>(this, Signatures::Offset::LevelRendererPlayer_fovX.result);
 }
 
 float& SDK::LevelRendererPlayer::getFovY() {
