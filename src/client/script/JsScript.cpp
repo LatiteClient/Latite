@@ -389,6 +389,8 @@ namespace {
 		auto mod = thi->getPlugin()->loadOrFindModule(thi, wPath);
 		if (!mod) {
 			Chakra::ThrowError(L"Unable to load module " + wPath);
+			Logger::Warn("Terminating plugin {}! This is most likely caused by a circular dependency ({})->({})", util::WStrToStr(thi->getPlugin()->getName()), thi->getRelativePath().string(), util::WStrToStr(wPath));
+			thi->getPlugin()->unload();
 			return Chakra::GetUndefined();
 		}
 
