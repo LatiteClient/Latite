@@ -20,6 +20,7 @@
 #include "../class/impl/game/JsLocalPlayerClass.h"
 #include <sdk/common/network/packet/CommandRequestPacket.h>
 #include <client/script/class/impl/game/JsBlock.h>
+#include <client/script/class/impl/JsVec3.h>
 
 void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	this->createWorldObject();
@@ -36,6 +37,8 @@ void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(object, getPortCallback, XW("getPort"));
 	Chakra::DefineFunc(object, getConnectedFeaturedServerCallback, XW("getFeaturedServer"));
 	Chakra::DefineFunc(object, getInputBinding, XW("getInputBinding"));
+	Chakra::DefineFunc(object, getFOV, XW("getFOV"));
+	Chakra::DefineFunc(object, getCameraPosition, XW("getCameraPosition"));
 }
 
 void GameScriptingObject::createWorldObject() {
@@ -229,6 +232,24 @@ JsValueRef GameScriptingObject::getDimensionCallback(JsValueRef callee, bool isC
 
 JsValueRef GameScriptingObject::isInUICallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	return SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed() ? Chakra::GetFalse() : Chakra::GetTrue();
+}
+
+JsValueRef GameScriptingObject::getFOV(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
+		return Chakra::GetNull();
+	}
+
+	auto lrp = SDK::ClientInstance::get()->levelRenderer->getLevelRendererPlayer();
+	return JsScript::getThis()->getClass<JsVec2>()->construct(Vec2(lrp->getFovX(), lrp->getFovY()));
+}
+
+JsValueRef GameScriptingObject::getCameraPosition(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
+		return Chakra::GetNull();
+	}
+
+	auto lrp = SDK::ClientInstance::get()->levelRenderer->getLevelRendererPlayer();
+	return JsScript::getThis()->getClass<JsVec3>()->construct(lrp->getOrigin());
 }
 
 JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {

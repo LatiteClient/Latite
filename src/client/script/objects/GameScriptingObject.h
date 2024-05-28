@@ -35,6 +35,10 @@ class GameScriptingObject : public ScriptingObject {
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK getScreenCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK getFOV(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK getCameraPosition(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 public:
 	inline static int objectID = -1;
 	GameScriptingObject(int id) : ScriptingObject(id, L"game") { GameScriptingObject::objectID = id; }
