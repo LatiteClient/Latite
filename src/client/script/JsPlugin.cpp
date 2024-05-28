@@ -138,11 +138,7 @@ std::shared_ptr<JsScript> JsPlugin::loadAndRunScript(std::wstring relPath) {
 
 	auto err = scr->runScript();
 	if (err != JsNoError) {
-		if (err == JsErrorScriptException) {
-			JsValueRef except;
-			JS::JsGetAndClearException(&except);
-			Latite::getPluginManager().reportError(except, scr->getPlugin()->getFolderName() + L"/" + scr->getPath().filename().wstring());
-		}
+		Latite::getPluginManager().handleErrors(err);
 		return nullptr;
 	}
 
@@ -185,11 +181,7 @@ std::shared_ptr<JsScript> JsPlugin::loadOrFindModule(JsScript* script, std::wstr
 	auto err = scr->runScript();
 
 	if (err != JsNoError) {
-		if (err == JsErrorScriptException) {
-			JsValueRef except;
-			JS::JsGetAndClearException(&except);
-			Latite::getPluginManager().reportError(except, scr->getPlugin()->getFolderName() + L"/" + scr->getPath().filename().wstring());
-		}
+		Latite::getPluginManager().handleErrors(err);
 		return nullptr;
 	}
 	return scr;
