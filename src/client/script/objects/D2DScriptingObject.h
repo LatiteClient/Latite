@@ -108,7 +108,7 @@ public:
 	void setMatrix(D2D1::Matrix3x2F const& matr) { matrix = matr; }
 private:
 	bool mcRend = true;
-	D2D1::Matrix3x2F matrix;
+	D2D1::Matrix3x2F matrix = D2D1::Matrix3x2F();
 	SDK::MinecraftUIRenderContext* cachedCtx = nullptr;
 
 	static JsValueRef CALLBACK useCallback(JsValueRef callee, bool isConstructor,

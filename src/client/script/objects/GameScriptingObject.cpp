@@ -39,6 +39,8 @@ void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(object, getInputBinding, XW("getInputBinding"));
 	Chakra::DefineFunc(object, getFOV, XW("getFOV"));
 	Chakra::DefineFunc(object, getCameraPosition, XW("getCameraPosition"));
+	Chakra::DefineFunc(object, captureCursor, XW("captureCursor"));
+	Chakra::DefineFunc(object, releaseCursor, XW("releaseCursor"));
 }
 
 void GameScriptingObject::createWorldObject() {
@@ -250,6 +252,16 @@ JsValueRef GameScriptingObject::getCameraPosition(JsValueRef callee, bool isCons
 
 	auto lrp = SDK::ClientInstance::get()->levelRenderer->getLevelRendererPlayer();
 	return JsScript::getThis()->getClass<JsVec3>()->construct(lrp->getOrigin());
+}
+
+JsValueRef GameScriptingObject::captureCursor(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	SDK::ClientInstance::get()->grabCursor();
+	return Chakra::GetNull();
+}
+
+JsValueRef GameScriptingObject::releaseCursor(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {	
+	SDK::ClientInstance::get()->releaseCursor();
+	return Chakra::GetNull();
 }
 
 JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {

@@ -20,6 +20,7 @@ void D2DScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 
 void D2DScriptingObject::onRenderOverlay(Event& ev) {
 	auto mLock = this->lock();
+	Latite::getRenderer().getDeviceContext()->GetTransform(&matrix);
 	flushOverlay();
 }
 
@@ -31,9 +32,11 @@ void D2DScriptingObject::onRenderLayer(Event& evG) {
 void D2DScriptingObject::onUpdate(Event&) {
 	auto lk = lock();
 	operations = operationsDirty;
+	operationsDirty.clear();
 }
 
 void D2DScriptingObject::flushOverlay() {
+	auto lk = lock();
 	for (auto& operation : operations) {
 		auto ctx = Latite::getRenderer().getDeviceContext();
 		D2D1::Matrix3x2F oMat;
@@ -42,7 +45,7 @@ void D2DScriptingObject::flushOverlay() {
 		std::visit(DrawVisitor{}, operation.op);
 		ctx->SetTransform(oMat);
 	}
-	Latite::getRenderer().getDeviceContext()->Flush();
+	operations.clear();
 }
 
 JsValueRef D2DScriptingObject::useCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
@@ -67,8 +70,8 @@ JsValueRef D2DScriptingObject::useCallback(JsValueRef callee, bool isConstructor
 }
 
 JsValueRef D2DScriptingObject::fillRectCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	if (!Chakra::VerifyArgCount(argCount, 3, true)) return JS_INVALID_REFERENCE;
-	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject }, { arguments[3], JsNumber, true }})) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyArgCount(argCount, 3, true, true)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject }, { Chakra::TryGet(arguments, argCount, 3), JsNumber, true}})) return JS_INVALID_REFERENCE;
 
 	auto rect = JsRect::ToRect(arguments[1]);
 	auto color = JsColor::ToColor(arguments[2]);
@@ -99,8 +102,8 @@ JsValueRef D2DScriptingObject::fillRectCallback(JsValueRef callee, bool isConstr
 
 JsValueRef D2DScriptingObject::drawRectCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
 {
-	if (!Chakra::VerifyArgCount(argCount, 4, true)) return JS_INVALID_REFERENCE;
-	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject }, { arguments[3], JsNumber}})) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyArgCount(argCount, 4, true, true)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject }, { arguments[3], JsNumber},  { Chakra::TryGet(arguments, argCount, 4), JsNumber, true} })) return JS_INVALID_REFERENCE;
 
 	auto rect = JsRect::ToRect(arguments[1]);
 	auto color = JsColor::ToColor(arguments[2]);
