@@ -34,7 +34,7 @@ Vec2 Keystrokes::drawKeystroke(DrawUtil& ctx, Vec2 const& pos, Keystroke& stroke
 	float scale = std::get<FloatValue>(textSize);//ctx.scaleTextInBounds(key, 1 * textSize, (front.right - front.left), 2);
 	ctx.fillRoundedRectangle(front, stroke.col, std::min(std::get<FloatValue>(this->radius).value, std::get<FloatValue>(keystrokeSize) / 2.f));
 	if (std::get<BoolValue>(border)) ctx.drawRoundedRectangle(front, std::get<ColorValue>(borderColor).color1, std::get<FloatValue>(this->radius), std::get<FloatValue>(borderLength));
-	ctx.drawText(front, stroke.keyName, stroke.textCol, Renderer::FontSelection::PrimaryLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+	ctx.drawText(front, stroke.keyName, stroke.textCol, Renderer::FontSelection::SecondaryLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	return { front.right - front.left, front.bottom - front.top };
 }
 
@@ -119,7 +119,7 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 				str += L"\n" + std::to_wstring(Latite::get().getTimings().getCPSL()) + L" CPS";
 			}
 
-			dc.drawText(mb, str, btn.textCol, Renderer::FontSelection::PrimaryLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			dc.drawText(mb, str, btn.textCol, Renderer::FontSelection::SecondaryLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 			if (std::get<BoolValue>(border)) {
 				dc.drawRoundedRectangle(mb, std::get<ColorValue>(this->borderColor).color1, rad, std::get<FloatValue>(this->borderLength));
 			}
@@ -136,7 +136,7 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 				str += L"\n" + std::to_wstring(Latite::get().getTimings().getCPSR()) + L" CPS";
 			}
 
-			dc.drawText(mb, str, btn.textCol, Renderer::FontSelection::PrimaryLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			dc.drawText(mb, str, btn.textCol, Renderer::FontSelection::SecondaryLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 			if (std::get<BoolValue>(border)) {
 				dc.drawRoundedRectangle(mb, std::get<ColorValue>(this->borderColor).color1, rad, std::get<FloatValue>(this->borderLength));
 			}
@@ -163,7 +163,7 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 		d2d::Rect shiftBox = { 0.f, pos.y, pos.x, pos.y + std::get<FloatValue>(spaceSize) };
 		dc.fillRoundedRectangle(shiftBox, keystrokes[4].col, rad);
 		if (std::get<BoolValue>(border)) dc.drawRoundedRectangle(shiftBox, std::get<ColorValue>(borderColor).color1, rad, std::get<FloatValue>(borderLength));
-		dc.drawText(shiftBox, keystrokes[4].keyName, keystrokes[4].textCol, Renderer::FontSelection::PrimaryLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(shiftBox, keystrokes[4].keyName, keystrokes[4].textCol, Renderer::FontSelection::SecondaryLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		pos.y += shiftBox.getHeight();
 	}
 
