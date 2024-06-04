@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Logger.h"
 #include "util/Util.h"
+#include <ctime>
 #include "client/Latite.h"
 #include "client/misc/ClientMessageSink.h"
 
@@ -13,6 +14,7 @@ void Logger::Setup() {
 void Logger::LogInternal(Level level, std::string str) {
     std::time_t t = std::time(0);   // get time now
     std::tm now;
+    std::ostringstream oss;
     localtime_s(&now, &t);
 
     auto tmh = now.tm_hour;
@@ -24,6 +26,8 @@ void Logger::LogInternal(Level level, std::string str) {
 
     std::stringstream time;
     time << "[" << (now.tm_mon + 1) << "-" << now.tm_mday << "-" << (now.tm_year + 1900) << ", " << hr << ":" << mn << ":" << sn << "]";
+
+    oss << std::put_time(&now, "%Y-%m-%d");
 
     std::string prefix = "";
     switch (level) {
@@ -41,13 +45,25 @@ void Logger::LogInternal(Level level, std::string str) {
     std::string pref = time.str() + " [" + prefix + "] ";
     std::string mstr = pref + str + "\n";
     auto path = util::GetLatitePath();
-    auto logPath = path / "Logs" / "latest.log";
+	std::filesystem::path logPath = path / "Logs" / "latest.log";
+    std::string archiveLogFileName = "LatiteRecode-" + oss.str() + ".log";
+    std::filesystem::path archiveLogPath = path / "Logs" / archiveLogFileName;
 
-    std::ofstream ofs;
-    ofs.open(logPath, std::ios::app);
+    // using 2 file streams here might be bad practice but honestly
+    // seems like an easier solution than opening and closing the stream
+    // multiple times.
+    std::ofstream ofsLogPath;
+    ofsLogPath.open(logPath, std::ios::app);
+    std::ofstream ofsArchiveLogPath;
+    ofsArchiveLogPath.open(archiveLogPath, std::ios::app);
 
-    if (!ofs.fail()) {
-        ofs << mstr;
+    if (!ofsLogPath.fail()) {
+        ofsLogPath << mstr;
+        ofsLogPath.close();
+    }
+    if (!ofsArchiveLogPath.fail()) {
+        ofsArchiveLogPath << mstr;
+        ofsArchiveLogPath.close();
     }
     OutputDebugStringA(mstr.c_str());
 
