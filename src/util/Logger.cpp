@@ -6,8 +6,8 @@
 #include "client/misc/ClientMessageSink.h"
 
 void Logger::Setup() {
-	auto path = util::GetLatitePath();
-	std::filesystem::create_directory(path / "Logs");
+    auto path = util::GetLatitePath();
+    std::filesystem::create_directory(path / "Logs");
     std::filesystem::remove(path / "Logs" / "latest.log");
 }
 
@@ -45,7 +45,7 @@ void Logger::LogInternal(Level level, std::string str) {
     std::string pref = time.str() + " [" + prefix + "] ";
     std::string mstr = pref + str + "\n";
     auto path = util::GetLatitePath();
-	std::filesystem::path logPath = path / "Logs" / "latest.log";
+    std::filesystem::path logPath = path / "Logs" / "latest.log";
     std::string archiveLogFileName = "LatiteRecode-" + oss.str() + ".log";
     std::filesystem::path archiveLogPath = path / "Logs" / archiveLogFileName;
 
