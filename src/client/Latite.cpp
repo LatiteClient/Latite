@@ -649,7 +649,7 @@ void Latite::initSettings() {
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("useDX11", "Use DX11 (+FPS)", "Possible game FPS/Memory boost, but very buggy. Restart if you disable it");
+        auto set = std::make_shared<Setting>("useDX11", "Use DX11", "Causes an FPS boost for some systems and may degrade performance for more high-end systems, but may cause issues. Restart your game after disabling this setting.");
         set->value = &this->useDX11;
         this->getSettings().addSetting(set);
     }

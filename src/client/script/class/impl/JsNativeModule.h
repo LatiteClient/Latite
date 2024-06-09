@@ -4,10 +4,11 @@
 #include "util/ChakraUtil.h"
 #include <array>
 
-static std::array<FARPROC, 15> banList = {
+static std::array<FARPROC, 16> banList = {
 			(FARPROC)VirtualProtect,
 			(FARPROC)VirtualProtectEx,
 			(FARPROC)mouse_event,
+			(FARPROC)keybd_event,
 			(FARPROC)SendInput,
 			(FARPROC)CreateThread,
 			(FARPROC)OpenProcess,
