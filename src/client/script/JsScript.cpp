@@ -304,7 +304,7 @@ namespace {
 		wchar_t* env;
 		size_t size;
 		if (!_wdupenv_s(&env, &size, arg.c_str()) && env) {
-			auto str = std::wstring(env, size);
+			auto str = std::wstring(env, size - 1);
 			delete env;
 			return Chakra::MakeString(str);
 		}
