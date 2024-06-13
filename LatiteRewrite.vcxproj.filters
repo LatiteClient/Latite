@@ -882,6 +882,9 @@
     <ClInclude Include="src\sdk\common\network\packet\ActorEventPacket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\hud\Coordinates.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1350,6 +1353,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\feature\module\impl\hud\ComboCounter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\hud\Coordinates.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
