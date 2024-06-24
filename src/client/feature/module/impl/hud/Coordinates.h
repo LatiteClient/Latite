@@ -1,12 +1,11 @@
 #pragma once
-#include "../../TextModule.h"
+#include "../../HUDModule.h"
 
-class Coordinates : public TextModule {
+class Coordinates : public HUDModule {
 public:
 	Coordinates();
 
-	std::wstringstream text(bool isDefault, bool inEditor) override;
+	void render(DrawUtil& dc, bool, bool) override;
 private:
-	ValueType showBiome = BoolValue(true);
 	ValueType showDimension = BoolValue(true);
 };
