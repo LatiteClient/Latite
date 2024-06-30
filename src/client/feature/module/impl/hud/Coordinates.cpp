@@ -18,7 +18,7 @@ Coordinates::Coordinates() : HUDModule("Coordinates", "Coordinates", "Shows play
 }
 
 void Coordinates::render(DrawUtil& dc, bool isDefault, bool inEditor) {
-	// todo: fix module looking weird in mod menu dropdown (rect issue)
+	// todo: fix module looking weird in mod menu dropdown (dimension rect issue)
 
 	if (!SDK::ClientInstance::get()->getLocalPlayer()) return;
 	if (std::get<BoolValue>(this->movableVanillaCoordinates)) return;
@@ -88,20 +88,23 @@ void Coordinates::onRenderLayer(Event& evG) {
 				XOR_STRING("player_position_text"));
 			float guiScale = SDK::ClientInstance::get()->getGuiData()->guiScale;
 
-			if (this->vanillaCoordinates && std::get<BoolValue>(this->hideVanillaCoordinates)) {
-				vanillaCoordinates->position = { 9999.f, 9999.f }; // very scuffed
-				updatePos();
-			}
-			else if (this->vanillaCoordinates && std::get<BoolValue>(this->movableVanillaCoordinates)) {
-				vanillaCoordinates->position = { rect.left / guiScale, rect.top / guiScale };
-				updatePos();
 
-				this->rect.right = rect.left + vanillaCoordinates->bounds.x * guiScale;
-				this->rect.bottom = rect.top + vanillaCoordinates->bounds.y * guiScale;
-			}
-			else {
-				vanillaCoordinates->position = { 3.f, 52.f }; // default vanilla coordinate position
-				updatePos();
+			if (this->vanillaCoordinates) {
+				if (std::get<BoolValue>(this->hideVanillaCoordinates)) {
+					vanillaCoordinates->position = { 9999.f, 9999.f }; // very scuffed
+					updatePos();
+				}
+				else if (std::get<BoolValue>(this->movableVanillaCoordinates)) {
+					vanillaCoordinates->position = { rect.left / guiScale, rect.top / guiScale };
+					updatePos();
+
+					this->rect.right = rect.left + vanillaCoordinates->bounds.x * guiScale;
+					this->rect.bottom = rect.top + vanillaCoordinates->bounds.y * guiScale;
+				}
+				else {
+					vanillaCoordinates->position = { 3.f, 52.f }; // default vanilla coordinate position
+					updatePos();
+				}
 			}
 		}
 	}
