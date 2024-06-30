@@ -1,17 +1,17 @@
 #pragma once
-#include "../../HUDModule.h"
+#include "../../TextModule.h"
 #include <sdk/common/client/gui/controls/UIControl.h>
 
-class Coordinates : public HUDModule {
+class Coordinates : public TextModule {
 public:
 	Coordinates();
 
-	void render(DrawUtil& dc, bool, bool) override;
+	std::wstringstream text(bool isDefault, bool inEditor) override;
 	void onRenderLayer(Event& ev);
 	void updatePos();
 private:
 	SDK::UIControl* vanillaCoordinates;
-	ValueType showDimension = BoolValue(true);
+	ValueType showDimension = BoolValue(false);
 	ValueType hideVanillaCoordinates = BoolValue(false);
 	ValueType movableVanillaCoordinates = BoolValue(false);
 };
