@@ -14,6 +14,7 @@ public:
 	void updatePos();
 private:
 	SDK::UIControl* bossHealthGrid;
+	ValueType hideBossbar = BoolValue(false);
 
 	Vec2 newPos = {};
 };
