@@ -352,9 +352,10 @@
     <ClInclude Include="src\client\feature\module\impl\game\Waypoints.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\Chat.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\ComboCounter.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\Coordinates.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\CustomCoordinates.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\ItemCounter.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\MovableBossbar.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\MovableCoordinates.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\MovableScoreboard.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\ReachDisplay.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\CommandShortcuts.h" />
@@ -644,9 +645,10 @@
     <ClCompile Include="src\client\feature\module\impl\game\Waypoints.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\Chat.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\ComboCounter.cpp" />
-    <ClCompile Include="src\client\feature\module\impl\hud\Coordinates.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\CustomCoordinates.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\ItemCounter.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\MovableBossbar.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\MovableCoordinates.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\MovableScoreboard.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\ReachDisplay.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\CommandShortcuts.cpp" />
