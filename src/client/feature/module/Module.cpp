@@ -16,7 +16,7 @@ void Module::loadConfig(SettingGroup& resolvedGroup) {
 	afterLoadConfig();
 }
 
-std::shared_ptr<Setting> Module::addSetting(std::string const& internalName, std::string const& disp, std::string const& desc, ValueType& val, Setting::Condition condition) {
+std::shared_ptr<Setting> Module::addSetting(std::string const& internalName, std::wstring const& disp, std::wstring const& desc, ValueType& val, Setting::Condition condition) {
 	auto set = std::make_shared<Setting>(internalName, disp, desc, condition);
 	set->value = &val;
 	set->defaultValue = val;
@@ -24,7 +24,7 @@ std::shared_ptr<Setting> Module::addSetting(std::string const& internalName, std
 	return set;
 }
 
-std::shared_ptr<Setting> Module::addEnumSetting(std::string const& internalName, std::string const& displayName, std::string const& desc, EnumData& dat, Setting::Condition condition) {
+std::shared_ptr<Setting> Module::addEnumSetting(std::string const& internalName, std::wstring const& displayName, std::wstring const& desc, EnumData& dat, Setting::Condition condition) {
 	auto set = std::make_shared<Setting>(internalName, displayName, desc, condition);
 	set->enumData = &dat;
 	set->value = dat.getValue();
@@ -33,7 +33,7 @@ std::shared_ptr<Setting> Module::addEnumSetting(std::string const& internalName,
 	return set;
 }
 
-std::shared_ptr<Setting> Module::addSliderSetting(std::string const& internalName, std::string const& displayName, std::string const& desc, ValueType& val, ValueType min, ValueType max, ValueType interval, Setting::Condition condition) {
+std::shared_ptr<Setting> Module::addSliderSetting(std::string const& internalName, std::wstring const& displayName, std::wstring const& desc, ValueType& val, ValueType min, ValueType max, ValueType interval, Setting::Condition condition) {
 
 	auto set = std::make_shared<Setting>(internalName, displayName, desc, condition);
 	set->value = &val;

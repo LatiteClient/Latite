@@ -9,7 +9,7 @@
 namespace SDK {
 	class Player : public Mob {
 	public:
-		void displayClientMessage(std::string const& message);
+		void displayClientMessage(std::wstring const& message);
 
 		MoveInputComponent* getMoveInputComponent();
 		std::string getXUID();

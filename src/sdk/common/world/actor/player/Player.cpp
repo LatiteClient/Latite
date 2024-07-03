@@ -5,7 +5,7 @@
 #include "sdk/Version.h"
 #include "sdk/signature/storage.h"
 
-void SDK::Player::displayClientMessage(std::string const& message) {
+void SDK::Player::displayClientMessage(std::wstring const& message) {
 	memory::callVirtual<void>(this, mvGetOffset<0xD7, 0xEF, 0x15E, 0x184, 0x18A>(), message);
 }
 

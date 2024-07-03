@@ -33,8 +33,8 @@ protected:
 	static constexpr int alignment_right = 2;
 	EnumData alignment;
 public:
-	TextModule(std::string const& name, std::string const& displayName,
-		std::string const& description, Category category, float maxBgX = 400.f, int keybind = 0, bool cacheText = false)
+	TextModule(std::string const& name, std::wstring const& displayName,
+		std::wstring const& description, Category category, float maxBgX = 400.f, int keybind = 0, bool cacheText = false)
 	: HUDModule(name, displayName, description, category, keybind, true),
 	maxBGX(maxBgX), cacheText(cacheText) {
 		this->textual = true;

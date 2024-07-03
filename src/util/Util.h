@@ -16,7 +16,9 @@ namespace util {
 	extern std::filesystem::path GetLatitePath();
 	extern std::wstring StrToWStr(std::string const& s);
 	extern std::string WStrToStr(std::wstring const& ws);
-	extern std::string Format(std::string const& s);
+	extern std::wstring FormatWString(std::wstring formatString, std::vector<std::wstring> formatArgs);
+	extern std::string FormatMC(std::string const& s);
+	extern std::wstring FormatWStringMC(std::wstring const& s);
 	extern std::wstring GetClipboardText();
 	extern void SetClipboardText(std::wstring const& text);
 
