@@ -3,6 +3,7 @@
 //
 
 #include "Latite.h"
+#include "localization/LocalizeString.h"
 
 #include "client/ui/TextBox.h"
 
@@ -508,9 +509,8 @@ void Latite::threadsafeInit() {
     Latite::getRenderer().setShouldInit();
 
     Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
-
-    Latite::getNotifications().push(XW("Welcome to Latite Client!"));
-    Latite::getNotifications().push(L"Press " + util::StrToWStr(util::KeyToString(Latite::getMenuKey().value)) + L" in a world or server to open the mod menu.");
+    Latite::getNotifications().push(LocalizeString::get(L"intro.welcome"));
+    Latite::getNotifications().push(LocalizeString::get(L"intro.menubutton"));
 }
 
 void Latite::patchKey() {
@@ -641,6 +641,11 @@ void Latite::initSettings() {
     {
         auto set = std::make_shared<Setting>("ejectKey", "Eject Key", "The key used to uninject the client");
         set->value = &this->ejectKey;
+        this->getSettings().addSetting(set);
+    }
+    {
+        auto set = std::make_shared<Setting>("language", "Language", "Language selection");
+        set->value = &this->clientLanguage;
         this->getSettings().addSetting(set);
     }
     {

@@ -82,6 +82,10 @@ public:
 		return std::get<BoolValue>(useDX11);
 	}
 
+	[[nodiscard]] std::wstring getClientLanguage() {
+		return std::get<TextValue>(clientLanguage).str;
+	}
+
 	[[nodiscard]] bool shoulBlurHUD() {
 		return std::get<BoolValue>(hudBlur);
 	}
@@ -134,6 +138,7 @@ private:
 	ValueType commandPrefix = TextValue(L".");
 	ValueType menuKey = KeyValue('M');
 	ValueType ejectKey = KeyValue(VK_END);
+	ValueType clientLanguage = TextValue(L"English");
 	ValueType hudBlur = BoolValue(false);
 	ValueType hudBlurIntensity = FloatValue(10.f);
 	ValueType menuBlurEnabled = BoolValue(true);
