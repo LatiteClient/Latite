@@ -6,7 +6,7 @@
 English::English() {
     English::strings = {
         { "intro.welcome", L"Welcome to Latite Client!" },
-        { "intro.menubutton", L"Press " + util::StrToWStr(util::KeyToString(Latite::get().getMenuKey().value)) + L" in a world or server to open the mod menu." },
+        { "intro.menubutton", L"Press {} in a world or server to open the mod menu." },
 
         { "client.module.enabled", L"Enabled" },
         { "client.module.enabled.desc", L"Whether the module is on or not" },
