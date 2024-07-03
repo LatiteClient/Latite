@@ -3,6 +3,6 @@
 class LocalizeString
 {
 public:
-    static std::wstring get(std::wstring id);
+    static std::wstring get(std::string id);
 };
 

@@ -8,16 +8,16 @@ public:
 	static constexpr float min_scale = 0.f;
 	static constexpr float max_scale = 4.f;
 
-	HUDModule(std::string const& name, std::string const& displayName, std::string const& description, Category category, int keybind = 0,
+	HUDModule(std::string const& name, std::wstring const& displayName, std::wstring const& description, Category category, int keybind = 0,
 		bool resizable = true)
 		: Module(name, displayName, description, category, keybind, true), resizable(resizable) {
 		
-		addSetting("pos", "Position", "<internal setting>", storedPos);
-		addSetting("snapX", "Snap X", "<internal setting>", snappingX);
-		addSetting("snapY", "Snap Y", "<internal setting>", snappingY);
+		addSetting("pos", LocalizeString::get("client.hudmodule.pos"), L"<internal setting>", storedPos);
+		addSetting("snapX", LocalizeString::get("client.hudmodule.snapX"), L"<internal setting>", snappingX);
+		addSetting("snapY", LocalizeString::get("client.hudmodule.snapY"), L"<internal setting>", snappingY);
 
-		if (resizable) addSliderSetting("scale", "Size", "", scale, FloatValue(min_scale), FloatValue(max_scale), FloatValue(0.05f));
-		addSetting("forceMinecraftRend", "Force Minecraft Renderer", "Whether or not to use the Minecraft renderer for this module.", forceMCRend);
+		if (resizable) addSliderSetting("scale", LocalizeString::get("client.hudmodule.size"), L"", scale, FloatValue(min_scale), FloatValue(max_scale), FloatValue(0.05f));
+		addSetting("forceMinecraftRend", LocalizeString::get("client.hudmodule.forceMcRend"), LocalizeString::get("client.hudmodule.forceMcRend.desc"), forceMCRend);
 	}
 
 	virtual ~HUDModule() = default;

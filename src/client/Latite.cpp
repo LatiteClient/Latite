@@ -509,8 +509,8 @@ void Latite::threadsafeInit() {
     Latite::getRenderer().setShouldInit();
 
     Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
-    Latite::getNotifications().push(LocalizeString::get(L"intro.welcome"));
-    Latite::getNotifications().push(LocalizeString::get(L"intro.menubutton"));
+    Latite::getNotifications().push(LocalizeString::get("intro.welcome"));
+    Latite::getNotifications().push(LocalizeString::get("intro.menubutton"));
 }
 
 void Latite::patchKey() {

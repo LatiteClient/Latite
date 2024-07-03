@@ -5,8 +5,8 @@ class English
 {
 public:
     English();
-    std::wstring getString(std::wstring id);
+    std::wstring getString(std::string id);
 private:
-    std::map<std::wstring, std::wstring> strings;
+    std::map<std::string, std::wstring> strings;
 };
 

@@ -5,7 +5,7 @@
 #include "Spanish.h"
 
 
-std::wstring LocalizeString::get(std::wstring id) {
+std::wstring LocalizeString::get(std::string id) {
     English english;
     Spanish spanish;
 
