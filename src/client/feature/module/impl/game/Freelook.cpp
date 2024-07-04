@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Freelook.h"
 
-Freelook::Freelook() : Module("Freelook", "Freelook", "Look around freely.", GAME, 'F') {
+Freelook::Freelook() : Module("Freelook", LocalizeString::get("client.module.freelook.name"), LocalizeString::get("client.module.freelook.desc"), GAME, 'F') {
 	listen<UpdatePlayerCameraEvent>((EventListenerFunc)&Freelook::onCameraUpdate);
 	listen<PerspectiveEvent>((EventListenerFunc)&Freelook::onPerspective);
 }

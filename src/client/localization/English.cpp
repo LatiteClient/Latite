@@ -21,6 +21,8 @@ English::English() {
 
         { "client.module.behindYou.name", L"Behind You!" },
         { "client.module.behindYou.desc", L"Bind a perspective to a key." },
+        { "client.module.freelook.name", L"Freelook" },
+        { "client.module.freelook.desc", L"Look around freely." },
 
         // todo: check if this displays diacritics correctly (or even works at all)
         { "client.commands.config.desc", L"Perform actions related to profiles/configs" },
