@@ -2,8 +2,9 @@
 #include "ComboCounter.h"
 #include <sdk/common/network/packet/ActorEventPacket.h>
 
-ComboCounter::ComboCounter() : TextModule("ComboCounter", "Combo Counter", "Shows how many combos you have.", HUD) {
-    prefix = TextValue(L"Combo: ");
+ComboCounter::ComboCounter() : TextModule("ComboCounter", LocalizeString::get("client.hudmodule.comboCounter.name"),
+                                          LocalizeString::get("client.hudmodule.comboCounter.desc"), HUD) {
+    prefix = TextValue(LocalizeString::get("client.hudmodule.comboCounter.count.name"));
 
     listen<AttackEvent>((EventListenerFunc)&ComboCounter::onAttack);
     listen<PacketReceiveEvent>((EventListenerFunc)&ComboCounter::onPacketReceive);

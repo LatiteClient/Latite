@@ -8,17 +8,21 @@ English::English() {
         { "intro.welcome", L"Welcome to Latite Client!" },
         { "intro.menubutton", L"Press {} in a world or server to open the mod menu." },
 
-        { "client.module.enabled.name", L"Enabled" },
-        { "client.module.key.name", L"Key" },
-        { "client.module.enabled.desc", L"Whether the module is on or not" },
-        { "client.module.key.desc", L"The keybind of the module" },
-
         { "client.hudmodule.pos.name", L"Position" },
         { "client.hudmodule.snapX.name", L"Snap X" },
         { "client.hudmodule.snapY.name", L"Snap Y" },
         { "client.hudmodule.size.name", L"Size" },
         { "client.hudmodule.forceMcRend.name", L"Force Minecraft Renderer" },
         { "client.hudmodule.forceMcRend.desc", L"Whether or not to use the Minecraft renderer for this module." },
+
+        { "client.textmodule.comboCounter.name", L"Combo Counter" },
+        { "client.textmodule.comboCounter.desc", L"Shows how many combos you have." },
+        { "client.textmodule.comboCounter.count.name", L"Combo: " },
+
+        { "client.module.enabled.name", L"Enabled" },
+        { "client.module.key.name", L"Key" },
+        { "client.module.enabled.desc", L"Whether the module is on or not" },
+        { "client.module.key.desc", L"The keybind of the module" },
 
         { "client.module.behindYou.name", L"Behind You!" },
         { "client.module.behindYouState0.name", L"Third Person Front" },
