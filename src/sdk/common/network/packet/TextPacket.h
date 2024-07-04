@@ -24,9 +24,8 @@ namespace SDK {
 		String str;
 
 	private:
-		[[maybe_unused]] char pad[24];
+		[[maybe_unused]] char pad[9 * 8];
 	public:
-		alignas(8) bool translationNeeded = false;
 		String xboxUserId, platformChatId;
 		// theres probably more stuff
 	private:
