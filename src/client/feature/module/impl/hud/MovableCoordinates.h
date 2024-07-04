@@ -2,19 +2,16 @@
 #include "../../HUDModule.h"
 #include <sdk/common/client/gui/controls/UIControl.h>
 
-class MovableBossbar : public HUDModule {
+class MovableCoordinates : public HUDModule {
 public:
-	MovableBossbar();
+	MovableCoordinates();
 
 	[[nodiscard]] virtual bool forceMinecraftRenderer() override { return true; }
 	virtual void render(DrawUtil& ctx, bool isDefault, bool inEditor);
 
 	void onRenderLayer(Event& ev);
-
 	void updatePos();
 private:
-	SDK::UIControl* bossHealthGrid;
-	ValueType hideBossbar = BoolValue(false);
-
-	Vec2 newPos = {};
+	SDK::UIControl* vanillaCoordinates;
+	ValueType hideVanillaCoordinates = BoolValue(false);
 };

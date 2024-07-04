@@ -8,6 +8,7 @@
 
 MovableBossbar::MovableBossbar() : HUDModule("MovableBossbar", "Movable Bossbar", "Makes the in-game bossbar movable.", HUD, 0, false) {
 	listen<RenderLayerEvent>((EventListenerFunc)&MovableBossbar::onRenderLayer, true, 10 /*need to overpower the hud renderer*/);
+	addSetting("hideBossbar", "Hide bossbar", "", this->hideBossbar);
 }
 
 void MovableBossbar::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
@@ -32,11 +33,17 @@ void MovableBossbar::onRenderLayer(Event& evG) {
 			float guiScale = SDK::ClientInstance::get()->getGuiData()->guiScale;
 
 			if (bossHealthGrid) {
-				bossHealthGrid->position = { rect.left / guiScale, rect.top / guiScale };
-				updatePos();
+				if (std::get<BoolValue>(this->hideBossbar)) {
+					bossHealthGrid->position = { 9999.f, 9999.f }; // very scuffed
+					updatePos();
+				}
+				else {
+					bossHealthGrid->position = { rect.left / guiScale, rect.top / guiScale };
+					updatePos();
 
-				this->rect.right = rect.left + bossHealthGrid->bounds.x * guiScale;
-				this->rect.bottom = rect.top + bossHealthGrid->bounds.y * guiScale;
+					this->rect.right = rect.left + bossHealthGrid->bounds.x * guiScale;
+					this->rect.bottom = rect.top + bossHealthGrid->bounds.y * guiScale;
+				}
 			}
 			else {
 				this->rect.right = rect.left + 100.f;

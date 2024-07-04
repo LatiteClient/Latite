@@ -332,6 +332,7 @@
     <ClInclude Include="deps\include\mnemosyne\scan\signature.hpp" />
     <ClInclude Include="deps\mnem\cpuid.hpp" />
     <ClInclude Include="deps\mnem\scan\scanner_impls.hpp" />
+    <ClInclude Include="resource1.h" />
     <ClInclude Include="src\client\event\impl\AttackEvent.h" />
     <ClInclude Include="src\client\event\impl\ChatMessageEvent.h" />
     <ClInclude Include="src\client\event\impl\ClientTextEvent.h" />
@@ -352,8 +353,10 @@
     <ClInclude Include="src\client\feature\module\impl\game\Waypoints.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\Chat.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\ComboCounter.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\CustomCoordinates.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\ItemCounter.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\MovableBossbar.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\MovableCoordinates.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\MovableScoreboard.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\ReachDisplay.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\CommandShortcuts.h" />
@@ -475,6 +478,9 @@
     <ClInclude Include="src\client\hook\impl\ScreenViewHooks.h" />
     <ClInclude Include="src\client\input\Keyboard.h" />
     <ClInclude Include="src\client\Latite.h" />
+    <ClInclude Include="src\client\localization\English.h" />
+    <ClInclude Include="src\client\localization\LocalizeString.h" />
+    <ClInclude Include="src\client\localization\Spanish.h" />
     <ClInclude Include="src\client\misc\AuthWindow.h" />
     <ClInclude Include="src\client\misc\ClientMessageSink.h" />
     <ClInclude Include="src\api\feature\module\Module.h" />
@@ -636,6 +642,7 @@
     <ClCompile Include="deps\mnem\os\win32\process.cpp" />
     <ClCompile Include="deps\mnem\scan\scanner.cpp" />
     <ClCompile Include="deps\mnem\scan\scanner_avx2.cpp" />
+    <ClCompile Include="src\client\localization\English.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\EnvironmentChanger.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\Freelook.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\TextHotkey.cpp" />
@@ -643,8 +650,10 @@
     <ClCompile Include="src\client\feature\module\impl\game\Waypoints.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\Chat.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\ComboCounter.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\CustomCoordinates.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\ItemCounter.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\MovableBossbar.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\MovableCoordinates.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\MovableScoreboard.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\ReachDisplay.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\CommandShortcuts.cpp" />
@@ -715,6 +724,8 @@
     <ClCompile Include="src\client\hook\impl\ScreenViewHooks.cpp" />
     <ClCompile Include="src\client\input\Keyboard.cpp" />
     <ClCompile Include="src\client\Latite.cpp" />
+    <ClCompile Include="src\client\localization\LocalizeString.cpp" />
+    <ClCompile Include="src\client\localization\Spanish.cpp" />
     <ClCompile Include="src\client\misc\AuthWindow.cpp" />
     <ClCompile Include="src\client\misc\ClientMessageSink.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\TestModule.cpp" />
@@ -795,6 +806,7 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\arrow.png" />
