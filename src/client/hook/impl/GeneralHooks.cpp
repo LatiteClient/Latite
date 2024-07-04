@@ -43,17 +43,6 @@ void GenericHooks::Level_tick(SDK::Level* level) {
 		Latite::getClientMessageSink().doPrint(100);
 
 		auto lp = SDK::ClientInstance::get()->getLocalPlayer();
-		{
-			static SDK::LocalPlayer* lastLocalPlayer = lp;
-
-
-
-			// this is cringe and in extremely cases would not fire, but it doesn't require any new SDK..
-			if (lp && lp != lastLocalPlayer) {
-				PluginManager::Event sEv{ L"world-change", {}, false };
-				Latite::getPluginManager().dispatchEvent(sEv);
-			}
-		}
 
 		static bool playerInitialized = false;
 		if (!playerInitialized && lp) {

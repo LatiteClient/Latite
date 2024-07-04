@@ -69,7 +69,7 @@ public:
 
 	struct Vtable {
 		inline static SigImpl TextPacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-			"48 8d 05 ? ? ? ? 48 89 85 ? ? ? ? c6 85 ? ? ? ? ? 0f 11 85 ? ? ? ? 4c 89 ad ? ? ? ? 4c 89 ad ? ? ? ? 48 8d 55"_sig,
+			"48 8d 05 ? ? ? ? 48 89 01 33 d2 48 89 51 ? 0f 57 c0 48 89 51 ? 48 8b c1 89 51"_sig,
 			"const TextPacket::`vftable'"};
 		inline static SigImpl CommandRequestPacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8d 05 ? ? ? ? 48 89 73 ? 48 89 43 ? c7 43 ? ? ? ? ? c7 43 ? ? ? ? ? 66 89 73 ? 48 89 73 ? 89 73 ? 0f 11 43 ? 48 89 73 ? 48 c7 43 ? ? ? ? ? 40 88 73 ? 40 88 73 ? 48 89 73"_sig,
@@ -78,7 +78,7 @@ public:
 		// "Client%d camera ticking system"
 		// 1st of 3 data LEA's
 		inline static SigImpl Level{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-			"48 8d 05 ? ? ? ? 48 89 03 48 8d 05 ? ? ? ? 48 89 43 ? 48 8d 05 ? ? ? ? 48 89 43 ? 33 c0"_sig,
+			"48 8d 05 ? ? ? ? 48 89 03 48 8d 05 ? ? ? ? 48 89 43 ? 48 8d 05 ? ? ? ? 48 89 43 ? 48 8d 8b"_sig,
 			"const Level::`vftable'"};
 		inline static SigImpl SetTitlePacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8d 05 ? ? ? ? 48 89 01 89 51 ? 48 83 c1 ? 0f 57 c0 0f 11 01 48 89 79"_sig,
@@ -135,8 +135,8 @@ public:
 		"GameRenderer::_renderCurrentFrame"};
 
 	//48 89 5c 24 ? 48 89 74 24 ? 57 48 83 ec ? 48 8b f1 c6 81 ? ? ? ? ? 48 8d b9 ? ? ? ? 48 89 7c 24 ? 48 8b cf ff 15 ? ? ? ? 85 c0 74 ? 8b c8 ff 15 ? ? ? ? 90 48 8b 5e ? 48 8b 1b 80 7b ? ? 75 ? 0f 1f 84 00 ? ? ? ? 48 8b 4b ? 48 8b 01 48 8b 40 ? ff 15 ? ? ? ? 48 8b 43 ? 80 78 ? ? 74 ? 48 8b 43 ? 80 78 ? ? 75 ? 48 3b 58 ? 75 ? 48 8b d8 48 8b 40 ? 80 78 ? ? 74 ? 48 8b d8 eb ? 48 8b d8 48 8b 08 80 79 ? ? 75 ? 0f 1f 80 ? ? ? ? 48 8b d9 48 8b 01 48 8b c8 80 78 ? ? 74 ? 80 7b ? ? 74 ? c7 86 ? ? ? ? ? ? ? ? 48 8b cf 48 8b 5c 24 ? 48 8b 74 24 ? 48 83 c4 ? 5f 48 ff 25 ? ? ? ? cc cc cc cc cc cc cc cc 48 89 5c 24 ? 48 89 74 24
-	inline static SigImpl AppPlatform__fireAppFocusLost{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"e8 ? ? ? ? 48 8b 83 ? ? ? ? 4c 8b 70 ? 45 33 ff"_sig,
+	inline static SigImpl AppPlatform__fireAppFocusLost{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5c 24 ? 48 89 74 24 ? 57 48 83 ec ? 48 8b f1 c6 81 ? ? ? ? ? 48 8d b9 ? ? ? ? 48 89 7c 24 ? 48 8b cf ff 15 ? ? ? ? 85 c0 74 ? 8b c8 ff 15 ? ? ? ? 90 48 8b 5e ? 48 8b 1b 80 7b ? ? 75 ? 0f 1f 84 00 ? ? ? ? 48 8b 4b ? 48 8b 01 48 8b 40 ? ff 15 ? ? ? ? 48 8b 43 ? 80 78 ? ? 74 ? 48 8b 43 ? 80 78 ? ? 75 ? 48 3b 58 ? 75 ? 48 8b d8 48 8b 40 ? 80 78 ? ? 74 ? 48 8b d8 eb ? 48 8b d8 48 8b 08 80 79 ? ? 75 ? 0f 1f 80 ? ? ? ? 48 8b d9 48 8b 01 48 8b c8 80 78 ? ? 74 ? 80 7b ? ? 74 ? c7 86 ? ? ? ? ? ? ? ? 48 8b cf 48 8b 5c 24 ? 48 8b 74 24 ? 48 83 c4 ? 5f 48 ff 25 ? ? ? ? cc cc cc cc cc cc cc cc 48 89 5c 24 ? 48 89 74 24"_sig,
 		"AppPlatform::_fireAppFocusLost"};
 
 	inline static SigImpl onClick{[](memory::signature_store&, uintptr_t res) { return res; },
