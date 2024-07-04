@@ -15,7 +15,7 @@ public:
 		key = KeyValue(keybind);
 
 		{
-			auto set = std::make_shared<Setting>("enabled", LocalizeString::get("client.module.enabled"), LocalizeString::get("client.module.enabled.desc"));
+			auto set = std::make_shared<Setting>("enabled", LocalizeString::get("client.module.enabled.name"), LocalizeString::get("client.module.enabled.desc"));
 			set->value = &enabled;
 			set->visible = false;
 			set->defaultValue = BoolValue(false);
@@ -26,7 +26,7 @@ public:
 			settings->addSetting(set);
 		}
 		if (keybind != 1) {
-			auto set = std::make_shared<Setting>("key", LocalizeString::get("client.module.key"), LocalizeString::get("client.module.key.desc"));
+			auto set = std::make_shared<Setting>("key", LocalizeString::get("client.module.key.name"), LocalizeString::get("client.module.key.desc"));
 			set->value = &key;
 			set->defaultValue = KeyValue(keybind);
 
