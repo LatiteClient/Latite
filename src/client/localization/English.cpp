@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "English.h"
 
-// {} is a placeholder for a variable, similar to std::format (but I had to implement it myself)
+// {} is a placeholder for a variable, similar to std::format (but I had to implement it myself).
+// When using {}, the LocalizeString::get call must be inside a util::FormatWString call to actually format it.
 
 English::English() {
     English::strings = {
