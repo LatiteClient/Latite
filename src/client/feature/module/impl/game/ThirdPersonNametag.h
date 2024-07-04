@@ -2,10 +2,12 @@
 
 class ThirdPersonNametag : public Module {
 public:
-    ThirdPersonNametag() : Module("ThirdPersonNametag", "Third Person Nametag", "Shows your nametag in third person view.", GAME) {
+    ThirdPersonNametag() : Module("ThirdPersonNametag", LocalizeString::get("client.module.thirdPersonNametag.name"),
+                                  LocalizeString::get("client.module.thirdPersonNametag.desc"), GAME) {
     }
 
-    virtual ~ThirdPersonNametag() {}
+    ~ThirdPersonNametag() override {
+    }
 
     void onEnable() override;
     void onDisable() override;

@@ -33,6 +33,9 @@ English::English() {
         { "client.module.freelook.name", L"Freelook" },
         { "client.module.freelook.desc", L"Look around freely." },
 
+        { "client.module.thirdPersonNametag.name", L"Third Person Nametag" },
+        { "client.module.thirdPersonNametag.desc", L"Shows your nametag in third person view." },
+
         { "client.module.environmentChanger.name", L"Environment Changer" },
         { "client.module.environmentChanger.desc", L"Changes visual features in the environment." },
         { "client.module.environmentChanger.setFogColor.name", L"Set Fog Color" },
