@@ -2,18 +2,27 @@
 #include "EnvironmentChanger.h"
 #include <client/event/impl/WeatherEvent.h>
 
-EnvironmentChanger::EnvironmentChanger() : Module("EnvironmentChanger", "Environment Changer",
-                                                  "Changes visual features in the environment.", GAME) {
+EnvironmentChanger::EnvironmentChanger() : Module("EnvironmentChanger", LocalizeString::get("client.module.environmentChanger.name"),
+                                                  LocalizeString::get("client.module.environmentChanger.desc"), GAME) {
 	listen<WeatherEvent>(static_cast<EventListenerFunc>(&EnvironmentChanger::onWeather));
 	listen<FogColorEvent>(static_cast<EventListenerFunc>(&EnvironmentChanger::onFogColor));
 	listen<GetTimeEvent>(static_cast<EventListenerFunc>(&EnvironmentChanger::onTime));
 
-	addSetting("setFogColor", "Set Fog Color", "", setFogColor);
-	addSetting("fogColor", "Fog Color", "The new fog color", fogColor, "setFogColor"_istrue);
-	addSetting("setTime", "Set Time", "Whether or not to set the time", setTime);
-	addSliderSetting("timeToSet", "Time", "The new time of day to set", time, FloatValue(0.f), FloatValue(1.f),
-	                 FloatValue(0.01f), "setTime");
-	addSetting("showWeather", "Show Weather", "Whether or not to show the weather", showWeather);
+    addSetting("setFogColor", LocalizeString::get("client.module.environmentChanger.setFogColor.name"), L"",
+               setFogColor);
+
+	addSetting("fogColor", LocalizeString::get("client.module.environmentChanger.fogColor.name"),
+               LocalizeString::get("client.module.environmentChanger.fogColor.desc"), fogColor, "setFogColor"_istrue);
+
+	addSetting("setTime", LocalizeString::get("client.module.environmentChanger.setTime.name"),
+               LocalizeString::get("client.module.environmentChanger.setTime.desc"), setTime);
+
+	addSliderSetting("timeToSet", LocalizeString::get("client.module.environmentChanger.timeToSet.name"),
+                     LocalizeString::get("client.module.environmentChanger.timeToSet.desc"), time, FloatValue(0.f),
+                     FloatValue(1.f), FloatValue(0.01f), "setTime");
+
+	addSetting("showWeather", LocalizeString::get("client.module.environmentChanger.showWeather.name"),
+               LocalizeString::get("client.module.environmentChanger.showWeather.desc"), showWeather);
 }
 
 void EnvironmentChanger::onWeather(Event& evG) {
