@@ -296,14 +296,14 @@ using ValueType = std::variant<
 	TextValue,
 	SnapValue>;
 
-class EnumEntry : public Feature {
-	std::string entryName;
+class EnumEntry /*: Feature*/ {
+	std::wstring entryName;
 	std::wstring entryDesc;
 public:
-	std::string name() override { return entryName; }
-	std::wstring desc() override { return entryDesc; }
+	std::wstring name() { return entryName; }
+	std::wstring desc() { return entryDesc; }
 
-	EnumEntry(int key, std::string const& name, std::wstring const& desc = L"") : entryName(name), entryDesc(desc) {}
+	EnumEntry(int key, std::wstring const& name, std::wstring const& desc = L"") : entryName(name), entryDesc(desc) {}
 };
 
 class EnumData {
@@ -322,7 +322,7 @@ public:
 		return std::get<EnumValue>(selectedIdx);
 	}
 
-	[[nodiscard]] std::string getSelectedName() {
+	[[nodiscard]] std::wstring getSelectedName() {
 		return entries[std::get<EnumValue>(selectedIdx)].name();
 	}
 

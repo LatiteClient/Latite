@@ -21,7 +21,14 @@ English::English() {
         { "client.hudmodule.forceMcRend.desc", L"Whether or not to use the Minecraft renderer for this module." },
 
         { "client.module.behindYou.name", L"Behind You!" },
+        { "client.module.behindYouState0.name", L"Third Person Front" },
+        { "client.module.behindYouState1.name", L"Third Person Back" },
+        { "client.module.behindYouState2.name", L"First Person" },
+        { "client.module.behindYou.perspective.name", L"Perspective" },
+        { "client.module.behindYou.bind.name", L"Bind" },
         { "client.module.behindYou.desc", L"Bind a perspective to a key." },
+        { "client.module.behindYou.bind.desc", L"What to bind the perspective to" },
+        { "client.module.behindYou.perspective.desc", L"The perspective" },
 
         { "client.module.freelook.name", L"Freelook" },
         { "client.module.freelook.desc", L"Look around freely." },
