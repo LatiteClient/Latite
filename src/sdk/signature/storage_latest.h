@@ -233,8 +233,8 @@ public:
 		"48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 48 89 4C 24 ?? 57 48 83 EC ?? 49 8B F8 48 8B DA 48 8B F1 48 8D 05"_sig,
 		"BaseActorRenderContext::BaseActorRenderContext"};
 
-	inline static SigImpl ItemRenderer_renderGuiItemNew{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"e8 ? ? ? ? 48 81 c3 ? ? ? ? 4c 89 65"_sig,
+	inline static SigImpl ItemRenderer_renderGuiItemNew{ [](memory::signature_store&, uintptr_t res) { return res; },
+		"48 8b c4 53 55 56 57 41 54 41 55 41 56 41 57 48 81 ec ? ? ? ? 0f 29 70 ? 0f 29 78 ? 48 8b 05"_sig,
 		"ItemRenderer::renderGuiItemNew"};
 
 	// TODO: this is actually BaseAttributeMap::getInstance
