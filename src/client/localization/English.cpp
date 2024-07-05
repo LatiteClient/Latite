@@ -57,6 +57,15 @@ English::English() {
         { "client.hudmodule.props.forceMcRend.name", L"Force Minecraft Renderer" },
         { "client.hudmodule.props.forceMcRend.desc", L"Whether or not to use the Minecraft renderer for this module." },
 
+        { "client.hudmodule.itemCounter.name", L"Item Counter" },
+        { "client.hudmodule.itemCounter.desc", L"Counts certain items in your inventory." },
+        { "client.hudmodule.itemCounter.alwaysShow.name", L"Always Show" },
+        { "client.hudmodule.itemCounter.potions.name", L"Potions" },
+        { "client.hudmodule.itemCounter.arrows.name", L"Arrows" },
+        { "client.hudmodule.itemCounter.crystals.name", L"Crystals" },
+        { "client.hudmodule.itemCounter.totems.name", L"Totems" },
+        { "client.hudmodule.itemCounter.xpBottles.name", L"XP Bottles" },
+
         { "client.module.props.enabled.name", L"Enabled" },
         { "client.module.props.key.name", L"Key" },
         { "client.module.props.enabled.desc", L"Whether the module is on or not" },
