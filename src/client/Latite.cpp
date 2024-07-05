@@ -644,9 +644,9 @@ void Latite::initSettings() {
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("language", "Language", "Language selection");
-        set->value = &this->clientLanguage;
-        this->getSettings().addSetting(set);
+        //auto set = std::make_shared<Setting>("language", "Language", "Language selection");
+        //set->value = &this->clientLanguage;
+        //this->getSettings().addSetting(set);
     }
     {
         auto set = std::make_shared<Setting>("menuBlurEnabled", "Menu Blur", "Whether blur is enabled or disabled for the menu");
