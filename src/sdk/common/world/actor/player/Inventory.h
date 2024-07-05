@@ -13,7 +13,13 @@ namespace SDK {
 		virtual void unk(void) = 0;
 		virtual void addContentChangeListener(class ContainerContentChangeListener*) = 0;
 		virtual void removeContentChangeListener(ContainerContentChangeListener*) = 0;
+		virtual void addRemovedListener(class ContainerRemovedListener*) = 0;
+		virtual void removeRemovedListener(class ContainerRemovedListener*) = 0;
 		virtual ItemStack* getItem(int) = 0;
+
+		// the other stuff aren't updated to 1.21 lol
+
+	private:
 		virtual bool hasRoomForItem(ItemStack const&) = 0;
 		virtual void addItem(ItemStack&) = 0;
 		virtual char addItemToFirstEmptySlot(ItemStack&) = 0;
