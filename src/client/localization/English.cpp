@@ -57,10 +57,10 @@ English::English() {
         { "client.textmodule.customCoordinates.desc", L"Shows player position and other info" },
         { "client.textmodule.customCoordinates.showDimension.desc", L"Show the dimension the player is currently in" },
 
-        { "client.module.enabled.name", L"Enabled" },
-        { "client.module.key.name", L"Key" },
-        { "client.module.enabled.desc", L"Whether the module is on or not" },
-        { "client.module.key.desc", L"The keybind of the module" },
+        { "client.module.props.enabled.name", L"Enabled" },
+        { "client.module.props.key.name", L"Key" },
+        { "client.module.props.enabled.desc", L"Whether the module is on or not" },
+        { "client.module.props.key.desc", L"The keybind of the module" },
 
         { "client.module.behindYou.name", L"Behind You!" },
         { "client.module.behindYouState0.name", L"Third Person Front" },
