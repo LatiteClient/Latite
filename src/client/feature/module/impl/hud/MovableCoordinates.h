@@ -12,6 +12,6 @@ public:
 	void onRenderLayer(Event& ev);
 	void updatePos();
 private:
-	SDK::UIControl* vanillaCoordinates;
+	SDK::UIControl* vanillaCoordinates = nullptr;
 	ValueType hideVanillaCoordinates = BoolValue(false);
 };
