@@ -2,8 +2,12 @@
 #include <cmath>
 #include "CustomCoordinates.h"
 
-CustomCoordinates::CustomCoordinates() : TextModule("CustomCoordinates", "Custom Coordinates", "Shows player position and other info", HUD) {
-    addSetting("showDimension", "Show Dimension", "Show the dimension the player is currently in", this->showDimension);
+CustomCoordinates::CustomCoordinates() : TextModule("CustomCoordinates",
+                                                    LocalizeString::get("client.textmodule.customCoordinates.name"),
+                                                    LocalizeString::get("client.textmodule.customCoordinates.desc"),
+                                                    HUD) {
+    addSetting("showDimension", LocalizeString::get("client.textmodule.customCoordinates.showDimension.name"),
+               LocalizeString::get("client.textmodule.customCoordinates.showDimension.desc"), this->showDimension);
 }
 
 std::wstringstream CustomCoordinates::text(bool isDefault, bool inEditor) {
@@ -14,7 +18,7 @@ std::wstringstream CustomCoordinates::text(bool isDefault, bool inEditor) {
     int playerPosX = static_cast<int>(localPlayer->getPos().x);
     int playerPosY = lroundf(localPlayer->getPos().y - 1.62f); // very hacky fix to get vanilla y coordinate (probably not 100% accurate)
     int playerPosZ = static_cast<int>(localPlayer->getPos().z);
-    std::string dimensionName = localPlayer->dimension->dimensionName;
+    std::wstring dimensionName = util::StrToWStr(localPlayer->dimension->dimensionName);
 
     std::wstring moduleText = util::StrToWStr(
         std::format(
@@ -25,12 +29,20 @@ std::wstringstream CustomCoordinates::text(bool isDefault, bool inEditor) {
         ));
 
     if (std::get<BoolValue>(showDimension)) {
+        if (dimensionName == L"Overworld")
+            dimensionName = LocalizeString::get("client.textmodule.customCoordinates.dimensionDisplay.overworld.name");
+        else if (dimensionName == L"Nether")
+            dimensionName = LocalizeString::get("client.textmodule.customCoordinates.dimensionDisplay.nether.name");
+        else if (dimensionName == L"TheEnd")
+            dimensionName = LocalizeString::get("client.textmodule.customCoordinates.dimensionDisplay.theEnd.name");
+
         moduleText = util::StrToWStr(
             std::format(
-                "X: {}\nY: {}\nZ: {}\nDimension: {}",
+                "X: {}\nY: {}\nZ: {}\n{}: {}",
                 playerPosX,
                 playerPosY,
                 playerPosZ,
+                LocalizeString::get("client.textmodule.customCoordinates.dimension.name"),
                 dimensionName
             ));
     }

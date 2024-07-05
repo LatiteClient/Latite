@@ -48,6 +48,15 @@ English::English() {
         { "client.textmodule.comboCounter.desc", L"Shows how many combos you have." },
         { "client.textmodule.comboCounter.count.name", L"Combo: " },
 
+        { "client.textmodule.customCoordinates.name", L"Custom Coordinates" },
+        { "client.textmodule.customCoordinates.showDimension.name", L"Show Dimension" },
+        { "client.textmodule.customCoordinates.dimension.name", L"Dimension: " },
+        { "client.textmodule.customCoordinates.dimensionDisplay.overworld.name", L"Overworld" },
+        { "client.textmodule.customCoordinates.dimensionDisplay.nether.name", L"Nether" },
+        { "client.textmodule.customCoordinates.dimensionDisplay.theEnd.name", L"The End" },
+        { "client.textmodule.customCoordinates.desc", L"Shows player position and other info" },
+        { "client.textmodule.customCoordinates.showDimension.desc", L"Show the dimension the player is currently in" },
+
         { "client.module.enabled.name", L"Enabled" },
         { "client.module.key.name", L"Key" },
         { "client.module.enabled.desc", L"Whether the module is on or not" },
