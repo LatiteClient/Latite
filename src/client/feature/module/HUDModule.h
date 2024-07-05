@@ -12,12 +12,14 @@ public:
 		bool resizable = true)
 		: Module(name, displayName, description, category, keybind, true), resizable(resizable) {
 		
-		addSetting("pos", LocalizeString::get("client.hudmodule.pos.name"), L"<internal setting>", storedPos);
-		addSetting("snapX", LocalizeString::get("client.hudmodule.snapX.name"), L"<internal setting>", snappingX);
-		addSetting("snapY", LocalizeString::get("client.hudmodule.snapY.name"), L"<internal setting>", snappingY);
+		addSetting("pos", LocalizeString::get("client.hudmodule.props.pos.name"), L"<internal setting>", storedPos);
+		addSetting("snapX", LocalizeString::get("client.hudmodule.props.snapX.name"), L"<internal setting>", snappingX);
+		addSetting("snapY", LocalizeString::get("client.hudmodule.props.snapY.name"), L"<internal setting>", snappingY);
 
-		if (resizable) addSliderSetting("scale", LocalizeString::get("client.hudmodule.size.name"), L"", scale, FloatValue(min_scale), FloatValue(max_scale), FloatValue(0.05f));
-		addSetting("forceMinecraftRend", LocalizeString::get("client.hudmodule.forceMcRend.name"), LocalizeString::get("client.hudmodule.forceMcRend.desc"), forceMCRend);
+        if (resizable) addSliderSetting("scale", LocalizeString::get("client.hudmodule.props.size.name"), L"", scale,
+                                        FloatValue(min_scale), FloatValue(max_scale), FloatValue(0.05f));
+        addSetting("forceMinecraftRend", LocalizeString::get("client.hudmodule.props.forceMcRend.name"),
+                   LocalizeString::get("client.hudmodule.props.forceMcRend.desc"), forceMCRend);
 	}
 
 	virtual ~HUDModule() = default;

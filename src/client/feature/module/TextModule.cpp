@@ -3,44 +3,44 @@
 #include "api/feature/setting/Setting.h"
 
 void TextModule::onInit() {
-	addSetting("fillBg", LocalizeString::get("client.textmodule.background.name"), L"", fillBg);
-	addSetting("customSize", LocalizeString::get("client.textmodule.customSize.name"),
-               LocalizeString::get("client.textmodule.customSize.desc"), customSize, "fillBg"_istrue);
-	addSliderSetting("bgX", LocalizeString::get("client.textmodule.bgX.name"),
-                     LocalizeString::get("client.textmodule.bgX.desc"), bgX, FloatValue(0.f), FloatValue(maxBGX),
+	addSetting("fillBg", LocalizeString::get("client.textmodule.props.background.name"), L"", fillBg);
+	addSetting("customSize", LocalizeString::get("client.textmodule.props.customSize.name"),
+               LocalizeString::get("client.textmodule.props.customSize.desc"), customSize, "fillBg"_istrue);
+	addSliderSetting("bgX", LocalizeString::get("client.textmodule.props.bgX.name"),
+                     LocalizeString::get("client.textmodule.props.bgX.desc"), bgX, FloatValue(0.f), FloatValue(maxBGX),
                      FloatValue(2.5f), "customSize"_istrue);
-	addSliderSetting("bgY", LocalizeString::get("client.textmodule.bgY.name"),
-                     LocalizeString::get("client.textmodule.bgY.desc"), bgY, FloatValue(0.f), FloatValue(300.f),
+	addSliderSetting("bgY", LocalizeString::get("client.textmodule.props.bgY.name"),
+                     LocalizeString::get("client.textmodule.props.bgY.desc"), bgY, FloatValue(0.f), FloatValue(300.f),
                      FloatValue(2.5f), "customSize"_istrue);
 
-    addSliderSetting("padX", LocalizeString::get("client.textmodule.padX.name"),
-                     LocalizeString::get("client.textmodule.padX.desc"), padX, FloatValue(0.f), FloatValue(40.f),
+    addSliderSetting("padX", LocalizeString::get("client.textmodule.props.padX.name"),
+                     LocalizeString::get("client.textmodule.props.padX.desc"), padX, FloatValue(0.f), FloatValue(40.f),
                      FloatValue(2.f), "customSize"_isfalse);
-    addSliderSetting("padY", LocalizeString::get("client.textmodule.padY.name"),
-                     LocalizeString::get("client.textmodule.padY.desc"), padY, FloatValue(0.f), FloatValue(40.f),
+    addSliderSetting("padY", LocalizeString::get("client.textmodule.props.padY.name"),
+                     LocalizeString::get("client.textmodule.props.padY.desc"), padY, FloatValue(0.f), FloatValue(40.f),
                      FloatValue(2.f), "customSize"_isfalse);
 
-    addSetting("prefix", LocalizeString::get("client.textmodule.prefix.name"),
-               LocalizeString::get("client.textmodule.prefix.desc"), prefix);
-    addSetting("suffix", LocalizeString::get("client.textmodule.suffix.name"),
-               LocalizeString::get("client.textmodule.suffix.desc"), suffix);
-    addSliderSetting("textSize", LocalizeString::get("client.textmodule.textSize.name"), L"", textSizeS,
+    addSetting("prefix", LocalizeString::get("client.textmodule.props.prefix.name"),
+               LocalizeString::get("client.textmodule.props.prefix.desc"), prefix);
+    addSetting("suffix", LocalizeString::get("client.textmodule.props.suffix.name"),
+               LocalizeString::get("client.textmodule.props.suffix.desc"), suffix);
+    addSliderSetting("textSize", LocalizeString::get("client.textmodule.props.textSize.name"), L"", textSizeS,
                      FloatValue(2.f), FloatValue(100.f), FloatValue(2.f));
 
-    addSetting("textCol", LocalizeString::get("client.textmodule.textColor.name"), L"", textColor);
-    addSetting("bgColor", LocalizeString::get("client.textmodule.bgColor.name"), L"", bgColor);
+    addSetting("textCol", LocalizeString::get("client.textmodule.props.textColor.name"), L"", textColor);
+    addSetting("bgColor", LocalizeString::get("client.textmodule.props.bgColor.name"), L"", bgColor);
 
-	alignment.addEntry({ alignment_center, LocalizeString::get("client.textmodule.alignmentCenter.name")});
-	alignment.addEntry({ alignment_left, LocalizeString::get("client.textmodule.alignmentLeft.name") });
-	alignment.addEntry({ alignment_right, LocalizeString::get("client.textmodule.alignmentRight.name") });
-    addEnumSetting("alignmnet", LocalizeString::get("client.textmodule.alignment.name"),
-                   LocalizeString::get("client.textmodule.alignment.desc"), this->alignment);
-    addSetting("showOutline", LocalizeString::get("client.textmodule.outline.name"), L"", showOutline);
-    addSliderSetting("outlineThickness", LocalizeString::get("client.textmodule.outlineThickness.name"), L"",
+	alignment.addEntry({ alignment_center, LocalizeString::get("client.textmodule.props.alignmentCenter.name")});
+	alignment.addEntry({ alignment_left, LocalizeString::get("client.textmodule.props.alignmentLeft.name") });
+	alignment.addEntry({ alignment_right, LocalizeString::get("client.textmodule.props.alignmentRight.name") });
+    addEnumSetting("alignmnet", LocalizeString::get("client.textmodule.props.alignment.name"),
+                   LocalizeString::get("client.textmodule.props.alignment.desc"), this->alignment);
+    addSetting("showOutline", LocalizeString::get("client.textmodule.props.outline.name"), L"", showOutline);
+    addSliderSetting("outlineThickness", LocalizeString::get("client.textmodule.props.outlineThickness.name"), L"",
                      outlineThickness, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f), "showOutline"_istrue);
-    addSetting("outlineCol", LocalizeString::get("client.textmodule.outlineColor.name"), L"", outlineColor,
+    addSetting("outlineCol", LocalizeString::get("client.textmodule.props.outlineColor.name"), L"", outlineColor,
                "showOutline"_istrue);
-    addSliderSetting("radius", LocalizeString::get("client.textmodule.radius.name"), L"", radius, FloatValue(0.f),
+    addSliderSetting("radius", LocalizeString::get("client.textmodule.props.radius.name"), L"", radius, FloatValue(0.f),
                      FloatValue(10.f), FloatValue(1.f));
 }
 
