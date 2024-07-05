@@ -9,13 +9,6 @@ English::English() {
         { "intro.welcome", L"Welcome to Latite Client!" },
         { "intro.menubutton", L"Press {} in a world or server to open the mod menu." },
 
-        { "client.hudmodule.props.pos.name", L"Position" },
-        { "client.hudmodule.props.snapX.name", L"Snap X" },
-        { "client.hudmodule.props.snapY.name", L"Snap Y" },
-        { "client.hudmodule.props.size.name", L"Size" },
-        { "client.hudmodule.props.forceMcRend.name", L"Force Minecraft Renderer" },
-        { "client.hudmodule.props.forceMcRend.desc", L"Whether or not to use the Minecraft renderer for this module." },
-
         { "client.textmodule.props.background.name", L"Background" },
         { "client.textmodule.props.customSize.name", L"Fixed Size" },
         { "client.textmodule.props.bgX.name", L"BG X" },
@@ -56,6 +49,13 @@ English::English() {
         { "client.textmodule.customCoordinates.dimensionDisplay.theEnd.name", L"The End" },
         { "client.textmodule.customCoordinates.desc", L"Shows player position and other info" },
         { "client.textmodule.customCoordinates.showDimension.desc", L"Show the dimension the player is currently in" },
+
+        { "client.hudmodule.props.pos.name", L"Position" },
+        { "client.hudmodule.props.snapX.name", L"Snap X" },
+        { "client.hudmodule.props.snapY.name", L"Snap Y" },
+        { "client.hudmodule.props.size.name", L"Size" },
+        { "client.hudmodule.props.forceMcRend.name", L"Force Minecraft Renderer" },
+        { "client.hudmodule.props.forceMcRend.desc", L"Whether or not to use the Minecraft renderer for this module." },
 
         { "client.module.props.enabled.name", L"Enabled" },
         { "client.module.props.key.name", L"Key" },
