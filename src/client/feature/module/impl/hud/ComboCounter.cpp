@@ -2,9 +2,9 @@
 #include "ComboCounter.h"
 #include <sdk/common/network/packet/ActorEventPacket.h>
 
-ComboCounter::ComboCounter() : TextModule("ComboCounter", LocalizeString::get("client.hudmodule.comboCounter.name"),
-                                          LocalizeString::get("client.hudmodule.comboCounter.desc"), HUD) {
-    prefix = TextValue(LocalizeString::get("client.hudmodule.comboCounter.count.name"));
+ComboCounter::ComboCounter() : TextModule("ComboCounter", LocalizeString::get("client.textmodule.comboCounter.name"),
+                                          LocalizeString::get("client.textmodule.comboCounter.desc"), HUD) {
+    prefix = TextValue(LocalizeString::get("client.textmodule.comboCounter.count.name"));
 
     listen<AttackEvent>((EventListenerFunc)&ComboCounter::onAttack);
     listen<PacketReceiveEvent>((EventListenerFunc)&ComboCounter::onPacketReceive);
