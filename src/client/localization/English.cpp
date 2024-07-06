@@ -110,6 +110,8 @@ English::English() {
 
         { "client.commands.eject.desc", L"Removes Latite from the game." },
         { "client.commands.eject.ejectMsg", L"Unloaded the client." },
+
+        { "client.commands.help.desc", L"Shows all commands and descriptions." },
     };
 }
 
