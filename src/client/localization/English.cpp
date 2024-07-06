@@ -71,6 +71,15 @@ English::English() {
         { "client.module.props.enabled.desc", L"Whether the module is on or not" },
         { "client.module.props.key.desc", L"The keybind of the module" },
 
+        { "client.module.freelook.name", L"Freelook" },
+        { "client.module.freelook.desc", L"Look around freely." },
+
+        { "client.module.thirdPersonNametag.name", L"Third Person Nametag" },
+        { "client.module.thirdPersonNametag.desc", L"Shows your nametag in third person view." },
+
+        { "client.module.cinematicCamera.name", L"Cinematic Camera" },
+        { "client.module.cinematicCamera.desc", L"Makes your camera smooth and cinematic. Useful for video shots." },
+
         { "client.module.behindYou.name", L"Behind You!" },
         { "client.module.behindYouState0.name", L"Third Person Front" },
         { "client.module.behindYouState1.name", L"Third Person Back" },
@@ -80,12 +89,6 @@ English::English() {
         { "client.module.behindYou.desc", L"Bind a perspective to a key." },
         { "client.module.behindYou.bind.desc", L"What to bind the perspective to" },
         { "client.module.behindYou.perspective.desc", L"The perspective" },
-
-        { "client.module.freelook.name", L"Freelook" },
-        { "client.module.freelook.desc", L"Look around freely." },
-
-        { "client.module.thirdPersonNametag.name", L"Third Person Nametag" },
-        { "client.module.thirdPersonNametag.desc", L"Shows your nametag in third person view." },
 
         { "client.module.environmentChanger.name", L"Environment Changer" },
         { "client.module.environmentChanger.desc", L"Changes visual features in the environment." },
