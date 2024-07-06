@@ -107,6 +107,9 @@ English::English() {
         { "client.commands.config.configNotFound", L"Could not find config &7{}" },
         { "client.commands.config.loadedConfig", L"Successfully loaded config &7{}" },
         { "client.commands.config.genericError", L"Something went wrong!" },
+
+        { "client.commands.eject.desc", L"Removes Latite from the game." },
+        { "client.commands.eject.ejectMsg", L"Unloaded the client." },
     };
 }
 

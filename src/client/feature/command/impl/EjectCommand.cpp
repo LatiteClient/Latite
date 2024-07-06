@@ -3,11 +3,11 @@
 #include "client/Latite.h"
 #include "client/misc/ClientMessageSink.h"
 
-EjectCommand::EjectCommand() : Command("eject", "Removes Latite from the game.", "{0}") {
+EjectCommand::EjectCommand() : Command("eject", LocalizeString::get("client.commands.eject.desc"), "{0}") {
 }
 
 bool EjectCommand::execute(std::string const label, std::vector<std::string> args) {
-	message("Unloaded the client.");
+	message(LocalizeString::get("client.commands.eject.ejectMsg"));
 	Latite::get().queueEject();
 	return true;
 }
