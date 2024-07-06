@@ -485,9 +485,9 @@ void ClickGUI::onRender(Event&) {
 			bool should = mod.shouldRender;
 			if (this->searchTextBox.getText().size() > 0) {
 				should = false;
-				std::string lower = mod.name;
+				std::wstring lower = mod.name;
 				std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
-				std::string lowerSearch = util::WStrToStr(searchTextBox.getText());
+				std::wstring lowerSearch = searchTextBox.getText();
 				std::transform(lowerSearch.begin(), lowerSearch.end(), lowerSearch.begin(), ::tolower);
 				if (lower.rfind(lowerSearch) != UINTPTR_MAX) should = true;
 			}
@@ -549,10 +549,10 @@ void ClickGUI::onRender(Event&) {
 						float textSizeDesc = textHeight * 0.72f;
 						float descTextPad = textSizeDesc / 3.f;
 						RectF descTextRect = { modRect.left + rlBounds, modRect.bottom, toggleRect.left, modRect.bottom + textSizeDesc + descTextPad };
-						descTextRect.bottom = descTextRect.top + dc.getTextSize(util::StrToWStr(mod.description), Renderer::FontSelection::PrimaryRegular, textSizeDesc).y + descTextPad;
+						descTextRect.bottom = descTextRect.top + dc.getTextSize(mod.description, Renderer::FontSelection::PrimaryRegular, textSizeDesc).y + descTextPad;
 						modRectActual.bottom = descTextRect.bottom;
 
-						dc.drawText(descTextRect, util::StrToWStr(mod.description), d2d::Color(1.f, 1.f, 1.f, 0.57f), FontSelection::PrimaryRegular, textSizeDesc, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+						dc.drawText(descTextRect, mod.description, d2d::Color(1.f, 1.f, 1.f, 0.57f), FontSelection::PrimaryRegular, textSizeDesc, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 						{
 							// Reset Button
@@ -633,7 +633,7 @@ void ClickGUI::onRender(Event&) {
 				// text
 				auto textRect = modRect;
 				textRect.left += modRect.getWidth() / 6.f;
-				dc.drawText(textRect, util::StrToWStr(mod.name), { 1.f, 1.f, 1.f, 1.f }, FontSelection::PrimaryLight, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+				dc.drawText(textRect, mod.name, { 1.f, 1.f, 1.f, 1.f }, FontSelection::PrimaryLight, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 				// toggle
 
@@ -909,7 +909,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 		}
 
 		textVal.str = std::move(tb->getText()); // I think im supposed to std::move this?
-		dc.drawText(rightRc, util::StrToWStr(set->getDisplayName()), { 1.f, 1.f, 1.f, 1.f }, Renderer::FontSelection::PrimarySemilight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		dc.drawText(rightRc, set->getDisplayName(), { 1.f, 1.f, 1.f, 1.f }, Renderer::FontSelection::PrimarySemilight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 		return rightRc.bottom;
 	}
 	break;
@@ -953,10 +953,10 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 		float newX = checkboxRect.right + offs;
 		float rem = newX - pos.x;
 		RectF textRect = { newX, checkboxRect.top, newX + (size - rem), checkboxRect.bottom };
-		auto disp = util::StrToWStr(set->getDisplayName());
+		auto disp = set->getDisplayName();
 
 		dc.drawText(textRect, disp, { 1.f, 1.f, 1.f, 1.f }, FontSelection::PrimarySemilight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-		auto desc = util::StrToWStr(set->desc());
+		auto desc = set->desc();
 		if (!desc.empty())
 			if (contains || shouldSelect(textRect, cursorPos)) setTooltip(desc);
 		return checkboxRect.bottom;
@@ -1021,10 +1021,10 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 
 		RectF textRect = { keyRect.right + padToName, keyRect.top, newX + (size - rem), keyRect.bottom };
 
-		auto disp = util::StrToWStr(set->getDisplayName());
+		auto disp = set->getDisplayName();
 		dc.drawText(textRect, disp, { 1.f, 1.f, 1.f, 1.f }, FontSelection::PrimarySemilight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		if (!set->desc().empty())
-			if (shouldSelect(textRect, cursorPos)) setTooltip(util::StrToWStr(set->desc()));
+			if (shouldSelect(textRect, cursorPos)) setTooltip(set->desc());
 		if (shouldSelect(keyRect, cursorPos)) {
 			setTooltip(L"Right click to reset");
 			if (justClicked[0]) {
@@ -1061,7 +1061,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 		set->rendererInfo.col[2] = lerpedColor.b;
 		set->rendererInfo.col[3] = lerpedColor.a;
 
-		auto text = util::StrToWStr(set->enumData->getSelectedName());
+		auto text = set->enumData->getSelectedName();
 
 		auto ts = dc.getTextSize(text, FontSelection::PrimarySemilight, textSize * 0.9f) + Vec2(8.f, 0.f);
 		if (ts.x > enumRect.getWidth()) enumRect.right = enumRect.left + (ts.x);
@@ -1083,15 +1083,15 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 
 		RectF textRect = { enumRect.right + padToName, enumRect.top, newX + (size - rem), enumRect.bottom };
 
-		dc.drawText(textRect, util::StrToWStr(set->getDisplayName()), { 1.f, 1.f, 1.f, 1.f }, FontSelection::PrimaryRegular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(textRect, set->getDisplayName(), { 1.f, 1.f, 1.f, 1.f }, FontSelection::PrimaryRegular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		if (!set->desc().empty())
-			if (shouldSelect(textRect, cursorPos)) setTooltip(util::StrToWStr(set->desc()));
+			if (shouldSelect(textRect, cursorPos)) setTooltip(set->desc());
 
 		if (shouldSelect(enumRect, cursorPos)) {
 			if (set->enumData->getSelectedDesc().size() > 0) {
-				setTooltip(util::StrToWStr(set->enumData->getSelectedDesc()));
+				setTooltip(set->enumData->getSelectedDesc());
 			}
-			else setTooltip(util::StrToWStr(set->enumData->getSelectedName()));
+			else setTooltip(set->enumData->getSelectedName());
 		}
 
 		if (shouldSelect(enumRect, cursorPos)) {
@@ -1110,7 +1110,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 
 		RectF colRect = { pos.x, pos.y, pos.x + checkboxSize * 2.f, pos.y + checkboxSize };
 		bool contains = this->shouldSelect(colRect, cursorPos);
-		std::wstring name = util::StrToWStr(set->getDisplayName());
+		std::wstring name = set->getDisplayName();
 
 		auto& colVal = std::get<ColorValue>(*set->value);
 
@@ -1179,7 +1179,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 		RectF textRect = { pos.x, pos.y, pos.x + textWidth, pos.y + sliderHeight };
 		RectF rtTextRect = textRect.translate(0.f, -(textRect.getHeight() / 2.f));
 		std::wstringstream namew;
-		namew << util::StrToWStr(set->getDisplayName());
+		namew << set->getDisplayName();
 		dc.drawText(rtTextRect, namew.str(), d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::PrimarySemilight, textSz, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 		float padToSlider = rect.getHeight() * 0.01063f;
 
