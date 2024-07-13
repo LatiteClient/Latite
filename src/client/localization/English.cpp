@@ -80,6 +80,9 @@ English::English() {
         { "client.module.cinematicCamera.name", L"Cinematic Camera" },
         { "client.module.cinematicCamera.desc", L"Makes your camera smooth and cinematic. Useful for video shots." },
 
+        { "client.module.movableScoreboard.name", L"Movable Scoreboard" },
+        { "client.module.movableScoreboard.desc", L"Makes the scoreboard movable." },
+
         { "client.module.behindYou.name", L"Behind You!" },
         { "client.module.behindYouState0.name", L"Third Person Front" },
         { "client.module.behindYouState1.name", L"Third Person Back" },
