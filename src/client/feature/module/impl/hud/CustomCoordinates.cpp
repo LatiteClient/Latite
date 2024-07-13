@@ -36,15 +36,13 @@ std::wstringstream CustomCoordinates::text(bool isDefault, bool inEditor) {
         else if (dimensionName == L"TheEnd")
             dimensionName = LocalizeString::get("client.textmodule.customCoordinates.dimensionDisplay.theEnd.name");
 
-        moduleText = util::StrToWStr(
-            std::format(
-                "X: {}\nY: {}\nZ: {}\n{}: {}",
-                playerPosX,
-                playerPosY,
-                playerPosZ,
-                LocalizeString::get("client.textmodule.customCoordinates.dimension.name"),
-                dimensionName
-            ));
+        moduleText = util::FormatWString(L"X: {}\nY: {}\nZ: {}\n{}: {}", {
+            std::to_wstring(playerPosX),
+            std::to_wstring(playerPosY),
+            std::to_wstring(playerPosZ),
+            LocalizeString::get("client.textmodule.customCoordinates.dimension.name"),
+            dimensionName
+        });
     }
 
     return std::wstringstream(moduleText);
