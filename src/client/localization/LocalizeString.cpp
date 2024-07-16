@@ -11,6 +11,8 @@ std::wstring LocalizeString::get(std::string id) {
 
     std::wstring language = Latite::get().getClientLanguage();
     // all this just to make the language string lowercase lol
+    // ok its been a hot minute since i wrote that comment and apparently util::ToLower
+    // is a thing but it only accepts std::string for params so no
     std::transform(language.begin(), language.end(), language.begin(),
                    [](unsigned char c) { return std::tolower(c); });
 
