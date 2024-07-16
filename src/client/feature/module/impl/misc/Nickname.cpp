@@ -4,7 +4,7 @@
 Nickname::Nickname() : Module("Nickname", LocalizeString::get("client.module.nickname.name"),
                               LocalizeString::get("client.module.nickname.desc"), GAME) {
 	addSetting("nick", LocalizeString::get("client.module.nickname.name"),
-               LocalizeString::get("client.module.nickname.newNickDesc"), this->nickname);
+               LocalizeString::get("client.module.nickname.newNick.desc"), this->nickname);
 
     listen<ClientTextEvent>((EventListenerFunc)&Nickname::onClientTextPacket);
 }

@@ -90,7 +90,7 @@ English::English() {
 
         { "client.module.nickname.name", L"Nickname" },
         { "client.module.nickname.desc", L"Makes your username appear as something else in Minecraft chat" },
-        { "client.module.nickname.newNickDesc", L"Your new nickname." },
+        { "client.module.nickname.newNick.desc", L"Your new nickname." },
 
         { "client.module.behindYou.name", L"Behind You!" },
         { "client.module.behindYouState0.name", L"Third Person Front" },
