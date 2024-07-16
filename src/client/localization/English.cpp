@@ -50,6 +50,11 @@ English::English() {
         { "client.textmodule.customCoordinates.desc", L"Shows player position and other info" },
         { "client.textmodule.customCoordinates.showDimension.desc", L"Show the dimension the player is currently in" },
 
+        { "client.textmodule.reachDisplay.name", L"Reach Display" },
+        { "client.textmodule.reachDisplay.desc", L"Displays your reach when attacking an entity." },
+        { "client.textmodule.reachDisplay.decimals.name", L"Decimals" },
+        { "client.textmodule.reachDisplay.decimals.desc", L"The number of decimals in the reach number" },
+
         { "client.hudmodule.props.pos.name", L"Position" },
         { "client.hudmodule.props.snapX.name", L"Snap X" },
         { "client.hudmodule.props.snapY.name", L"Snap Y" },
