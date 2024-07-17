@@ -631,7 +631,8 @@ void Latite::fetchLatiteUsers() {
 
 void Latite::initSettings() {
     {
-        auto set = std::make_shared<Setting>("menuKey", "Menu Key", "The key used to open the menu");
+        auto set = std::make_shared<Setting>("menuKey", LocalizeString::get("client.settings.menuKey.name"),
+                                             LocalizeString::get("client.settings.menuKey.desc"));
         set->value = &this->menuKey;
         set->callback = [this](Setting& set) {
             Latite::getScreenManager().get<HUDEditor>().key = this->getMenuKey();
@@ -639,33 +640,40 @@ void Latite::initSettings() {
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("ejectKey", "Eject Key", "The key used to uninject the client");
+        auto set = std::make_shared<Setting>("ejectKey", LocalizeString::get("client.settings.ejectKey.name"),
+                                             LocalizeString::get("client.settings.ejectKey.desc"));
         set->value = &this->ejectKey;
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("language", "Language", "Language selection");
+        auto set = std::make_shared<Setting>("language", LocalizeString::get("client.settings.language.name"),
+                                             LocalizeString::get("client.settings.language.desc"));
         set->value = &this->clientLanguage;
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("menuBlurEnabled", "Menu Blur", "Whether blur is enabled or disabled for the menu");
+        auto set = std::make_shared<Setting>("menuBlurEnabled",
+                                             LocalizeString::get("client.settings.menuBlurEnabled.name"),
+                                             LocalizeString::get("client.settings.menuBlurEnabled.desc"));
         set->value = &this->menuBlurEnabled;
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("useDX11", "Use DX11", "Causes an FPS boost for some systems and may degrade performance for more high-end systems, but may cause issues.\nRestart your game upon disabling this setting.");
+        auto set = std::make_shared<Setting>("useDX11", LocalizeString::get("client.settings.useDX11.name"),
+                                             LocalizeString::get("client.settings.useDX11.desc"));
         set->value = &this->useDX11;
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("commandPrefix", "Command Prefix", "Command Prefix");
+        auto set = std::make_shared<Setting>("commandPrefix", LocalizeString::get("client.settings.commandPrefix.name"),
+                                             LocalizeString::get("client.settings.commandPrefix.desc"));
         set->value = &this->commandPrefix;
         set->visible = false;
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("menuIntensity", "Blur Intensity", "The intensity of the menu blur");
+        auto set = std::make_shared<Setting>("menuIntensity", LocalizeString::get("client.settings.menuIntensity.name"),
+                                             LocalizeString::get("client.settings.menuIntensity.desc"));
         set->value = &this->menuBlur;
         set->min = FloatValue(1.f);
         set->max = FloatValue(30.f);
@@ -673,7 +681,8 @@ void Latite::initSettings() {
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("accentColor", "Accent Color", "Accent Color");
+        auto set = std::make_shared<Setting>("accentColor", LocalizeString::get("client.settings.accentColor.name"),
+                                             LocalizeString::get("client.settings.accentColor.desc"));
         set->value = &this->accentColor;
         this->getSettings().addSetting(set);
     }
@@ -685,29 +694,41 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("minecraftRenderer", "Use Minecraft Renderer", "Use the Minecraft renderer for all HUD modules.");
+        auto set = std::make_shared<Setting>("minecraftRenderer",
+                                             LocalizeString::get("client.settings.minecraftRenderer.name"),
+                                             LocalizeString::get("client.settings.minecraftRenderer.desc"));
         set->value = &this->minecraftRenderer;
         this->getSettings().addSetting(set);
     }
 
     {
-        auto set = std::make_shared<Setting>("textShadow", "Minecraft Text Shadows", "Whether to have text shadows or not with Minecraft renderer.");
+        auto set = std::make_shared<Setting>("textShadow", LocalizeString::get("client.settings.textShadow.name"),
+                                             LocalizeString::get("client.settings.textShadow.desc"));
         set->value = &this->textShadow;
         this->getSettings().addSetting(set);
     }
 
     {
-        auto set = std::make_shared<Setting>("secondaryFont", "HUD font", "HUD Font when using non-minecraft renderer");
+        auto set = std::make_shared<Setting>("secondaryFont", LocalizeString::get("client.settings.secondaryFont.name"),
+                                             LocalizeString::get("client.settings.secondaryFont.desc"));
         set->value = &this->secondaryFont;
         this->getSettings().addSetting(set);
     }
 
     {
-        auto set = std::make_shared<Setting>("mcRendererFont", "Minecraft HUD font", "The HUD font with the Minecraft renderer.");
+        auto set = std::make_shared<Setting>("mcRendererFont",
+                                             LocalizeString::get("client.settings.mcRendererFont.name"),
+                                             LocalizeString::get("client.settings.mcRendererFont.desc"));
         set->enumData = &this->mcRendFont;
         set->value = set->enumData->getValue();
-        set->enumData->addEntry({ 0, "Default", "The default UI font (Mojangles by default)" });
-        set->enumData->addEntry({ 1, "Noto Sans", "The smooth font (Noto Sans MS)" });
+        set->enumData->addEntry({
+            0, LocalizeString::get("client.settings.mcRendererFont.default.name"),
+            LocalizeString::get("client.settings.mcRendererFont.default.desc")
+        });
+        set->enumData->addEntry({
+            1, LocalizeString::get("client.settings.mcRendererFont.notoSans.name"),
+            LocalizeString::get("client.settings.mcRendererFont.notoSans.desc")
+        });
         this->getSettings().addSetting(set);
     }
 
@@ -718,13 +739,15 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("centerCursor", "Center cursor when opening UIs", "Crosshair will be centered when you open the menu.");
+        auto set = std::make_shared<Setting>("centerCursor", LocalizeString::get("client.settings.centerCursor.name"),
+                                             LocalizeString::get("client.settings.centerCursor.desc"));
         set->value = &this->centerCursorMenus;
         this->getSettings().addSetting(set);
     }
 
     {
-        auto set = std::make_shared<Setting>("snapLines", "Snap Lines", "Snap lines to help you align modules");
+        auto set = std::make_shared<Setting>("snapLines", LocalizeString::get("client.settings.snapLines.name"),
+                                             LocalizeString::get("client.settings.snapLines.desc"));
         set->value = &this->snapLines;
         this->getSettings().addSetting(set);
     }
