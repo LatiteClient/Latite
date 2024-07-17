@@ -93,9 +93,6 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 		else if (packetId == SDK::PacketID::TEXT) {
 			auto pkt = std::static_pointer_cast<SDK::TextPacket>(packet).get();
 
-			ClientTextEvent ev{ pkt };
-			Eventing::get().dispatch(ev);
-
 			PluginManager::Event::Value typ{ L"type" };
 			typ.val = L"Unknown";
 			switch (pkt->type) {
@@ -151,6 +148,9 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 				pkt->str.setString("");
 				pkt->source.setString("");
 			}
+
+			ClientTextEvent ev{ pkt };
+			Eventing::get().dispatch(ev);
 		}
 	}
 	hook->oFunc<decltype(&PacketHandlerDispatcherInstance_handle)>()(instance, networkIdentifier, netEventCallback, packet);
