@@ -6,8 +6,8 @@
 
 English::English() {
     English::strings = {
-        { "intro.welcome", L"Welcome to Latite Client!" },
-        { "intro.menubutton", L"Press {} in a world or server to open the mod menu." },
+        { "client.intro.welcome", L"Welcome to Latite Client!" },
+        { "client.intro.menubutton", L"Press {} in a world or server to open the mod menu." },
 
         { "client.settings.menuKey.name", L"Menu Key" },
         { "client.settings.ejectKey.name", L"Eject Key" },
