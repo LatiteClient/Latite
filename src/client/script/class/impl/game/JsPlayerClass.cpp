@@ -58,6 +58,9 @@ JsValueRef JsPlayerClass::playerGetSelectedSlot(JsValueRef callee, bool isConstr
 }
 
 JsValueRef JsPlayerClass::playerGetInventorySlot(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsNumber} })) return JS_INVALID_REFERENCE;
+	
 	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate() && ent->getEntity()->isPlayer()) {
@@ -69,7 +72,7 @@ JsValueRef JsPlayerClass::playerGetInventorySlot(JsValueRef callee, bool isConst
 				return Chakra::GetNull();
 			}
 
-			return JsScript::getThis()->getClass<JsItemStack>()->construct(supp->inventory->getItem(supp->selectedSlot), false);
+			return JsScript::getThis()->getClass<JsItemStack>()->construct(supp->inventory->getItem(Chakra::GetInt(arguments[1])), false);
 		}
 		else {
 			Chakra::ThrowError(XW("Access denied - cannot use getItem"));
