@@ -177,7 +177,7 @@ std::string util::WStrToStr(std::wstring const& ws) {
     return ret;
 }
 
-std::string util::FormatMC(std::string const& s) {
+std::string util::Format(std::string const& s) {
 	std::string out;
 
     for (auto& ch : s) {

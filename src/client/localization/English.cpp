@@ -4,6 +4,9 @@
 // {} is a placeholder for a variable, similar to std::format (but I had to implement it myself).
 // When using {}, the LocalizeString::get call must be inside a util::FormatWString call to actually format it.
 
+// & is a placeholder for the format character Minecraft uses
+// When using &, the LocalizeString::get call must be inside a util::FormatWStringMC call to actually format it.
+
 English::English() {
     English::strings = {
         { "client.intro.welcome", L"Welcome to Latite Client!" },
@@ -42,6 +45,8 @@ English::English() {
         { "client.settings.mcRendererFont.notoSans.name", L"Noto Sans" },
         { "client.settings.mcRendererFont.default.desc", L"The default UI font (Mojangles by default)" },
         { "client.settings.mcRendererFont.notoSans.desc", L"The smooth font (Noto Sans MS)" },
+
+        { "client.settings.dx11EnabledMsg.name", L"&7Please restart your game to use DX12 again!" },
 
         { "client.textmodule.props.background.name", L"Background" },
         { "client.textmodule.props.customSize.name", L"Fixed Size" },

@@ -891,7 +891,8 @@ void Latite::onUpdate(Event& evGeneric) {
     if (std::get<BoolValue>(useDX11) != lastDX11) {
 
         if (lastDX11) {
-            Latite::getClientMessageSink().display(util::Format("&7Please restart your game to use DX12 again!"));
+            Latite::getClientMessageSink().display(
+                util::FormatWStringMC(LocalizeString::get("client.settings.dx11EnabledMsg.name")));
         }
         else {
             Latite::getRenderer().setShouldReinit();
