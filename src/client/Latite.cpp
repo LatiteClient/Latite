@@ -537,7 +537,7 @@ void Latite::patchKey() {
 static void blockModules(std::string_view moduleName, std::string_view serverName) {
     auto inst = SDK::RakNetConnector::get();
 
-    std::vector<std::string> blockedList;
+    std::vector<std::wstring> blockedList;
     if (inst->dns.find(serverName) != std::string::npos) {
         Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
             if (!mod->isBlocked()) {
@@ -552,7 +552,7 @@ static void blockModules(std::string_view moduleName, std::string_view serverNam
     if (!blockedList.empty()) {
         std::wstring str;
         for (size_t i = 0; i < blockedList.size(); i++) {
-            str += util::StrToWStr(blockedList[i]);
+            str += blockedList[i];
             if (i != blockedList.size() - 1) {
                 str += L", ";
             }
