@@ -141,6 +141,7 @@ English::English() {
         { "client.module.behindYou.bind.desc", L"What to bind the perspective to" },
         { "client.module.behindYou.perspective.desc", L"The perspective" },
 
+        // todo: move 2nd desc down to desc section
         { "client.module.environmentChanger.name", L"Environment Changer" },
         { "client.module.environmentChanger.desc", L"Changes visual features in the environment." },
         { "client.module.environmentChanger.setFogColor.name", L"Set Fog Color" },
@@ -154,6 +155,7 @@ English::English() {
         { "client.module.environmentChanger.showWeather.desc", L"Whether or not to show the weather" },
 
         // todo: check if this displays diacritics correctly (or even works at all)
+        // todo: use standard localization ID format here
         { "client.commands.config.desc", L"Perform actions related to profiles/configs" },
         { "client.commands.config.savedConfig", L"Saved current config!" },
         { "client.commands.config.savedConfigPath", L"Successfully saved config to &7{}.json" },
@@ -162,6 +164,7 @@ English::English() {
         { "client.commands.config.loadedConfig", L"Successfully loaded config &7{}" },
         { "client.commands.config.genericError", L"Something went wrong!" },
 
+        // todo: use standard localization ID format here
         { "client.commands.eject.desc", L"Removes Latite from the game." },
         { "client.commands.eject.ejectMsg", L"Unloaded the client." },
 
