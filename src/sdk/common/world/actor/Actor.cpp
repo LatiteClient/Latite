@@ -115,7 +115,7 @@ SDK::ItemStack* SDK::Actor::getArmor(int armorSlot) {
 		auto obj = reinterpret_cast<void* (*)(void* obj, int& id)>(Signatures::Components::actorEquipmentPersistentComponent.result)
 			(util::directAccess<void*>(this, 0x10), componentId);
 
-		return (*(SDK::ItemStack*(**)(LPVOID, int))(**(uintptr_t**)((uintptr_t)obj + 8) + 40i64))(*(LPVOID*)((uintptr_t)obj + 8), armorSlot);
+		return (*(SDK::ItemStack*(**)(LPVOID, int))(**(uintptr_t**)((uintptr_t)obj + 8) + 56i64))(*(LPVOID*)((uintptr_t)obj + 8), armorSlot);
 	}
 
 	if (internalVers >= V1_20_40) {
