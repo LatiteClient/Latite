@@ -3,6 +3,7 @@
 #include "client/Latite.h"
 #include "sdk/common/client/gui/controls/UIControl.h"
 #include "sdk/common/client/gui/controls/VisualTree.h"
+#include <sdk/common/nbt/CompoundTag.h>
 
 static SDK::UIControl* bossbar = nullptr;
 
@@ -53,8 +54,19 @@ bool TestCommand::execute(std::string const label, std::vector<std::string> args
 	if (!lp) return true;
 	//Logger::Info("{} {} {}", lp->getHealth(), lp->getHunger(), lp->getSaturation());
 	
-	if (args.size() < 1) return false;
+	//if (args.size() < 1) return false;
 
+
+	auto selec = lp->supplies->inventory->getItem(lp->supplies->selectedSlot);
+
+	if (selec && selec->tag) {
+		SDK::BasicPrintStream ps{};
+		SDK::BasicDataOutput psx{};
+		selec->tag->print("prefix", ps);
+		selec->tag->write(psx);
+
+		message(ps.mStr);
+	}
 	//SDK::LevelRendererPlayer::selecOffset = std::stoull(args.at(0), 0, 16);
 
 

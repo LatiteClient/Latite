@@ -558,6 +558,8 @@
     <ClInclude Include="src\sdk\common\client\util\JpegCommentWriter.h" />
     <ClInclude Include="src\sdk\common\entity\component\AttributesComponent.h" />
     <ClInclude Include="src\sdk\common\entity\component\MoveInputComponent.h" />
+    <ClInclude Include="src\sdk\common\nbt\CompoundTag.h" />
+    <ClInclude Include="src\sdk\common\nbt\Tag.h" />
     <ClInclude Include="src\sdk\common\network\MinecraftPackets.h" />
     <ClInclude Include="src\sdk\common\network\Packet.h" />
     <ClInclude Include="src\sdk\common\network\PacketSender.h" />
@@ -566,6 +568,8 @@
     <ClInclude Include="src\sdk\common\network\packet\SetTitlePacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\TextPacket.h" />
     <ClInclude Include="src\sdk\common\network\RakPeer.h" />
+    <ClInclude Include="src\sdk\common\util\BasicDataOutput.h" />
+    <ClInclude Include="src\sdk\common\util\BasicPrintStream.h" />
     <ClInclude Include="src\sdk\common\util\MolangVariable.h" />
     <ClInclude Include="src\sdk\common\util\MolangVariableMap.h" />
     <ClInclude Include="src\sdk\common\world\actor\player\GameMode.h" />
