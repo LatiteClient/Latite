@@ -131,6 +131,11 @@ English::English() {
         { "client.module.nickname.desc", L"Makes your username appear as something else in Minecraft chat" },
         { "client.module.nickname.newNick.desc", L"Your new nickname." },
 
+        { "client.module.itemTweaks.name", L"Item Tweaks" },
+        { "client.module.itemTweaks.disableFlyingItem.name", L"Disable flying item animation" },
+        { "client.module.itemTweaks.desc", L"Tweaks/settings related to item rendering." },
+        { "client.module.itemTweaks.disableFlyingItem.desc", L"Disables the animation when you shift click an item" },
+
         { "client.module.behindYou.name", L"Behind You!" },
         { "client.module.behindYouState0.name", L"Third Person Front" },
         { "client.module.behindYouState1.name", L"Third Person Back" },
