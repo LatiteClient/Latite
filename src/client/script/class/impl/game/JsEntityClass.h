@@ -33,6 +33,8 @@ public:
 		Chakra::DefineFunc(prototype, entityGetSaturation, XW("getSaturation"), this);
 		Chakra::DefineFunc(prototype, entityGetVariable, XW("getMolangVariable"), this);
 		Chakra::DefineFunc(prototype, entitySetVariable, XW("setMolangVariable"), this);
+		Chakra::DefineFunc(prototype, entityGetStatusFlag, XW("getFlag"), this);
+		Chakra::DefineFunc(prototype, entitySetStatusFlag, XW("setFlag"), this);
 		Chakra::SetPropertyNumber(prototype, L"runtimeId", 0.0, true);
 	};
 private:
@@ -67,5 +69,9 @@ private:
 	static JsValueRef CALLBACK entityGetPosInterpolated(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK entityGetPosPrev(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK entityGetStatusFlag(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK entitySetStatusFlag(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 };

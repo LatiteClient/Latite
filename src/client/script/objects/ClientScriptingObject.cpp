@@ -14,8 +14,8 @@
 JsValueRef ClientScriptingObject::registerEventCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	JsValueRef undefined;
 	JS::JsGetUndefinedValue(&undefined);
-	if (!Chakra::VerifyArgCount(argCount, 3)) return undefined;
-	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsFunction} })) return undefined;
+	if (!Chakra::VerifyArgCount(argCount, 3, true, true)) return undefined;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsFunction}, {arguments[3], JsNumber, true}})) return undefined;
 
 	const wchar_t* myS;
 	size_t sze;
@@ -27,7 +27,13 @@ JsValueRef ClientScriptingObject::registerEventCallback(JsValueRef callee, bool 
 			JsContextRef ct;
 			JS::JsGetCurrentContext(&ct);
 			JS::JsAddRef(arguments[2], nullptr);
-			lis.second.push_back({ arguments[2], ct });
+
+			auto priority = Chakra::TryGet(arguments, argCount, 3);
+			lis.second.push_back({ priority ? Chakra::GetInt(priority) : 0, arguments[2], ct});
+
+			std::ranges::sort(lis.second, [](auto& left, auto& right) {
+				return std::get<0>(left) > std::get<0>(right);
+				});
 			return undefined;
 		}
 	}

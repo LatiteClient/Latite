@@ -4,6 +4,14 @@
 #include "sdk/common/world/Attribute.h"
 #include <sdk/common/entity/component/AttributesComponent.h>
 
+bool SDK::Actor::getStatusFlag(int flag) {
+	return memory::callVirtual<bool>(this, 0, flag);
+}
+
+void SDK::Actor::setStatusFlag(int flag, bool value) {
+	return memory::callVirtual<void>(this, 1, flag, value);
+}
+
 AABB& SDK::Actor::getBoundingBox() {
 	if (internalVers < V1_19_51) {
 		return util::directAccess<AABB>(this, 0x4B8);

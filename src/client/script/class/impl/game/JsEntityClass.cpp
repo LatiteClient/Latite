@@ -275,3 +275,38 @@ JsValueRef JsEntityClass::entityGetPosPrev(JsValueRef callee, bool isConstructor
 	Chakra::ThrowError(XW("Invalid entity"));
 	return Chakra::GetUndefined();
 }
+
+JsValueRef JsEntityClass::entityGetStatusFlag(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsNumber } })) return JS_INVALID_REFERENCE;
+
+	JsEntity* ent = nullptr;
+	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
+	if (ent && ent->validate()) {
+		auto actor = ent->getEntity();
+		return actor->getStatusFlag(Chakra::GetInt(arguments[1])) ? Chakra::GetTrue() : Chakra::GetFalse();
+	}
+	Chakra::ThrowError(XW("Invalid entity"));
+	return JS_INVALID_REFERENCE;
+}
+
+JsValueRef JsEntityClass::entitySetStatusFlag(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 3)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsNumber }, { arguments[2], JsBoolean }})) return JS_INVALID_REFERENCE;
+
+	JsEntity* ent = nullptr;
+	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
+	if (ent && ent->validate() && ent->level != JsEntity::AccessLevel::Restricted || SDK::ClientInstance::get()->getLocalPlayer()->getCommandPermissionLevel() > 1) {
+		auto actor = ent->getEntity();
+		actor->setStatusFlag(Chakra::GetInt(arguments[1]), Chakra::GetBool(arguments[2]));
+		return Chakra::GetUndefined();
+	}
+	else {
+		Chakra::ThrowError(XW("Access denied, cannot use getStatusFlag"));
+		return Chakra::GetUndefined();
+	}
+	Chakra::ThrowError(XW("Invalid entity"));
+
+	return JS_INVALID_REFERENCE;
+
+}

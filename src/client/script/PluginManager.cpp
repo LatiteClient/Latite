@@ -373,13 +373,13 @@ void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr) {
 			while (it != ev.second.end()) {
 				auto& scr = ptr->getScripts();
 				auto removeIt = std::remove_if(scr.begin(), scr.end(), [&](const auto& script) {
-					return !script || it->second == script->getContext();
+					return !script || std::get<2>(*it) == script->getContext();
 					});
 
 				if (removeIt != scr.end()) {
-					Chakra::SetContext(it->second);
+					Chakra::SetContext(std::get<2>(*it));
 					unsigned int refCount;
-					JS::JsRelease(it->first, &refCount);
+					JS::JsRelease(std::get<1>(*it), &refCount);
 					ev.second.erase(it);
 				}
 				else {
@@ -427,7 +427,7 @@ bool PluginManager::dispatchEvent(Event& ev) {
 	for (auto& lis : eventListeners) {
 		if (lis.first == ev.type) {
 			for (auto& l : lis.second) {
-				Chakra::SetContext(l.second);
+				Chakra::SetContext(std::get<2>(l));
 				JsValueRef params[2] = {};
 				// create the obj
 				JS::JsGetUndefinedValue(params);
@@ -480,7 +480,7 @@ bool PluginManager::dispatchEvent(Event& ev) {
 
 				//int refc1 = Chakra::GetRefCount(l.first);
 				//int refc = Chakra::GetRefCount(params[1]);
-				handleErrors(Chakra::CallFunction(l.first, params, 2, &ret));
+				handleErrors(Chakra::CallFunction(std::get<1>(l), params, 2, &ret));
 
 				if (ev.isCancellable) {
 					auto b = Chakra::GetBoolProperty(params[1], L"cancel");

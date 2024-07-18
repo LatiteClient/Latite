@@ -77,7 +77,7 @@ public:
 		}
 	};
 
-	std::unordered_map<std::wstring, std::vector<std::pair<JsValueRef, JsContextRef>>> eventListeners;
+	std::unordered_map<std::wstring, std::vector<std::tuple<int, JsValueRef, JsContextRef>>> eventListeners;
 	bool dispatchEvent(Event& ev);
 	void uninitialize();
 };

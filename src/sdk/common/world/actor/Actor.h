@@ -26,6 +26,10 @@ namespace SDK {
 		// @dump-wbds Actor::getArmorContainer, 3
 		MVCLASS_FIELD(class Inventory*, armorContainer, 0x0, 0x428, 0, 0, 0); // xref: Actor::getArmor(ArmorSlot)
 
+
+		bool getStatusFlag(int flag);
+		void setStatusFlag(int flag, bool value);
+		
 		AABB& getBoundingBox();
 		Vec2& getRot();
 		Vec3& getVelocity();
