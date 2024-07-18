@@ -15,8 +15,8 @@ JsValueRef ClientScriptingObject::registerEventCallback(JsValueRef callee, bool 
 	JsValueRef undefined;
 	JS::JsGetUndefinedValue(&undefined);
 	if (!Chakra::VerifyArgCount(argCount, 3, true, true)) return undefined;
-	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsFunction}, {arguments[3], JsNumber, true}})) return undefined;
-
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsFunction}, {Chakra::TryGet(arguments, argCount, 3), JsNumber, true}})) return undefined;
+	
 	const wchar_t* myS;
 	size_t sze;
 	JS::JsStringToPointer(arguments[1], &myS, &sze);
