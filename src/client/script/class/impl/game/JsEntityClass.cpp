@@ -302,7 +302,7 @@ JsValueRef JsEntityClass::entitySetStatusFlag(JsValueRef callee, bool isConstruc
 		return Chakra::GetUndefined();
 	}
 	else {
-		Chakra::ThrowError(XW("Access denied, cannot use getStatusFlag"));
+		Chakra::ThrowError(XW("Access denied, cannot use setStatusFlag"));
 		return Chakra::GetUndefined();
 	}
 	Chakra::ThrowError(XW("Invalid entity"));
