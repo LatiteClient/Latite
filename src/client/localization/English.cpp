@@ -94,6 +94,10 @@ English::English() {
         { "client.textmodule.reachDisplay.decimals.name", L"Decimals" },
         { "client.textmodule.reachDisplay.decimals.desc", L"The number of decimals in the reach number" },
 
+        { "client.hudmodule.movableBossbar.name", L"Movable Bossbar" },
+        { "client.hudmodule.movableBossbar.hideBossbar.name", L"Hide bossbar" },
+        { "client.hudmodule.movableBossbar.desc", L"Makes the in-game bossbar movable." },
+
         { "client.hudmodule.props.pos.name", L"Position" },
         { "client.hudmodule.props.snapX.name", L"Snap X" },
         { "client.hudmodule.props.snapY.name", L"Snap Y" },
@@ -136,7 +140,7 @@ English::English() {
         { "client.module.itemTweaks.desc", L"Tweaks/settings related to item rendering." },
         { "client.module.itemTweaks.disableFlyingItem.desc", L"Disables the animation when you shift click an item" },
 
-        { "client.module.behindYou.name", L"Behind You" },
+        { "client.module.behindYou.name", L"Behind You!" },
         { "client.module.behindYouState0.name", L"Third Person Front" },
         { "client.module.behindYouState1.name", L"Third Person Back" },
         { "client.module.behindYouState2.name", L"First Person" },
