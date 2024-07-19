@@ -62,8 +62,8 @@ public:
 
 		Chakra::SetPropertyNumber(obj, L"key", static_cast<double>(mod->getKeybind()));
 		Chakra::SetPropertyString(obj, L"name", util::StrToWStr(mod->name()));
-		Chakra::SetPropertyString(obj, L"displayName", util::StrToWStr(mod->getDisplayName()));
-		Chakra::SetPropertyString(obj, L"description", util::StrToWStr(mod->desc()));
+		Chakra::SetPropertyString(obj, L"displayName", mod->getDisplayName());
+		Chakra::SetPropertyString(obj, L"description", mod->desc());
 		Chakra::SetPropertyBool(obj, L"visual", mod->isHud());
 		Chakra::SetPropertyBool(obj, L"visible", mod->isVisible());
 

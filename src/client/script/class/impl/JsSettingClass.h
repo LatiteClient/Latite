@@ -46,8 +46,8 @@ public:
 		auto obj = __super::construct(set, finalize);
 
 		Chakra::SetPropertyString(obj, L"name", util::StrToWStr(set->name()), true);
-		Chakra::SetPropertyString(obj, L"description", util::StrToWStr(set->desc()), true);
-		Chakra::SetPropertyString(obj, L"displayName", util::StrToWStr(set->getDisplayName()), true);
+		Chakra::SetPropertyString(obj, L"description", set->desc(), true);
+		Chakra::SetPropertyString(obj, L"displayName", set->getDisplayName(), true);
 		return obj;
 	}
 
