@@ -98,6 +98,10 @@ English::English() {
         { "client.hudmodule.movableBossbar.hideBossbar.name", L"Hide bossbar" },
         { "client.hudmodule.movableBossbar.desc", L"Makes the in-game bossbar movable." },
 
+        { "client.hudmodule.movableCoordinates.name", L"Movable Coordinates" },
+        { "client.hudmodule.movableCoordinates.hideVanillaCoordinates.name", L"Hide vanilla coordinates" },
+        { "client.hudmodule.movableCoordinates.desc", L"Makes the vanilla coordinates display movable." },
+
         { "client.hudmodule.props.pos.name", L"Position" },
         { "client.hudmodule.props.snapX.name", L"Snap X" },
         { "client.hudmodule.props.snapY.name", L"Snap Y" },
