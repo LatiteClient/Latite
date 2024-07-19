@@ -207,6 +207,7 @@ JsValueRef JsEntityClass::entitySetVariable(JsValueRef callee, bool isConstructo
 	if (!Chakra::VerifyArgCount(argCount, 3)) return JS_INVALID_REFERENCE;
 	if (!Chakra::VerifyParameters({ { arguments[1], JsString }, {arguments[2], JsNumber}})) return JS_INVALID_REFERENCE;
 
+#ifdef LATITE_DEBUG
 	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 
@@ -227,6 +228,9 @@ JsValueRef JsEntityClass::entitySetVariable(JsValueRef callee, bool isConstructo
 	}
 
 	Chakra::ThrowError(XW("Invalid entity"));
+#else
+	Chakra::ThrowError(XW("setMolangVariable is reserved"));
+#endif
 	return JS_INVALID_REFERENCE;
 }
 
@@ -296,7 +300,7 @@ JsValueRef JsEntityClass::entitySetStatusFlag(JsValueRef callee, bool isConstruc
 
 	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
-	if (ent && ent->validate() && ent->level != JsEntity::AccessLevel::Restricted || SDK::ClientInstance::get()->getLocalPlayer()->getCommandPermissionLevel() > 1) {
+	if (ent && ent->validate() && SDK::ClientInstance::get()->getLocalPlayer()->getCommandPermissionLevel() > 1) {
 		auto actor = ent->getEntity();
 		actor->setStatusFlag(Chakra::GetInt(arguments[1]), Chakra::GetBool(arguments[2]));
 		return Chakra::GetUndefined();
