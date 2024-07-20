@@ -12,4 +12,5 @@ public:
 	void onRender(Event& ev);
 	void onKey(Event& ev);
 	void onEnable() override {};
+	void onRenderLayer(Event& ev);
 };

@@ -1,9 +1,8 @@
 #pragma once
 namespace SDK {
-	class ScreenView
-	{
-		char pad_0000[72]; //0x0000
+	class ScreenView {
 	public:
-		class VisualTree* visualTree; //0x0048
+		CLASS_FIELD(class ScreenController*, screenController, 0x38);
+		CLASS_FIELD(class VisualTree*, visualTree, 0x48);
 	}; //Size: 0x0080
 }

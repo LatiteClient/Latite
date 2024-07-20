@@ -13,6 +13,9 @@
 #include <sdk/common/client/util/JpegCommentWriter.h>
 #include <sdk/common/client/renderer/MaterialPtr.h>
 #include <sdk/deps/CoreGraphics/ImageBuffer.h>
+#include <sdk/common/client/gui/controls/VisualTree.h>
+#include <sdk/common/client/gui/controls/UIControl.h>
+#include <sdk/common/client/gui/screens/ContainerScreenController.h>
 
 #define FUNC_HELPER(x)  void(Feature::*)(x&)
 
@@ -29,6 +32,7 @@ TestModule::TestModule() : Module("TestModule", "TestModule", "Module for testin
 	this->listen<TickEvent>(&TestModule::onTick);
 	this->listen<RenderLayerEvent>(&TestModule::onRender, true);
 	this->listen<KeyUpdateEvent>(&TestModule::onKey);
+	this->listen<RenderLayerEvent>(&TestModule::onRenderLayer);
 }
 
 void TestModule::onTick(Event& evGeneric) {
@@ -74,6 +78,15 @@ void TestModule::onKey(Event& ev)
 			}
 			util::SetClipboardText(util::StrToWStr(str));
 		}
+	}
+}
+
+void TestModule::onRenderLayer(Event& evG) {
+	auto& ev = reinterpret_cast<RenderLayerEvent&>(evG);
+	
+	if (ev.getScreenView()->visualTree->rootControl->name == "inventory_screen") {
+		auto info = ((SDK::ContainerScreenController*)ev.getScreenView()->screenController)->_getSelectedSlotInfo();
+		int test = 32;
 	}
 }
 
