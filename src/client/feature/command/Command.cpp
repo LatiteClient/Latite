@@ -17,10 +17,10 @@ Command::Command(std::string const& name, std::string const& description, std::s
 void Command::message(std::wstring const& str, bool error) {
 	std::wstring fin = L"";
 	if (!error) {
-		fin = util::FormatWStringMC(L"[&9Latite&r] " + util::FormatWStringMC(str));
+		fin = util::WFormat(L"[&9Latite&r] " + util::WFormat(str));
 	}
 	else {
-		fin = util::FormatWStringMC(L"&c" + util::FormatWStringMC(str));
+		fin = util::WFormat(L"&c" + util::WFormat(str));
 	}
 	Latite::get().getClientMessageSink().display(fin);
 }
