@@ -167,7 +167,6 @@ English::English() {
         { "client.module.behindYou.bind.desc", L"What to bind the perspective to" },
         { "client.module.behindYou.perspective.desc", L"The perspective" },
 
-        // todo: move 2nd desc down to desc section
         { "client.module.environmentChanger.name", L"Environment Changer" },
         { "client.module.environmentChanger.setFogColor.name", L"Set Fog Color" },
         { "client.module.environmentChanger.fogColor.name", L"Fog Color" },
