@@ -18,7 +18,7 @@ bool ConfigCommand::execute(std::string const label, std::vector<std::string> ar
 		}
 		if (Latite::getConfigManager().saveTo(util::StrToWStr(args[1]))) {
 			message(util::FormatWString(
-                util::FormatWStringMC(LocalizeString::get("client.commands.config.savedConfigPath.name")),
+                util::WFormat(LocalizeString::get("client.commands.config.savedConfigPath.name")),
                 { util::StrToWStr(args[1]) }));
 			return true;
 		}
@@ -37,13 +37,13 @@ bool ConfigCommand::execute(std::string const label, std::vector<std::string> ar
 
 		if (!Latite::getConfigManager().loadUserConfig(util::StrToWStr(args[1]))) {
 			message(util::FormatWString(
-                        util::FormatWStringMC(LocalizeString::get("client.commands.config.configNotFound.name")),
+                        util::WFormat(LocalizeString::get("client.commands.config.configNotFound.name")),
                         { util::StrToWStr(args[1]) }), true);
 			LocalizeString::get("");
 			return true;
 		}
 		message(util::FormatWString(
-            util::FormatWStringMC(LocalizeString::get("client.commands.config.loadedConfig.name")),
+            util::WFormat(LocalizeString::get("client.commands.config.loadedConfig.name")),
             { util::StrToWStr(args[1]) }));
 		return true;
 	}

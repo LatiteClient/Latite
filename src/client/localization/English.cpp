@@ -5,7 +5,7 @@
 // When using {}, the LocalizeString::get call must be inside a util::FormatWString call to actually format it.
 
 // & is a placeholder for the format character Minecraft uses
-// When using &, the LocalizeString::get call must be inside a util::FormatWStringMC call to actually format it.
+// When using &, the LocalizeString::get call must be inside a util::WFormat call to actually format it.
 
 English::English() {
     English::strings = {
