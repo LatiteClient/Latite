@@ -169,30 +169,28 @@ English::English() {
 
         // todo: move 2nd desc down to desc section
         { "client.module.environmentChanger.name", L"Environment Changer" },
-        { "client.module.environmentChanger.desc", L"Changes visual features in the environment." },
         { "client.module.environmentChanger.setFogColor.name", L"Set Fog Color" },
         { "client.module.environmentChanger.fogColor.name", L"Fog Color" },
         { "client.module.environmentChanger.setTime.name", L"Set Time" },
         { "client.module.environmentChanger.timeToSet.name", L"Time" },
         { "client.module.environmentChanger.showWeather.name", L"Show Weather" },
+        { "client.module.environmentChanger.desc", L"Changes visual features in the environment." },
         { "client.module.environmentChanger.fogColor.desc", L"The new fog color" },
         { "client.module.environmentChanger.setTime.desc", L"Whether or not to set the time" },
         { "client.module.environmentChanger.timeToSet.desc", L"The new time of day to set" },
         { "client.module.environmentChanger.showWeather.desc", L"Whether or not to show the weather" },
 
         // todo: check if this displays diacritics correctly (or even works at all)
-        // todo: use standard localization ID format here
         { "client.commands.config.desc", L"Perform actions related to profiles/configs" },
-        { "client.commands.config.savedConfig", L"Saved current config!" },
-        { "client.commands.config.savedConfigPath", L"Successfully saved config to &7{}.json" },
-        { "client.commands.config.saveDuringLoadingError", L"Could not save current config before loading!" },
-        { "client.commands.config.configNotFound", L"Could not find config &7{}" },
-        { "client.commands.config.loadedConfig", L"Successfully loaded config &7{}" },
-        { "client.commands.config.genericError", L"Something went wrong!" },
+        { "client.commands.config.savedConfig.name", L"Saved current config!" },
+        { "client.commands.config.savedConfigPath.name", L"Successfully saved config to &7{}.json" },
+        { "client.commands.config.saveDuringLoadingError.name", L"Could not save current config before loading!" },
+        { "client.commands.config.configNotFound.name", L"Could not find config &7{}" },
+        { "client.commands.config.loadedConfig.name", L"Successfully loaded config &7{}" },
+        { "client.commands.config.genericError.name", L"Something went wrong!" },
 
-        // todo: use standard localization ID format here
         { "client.commands.eject.desc", L"Removes Latite from the game." },
-        { "client.commands.eject.ejectMsg", L"Unloaded the client." },
+        { "client.commands.eject.ejectMsg.name", L"Unloaded the client." },
 
         { "client.commands.help.desc", L"Shows all commands and descriptions." },
     };
