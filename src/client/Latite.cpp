@@ -892,7 +892,7 @@ void Latite::onUpdate(Event& evGeneric) {
 
         if (lastDX11) {
             Latite::getClientMessageSink().display(
-                util::FormatWStringMC(LocalizeString::get("client.settings.dx11EnabledMsg.name")));
+                util::WFormat(LocalizeString::get("client.settings.dx11EnabledMsg.name")));
         }
         else {
             Latite::getRenderer().setShouldReinit();

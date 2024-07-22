@@ -190,7 +190,7 @@ std::string util::Format(std::string const& s) {
     return out;
 }
 
-std::wstring util::FormatWStringMC(std::wstring const& s) {
+std::wstring util::WFormat(std::wstring const& s) {
     std::wstring out;
 
     for (auto& ch : s) {

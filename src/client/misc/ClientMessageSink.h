@@ -10,12 +10,14 @@ public:
 	~ClientMessageSink() = default;
 
 	void doPrint(int numMessages);
+	void push(std::string const& message);
 	void push(std::wstring const& message);
 
 	// ONLY call this if it's in the game thread.
+	void display(std::string const& message);
 	void display(std::wstring const& message);
 
 private:
 	std::mutex sinkLock;
-	std::vector<std::wstring> messages;
+	std::vector<std::string> messages;
 };
