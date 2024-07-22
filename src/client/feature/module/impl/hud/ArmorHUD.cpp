@@ -1,15 +1,20 @@
 #include "pch.h"
 #include "ArmorHUD.h"
 
-ArmorHUD::ArmorHUD() : HUDModule("ArmorHUD", "Armor HUD", "Shows your armor and held items.", HUD) {
-	mode.addEntry(EnumEntry{ mode_vetical, "Vertical" });
-	mode.addEntry(EnumEntry{ mode_horizontal, "Horizontal" });
-	addEnumSetting("mode", "Mode", "Mode", mode);
-	addSetting("durability", "Show Durability", "Show Durability", showDamage);
-	addSetting("percent", "Durability %", "The durability percent", this->percentage, "durability"_istrue);
+ArmorHUD::ArmorHUD() : HUDModule("ArmorHUD", LocalizeString::get("client.hudmodule.armorHud.name"),
+                                 LocalizeString::get("client.hudmodule.armorHud.desc"), HUD) {
+	mode.addEntry(EnumEntry{ mode_vetical, LocalizeString::get("client.hudmodule.armorHud.modeVertical.name") });
+	mode.addEntry(EnumEntry{ mode_horizontal, LocalizeString::get("client.hudmodule.armorHud.modeHorizontal.name") });
+	addEnumSetting("mode", LocalizeString::get("client.hudmodule.armorHud.mode.nam e"),
+                   LocalizeString::get("client.hudmodule.armorHud.mode.desc"), mode);
+	addSetting("durability", LocalizeString::get("client.hudmodule.armorHud.durability.name"),
+               LocalizeString::get("client.hudmodule.armorHud.durability.desc"), showDamage);
+	addSetting("percent", LocalizeString::get("client.hudmodule.armorHud.percent.name"),
+               LocalizeString::get("client.hudmodule.armorHud.percent.desc"), this->percentage, "durability"_istrue);
 
 	std::get<ColorValue>(txtColor).color1 = { 1.f, 1.f, 1.f, 1.f };
-	addSetting("textColor", "Text Color", "The text color", txtColor);
+	addSetting("textColor", LocalizeString::get("client.hudmodule.armorHud.textColor.name"),
+               LocalizeString::get("client.hudmodule.armorHud.textColor.desc"), txtColor);
 }
 
 void ArmorHUD::render(DrawUtil& ctxGeneric, bool isDefault, bool inEditor) {
