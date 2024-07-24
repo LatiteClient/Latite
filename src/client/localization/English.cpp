@@ -153,6 +153,9 @@ English::English() {
         { "client.module.movableScoreboard.name", L"Movable Scoreboard" },
         { "client.module.movableScoreboard.desc", L"Makes the scoreboard movable." },
 
+        { "client.module.commandShortcuts.name", L"Command Shortcuts" },
+        { "client.module.commandShortcuts.desc", L"Shortcuts for commands like /gmc, /gms, etc." },
+
         { "client.module.nickname.name", L"Nickname" },
         { "client.module.nickname.desc", L"Makes your username appear as something else in Minecraft chat" },
         { "client.module.nickname.newNick.desc", L"Your new nickname." },

@@ -2,12 +2,14 @@
 #include "CommandShortcuts.h"
 #include <sdk/common/network/packet/CommandRequestPacket.h>
 
-CommandShortcuts::CommandShortcuts() : Module("CommandShortcuts", "Command Shortcuts", "Shortcuts for commands like /gmc, /gms, etc.", GAME) {
-	listen<SendPacketEvent>((EventListenerFunc)&CommandShortcuts::onPacket);
+CommandShortcuts::CommandShortcuts() : Module("CommandShortcuts",
+                                              LocalizeString::get("client.module.commandShortcuts.name"),
+                                              LocalizeString::get("client.module.commandShortcuts.desc"), GAME) {
+    listen<SendPacketEvent>((EventListenerFunc)&CommandShortcuts::onPacket);
 }
 
 void CommandShortcuts::onPacket(Event& evG) {
-	auto& ev = reinterpret_cast<SendPacketEvent&>(evG);
+    auto& ev = reinterpret_cast<SendPacketEvent&>(evG);
     auto packetId = ev.getPacket()->getID();
 
     if (packetId == SDK::PacketID::COMMAND_REQUEST) {
