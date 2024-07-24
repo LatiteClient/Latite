@@ -85,6 +85,11 @@ English::English() {
         { "client.textmodule.reachDisplay.decimals.name", L"Decimals" },
         { "client.textmodule.reachDisplay.decimals.desc", L"The number of decimals in the reach number" },
 
+        { "client.textmodule.breakIndicator.name", L"Break Indicator" },
+        { "client.textmodule.breakIndicator.desc", L"Shows the break progress of the block you're breaking." },
+        { "client.textmodule.breakIndicator.lastProgress.name", L"Last Progress" },
+        { "client.textmodule.breakIndicator.lastProgress.desc", L"Whether to save the progress after breaking is interrupted or not" },
+
         { "client.textmodule.customCoordinates.name", L"Custom Coordinates" },
         { "client.textmodule.customCoordinates.showDimension.name", L"Show Dimension" },
         { "client.textmodule.customCoordinates.dimension.name", L"Dimension: " },

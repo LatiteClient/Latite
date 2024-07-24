@@ -1,8 +1,12 @@
 #include "pch.h"
 #include "BreakIndicator.h"
 
-BreakIndicator::BreakIndicator() : TextModule("BreakProgress", "Break Progress", "Shows the break progress of the block you're breaking.", HUD, 400.f, 0, true) {
-    addSetting("last", "Last Progress", "Whether to save the progress after breaking is interrupted or not", this->last);
+BreakIndicator::BreakIndicator() : TextModule("BreakProgress",
+                                              LocalizeString::get("client.textmodule.breakIndicator.name"),
+                                              LocalizeString::get("client.textmodule.breakIndicator.desc"), HUD, 400.f,
+                                              0, true) {
+    addSetting("last", LocalizeString::get("client.textmodule.breakIndicator.lastProgress.name"),
+               LocalizeString::get("client.textmodule.breakIndicator.lastProgress.desc"), this->last);
 }
 
 BreakIndicator::~BreakIndicator() {
