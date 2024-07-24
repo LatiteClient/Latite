@@ -80,6 +80,11 @@ English::English() {
         { "client.textmodule.comboCounter.desc", L"Shows how many combos you have." },
         { "client.textmodule.comboCounter.count.name", L"Combo: " },
 
+        { "client.textmodule.reachDisplay.name", L"Reach Display" },
+        { "client.textmodule.reachDisplay.desc", L"Displays your reach when attacking an entity." },
+        { "client.textmodule.reachDisplay.decimals.name", L"Decimals" },
+        { "client.textmodule.reachDisplay.decimals.desc", L"The number of decimals in the reach number" },
+
         { "client.textmodule.customCoordinates.name", L"Custom Coordinates" },
         { "client.textmodule.customCoordinates.showDimension.name", L"Show Dimension" },
         { "client.textmodule.customCoordinates.dimension.name", L"Dimension: " },
@@ -88,11 +93,6 @@ English::English() {
         { "client.textmodule.customCoordinates.dimensionDisplay.theEnd.name", L"The End" },
         { "client.textmodule.customCoordinates.desc", L"Shows player position and other info" },
         { "client.textmodule.customCoordinates.showDimension.desc", L"Show the dimension the player is currently in" },
-
-        { "client.textmodule.reachDisplay.name", L"Reach Display" },
-        { "client.textmodule.reachDisplay.desc", L"Displays your reach when attacking an entity." },
-        { "client.textmodule.reachDisplay.decimals.name", L"Decimals" },
-        { "client.textmodule.reachDisplay.decimals.desc", L"The number of decimals in the reach number" },
 
         { "client.hudmodule.movableBossbar.name", L"Movable Bossbar" },
         { "client.hudmodule.movableBossbar.hideBossbar.name", L"Hide bossbar" },
