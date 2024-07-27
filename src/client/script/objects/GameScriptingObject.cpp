@@ -272,7 +272,7 @@ JsValueRef GameScriptingObject::isKeyDown(JsValueRef callee, bool isConstructor,
 
 	int vKey = Chakra::GetInt(arguments[1]);
 	if (vKey > 255 || vKey < 0) {
-		Chakra::ThrowError(XW("Virtual key code out of bounds (0-255)"));
+		Chakra::ThrowError(XW("Virtual key code out of bounds [0-255]"));
 		return JS_INVALID_REFERENCE;
 	}
 

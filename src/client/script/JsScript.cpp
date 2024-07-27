@@ -47,6 +47,7 @@
 #include "util/Logger.h"
 
 #include <resource.h>
+#include "objects/OptionsScriptingObject.h"
 
 using namespace winrt::Windows::Web::Http;
 
@@ -474,6 +475,7 @@ void JsScript::loadScriptObjects() {
 	this->objects.push_back(std::make_shared<GameScriptingObject>(i++));
 	this->objects.push_back(std::make_shared<D2DScriptingObject>(i++));
 	this->objects.push_back(std::make_shared<Graphics3DScriptingObject>(i++));
+	this->objects.push_back(std::make_shared<OptionsScriptingObject>(i++));
 
 	this->classes.clear();
 	this->classes.push_back(std::make_shared<JsVec2>(this));

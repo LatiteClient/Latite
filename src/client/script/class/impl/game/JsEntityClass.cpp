@@ -331,7 +331,7 @@ JsValueRef JsEntityClass::entityGetArmorSlot(JsValueRef callee, bool isConstruct
 	int slot = Chakra::GetInt(arguments[1]);
 
 	if (slot < 0 || slot > 3) {
-		Chakra::ThrowError(XW("Armor slot out of bounds (0-3)"));
+		Chakra::ThrowError(XW("Armor slot out of bounds [0-3]"));
 		return JS_INVALID_REFERENCE;
 	}
 
