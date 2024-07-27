@@ -5,6 +5,7 @@
 #include "../class/impl/JsVec2.h"
 #include "util/DxContext.h"
 #include <client/script/class/impl/JsTextureClass.h>
+#include <client/script/class/impl/game/JsItemStack.h>
 
 void D2DScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(object, useCallback, XW("use"), this);
@@ -16,6 +17,7 @@ void D2DScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(object, getTextSize, XW("getTextSize"), this);
 	Chakra::DefineFunc(object, setClippingRect, XW("setClipRect"), this);
 	Chakra::DefineFunc(object, restoreClippingRect, XW("restoreClipRect"), this);
+	Chakra::DefineFunc(object, drawItem, XW("drawItem"), this);
 }
 
 void D2DScriptingObject::onRenderOverlay(Event& ev) {
@@ -277,6 +279,31 @@ JsValueRef D2DScriptingObject::fillCircle(JsValueRef callee, bool isConstructor,
 
 JsValueRef D2DScriptingObject::drawLine(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	return JsValueRef();
+}
+
+JsValueRef D2DScriptingObject::drawItem(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 5)) return Chakra::GetUndefined();
+	if (!Chakra::VerifyParameters({ {arguments[1], JsObject}, {arguments[2], JsObject}, {arguments[3], JsNumber}, {arguments[4], JsNumber} })) return JS_INVALID_REFERENCE;
+	auto thi = reinterpret_cast<D2DScriptingObject*>(callbackState);
+
+
+	auto item = JsItemStack::Get(arguments[1]);
+	if (!item) {
+		Chakra::ThrowError(XW("Invalid item"));
+		return JS_INVALID_REFERENCE;
+	}
+
+	auto pos = JsVec2::ToVec2(arguments[2]);
+
+	if (thi->usingMinecraftRend()) {
+		MCDrawUtil dc{ thi->cachedCtx, Latite::get().getFont() };
+
+		dc.drawItem(item, pos, static_cast<float>(Chakra::GetNumber(arguments[3])), static_cast<float>(Chakra::GetNumber(arguments[4])));
+		return Chakra::GetUndefined();
+	}
+
+	Chakra::ThrowError(XW("Cannot draw items in non-Minecraft renderer mode"));
+	return Chakra::GetUndefined();
 }
 
 void D2DScriptingObject::DrawVisitor::operator()(OpDrawRect& op) {
