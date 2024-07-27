@@ -265,6 +265,19 @@ JsValueRef GameScriptingObject::releaseCursor(JsValueRef callee, bool isConstruc
 	return Chakra::GetNull();
 }
 
+JsValueRef GameScriptingObject::isKeyDown(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsNumber } }));
+
+	int vKey = Chakra::GetInt(arguments[1]);
+	if (vKey > 255 || vKey < 0) {
+		Chakra::ThrowError(XW("Virtual key code out of bounds (0-255)"));
+		return JS_INVALID_REFERENCE;
+	}
+
+	return Latite::getKeyboard().isKeyDown(vKey) ? Chakra::GetTrue() : Chakra::GetFalse();
+}
+
 JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
 	if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsString} })) return JS_INVALID_REFERENCE;
