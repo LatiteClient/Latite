@@ -2,6 +2,7 @@
 #include "JsEntityClass.h"
 #include "../JsVec3.h"
 #include "../JsVec2.h"
+#include "JsItemStack.h"
 #include "sdk/common/world/level/Dimension.h"
 #include "sdk/common/client/player/LocalPlayer.h"
 #include "sdk/common/client/game/ClientInstance.h"
@@ -313,4 +314,26 @@ JsValueRef JsEntityClass::entitySetStatusFlag(JsValueRef callee, bool isConstruc
 
 	return JS_INVALID_REFERENCE;
 
+}
+
+JsValueRef JsEntityClass::entityGetArmorSlot(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsNumber } })) return JS_INVALID_REFERENCE;
+
+	JsEntity* ent = nullptr;
+	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
+
+	if (!ent) {
+		Chakra::ThrowError(XW("Invalid entity"));
+		return JS_INVALID_REFERENCE;
+	}
+
+	int slot = Chakra::GetInt(arguments[1]);
+
+	if (slot < 0 || slot > 3) {
+		Chakra::ThrowError(XW("Armor slot out of bounds (0-3)"));
+		return JS_INVALID_REFERENCE;
+	}
+
+	return JsScript::getThis()->getClass<JsItemStack>()->construct(ent->getEntity()->getArmor(slot), false);
 }
