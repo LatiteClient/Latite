@@ -42,6 +42,7 @@ void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(object, getCameraPosition, XW("getCameraPosition"));
 	Chakra::DefineFunc(object, captureCursor, XW("captureCursor"));
 	Chakra::DefineFunc(object, releaseCursor, XW("releaseCursor"));
+	Chakra::DefineFunc(object, isKeyDown, XW("isKeyDown"));
 }
 
 void GameScriptingObject::createWorldObject() {
