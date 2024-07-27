@@ -24,6 +24,7 @@
 
 void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	this->createWorldObject();
+	Chakra::SetPropertyString(object, XW("version"), util::StrToWStr(Latite::get().gameVersion));
 	Chakra::DefineFunc(object, getLocalPlayerCallback, XW("getLocalPlayer"));
 	Chakra::DefineFunc(object, getMousePosCallback, XW("getMousePos"));
 	Chakra::DefineFunc(object, getScreenSizeCallback, XW("getScreenSize"));
