@@ -15,6 +15,7 @@ namespace SDK {
 		class BlockSource* getRegion();
 		class LocalPlayer* getLocalPlayer();
 		class GuiData* getGuiData();
+		class Options* getOptions();
 
 		void grabCursor();
 		void releaseCursor();

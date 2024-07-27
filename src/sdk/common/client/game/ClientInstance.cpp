@@ -89,6 +89,10 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
     return nullptr;
 }
 
+SDK::Options* SDK::ClientInstance::getOptions() {
+    return memory::callVirtual<Options*>(this, 0xBD);
+}
+
 void SDK::ClientInstance::grabCursor() {
     if (internalVers == V1_18_12) {
         // 1.18.12
