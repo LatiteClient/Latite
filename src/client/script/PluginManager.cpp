@@ -358,6 +358,7 @@ void PluginManager::initListeners()
 	eventListeners[L"text-input"] = {};
 	eventListeners[L"transfer"] = {};
 	eventListeners[L"change-dimension"] = {};
+	eventListeners[L"pre-move"] = {};
 }
 
 void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr) {
