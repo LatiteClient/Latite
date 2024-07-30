@@ -181,7 +181,6 @@ English::English() {
         { "client.hudmodule.keystrokes.ptCol.desc", L"The text color when pressed" },
         { "client.hudmodule.keystrokes.uptCol.desc", L"The text color when not pressed" },
 
-
         // Regular modules
 
         { "client.module.props.enabled.name", L"Enabled" },
@@ -234,6 +233,26 @@ English::English() {
         { "client.module.environmentChanger.setTime.desc", L"Whether or not to set the time" },
         { "client.module.environmentChanger.timeToSet.desc", L"The new time of day to set" },
         { "client.module.environmentChanger.showWeather.desc", L"Whether or not to show the weather" },
+
+        { "client.module.blockOutline.name", L"Block Overlay" },
+        { "client.module.blockOutline.renderThrough.name", L"Render Through" },
+        { "client.module.blockOutline.transparent.name", L"Transparent" },
+        { "client.module.blockOutline.vanillaOutline.name", L"Vanilla Outline" },
+        { "client.module.blockOutline.outline.name", L"Outline" },
+        { "client.module.blockOutline.outlineColor.name", L"Outline Color" },
+        { "client.module.blockOutline.overlay.name", L"Overlay" },
+        { "client.module.blockOutline.faceOverlay.name", L"Face Overlay" },
+        { "client.module.blockOutline.overlayColor.name", L"Overlay Color" },
+        { "client.module.blockOutline.desc", L"Changes the overlay in blocks!" },
+        { "client.module.blockOutline.renderThrough.desc", L"Whether to render the outline through blocks or not" },
+        { "client.module.blockOutline.transparent.desc", L"Whether or not to have a transparent overlay" },
+        { "client.module.blockOutline.vanillaOutline.desc", L"Keep the vanilla outline." },
+        { "client.module.blockOutline.outline.desc", L"Render an outline" },
+        { "client.module.blockOutline.outlineColor.desc", L"The outline color" },
+        { "client.module.blockOutline.overlay.desc", L"Render an overlay" },
+        { "client.module.blockOutline.faceOverlay.desc", L"Render the selected face of the block." },
+        { "client.module.blockOutline.overlayColor.desc", L"The overlay color" },
+
 
         // todo: check if this displays diacritics correctly (or even works at all)
         { "client.commands.config.desc", L"Perform actions related to profiles/configs" },
