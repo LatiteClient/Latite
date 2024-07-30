@@ -144,9 +144,7 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 
 			PluginManager::Event sEv{ L"receive-chat", { typ, val, val2, val3, isChat }, true };
 			if (Latite::getPluginManager().dispatchEvent(sEv)) {
-				pkt->type = SDK::TextPacketType::JUKEBOX_POPUP;
-				pkt->str.setString("");
-				pkt->source.setString("");
+				return;
 			}
 
 			ClientTextEvent ev{ pkt };
