@@ -122,6 +122,11 @@ English::English() {
         { "client.hudmodule.movableCoordinates.hideVanillaCoordinates.name", L"Hide vanilla coordinates" },
         { "client.hudmodule.movableCoordinates.desc", L"Makes the vanilla coordinates display movable." },
 
+        { "client.hudmodule.movablePaperdoll.name", L"Movable Paperdoll" },
+        { "client.hudmodule.movablePaperdoll.alwaysShow.name", L"Always Show" },
+        { "client.hudmodule.movablePaperdoll.desc", L"Makes the paperdoll movable. Requires the paperdoll to be enabled via game options." },
+        { "client.hudmodule.movablePaperdoll.alwaysShow.desc", L"Always show the paper doll." },
+
         { "client.hudmodule.healthWarning.name", L"Health Warning" },
         { "client.hudmodule.healthWarning.vignetteColor.name", L"Vignette" },
         { "client.hudmodule.healthWarning.healthPointThreshold.name", L"Health" },

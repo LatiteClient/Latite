@@ -5,10 +5,14 @@
 #include <sdk/common/client/gui/controls/UIControl.h>
 #include <sdk/common/client/renderer/HudPlayerRenderer.h>
 
-MovablePaperdoll::MovablePaperdoll() : HUDModule("Paperdoll", "Movable Paperdoll", "Makes the paperdoll movable. Requires the paperdoll to be enabled via game options.", HUD) {
-	addSetting("alwaysShow", "Always Show", "Always show the paper doll.", alwaysShow);
+MovablePaperdoll::MovablePaperdoll() : HUDModule("Paperdoll",
+                                                 LocalizeString::get("client.hudmodule.movablePaperdoll.name"),
+                                                 LocalizeString::get("client.hudmodule.movablePaperdoll.desc"), HUD) {
+    addSetting("alwaysShow", LocalizeString::get("client.hudmodule.movablePaperdoll.alwaysShow.name"),
+               LocalizeString::get("client.hudmodule.movablePaperdoll.alwaysShow.desc"), alwaysShow);
 
-	listen<RenderLayerEvent>((EventListenerFunc)&MovablePaperdoll::onRenderLayer, true, 10 /*need to overpower the hud renderer*/);
+    listen<RenderLayerEvent>(static_cast<EventListenerFunc>(&MovablePaperdoll::onRenderLayer), true,
+                             10 /*need to overpower the hud renderer*/);
 }
 
 void MovablePaperdoll::render(DrawUtil& ctx, bool, bool) {
