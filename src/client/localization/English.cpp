@@ -83,6 +83,9 @@ English::English() {
         { "client.textmodule.fpsCounter.name", L"FPS Counter" },
         { "client.textmodule.fpsCounter.desc", L"Shows your framerate (FPS)." },
 
+        { "client.textmodule.pingDisplay.name", L"Ping Display" },
+        { "client.textmodule.pingDisplay.desc", L"Displays the average upstream ping of the connected server." },
+
         { "client.textmodule.comboCounter.name", L"Combo Counter" },
         { "client.textmodule.comboCounter.desc", L"Shows how many combos you have." },
         { "client.textmodule.comboCounter.count.name", L"Combo: " },
