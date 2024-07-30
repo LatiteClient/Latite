@@ -122,6 +122,12 @@ English::English() {
         { "client.hudmodule.movableCoordinates.hideVanillaCoordinates.name", L"Hide vanilla coordinates" },
         { "client.hudmodule.movableCoordinates.desc", L"Makes the vanilla coordinates display movable." },
 
+        { "client.hudmodule.healthWarning.name", L"Health Warning" },
+        { "client.hudmodule.healthWarning.vignetteColor.name", L"Vignette" },
+        { "client.hudmodule.healthWarning.healthPointThreshold.name", L"Health" },
+        { "client.hudmodule.healthWarning.vignetteFade.name", L"Intensity" },
+        { "client.hudmodule.healthWarning.desc", L"Give the screen a vignette when your health is low." },
+
         { "client.hudmodule.props.pos.name", L"Position" },
         { "client.hudmodule.props.snapX.name", L"Snap X" },
         { "client.hudmodule.props.snapY.name", L"Snap Y" },
