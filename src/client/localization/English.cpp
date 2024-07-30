@@ -293,6 +293,11 @@ English::English() {
         { "client.hudmodule.guiScaleChanger.desc", L"Change the scale of the Minecraft GUI" },
         { "client.hudmodule.guiScaleChanger.guiscale.desc", L"Scale of GUI you want." },
 
+        { "client.module.motionBlur.name", L"Motion Blur" },
+        { "client.module.motionBlur.intensity.name", L"Intensity" },
+        { "client.module.motionBlur.bleed.name", L"Anti Bleed" },
+        { "client.module.motionBlur.desc", L"Blurs motion" },
+
         { "client.module.behindYou.name", L"Behind You!" },
         { "client.module.behindYouState0.name", L"Third Person Front" },
         { "client.module.behindYouState1.name", L"Third Person Back" },
