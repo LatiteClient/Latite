@@ -49,6 +49,7 @@ class GenericHooks : public HookGroup {
     static Color* hkGetFogColor(SDK::Dimension* obj, Color* out, SDK::Actor* ent, float f);
     static void hkAddMessage(SDK::GuiData* obj, void* msg, uint32_t profanityContext);
     static void hkUpdatePlayer(SDK::CameraComponent* obj, void* a, void* b);
+    static void hkOnUri(void* obj, void* uri);
 public:
     GenericHooks();
 };

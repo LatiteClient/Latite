@@ -32,6 +32,7 @@ namespace {
 	std::shared_ptr<Hook> FogColorHook;
 	std::shared_ptr<Hook> AddMessageHook;
 	std::shared_ptr<Hook> UpdatePlayerHook;
+	std::shared_ptr<Hook> OnUriHook;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -347,6 +348,27 @@ void GenericHooks::hkUpdatePlayer(SDK::CameraComponent* obj, void* a, void* b) {
 
 }
 
+void GenericHooks::hkOnUri(void* obj, void* pUri) {
+	struct ActivationUri {
+		std::string verb;
+		std::unordered_map<std::string, std::string> arguments;
+	};
+
+	ActivationUri* uri = reinterpret_cast<ActivationUri*>(pUri);
+	
+	if (uri->verb == "addlatiteplugin") {
+		auto pluginName = uri->arguments.find("id");
+
+		if (pluginName != uri->arguments.end()) {
+			Latite::getNotifications().push(L"Installing plugin " + util::StrToWStr(pluginName->second));
+			Latite::getPluginManager().installScript(pluginName->second);
+		}
+		return;
+	}
+
+	OnUriHook->oFunc<decltype(&hkOnUri)>()(obj, pUri);
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
 	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
@@ -394,5 +416,6 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	WeatherHook = addHook(Signatures::Weather_tick.result, hkWeatherTick, "Weather::tick");
 	AddMessageHook = addHook(Signatures::GuiData__addMessage.result, hkAddMessage, "GuiData::_addMessage");
 	UpdatePlayerHook = addHook(Signatures::_updatePlayer.result, hkUpdatePlayer, "`anonymous namespace'::_updatePlayer");
+	OnUriHook = addHook(Signatures::GameArguments__onUri.result, hkOnUri, "GameArguments::_onUri");
 }
 

@@ -530,11 +530,14 @@
     <ClInclude Include="src\client\script\objects\D2DScriptingObject.h" />
     <ClInclude Include="src\client\script\objects\DimensionObject.h" />
     <ClInclude Include="src\client\script\objects\GameScriptingObject.h" />
+    <ClInclude Include="src\client\script\objects\Graphics3DScriptingObject.h" />
+    <ClInclude Include="src\client\script\objects\OptionsScriptingObject.h" />
     <ClInclude Include="src\client\script\ScriptCertificate.h" />
     <ClInclude Include="src\client\script\ScriptingObject.h" />
     <ClInclude Include="src\client\script\PluginManager.h" />
     <ClInclude Include="src\client\ui\TextBox.h" />
     <ClInclude Include="src\sdk\common\client\game\FontRepository.h" />
+    <ClInclude Include="src\sdk\common\client\game\Options.h" />
     <ClInclude Include="src\sdk\common\client\gui\controls\UIControl.h" />
     <ClInclude Include="src\sdk\common\client\gui\controls\VisualTree.h" />
     <ClInclude Include="src\sdk\common\client\gui\Font.h" />
@@ -766,6 +769,7 @@
     <ClCompile Include="src\client\script\objects\D2DScriptingObject.cpp" />
     <ClCompile Include="src\client\script\objects\GameScriptingObject.cpp" />
     <ClCompile Include="src\client\script\objects\Graphics3DScriptingObject.cpp" />
+    <ClCompile Include="src\client\script\objects\OptionsScriptingObject.cpp" />
     <ClCompile Include="src\client\script\ScriptingObject.cpp" />
     <ClCompile Include="src\client\script\PluginManager.cpp" />
     <ClCompile Include="src\client\ui\TextBox.cpp" />

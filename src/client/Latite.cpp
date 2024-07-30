@@ -234,6 +234,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(GuiData__addMessage),
         MVSIG(Components::actorEquipmentPersistentComponent),
         MVSIG(_updatePlayer),
+        MVSIG(GameArguments__onUri),
     };
     
     new (mmgrBuf) ModuleManager;

@@ -909,6 +909,21 @@
     <ClInclude Include="src\sdk\common\util\BasicDataOutput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\sdk\common\client\gui\screens\ContainerScreenController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\client\gui\screens\ScreenController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sdk\common\client\game\Options.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\script\objects\OptionsScriptingObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\script\objects\Graphics3DScriptingObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1392,6 +1407,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\localization\Spanish.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sdk\common\client\gui\screens\ContainerScreenController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\script\objects\OptionsScriptingObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
