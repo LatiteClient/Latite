@@ -25,7 +25,7 @@ Chat::Chat() : HUDModule("Chat", L"Custom Chat", L"A custom chat, replacing the 
 	//std::get<SnapValue>(snappingY).index = 2;
 
 	addSliderSetting("chatWidth", L"Chat Width", L"", chatWidth, FloatValue(100.f), FloatValue(1000.f), FloatValue(10.f));
-	addSetting("backgroundColor", L"Background Color", L "The color of the background", backgroundColor);
+	addSetting("backgroundColor", L"Background Color", L"The color of the background", backgroundColor);
 	addSetting("textColor", L"Text Color", L"The color of the text", textColor);
 	addSetting("antiSpam", L"Anti Spam", L"Prevent spam messages in chat.", antiSpam);
 	addSliderSetting("animSpeed", L"Animation Time", L"The speed of the animation", animationSpeed, FloatValue(0.f), FloatValue(5.f), FloatValue(0.1f));
