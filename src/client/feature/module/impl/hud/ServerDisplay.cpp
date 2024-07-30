@@ -1,14 +1,20 @@
 #include "pch.h"
 #include "ServerDisplay.h"
 #include "sdk/common/network/RakNetConnector.h"
-
-ServerDisplay::ServerDisplay() : TextModule("ServerDisplay", "Server Display", "Displays the server connected to.", HUD, 400.f, 0, true) {
-    port.addEntry({ port_mixed, "Non-Default" });
-    port.addEntry({ port_constant, "Always"});
-    port.addEntry({ port_none, "None" });
-    addEnumSetting("showPort", "Show Port", "How to show the port", port);
-    addSetting("featuredName", "Featured Server Name", "Whether to show the featured server name or not", this->showServerName);
+ServerDisplay::ServerDisplay() : TextModule("ServerDisplay",
+                                            LocalizeString::get("client.textmodule.serverDisplay.name"),
+                                            LocalizeString::get("client.textmodule.serverDisplay.desc"), HUD, 400.f, 0,
+                                            true) {
+    port.addEntry({port_mixed, LocalizeString::get("client.textmodule.serverDisplay.showPortState0.name")});
+    port.addEntry({port_constant, LocalizeString::get("client.textmodule.serverDisplay.showPortState1.name")});
+    port.addEntry({port_none, LocalizeString::get("client.textmodule.serverDisplay.showPortState2.name")});
+    addEnumSetting("showPort", LocalizeString::get("client.textmodule.serverDisplay.showPort.name"),
+                   LocalizeString::get("client.textmodule.serverDisplay.showPort.desc"), port);
+    addSetting("featuredName", LocalizeString::get("client.textmodule.serverDisplay.featuredName.name"),
+               LocalizeString::get("client.textmodule.serverDisplay.featuredName.desc"), this->showServerName);
 }
+
+
 
 std::wstringstream ServerDisplay::text(bool isDefault, bool inEditor) {
     std::wstringstream wss;

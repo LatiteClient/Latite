@@ -115,6 +115,16 @@ English::English() {
         { "client.textmodule.customCoordinates.desc", L"Shows player position and other info" },
         { "client.textmodule.customCoordinates.showDimension.desc", L"Show the dimension the player is currently in" },
 
+        { "client.textmodule.serverDisplay.name", L"Server Display" },
+        { "client.textmodule.serverDisplay.showPort.name", L"Show Port" },
+        { "client.textmodule.serverDisplay.featuredName.name", L"Featured Server Name" },
+        { "client.textmodule.serverDisplay.desc", L"Displays the server connected to." },
+        { "client.textmodule.serverDisplay.showPort.desc", L"How to show the port" },
+        { "client.textmodule.serverDisplay.featuredName.desc", L"Whether to show the featured server name or not" },
+        { "client.textmodule.serverDisplay.showPortState0.name", L"Non-Default" },
+        { "client.textmodule.serverDisplay.showPortState1.name", L"Always" },
+        { "client.textmodule.serverDisplay.showPortState2.name", L"None" },
+
         { "client.textmodule.toggleSprintSneak.name", L"Toggle Sprint/Sneak" },
         { "client.textmodule.toggleSprintSneak.label.name", L"Label" },
         { "client.textmodule.toggleSprintSneak.toggleSprint.name", L"Toggle Sprint" },
