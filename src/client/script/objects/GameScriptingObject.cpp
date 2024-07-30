@@ -268,7 +268,7 @@ JsValueRef GameScriptingObject::releaseCursor(JsValueRef callee, bool isConstruc
 
 JsValueRef GameScriptingObject::isKeyDown(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
-	if (!Chakra::VerifyParameters({ { arguments[1], JsNumber } }));
+	if (!Chakra::VerifyParameters({ { arguments[1], JsNumber } })) return JS_INVALID_REFERENCE;
 
 	int vKey = Chakra::GetInt(arguments[1]);
 	if (vKey > 255 || vKey < 0) {
