@@ -359,6 +359,7 @@ void PluginManager::initListeners()
 	eventListeners[L"transfer"] = {};
 	eventListeners[L"change-dimension"] = {};
 	eventListeners[L"pre-move"] = {};
+	eventListeners[L"post-move"] = {};
 }
 
 void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr) {
