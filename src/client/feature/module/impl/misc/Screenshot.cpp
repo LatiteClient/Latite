@@ -19,12 +19,12 @@ using namespace winrt::Windows::Web::Http::Filters;
 using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Storage;
 
-Screenshot::Screenshot() : Module("Screenshot", "Screenshot", "Take a screenshot with a key.", GAME, nokeybind) {
+Screenshot::Screenshot() : Module("Screenshot", L"Screenshot", L"Take a screenshot with a key.", GAME, nokeybind) {
     listen<KeyUpdateEvent>((EventListenerFunc)&Screenshot::onKey);
     listen<UpdateEvent>((EventListenerFunc)&Screenshot::onUpdate);
     listen<RenderOverlayEvent>((EventListenerFunc)&Screenshot::onRenderOverlay, false, 0 /*lowest priority so that Latite renders everything else*/);
 
-    addSetting("ssKey", "Screenshot key", "The key you press to take a screenshot", this->screenshotKey);
+    addSetting("ssKey", L"Screenshot key", L"The key you press to take a screenshot", this->screenshotKey);
 }
 
 namespace {
