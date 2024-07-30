@@ -4,30 +4,58 @@
 #include <array>
 #include <client/Latite.h>
 
-Keystrokes::Keystrokes() : HUDModule("Keystrokes", "Keystrokes", "Shows movement keys and states.", HUD) {
-	addSetting("mouseButtons", "Mouse Buttons", "Show mouse buttons", mouseButtons);
-	addSetting("showCps", "CPS", "Show clicks per second", cps);
-	addSetting("spaceBar", "Space Bar", "Space bar", spaceBar);
-	addSetting("border", "Border", "Border", border);
-	addSetting("showSneak", "Sneak Key", "Shows the sneak key", shiftKey);
+Keystrokes::Keystrokes() : HUDModule("Keystrokes", LocalizeString::get("client.module.keystrokes.name"),
+                                     LocalizeString::get("client.module.keystrokes.desc"), HUD) {
+    addSetting("mouseButtons", LocalizeString::get("client.module.keystrokes.mouseButtons.name"),
+               LocalizeString::get("client.module.keystrokes.mouseButtons.desc"), mouseButtons);
+    addSetting("showCps", LocalizeString::get("client.module.keystrokes.showCps.name"),
+               LocalizeString::get("client.module.keystrokes.showCps.desc"), cps);
+    addSetting("spaceBar", LocalizeString::get("client.module.keystrokes.spaceBar.name"),
+               LocalizeString::get("client.module.keystrokes.spaceBar.desc"), spaceBar);
+    addSetting("border", LocalizeString::get("client.module.keystrokes.border.name"),
+               LocalizeString::get("client.module.keystrokes.border.desc"), border);
+    addSetting("showSneak", LocalizeString::get("client.module.keystrokes.showSneak.name"),
+               LocalizeString::get("client.module.keystrokes.showSneak.desc"), shiftKey);
 
-	addSliderSetting("radius", "Radius", "How round the buttons are", radius, FloatValue(0.f), FloatValue(10.f), FloatValue(1.f));
-	addSliderSetting("textSize", "Text Size", "Text Size", textSize,   FloatValue(2.f), FloatValue(40.f), FloatValue(0.2f));
-	addSliderSetting("keySize", "Key Size", "Key Size", keystrokeSize, FloatValue(15.f), FloatValue(90.f), FloatValue(2.f));
-	addSliderSetting("spaceSize", "Space Bar", "Spacebar Size", spaceSize, FloatValue(0.f), FloatValue(90.f), FloatValue(2.f));
-	addSliderSetting("mouseButtonHeight", "Mouse Button Height", "Mouse Button Height", mouseButtonHeight, FloatValue(15.f), FloatValue(90.f), FloatValue(2.f), "mouseButtons"_istrue);
-	addSliderSetting("padding", "Padding", "Padding between keys", padding, FloatValue(0.f), FloatValue(6.f), FloatValue(0.25f));
-	addSliderSetting("borderLength", "Border Length", "The border length", borderLength, FloatValue(0.f), FloatValue(6.f), FloatValue(0.25f), "border"_istrue);
-	addSliderSetting("transition", "Transition (0 = No Transition)", "The smooth color transition (0 for no transition)", lerpSpeed, FloatValue(0.f), FloatValue(3.f), FloatValue(0.05f));
-	
-	addSetting("borderCol", "Border Color", "The color of the border", borderColor);
-	addSetting("pressedCol", "Pressed Color", "The key color when pressed", pressedColor);
-	addSetting("unpressedCol", "Unpressed Color", "The key color when not pressed", unpressedColor);
-	addSetting("ptCol", "Pressed Text Color", "The text color when pressed", pressedTextColor);
-	addSetting("uptCol", "Unpressed Text Color", "The text color when not pressed", unpressedTextColor);
+    addSliderSetting("radius", LocalizeString::get("client.module.keystrokes.radius.name"),
+                     LocalizeString::get("client.module.keystrokes.radius.desc"), radius, FloatValue(0.f),
+                     FloatValue(10.f), FloatValue(1.f));
+    addSliderSetting("textSize", LocalizeString::get("client.module.keystrokes.textSize.name"),
+                     LocalizeString::get("client.module.keystrokes.textSize.desc"), textSize, FloatValue(2.f),
+                     FloatValue(40.f), FloatValue(0.2f));
+    addSliderSetting("keySize", LocalizeString::get("client.module.keystrokes.keySize.name"),
+                     LocalizeString::get("client.module.keystrokes.keySize.desc"), keystrokeSize, FloatValue(15.f),
+                     FloatValue(90.f), FloatValue(2.f));
+    addSliderSetting("spaceSize", LocalizeString::get("client.module.keystrokes.spaceSize.name"),
+                     LocalizeString::get("client.module.keystrokes.spaceSize.desc"), spaceSize, FloatValue(0.f),
+                     FloatValue(90.f), FloatValue(2.f));
+    addSliderSetting("mouseButtonHeight", LocalizeString::get("client.module.keystrokes.mouseButtonHeight.name"),
+                     LocalizeString::get("client.module.keystrokes.mouseButtonHeight.desc"), mouseButtonHeight,
+                     FloatValue(15.f), FloatValue(90.f), FloatValue(2.f), "mouseButtons"_istrue);
+    addSliderSetting("padding", LocalizeString::get("client.module.keystrokes.padding.name"),
+                     LocalizeString::get("client.module.keystrokes.padding.desc"), padding, FloatValue(0.f),
+                     FloatValue(6.f), FloatValue(0.25f));
+    addSliderSetting("borderLength", LocalizeString::get("client.module.keystrokes.borderLength.name"),
+                     LocalizeString::get("client.module.keystrokes.borderLength.desc"), borderLength, FloatValue(0.f),
+                     FloatValue(6.f), FloatValue(0.25f), "border"_istrue);
+    addSliderSetting("transition", LocalizeString::get("client.module.keystrokes.transition.name"),
+                     LocalizeString::get("client.module.keystrokes.transition.desc"), lerpSpeed, FloatValue(0.f),
+                     FloatValue(3.f), FloatValue(0.05f));
 
-	listen<ClickEvent>((EventListenerFunc)&Keystrokes::onClick);
+    addSetting("borderCol", LocalizeString::get("client.module.keystrokes.borderCol.name"),
+               LocalizeString::get("client.module.keystrokes.borderCol.desc"), borderColor);
+    addSetting("pressedCol", LocalizeString::get("client.module.keystrokes.pressedCol.name"),
+               LocalizeString::get("client.module.keystrokes.pressedCol.desc"), pressedColor);
+    addSetting("unpressedCol", LocalizeString::get("client.module.keystrokes.unpressedCol.name"),
+               LocalizeString::get("client.module.keystrokes.unpressedCol.desc"), unpressedColor);
+    addSetting("ptCol", LocalizeString::get("client.module.keystrokes.ptCol.name"),
+               LocalizeString::get("client.module.keystrokes.ptCol.desc"), pressedTextColor);
+    addSetting("uptCol", LocalizeString::get("client.module.keystrokes.uptCol.name"),
+               LocalizeString::get("client.module.keystrokes.uptCol.desc"), unpressedTextColor);
+
+    listen<ClickEvent>((EventListenerFunc)&Keystrokes::onClick);
 }
+
 
 Vec2 Keystrokes::drawKeystroke(DrawUtil& ctx, Vec2 const& pos, Keystroke& stroke) {
 	d2d::Rect front = { pos.x, pos.y, pos.x + std::get<FloatValue>(keystrokeSize), pos.y + std::get<FloatValue>(keystrokeSize) };
