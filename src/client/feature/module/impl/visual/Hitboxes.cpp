@@ -2,6 +2,26 @@
 #include "Hitboxes.h"
 #include <util/DrawUtil3D.h>
 
+Hitboxes::Hitboxes() : Module("Hitboxes", LocalizeString::get("client.module.hitboxes.name"),
+                              LocalizeString::get("client.module.hitboxes.desc"), GAME) {
+    addSetting("transparent", LocalizeString::get("client.module.hitboxes.transparent.name"),
+               LocalizeString::get("client.module.hitboxes.transparent.desc"), transparent);
+    addSetting("boxColor", LocalizeString::get("client.module.hitboxes.boxColor.name"),
+               LocalizeString::get("client.module.hitboxes.boxColor.desc"), boxColor);
+    addSetting("showEyeLine", LocalizeString::get("client.module.hitboxes.showEyeLine.name"),
+               LocalizeString::get("client.module.hitboxes.showEyeLine.desc"), this->showEyeLine);
+    addSetting("eyeLine", LocalizeString::get("client.module.hitboxes.eyeLine.name"),
+               LocalizeString::get("client.module.hitboxes.eyeLine.desc"), this->eyeColor, "showEyeLine"_istrue);
+    addSetting("showLookingAt", LocalizeString::get("client.module.hitboxes.showLookingAt.name"),
+               LocalizeString::get("client.module.hitboxes.showLookingAt.desc"), this->showLine);
+    addSetting("lookingAt", LocalizeString::get("client.module.hitboxes.lookingAt.name"),
+               LocalizeString::get("client.module.hitboxes.lookingAt.desc"), this->lineColor, "showLookingAt"_istrue);
+    addSetting("items", LocalizeString::get("client.module.hitboxes.items.name"),
+               LocalizeString::get("client.module.hitboxes.items.desc"), items);
+
+    listen<AfterRenderEntityEvent>(static_cast<EventListenerFunc>(&Hitboxes::onEntityRender), false);
+}
+
 void Hitboxes::onEntityRender(Event& evG) {
 	auto& ev = reinterpret_cast<AfterRenderEntityEvent&>(evG);
 
@@ -66,15 +86,4 @@ void Hitboxes::onEntityRender(Event& evG) {
 		dc.drawLine(begin, end, lineCol);
 	}
 	dc.flush();
-}
-Hitboxes::Hitboxes() : Module("Hitboxes", "Hitboxes", "Shows entity bounding boxes.", GAME) {
-	addSetting("transparent", "Transparent", "Whether or not the hitboxes are transparent.", transparent);
-	addSetting("boxColor", "Box", "The hitbox color.", boxColor);
-	addSetting("showEyeLine", "Show Eye Line", "Whether or not to show the eye line.", this->showEyeLine);
-	addSetting("eyeLine", "Eye Line", "The eye line color.", this->eyeColor, "showEyeLine"_istrue);
-	addSetting("showLookingAt", "Show Looking At", "Whether or not to show the looking at line.", this->showLine);
-	addSetting("lookingAt", "Looking At", "Looking At color", this->lineColor, "showLookingAt"_istrue);
-	addSetting("items", "Items", "Show item hitboxes", items);
-
-	listen<AfterRenderEntityEvent>((EventListenerFunc)&Hitboxes::onEntityRender, false);
 }
