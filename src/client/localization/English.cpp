@@ -298,6 +298,11 @@ English::English() {
         { "client.module.motionBlur.bleed.name", L"Anti Bleed" },
         { "client.module.motionBlur.desc", L"Blurs motion" },
 
+        { "client.module.fullbright.name", L"Fullbright" },
+        { "client.module.fullbright.gamma.name", L"Gamma" },
+        { "client.module.fullbright.desc", L"Extra world brightness" },
+        { "client.module.fullbright.gamma.desc", L"The amount of light" },
+
         { "client.module.behindYou.name", L"Behind You!" },
         { "client.module.behindYouState0.name", L"Third Person Front" },
         { "client.module.behindYouState1.name", L"Third Person Back" },
