@@ -9,6 +9,8 @@
 
 English::English() {
     English::strings = {
+        // misc.
+
         { "client.intro.welcome", L"Welcome to Latite Client!" },
         { "client.intro.menubutton", L"Press {} in a world or server to open the mod menu." },
 
@@ -47,6 +49,8 @@ English::English() {
         { "client.settings.mcRendererFont.notoSans.desc", L"The smooth font (Noto Sans MS)" },
 
         { "client.settings.dx11EnabledMsg.name", L"&7Please restart your game to use DX12 again!" },
+
+        // Text Modules
 
         { "client.textmodule.props.background.name", L"Background" },
         { "client.textmodule.props.customSize.name", L"Fixed Size" },
@@ -99,6 +103,8 @@ English::English() {
         { "client.textmodule.customCoordinates.desc", L"Shows player position and other info" },
         { "client.textmodule.customCoordinates.showDimension.desc", L"Show the dimension the player is currently in" },
 
+        // HUD Modules
+
         { "client.hudmodule.movableBossbar.name", L"Movable Bossbar" },
         { "client.hudmodule.movableBossbar.hideBossbar.name", L"Hide bossbar" },
         { "client.hudmodule.movableBossbar.desc", L"Makes the in-game bossbar movable." },
@@ -135,6 +141,8 @@ English::English() {
         { "client.hudmodule.armorHud.durability.desc", L"Show Durability" },
         { "client.hudmodule.armorHud.percent.desc", L"The durability percent" },
         { "client.hudmodule.armorHud.textColor.desc", L"The text color" },
+
+        // Regular modules
 
         { "client.module.props.enabled.name", L"Enabled" },
         { "client.module.props.key.name", L"Key" },
