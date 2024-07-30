@@ -288,10 +288,10 @@ English::English() {
         { "client.module.itemTweaks.desc", L"Tweaks/settings related to item rendering." },
         { "client.module.itemTweaks.disableFlyingItem.desc", L"Disables the animation when you shift click an item" },
 
-        { "client.hudmodule.guiScaleChanger.name", L"GUI Scale Changer" },
-        { "client.hudmodule.guiScaleChanger.guiscale.name", L"Guiscale" },
-        { "client.hudmodule.guiScaleChanger.desc", L"Change the scale of the Minecraft GUI" },
-        { "client.hudmodule.guiScaleChanger.guiscale.desc", L"Scale of GUI you want." },
+        { "client.module.guiScaleChanger.name", L"GUI Scale Changer" },
+        { "client.module.guiScaleChanger.guiscale.name", L"Guiscale" },
+        { "client.module.guiScaleChanger.desc", L"Change the scale of the Minecraft GUI" },
+        { "client.module.guiScaleChanger.guiscale.desc", L"Scale of GUI you want." },
 
         { "client.module.motionBlur.name", L"Motion Blur" },
         { "client.module.motionBlur.intensity.name", L"Intensity" },
