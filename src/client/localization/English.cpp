@@ -283,6 +283,10 @@ English::English() {
         { "client.module.nickname.desc", L"Makes your username appear as something else in Minecraft chat" },
         { "client.module.nickname.newNick.desc", L"Your new nickname." },
 
+        { "client.module.chunkBorders.name", L"Chunk Borders" },
+        { "client.module.chunkBorders.transparent.name", L"Transparent" },
+        { "client.module.chunkBorders.desc", L"Show chunk borders near you." },
+
         { "client.module.itemTweaks.name", L"Item Tweaks" },
         { "client.module.itemTweaks.disableFlyingItem.name", L"Disable flying item animation" },
         { "client.module.itemTweaks.desc", L"Tweaks/settings related to item rendering." },
