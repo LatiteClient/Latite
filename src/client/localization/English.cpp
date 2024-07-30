@@ -112,6 +112,17 @@ English::English() {
         { "client.textmodule.customCoordinates.desc", L"Shows player position and other info" },
         { "client.textmodule.customCoordinates.showDimension.desc", L"Show the dimension the player is currently in" },
 
+        { "client.textmodule.toggleSprintSneak.name", L"Toggle Sprint/Sneak" },
+        { "client.textmodule.toggleSprintSneak.label.name", L"Label" },
+        { "client.textmodule.toggleSprintSneak.toggleSprint.name", L"Toggle Sprint" },
+        { "client.textmodule.toggleSprintSneak.alwaysSprint.name", L"Always Sprint" },
+        { "client.textmodule.toggleSprintSneak.toggleSneak.name", L"Toggle Sneak" },
+        { "client.textmodule.toggleSprintSneak.desc", L"Toggle sprinting or sneaking without holding the button." },
+        { "client.textmodule.toggleSprintSneak.label.desc", L"Whether to show the label or not" },
+        { "client.textmodule.toggleSprintSneak.toggleSprint.desc", L"Toggle Sprint" },
+        { "client.textmodule.toggleSprintSneak.alwaysSprint.desc", L"Always Sprint even if sprinting is not toggled" },
+        { "client.textmodule.toggleSprintSneak.toggleSneak.desc", L"Toggle Sneak" },
+
         // HUD Modules
 
         { "client.hudmodule.movableBossbar.name", L"Movable Bossbar" },
