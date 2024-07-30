@@ -80,6 +80,9 @@ English::English() {
         { "client.textmodule.props.suffix.desc", L"The text after the value" },
         { "client.textmodule.props.alignment.desc", L"How the text is aligned/expands" },
 
+        { "client.textmodule.fpsCounter.name", L"FPS Counter" },
+        { "client.textmodule.fpsCounter.desc", L"Shows your framerate (FPS)." },
+
         { "client.textmodule.comboCounter.name", L"Combo Counter" },
         { "client.textmodule.comboCounter.desc", L"Shows how many combos you have." },
         { "client.textmodule.comboCounter.count.name", L"Combo: " },
