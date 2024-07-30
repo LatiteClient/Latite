@@ -136,6 +136,28 @@ English::English() {
         { "client.textmodule.toggleSprintSneak.alwaysSprint.desc", L"Always Sprint even if sprinting is not toggled" },
         { "client.textmodule.toggleSprintSneak.toggleSneak.desc", L"Toggle Sneak" },
 
+        { "client.textmodule.bowIndicator.name", L"Bow Indicator" },
+        { "client.textmodule.bowIndicator.visual.name", L"Visual Indicator" },
+        { "client.textmodule.bowIndicator.fgCol.name", L"Color" },
+        { "client.textmodule.bowIndicator.bgCol.name", L"Background Color" },
+        { "client.textmodule.bowIndicator.horizontal.name", L"Horizontal" },
+        { "client.textmodule.bowIndicator.hideWhenCharged.name", L"Hide when charged" },
+        { "client.textmodule.bowIndicator.size.name", L"Length" },
+        { "client.textmodule.bowIndicator.width.name", L"Width" },
+        { "client.textmodule.bowIndicator.rad.name", L"Radius" },
+        { "client.textmodule.bowIndicator.padding.name", L"Padding" },
+        { "client.textmodule.bowIndicator.desc", L"Shows how charged your bow is." },
+        { "client.textmodule.bowIndicator.visual.desc", L"To show a bar instead of text" },
+        { "client.textmodule.bowIndicator.fgCol.desc", L"The indicator foreground color" },
+        { "client.textmodule.bowIndicator.bgCol.desc", L"The indicator background color" },
+        { "client.textmodule.bowIndicator.horizontal.desc", L"Whether it's horizontal or not" },
+        { "client.textmodule.bowIndicator.hideWhenCharged.desc", L"Hide indicator when it is almost fully charged" },
+        { "client.textmodule.bowIndicator.size.desc", L"The length of the indicator" },
+        { "client.textmodule.bowIndicator.width.desc", L"The width of the indicator" },
+        { "client.textmodule.bowIndicator.rad.desc", L"The radius of the indicator" },
+        { "client.textmodule.bowIndicator.padding.desc", L"The padding of the indicator" },
+
+
         // HUD Modules
 
         { "client.hudmodule.movableBossbar.name", L"Movable Bossbar" },
