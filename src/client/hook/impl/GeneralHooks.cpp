@@ -119,6 +119,8 @@ void GenericHooks::onClick(ClickMap* map, char clickType, char isDownWheelDelta,
 	if (clickType > 0) {
 		Vec2& mousePos = SDK::ClientInstance::get()->cursorPos;
 
+		std::vector<PluginManager::Event::Value> values;
+
 		PluginManager::Event::Value val{L"mouseX"};
 		val.val = static_cast<double>(mousePos.x);
 
@@ -131,7 +133,18 @@ void GenericHooks::onClick(ClickMap* map, char clickType, char isDownWheelDelta,
 		PluginManager::Event::Value val4{L"button"};
 		val4.val = static_cast<double>(clickType);
 
-		PluginManager::Event ev{L"click", { val, val2, val3, val4 }, true};
+		values.push_back(val);
+		values.push_back(val2);
+		values.push_back(val3);
+		values.push_back(val4);
+
+		if (clickType == 4) {
+			PluginManager::Event::Value wheel{ L"wheelDelta" };
+			wheel.val = static_cast<double>(clickType);
+			values.push_back(wheel);
+		}
+
+		PluginManager::Event ev{L"click", values, true};
 		if (Latite::getPluginManager().dispatchEvent(ev)) return;
 	}
 
