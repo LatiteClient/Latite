@@ -4,54 +4,54 @@
 #include <array>
 #include <client/Latite.h>
 
-Keystrokes::Keystrokes() : HUDModule("Keystrokes", LocalizeString::get("client.module.keystrokes.name"),
-                                     LocalizeString::get("client.module.keystrokes.desc"), HUD) {
-    addSetting("mouseButtons", LocalizeString::get("client.module.keystrokes.mouseButtons.name"),
-               LocalizeString::get("client.module.keystrokes.mouseButtons.desc"), mouseButtons);
-    addSetting("showCps", LocalizeString::get("client.module.keystrokes.showCps.name"),
-               LocalizeString::get("client.module.keystrokes.showCps.desc"), cps);
-    addSetting("spaceBar", LocalizeString::get("client.module.keystrokes.spaceBar.name"),
-               LocalizeString::get("client.module.keystrokes.spaceBar.desc"), spaceBar);
-    addSetting("border", LocalizeString::get("client.module.keystrokes.border.name"),
-               LocalizeString::get("client.module.keystrokes.border.desc"), border);
-    addSetting("showSneak", LocalizeString::get("client.module.keystrokes.showSneak.name"),
-               LocalizeString::get("client.module.keystrokes.showSneak.desc"), shiftKey);
+Keystrokes::Keystrokes() : HUDModule("Keystrokes", LocalizeString::get("client.hudmodule.keystrokes.name"),
+                                     LocalizeString::get("client.hudmodule.keystrokes.desc"), HUD) {
+    addSetting("mouseButtons", LocalizeString::get("client.hudmodule.keystrokes.mouseButtons.name"),
+               LocalizeString::get("client.hudmodule.keystrokes.mouseButtons.desc"), mouseButtons);
+    addSetting("showCps", LocalizeString::get("client.hudmodule.keystrokes.showCps.name"),
+               LocalizeString::get("client.hudmodule.keystrokes.showCps.desc"), cps);
+    addSetting("spaceBar", LocalizeString::get("client.hudmodule.keystrokes.spaceBar.name"),
+               LocalizeString::get("client.hudmodule.keystrokes.spaceBar.desc"), spaceBar);
+    addSetting("border", LocalizeString::get("client.hudmodule.keystrokes.border.name"),
+               LocalizeString::get("client.hudmodule.keystrokes.border.desc"), border);
+    addSetting("showSneak", LocalizeString::get("client.hudmodule.keystrokes.showSneak.name"),
+               LocalizeString::get("client.hudmodule.keystrokes.showSneak.desc"), shiftKey);
 
-    addSliderSetting("radius", LocalizeString::get("client.module.keystrokes.radius.name"),
-                     LocalizeString::get("client.module.keystrokes.radius.desc"), radius, FloatValue(0.f),
+    addSliderSetting("radius", LocalizeString::get("client.hudmodule.keystrokes.radius.name"),
+                     LocalizeString::get("client.hudmodule.keystrokes.radius.desc"), radius, FloatValue(0.f),
                      FloatValue(10.f), FloatValue(1.f));
-    addSliderSetting("textSize", LocalizeString::get("client.module.keystrokes.textSize.name"),
-                     LocalizeString::get("client.module.keystrokes.textSize.desc"), textSize, FloatValue(2.f),
+    addSliderSetting("textSize", LocalizeString::get("client.hudmodule.keystrokes.textSize.name"),
+                     LocalizeString::get("client.hudmodule.keystrokes.textSize.desc"), textSize, FloatValue(2.f),
                      FloatValue(40.f), FloatValue(0.2f));
-    addSliderSetting("keySize", LocalizeString::get("client.module.keystrokes.keySize.name"),
-                     LocalizeString::get("client.module.keystrokes.keySize.desc"), keystrokeSize, FloatValue(15.f),
+    addSliderSetting("keySize", LocalizeString::get("client.hudmodule.keystrokes.keySize.name"),
+                     LocalizeString::get("client.hudmodule.keystrokes.keySize.desc"), keystrokeSize, FloatValue(15.f),
                      FloatValue(90.f), FloatValue(2.f));
-    addSliderSetting("spaceSize", LocalizeString::get("client.module.keystrokes.spaceSize.name"),
-                     LocalizeString::get("client.module.keystrokes.spaceSize.desc"), spaceSize, FloatValue(0.f),
+    addSliderSetting("spaceSize", LocalizeString::get("client.hudmodule.keystrokes.spaceSize.name"),
+                     LocalizeString::get("client.hudmodule.keystrokes.spaceSize.desc"), spaceSize, FloatValue(0.f),
                      FloatValue(90.f), FloatValue(2.f));
-    addSliderSetting("mouseButtonHeight", LocalizeString::get("client.module.keystrokes.mouseButtonHeight.name"),
-                     LocalizeString::get("client.module.keystrokes.mouseButtonHeight.desc"), mouseButtonHeight,
+    addSliderSetting("mouseButtonHeight", LocalizeString::get("client.hudmodule.keystrokes.mouseButtonHeight.name"),
+                     LocalizeString::get("client.hudmodule.keystrokes.mouseButtonHeight.desc"), mouseButtonHeight,
                      FloatValue(15.f), FloatValue(90.f), FloatValue(2.f), "mouseButtons"_istrue);
-    addSliderSetting("padding", LocalizeString::get("client.module.keystrokes.padding.name"),
-                     LocalizeString::get("client.module.keystrokes.padding.desc"), padding, FloatValue(0.f),
+    addSliderSetting("padding", LocalizeString::get("client.hudmodule.keystrokes.padding.name"),
+                     LocalizeString::get("client.hudmodule.keystrokes.padding.desc"), padding, FloatValue(0.f),
                      FloatValue(6.f), FloatValue(0.25f));
-    addSliderSetting("borderLength", LocalizeString::get("client.module.keystrokes.borderLength.name"),
-                     LocalizeString::get("client.module.keystrokes.borderLength.desc"), borderLength, FloatValue(0.f),
+    addSliderSetting("borderLength", LocalizeString::get("client.hudmodule.keystrokes.borderLength.name"),
+                     LocalizeString::get("client.hudmodule.keystrokes.borderLength.desc"), borderLength, FloatValue(0.f),
                      FloatValue(6.f), FloatValue(0.25f), "border"_istrue);
-    addSliderSetting("transition", LocalizeString::get("client.module.keystrokes.transition.name"),
-                     LocalizeString::get("client.module.keystrokes.transition.desc"), lerpSpeed, FloatValue(0.f),
+    addSliderSetting("transition", LocalizeString::get("client.hudmodule.keystrokes.transition.name"),
+                     LocalizeString::get("client.hudmodule.keystrokes.transition.desc"), lerpSpeed, FloatValue(0.f),
                      FloatValue(3.f), FloatValue(0.05f));
 
-    addSetting("borderCol", LocalizeString::get("client.module.keystrokes.borderCol.name"),
-               LocalizeString::get("client.module.keystrokes.borderCol.desc"), borderColor);
-    addSetting("pressedCol", LocalizeString::get("client.module.keystrokes.pressedCol.name"),
-               LocalizeString::get("client.module.keystrokes.pressedCol.desc"), pressedColor);
-    addSetting("unpressedCol", LocalizeString::get("client.module.keystrokes.unpressedCol.name"),
-               LocalizeString::get("client.module.keystrokes.unpressedCol.desc"), unpressedColor);
-    addSetting("ptCol", LocalizeString::get("client.module.keystrokes.ptCol.name"),
-               LocalizeString::get("client.module.keystrokes.ptCol.desc"), pressedTextColor);
-    addSetting("uptCol", LocalizeString::get("client.module.keystrokes.uptCol.name"),
-               LocalizeString::get("client.module.keystrokes.uptCol.desc"), unpressedTextColor);
+    addSetting("borderCol", LocalizeString::get("client.hudmodule.keystrokes.borderCol.name"),
+               LocalizeString::get("client.hudmodule.keystrokes.borderCol.desc"), borderColor);
+    addSetting("pressedCol", LocalizeString::get("client.hudmodule.keystrokes.pressedCol.name"),
+               LocalizeString::get("client.hudmodule.keystrokes.pressedCol.desc"), pressedColor);
+    addSetting("unpressedCol", LocalizeString::get("client.hudmodule.keystrokes.unpressedCol.name"),
+               LocalizeString::get("client.hudmodule.keystrokes.unpressedCol.desc"), unpressedColor);
+    addSetting("ptCol", LocalizeString::get("client.hudmodule.keystrokes.ptCol.name"),
+               LocalizeString::get("client.hudmodule.keystrokes.ptCol.desc"), pressedTextColor);
+    addSetting("uptCol", LocalizeString::get("client.hudmodule.keystrokes.uptCol.name"),
+               LocalizeString::get("client.hudmodule.keystrokes.uptCol.desc"), unpressedTextColor);
 
     listen<ClickEvent>((EventListenerFunc)&Keystrokes::onClick);
 }
