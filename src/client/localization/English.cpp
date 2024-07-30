@@ -157,7 +157,6 @@ English::English() {
         { "client.textmodule.bowIndicator.rad.desc", L"The radius of the indicator" },
         { "client.textmodule.bowIndicator.padding.desc", L"The padding of the indicator" },
 
-
         // HUD Modules
 
         { "client.hudmodule.movableBossbar.name", L"Movable Bossbar" },
@@ -323,7 +322,6 @@ English::English() {
         { "client.module.blockOutline.overlay.desc", L"Render an overlay" },
         { "client.module.blockOutline.faceOverlay.desc", L"Render the selected face of the block." },
         { "client.module.blockOutline.overlayColor.desc", L"The overlay color" },
-
 
         // todo: check if this displays diacritics correctly (or even works at all)
         { "client.commands.config.desc", L"Perform actions related to profiles/configs" },
