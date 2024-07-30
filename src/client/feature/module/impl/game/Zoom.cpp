@@ -3,21 +3,31 @@
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
 
-Zoom::Zoom() : Module("Zoom", "Zoom", "Zooming in and out bound to a key.", GAME, nokeybind) {
-	addSetting("zoomKey", "Zoom Key", "The key to press to zoom", this->zoomKey);
-	addSliderSetting("modifier", "Modifier", "How far to zoom", this->modifier, FloatValue(1.f), FloatValue(50.f), FloatValue(1.f));
-	addSetting("animation", "Animation", "Whether to have a zoom animation or not", hasAnim);
-	addSliderSetting("animationSpeed", "Speed", "The speed of the animation", animSpeed, FloatValue(1.f), FloatValue(5.f), FloatValue(1.f), "animation"_istrue);
-	addSetting("cinematic", "Cinematic Camera", "Enable cinematic camera while Zoom is on", this->cinematicCam);
-	addSetting("hideHand", "Hide Hand", "Whether or not to hide the hand when zooming.", this->hideHand);
-	addSetting("dpiAdjust", "Adjust DPI", "Adjust the sensitivity while zooming.", this->dpiAdjust);
+Zoom::Zoom() : Module("Zoom", LocalizeString::get("client.module.zoom.name"),
+                      LocalizeString::get("client.module.zoom.desc"), GAME, nokeybind) {
+    addSetting("zoomKey", LocalizeString::get("client.module.zoom.zoomKey.name"),
+               LocalizeString::get("client.module.zoom.zoomKey.desc"), this->zoomKey);
+    addSliderSetting("modifier", LocalizeString::get("client.module.zoom.modifier.name"),
+                     LocalizeString::get("client.module.zoom.modifier.desc"), this->modifier, FloatValue(1.f),
+                     FloatValue(50.f), FloatValue(1.f));
+    addSetting("animation", LocalizeString::get("client.module.zoom.animation.name"),
+               LocalizeString::get("client.module.zoom.animation.desc"), hasAnim);
+    addSliderSetting("animationSpeed", LocalizeString::get("client.module.zoom.animationSpeed.name"),
+                     LocalizeString::get("client.module.zoom.animationSpeed.desc"), animSpeed, FloatValue(1.f),
+                     FloatValue(5.f), FloatValue(1.f), "animation"_istrue);
+    addSetting("cinematic", LocalizeString::get("client.module.zoom.cinematic.name"),
+               LocalizeString::get("client.module.zoom.cinematic.desc"), this->cinematicCam);
+    addSetting("hideHand", LocalizeString::get("client.module.zoom.hideHand.name"),
+               LocalizeString::get("client.module.zoom.hideHand.desc"), this->hideHand);
+    addSetting("dpiAdjust", LocalizeString::get("client.module.zoom.dpiAdjust.name"),
+               LocalizeString::get("client.module.zoom.dpiAdjust.desc"), this->dpiAdjust);
 
-	listen<RenderLevelEvent>((EventListenerFunc)&Zoom::onRenderLevel);
-	listen<KeyUpdateEvent>((EventListenerFunc)&Zoom::onKeyUpdate);
-	listen<ClickEvent>((EventListenerFunc)&Zoom::onClickUpdate);
-	listen<CinematicCameraEvent>((EventListenerFunc)&Zoom::onCinematicCamera);
-	listen<HideHandEvent>((EventListenerFunc)&Zoom::onHideHand);
-	listen<SensitivityEvent>((EventListenerFunc)&Zoom::onSensitivity);
+    listen<RenderLevelEvent>(static_cast<EventListenerFunc>(&Zoom::onRenderLevel));
+    listen<KeyUpdateEvent>(static_cast<EventListenerFunc>(&Zoom::onKeyUpdate));
+    listen<ClickEvent>(static_cast<EventListenerFunc>(&Zoom::onClickUpdate));
+    listen<CinematicCameraEvent>(static_cast<EventListenerFunc>(&Zoom::onCinematicCamera));
+    listen<HideHandEvent>(static_cast<EventListenerFunc>(&Zoom::onHideHand));
+    listen<SensitivityEvent>(static_cast<EventListenerFunc>(&Zoom::onSensitivity));
 }
 
 void Zoom::onRenderLevel(Event& evGeneric) {
