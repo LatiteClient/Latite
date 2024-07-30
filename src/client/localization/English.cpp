@@ -100,6 +100,13 @@ English::English() {
         { "client.textmodule.breakIndicator.lastProgress.name", L"Last Progress" },
         { "client.textmodule.breakIndicator.lastProgress.desc", L"Whether to save the progress after breaking is interrupted or not" },
 
+        { "client.textmodule.speedDisplay.name", L"Speed Display" },
+        { "client.textmodule.speedDisplay.decimals.name", L"Decimals" },
+        { "client.textmodule.speedDisplay.includeY.name", L"Y Motion" },
+        { "client.textmodule.speedDisplay.desc", L"Displays your speed in blocks (meters) per second." },
+        { "client.textmodule.speedDisplay.decimals.desc", L"The number of decimals to show" },
+        { "client.textmodule.speedDisplay.includeY.desc", L"Include Y motion in the speed value" },
+
         { "client.textmodule.cpsCounter.name", L"CPS Counter" },
         { "client.textmodule.cpsCounter.modeState0.name", L"Left" },
         { "client.textmodule.cpsCounter.modeState1.name", L"Right" },
