@@ -5,10 +5,11 @@
 static constexpr float maxY = 320.f;
 static constexpr float minY = -64.f;
 
-ChunkBorders::ChunkBorders() : Module("ChunkBorders", LocalizeString::get("client.module.chunkBorders.name"), LocalizeString::get("client.module.chunkBorders.desc"), GAME) {
-	addSetting("transparent", LocalizeString::get("client.module.chunkBorders.transparent.name"), L"", transparent);
+ChunkBorders::ChunkBorders() : Module("ChunkBorders", LocalizeString::get("client.module.chunkBorders.name"),
+                                      LocalizeString::get("client.module.chunkBorders.desc"), GAME) {
+    addSetting("transparent", LocalizeString::get("client.module.chunkBorders.transparent.name"), L"", transparent);
 
-	listen<RenderLevelEvent>((EventListenerFunc)&ChunkBorders::onRender3d);
+    listen<RenderLevelEvent>(static_cast<EventListenerFunc>(&ChunkBorders::onRender3d));
 }
 
 namespace {
