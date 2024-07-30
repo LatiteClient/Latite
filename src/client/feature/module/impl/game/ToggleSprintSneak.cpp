@@ -73,15 +73,13 @@ void ToggleSprintSneak::afterMove(Event& evGeneric) {
 	auto& ev = reinterpret_cast<AfterMoveEvent&>(evGeneric);
 	realSneaking = ev.getMoveInputHandler()->sneak;
 	realSprint = ev.getMoveInputHandler()->sprintKey;
-	if (SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
-		if (std::get<BoolValue>(sneak) && toggleSneaking) {
-			ev.getMoveInputHandler()->sneak = true;
-		}
-
-		//if (std::get<BoolValue>(sprint) && toggleSprinting && sprintMode.getSelectedKey() == sprint_mode_normal) {
-		//	ev.getMoveInputHandler()->sprintKey = true;
-		//}
+	if (std::get<BoolValue>(sneak) && toggleSneaking) {
+		ev.getMoveInputHandler()->sneak = true;
 	}
+
+	//if (std::get<BoolValue>(sprint) && toggleSprinting && sprintMode.getSelectedKey() == sprint_mode_normal) {
+	//	ev.getMoveInputHandler()->sprintKey = true;
+	//}
 }
 
 std::wstringstream ToggleSprintSneak::text(bool isDefault, bool inEditor) {
