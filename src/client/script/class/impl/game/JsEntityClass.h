@@ -36,6 +36,8 @@ public:
 		Chakra::DefineFunc(prototype, entityGetStatusFlag, XW("getFlag"), this);
 		Chakra::DefineFunc(prototype, entitySetStatusFlag, XW("setFlag"), this);
 		Chakra::DefineFunc(prototype, entityGetArmorSlot, XW("getArmorSlot"), this);
+		Chakra::DefineFunc(prototype, entityGetVelocity, XW("getVelocity"), this);
+		Chakra::DefineFunc(prototype, entitySetVelocity, XW("setVelocity"), this);
 		Chakra::SetPropertyNumber(prototype, L"runtimeId", 0.0, true);
 	};
 private:
@@ -76,5 +78,9 @@ private:
 	static JsValueRef CALLBACK entitySetStatusFlag(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK entityGetArmorSlot(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK entityGetVelocity(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK entitySetVelocity(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 };

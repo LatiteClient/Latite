@@ -99,7 +99,7 @@ JsValueRef JsEntityClass::entityIsPlayer(JsValueRef callee, bool isConstructor, 
 JsValueRef JsEntityClass::entityAttack(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
-	if (ent && ent->validate() && ent->getEntity() != SDK::ClientInstance::get()->getLocalPlayer()) {
+	if (ent && ent->validate() && ent->getEntity() != SDK::ClientInstance::get()->getLocalPlayer() && SDK::ClientInstance::get()->getLocalPlayer()->getCommandPermissionLevel() > 1) {
 		auto actor = ent->getEntity();
 		SDK::ClientInstance::get()->getLocalPlayer()->swing();
 		SDK::ClientInstance::get()->getLocalPlayer()->gameMode->attack(actor);
@@ -336,4 +336,47 @@ JsValueRef JsEntityClass::entityGetArmorSlot(JsValueRef callee, bool isConstruct
 	}
 
 	return JsScript::getThis()->getClass<JsItemStack>()->construct(ent->getEntity()->getArmor(slot), false);
+}
+
+JsValueRef JsEntityClass::entitySetVelocity(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ { arguments[1], JsObject } })) return JS_INVALID_REFERENCE;
+
+	JsEntity* ent = nullptr;
+	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
+	if (ent && ent->validate()) {
+		auto actor = ent->getEntity();
+		if (SDK::ClientInstance::get()->getLocalPlayer()->getCommandPermissionLevel() > 1) {
+			actor->getVelocity() = JsVec3::ToVec3(arguments[1]);
+			return Chakra::GetUndefined();
+		}
+		else {
+			Chakra::ThrowError(XW("Access denied, cannot use setVelocity"));
+			return Chakra::GetUndefined();
+		}
+	}
+	Chakra::ThrowError(XW("Invalid entity"));
+	return Chakra::GetUndefined();
+}
+
+JsValueRef JsEntityClass::entityGetVelocity(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	JsEntity* ent = nullptr;
+	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
+	if (ent && ent->validate()) {
+		auto actor = ent->getEntity();
+
+		if (ent->level != JsEntity::AccessLevel::Restricted || SDK::ClientInstance::get()->getLocalPlayer()->getCommandPermissionLevel() > 1) {
+			auto thi = reinterpret_cast<JsEntityClass*>(callbackState);
+			auto cl = thi->owner->getClass<JsVec3>();
+
+			auto ret = cl->construct(actor->getVelocity());
+			return ret;
+		}
+		else {
+			Chakra::ThrowError(XW("Access denied, cannot use getVelocity"));
+			return Chakra::GetUndefined();
+		}
+	}
+	Chakra::ThrowError(XW("Invalid entity"));
+	return Chakra::GetUndefined();
 }
