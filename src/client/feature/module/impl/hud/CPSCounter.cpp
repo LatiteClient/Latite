@@ -2,13 +2,19 @@
 #include "CPSCounter.h"
 #include "client/Latite.h"
 
-CPSCounter::CPSCounter() : TextModule("CPS", "CPS Counter", "Shows your CPS (clicks per second).", HUD, 400.f, 0, true /*cache CPS text*/) {
-	mode.addEntry(EnumEntry(0, "Left", "Left"));
-	mode.addEntry(EnumEntry(1, "Right", "Right"));
-	mode.addEntry(EnumEntry(2, "Both", "Both"));
-	addEnumSetting("Mode", "Mode", "What to show", mode);
+CPSCounter::CPSCounter() : TextModule("CPS", LocalizeString::get("client.textmodule.cpsCounter.name"),
+                                      LocalizeString::get("client.textmodule.cpsCounter.desc"), HUD, 400.f, 0,
+                                      true /*cache CPS text*/) {
+    mode.addEntry(EnumEntry(0, LocalizeString::get("client.textmodule.cpsCounter.modeState0.name"),
+                            LocalizeString::get("client.textmodule.cpsCounter.modeState0.name")));
+    mode.addEntry(EnumEntry(1, LocalizeString::get("client.textmodule.cpsCounter.modeState1.name"),
+                            LocalizeString::get("client.textmodule.cpsCounter.modeState1.name")));
+    mode.addEntry(EnumEntry(2, LocalizeString::get("client.textmodule.cpsCounter.modeState2.name"),
+                            LocalizeString::get("client.textmodule.cpsCounter.modeState2.name")));
+    addEnumSetting("Mode", LocalizeString::get("client.textmodule.cpsCounter.mode.name"),
+                   LocalizeString::get("client.textmodule.cpsCounter.mode.desc"), mode);
 
-	std::get<TextValue>(this->prefix).str = L"CPS: ";
+    std::get<TextValue>(this->prefix).str = L"CPS: ";
 }
 
 std::wstringstream CPSCounter::text(bool isDefault, bool inEditor) {

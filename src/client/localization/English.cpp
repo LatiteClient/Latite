@@ -97,6 +97,14 @@ English::English() {
         { "client.textmodule.breakIndicator.lastProgress.name", L"Last Progress" },
         { "client.textmodule.breakIndicator.lastProgress.desc", L"Whether to save the progress after breaking is interrupted or not" },
 
+        { "client.textmodule.cpsCounter.name", L"CPS Counter" },
+        { "client.textmodule.cpsCounter.modeState0.name", L"Left" },
+        { "client.textmodule.cpsCounter.modeState1.name", L"Right" },
+        { "client.textmodule.cpsCounter.modeState2.name", L"Both" },
+        { "client.textmodule.cpsCounter.mode.name", L"Mode" },
+        { "client.textmodule.cpsCounter.desc", L"Shows your CPS (clicks per second)." },
+        { "client.textmodule.cpsCounter.mode.desc", L"What to show" },
+
         { "client.textmodule.clock.name", L"Clock" },
         { "client.textmodule.clock.militaryTime.name", L"24-hour time" },
         { "client.textmodule.clock.showSeconds.name", L"Show seconds" },
