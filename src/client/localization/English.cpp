@@ -287,6 +287,10 @@ English::English() {
         { "client.module.chunkBorders.transparent.name", L"Transparent" },
         { "client.module.chunkBorders.desc", L"Show chunk borders near you." },
 
+        { "client.module.hurtColor.name", L"Hurt Color" },
+        { "client.module.hurtColor.color.name", L"Color" },
+        { "client.module.hurtColor.desc", L"Change the color when entities get hit" },
+
         { "client.module.itemTweaks.name", L"Item Tweaks" },
         { "client.module.itemTweaks.disableFlyingItem.name", L"Disable flying item animation" },
         { "client.module.itemTweaks.desc", L"Tweaks/settings related to item rendering." },

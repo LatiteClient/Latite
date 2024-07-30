@@ -3,10 +3,12 @@
 #include "client/event/Eventing.h"
 #include "client/event/impl/OverlayColorEvent.h"
 
-HurtColor::HurtColor() : Module("HurtColor", "Hurt Color", "Change the color when entities get hit", IModule::GAME) {
-	addSetting("color", "Color", "", color);
+HurtColor::HurtColor() : Module("HurtColor", LocalizeString::get("client.module.hurtColor.name"),
+                                LocalizeString::get("client.module.hurtColor.desc"),
+                                GAME) {
+    addSetting("color", LocalizeString::get("client.module.hurtColor.color.name"), L"", color);
 
-	listen<OverlayColorEvent>((EventListenerFunc)&HurtColor::onActorOverlay);
+    listen<OverlayColorEvent>(static_cast<EventListenerFunc>(&HurtColor::onActorOverlay));
 }
 
 void HurtColor::onActorOverlay(Event& evGeneric) {
