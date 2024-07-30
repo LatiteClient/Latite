@@ -94,6 +94,15 @@ English::English() {
         { "client.textmodule.breakIndicator.lastProgress.name", L"Last Progress" },
         { "client.textmodule.breakIndicator.lastProgress.desc", L"Whether to save the progress after breaking is interrupted or not" },
 
+        { "client.textmodule.clock.name", L"Clock" },
+        { "client.textmodule.clock.militaryTime.name", L"24-hour time" },
+        { "client.textmodule.clock.showSeconds.name", L"Show seconds" },
+        { "client.textmodule.clock.showDate.name", L"Show date" },
+        { "client.textmodule.clock.desc", L"Shows the current time." },
+        { "client.textmodule.clock.militaryTime.desc", L"Display the time in 24-hour format." },
+        { "client.textmodule.clock.showSeconds.desc", L"Display time with seconds" },
+        { "client.textmodule.clock.showDate.desc", L"Display the current date along with the time" },
+
         { "client.textmodule.customCoordinates.name", L"Custom Coordinates" },
         { "client.textmodule.customCoordinates.showDimension.name", L"Show Dimension" },
         { "client.textmodule.customCoordinates.dimension.name", L"Dimension: " },
