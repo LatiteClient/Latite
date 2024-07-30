@@ -3,11 +3,13 @@
 #include "client/Latite.h"
 #include "client/render/Assets.h"
 
-TabList::TabList() : Module("PlayerList", "Player List", "Shows the player list.", HUD, VK_TAB) {
-	
-	addSetting("textColor", "Text", "Text Color", textCol);
-	addSetting("bgColor", "Background", "Background Color", bgCol);
-	listen<RenderOverlayEvent>((EventListenerFunc)&TabList::onRenderOverlay);
+TabList::TabList() : Module("PlayerList", LocalizeString::get("client.module.tabList.name"),
+                            LocalizeString::get("client.module.tabList.desc"), HUD, VK_TAB) {
+    addSetting("textColor", LocalizeString::get("client.module.tabList.textColor.name"),
+               LocalizeString::get("client.module.tabList.textColor.desc"), textCol);
+    addSetting("bgColor", LocalizeString::get("client.module.tabList.bgColor.name"),
+               LocalizeString::get("client.module.tabList.bgColor.desc"), bgCol);
+    listen<RenderOverlayEvent>(static_cast<EventListenerFunc>(&TabList::onRenderOverlay));
 }
 
 void TabList::onRenderOverlay(Event& evG) {

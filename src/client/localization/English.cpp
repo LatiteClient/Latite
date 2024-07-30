@@ -318,6 +318,13 @@ English::English() {
         { "client.module.fullbright.desc", L"Extra world brightness" },
         { "client.module.fullbright.gamma.desc", L"The amount of light" },
 
+        { "client.module.tabList.name", L"Player List" },
+        { "client.module.tabList.textColor.name", L"Text" },
+        { "client.module.tabList.bgColor.name", L"Background" },
+        { "client.module.tabList.desc", L"Shows the player list." },
+        { "client.module.tabList.textColor.desc", L"Text Color" },
+        { "client.module.tabList.bgColor.desc", L"Background Color" },
+
         { "client.module.behindYou.name", L"Behind You!" },
         { "client.module.behindYouState0.name", L"Third Person Front" },
         { "client.module.behindYouState1.name", L"Third Person Back" },
