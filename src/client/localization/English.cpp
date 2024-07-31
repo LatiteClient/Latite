@@ -421,6 +421,9 @@ English::English() {
         { "client.commands.setPrefix.success.name", L"The command prefix is set to &7'{}'" },
         { "client.commands.setPrefix.desc", L"Set the command prefix" },
 
+        { "client.commands.toggle.msg.unknownModule.name", L"Unknown module {}" },
+        { "client.commands.toggle.desc", L"Toggles a module on or off." },
+
         { "client.commands.config.savedConfig.name", L"Saved current config!" },
         { "client.commands.config.savedConfigPath.name", L"Successfully saved config to &7{}.json" },
         { "client.commands.config.saveDuringLoadingError.name", L"Could not save current config before loading!" },

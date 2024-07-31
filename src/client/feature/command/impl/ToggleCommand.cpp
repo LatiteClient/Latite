@@ -3,7 +3,8 @@
 #include "client/Latite.h"
 #include "client/feature/module/ModuleManager.h"
 
-ToggleCommand::ToggleCommand() : Command("toggle", "Toggles a module on or off.", "$ <module>", {"t"}) {
+ToggleCommand::ToggleCommand() : Command("toggle", LocalizeString::get("client.commands.toggle.desc"), "$ <module>",
+                                         { "t" }) {
 }
 
 bool ToggleCommand::execute(std::string const label, std::vector<std::string> args) {
@@ -14,9 +15,10 @@ bool ToggleCommand::execute(std::string const label, std::vector<std::string> ar
 	auto mod = Latite::getModuleManager().find(args[0]);
 	if (mod) {
 		mod->setEnabled(!mod->isEnabled());
-		message(std::format("Toggled {} {}", mod->getDisplayName(), mod->isEnabled() ? "ON" : "OFF"));
+		message(util::StrToWStr(std::format("Toggled {} {}", mod->getDisplayName(), mod->isEnabled() ? "ON" : "OFF")));
 		return true;
 	}
-	message("Unknown module " + args[0], true);
+	message(util::FormatWString(LocalizeString::get("client.commands.toggle.msg.unknownModule.name"),
+                                { util::StrToWStr(args[0]) }), true);
 	return true;
 }
