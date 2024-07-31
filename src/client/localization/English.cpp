@@ -418,6 +418,9 @@ English::English() {
         { "client.commands.eject.ejectMsg.name", L"Unloaded the client." },
         { "client.commands.eject.desc", L"Removes Latite from the game." },
 
+        { "client.commands.setPrefix.success.name", L"The command prefix is set to &7'{}'" },
+        { "client.commands.setPrefix.desc", L"Set the command prefix" },
+
         { "client.commands.config.savedConfig.name", L"Saved current config!" },
         { "client.commands.config.savedConfigPath.name", L"Successfully saved config to &7{}.json" },
         { "client.commands.config.saveDuringLoadingError.name", L"Could not save current config before loading!" },
