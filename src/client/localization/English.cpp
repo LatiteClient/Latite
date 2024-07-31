@@ -416,6 +416,17 @@ English::English() {
         { "client.commands.config.loadedConfig.name", L"Successfully loaded config &7{}" },
         { "client.commands.config.genericError.name", L"Something went wrong!" },
         { "client.commands.config.desc", L"Perform actions related to profiles/configs" },
+
+        { "client.commands.plugin.desc", L"Do actions related to plugins/scripts" },
+        { "client.commands.plugin.scriptingNotSupported.name", L"&eScripting/Plugins are not supported! Try restarting your game." },
+        { "client.commands.plugin.load.success.name", L"Loaded plugin {} {}!" },
+        { "client.commands.plugin.load.error.name", L"Could not load and run the plugin successfully! Check your folder path." },
+        { "client.commands.plugin.unload.all.name", L"Unloaded all plugins." },
+        { "client.commands.plugin.unload.name", L"Successfully unloaded plugin." },
+        { "client.commands.plugin.unload.unknownPlugin.name", L"Unknown plugin {}" },
+        { "client.commands.plugin.startup.name", L"Successfully moved plugin folder {} to startup." },
+        { "client.commands.plugin.startup.error.name", L"Cannot find plugin {}" },
+        { "client.commands.plugin.install.name", L"Plugin installed. Do &7 {} plugin load &7 {} &r to run the plugin.\nThis plugin will load every time you load Minecraft." },
     };
 }
 
