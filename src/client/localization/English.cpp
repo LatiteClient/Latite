@@ -328,6 +328,15 @@ English::English() {
         { "client.module.tabList.textColor.desc", L"Text Color" },
         { "client.module.tabList.bgColor.desc", L"Background Color" },
 
+        { "client.module.textHotkey.name", L"Text/Command Hotkey" },
+        { "client.module.textHotkey.commandMode.name", L"Command Mode" },
+        { "client.module.textHotkey.textKey.name", L"Hotkey" },
+        { "client.module.textHotkey.text.name", L"Text" },
+        { "client.module.textHotkey.desc", L"Binds a chat message or a command to a text message." },
+        { "client.module.textHotkey.commandMode.desc", L"Send a command instead of a chat message" },
+        { "client.module.textHotkey.textKey.desc", L"The hotkey to bind the text message or command to" },
+        { "client.module.textHotkey.text.desc", L"The text or command" },
+
         { "client.module.behindYou.name", L"Behind You!" },
         { "client.module.behindYouState0.name", L"Third Person Front" },
         { "client.module.behindYouState1.name", L"Third Person Back" },

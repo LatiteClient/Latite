@@ -2,11 +2,15 @@
 #include "TextHotkey.h"
 #include <sdk/common/network/packet/CommandRequestPacket.h>
 
-TextHotkey::TextHotkey() : Module("TextHotkey", "Text/Command Hotkey", "Binds a chat message or a command to a text message.", GAME, nokeybind) {
-	addSetting("commandMode", "Command Mode", "Send a command instead of a chat message", this->commandMode);
-	addSetting("textKey", "Hotkey", "The hotkey to bind the text message or command to", this->textKey);
-	addSetting("text", "Text", "The text or command", this->textMessage);
-	listen<KeyUpdateEvent>((EventListenerFunc)&TextHotkey::onKey);
+TextHotkey::TextHotkey() : Module("TextHotkey", LocalizeString::get("client.module.textHotkey.name"),
+                                  LocalizeString::get("client.module.textHotkey.desc"), GAME, nokeybind) {
+    addSetting("commandMode", LocalizeString::get("client.module.textHotkey.commandMode.name"),
+               LocalizeString::get("client.module.textHotkey.commandMode.desc"), this->commandMode);
+    addSetting("textKey", LocalizeString::get("client.module.textHotkey.textKey.name"),
+               LocalizeString::get("client.module.textHotkey.textKey.desc"), this->textKey);
+    addSetting("text", LocalizeString::get("client.module.textHotkey.text.name"),
+               LocalizeString::get("client.module.textHotkey.text.desc"), this->textMessage);
+    listen<KeyUpdateEvent>(static_cast<EventListenerFunc>(&TextHotkey::onKey));
 }
 
 void TextHotkey::onKey(Event& evG) {
