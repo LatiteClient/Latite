@@ -4,7 +4,7 @@
 
 class JsSetting : public Setting {
 public:
-	JsSetting(std::string const& internalName, std::string const& displayName, std::string const& description)
+	JsSetting(std::string const& internalName, std::wstring const& displayName, std::wstring const& description)
 		: Setting(internalName, displayName, description) {
 		this->value = &jsVal;
 	}
