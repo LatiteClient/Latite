@@ -332,7 +332,6 @@
     <ClInclude Include="deps\include\mnemosyne\scan\signature.hpp" />
     <ClInclude Include="deps\mnem\cpuid.hpp" />
     <ClInclude Include="deps\mnem\scan\scanner_impls.hpp" />
-    <ClInclude Include="resource1.h" />
     <ClInclude Include="src\client\event\impl\AttackEvent.h" />
     <ClInclude Include="src\client\event\impl\ChatMessageEvent.h" />
     <ClInclude Include="src\client\event\impl\ClientTextEvent.h" />
@@ -806,7 +805,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />
-    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\arrow.png" />

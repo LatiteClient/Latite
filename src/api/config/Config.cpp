@@ -55,7 +55,7 @@ void Config::addGroup(nlohmann::json obj) {
 }
 
 void Config::addSetting(SettingGroup& group, nlohmann::json& obj) {
-	auto set = std::make_shared<Setting>(obj["name"].get<std::string>(), "", "");
+	auto set = std::make_shared<Setting>(obj["name"].get<std::string>(), L"", L"");
 	auto jVal = obj["value"];
 	auto type = obj["type"].get<int>();
 

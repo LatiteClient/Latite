@@ -15,7 +15,7 @@ bool ToggleCommand::execute(std::string const label, std::vector<std::string> ar
 	auto mod = Latite::getModuleManager().find(args[0]);
 	if (mod) {
 		mod->setEnabled(!mod->isEnabled());
-		message(util::StrToWStr(std::format("Toggled {} {}", mod->getDisplayName(), mod->isEnabled() ? "ON" : "OFF")));
+		message(util::StrToWStr(std::format("Toggled module {}", mod->isEnabled() ? "ON" : "OFF")));
 		return true;
 	}
 	message(util::FormatWString(LocalizeString::get("client.commands.toggle.msg.unknownModule.name"),

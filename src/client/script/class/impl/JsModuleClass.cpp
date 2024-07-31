@@ -129,7 +129,7 @@ JsValueRef JsModuleClass::moduleAddBoolSetting(JsValueRef callee, bool isConstru
 	auto disp = Chakra::GetString(arguments[2]);
 	auto desc = Chakra::GetString(arguments[3]);
 
-	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
+	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), disp, desc);
 
 	*set->value = BoolValue(Chakra::GetBool(arguments[4]));
 	set->defaultValue = BoolValue(Chakra::GetBool(arguments[4]));;
@@ -165,7 +165,7 @@ JsValueRef JsModuleClass::moduleAddNumberSetting(JsValueRef callee, bool isConst
 	float max = static_cast<float>(Chakra::GetNumber(arguments[5]));
 	float intr = static_cast<float>(Chakra::GetNumber(arguments[6]));
 
-	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
+	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), disp, desc);
 
 	*set->value = FloatValue(static_cast<float>(Chakra::GetNumber(arguments[7])));
 	set->min = FloatValue(min);
@@ -196,7 +196,7 @@ JsValueRef JsModuleClass::moduleAddKeySetting(JsValueRef callee, bool isConstruc
 	auto disp = Chakra::GetString(arguments[2]);
 	auto desc = Chakra::GetString(arguments[3]);
 
-	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
+	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), disp, desc);
 
 	*set->value = KeyValue(Chakra::GetInt(arguments[4]));
 	set->defaultValue = *set->value;
@@ -224,7 +224,7 @@ JsValueRef JsModuleClass::moduleAddTextSetting(JsValueRef callee, bool isConstru
 	auto disp = Chakra::GetString(arguments[2]);
 	auto desc = Chakra::GetString(arguments[3]);
 
-	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
+	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), disp, desc);
 
 	*set->value = TextValue(Chakra::GetString(arguments[4]));
 	set->defaultValue = *set->value;
@@ -253,7 +253,7 @@ JsValueRef JsModuleClass::moduleAddColorSetting(JsValueRef callee, bool isConstr
 	auto desc = Chakra::GetString(arguments[3]);
 	auto col = JsColor::ToColor(arguments[4]);
 
-	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), util::WStrToStr(disp), util::WStrToStr(desc));
+	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), disp, desc);
 
 	*set->value = ColorValue(col.r, col.g, col.b, col.a);
 	set->defaultValue = *set->value;
