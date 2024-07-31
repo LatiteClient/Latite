@@ -5,8 +5,8 @@
 
 class JsHUDModule : public HUDModule, public JsEvented {
 public:
-	JsHUDModule(std::string const& name, std::string const& displayName,
-		std::string const& desc, int key, bool resizable);
+	JsHUDModule(std::string const& name, std::wstring const& displayName,
+		std::wstring const& desc, int key, bool resizable);
 
 	~JsHUDModule() {
 		// FIXME: check if no leak

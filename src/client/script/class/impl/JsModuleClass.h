@@ -13,7 +13,7 @@ protected:
 		if (!Chakra::VerifyArgCount(argCount, 5)) return JS_INVALID_REFERENCE;
 		if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsString}, {arguments[3], JsString}, {arguments[4], JsNumber} })) return JS_INVALID_REFERENCE;
 
-		auto jsm = new JsModule(util::WStrToStr(Chakra::GetString(arguments[1])), util::WStrToStr(Chakra::GetString(arguments[2])), util::WStrToStr(Chakra::GetString(arguments[3])), Chakra::GetInt(arguments[4]));
+		auto jsm = new JsModule(util::WStrToStr(Chakra::GetString(arguments[1])), Chakra::GetString(arguments[2]), Chakra::GetString(arguments[3]), Chakra::GetInt(arguments[4]));
 		return thi->construct(jsm, true);
 	}
 

@@ -13,7 +13,7 @@ public:
 		if (!Chakra::VerifyArgCount(argCount, 6)) return JS_INVALID_REFERENCE;
 		if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsString}, {arguments[3], JsString}, {arguments[4], JsNumber}, {arguments[5], JsBoolean}})) return JS_INVALID_REFERENCE;
 
-		auto jsm = new JsHUDModule(util::WStrToStr(Chakra::GetString(arguments[1])), util::WStrToStr(Chakra::GetString(arguments[2])), util::WStrToStr(Chakra::GetString(arguments[3])), Chakra::GetInt(arguments[4]), Chakra::GetBool(arguments[5]));
+		auto jsm = new JsHUDModule(util::WStrToStr(Chakra::GetString(arguments[1])), Chakra::GetString(arguments[2]), Chakra::GetString(arguments[3]), Chakra::GetInt(arguments[4]), Chakra::GetBool(arguments[5]));
 		return thi->construct(reinterpret_cast<JsModule*>(jsm), true);
 	}
 
