@@ -404,18 +404,18 @@ English::English() {
         { "client.module.blockOutline.overlayColor.desc", L"The overlay color" },
 
         // todo: check if this displays diacritics correctly (or even works at all)
-        { "client.commands.config.desc", L"Perform actions related to profiles/configs" },
+        { "client.commands.help.desc", L"Shows all commands and descriptions." },
+
+        { "client.commands.eject.ejectMsg.name", L"Unloaded the client." },
+        { "client.commands.eject.desc", L"Removes Latite from the game." },
+
         { "client.commands.config.savedConfig.name", L"Saved current config!" },
         { "client.commands.config.savedConfigPath.name", L"Successfully saved config to &7{}.json" },
         { "client.commands.config.saveDuringLoadingError.name", L"Could not save current config before loading!" },
         { "client.commands.config.configNotFound.name", L"Could not find config &7{}" },
         { "client.commands.config.loadedConfig.name", L"Successfully loaded config &7{}" },
         { "client.commands.config.genericError.name", L"Something went wrong!" },
-
-        { "client.commands.eject.desc", L"Removes Latite from the game." },
-        { "client.commands.eject.ejectMsg.name", L"Unloaded the client." },
-
-        { "client.commands.help.desc", L"Shows all commands and descriptions." },
+        { "client.commands.config.desc", L"Perform actions related to profiles/configs" },
     };
 }
 
