@@ -3,12 +3,12 @@
 #include "client/event/impl/TickEvent.h"
 
 GuiscaleChanger::GuiscaleChanger() : Module("GUIScaleChanger",
-                                            LocalizeString::get("client.hudmodule.guiScaleChanger.name"),
-                                            LocalizeString::get("client.hudmodule.guiScaleChanger.desc"), HUD,
+                                            LocalizeString::get("client.module.guiScaleChanger.name"),
+                                            LocalizeString::get("client.module.guiScaleChanger.desc"), HUD,
                                             nokeybind) {
     this->listen<TickEvent>(&GuiscaleChanger::onTick);
-    addSliderSetting("guiscale", LocalizeString::get("client.hudmodule.guiScaleChanger.guiscale.name"),
-                     LocalizeString::get("client.hudmodule.guiScaleChanger.guiscale.desc"), this->guiscale,
+    addSliderSetting("guiscale", LocalizeString::get("client.module.guiScaleChanger.guiscale.name"),
+                     LocalizeString::get("client.module.guiScaleChanger.guiscale.desc"), this->guiscale,
                      FloatValue(0.5f), FloatValue(5.f), FloatValue(0.5f));
 }
 

@@ -35,7 +35,7 @@ void TextModule::onInit() {
 	alignment.addEntry({ alignment_right, LocalizeString::get("client.textmodule.props.alignmentRight.name") });
     addEnumSetting("alignmnet", LocalizeString::get("client.textmodule.props.alignment.name"),
                    LocalizeString::get("client.textmodule.props.alignment.desc"), this->alignment);
-    addSetting("showOutline", LocalizeString::get("client.textmodule.props.outline.name"), L"", showOutline);
+    addSetting("showOutline", LocalizeString::get("client.textmodule.props.showOutline.name"), L"", showOutline);
     addSliderSetting("outlineThickness", LocalizeString::get("client.textmodule.props.outlineThickness.name"), L"",
                      outlineThickness, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f), "showOutline"_istrue);
     addSetting("outlineCol", LocalizeString::get("client.textmodule.props.outlineColor.name"), L"", outlineColor,

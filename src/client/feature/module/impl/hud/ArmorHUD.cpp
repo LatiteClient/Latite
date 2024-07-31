@@ -5,7 +5,7 @@ ArmorHUD::ArmorHUD() : HUDModule("ArmorHUD", LocalizeString::get("client.hudmodu
                                  LocalizeString::get("client.hudmodule.armorHud.desc"), HUD) {
 	mode.addEntry(EnumEntry{ mode_vetical, LocalizeString::get("client.hudmodule.armorHud.modeVertical.name") });
 	mode.addEntry(EnumEntry{ mode_horizontal, LocalizeString::get("client.hudmodule.armorHud.modeHorizontal.name") });
-	addEnumSetting("mode", LocalizeString::get("client.hudmodule.armorHud.mode.nam e"),
+	addEnumSetting("mode", LocalizeString::get("client.hudmodule.armorHud.mode.name"),
                    LocalizeString::get("client.hudmodule.armorHud.mode.desc"), mode);
 	addSetting("durability", LocalizeString::get("client.hudmodule.armorHud.durability.name"),
                LocalizeString::get("client.hudmodule.armorHud.durability.desc"), showDamage);
