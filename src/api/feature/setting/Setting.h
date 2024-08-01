@@ -377,7 +377,7 @@ public:
 
 	std::optional<std::function<void(Setting&)>> callback;
 
-	virtual void update() {
+	void update() {
 		if (callback) callback.value()(*this);
 	}
 

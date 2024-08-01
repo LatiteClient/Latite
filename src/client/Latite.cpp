@@ -740,6 +740,9 @@ void Latite::initSettings() {
             LocalizeString::get("client.settings.language.desc"));
         set->enumData = &this->clientLanguage;
         set->value = set->enumData->getValue();
+        set->callback = [](Setting&) {
+            Latite::getClientMessageSink().push(util::WFormat(LocalizeString::get("client.message.languageSwitchHelper"));
+            };
 
         for (int i = 0; auto & lang : l10nData->getLanguages()) {
             set->enumData->addEntry({
