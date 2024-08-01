@@ -371,5 +371,5 @@
         "client.commands.plugin.unload.unknownPlugin.name": "Unknown plugin {}",
         "client.commands.plugin.startup.name": "Successfully moved plugin folder {} to startup.",
         "client.commands.plugin.startup.error.name": "Cannot find plugin {}",
-        "client.commands.plugin.install.name": "Plugin installed. Do &7 {} plugin load &7 {} &r to run the plugin.\nThis plugin will load every time you load Minecraft.",
+        "client.commands.plugin.install.name": "Plugin installed. Do &7 {} plugin load &7 {} &r to run the plugin.\nThis plugin will load every time you load Minecraft."
 }
