@@ -37,7 +37,7 @@ bool LocalizeData::parseLangFile(Language& lang, const std::string& content, boo
     lang.name = obj["name"].get<std::string>();
 
     if (cache) {
-        for (auto it = obj["translations"].begin(); it != obj.end(); ++it) {
+        for (auto it = obj["translations"].begin(); it != obj["translations"].end(); ++it) {
             localizeCache[it.key()] = util::StrToWStr(it.value().get<std::string>());
         }
     }
