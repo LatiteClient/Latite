@@ -194,9 +194,8 @@ std::wstring util::WFormat(std::wstring const& s) {
     std::wstring out;
 
     for (auto& ch : s) {
-        if (ch == '&') {
-            out += (char)0xC2;
-            out += (char)0xA7;
+        if (ch == L'&') {
+            out += L'§';
         }
         else out += ch;
     }
