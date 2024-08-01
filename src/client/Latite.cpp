@@ -236,6 +236,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(_updatePlayer),
     };
     
+    new (configMgrBuf) ConfigManager();
     if (!Latite::getConfigManager().loadMaster()) {
         Logger::Fatal(XOR_STRING("Could not load master config!"));
     }
@@ -250,7 +251,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (commandMgrBuf) CommandManager;
     new (mainSettingGroup) SettingGroup("global");
     new (scnMgrBuf) ScreenManager(); // needs to be before renderer
-    new (configMgrBuf) ConfigManager();
 
     new (scriptMgrBuf) PluginManager();
     new (rendererBuf) Renderer();
