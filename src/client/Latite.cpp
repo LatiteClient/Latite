@@ -121,6 +121,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     Logger::Info(XOR_STRING("Loading assets"));
     Latite::get().dllInst = dll;
     // ... init assets
+    Latite::get().initL10n();
+
     Latite::get().initAsset(ICON_LOGO, L"logo.png");
     Latite::get().initAsset(ICON_SEARCH, L"searchicon.png");
     Latite::get().initAsset(ICON_ARROW, L"arrow.png");
@@ -241,6 +243,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         Logger::Info(XOR_STRING("Loaded master config"));
         Latite::getConfigManager().applyGlobalConfig();
     }
+
+
 
     new (mmgrBuf) ModuleManager;
     new (commandMgrBuf) CommandManager;
@@ -651,12 +655,6 @@ void Latite::initSettings() {
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("language", LocalizeString::get("client.settings.language.name"),
-                                             LocalizeString::get("client.settings.language.desc"));
-        set->value = &this->clientLanguage;
-        this->getSettings().addSetting(set);
-    }
-    {
         auto set = std::make_shared<Setting>("menuBlurEnabled",
                                              LocalizeString::get("client.settings.menuBlurEnabled.name"),
                                              LocalizeString::get("client.settings.menuBlurEnabled.desc"));
@@ -738,6 +736,21 @@ void Latite::initSettings() {
     }
 
     {
+        auto set = std::make_shared<Setting>("language", LocalizeString::get("client.settings.language.name"),
+            LocalizeString::get("client.settings.language.desc"));
+        set->enumData = &this->clientLanguage;
+        set->value = set->enumData->getValue();
+
+        for (int i = 0; auto & lang : l10nData->getLanguages()) {
+            set->enumData->addEntry({
+                i, util::StrToWStr(lang.name)
+                });
+            i++;
+        }
+        this->getSettings().addSetting(set);
+    }
+
+    {
         //auto set = std::make_shared<Setting>("broadcastClientUsage", "Latite Client Presence", "If you leave this on, others with Latite will see that you are using Latite and you will see other people who use Latite.");
         //set->value = &this->broadcastUsage;
         //this->getSettings().addSetting(set);
@@ -794,6 +807,10 @@ void Latite::initAsset(int resource, std::wstring const& filename) {
     auto ofs = std::ofstream(fullPath.c_str(), std::ios::binary);
     ofs << std::string(hFinal, hSize);
     ofs.flush();
+}
+
+void Latite::initL10n() {
+    l10nData = LocalizeData();
 }
 
 std::string Latite::getTextAsset(int resource) {

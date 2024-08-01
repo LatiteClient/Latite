@@ -897,6 +897,12 @@
     <ClInclude Include="src\client\localization\Spanish.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="assets\lang\en_US.json">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\localization\LocalizeData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1380,6 +1386,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\localization\Spanish.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\localization\LocalizeData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

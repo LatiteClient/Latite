@@ -322,6 +322,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="assets\lang\en_US.json" />
     <ClInclude Include="deps\include\mnemosyne\core\memory_range.hpp" />
     <ClInclude Include="deps\include\mnemosyne\core\vfunc_index.hpp" />
     <ClInclude Include="deps\include\mnemosyne\defines.hpp" />
@@ -478,6 +479,7 @@
     <ClInclude Include="src\client\input\Keyboard.h" />
     <ClInclude Include="src\client\Latite.h" />
     <ClInclude Include="src\client\localization\English.h" />
+    <ClInclude Include="src\client\localization\LocalizeData.h" />
     <ClInclude Include="src\client\localization\LocalizeString.h" />
     <ClInclude Include="src\client\localization\Spanish.h" />
     <ClInclude Include="src\client\misc\AuthWindow.h" />
@@ -723,6 +725,7 @@
     <ClCompile Include="src\client\hook\impl\ScreenViewHooks.cpp" />
     <ClCompile Include="src\client\input\Keyboard.cpp" />
     <ClCompile Include="src\client\Latite.cpp" />
+    <ClCompile Include="src\client\localization\LocalizeData.cpp" />
     <ClCompile Include="src\client\localization\LocalizeString.cpp" />
     <ClCompile Include="src\client\localization\Spanish.cpp" />
     <ClCompile Include="src\client\misc\AuthWindow.cpp" />

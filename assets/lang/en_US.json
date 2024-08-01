@@ -1,4 +1,6 @@
 {
+    "name": "English (US)",
+    "translations": {
         "client.intro.welcome": "Welcome to Latite Client!",
         "client.intro.menubutton": "Press {} in a world or server to open the mod menu.",
         "client.settings.menuKey.name": "Menu Key",
@@ -372,4 +374,5 @@
         "client.commands.plugin.startup.name": "Successfully moved plugin folder {} to startup.",
         "client.commands.plugin.startup.error.name": "Cannot find plugin {}",
         "client.commands.plugin.install.name": "Plugin installed. Do &7 {} plugin load &7 {} &r to run the plugin.\nThis plugin will load every time you load Minecraft."
+    }
 }

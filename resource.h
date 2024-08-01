@@ -28,4 +28,4 @@
 
 #define JS_LATITEAPI 100
 
-#define LANG_EN_US 50
+#define LANG_EN_US 101

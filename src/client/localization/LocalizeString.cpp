@@ -5,8 +5,8 @@
 #include "Spanish.h"
 
 
-std::wstring LocalizeString::get(std::string id) {
-    English english;
+std::wstring LocalizeString::get(const std::string& id) {
+    /*English english;
     Spanish spanish;
 
     std::wstring language = Latite::get().getClientLanguage();
@@ -20,5 +20,7 @@ std::wstring LocalizeString::get(std::string id) {
         return english.getString(id);
     if (language == L"spanish")
         return spanish.getString(id);
-    return english.getString(id);
+    return english.getString(id);*/
+
+    return Latite::get().getL10nData().get(id);
 }
