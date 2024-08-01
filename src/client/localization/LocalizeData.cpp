@@ -2,7 +2,7 @@
 #include "LocalizeData.h"
 #include <client/Latite.h>
 #include "resource.h"
-// todo: fix language switch not working
+
 LocalizeData::LocalizeData() {
     fallbackLanguage = std::make_shared<Language>(LANG_EN_US);
 
