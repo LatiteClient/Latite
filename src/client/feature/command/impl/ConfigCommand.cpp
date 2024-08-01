@@ -39,9 +39,10 @@ bool ConfigCommand::execute(std::string const label, std::vector<std::string> ar
 			message(util::FormatWString(
                         util::WFormat(LocalizeString::get("client.commands.config.configNotFound.name")),
                         { util::StrToWStr(args[1]) }), true);
-			LocalizeString::get("");
 			return true;
 		}
+		Latite::getConfigManager().applyGlobalConfig();
+		Latite::getConfigManager().applyModuleConfig();
 		message(util::FormatWString(
             util::WFormat(LocalizeString::get("client.commands.config.loadedConfig.name")),
             { util::StrToWStr(args[1]) }));
