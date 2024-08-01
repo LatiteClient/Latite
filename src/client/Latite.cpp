@@ -242,7 +242,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     }
     else {
         Logger::Info(XOR_STRING("Loaded master config"));
-        Latite::getConfigManager().applyGlobalConfig();
     }
 
 
@@ -328,6 +327,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     }
 
     Latite::get().initSettings();
+    Latite::getConfigManager().applyGlobalConfig();
 
     Latite::get().initialize(dll);
 
