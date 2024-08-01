@@ -280,7 +280,7 @@
         "client.module.textHotkey.commandMode.desc": "Send a command instead of a chat message",
         "client.module.textHotkey.textKey.desc": "The hotkey to bind the text message or command to",
         "client.module.textHotkey.text.desc": "The text or command",
-        "client.module.behindYou.name": "Behind You!",
+        "client.module.behindYou.name": "Behind You",
         "client.module.behindYouState0.name": "Third Person Front",
         "client.module.behindYouState1.name": "Third Person Back",
         "client.module.behindYouState2.name": "First Person",

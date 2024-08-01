@@ -364,7 +364,7 @@
         "client.commands.config.loadedConfig.name": "Successfully loaded config &7{}",
         "client.commands.config.genericError.name": "Something went wrong!",
         "client.commands.config.desc": "Perform actions related to profiles/configs",
-        "client.commands.plugin.desc": "Do actions related to plugins/scripts",
+        "client.commands.plugin.desc": "Hacer acciones sobre los Plugins",
         "client.commands.plugin.scriptingNotSupported.name": "&eScripting/Plugins are not supported! Try restarting your game.",
         "client.commands.plugin.load.success.name": "Loaded plugin {} {}!",
         "client.commands.plugin.load.error.name": "Could not load and run the plugin successfully! Check your folder path.",

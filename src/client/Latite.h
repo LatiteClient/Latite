@@ -36,6 +36,7 @@ public:
 	[[nodiscard]] LocalizeData& getL10nData() noexcept { return *l10nData; }
 	[[nodiscard]] Timings& getTimings() noexcept { return timings; }
 	[[nodiscard]] std::string getCommandPrefix() { return util::WStrToStr(std::get<TextValue>(commandPrefix).str); }
+	[[nodiscard]] int getSelectedLanguage() { return clientLanguage.getSelectedKey(); }
 
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);

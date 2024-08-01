@@ -4,14 +4,16 @@
 #include "resource.h"
 // todo: fix language switch not working
 LocalizeData::LocalizeData() {
-    Language englishLanguage = Language{
-        .resource = LANG_EN_US };
-    languages.push_back(englishLanguage);
-    loadLanguage(englishLanguage, true);
+    fallbackLanguage = std::make_shared<Language>(LANG_EN_US);
 
-    Language spanishLanguage = Language{
-         .resource = LANG_ES_ES };
-    languages.push_back(spanishLanguage);
+    languages = {
+        fallbackLanguage,
+        std::make_shared<Language>(LANG_ES_ES)
+    };
+
+    for (auto& lang : languages) {
+        loadLanguage(*lang, true);
+    }
 }
 
 std::string LocalizeData::getResourceContent(const std::variant<int, std::string>& resource) {
@@ -30,7 +32,6 @@ void LocalizeData::loadLanguage(Language& lang, bool cache) {
 }
 
 bool LocalizeData::parseLangFile(Language& lang, const std::string& content, bool cache) {
-
     auto obj = json::parse(content);
 
     if (!obj.is_object()) return false;
@@ -41,9 +42,27 @@ bool LocalizeData::parseLangFile(Language& lang, const std::string& content, boo
 
     if (cache) {
         for (auto it = obj["translations"].begin(); it != obj["translations"].end(); ++it) {
-            localizeCache[it.key()] = util::StrToWStr(it.value().get<std::string>());
+            lang.localizeCache[it.key()] = util::StrToWStr(it.value().get<std::string>());
         }
     }
 
     return true;
+}
+
+std::wstring LocalizeData::get(const std::string& id) {
+    auto& lang = *languages.at(Latite::get().getSelectedLanguage());
+    return tryGetKey(lang, id)
+        .value_or(tryGetKey(*fallbackLanguage, id)
+            .value_or(util::StrToWStr(id)));
+}
+
+std::optional<std::wstring> LocalizeData::tryGetKey(Language& lang, const std::string& key) {
+    auto& cache = lang.localizeCache;
+    auto it = cache.find(key);
+
+    if (it != cache.end()) {
+        return it->second;
+    }
+
+    return std::nullopt;
 }

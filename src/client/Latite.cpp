@@ -743,7 +743,7 @@ void Latite::initSettings() {
 
         for (int i = 0; auto & lang : l10nData->getLanguages()) {
             set->enumData->addEntry({
-                i, util::StrToWStr(lang.name)
+                i, util::StrToWStr(lang->name)
                 });
             i++;
         }
