@@ -887,14 +887,7 @@
     </ClInclude>
     <ClInclude Include="src\client\feature\module\impl\hud\MovableCoordinates.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\client\localization\English.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\client\localization\LocalizeString.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\client\localization\Spanish.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="assets\lang\en_US.json">
@@ -1373,9 +1366,6 @@
     <ClCompile Include="src\client\feature\module\impl\hud\ComboCounter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\client\localization\English.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\client\feature\module\impl\hud\CustomCoordinates.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1383,9 +1373,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\localization\LocalizeString.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\localization\Spanish.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\localization\LocalizeData.cpp">

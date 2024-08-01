@@ -2,13 +2,16 @@
 #include "LocalizeData.h"
 #include <client/Latite.h>
 #include "resource.h"
-
+// todo: fix language switch not working
 LocalizeData::LocalizeData() {
-    // Add English as a language by default.
-    auto defaultLanguage = Language{
+    Language englishLanguage = Language{
         .resource = LANG_EN_US };
-    loadLanguage(defaultLanguage, true);
-    languages.push_back(defaultLanguage);
+    languages.push_back(englishLanguage);
+    loadLanguage(englishLanguage, true);
+
+    Language spanishLanguage = Language{
+         .resource = LANG_ES_ES };
+    languages.push_back(spanishLanguage);
 }
 
 std::string LocalizeData::getResourceContent(const std::variant<int, std::string>& resource) {

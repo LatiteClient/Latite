@@ -13,7 +13,7 @@ public:
 	LocalizeData();
 
 	std::string getResourceContent(const std::variant<int, std::string>& resource);
-	bool parseLangFile(Language& lang, const std::string& content, bool updateCache);
+    bool parseLangFile(Language& lang, const std::string& content, bool updateCache);
 	void loadLanguage(Language& lang, bool updateCache);
 
 	const std::vector<Language>& getLanguages() const {

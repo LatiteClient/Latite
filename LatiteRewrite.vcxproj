@@ -802,6 +802,9 @@
     <ClCompile Include="src\client\feature\module\impl\hud\TabList.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="assets\lang\es_ES.json">
+      <FileType>Document</FileType>
+    </ClInclude>
     <None Include="CMakePresets.json" />
     <None Include="CppProperties.json" />
     <None Include="src\client\script\js\latiteapi.js" />
