@@ -178,7 +178,7 @@ std::string util::WStrToStr(std::wstring const& ws) {
 }
 
 std::string util::Format(std::string const& s) {
-	std::string out;
+    std::string out;
 
     for (auto& ch : s) {
         if (ch == '&') {
@@ -202,24 +202,29 @@ std::wstring util::WFormat(std::wstring const& s) {
     return out;
 }
 
-std::wstring util::FormatWString(std::wstring formatString, std::vector<std::wstring> formatArgs) {
-    std::wstringstream ss;
+std::wstring util::FormatWString(std::wstring const& formatString, std::vector<std::wstring> const& formatArgs) {
+    std::wstringstream result;
+    size_t argIndex = 0;
     size_t pos = 0;
-    size_t arg_index = 0;
 
-    while ((pos = formatString.find(L'{}', pos)) != std::wstring::npos) {
-        ss << formatString.substr(0, pos);
-        if (arg_index < formatArgs.size()) {
-            ss << formatArgs[arg_index++];
+    while (pos < formatString.length()) {
+        if (formatString[pos] == L'{' && (pos + 1 < formatString.length()) && formatString[pos + 1] == L'}') {
+            if (argIndex >= formatArgs.size()) {
+                throw std::invalid_argument("Not enough arguments provided for the format string.");
+            }
+            result << formatArgs[argIndex++];
+            pos += 2; // Skip over the "{}"
         }
         else {
-            ss << L"{}"; // No more arguments, keep {}
+            result << formatString[pos++];
         }
-        formatString = formatString.substr(pos + 2);
     }
-    ss << formatString;
 
-    return ss.str();
+    if (argIndex < formatArgs.size()) {
+        throw std::invalid_argument("Too many arguments provided for the format string.");
+    }
+
+    return result.str();
 }
 
 std::wstring util::GetClipboardText() {
