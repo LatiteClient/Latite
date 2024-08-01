@@ -14,6 +14,28 @@ bool ConfigManager::loadMaster() {
 	return load(masterConfig);
 }
 
+void ConfigManager::applyGlobalConfig() {
+	for (auto& item : loadedConfig->getOutput()) {
+
+		// Might be a bit hacky
+		if (Latite::getSettings().name() == item->name()) {
+			Latite::get().loadConfig(*item.get());
+		}
+	}
+}
+
+void ConfigManager::applyModuleConfig() {
+	for (auto& item : loadedConfig->getOutput()) {
+		auto mod = Latite::getModuleManager().find(item->name());
+		if (!mod) {
+			Logger::Warn("Could not find {} as module in config", item->name());
+		}
+		else {
+			mod->loadConfig(*item.get());
+		}
+	}
+}
+
 bool ConfigManager::saveCurrentConfig() {
 	return save(loadedConfig);
 }
@@ -50,28 +72,12 @@ bool ConfigManager::load(std::shared_ptr<Config> cfg) {
 	loadedConfig = cfg;
 	auto res = cfg->load();
 	if (res != std::nullopt) return false;
-	for (auto& item : cfg->getOutput()) {
-
-		// Might be a bit hacky
-		if (Latite::getSettings().name() == item->name()) {
-			Latite::get().loadConfig(*item.get());
-		}
-		else {
-			auto mod = Latite::getModuleManager().find(item->name());
-			if (!mod) {
-				Logger::Warn("Could not find {} as module in config", item->name());
-			}
-			else {
-				mod->loadConfig(*item.get());
-			}
-		}
-	}
 	return true;
 }
 
 bool ConfigManager::save(std::shared_ptr<Config> cfg) {
 	std::vector<SettingGroup*> groups = {};
-	groups.push_back(&Latite::get().getSettings());
+	groups.push_back(&Latite::getSettings());
 
 	Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
 		groups.push_back(mod->settings.get());

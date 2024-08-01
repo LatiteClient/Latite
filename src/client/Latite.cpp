@@ -234,6 +234,14 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(_updatePlayer),
     };
     
+    if (!Latite::getConfigManager().loadMaster()) {
+        Logger::Fatal(XOR_STRING("Could not load master config!"));
+    }
+    else {
+        Logger::Info(XOR_STRING("Loaded master config"));
+        Latite::getConfigManager().applyGlobalConfig();
+    }
+
     new (mmgrBuf) ModuleManager;
     new (commandMgrBuf) CommandManager;
     new (mainSettingGroup) SettingGroup("global");
@@ -500,12 +508,9 @@ void Latite::threadsafeInit() {
     app.Title(ws);
     Latite::getPluginManager().loadPrerunScripts();
     Logger::Info(XOR_STRING("Loaded startup scripts"));
-    if (!Latite::getConfigManager().loadMaster()) {
-        Logger::Fatal(XOR_STRING("Could not load master config!"));
-    }
-    else {
-        Logger::Info(XOR_STRING("Loaded master config"));
-    }
+    
+    Latite::getConfigManager().applyModuleConfig();
+
     Latite::getRenderer().setShouldInit();
 
     Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
