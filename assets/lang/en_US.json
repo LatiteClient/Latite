@@ -1,5 +1,5 @@
 {
-        "client.intro.welcome": "L\"Welcome to Latite Client!\"",
+        "client.intro.welcome": "Welcome to Latite Client!",
         "client.intro.menubutton": "Press {} in a world or server to open the mod menu.",
         "client.settings.menuKey.name": "Menu Key",
         "client.settings.ejectKey.name": "Eject Key",
