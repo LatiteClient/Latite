@@ -24,6 +24,7 @@
 #include "impl/visual/ChunkBorders.h"
 #include "impl/visual/Hitboxes.h"
 #include "impl/visual/BlockOutline.h"
+#include "impl/visual/NoHurtCam.h"
 
 #include "impl/hud/FPSCounter.h"
 #include "impl/hud/CPSCounter.h"
@@ -93,6 +94,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<ComboCounter>());
 	this->items.push_back(std::make_shared<CustomCoordinates>());
 	this->items.push_back(std::make_shared<MovableCoordinates>());
+	this->items.push_back(std::make_shared<NoHurtCam>());
 
 	for (auto& mod : items) {
 		mod->onInit();

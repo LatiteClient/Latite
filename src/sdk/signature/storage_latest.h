@@ -297,6 +297,10 @@ public:
 	inline static SigImpl GameArguments__onUri{ [](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5c 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8d ac 24 ? ? ? ? b8 ? ? ? ? e8 ? ? ? ? 48 2b e0 48 8b 05 ? ? ? ? 48 33 c4 48 89 85 ? ? ? ? 4c 8b e2 4c 8b f1"_sig,
 		"GameArguments::_onUri" };
+
+	inline static SigImpl _bobHurt{ [](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5c 24 ? 55 48 8d 6c 24 ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 45 ? 49 8b 00"_sig,
+		"anonymous namespace::_bobHurt" };
 };
 
 // after adding sigs here, add them in latite.cpp

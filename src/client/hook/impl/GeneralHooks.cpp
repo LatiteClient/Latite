@@ -33,6 +33,7 @@ namespace {
 	std::shared_ptr<Hook> AddMessageHook;
 	std::shared_ptr<Hook> UpdatePlayerHook;
 	std::shared_ptr<Hook> OnUriHook;
+	std::shared_ptr<Hook> BobHurtHook;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -397,6 +398,13 @@ void GenericHooks::hkOnUri(void* obj, void* pUri) {
 	OnUriHook->oFunc<decltype(&hkOnUri)>()(obj, pUri);
 }
 
+void GenericHooks::hkBobHurt(void* obj, void* a2, void* a3) {
+	BobHurtEvent ev{};
+	if (Eventing::get().dispatch(ev)) return;
+
+	BobHurtHook->oFunc<decltype(&hkBobHurt)>()(obj, a2, a3);
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
 	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
@@ -445,5 +453,6 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	AddMessageHook = addHook(Signatures::GuiData__addMessage.result, hkAddMessage, "GuiData::_addMessage");
 	UpdatePlayerHook = addHook(Signatures::_updatePlayer.result, hkUpdatePlayer, "`anonymous namespace'::_updatePlayer");
 	OnUriHook = addHook(Signatures::GameArguments__onUri.result, hkOnUri, "GameArguments::_onUri");
+	BobHurtHook = addHook(Signatures::_bobHurt.result, hkBobHurt, "`anonymous namespace`::_bobHurt");
 }
 

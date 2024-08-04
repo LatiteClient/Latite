@@ -50,6 +50,7 @@ class GenericHooks : public HookGroup {
     static void hkAddMessage(SDK::GuiData* obj, void* msg, uint32_t profanityContext);
     static void hkUpdatePlayer(SDK::CameraComponent* obj, void* a, void* b);
     static void hkOnUri(void* obj, void* uri);
+    static void hkBobHurt(void* obj, void*, void*);
 public:
     GenericHooks();
 };

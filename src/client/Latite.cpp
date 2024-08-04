@@ -52,6 +52,7 @@ using namespace winrt::Windows::Storage;
 #include "render/Assets.h"
 #include "resource.h"
 #include "feature/module/impl/game/Freelook.h"
+#include "feature/module/impl/visual/NoHurtCam.h"
 
 int SDK::internalVers = SDK::VLATEST;
 
@@ -575,9 +576,11 @@ void Latite::updateModuleBlocking() {
         // scuffed but we don't have a proper static management system
 
         static_assert(std::is_base_of_v<Module, Freelook>);
+        static_assert(std::is_base_of_v<Module, NoHurtCam>);
 
         blockModules("Freelook", "hivebedrock");
         blockModules("Freelook", "galaxite");
+        blockModules("NoHurtCam", "galaxite");
     }
     else {
         
