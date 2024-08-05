@@ -1413,6 +1413,11 @@ void ClickGUI::drawColorPicker() {
 
 	std::array<std::optional<StoredColor>, 3> cols = { colVal.getMainColor(), std::nullopt, std::nullopt };
 
+	if (colVal.isChroma) {
+		cols[1] = colVal.color2;
+		cols[2] = colVal.color3;
+	}
+
 	RectF lastrc = alphaBar;
 	for (size_t i = 0; i < cols.size(); ++i) {
 		auto& c = cols[i];
@@ -1483,6 +1488,7 @@ void ClickGUI::drawColorPicker() {
 
 
 			// rgb setting
+			colorPicker.rgbSetting.value = &colorPicker.rgbSelector;
 			drawSetting(&colorPicker.rgbSetting, nullptr, { alphaBar.left, alphaBar.bottom + hexBox.getHeight() * 1.5f}, dc, 150.f, 0.21f, true);
 		}
 	}

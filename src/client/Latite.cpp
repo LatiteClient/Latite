@@ -891,7 +891,10 @@ void Latite::onUpdate(Event& evGeneric) {
         lastDX11 = std::get<BoolValue>(useDX11);
     }
 
-    rgbHue += SDK::ClientInstance::get()->minecraft->timer->alpha * std::get<FloatValue>(rgbSpeed);
+    rgbHue += SDK::ClientInstance::get()->minecraft->timer->alpha * 0.005f * std::get<FloatValue>(rgbSpeed);
+    if (rgbHue > 1.f) {
+        rgbHue = 0.f;
+    }
 #if 0
     {
         static auto time = std::chrono::steady_clock::now();
