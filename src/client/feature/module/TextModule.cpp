@@ -42,11 +42,11 @@ void TextModule::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 
 
 	std::wstring str = text.str();
-	auto sCol = std::get<ColorValue>(bgColor).color1;
+	auto sCol = std::get<ColorValue>(bgColor).getMainColor();
 	d2d::Color realCol = sCol;
-	auto sTCol = std::get<ColorValue>(textColor).color1;
+	auto sTCol = std::get<ColorValue>(textColor).getMainColor();
 	d2d::Color realTCol = sTCol;
-	auto sOCol = std::get<ColorValue>(outlineColor).color1;
+	auto sOCol = std::get<ColorValue>(outlineColor).getMainColor();
 	d2d::Color realOCol = sOCol;
 
 	float rad = 0.f;
@@ -79,7 +79,7 @@ void TextModule::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 		if (!text.str().empty()) {
 			rad = (std::get<FloatValue>(radius).value / 10.f) * (rc.getHeight() / 2.f);
 			if (std::get<BoolValue>(showOutline)) dc.drawRoundedRectangle(rc, realOCol, rad, std::get<FloatValue>(outlineThickness));
-			if (std::get<BoolValue>(fillBg)) dc.fillRoundedRectangle(rc, std::get<ColorValue>(bgColor).color1, rad);
+			if (std::get<BoolValue>(fillBg)) dc.fillRoundedRectangle(rc, std::get<ColorValue>(bgColor).getMainColor(), rad);
 			dc.drawText(rc, str.c_str(), realTCol, Renderer::FontSelection::SecondaryLight, textSize, align, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, !isDefault && !inEditor && cacheText);
 		}
 

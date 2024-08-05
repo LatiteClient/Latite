@@ -33,7 +33,7 @@ Vec2 Keystrokes::drawKeystroke(DrawUtil& ctx, Vec2 const& pos, Keystroke& stroke
 	d2d::Rect front = { pos.x, pos.y, pos.x + std::get<FloatValue>(keystrokeSize), pos.y + std::get<FloatValue>(keystrokeSize) };
 	float scale = std::get<FloatValue>(textSize);//ctx.scaleTextInBounds(key, 1 * textSize, (front.right - front.left), 2);
 	ctx.fillRoundedRectangle(front, stroke.col, std::min(std::get<FloatValue>(this->radius).value, std::get<FloatValue>(keystrokeSize) / 2.f));
-	if (std::get<BoolValue>(border)) ctx.drawRoundedRectangle(front, std::get<ColorValue>(borderColor).color1, std::get<FloatValue>(this->radius), std::get<FloatValue>(borderLength));
+	if (std::get<BoolValue>(border)) ctx.drawRoundedRectangle(front, std::get<ColorValue>(borderColor).getMainColor(), std::get<FloatValue>(this->radius), std::get<FloatValue>(borderLength));
 	ctx.drawText(front, stroke.keyName, stroke.textCol, Renderer::FontSelection::SecondaryLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	return { front.right - front.left, front.bottom - front.top };
 }
@@ -71,24 +71,24 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 
 	for (auto& key : keystrokes) {
 		if (ls > 0.01f) {
-			key.col = util::LerpColorState(key.col, d2d::Color(std::get<ColorValue>(this->pressedColor).color1), d2d::Color(std::get<ColorValue>(this->unpressedColor).color1), key.input.get(), lerpT);
-			key.textCol = util::LerpColorState(key.textCol, d2d::Color(std::get<ColorValue>(this->pressedTextColor).color1), d2d::Color(std::get<ColorValue>(this->unpressedTextColor).color1), key.input.get(), lerpT);
+			key.col = util::LerpColorState(key.col, d2d::Color(std::get<ColorValue>(this->pressedColor).getMainColor()), d2d::Color(std::get<ColorValue>(this->unpressedColor).getMainColor()), key.input.get(), lerpT);
+			key.textCol = util::LerpColorState(key.textCol, d2d::Color(std::get<ColorValue>(this->pressedTextColor).getMainColor()), d2d::Color(std::get<ColorValue>(this->unpressedTextColor).getMainColor()), key.input.get(), lerpT);
 		}
 		else {
-			key.col = key.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedColor).color1) : d2d::Color(std::get<ColorValue>(this->unpressedColor).color1);
-			key.textCol = key.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedTextColor).color1) : d2d::Color(std::get<ColorValue>(this->unpressedTextColor).color1);
+			key.col = key.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedColor).getMainColor()) : d2d::Color(std::get<ColorValue>(this->unpressedColor).getMainColor());
+			key.textCol = key.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedTextColor).getMainColor()) : d2d::Color(std::get<ColorValue>(this->unpressedTextColor).getMainColor());
 		}
 	
 	}
 
 	for (auto& btn : mouseButtons) {
 		if (ls > 0.01f) {
-			btn.col = util::LerpColorState(btn.col, d2d::Color(std::get<ColorValue>(this->pressedColor).color1), d2d::Color(std::get<ColorValue>(this->unpressedColor).color1), btn.input.get(), lerpT);
-			btn.textCol = util::LerpColorState(btn.textCol, d2d::Color(std::get<ColorValue>(this->pressedTextColor).color1), d2d::Color(std::get<ColorValue>(this->unpressedTextColor).color1), btn.input.get(), lerpT);
+			btn.col = util::LerpColorState(btn.col, d2d::Color(std::get<ColorValue>(this->pressedColor).getMainColor()), d2d::Color(std::get<ColorValue>(this->unpressedColor).getMainColor()), btn.input.get(), lerpT);
+			btn.textCol = util::LerpColorState(btn.textCol, d2d::Color(std::get<ColorValue>(this->pressedTextColor).getMainColor()), d2d::Color(std::get<ColorValue>(this->unpressedTextColor).getMainColor()), btn.input.get(), lerpT);
 		}
 		else {
-			btn.col = btn.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedColor).color1) : d2d::Color(std::get<ColorValue>(this->unpressedColor).color1);
-			btn.textCol = btn.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedTextColor).color1) : d2d::Color(std::get<ColorValue>(this->unpressedTextColor).color1);
+			btn.col = btn.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedColor).getMainColor()) : d2d::Color(std::get<ColorValue>(this->unpressedColor).getMainColor());
+			btn.textCol = btn.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedTextColor).getMainColor()) : d2d::Color(std::get<ColorValue>(this->unpressedTextColor).getMainColor());
 		}
 	}
 
@@ -121,7 +121,7 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 
 			dc.drawText(mb, str, btn.textCol, Renderer::FontSelection::SecondaryLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 			if (std::get<BoolValue>(border)) {
-				dc.drawRoundedRectangle(mb, std::get<ColorValue>(this->borderColor).color1, rad, std::get<FloatValue>(this->borderLength));
+				dc.drawRoundedRectangle(mb, std::get<ColorValue>(this->borderColor).getMainColor(), rad, std::get<FloatValue>(this->borderLength));
 			}
 		}
 		{
@@ -138,7 +138,7 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 
 			dc.drawText(mb, str, btn.textCol, Renderer::FontSelection::SecondaryLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 			if (std::get<BoolValue>(border)) {
-				dc.drawRoundedRectangle(mb, std::get<ColorValue>(this->borderColor).color1, rad, std::get<FloatValue>(this->borderLength));
+				dc.drawRoundedRectangle(mb, std::get<ColorValue>(this->borderColor).getMainColor(), rad, std::get<FloatValue>(this->borderLength));
 			}
 		}
 		pos.y += mbHeight;
@@ -151,7 +151,7 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 		dc.fillRoundedRectangle(spaceBox, keystrokes[5].col, rad);
 		dc.flush(false);
 
-		if (std::get<BoolValue>(border)) dc.drawRoundedRectangle(spaceBox, std::get<ColorValue>(borderColor).color1, rad, std::get<FloatValue>(borderLength));
+		if (std::get<BoolValue>(border)) dc.drawRoundedRectangle(spaceBox, std::get<ColorValue>(borderColor).getMainColor(), rad, std::get<FloatValue>(borderLength));
 		Vec2 center = spaceBox.center({ 1.f * std::get<FloatValue>(keystrokeSize), 1 });
 		dc.fillRectangle({ center.x, center.y, center.x + (1.f * std::get<FloatValue>(keystrokeSize)), center.y + 1 }, keystrokes[5].textCol);
 		pos.y += spaceBox.getHeight();
@@ -162,7 +162,7 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 		pos.y += pad;
 		d2d::Rect shiftBox = { 0.f, pos.y, pos.x, pos.y + std::get<FloatValue>(spaceSize) };
 		dc.fillRoundedRectangle(shiftBox, keystrokes[4].col, rad);
-		if (std::get<BoolValue>(border)) dc.drawRoundedRectangle(shiftBox, std::get<ColorValue>(borderColor).color1, rad, std::get<FloatValue>(borderLength));
+		if (std::get<BoolValue>(border)) dc.drawRoundedRectangle(shiftBox, std::get<ColorValue>(borderColor).getMainColor(), rad, std::get<FloatValue>(borderLength));
 		dc.drawText(shiftBox, keystrokes[4].keyName, keystrokes[4].textCol, Renderer::FontSelection::SecondaryLight, std::get<FloatValue>(textSize), DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		pos.y += shiftBox.getHeight();
 	}

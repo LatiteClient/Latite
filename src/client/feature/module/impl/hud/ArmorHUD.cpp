@@ -8,7 +8,7 @@ ArmorHUD::ArmorHUD() : HUDModule("ArmorHUD", "Armor HUD", "Shows your armor and 
 	addSetting("durability", "Show Durability", "Show Durability", showDamage);
 	addSetting("percent", "Durability %", "The durability percent", this->percentage, "durability"_istrue);
 
-	std::get<ColorValue>(txtColor).color1 = { 1.f, 1.f, 1.f, 1.f };
+	std::get<ColorValue>(txtColor).getMainColor() = { 1.f, 1.f, 1.f, 1.f };
 	addSetting("textColor", "Text Color", "The text color", txtColor);
 }
 
@@ -110,12 +110,12 @@ void ArmorHUD::render(DrawUtil& ctxGeneric, bool isDefault, bool inEditor) {
 
 					if (!isLeft) {
 						extra = 6.f;
-						dc.drawText({ rc.right + extra, rc.top, rect.getWidth(), rc.bottom}, txt, std::get<ColorValue>(txtColor).color1, Renderer::FontSelection::PrimaryRegular, textS, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+						dc.drawText({ rc.right + extra, rc.top, rect.getWidth(), rc.bottom}, txt, std::get<ColorValue>(txtColor).getMainColor(), Renderer::FontSelection::PrimaryRegular, textS, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 						extra += textSize.x;
 					}
 					else {
 						extra = 6.f;
-						dc.drawText(rc.translate(-rc.getWidth() - extra, 0.f), txt, std::get<ColorValue>(txtColor).color1, Renderer::FontSelection::PrimaryRegular, textS, DWRITE_TEXT_ALIGNMENT_TRAILING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+						dc.drawText(rc.translate(-rc.getWidth() - extra, 0.f), txt, std::get<ColorValue>(txtColor).getMainColor(), Renderer::FontSelection::PrimaryRegular, textS, DWRITE_TEXT_ALIGNMENT_TRAILING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 						extra += textSize.x;
 					}
 				}
@@ -155,7 +155,7 @@ d2d::Rect ArmorHUD::drawItem(MCDrawUtil& dc, Vec2 pos, SDK::ItemStack* stack, fl
 	if (stack->itemCount > 1) {
 		std::wstring st = std::to_wstring(stack->itemCount);
 		float textSize = 25.f;
-		dc.drawText(rc, st, std::get<ColorValue>(txtColor).color1, Renderer::FontSelection::PrimaryRegular,
+		dc.drawText(rc, st, std::get<ColorValue>(txtColor).getMainColor(), Renderer::FontSelection::PrimaryRegular,
 			textSize, DWRITE_TEXT_ALIGNMENT_TRAILING, DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 	}
 	return rc;

@@ -623,7 +623,7 @@ void ClickGUI::onRender(Event&) {
 
 
 				dc.fillRoundedRectangle(modRectActual, d2d::Color::RGB(0x44, 0x44, 0x44).asAlpha(0.22f), .22f * modHeight);
-				dc.drawRoundedRectangle(modRectActual, d2d::Color(Latite::get().getAccentColor().color1).asAlpha(1.f * mod.lerpToggle), .22f * modHeight, 1.f, DrawUtil::OutlinePosition::Inside);;
+				dc.drawRoundedRectangle(modRectActual, d2d::Color(Latite::get().getAccentColor().getMainColor()).asAlpha(1.f * mod.lerpToggle), .22f * modHeight, 1.f, DrawUtil::OutlinePosition::Inside);;
 				if (renderExtended) {
 
 					dc.ctx->DrawBitmap(auxiliaryBitmap.Get());
@@ -660,7 +660,7 @@ void ClickGUI::onRender(Event&) {
 						}
 						static auto offCol = d2d::Color::RGB(0x63, 0x63, 0x63);
 
-						mod.toggleColorOn = util::LerpColorState(mod.toggleColorOn, d2d::Color(Latite::get().getAccentColor().color1) + 0.2f, d2d::Color(Latite::get().getAccentColor().color1), selecToggle);
+						mod.toggleColorOn = util::LerpColorState(mod.toggleColorOn, d2d::Color(Latite::get().getAccentColor().getMainColor()) + 0.2f, d2d::Color(Latite::get().getAccentColor().getMainColor()), selecToggle);
 						mod.toggleColorOff = util::LerpColorState(mod.toggleColorOff, offCol + 0.2f, offCol, selecToggle);
 
 						//float aTogglePadY = toggleRect.getHeight() * 0.15f;
@@ -1126,7 +1126,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 		prop.startPoint = { 0.f, ss.height / 2.f };
 		prop.endPoint = { ss.width, ss.height / 2.f };
 
-		d2d::Color col = { colVal.color1.r, colVal.color1.g, colVal.color1.b, colVal.color1.a };
+		d2d::Color col = { colVal.getMainColor().r, colVal.getMainColor().g, colVal.getMainColor().b, colVal.getMainColor().a };
 
 		const D2D1_GRADIENT_STOP stops[] = {
 			0.f, col.asAlpha(1.f).get(),
@@ -1245,7 +1245,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 		innerSliderRect.right = std::clamp(newRight, oLeft, oRight);
 
 		dc.fillRoundedRectangle(sliderRect, d2d::Color::RGB(0x8D, 0x8D, 0x8D).asAlpha(0.11f), sliderRect.getHeight() / 2.f);
-		dc.fillRoundedRectangle(innerSliderRect, d2d::Color(Latite::get().getAccentColor().color1), innerSliderRect.getHeight() / 2.f);
+		dc.fillRoundedRectangle(innerSliderRect, d2d::Color(Latite::get().getAccentColor().getMainColor()), innerSliderRect.getHeight() / 2.f);
 
 		dc.brush->SetColor(d2d::Color(0xB9, 0xB9, 0xB9).get());
 		dc.ctx->FillEllipse(D2D1::Ellipse({ innerSliderRect.right, sliderRect.centerY() }, sliderRect.getHeight() * 0.6f, sliderRect.getHeight() * 0.6f), dc.brush);
@@ -1411,7 +1411,7 @@ void ClickGUI::drawColorPicker() {
 
 	// color hex edits/displays
 
-	std::array<std::optional<StoredColor>, 3> cols = { colVal.color1, std::nullopt, std::nullopt };
+	std::array<std::optional<StoredColor>, 3> cols = { colVal.getMainColor(), std::nullopt, std::nullopt };
 
 	RectF lastrc = alphaBar;
 	for (size_t i = 0; i < cols.size(); ++i) {

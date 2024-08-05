@@ -27,7 +27,7 @@ void EnvironmentChanger::onWeather(Event& evG) {
 void EnvironmentChanger::onFogColor(Event& evG) {
 	auto& ev = reinterpret_cast<FogColorEvent&>(evG);
 	if (std::get<BoolValue>(setFogColor)) {
-		auto col = std::get<ColorValue>(fogColor).color1;
+		auto col = std::get<ColorValue>(fogColor).getMainColor();
 		ev.setColor(col.r, col.g, col.b);
 	}
 }

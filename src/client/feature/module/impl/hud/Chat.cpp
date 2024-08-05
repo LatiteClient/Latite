@@ -36,8 +36,8 @@ Chat::Chat() : HUDModule("Chat", "Custom Chat", "A custom chat, replacing the va
 }
 
 void Chat::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
-	d2d::Color bgCol = std::get<ColorValue>(backgroundColor).color1;
-	d2d::Color fgCol = std::get<ColorValue>(textColor).color1;
+	d2d::Color bgCol = std::get<ColorValue>(backgroundColor).getMainColor();
+	d2d::Color fgCol = std::get<ColorValue>(textColor).getMainColor();
 
 	float windowWidth = std::get<FloatValue>(chatWidth);
 	float windowHeight = messageHeight * maxMessages;

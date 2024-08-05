@@ -47,7 +47,7 @@ void BowIndicator::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 			return;
 		}
 
-		dc.fillRoundedRectangle(rc, std::get<ColorValue>(indicatorCol).color1, rad);
+		dc.fillRoundedRectangle(rc, std::get<ColorValue>(indicatorCol).getMainColor(), rad);
 
 		d2d::Rect fillRc = rc;
 
@@ -63,7 +63,7 @@ void BowIndicator::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 		else {
 			fillRc.top = fillRc.bottom - fillRc.getHeight() * percent.value();
 		}
-		dc.fillRoundedRectangle(fillRc, std::get<ColorValue>(indicatorCol2).color1, rad);
+		dc.fillRoundedRectangle(fillRc, std::get<ColorValue>(indicatorCol2).getMainColor(), rad);
 	}
 }
 

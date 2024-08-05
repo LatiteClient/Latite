@@ -73,10 +73,10 @@ void TabList::onRenderOverlay(Event& evG) {
 	dc.ctx->SetTransform(mat * D2D1::Matrix3x2F::Translation(ss.x / 2.f - calcWidth / 2.f, 20.f));
 
 
-	dc.fillRectangle({ 0.f, 0.f, calcWidth, calcHeight + oY }, std::get<ColorValue>(this->bgCol).color1);
-	dc.drawRectangle({ 0.f, 0.f, calcWidth, calcHeight + oY }, d2d::Color(std::get<ColorValue>(this->bgCol).color1).asAlpha(1.f), 2.f);
+	dc.fillRectangle({ 0.f, 0.f, calcWidth, calcHeight + oY }, std::get<ColorValue>(this->bgCol).getMainColor());
+	dc.drawRectangle({ 0.f, 0.f, calcWidth, calcHeight + oY }, d2d::Color(std::get<ColorValue>(this->bgCol).getMainColor()).asAlpha(1.f), 2.f);
 
-	dc.drawText({ 0.f, 0.f, calcWidth, oY }, txt, std::get<ColorValue>(this->textCol).color1, font, textP, DWRITE_TEXT_ALIGNMENT_CENTER);
+	dc.drawText({ 0.f, 0.f, calcWidth, oY }, txt, std::get<ColorValue>(this->textCol).getMainColor(), font, textP, DWRITE_TEXT_ALIGNMENT_CENTER);
 
 
 	for (auto& ent : *lvl->getPlayerList()) {
@@ -93,7 +93,7 @@ void TabList::onRenderOverlay(Event& evG) {
 		// render
 		//dc.drawRectangle(rc, d2d::Colors::BLACK, 0.5f);
 
-		dc.drawText(rc, name, std::get<ColorValue>(textCol).color1, font, textP, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
+		dc.drawText(rc, name, std::get<ColorValue>(textCol).getMainColor(), font, textP, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
 
 		idx++;
 		if (idx < maxPerTab) {

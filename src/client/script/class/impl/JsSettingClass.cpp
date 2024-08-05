@@ -24,7 +24,7 @@ JsValueRef JsSettingClass::getValueCallback(JsValueRef callee, bool isConstructo
 	{
 		auto colClass = thi->owner->getClass<JsColor>();
 		if (colClass) {
-			return colClass->construct(d2d::Color(std::get<ColorValue>(*set->value).color1));
+			return colClass->construct(d2d::Color(std::get<ColorValue>(*set->value).getMainColor()));
 		}
 		break;
 	}
@@ -87,7 +87,7 @@ JsValueRef JsSettingClass::setValueCallback(JsValueRef callee, bool isConstructo
 	case Setting::Type::Color:
 		if (argType == JsObject) {
 			auto col = JsColor::ToColor(setVal);
-			std::get<ColorValue>(*set->value).color1 = StoredColor(col.r, col.g, col.b, col.a);
+			std::get<ColorValue>(*set->value).getMainColor() = StoredColor(col.r, col.g, col.b, col.a);
 		}
 		return undef;
 	case Setting::Type::Enum:

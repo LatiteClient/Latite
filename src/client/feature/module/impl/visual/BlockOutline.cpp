@@ -31,11 +31,11 @@ void BlockOutline::onOutlineSelection(Event& evG) {
 		std::get<BoolValue>(renderThrough) ? SDK::MaterialPtr::getUIColor() : (std::get<BoolValue>(transparent) ? lrp->getSelectionOverlayMaterial() : lrp->getSelectionBoxMaterial())};
 
 	if (std::get<BoolValue>(outline)) {
-		dc.drawBox(ev.getBoundingBox(), std::get<ColorValue>(outlineColor).color1);
+		dc.drawBox(ev.getBoundingBox(), std::get<ColorValue>(outlineColor).getMainColor());
 	}
 
-	auto outlineCol = std::get<ColorValue>(outlineColor).color1;
-	auto overlayCol = std::get<ColorValue>(overlayColor).color1;
+	auto outlineCol = std::get<ColorValue>(outlineColor).getMainColor();
+	auto overlayCol = std::get<ColorValue>(overlayColor).getMainColor();
 
 	if (std::get<BoolValue>(outline)) {
 		dc.drawBox(ev.getBoundingBox(), outlineCol);

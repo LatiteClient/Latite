@@ -29,9 +29,9 @@ void Hitboxes::onEntityRender(Event& evG) {
 
 	bool willShowLine = std::get<BoolValue>(showLine) && (!entt->isPlayer() || (!SDK::RakNetConnector::get() || SDK::RakNetConnector::get()->ipAddress.empty()) || entt == lp);
 
-	auto boxCol = std::get<ColorValue>(boxColor).color1;
-	auto lineCol = std::get<ColorValue>(lineColor).color1;
-	auto eyeCol = std::get<ColorValue>(eyeColor).color1;
+	auto boxCol = std::get<ColorValue>(boxColor).getMainColor();
+	auto lineCol = std::get<ColorValue>(lineColor).getMainColor();
+	auto eyeCol = std::get<ColorValue>(eyeColor).getMainColor();
 
 	dc.drawBox(bb, boxCol);
 	float eyePos = newPos.y;

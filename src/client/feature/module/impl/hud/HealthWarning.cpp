@@ -17,7 +17,7 @@ void HealthWarning::onRenderLayer(Event& evG) {
 
 	if (!SDK::ClientInstance::get()->getLocalPlayer()) return;
 
-	StoredColor vignette = std::get<ColorValue>(vignetteColor).color1;
+	StoredColor vignette = std::get<ColorValue>(vignetteColor).getMainColor();
 
 	MCDrawUtil dc{ ev.getUIRenderContext(), SDK::ClientInstance::get()->minecraftGame->minecraftFont };
 	if (std::get<FloatValue>(healthPointThreshold) > SDK::ClientInstance::get()->getLocalPlayer()->getHealth() && screenView->visualTree->rootControl->name == "hud_screen") {
