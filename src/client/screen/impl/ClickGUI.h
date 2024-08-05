@@ -18,7 +18,7 @@ public:
 	void onClick(Event& ev);
 
 	std::string getName() override { return "ClickGUI"; }
-	float drawSetting(class Setting* set, class SettingGroup* group, struct Vec2 const& pos, class D2DUtil& dc, float size = 150.f, float fTextWidth = 0.21f);
+	float drawSetting(class Setting* set, class SettingGroup* group, struct Vec2 const& pos, class D2DUtil& dc, float size = 150.f, float fTextWidth = 0.21f, bool bypassClickThrough = false);
 	
 	bool shouldSelect(d2d::Rect rc, Vec2 const& pt) override;
 
@@ -48,6 +48,13 @@ private:
 		bool queueClose = false;
 		bool dragging = false;
 		Vec2 dragOffs = {};
+		ValueType rgbSelector = BoolValue(false);
+
+		Setting rgbSetting = Setting{ "colorpickerrgb", "RGB", "Cycle through a rainbow of colors for this setting" };
+
+		ColorPicker() {
+			rgbSetting.value = &rgbSelector;
+		}
 	} colorPicker{};
 
 	ui::TextBox searchTextBox{};

@@ -157,6 +157,8 @@ struct ColorValue {
 		}
 	}
 
+	StoredColor getMainColor() const;
+
 	void store(nlohmann::json& jout) {
 		auto col1 = nlohmann::json::object();
 		auto col2 = nlohmann::json::object();

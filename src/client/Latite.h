@@ -120,6 +120,7 @@ public:
 	int plrOffs = 0;
 
 	void loadConfig(class SettingGroup& resolvedGroup);
+	float getRGBHue() const { return rgbHue; }
 
 	static bool isMainThread() { return std::this_thread::get_id() == gameThreadId; }
 private:
@@ -153,6 +154,7 @@ private:
 	ValueType centerCursorMenus = BoolValue(false);
 	ValueType snapLines = BoolValue(true);
 	ValueType secondaryFont = TextValue(L"Segoe UI");
+	ValueType rgbSpeed = FloatValue(1.f);
 
 	EnumData mcRendFont;
 
@@ -160,6 +162,8 @@ private:
 	ComPtr<struct ID2D1Bitmap1> hudBlurBitmap;
 	ComPtr<struct ID2D1BitmapBrush1> hudBlurBrush;
 	ComPtr<struct ID2D1Effect> gaussianBlurEffect;
+
+	float rgbHue = 0.f;
 
 	void threadsafeInit();
 	void patchKey();

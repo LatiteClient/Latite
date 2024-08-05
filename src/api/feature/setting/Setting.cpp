@@ -2,6 +2,10 @@
 #include "Setting.h"
 #include "SettingGroup.h"
 
+// YES, this is the API folder, client specific stuff SHOULD NOT be in here at all, but
+// i really dont want to go through everything that uses color1 and refactor manually...
+#include <client/Latite.h>
+
 bool Setting::shouldRender(SettingGroup& group) {
     if (this->condition.type == Condition::NONE) return true;
     bool has = false;
@@ -14,4 +18,14 @@ bool Setting::shouldRender(SettingGroup& group) {
             }, *set->value);
         });
     return condition.type == Condition::EQUALS ? has : !has;
+}
+
+StoredColor ColorValue::getMainColor() const {
+    if (!isRGB) {
+        return color1;
+    }
+    auto color1HSV = util::ColorToHSV({ color1.r, color1.g, color1.b, color1.a });
+    color1HSV.h = Latite::get().getRGBHue();
+    auto col = util::HSVToColor(color1HSV);
+    return { col.r, col.g, col.b, col.a };
 }

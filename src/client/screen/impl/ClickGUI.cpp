@@ -751,6 +751,7 @@ void ClickGUI::onRender(Event&) {
 		drawColorPicker();
 		if (colorPicker.queueClose) {
 			auto& colVal = std::get<ColorValue>(*colorPicker.setting->value);
+			colVal.isRGB = std::get<BoolValue>(colorPicker.rgbSelector);
 			auto d2dCol = d2d::Color(util::HSVToColor(colorPicker.pickerColor)).asAlpha(colorPicker.opacityMod);
 			*colorPicker.selectedColor = { d2dCol.r, d2dCol.g, d2dCol.b, d2dCol.a };
 			colorPicker.setting->update();
@@ -862,7 +863,7 @@ namespace {
 	}
 }
 
-float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, D2DUtil& dc, float size, float fTextWidth) {
+float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUtil& dc, float size, float fTextWidth, bool bypassClickThrough) {
 	const float checkboxSize = rect.getWidth() * setting_height_relative;
 	const float textSize = checkboxSize * 0.8f;
 	const auto cursorPos = SDK::ClientInstance::get()->cursorPos;
@@ -916,7 +917,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 	case Setting::Type::Bool:
 	{
 		RectF checkboxRect = { pos.x, pos.y, pos.x + checkboxSize, pos.y + checkboxSize };
-		bool contains = this->shouldSelect(checkboxRect, cursorPos);
+		bool contains = bypassClickThrough ? checkboxRect.contains(cursorPos) : this->shouldSelect(checkboxRect, cursorPos);
 
 		auto colOff = d2d::Color::RGB(0xD9, 0xD9, 0xD9).asAlpha(0.11f);
 		if (!set->rendererInfo.init) {
@@ -1154,6 +1155,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup* group, Vec2 const& pos, 
 			if (justClicked[0]) {
 				playClickSound();
 				colorPicker.setting = set;
+				std::get<BoolValue>(colorPicker.rgbSelector) = std::get<ColorValue>(*set->value).isRGB;
 				colorPicker.dragging = false;
 				cPickerRect = { colRect.left, colRect.bottom + 20.f, 0.f, 0.f };
 				auto& colVal = std::get<ColorValue>(*set->value);
@@ -1478,6 +1480,10 @@ void ClickGUI::drawColorPicker() {
 			if (justClicked[0]) {
 				tb.setSelected(hexBox.contains(cursorPos));
 			}
+
+
+			// rgb setting
+			drawSetting(&colorPicker.rgbSetting, nullptr, { alphaBar.left, alphaBar.bottom + hexBox.getHeight() * 1.5f}, dc, 150.f, 0.21f, true);
 		}
 	}
 
@@ -1557,7 +1563,7 @@ void ClickGUI::drawColorPicker() {
 	}
 
 
-	cPickerRect.bottom = alphaBar.bottom + remPad * 2.f;
+	cPickerRect.bottom = alphaBar.bottom + remPad * 2.f + 50.f;
 
 	dc.ctx->SetTarget(Latite::getRenderer().getBitmap());
 

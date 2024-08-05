@@ -685,7 +685,7 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("minViewBob", "Minimal View Bob", "Only bob the item in hand, not the camera");
+        auto set = std::make_shared<Setting>("minViewBob", "Minimal View Bob (UNSTABLE)", "Only bob the item in hand, not the camera");
         set->value = &this->minimalViewBob;
         this->getSettings().addSetting(set);
     }
@@ -732,6 +732,15 @@ void Latite::initSettings() {
     {
         auto set = std::make_shared<Setting>("snapLines", "Snap Lines", "Snap lines to help you align modules");
         set->value = &this->snapLines;
+        this->getSettings().addSetting(set);
+    }
+
+    {
+        auto set = std::make_shared<Setting>("rgbSpeed", "RGB Speed", "How fast the RGB color cycles");
+        set->value = &this->rgbSpeed;
+        set->min = FloatValue(0.f);
+        set->max = FloatValue(3.f);
+        set->interval = FloatValue(0.1f);
         this->getSettings().addSetting(set);
     }
 }
@@ -882,6 +891,7 @@ void Latite::onUpdate(Event& evGeneric) {
         lastDX11 = std::get<BoolValue>(useDX11);
     }
 
+    rgbHue += SDK::ClientInstance::get()->minecraft->timer->alpha * std::get<FloatValue>(rgbSpeed);
 #if 0
     {
         static auto time = std::chrono::steady_clock::now();
