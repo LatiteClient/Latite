@@ -54,7 +54,7 @@ void Chakra::SetContext(JsContextRef context) {
 	auto error = JS::JsSetCurrentContext(context);
 
 	if (error != JsNoError) {
-		Logger::Warn("{}: {:X}", XOR_STRING("SetContext JsError", (int)error));
+		Logger::Warn("{}: {:X}", XOR_STRING("SetContext JsError"), (int)error);
 	}
 }
 

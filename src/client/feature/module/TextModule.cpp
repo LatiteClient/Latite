@@ -40,8 +40,9 @@ void TextModule::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	std::wstringstream text = this->text(isDefault, inEditor);
 	text = processText(text);
 
-
 	std::wstring str = text.str();
+	lastText = str;
+
 	auto sCol = std::get<ColorValue>(bgColor).getMainColor();
 	d2d::Color realCol = sCol;
 	auto sTCol = std::get<ColorValue>(textColor).getMainColor();

@@ -924,6 +924,12 @@
     <ClInclude Include="src\client\script\objects\Graphics3DScriptingObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\client\event\impl\BobHurtEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\client\feature\module\impl\visual\NoHurtCam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\util\CMakeLists.txt" />
@@ -1413,6 +1419,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\script\objects\OptionsScriptingObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\feature\module\impl\visual\NoHurtCam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\client\script\class\impl\JsTextModuleClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

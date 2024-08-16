@@ -758,6 +758,7 @@
     <ClCompile Include="src\client\script\class\impl\JsHudModuleClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsModuleClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsSettingClass.cpp" />
+    <ClCompile Include="src\client\script\class\impl\JsTextModuleClass.cpp" />
     <ClCompile Include="src\client\script\event\ScriptListener.cpp" />
     <ClCompile Include="src\client\script\feature\JsEvented.cpp" />
     <ClCompile Include="src\client\script\interop\classes\JsEntity.cpp" />

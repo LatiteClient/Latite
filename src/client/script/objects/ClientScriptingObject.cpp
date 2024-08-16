@@ -10,6 +10,8 @@
 
 #include "../class/impl/JsModuleClass.h"
 #include "client/feature/command/script/JsCommand.h"
+#include <client/feature/module/script/JsTextModule.h>
+#include <client/script/class/impl/JsTextModuleClass.h>
 
 JsValueRef ClientScriptingObject::registerEventCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	JsValueRef undefined;
@@ -199,7 +201,19 @@ JsValueRef ClientScriptingObject::mmgrGetModuleByName(JsValueRef callee, bool is
 	JsContextRef ctx;
 	JS::JsGetCurrentContext(&ctx);
 	JsScript* script = JsScript::getThis();
+
 	if (script && mod) {
+		if (mod->isTextual()) {
+			auto cl = script->getClass<JsTextModuleClass>();
+			auto r = cl->construct(reinterpret_cast<JsModule*>(mod.get()), false);
+			return r;
+		}
+		else if (mod->isHud()) {
+			auto cl = script->getClass<JsHudModuleClass>();
+			auto r = cl->construct(reinterpret_cast<JsModule*>(mod.get()), false);
+			return r;
+		}
+
 		auto cl = script->getClass<JsModuleClass>();
 		auto r = cl->construct(reinterpret_cast<JsModule*>(mod.get()), false);
 		return r;
@@ -234,7 +248,22 @@ JsValueRef ClientScriptingObject::mmgrForEachModule(JsValueRef callee, bool isCo
 	}
 
 	Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> modul) {
-		JsValueRef r[2] = { arguments[0], cl->construct(reinterpret_cast<JsModule*>(modul.get()), false) };
+		JsValueRef jsMod = JS_INVALID_REFERENCE;
+
+		if (modul->isTextual()) {
+			auto cl = script->getClass<JsTextModuleClass>();
+			jsMod = cl->construct(reinterpret_cast<JsModule*>(modul.get()), false);
+		}
+		else if (modul->isHud()) {
+			auto cl = script->getClass<JsHudModuleClass>();
+			jsMod = cl->construct(reinterpret_cast<JsModule*>(modul.get()), false);
+		}
+		else {
+			auto cl = script->getClass<JsModuleClass>();
+			jsMod = cl->construct(reinterpret_cast<JsModule*>(modul.get()), false);
+		}
+
+		JsValueRef r[2] = { arguments[0], jsMod };
 		JsValueRef res;
 		Latite::getPluginManager().handleErrors(Chakra::CallFunction(arguments[1], r, 2, &res));
 		Chakra::Release(res);

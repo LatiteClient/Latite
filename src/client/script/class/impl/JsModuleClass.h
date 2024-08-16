@@ -81,6 +81,6 @@ public:
 		Chakra::DefineFunc(prototype, moduleAddNumberSetting, XW("addNumberSetting"), this);
 		Chakra::DefineFunc(prototype, moduleAddKeySetting, XW("addKeySetting"), this);
 		Chakra::DefineFunc(prototype, moduleAddTextSetting, XW("addTextSetting"), this);
-		Chakra::DefineFunc(prototype, moduleAddTextSetting, XW("addColorSetting"), this);
+		Chakra::DefineFunc(prototype, moduleAddColorSetting, XW("addColorSetting"), this);
 	};
 };

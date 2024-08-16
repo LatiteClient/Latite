@@ -45,10 +45,11 @@ public:
 	void onInit() override;
 
 	void render(DrawUtil& ctx, bool isDefault, bool inEditor) override;
-
+	std::wstring getLastText() { return lastText; }
 protected:
 	virtual std::wstringstream text(bool isDefault, bool inEditor) = 0;
 	bool cacheText;
+	std::wstring lastText;
 	FloatValue maxBGX = 0.f;
 private:
 	std::wstringstream processText(std::wstringstream& stream);

@@ -26,7 +26,10 @@ public:
 
 	void prepareFunctions() override {
 		__super::prepareFunctions();
+		Chakra::DefineFunc(prototype, getLastTextCallback, XW("getLastText"), this);
 	};
 
 private:
+	static JsValueRef CALLBACK getLastTextCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 };

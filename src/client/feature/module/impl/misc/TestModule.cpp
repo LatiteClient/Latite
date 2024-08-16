@@ -58,23 +58,20 @@ void TestModule::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 
 		static int color = 0;
 
-		if (fmodf(shift, 1.f) < shift) {
-			color++;
-			color %= col.numColors;
-			shift = fmodf(shift, 1.f);
-		}
+		color++;
+		color %= col.numColors;
 
 		float sw = rect.getWidth() * shift;
 		float sh = rect.getHeight() * shift;
 
-		prop.startPoint = { -sw, 0};
-		prop.endPoint = { -sw - sw, 0};
+		prop.startPoint = { 0,0 };
+		prop.endPoint = { rect.getWidth(),0};
 
 		if (col.numColors == 2) {
 			d2d::Color colors[2] = { d2d::Color(col.color1), d2d::Color(col.color2) };
-			const D2D1_GRADIENT_STOP stops[] = {
+			const D2D1_GRADIENT_STOP stops[50] = {
 				0.f, colors[color].get(),
-				1.f, colors[(color + 1) % col.numColors].get()
+				1.f, colors[(color + 1) % col.numColors].get(),
 			};
 			dc->CreateGradientStopCollection(stops, _countof(stops), gradientStopCollection.GetAddressOf());
 
@@ -90,7 +87,7 @@ void TestModule::render(DrawUtil& ctx, bool isDefault, bool inEditor) {
 		}
 		else return;
 
-		dc->CreateLinearGradientBrush(prop, gradientStopCollection.Get(), brush.GetAddressOf());
+		dc->CreateLinearGradientBrush(prop, gradientStopCollection.Get(), brush.ReleaseAndGetAddressOf());
 	}
 
 
