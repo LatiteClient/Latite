@@ -16,17 +16,17 @@ namespace SDK {
 		virtual void Function0();
 	}; //Size: 0x00A0
 
-	class TextComponent : public UIComponent {
+	class TextComponent : public UIComponent { // TODO: needs checking
 	public:
-		CLASS_FIELD(std::string, variableToText, 0x0130);
-		CLASS_FIELD(std::string, resolvedText, 0x0188);
-		CLASS_FIELD(std::string, resolvedText2, 0x01A8);
-		CLASS_FIELD(Vec2, controlBounds, 0x01C8);
-		CLASS_FIELD(std::string, variableToText2, 0x01D8);
-		CLASS_FIELD(std::string, resolvedText3, 0x01F8);
-		CLASS_FIELD(std::string, lang, 0x0218);
-		CLASS_FIELD(std::string, font, 0x0238);
-		CLASS_FIELD(std::string, resolvedText4, 0x0258);
+		CLASS_FIELD(std::string, variableToText, 0x0138);
+		CLASS_FIELD(std::string, resolvedText, 0x0190);
+		CLASS_FIELD(std::string, resolvedText2, 0x01B0);
+		CLASS_FIELD(Vec2, controlBounds, 0x01D0);
+		CLASS_FIELD(std::string, variableToText2, 0x01E0);
+		CLASS_FIELD(std::string, resolvedText3, 0x0200);
+		CLASS_FIELD(std::string, lang, 0x0220);
+		CLASS_FIELD(std::string, font, 0x0240);
+		CLASS_FIELD(std::string, resolvedText4, 0x0260);
 	};
 
 	class CustomRenderComponent : UIComponent { // 4 in list
@@ -39,9 +39,9 @@ namespace SDK {
 	class UIControl
 	{
 	public:
-		char pad_0000[24]; //0x0000
+		char pad_0000[32]; //0x0000
 	public:
-		std::string name; //0x0018
+		std::string name; //0x0020
 	private:
 		char pad_0038[8]; //0x0038
 	public:
