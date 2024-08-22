@@ -13,7 +13,6 @@ namespace SDK {
 		uint8_t itemCount;
 		bool valid;
 		std::chrono::steady_clock::time_point pickupTime;
-		bool showPickup;
 		std::vector<class BlockLegacy*> canPlaceOn;
 		uintptr_t canPlaceOnHash;
 		std::vector<class BlockLegacy*> canDestroy;
@@ -37,5 +36,5 @@ namespace SDK {
 		virtual ~ItemStackBase() = 0;
 	};
 
-	static_assert(sizeof(ItemStackBase) == 0x88);
+	static_assert(sizeof(ItemStackBase) == 0x80);
 }

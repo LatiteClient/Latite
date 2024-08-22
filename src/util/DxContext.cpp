@@ -290,15 +290,10 @@ d2d::Rect MCDrawUtil::drawItem(SDK::ItemStack* item, Vec2 const& pos, float size
 	
 	auto it = item->getItem();
 
-	auto oPickup = item->showPickup;
-	item->showPickup = false;
-
 	ctx.itemRenderer->renderGuiItemNew(&ctx, item, 0, pos.x * guiScale, pos.y * guiScale, opacity, (sizeModifier * guiScale) * 3.f, 0.f, false);
 	if (it && it->isGlint(item)) {
 		ctx.itemRenderer->renderGuiItemNew(&ctx, item, 0, pos.x * guiScale, pos.y * guiScale, opacity, (sizeModifier * guiScale) * 3.f, 0.f, true);
 	}
-
-	item->showPickup = false;
 
 	constexpr float itemSize = 16.f;
 

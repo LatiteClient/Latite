@@ -59,6 +59,15 @@ namespace SDK {
             }
         }
 
+        void drawImage(TexturePtr const& texture, Vec2 const& pos, Vec2 const& size, Vec2 const& uvPos, Vec2 const& uvSize) {
+            if (internalVers >= V1_21_20) {
+                memory::callVirtual<void>(this, 7, texture, pos, size, uvPos, uvSize, false);
+            }
+            else {
+                memory::callVirtual<void>(this, 7, texture, pos, size, uvPos, uvSize);
+            }
+        }
+
         virtual ~MinecraftUIRenderContext() = 0; // 0x0
         virtual void getLineLength(class Font*,  std::string const&,  float,  bool) = 0; // 0x1
         virtual float getTextAlpha() = 0; // 0x2
@@ -68,8 +77,8 @@ namespace SDK {
         
     private:
         virtual void flushText_(float) = 0; // 0x6
+        virtual void drawImage_(TexturePtr const& texture, Vec2 const& pos, Vec2 const& size, Vec2 const& uvPos, Vec2 const& uvSize) = 0; // 0x7
     public:
-        virtual void drawImage(TexturePtr const& texture, Vec2 const& pos, Vec2 const& size, Vec2 const& uvPos, Vec2 const& uvSize) = 0; // 0x7
         virtual void drawNineslice(TexturePtr const&, void* const&) = 0; // 0x8
         virtual void flushImages(Color const&, float, HashedString const&) = 0; // 0x9
         virtual void beginSharedMeshBatch(void*) = 0; // 0xA
