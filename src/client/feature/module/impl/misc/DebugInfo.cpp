@@ -12,9 +12,10 @@
 #include "sdk/common/client/gui/controls/VisualTree.h"
 #include <util/DxContext.h>
 
-DebugInfo::DebugInfo() : Module("DebugInfo", "Java Debug Info", "Shows useful debugging information. Similar to Java Edition F3.", GAME, VK_F3) {
-    listen<RenderLayerEvent>((EventListenerFunc)&DebugInfo::onRenderOverlay);
-    listen<DrawHUDModulesEvent>((EventListenerFunc)&DebugInfo::onRenderHUDModules, false, 2);
+DebugInfo::DebugInfo() : Module("DebugInfo", LocalizeString::get("client.module.debugInfo.name"),
+                                LocalizeString::get("client.module.debugInfo.desc"), GAME, VK_F3) {
+    listen<RenderLayerEvent>(static_cast<EventListenerFunc>(&DebugInfo::onRenderOverlay));
+    listen<DrawHUDModulesEvent>(static_cast<EventListenerFunc>(&DebugInfo::onRenderHUDModules), false, 2);
 }
 
 namespace {

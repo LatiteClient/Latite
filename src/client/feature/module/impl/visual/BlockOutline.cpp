@@ -4,20 +4,31 @@
 #include <sdk/common/client/renderer/MaterialPtr.h>
 #include <sdk/common/world/level/HitResult.h>
 
-BlockOutline::BlockOutline() : Module("BlockOutline", "Block Overlay", "Changes the overlay in blocks!", GAME) {
-	addSetting("renderThrough", "Render Through", "Whether to render the outline through blocks or not", this->renderThrough);
-	addSetting("transparent", "Transparent", "Whether or not to have a transparent overlay", this->transparent, "renderThrough"_isfalse);
-	
-	addSetting("vanillaOutline", "Vanilla Outline", "Keep the vanilla outline.", this->outlineVanilla);
-	addSetting("outline", "Outline", "Render an outline", this->outline, "vanillaOutline"_isfalse);
-	addSetting("outlineColor", "Outline Color", "The outline color", this->outlineColor, "outline");
+BlockOutline::BlockOutline() : Module("BlockOutline", LocalizeString::get("client.module.blockOutline.name"),
+                                      LocalizeString::get("client.module.blockOutline.desc"), GAME) {
+    addSetting("renderThrough", LocalizeString::get("client.module.blockOutline.renderThrough.name"),
+               LocalizeString::get("client.module.blockOutline.renderThrough.desc"), this->renderThrough);
+    addSetting("transparent", LocalizeString::get("client.module.blockOutline.transparent.name"),
+               LocalizeString::get("client.module.blockOutline.transparent.desc"), this->transparent,
+               "renderThrough"_isfalse);
 
-	addSetting("overlay", "Overlay", "Render an overlay", this->overlay);
-	addSetting("faceOverlay", "Face Overlay", "Render the selected face of the block.", this->faceOverlay);
-	addSetting("overlayColor", "Overlay Color", "The overlay color", this->overlayColor, "overlay");
-	
-	listen<OutlineSelectionEvent>((EventListenerFunc)&BlockOutline::onOutlineSelection, false,1);
+    addSetting("vanillaOutline", LocalizeString::get("client.module.blockOutline.vanillaOutline.name"),
+               LocalizeString::get("client.module.blockOutline.vanillaOutline.desc"), this->outlineVanilla);
+    addSetting("outline", LocalizeString::get("client.module.blockOutline.outline.name"),
+               LocalizeString::get("client.module.blockOutline.outline.desc"), this->outline, "vanillaOutline"_isfalse);
+    addSetting("outlineColor", LocalizeString::get("client.module.blockOutline.outlineColor.name"),
+               LocalizeString::get("client.module.blockOutline.outlineColor.desc"), this->outlineColor, "outline");
+
+    addSetting("overlay", LocalizeString::get("client.module.blockOutline.overlay.name"),
+               LocalizeString::get("client.module.blockOutline.overlay.desc"), this->overlay);
+    addSetting("faceOverlay", LocalizeString::get("client.module.blockOutline.faceOverlay.name"),
+               LocalizeString::get("client.module.blockOutline.faceOverlay.desc"), this->faceOverlay);
+    addSetting("overlayColor", LocalizeString::get("client.module.blockOutline.overlayColor.name"),
+               LocalizeString::get("client.module.blockOutline.overlayColor.desc"), this->overlayColor, "overlay");
+
+    listen<OutlineSelectionEvent>((EventListenerFunc)&BlockOutline::onOutlineSelection, false, 1);
 }
+
 
 void BlockOutline::onOutlineSelection(Event& evG) {
 	auto& ev = reinterpret_cast<OutlineSelectionEvent&>(evG);

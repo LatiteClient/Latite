@@ -5,7 +5,7 @@
 
 class ICommand : public Listener, public Feature {
 public:
-	ICommand(std::string const& name, std::string const& description, std::string const& usage, std::vector<std::string> aliases = {})
+	ICommand(std::string const& name, std::wstring const& description, std::string const& usage, std::vector<std::string> aliases = {})
 		: cmdName(name), description(description), usage(usage)
 	{
 		this->aliases = { name };
@@ -24,14 +24,15 @@ public:
 	[[nodiscard]] std::vector<std::string> getAliases() { return aliases; }
 	[[nodiscard]] std::string getUsage() { return usage; }
 
-	virtual void message(std::string const& str, bool error = false) = 0;
+	virtual void message(std::wstring const& str, bool error = false) = 0;
 	
-	[[nodiscard]] std::string desc() override { return description; };
+	[[nodiscard]] std::wstring desc() override { return description; };
 	[[nodiscard]] std::string name() override { return cmdName; };
 
 
 protected:
-	std::string cmdName, description, usage;
+	std::string cmdName, usage;
+	std::wstring description;
 	std::vector<std::string> aliases;
 	bool script = false;
 

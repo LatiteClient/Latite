@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "JsModule.h"
 
-JsModule::JsModule(std::string const& name, std::string const& displayName, std::string const& desc, int key)
+JsModule::JsModule(std::string const& name, std::wstring const& displayName, std::wstring const& desc, int key)
 	: Module(name, displayName, desc, SCRIPT, key, false) {
 	JS::JsGetCurrentContext(&this->ctx);
 

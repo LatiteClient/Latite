@@ -1,32 +1,47 @@
 #include "pch.h"
 #include "TextModule.h"
 #include "api/feature/setting/Setting.h"
-#include <client/Latite.h>
 
 void TextModule::onInit() {
-	addSetting("fillBg", "Background", "", fillBg);
-	addSetting("customSize", "Fixed Size", "Use a custom size instead of padding", customSize, "fillBg"_istrue);
-	addSliderSetting("bgX", "BG X", "Background size (only if Fixed Size is enabled)", bgX, FloatValue(0.f), FloatValue(maxBGX), FloatValue(2.5f), "customSize"_istrue);
-	addSliderSetting("bgY", "BG Y", "Background size (only if Fixed Size is enabled)", bgY, FloatValue(0.f), FloatValue(300.f), FloatValue(2.5f), "customSize"_istrue);
+	addSetting("fillBg", LocalizeString::get("client.textmodule.props.background.name"), L"", fillBg);
+	addSetting("customSize", LocalizeString::get("client.textmodule.props.customSize.name"),
+               LocalizeString::get("client.textmodule.props.customSize.desc"), customSize, "fillBg"_istrue);
+	addSliderSetting("bgX", LocalizeString::get("client.textmodule.props.bgX.name"),
+                     LocalizeString::get("client.textmodule.props.bgX.desc"), bgX, FloatValue(0.f), FloatValue(maxBGX),
+                     FloatValue(2.5f), "customSize"_istrue);
+	addSliderSetting("bgY", LocalizeString::get("client.textmodule.props.bgY.name"),
+                     LocalizeString::get("client.textmodule.props.bgY.desc"), bgY, FloatValue(0.f), FloatValue(300.f),
+                     FloatValue(2.5f), "customSize"_istrue);
 
-	addSliderSetting("padX", "Pad X", "Padding", padX, FloatValue(0.f), FloatValue(40.f), FloatValue(2.f), "customSize"_isfalse);
-	addSliderSetting("padY", "Pad Y", "Padding", padY, FloatValue(0.f), FloatValue(40.f), FloatValue(2.f), "customSize"_isfalse);
+    addSliderSetting("padX", LocalizeString::get("client.textmodule.props.padX.name"),
+                     LocalizeString::get("client.textmodule.props.padX.desc"), padX, FloatValue(0.f), FloatValue(40.f),
+                     FloatValue(2.f), "customSize"_isfalse);
+    addSliderSetting("padY", LocalizeString::get("client.textmodule.props.padY.name"),
+                     LocalizeString::get("client.textmodule.props.padY.desc"), padY, FloatValue(0.f), FloatValue(40.f),
+                     FloatValue(2.f), "customSize"_isfalse);
 
-	addSetting("prefix", "Prefix", "The text before the value", prefix);
-	addSetting("suffix", "Suffix", "The text after the value", suffix);
-	addSliderSetting("textSize", "Text Size", "", textSizeS, FloatValue(2.f), FloatValue(100.f), FloatValue(2.f));
+    addSetting("prefix", LocalizeString::get("client.textmodule.props.prefix.name"),
+               LocalizeString::get("client.textmodule.props.prefix.desc"), prefix);
+    addSetting("suffix", LocalizeString::get("client.textmodule.props.suffix.name"),
+               LocalizeString::get("client.textmodule.props.suffix.desc"), suffix);
+    addSliderSetting("textSize", LocalizeString::get("client.textmodule.props.textSize.name"), L"", textSizeS,
+                     FloatValue(2.f), FloatValue(100.f), FloatValue(2.f));
 
-	addSetting("textCol", "Text", "", textColor);
-	addSetting("bgColor", "Background", "", bgColor);
+    addSetting("textCol", LocalizeString::get("client.textmodule.props.textColor.name"), L"", textColor);
+    addSetting("bgColor", LocalizeString::get("client.textmodule.props.bgColor.name"), L"", bgColor);
 
-	alignment.addEntry({ alignment_center, "Center" });
-	alignment.addEntry({ alignment_left, "Left" });
-	alignment.addEntry({ alignment_right, "Right" });
-	addEnumSetting("alignmnet", "Alignment", "How the text is aligned/expands", this->alignment);
-	addSetting("showOutline", "Outline", "", showOutline);
-	addSliderSetting("outlineThickness", "Thickness", "", outlineThickness, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f), "showOutline"_istrue);
-	addSetting("outlineCol", "Outline Color", "", outlineColor, "showOutline"_istrue);
-	addSliderSetting("radius", "Radius", "", radius, FloatValue(0.f), FloatValue(10.f), FloatValue(1.f));
+	alignment.addEntry({ alignment_center, LocalizeString::get("client.textmodule.props.alignmentCenter.name")});
+	alignment.addEntry({ alignment_left, LocalizeString::get("client.textmodule.props.alignmentLeft.name") });
+	alignment.addEntry({ alignment_right, LocalizeString::get("client.textmodule.props.alignmentRight.name") });
+    addEnumSetting("alignmnet", LocalizeString::get("client.textmodule.props.alignment.name"),
+                   LocalizeString::get("client.textmodule.props.alignment.desc"), this->alignment);
+    addSetting("showOutline", LocalizeString::get("client.textmodule.props.showOutline.name"), L"", showOutline);
+    addSliderSetting("outlineThickness", LocalizeString::get("client.textmodule.props.outlineThickness.name"), L"",
+                     outlineThickness, FloatValue(0.f), FloatValue(20.f), FloatValue(1.f), "showOutline"_istrue);
+    addSetting("outlineCol", LocalizeString::get("client.textmodule.props.outlineColor.name"), L"", outlineColor,
+               "showOutline"_istrue);
+    addSliderSetting("radius", LocalizeString::get("client.textmodule.props.radius.name"), L"", radius, FloatValue(0.f),
+                     FloatValue(10.f), FloatValue(1.f));
 }
 
 void TextModule::render(DrawUtil& dc, bool isDefault, bool inEditor) {

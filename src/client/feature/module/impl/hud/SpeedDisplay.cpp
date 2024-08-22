@@ -3,13 +3,17 @@
 #include "client/event/Eventing.h"
 #include "client/event/impl/TickEvent.h"
 
-SpeedDisplay::SpeedDisplay() : TextModule("SpeedDisplay", "Speed Display", "Displays your speed in blocks (meters) per second.", HUD) {
-	addSliderSetting("decimals", "Decimals", "The number of decimals to show", decimals, FloatValue(0.f), FloatValue(10.f), FloatValue(1.f));
-	addSetting("includeY", "Y Motion", "Include Y motion in the speed value", includeY);
+SpeedDisplay::SpeedDisplay() : TextModule("SpeedDisplay", LocalizeString::get("client.textmodule.speedDisplay.name"),
+                                          LocalizeString::get("client.textmodule.speedDisplay.desc"), HUD) {
+    addSliderSetting("decimals", LocalizeString::get("client.textmodule.speedDisplay.decimals.name"),
+                     LocalizeString::get("client.textmodule.speedDisplay.decimals.desc"), decimals, FloatValue(0.f),
+                     FloatValue(10.f), FloatValue(1.f));
+    addSetting("includeY", LocalizeString::get("client.textmodule.speedDisplay.includeY.name"),
+               LocalizeString::get("client.textmodule.speedDisplay.includeY.desc"), includeY);
 
-	this->suffix = TextValue(L" m/s");
+    this->suffix = TextValue(L" m/s");
 
-	listen<TickEvent>((EventListenerFunc)&SpeedDisplay::onTick);
+    listen<TickEvent>(static_cast<EventListenerFunc>(&SpeedDisplay::onTick));
 }
 
 void SpeedDisplay::onTick(Event& evGeneric) {

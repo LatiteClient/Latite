@@ -6,9 +6,13 @@
 #include <sdk/common/client/gui/controls/UIControl.h>
 
 
-MovableBossbar::MovableBossbar() : HUDModule("MovableBossbar", "Movable Bossbar", "Makes the in-game bossbar movable.", HUD, 0, false) {
+MovableBossbar::MovableBossbar() : HUDModule("MovableBossbar",
+                                             LocalizeString::get("client.hudmodule.movableBossbar.name"),
+                                             LocalizeString::get("client.hudmodule.movableBossbar.desc"), HUD, 0,
+                                             false) {
 	listen<RenderLayerEvent>((EventListenerFunc)&MovableBossbar::onRenderLayer, true, 10 /*need to overpower the hud renderer*/);
-	addSetting("hideBossbar", "Hide bossbar", "", this->hideBossbar);
+	addSetting("hideBossbar", LocalizeString::get("client.hudmodule.movableBossbar.hideBossbar.name"), L"",
+               this->hideBossbar);
 }
 
 void MovableBossbar::render(DrawUtil& ctx, bool isDefault, bool inEditor) {

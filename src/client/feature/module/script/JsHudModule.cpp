@@ -3,7 +3,7 @@
 #include <client/script/objects/D2DScriptingObject.h>
 #include <client/script/JsScript.h>
 
-JsHUDModule::JsHUDModule(std::string const& name, std::string const& displayName, std::string const& desc, int key, bool resizable) : HUDModule(name, displayName, desc, SCRIPT, key, resizable) {
+JsHUDModule::JsHUDModule(std::string const& name, std::wstring const& displayName, std::wstring const& desc, int key, bool resizable) : HUDModule(name, displayName, desc, SCRIPT, key, resizable) {
 	JS::JsAddRef(object, nullptr);
 	JS::JsGetCurrentContext(&this->ctx);
 

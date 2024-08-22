@@ -1,10 +1,14 @@
 #include "pch.h"
 #include "Clock.h"
 
-Clock::Clock() : TextModule("Clock", "Clock", "Shows the current time.", HUD) {
-    addSetting("militaryTime", "24-hour time", "Display the time in 24-hour format.", this->militaryTime);
-    addSetting("showSeconds", "Show seconds", "Display time with seconds", this->showSeconds);
-    addSetting("showDate", "Show date", "Display the current date along with the time", this->showDate);
+Clock::Clock() : TextModule("Clock", LocalizeString::get("client.textmodule.clock.name"),
+                            LocalizeString::get("client.textmodule.clock.desc"), HUD) {
+    addSetting("militaryTime", LocalizeString::get("client.textmodule.clock.militaryTime.name"),
+               LocalizeString::get("client.textmodule.clock.militaryTime.desc"), this->militaryTime);
+    addSetting("showSeconds", LocalizeString::get("client.textmodule.clock.showSeconds.name"),
+               LocalizeString::get("client.textmodule.clock.showSeconds.desc"), this->showSeconds);
+    addSetting("showDate", LocalizeString::get("client.textmodule.clock.showDate.name"),
+               LocalizeString::get("client.textmodule.clock.showDate.desc"), this->showDate);
 }
 
 std::string Clock::getTimeString() {

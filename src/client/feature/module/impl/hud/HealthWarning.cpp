@@ -4,12 +4,13 @@
 #include "sdk/common/client/gui/controls/VisualTree.h"
 #include "sdk/common/client/gui/controls/UIControl.h"
 
-HealthWarning::HealthWarning() : Module("HealthWarning", "Health Warning", "Give the screen a vignette when your health is low.", HUD, nokeybind) {
-    this->listen<RenderLayerEvent>(&HealthWarning::onRenderLayer);
-	addSetting("vignetteColor", "Vignette", "", vignetteColor);
-	addSliderSetting("healthPointThreshold", "Health", "", healthPointThreshold, FloatValue(1.f), FloatValue(19.f), FloatValue(.5f));
-	addSliderSetting("vignetteFade", "Intensity", "", vignetteFade, FloatValue(0.f), FloatValue(1.f), FloatValue(.1f));
+HealthWarning::HealthWarning() : Module("HealthWarning", LocalizeString::get("client.hudmodule.healthWarning.name"), LocalizeString::get("client.hudmodule.healthWarning.desc"), HUD, nokeybind) {
+	this->listen<RenderLayerEvent>(&HealthWarning::onRenderLayer);
+	addSetting("vignetteColor", LocalizeString::get("client.hudmodule.healthWarning.vignetteColor.name"), L"", vignetteColor);
+	addSliderSetting("healthPointThreshold", LocalizeString::get("client.hudmodule.healthWarning.healthPointThreshold.name"), L"", healthPointThreshold, FloatValue(1.f), FloatValue(19.f), FloatValue(.5f));
+	addSliderSetting("vignetteFade", LocalizeString::get("client.hudmodule.healthWarning.vignetteFade.name"), L"", vignetteFade, FloatValue(0.f), FloatValue(1.f), FloatValue(.1f));
 }
+
 
 void HealthWarning::onRenderLayer(Event& evG) {
 	RenderLayerEvent& ev = reinterpret_cast<RenderLayerEvent&>(evG);

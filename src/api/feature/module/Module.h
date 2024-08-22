@@ -15,8 +15,8 @@ public:
 		SURVIVAL,
 	};
 
-	explicit IModule(std::string const& name, std::string const& description,
-		std::string const& displayName, Category category, bool visible) : modName(name), description(description), displayName(displayName), category(category), visible(visible) {
+	explicit IModule(std::string const& name, std::wstring const& description,
+		std::wstring const& displayName, Category category, bool visible) : modName(name), description(description), displayName(displayName), category(category), visible(visible) {
 		settings = std::make_shared<SettingGroup>(name);
 	}
 	IModule(IModule&) = delete;
@@ -51,8 +51,8 @@ public:
 	virtual bool shouldHoldToToggle() { return false; }
 
 	[[nodiscard]] std::string name() override { return modName; }
-	[[nodiscard]] std::string desc() override { return description; }
-	[[nodiscard]] std::string getDisplayName() { return displayName; }
+	[[nodiscard]] std::wstring desc() override { return description; }
+	[[nodiscard]] std::wstring getDisplayName() { return displayName; }
 
 	[[nodiscard]] Category getCategory() { return category; }
 
@@ -60,7 +60,8 @@ public:
 		return shared_from_this();
 	}
 protected:
-	std::string modName, description, displayName;
+	std::string modName;
+	std::wstring description, displayName;
 	ValueType enabled = BoolValue(false);
 	ValueType key = KeyValue(0);
 	bool visible;

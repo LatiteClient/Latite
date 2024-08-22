@@ -5,12 +5,12 @@
 static constexpr float maxY = 320.f;
 static constexpr float minY = -64.f;
 
-ChunkBorders::ChunkBorders() : Module("ChunkBorders", "Chunk Borders", "Show chunk borders near you.", GAME) {
-	addSetting("transparent", "Transparent", "Transparent", transparent);
-	
-	listen<RenderLevelEvent>((EventListenerFunc)&ChunkBorders::onRender3d);
-}
+ChunkBorders::ChunkBorders() : Module("ChunkBorders", LocalizeString::get("client.module.chunkBorders.name"),
+                                      LocalizeString::get("client.module.chunkBorders.desc"), GAME) {
+    addSetting("transparent", LocalizeString::get("client.module.chunkBorders.transparent.name"), L"", transparent);
 
+    listen<RenderLevelEvent>(static_cast<EventListenerFunc>(&ChunkBorders::onRender3d));
+}
 
 namespace {
 	void renderFace(MCDrawUtil3D& dc, float x1, float z1, float x2, float z2, float opacity) {

@@ -7,7 +7,7 @@
 
 static SDK::UIControl* bossbar = nullptr;
 
-TestCommand::TestCommand() : Command("test", "A command for testing", "$ [...]", {"tc"}) {
+TestCommand::TestCommand() : Command("test", L"A command for testing", "$ [...]", {"tc"}) {
 	Eventing::get().listen<RenderLayerEvent>(this, (EventListenerFunc)&TestCommand::onRenderLayer);
 }
 

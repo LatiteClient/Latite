@@ -33,7 +33,7 @@ public:
 		JS::JsSetPrototype(obj, getPrototype());
 
 		Chakra::SetPropertyString(obj, L"name", util::StrToWStr(mod->name()));
-		Chakra::SetPropertyString(obj, L"description", util::StrToWStr(mod->desc()));
+		Chakra::SetPropertyString(obj, L"description", mod->desc());
 		// aliases
 		JsValueRef array;
 		JS::JsCreateArray(0, &array);

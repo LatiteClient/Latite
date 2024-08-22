@@ -4,11 +4,15 @@
 #include <sdk/common/client/gui/controls/VisualTree.h>
 #include <sdk/common/client/gui/controls/UIControl.h>
 
-MovableCoordinates::MovableCoordinates() : HUDModule("MovableCoordinates", "Movable Coordinates",
-                                                     "Makes the vanilla coordinates display movable.", HUD, 0, false) {
+MovableCoordinates::MovableCoordinates() : HUDModule("MovableCoordinates",
+                                                     LocalizeString::get("client.hudmodule.movableCoordinates.name"),
+                                                     LocalizeString::get("client.hudmodule.movableCoordinates.desc"),
+                                                     HUD, 0, false) {
     listen<RenderLayerEvent>(static_cast<EventListenerFunc>(&MovableCoordinates::onRenderLayer), true,
                              10 /*need to overpower the hud renderer*/);
-    addSetting("hideVanillaCoordinates", "Hide vanilla coordinates", "", this->hideVanillaCoordinates);
+    addSetting("hideVanillaCoordinates",
+               LocalizeString::get("client.hudmodule.movableCoordinates.hideVanillaCoordinates.name"), L"",
+               this->hideVanillaCoordinates);
 }
 
 void MovableCoordinates::render(DrawUtil& ctx, bool isDefault, bool inEditor) {

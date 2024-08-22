@@ -4,7 +4,7 @@
 
 class JsCommand : public Command, public JsEvented {
 public:
-	JsCommand(JsValueRef obj, std::string const& name, std::string const& description, std::string const& usage, std::vector<std::string> aliases = {})
+	JsCommand(JsValueRef obj, std::string const& name, std::wstring const& description, std::string const& usage, std::vector<std::string> aliases = {})
 		: Command(name, description, usage, aliases),
 		obj(obj) {
 		JS::JsGetCurrentContext(&ctx);

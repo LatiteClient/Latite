@@ -33,6 +33,10 @@ void ClientMessageSink::push(std::string const& message) {
 	this->sinkLock.unlock();
 }
 
+void ClientMessageSink::push(std::wstring const& message) {
+	push(util::WStrToStr(message));
+}
+
 void ClientMessageSink::display(std::string const& message) {
 	auto cInst = SDK::ClientInstance::get();
 	auto lp = cInst->getLocalPlayer();
@@ -41,4 +45,8 @@ void ClientMessageSink::display(std::string const& message) {
 		Eventing::get().dispatch(ev);
 		lp->displayClientMessage(message);
 	}
+}
+
+void ClientMessageSink::display(std::wstring const& message) {
+	display(util::WStrToStr(message));
 }

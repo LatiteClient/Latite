@@ -5,6 +5,7 @@
 #include <optional>
 #include "misc/Timings.h"
 #include "misc/Notifications.h"
+#include "localization/LocalizeData.h"
 
 namespace ui {
 	class TextBox;
@@ -32,8 +33,10 @@ public:
 	[[nodiscard]] static class Keyboard& getKeyboard() noexcept;
 	[[nodiscard]] static class Notifications& getNotifications() noexcept;
 
+	[[nodiscard]] LocalizeData& getL10nData() noexcept { return *l10nData; }
 	[[nodiscard]] Timings& getTimings() noexcept { return timings; }
 	[[nodiscard]] std::string getCommandPrefix() { return util::WStrToStr(std::get<TextValue>(commandPrefix).str); }
+	[[nodiscard]] int getSelectedLanguage() { return clientLanguage.getSelectedKey(); }
 
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);
@@ -82,10 +85,6 @@ public:
 		return std::get<BoolValue>(useDX11);
 	}
 
-	[[nodiscard]] std::wstring getClientLanguage() {
-		return std::get<TextValue>(clientLanguage).str;
-	}
-
 	[[nodiscard]] bool shoulBlurHUD() {
 		return std::get<BoolValue>(hudBlur);
 	}
@@ -114,6 +113,8 @@ public:
 
 	void initAsset(int resource, std::wstring const& filename);
 
+	void initL10n();
+
 	int cInstOffs2 = 0;
 	int cInstOffs = 0;
 	int plrOffs2 = 0;
@@ -124,6 +125,8 @@ public:
 
 	static bool isMainThread() { return std::this_thread::get_id() == gameThreadId; }
 private:
+	std::optional<LocalizeData> l10nData;
+
 	bool downloadingAssets = false;
 	std::vector<std::string> latiteUsers;
 	std::vector<std::string> latiteUsersDirty;
@@ -139,7 +142,6 @@ private:
 	ValueType commandPrefix = TextValue(L".");
 	ValueType menuKey = KeyValue('M');
 	ValueType ejectKey = KeyValue(VK_END);
-	ValueType clientLanguage = TextValue(L"English");
 	ValueType hudBlur = BoolValue(false);
 	ValueType hudBlurIntensity = FloatValue(10.f);
 	ValueType menuBlurEnabled = BoolValue(true);
@@ -157,6 +159,7 @@ private:
 	ValueType rgbSpeed = FloatValue(1.f);
 
 	EnumData mcRendFont;
+	EnumData clientLanguage;
 
 	std::vector<ui::TextBox*> textBoxes;
 	ComPtr<struct ID2D1Bitmap1> hudBlurBitmap;

@@ -20,7 +20,7 @@ JsValueRef JsCommandClass::jsConstructor(JsValueRef callee, bool isConstructor, 
 		JS::JsRelease(str, nullptr);
 	}
 
-	auto jsc = new JsCommand(arguments[0], util::WStrToStr(Chakra::GetString(arguments[1])), util::WStrToStr(Chakra::GetString(arguments[2])), util::WStrToStr(Chakra::GetString(arguments[3])), aliases);
+	auto jsc = new JsCommand(arguments[0], util::WStrToStr(Chakra::GetString(arguments[1])), Chakra::GetString(arguments[2]), util::WStrToStr(Chakra::GetString(arguments[3])), aliases);
 	return thi->construct(jsc, false);
 }
 

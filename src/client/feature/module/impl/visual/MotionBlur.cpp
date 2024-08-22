@@ -5,14 +5,16 @@
 
 #include "client/event/impl/RendererInitEvent.h"
 
-MotionBlur::MotionBlur() : Module("MotionBlur", "Motion Blur", "Blurs motion", GAME) {
-	addSliderSetting("intensity", "Intensity", "", intensity, FloatValue(0.f), FloatValue(10.f), FloatValue(1.f));
-	addSliderSetting("bleed", "Anti Bleed", "", antiBleed, FloatValue(0.f), FloatValue(1.f), FloatValue(0.1f));
-	
-	listen<RendererCleanupEvent>(&MotionBlur::onCleanup);
-	listen<RenderOverlayEvent>(&MotionBlur::onRender, true, 10);
-	listen<RendererInitEvent>(&MotionBlur::onRendererInit, true);
+MotionBlur::MotionBlur() : Module("MotionBlur", LocalizeString::get("client.module.motionBlur.name"),
+                                  LocalizeString::get("client.module.motionBlur.desc"), GAME) {
+    addSliderSetting("intensity", LocalizeString::get("client.module.motionBlur.intensity.name"), L"", intensity,
+                     FloatValue(0.f), FloatValue(10.f), FloatValue(1.f));
+    addSliderSetting("bleed", LocalizeString::get("client.module.motionBlur.bleed.name"), L"", antiBleed,
+                     FloatValue(0.f), FloatValue(1.f), FloatValue(0.1f));
 
+    listen<RendererCleanupEvent>(&MotionBlur::onCleanup);
+    listen<RenderOverlayEvent>(&MotionBlur::onRender, true, 10);
+    listen<RendererInitEvent>(&MotionBlur::onRendererInit, true);
 }
 
 void MotionBlur::onEnable() {

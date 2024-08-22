@@ -79,8 +79,8 @@ private:
 	} modTab = ALL;
 
 	struct ModContainer {
-		std::string name;
-		std::string description;
+		std::wstring name;
+		std::wstring description;
 		std::wstring pluginName = L"";
 		std::shared_ptr<class IModule> mod;
 		bool shouldRender = true;

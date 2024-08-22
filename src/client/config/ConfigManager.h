@@ -7,6 +7,10 @@ public:
 	~ConfigManager() = default;
 
 	bool loadMaster();
+
+	void applyGlobalConfig();
+	void applyModuleConfig();
+
 	bool saveCurrentConfig();
 	bool saveTo(std::wstring const& name);
 	bool loadUserConfig(std::wstring const& name);

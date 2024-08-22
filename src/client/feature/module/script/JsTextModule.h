@@ -5,8 +5,8 @@
 
 class JsTextModule : public TextModule, public JsEvented {
 public:
-	JsTextModule(std::string const& name, std::string const& displayName,
-		std::string const& desc, int key);
+	JsTextModule(std::string const& name, std::wstring const& displayName,
+		std::wstring const& desc, int key);
 
 	~JsTextModule() {
 		// FIXME: check if no leak

@@ -298,14 +298,14 @@ using ValueType = std::variant<
 	TextValue,
 	SnapValue>;
 
-class EnumEntry : public Feature {
-	std::string entryName;
-	std::string entryDesc;
+class EnumEntry /*: Feature*/ {
+	std::wstring entryName;
+	std::wstring entryDesc;
 public:
-	std::string name() override { return entryName; }
-	std::string desc() override { return entryDesc; }
+	std::wstring name() { return entryName; }
+	std::wstring desc() { return entryDesc; }
 
-	EnumEntry(int key, std::string const& name, std::string const& desc = "") : entryName(name), entryDesc(desc) {}
+	EnumEntry(int key, std::wstring const& name, std::wstring const& desc = L"") : entryName(name), entryDesc(desc) {}
 };
 
 class EnumData {
@@ -324,11 +324,11 @@ public:
 		return std::get<EnumValue>(selectedIdx);
 	}
 
-	[[nodiscard]] std::string getSelectedName() {
+	[[nodiscard]] std::wstring getSelectedName() {
 		return entries[std::get<EnumValue>(selectedIdx)].name();
 	}
 
-	[[nodiscard]] std::string getSelectedDesc() {
+	[[nodiscard]] std::wstring getSelectedDesc() {
 		return entries[std::get<EnumValue>(selectedIdx)].desc();
 	}
 
@@ -368,18 +368,18 @@ public:
 		Snap
 	};
 
-	Setting(std::string const& internalName, std::string const& displayName, std::string const& description, Condition condition = Condition()) : settingName(internalName), displayName(displayName), description(description), condition(std::move(condition)) {}
+	Setting(std::string const& internalName, std::wstring const& displayName, std::wstring const& description, Condition condition = Condition()) : settingName(internalName), displayName(displayName), description(description), condition(std::move(condition)) {}
 
 	[[nodiscard]] bool shouldRender(class SettingGroup& group);
 
-	std::string desc() override { return description; }
+	std::wstring desc() override { return description; }
+	std::wstring getDisplayName() { return displayName; }
 	std::string name() override { return settingName; }
-
-	std::string getDisplayName() { return displayName; }
+	
 
 	std::optional<std::function<void(Setting&)>> callback;
 
-	virtual void update() {
+	void update() {
 		if (callback) callback.value()(*this);
 	}
 
@@ -401,7 +401,8 @@ public:
 		float col[4] = { 0.f, 0.f, 0.f, 1.f };
 	} rendererInfo;
 protected:
-	std::string settingName, displayName, description;
+	std::string settingName;
+	std::wstring displayName, description;
 
 };
 

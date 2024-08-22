@@ -23,15 +23,14 @@
 bool wState = false;
 bool lastWState = false;
 
-TestModule::TestModule() : HUDModule("TestModule", "TestModule", "Module for testing new things.", GAMEHUD) {
+TestModule::TestModule() : Module("TestModule", L"TestModule", L"Module for testing new things.", GAMEHUD) {
 	
-	testEnum.addEntry({ 0, "Test", "Test" });
-	testEnum.addEntry({ 1, "Gaming", "Test" });
-	testEnum.addEntry({ 2, "Hi", "Test" });
-	addEnumSetting("test", "Test", "Gaming", this->testEnum);
-
-	addSetting("colorSetting", "Color Setting", "", colorSetting);
-
+	testEnum.addEntry({ 0, L"Test", L"Test" });
+	testEnum.addEntry({ 1, L"Gaming", L"Test" });
+	testEnum.addEntry({ 2, L"Hi", L"Test" });
+	addEnumSetting("test", L"Test", L"Gaming", this->testEnum);
+	addSetting("colorSetting", L"Color Setting", L"", colorSetting);
+	
 	this->listen<TickEvent>(&TestModule::onTick);
 	this->listen<RenderLayerEvent>(&TestModule::onRender, true);
 	this->listen<KeyUpdateEvent>(&TestModule::onKey);

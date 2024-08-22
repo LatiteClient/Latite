@@ -14,13 +14,13 @@ Command::Command(std::string const& name, std::string const& description, std::s
 	}
 }*/
 
-void Command::message(std::string const& str, bool error) {
-	std::string fin = "";
+void Command::message(std::wstring const& str, bool error) {
+	std::wstring fin = L"";
 	if (!error) {
-		fin = util::Format("[&9Latite&r] " + util::Format(str));
+		fin = util::WFormat(L"[&9Latite&r] " + util::WFormat(str));
 	}
 	else {
-		fin = util::Format("&c" + util::Format(str));
+		fin = util::WFormat(L"&c" + util::WFormat(str));
 	}
 	Latite::get().getClientMessageSink().display(fin);
 }

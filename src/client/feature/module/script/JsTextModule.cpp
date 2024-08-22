@@ -3,7 +3,7 @@
 #include <client/script/objects/D2DScriptingObject.h>
 
 JsTextModule::JsTextModule(std::string const& name,
-	std::string const& displayName, std::string const& desc, int key)
+	std::wstring const& displayName, std::wstring const& desc, int key)
 	: TextModule(name, displayName, desc, SCRIPT, 400.f, key) {
 
 	script = JsScript::getThis();

@@ -4,20 +4,30 @@
 #include "client/event/impl/BeforeMoveEvent.h"
 #include "client/event/impl/AfterMoveEvent.h"
 
-ToggleSprintSneak::ToggleSprintSneak() : TextModule("ToggleSprintSneak", "Toggle Sprint/Sneak", "Toggle sprinting or sneaking without holding the button.", GAMEHUD, 400.f, 0, true) {
-	listen<TickEvent>((EventListenerFunc)&ToggleSprintSneak::onTick);
-	listen<BeforeMoveEvent>((EventListenerFunc)&ToggleSprintSneak::beforeMove);
-	listen<AfterMoveEvent>((EventListenerFunc)&ToggleSprintSneak::afterMove);
-	
-	addSetting("label", "Label", "Whether to show the label or not", label);
-	addSetting("toggleSprint", "Toggle Sprint", "Toggle Sprint", sprint);
-	addSetting("alwaysSprint", "Always Sprint", "Always Sprint even if sprinting is not toggled", alwaysSprint, "toggleSprint"_istrue);
-	
-	//sprintMode.addEntry({ sprint_mode_normal, "Normal", "Lets the game handle the sprinting" });
-	//sprintMode.addEntry({ sprint_mode_raw, "Raw", "Latite makes the player sprint" });
-	//addEnumSetting("sprintMode", "Sprint Mode", "The method used by the client to sprint", sprintMode, "toggleSprint"_istrue);
-	addSetting("toggleSneak", "Toggle Sneak", "Toggle Sneak", sneak);
+ToggleSprintSneak::ToggleSprintSneak() : TextModule("ToggleSprintSneak",
+                                                    LocalizeString::get("client.textmodule.toggleSprintSneak.name"),
+                                                    LocalizeString::get("client.textmodule.toggleSprintSneak.desc"),
+                                                    GAMEHUD, 400.f, 0, true) {
+    listen<TickEvent>(static_cast<EventListenerFunc>(&ToggleSprintSneak::onTick));
+    listen<BeforeMoveEvent>(static_cast<EventListenerFunc>(&ToggleSprintSneak::beforeMove));
+    listen<AfterMoveEvent>(static_cast<EventListenerFunc>(&ToggleSprintSneak::afterMove));
+
+    addSetting("label", LocalizeString::get("client.textmodule.toggleSprintSneak.label.name"),
+               LocalizeString::get("client.textmodule.toggleSprintSneak.label.desc"), label);
+    addSetting("toggleSprint", LocalizeString::get("client.textmodule.toggleSprintSneak.toggleSprint.name"),
+               LocalizeString::get("client.textmodule.toggleSprintSneak.toggleSprint.desc"), sprint);
+    addSetting("alwaysSprint", LocalizeString::get("client.textmodule.toggleSprintSneak.alwaysSprint.name"),
+               LocalizeString::get("client.textmodule.toggleSprintSneak.alwaysSprint.desc"), alwaysSprint,
+               "toggleSprint"_istrue);
+
+
+    //sprintMode.addEntry({ sprint_mode_normal, "Normal", "Lets the game handle the sprinting" });
+    //sprintMode.addEntry({ sprint_mode_raw, "Raw", "Latite makes the player sprint" });
+    //addEnumSetting("sprintMode", "Sprint Mode", "The method used by the client to sprint", sprintMode, "toggleSprint"_istrue);
+    addSetting("toggleSneak", LocalizeString::get("client.textmodule.toggleSprintSneak.toggleSneak.name"),
+               LocalizeString::get("client.textmodule.toggleSprintSneak.toggleSneak.desc"), sneak);
 }
+
 
 void ToggleSprintSneak::onTick(Event& evGeneric) {
 	auto& ev = reinterpret_cast<TickEvent&>(evGeneric);

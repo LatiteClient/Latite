@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "CinematicCamera.h"
 
-CinematicCamera::CinematicCamera() : Module("CinematicCamera", "Cinematic Camera", "Makes your camera smooth and cinematic. Useful for video shots.", GAME, VK_F4) {
-	listen<CinematicCameraEvent>((EventListenerFunc)&CinematicCamera::onCinematicCamera);
+CinematicCamera::CinematicCamera() : Module("CinematicCamera",
+                                            LocalizeString::get("client.module.cinematicCamera.name"),
+                                            LocalizeString::get("client.module.cinematicCamera.desc"), GAME, VK_F4) {
+    listen<CinematicCameraEvent>(static_cast<EventListenerFunc>(&CinematicCamera::onCinematicCamera));
 }
 
 void CinematicCamera::onCinematicCamera(Event& evGeneric) {

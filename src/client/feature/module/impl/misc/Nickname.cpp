@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "Nickname.h"
 
-Nickname::Nickname() : Module("Nickname", "Nickname", "Sets your nickname in the chat.", GAME) {
-	addSetting("nick", "Nickname", "Your new nickname.", this->nickname);
+Nickname::Nickname() : Module("Nickname", LocalizeString::get("client.module.nickname.name"),
+                              LocalizeString::get("client.module.nickname.desc"), GAME) {
+	addSetting("nick", LocalizeString::get("client.module.nickname.name"),
+               LocalizeString::get("client.module.nickname.newNick.desc"), this->nickname);
 
     listen<ClientTextEvent>((EventListenerFunc)&Nickname::onClientTextPacket);
 }

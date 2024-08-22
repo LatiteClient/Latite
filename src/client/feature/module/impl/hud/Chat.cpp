@@ -4,14 +4,14 @@
 #include <sdk/common/client/gui/controls/VisualTree.h>
 #include <sdk/common/client/gui/controls/UIControl.h>
 
-Chat::Chat() : HUDModule("Chat", "Custom Chat", "A custom chat, replacing the vanilla chat.", HUD) {
+Chat::Chat() : HUDModule("Chat", L"Custom Chat", L"A custom chat, replacing the vanilla chat.", HUD) {
 	listen<ChatMessageEvent>((EventListenerFunc)&Chat::onText);
 	//listen<LatiteClientMessageEvent>((EventListenerFunc)&Chat::onLatiteMessage);
 	//listen<RenderLayerEvent>((EventListenerFunc)&Chat::onRenderLayer, true);
 	
-	anchorData.addEntry(EnumEntry{ anchor_auto, "Auto" });
-	anchorData.addEntry(EnumEntry{ anchor_top, "Top" });
-	anchorData.addEntry(EnumEntry{ anchor_bottom, "Bottom" });
+	anchorData.addEntry(EnumEntry{ anchor_auto, L"Auto" });
+	anchorData.addEntry(EnumEntry{ anchor_top,L"Top" });
+	anchorData.addEntry(EnumEntry{ anchor_bottom, L"Bottom" });
 
 	setEnabled(true);
 	//std::get<SnapValue>(snappingX).doSnapping = true;
@@ -24,13 +24,13 @@ Chat::Chat() : HUDModule("Chat", "Custom Chat", "A custom chat, replacing the va
 	//std::get<SnapValue>(snappingX).position = SnapValue::Left;
 	//std::get<SnapValue>(snappingY).index = 2;
 
-	addSliderSetting("chatWidth", "Chat Width", "", chatWidth, FloatValue(100.f), FloatValue(1000.f), FloatValue(10.f));
-	addSetting("backgroundColor", "Background Color", "The color of the background", backgroundColor);
-	addSetting("textColor", "Text Color", "The color of the text", textColor);
-	addSetting("antiSpam", "Anti Spam", "Prevent spam messages in chat.", antiSpam);
-	addSliderSetting("animSpeed", "Animation Time", "The speed of the animation", animationSpeed, FloatValue(0.f), FloatValue(5.f), FloatValue(0.1f));
-	addSliderSetting("messageDuration", "Message Duration", "The duration of the message, excluding the animation", messageDuration, FloatValue(1.f), FloatValue(15.f), FloatValue(0.5f));
-	addEnumSetting("anchor", "Anchor", "How the chat window will be anchored", anchorData);
+	addSliderSetting("chatWidth", L"Chat Width", L"", chatWidth, FloatValue(100.f), FloatValue(1000.f), FloatValue(10.f));
+	addSetting("backgroundColor", L"Background Color", L"The color of the background", backgroundColor);
+	addSetting("textColor", L"Text Color", L"The color of the text", textColor);
+	addSetting("antiSpam", L"Anti Spam", L"Prevent spam messages in chat.", antiSpam);
+	addSliderSetting("animSpeed", L"Animation Time", L"The speed of the animation", animationSpeed, FloatValue(0.f), FloatValue(5.f), FloatValue(0.1f));
+	addSliderSetting("messageDuration", L"Message Duration", L"The duration of the message, excluding the animation", messageDuration, FloatValue(1.f), FloatValue(15.f), FloatValue(0.5f));
+	addEnumSetting("anchor", L"Anchor", L"How the chat window will be anchored", anchorData);
 	
 	showPreview = false;
 }
