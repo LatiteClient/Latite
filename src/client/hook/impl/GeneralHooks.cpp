@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "GeneralHooks.h"
 #include "client/Latite.h"
-#include "client/misc/ClientMessageSink.h"
+#include "client/misc/ClientMessageQueue.h"
 #include "client/feature/command/commandmanager.h"
 #include "client/event/Eventing.h"
 #include "client/script/PluginManager.h"
@@ -42,7 +42,7 @@ void GenericHooks::Level_tick(SDK::Level* level) {
 		// dispatch clientside tick event..
 		TickEvent ev(level);
 		Latite::getEventing().dispatch(ev);
-		Latite::getClientMessageSink().doPrint(100);
+		Latite::getClientMessageQueue().doPrint(100);
 
 		auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 

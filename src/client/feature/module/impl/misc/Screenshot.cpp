@@ -5,7 +5,7 @@
 #include "client/event/impl/RenderOverlayEvent.h"
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
-#include "client/misc/ClientMessageSink.h"
+#include "client/misc/ClientMessageQueue.h"
 
 #include <SHCore.h>
 
@@ -46,7 +46,7 @@ void Screenshot::onRenderOverlay(Event& ev) {
     D2DUtil dc;
     if (queueToScreenshot) {
         takeScreenshot(screenshotPath);
-        Latite::getClientMessageSink().push(std::format("Screenshot saved to {}", (screenshotPath / "screenshot.png").string()));
+        Latite::getClientMessageQueue().push(std::format("Screenshot saved to {}", (screenshotPath / "screenshot.png").string()));
         queueToScreenshot = false;
     }
 

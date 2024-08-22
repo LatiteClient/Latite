@@ -6,7 +6,7 @@
 #include "client/event/impl/RenderGameEvent.h"
 #include "client/render/Renderer.h"
 #include "client/event/impl/KeyUpdateEvent.h"
-#include "client/misc/ClientMessageSink.h"
+#include "client/misc/ClientMessageQueue.h"
 #include "sdk/common/network/packet/TextPacket.h"
 #include "sdk/String.h"
 #include "client/event/impl/TickEvent.h"
@@ -23,7 +23,7 @@
 bool wState = false;
 bool lastWState = false;
 
-TestModule::TestModule() : Module("TestModule", L"TestModule", L"Module for testing new things.", GAMEHUD) {
+TestModule::TestModule() : HUDModule("TestModule", L"TestModule", L"Module for testing new things.", GAMEHUD) {
 	
 	testEnum.addEntry({ 0, L"Test", L"Test" });
 	testEnum.addEntry({ 1, L"Gaming", L"Test" });

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Command.h"
 
-#include "client/misc/ClientMessageSink.h"
+#include "client/misc/ClientMessageQueue.h"
 #include "client/Latite.h"
 #include "util/Util.h"
 
@@ -22,5 +22,9 @@ void Command::message(std::wstring const& str, bool error) {
 	else {
 		fin = util::WFormat(L"&c" + util::WFormat(str));
 	}
-	Latite::get().getClientMessageSink().display(fin);
+	Latite::get().getClientMessageQueue().display(fin);
+}
+
+void Command::message(std::string const& str, bool error) {
+	message(util::StrToWStr(str), error);
 }

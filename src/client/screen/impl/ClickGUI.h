@@ -50,7 +50,7 @@ private:
 		Vec2 dragOffs = {};
 		ValueType rgbSelector = BoolValue(false);
 
-		Setting rgbSetting = Setting{ "colorpickerrgb", "RGB", "Cycle through a rainbow of colors for this setting" };
+		Setting rgbSetting = Setting{ "colorpickerrgb", L"RGB", L"Cycle through a rainbow of colors for this setting" };
 
 		ColorPicker() {
 			rgbSetting.value = &rgbSelector;

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "NoHurtCam.h"
 
-NoHurtCam::NoHurtCam() : Module("NoHurtCam", "No Hurt Cam", "Disable camera shake when hurt.", GAME) {
+NoHurtCam::NoHurtCam() : Module("NoHurtCam", LocalizeString::get("client.module.noHurtCam.name"), LocalizeString::get("client.module.noHurtCam.desc"), GAME) {
 }
 
 void NoHurtCam::onBobHurt(Event& ev) {

@@ -350,6 +350,8 @@
     "client.module.blockOutline.overlay.desc": "Render an overlay",
     "client.module.blockOutline.faceOverlay.desc": "Render the selected face of the block.",
     "client.module.blockOutline.overlayColor.desc": "The overlay color",
+    "client.module.noHurtCam.name": "NoHurtCam",
+    "client.module.noHurtCam.desc": "Disables camera shake when hurt.",
     "client.commands.help.desc": "Shows all commands and descriptions.",
     "client.commands.eject.ejectMsg.name": "Unloaded the client.",
     "client.commands.eject.desc": "Removes Latite from the game.",

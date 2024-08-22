@@ -3,7 +3,7 @@
 #include "util/Util.h"
 #include <ctime>
 #include "client/Latite.h"
-#include "client/misc/ClientMessageSink.h"
+#include "client/misc/ClientMessageQueue.h"
 
 void Logger::Setup() {
     auto path = util::GetLatitePath();
@@ -68,6 +68,6 @@ void Logger::LogInternal(Level level, std::string str) {
     OutputDebugStringA(mstr.c_str());
 
 #if LATITE_DEBUG
-    Latite::get().getClientMessageSink().push(util::Format("&7" + pref + "&r" + str));
+    Latite::get().getClientMessageQueue().push(util::Format("&7" + pref + "&r" + str));
 #endif
 }

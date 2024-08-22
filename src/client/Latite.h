@@ -22,7 +22,7 @@ public:
 	[[nodiscard]] static class ModuleManager& getModuleManager() noexcept;
 	[[nodiscard]] static class CommandManager& getCommandManager() noexcept;
 	[[nodiscard]] static class ConfigManager& getConfigManager() noexcept;
-	[[nodiscard]] static class ClientMessageSink& getClientMessageSink() noexcept;
+	[[nodiscard]] static class ClientMessageQueue& getClientMessageQueue() noexcept;
 	[[nodiscard]] static class SettingGroup& getSettings() noexcept;
 	[[nodiscard]] static class LatiteHooks& getHooks() noexcept;
 	[[nodiscard]] static class Eventing& getEventing() noexcept;
@@ -114,11 +114,6 @@ public:
 	void initAsset(int resource, std::wstring const& filename);
 
 	void initL10n();
-
-	int cInstOffs2 = 0;
-	int cInstOffs = 0;
-	int plrOffs2 = 0;
-	int plrOffs = 0;
 
 	void loadConfig(class SettingGroup& resolvedGroup);
 	float getRGBHue() const { return rgbHue; }

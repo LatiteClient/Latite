@@ -14,7 +14,7 @@ file (GLOB SOURCES "src/util/Util.cpp" "src/util/Logger.cpp" "src/client/Latite.
 
 include_directories("src" "." "deps/include")
 
-add_library(Latite SHARED ${SOURCES} "src/sdk/common/world/Minecraft.h" "src/sdk/common/world/level/Level.h" "src/sdk/common/server/ServerInstance.h" "src/api/manager/Manager.h" "src/client/module/ModuleManager.h" "src/client/module/Module.h" "src/api/manager/FeatureManager.h" "src/sdk/common/client/win/winrt/HidControllerWinRT.h" "src/client/command/Command.h" "src/client/script/PluginManager.h" "src/client/script/JsPlugin.h" "src/client/hook/Hook.h" "src/client/hook/Hook.cpp" "src/client/hook/impl/GenericHooks.h" "src/client/misc/ClientMessageSink.h" "src/client/command/CommandManager.h" "src/api/memory/memory.h")
+add_library(Latite SHARED ${SOURCES} "src/sdk/common/world/Minecraft.h" "src/sdk/common/world/level/Level.h" "src/sdk/common/server/ServerInstance.h" "src/api/manager/Manager.h" "src/client/module/ModuleManager.h" "src/client/module/Module.h" "src/api/manager/FeatureManager.h" "src/sdk/common/client/win/winrt/HidControllerWinRT.h" "src/client/command/Command.h" "src/client/script/PluginManager.h" "src/client/script/JsPlugin.h" "src/client/hook/Hook.h" "src/client/hook/Hook.cpp" "src/client/hook/impl/GenericHooks.h" "src/client/misc/ClientMessageQueue.h" "src/client/command/CommandManager.h" "src/api/memory/memory.h")
 
 add_subdirectory ("src")
 add_subdirectory ("deps")

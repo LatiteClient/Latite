@@ -10,5 +10,6 @@ public:
 		: ICommand(name, description, usage, aliases) {}
 
 	virtual void message(std::wstring const& str, bool error = false) override;
+	void message(std::string const& str, bool error = false);
 protected:
 };

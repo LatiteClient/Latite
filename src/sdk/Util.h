@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <functional>
 #include "Version.h"
-#include "Util/Meta.h"
 
 namespace SDK {
 	namespace detail {

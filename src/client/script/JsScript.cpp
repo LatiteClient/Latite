@@ -20,7 +20,7 @@
 #include "objects/ClientScriptingObject.h"
 
 #include "client/Latite.h"
-#include "client/misc/ClientMessageSink.h"
+#include "client/misc/ClientMessageQueue.h"
 
 #include "class/impl/JsVec2.h"
 #include "class/impl/JsVec3.h"
@@ -172,7 +172,7 @@ JsErrorCode JsScript::runScript() {
 		 code = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(this->path.wstring())), this->path.wstring().c_str(), nullptr);
 	}
 	catch (...) {
-		//Latite::getClientMessageSink().push("Exception while loading script " + path.string() + ": " + e.what());
+		//Latite::getClientMessageQueue().push("Exception while loading script " + path.string() + ": " + e.what());
 	}
 	return code;
 }
@@ -340,7 +340,7 @@ namespace {
 			JS::JsStringToPointer(myString, &result, &len);
 
 			std::string fs = util::WStrToStr(result);
-			Latite::getClientMessageSink().display(fs);
+			Latite::getClientMessageQueue().display(fs);
 
 			JS::JsRelease(myString, nullptr);
 		}

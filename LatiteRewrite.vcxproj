@@ -482,8 +482,7 @@
     <ClInclude Include="src\client\Latite.h" />
     <ClInclude Include="src\client\localization\LocalizeData.h" />
     <ClInclude Include="src\client\localization\LocalizeString.h" />
-    <ClInclude Include="src\client\misc\AuthWindow.h" />
-    <ClInclude Include="src\client\misc\ClientMessageSink.h" />
+    <ClInclude Include="src\client\misc\ClientMessageQueue.h" />
     <ClInclude Include="src\api\feature\module\Module.h" />
     <ClInclude Include="src\api\feature\module\ModuleManager.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\TestModule.h" />
@@ -736,8 +735,7 @@
     <ClCompile Include="src\client\Latite.cpp" />
     <ClCompile Include="src\client\localization\LocalizeData.cpp" />
     <ClCompile Include="src\client\localization\LocalizeString.cpp" />
-    <ClCompile Include="src\client\misc\AuthWindow.cpp" />
-    <ClCompile Include="src\client\misc\ClientMessageSink.cpp" />
+    <ClCompile Include="src\client\misc\ClientMessageQueue.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\TestModule.cpp" />
     <ClCompile Include="src\client\feature\module\ModuleManager.cpp" />
     <ClCompile Include="src\client\misc\Notifications.cpp" />

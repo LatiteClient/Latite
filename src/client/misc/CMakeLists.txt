@@ -1,4 +1,4 @@
 target_sources(
-	src/client/misc/ClientMessageSink.h
-	src/client/misc/ClientMessageSink.cpp
+	src/client/misc/ClientMessageQueue.h
+	src/client/misc/ClientMessageQueue.cpp
 )

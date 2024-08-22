@@ -2,7 +2,7 @@
 #include "CommandManager.h"
 #include "util/logger.h"
 #include "client/latite.h"
-#include "client/misc/ClientMessageSink.h"
+#include "client/misc/ClientMessageQueue.h"
 #include "util/Util.h"
 
 // Commands
@@ -107,13 +107,13 @@ bool CommandManager::runCommand(std::string const& line) {
 								pos += strlen("$");
 							}
 
-							Latite::getClientMessageSink().push(util::Format("&cUsage: " + usage));
+							Latite::getClientMessageQueue().push(util::Format("&cUsage: " + usage));
 						}
 						return result;
 					}
 					catch (std::exception& e) {
 						Logger::Warn("An unhandled exception occured while running this command: {}", e.what());
-						Latite::getClientMessageSink().push(util::Format(std::string("&cAn unhandled exception occured while running this command: ") + e.what()));
+						Latite::getClientMessageQueue().push(util::Format(std::string("&cAn unhandled exception occured while running this command: ") + e.what()));
 						return false;
 					}
 				}
@@ -125,6 +125,6 @@ bool CommandManager::runCommand(std::string const& line) {
 		return false;
 	}
 
-	Latite::getClientMessageSink().push(util::Format("&cUnknown command: " + (newArgs.empty() ? "" : newArgs[0]) + "."));
+	Latite::getClientMessageQueue().push(util::Format("&cUnknown command: " + (newArgs.empty() ? "" : newArgs[0]) + "."));
 	return false;
 }

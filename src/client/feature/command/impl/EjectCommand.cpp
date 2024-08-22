@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "EjectCommand.h"
 #include "client/Latite.h"
-#include "client/misc/ClientMessageSink.h"
+#include "client/misc/ClientMessageQueue.h"
 
 EjectCommand::EjectCommand() : Command("eject", LocalizeString::get("client.commands.eject.desc"), "{0}") {
 }

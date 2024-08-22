@@ -2,7 +2,7 @@
 // brace yourselves
 #include "PluginManager.h"
 #include "client/Latite.h"
-#include "client/misc/ClientMessageSink.h"
+#include "client/misc/ClientMessageQueue.h"
 #include "client/event/Eventing.h"
 #include "client/event/impl/UpdateEvent.h"
 
@@ -44,7 +44,7 @@ std::shared_ptr<JsPlugin> PluginManager::loadPlugin(std::wstring const& folderPa
 
 	for (auto& scr : this->items) {
 		if (std::filesystem::absolute(scr->getPath()) == std::filesystem::absolute(scriptPath)) {
-			Latite::getClientMessageSink().push(util::Format(std::format("Plugin {} is already loaded.", util::WStrToStr(scr->getName()))));
+			Latite::getClientMessageQueue().push(util::Format(std::format("Plugin {} is already loaded.", util::WStrToStr(scr->getName()))));
 			return nullptr;
 		}
 	}
@@ -92,7 +92,7 @@ void PluginManager::reportError(JsValueRef except, std::wstring filePath) {
 	std::stringstream ss;
 	ss << "&c" << util::WStrToStr(stack);
 
-	Latite::getClientMessageSink().display(util::Format(ss.str()));
+	Latite::getClientMessageQueue().display(util::Format(ss.str()));
 	Logger::Info("(plugin/{}) ({}) {}", util::WStrToStr(JsScript::getThis()->getPlugin()->getName()), JsScript::getThis()->getRelativePath().string(), util::WStrToStr(stack));
 	
 	// not sure if you release the exception or not, will do it anyway
@@ -110,7 +110,7 @@ void PluginManager::handleErrors(JsErrorCode code) {
 			reportError(except, script->data.name);
 		}
 		else if (code != JsNoError) {
-			Latite::getClientMessageSink().display(util::Format(std::format("&cA JS error occured in script {}: JsErrorCode 0x{:X}", util::WStrToStr(script->data.name), (int)code)));
+			Latite::getClientMessageQueue().display(util::Format(std::format("&cA JS error occured in script {}: JsErrorCode 0x{:X}", util::WStrToStr(script->data.name), (int)code)));
 			Logger::Info("(plugin/{}) ({}) Js ErrorCode: 0x{:X}", util::WStrToStr(script->getPlugin()->getName()), script->getRelativePath().string(), (int)code);
 		}
 	}
@@ -201,9 +201,9 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 
 	auto message = [](std::string const& msg, bool err = false) -> void {
 		if (err) {
-			Latite::getClientMessageSink().push(util::Format("[&5Plugin Manager&r] &c") + msg);
+			Latite::getClientMessageQueue().push(util::Format("[&5Plugin Manager&r] &c") + msg);
 		}
-		else Latite::getClientMessageSink().push(util::Format("[&5Plugin Manager&r] ") + msg);
+		else Latite::getClientMessageQueue().push(util::Format("[&5Plugin Manager&r] ") + msg);
 	};
 
 	auto http = HttpClient();
@@ -234,7 +234,7 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 			}
 		}
 		catch (winrt::hresult_error const& err) {
-			Latite::getClientMessageSink().push(util::WStrToStr(err.message().c_str()));
+			Latite::getClientMessageQueue().push(util::WStrToStr(err.message().c_str()));
 			return 0;
 		}
 	}
@@ -306,7 +306,7 @@ std::vector<PluginManager::PluginInfo> PluginManager::fetchPluginsFromMarket() {
 			}
 		}
 		catch (winrt::hresult_error const& err) {
-			Latite::getClientMessageSink().push(util::WStrToStr(err.message().c_str()));
+			Latite::getClientMessageQueue().push(util::WStrToStr(err.message().c_str()));
 			return list;
 		}
 	}

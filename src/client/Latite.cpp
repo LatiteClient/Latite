@@ -12,7 +12,7 @@
 #include "script/PluginManager.h"
 
 #include "config/ConfigManager.h"
-#include "misc/ClientMessageSink.h"
+#include "misc/ClientMessageQueue.h"
 #include "input/Keyboard.h"
 #include "hook/Hooks.h"
 #include "event/Eventing.h"
@@ -46,7 +46,6 @@ using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Storage;
 
 
-#include "misc/AuthWindow.h"
 #include "render/Renderer.h"
 #include "screen/ScreenManager.h"
 #include "render/Assets.h"
@@ -63,7 +62,7 @@ namespace {
     alignas(Latite) char latiteBuf[sizeof(Latite)] = {};
     alignas(Renderer) char rendererBuf[sizeof(Renderer)] = {};
     alignas(ModuleManager) char mmgrBuf[sizeof(ModuleManager)] = {};
-    alignas(ClientMessageSink) char messageSinkBuf[sizeof(ClientMessageSink)] = {};
+    alignas(ClientMessageQueue) char messageSinkBuf[sizeof(ClientMessageQueue)] = {};
     alignas(CommandManager) char commandMgrBuf[sizeof(CommandManager)] = {};
     alignas(ConfigManager) char configMgrBuf[sizeof(ConfigManager)] = {};
     alignas(SettingGroup) char mainSettingGroup[sizeof(SettingGroup)] = {};
@@ -89,13 +88,9 @@ namespace shared {
 /*return {&Signatures_1_18_12::__VA_ARGS__, &Signatures::__VA_ARGS__}; }*/\
 )()
 
-namespace {
-    AuthWindow* wnd = nullptr;
-}
-
 DWORD __stdcall startThread(HINSTANCE dll) {
     // Needed for Logger
-    new (messageSinkBuf) ClientMessageSink;
+    new (messageSinkBuf) ClientMessageQueue;
     new (eventing) Eventing();
     new (latiteBuf) Latite;
     new (notificaitonsBuf) Notifications;
@@ -283,48 +278,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     new (keyboardBuf) Keyboard(reinterpret_cast<int*>(Signatures::KeyMap.result));
 
-    Logger::Info(XOR_STRING("Waiting for user"));
-
-#ifdef LATITE_BETA
-    {
-        wnd = new AuthWindow(Latite::get().dllInst);
-        auto autoLogPath = util::GetLatitePath() / XOR_STRING("login.txt");
-        if (std::filesystem::exists(autoLogPath)) {
-            std::wifstream ifs{autoLogPath};
-            if (ifs.good()) {
-                wnd->beforeAuth();
-                std::wstring ws;
-                std::getline(ifs, ws);
-                auto res = wnd->doAuth(ws);
-                if (res.empty()) {
-                    Logger::Fatal(XOR_STRING("Auth has failed, maybe your token has expired?"));
-                }
-                wnd->setResult(res);
-            }
-            else {
-                wnd->show();
-                wnd->runMessagePump();
-                Logger::Fatal("{}", XOR_STRING("Please look at the pinned message in #status in the Latite Discord to setup Beta."));
-            }
-        }
-        else {
-            wnd->show();
-            wnd->runMessagePump();
-            Logger::Fatal("{}", XOR_STRING("Please look at the pinned message in #status in the Latite Discord to setup Beta."));
-        }
-        wnd->destroy();
-    }
-#endif
-
     Logger::Info(XOR_STRING("Waiting for game to load.."));
-
-#ifdef  LATITE_BETA
-    // its actually the real offset - 0x10
-    Latite::get().cInstOffs2 = wnd->getResult()[3];
-    Latite::get().cInstOffs = wnd->getResult()[2];
-    Latite::get().plrOffs = wnd->getResult()[0];
-    Latite::get().plrOffs2 = wnd->getResult()[1];
-#endif
 
     while (!SDK::ClientInstance::get()) {
         std::this_thread::sleep_for(10ms);
@@ -359,9 +313,6 @@ BOOL WINAPI DllMain(
         CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)startThread, hinstDLL, 0, nullptr));
     }
     else if (fdwReason == DLL_PROCESS_DETACH) {
-#ifdef LATITE_BETA
-        delete wnd;
-#endif
         // Remove singletons
 
         Latite::getHooks().disable();
@@ -373,7 +324,7 @@ BOOL WINAPI DllMain(
 
         Latite::getKeyboard().~Keyboard();
         Latite::getModuleManager().~ModuleManager();
-        Latite::getClientMessageSink().~ClientMessageSink();
+        Latite::getClientMessageQueue().~ClientMessageQueue();
         Latite::getCommandManager().~CommandManager();
         Latite::getSettings().~SettingGroup();
         Latite::getHooks().~LatiteHooks();
@@ -404,8 +355,8 @@ ConfigManager& Latite::getConfigManager() noexcept {
     return *std::launder(reinterpret_cast<ConfigManager*>(configMgrBuf));
 }
 
-ClientMessageSink& Latite::getClientMessageSink() noexcept {
-    return *std::launder(reinterpret_cast<ClientMessageSink*>(messageSinkBuf));
+ClientMessageQueue& Latite::getClientMessageQueue() noexcept {
+    return *std::launder(reinterpret_cast<ClientMessageQueue*>(messageSinkBuf));
 }
 
 SettingGroup& Latite::getSettings() noexcept {
@@ -697,7 +648,7 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("minViewBob", "Minimal View Bob (UNSTABLE)", "Only bob the item in hand, not the camera");
+        auto set = std::make_shared<Setting>("minViewBob", L"Minimal View Bob (UNSTABLE)", L"Only bob the item in hand, not the camera");
         set->value = &this->minimalViewBob;
         this->getSettings().addSetting(set);
     }
@@ -747,7 +698,7 @@ void Latite::initSettings() {
         set->enumData = &this->clientLanguage;
         set->value = set->enumData->getValue();
         set->callback = [](Setting&) {
-            Latite::getClientMessageSink().push(util::WFormat(LocalizeString::get("client.message.languageSwitchHelper.name")));
+            Latite::getClientMessageQueue().push(util::WFormat(LocalizeString::get("client.message.languageSwitchHelper.name")));
             };
 
         for (int i = 0; auto & lang : l10nData->getLanguages()) {
@@ -780,7 +731,7 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("rgbSpeed", "RGB Speed", "How fast the RGB color cycles");
+        auto set = std::make_shared<Setting>("rgbSpeed", L"RGB Speed", L"How fast the RGB color cycles");
         set->value = &this->rgbSpeed;
         set->min = FloatValue(0.f);
         set->max = FloatValue(3.f);
@@ -931,7 +882,7 @@ void Latite::onUpdate(Event& evGeneric) {
     if (std::get<BoolValue>(useDX11) != lastDX11) {
 
         if (lastDX11) {
-            Latite::getClientMessageSink().display(
+            Latite::getClientMessageQueue().display(
                 util::WFormat(LocalizeString::get("client.settings.dx11EnabledMsg.name")));
         }
         else {

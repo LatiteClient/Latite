@@ -59,7 +59,7 @@ using namespace std::chrono_literals;
 #include "client/script/PluginManager.h"
 #include "client/ui/TextBox.h"
 #include "client/misc/Timings.h"
-#include "client/misc/ClientMessageSink.h"
+#include "client/misc/ClientMessageQueue.h"
 #include "client/event/Events.h"
 #include "client/Latite.h"
 

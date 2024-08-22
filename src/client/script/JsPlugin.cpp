@@ -16,32 +16,12 @@
 #include "util/XorString.h"
 #include "util/Logger.h"
 
-#include "ScriptCertificate.h"
-
 using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Web::Http;
 using namespace winrt::Windows::Web::Http::Filters;
 
 
-void JsPlugin::checkTrusted() {
-	//if (this->loadedScript._Starts_with(util::StrToWStr(XOR_STRING("\"notrust\"")))) {
-	//	trusted = false;
-	//	return;
-	//}
-
-	auto hash = JsPlugin::getHash(getPath());
-
-	if (hash) {
-#if LATITE_DEBUG
-		Logger::Info("{} {}", util::WStrToStr(hash.value()), util::WStrToStr(getCertificate()));
-#endif
-		if (this->getCertificate() == hash) {
-			trusted = true;
-			return;
-		}
-	}
-	trusted = false;
-}
+void JsPlugin::checkTrusted() {}
 
 JsPlugin::JsPlugin(std::wstring const& relPath) {
 	this->path = this->path / relPath;
@@ -229,7 +209,6 @@ std::optional<std::wstring> JsPlugin::getHash(std::filesystem::path const& main)
 	for (auto& fil : jsFiles) {
 		std::wifstream ifs(fil);
 		if (!ifs.fail()) {
-			toHash << XOR_STRING(LATITE_SCRIPT_CERT_SALT);
 			toHash << ifs.rdbuf();
 			hasRead = true;
 		}
