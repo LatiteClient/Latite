@@ -244,7 +244,7 @@ public:
 
 	// TODO: this is actually BaseAttributeMap::getInstance
 	inline static SigImpl BaseAttributeMap_getInstance{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"e8 ? ? ? ? 48 8d 54 24 ? f3 0f 10 b0"_sig,
+		"E8 ? ? ? ? F3 0F 10 90"_sig,
 		"BaseAttributeMap::getInstance"};
 
 	inline static SigImpl UIControl_setPosition{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },

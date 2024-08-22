@@ -235,6 +235,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Components::actorEquipmentPersistentComponent),
         MVSIG(_updatePlayer),
         MVSIG(GameArguments__onUri),
+        //MVSIG(_bobHurt), // adding this breaks the mod menu LMFAO
     };
     
     new (configMgrBuf) ConfigManager();

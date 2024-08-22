@@ -102,7 +102,7 @@ SDK::AttributesComponent* SDK::Actor::getAttributesComponent() {
 
 SDK::AttributeInstance* SDK::Actor::getAttribute(SDK::Attribute& attribute) {
 	if (internalVers >= V1_20_40) {
-		return getAttributesComponent()->baseAttributes.getInstance(attribute.mIDValue).value_or(nullptr);
+		return getAttributesComponent()->baseAttributes.getInstance(attribute.mIDValue);
 	}
 
 	return memory::callVirtual<SDK::AttributeInstance*>(this, SDK::mvGetOffset<0xB8, 0xCF, 0xD0>(), attribute);
