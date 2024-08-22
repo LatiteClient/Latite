@@ -61,7 +61,7 @@ namespace SDK {
 
         void drawImage(TexturePtr const& texture, Vec2 const& pos, Vec2 const& size, Vec2 const& uvPos, Vec2 const& uvSize) {
             if (internalVers >= V1_21_20) {
-                memory::callVirtual<void>(this, 7, texture, pos, size, uvPos, uvSize, false);
+                memory::callVirtual<void, TexturePtr const&, Vec2 const&, Vec2 const&, Vec2 const&, Vec2 const&, bool>(this, 7, texture, pos, size, uvPos, uvSize, false);
             }
             else {
                 memory::callVirtual<void>(this, 7, texture, pos, size, uvPos, uvSize);
