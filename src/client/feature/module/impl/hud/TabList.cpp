@@ -30,7 +30,7 @@ void TabList::onRenderOverlay(Event& evG) {
 		txt = util::StrToWStr(SDK::RakNetConnector::get()->featuredServer);
 	}
 	else {
-		txt = util::StrToWStr(lvl->name);
+		txt = util::StrToWStr(lvl->getLevelName());
 	}
 
 	constexpr auto font = Renderer::FontSelection::PrimaryRegular;

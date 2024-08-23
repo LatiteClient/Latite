@@ -75,7 +75,7 @@ JsValueRef GameScriptingObject::worldGetName(JsValueRef callee, bool isConstruct
 		return Chakra::GetUndefined();
 	}
 
-	return Chakra::MakeString(util::StrToWStr(SDK::ClientInstance::get()->minecraft->getLevel()->name));
+	return Chakra::MakeString(util::StrToWStr(SDK::ClientInstance::get()->minecraft->getLevel()->getLevelName()));
 }
 
 JsValueRef GameScriptingObject::worldGetPlayers(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {

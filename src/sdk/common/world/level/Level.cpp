@@ -33,3 +33,10 @@ SDK::HitResult* SDK::Level::getLiquidHitResult() {
 bool SDK::Level::isClientSide() {
 	return memory::callVirtual<bool>(this, SDK::mvGetOffset<0x111, 0x110, 0x11F, 0x11F, 0x12B, 0x127>());
 }
+
+const std::string& SDK::Level::getLevelName() {
+	if (internalVers >= V1_21_20) {
+		return levelData->levelName;
+	}
+	return name;
+}

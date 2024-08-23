@@ -99,6 +99,11 @@ namespace SDK {
 			break;
 		}
 	}
+
+	template <int offs>
+	extern inline const int mvGetOffset() {
+		return offs;
+	}
 }
 
 #define CLASS_FIELD(type, name, offset)                                                                      \
