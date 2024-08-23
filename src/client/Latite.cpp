@@ -235,7 +235,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Components::actorEquipmentPersistentComponent),
         MVSIG(_updatePlayer),
         MVSIG(GameArguments__onUri),
-        //MVSIG(_bobHurt), // adding this breaks the mod menu LMFAO
+        MVSIG(_bobHurt),
     };
     
     new (configMgrBuf) ConfigManager();
@@ -543,6 +543,7 @@ void Latite::updateModuleBlocking() {
 
         blockModules("Freelook", "hivebedrock");
         blockModules("Freelook", "galaxite");
+        blockModules("NoHurtCam", "hivebedrock");
         blockModules("NoHurtCam", "galaxite");
     }
     else {
