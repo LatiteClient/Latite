@@ -543,6 +543,7 @@ void Latite::updateModuleBlocking() {
 
         blockModules("Freelook", "hivebedrock");
         blockModules("Freelook", "galaxite");
+        blockModules("NoHurtCam", "hivebedrock");
         blockModules("NoHurtCam", "galaxite");
     }
     else {
