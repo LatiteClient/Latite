@@ -4,12 +4,30 @@
 #include "sdk/common/world/Attribute.h"
 #include <sdk/common/entity/component/AttributesComponent.h>
 
+SDK::ActorDataFlagComponent* SDK::Actor::getActorDataFlagsComponent() {
+	return reinterpret_cast<SDK::ActorDataFlagComponent * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::actorDataFlagsComponent.result)(entityContext.getBasicRegistry(), &entityContext.getId());
+}
+
 bool SDK::Actor::getStatusFlag(int flag) {
-	return memory::callVirtual<bool>(this, 0, flag);
+	if (internalVers < V1_21_20) {
+		return memory::callVirtual<bool>(this, 0, flag);
+	}
+	auto comp = getActorDataFlagsComponent();
+	if (comp == nullptr) {
+		return false;
+	}
+	return comp->flags[flag];
 }
 
 void SDK::Actor::setStatusFlag(int flag, bool value) {
-	return memory::callVirtual<void>(this, 1, flag, value);
+	if (internalVers < V1_21_20) {
+		return memory::callVirtual<void>(this, 1, flag, value);
+	}
+	auto comp = getActorDataFlagsComponent();
+	if (comp == nullptr) {
+		return;
+	}
+	comp->flags[flag] = value;
 }
 
 AABB& SDK::Actor::getBoundingBox() {
@@ -51,7 +69,7 @@ Vec3& SDK::Actor::getPosOld() {
 
 int SDK::Actor::getCommandPermissionLevel() {
 	// @dump-wbds vtable Actor, getCommandPermissionLevel
-	return memory::callVirtual<int>(this, mvGetOffset<0x6D, 0x7C, 0xB5, 0xCC, 0xCD>());
+	return memory::callVirtual<int>(this, mvGetOffset<0x6B, 0x6D, 0x7C, 0xB5, 0xCC, 0xCD>());
 }
 
 int64_t SDK::Actor::getRuntimeID() {
@@ -71,7 +89,7 @@ uint8_t SDK::Actor::getEntityTypeID() {
 
 void SDK::Actor::swing() {
 	// @dump-wbds vtable Actor, swing
-	return memory::callVirtual<void>(this, SDK::mvGetOffset<0x75, 0x86, 0xC4, 0xDB, 0xDC>());
+	return memory::callVirtual<void>(this, SDK::mvGetOffset<0x73, 0x75, 0x86, 0xC4, 0xDB, 0xDC>());
 }
 
 bool SDK::Actor::isPlayer() {
@@ -84,7 +102,7 @@ SDK::AttributesComponent* SDK::Actor::getAttributesComponent() {
 
 SDK::AttributeInstance* SDK::Actor::getAttribute(SDK::Attribute& attribute) {
 	if (internalVers >= V1_20_40) {
-		return getAttributesComponent()->baseAttributes.getInstance(attribute.mIDValue).value_or(nullptr);
+		return getAttributesComponent()->baseAttributes.getInstance(attribute.mIDValue);
 	}
 
 	return memory::callVirtual<SDK::AttributeInstance*>(this, SDK::mvGetOffset<0xB8, 0xCF, 0xD0>(), attribute);
@@ -113,7 +131,7 @@ float SDK::Actor::getSaturation() {
 
 bool SDK::Actor::isInvisible() {
 	// @dump-wbds Actor, isInvisible
-	return memory::callVirtual<bool>(this, SDK::mvGetOffset<0x22, 0x25, 0x34, 0x3B, 0x3D>());
+	return memory::callVirtual<bool>(this, SDK::mvGetOffset<0x20, 0x22, 0x25, 0x34, 0x3B, 0x3D>());
 }
 
 SDK::ItemStack* SDK::Actor::getArmor(int armorSlot) {

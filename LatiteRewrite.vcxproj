@@ -589,6 +589,7 @@
     <ClInclude Include="src\sdk\common\world\level\block\Block.h" />
     <ClInclude Include="src\sdk\common\world\level\block\BlockLegacy.h" />
     <ClInclude Include="src\sdk\common\world\level\HitResult.h" />
+    <ClInclude Include="src\sdk\common\world\level\LevelData.h" />
     <ClInclude Include="src\sdk\common\world\Weather.h" />
     <ClInclude Include="src\sdk\deps\Application\AppPlatform.h" />
     <ClInclude Include="src\sdk\deps\CoreGraphics\ImageBuffer.h" />
@@ -799,6 +800,7 @@
     <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp" />
     <ClCompile Include="src\sdk\common\world\ItemStackBase.cpp" />
     <ClCompile Include="src\sdk\common\world\level\Level.cpp" />
+    <ClCompile Include="src\sdk\common\world\level\LevelData.cpp" />
     <ClCompile Include="src\sdk\common\world\Minecraft.cpp" />
     <ClCompile Include="src\sdk\deps\Application\AppPlatform.cpp" />
     <ClCompile Include="src\sdk\misc\ClickMap.cpp" />

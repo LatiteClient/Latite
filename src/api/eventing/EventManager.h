@@ -7,11 +7,6 @@ class IEventManager {
 public:
 	template <typename T>
 	bool dispatch(T& ev) requires std::derived_from<T, Event> {
-		std::sort(listeners.begin(), listeners.end(), [](std::pair<uint32_t, EventListener> const& left,
-			std::pair<uint32_t, EventListener> const& right) {
-				return left.second.priority > right.second.priority;
-			});
-
 		for (auto& pair : listeners) {
 			if (pair.first == T::hash) {
 				if (pair.second.listener->shouldListen() || pair.second.callWhileInactive) {
@@ -33,6 +28,10 @@ public:
 	void listen(Listener* ptr, EventListenerFunc listener, int priority = 0, bool callWhileInactive = false) requires std::derived_from<T, Event> {
 		mutex.lock();
 		listeners.push_back({ T::hash, EventListener{ listener, ptr, callWhileInactive, priority } });
+		std::sort(listeners.begin(), listeners.end(), [](std::pair<uint32_t, EventListener> const& left,
+			std::pair<uint32_t, EventListener> const& right) {
+				return left.second.priority > right.second.priority;
+		});
 		mutex.unlock();
 	}
 

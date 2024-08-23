@@ -12,5 +12,6 @@ namespace SDK {
 		MVCLASS_FIELD(bool, back, 0x0B, 0x60, 0x60);
 		MVCLASS_FIELD(bool, left, 0x0C, 0x61, 0x61);
 		MVCLASS_FIELD(bool, right, 0x0D, 0x62, 0x62);
+		MVCLASS_FIELD(bool, sprinting, 0x27, 0x6C, 0x6C);
 	};
 }

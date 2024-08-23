@@ -5,6 +5,8 @@
 #include "sdk/Util.h"
 #include <unordered_map>
 
+#include "LevelData.h"
+
 namespace SDK {
 
 	class PlayerListEntry {
@@ -22,6 +24,9 @@ namespace SDK {
 		class HitResult* getLiquidHitResult();
 		bool isClientSide();
 
-		MVCLASS_FIELD(std::string, name, 0x6C8, 0x698, 0x678, 0x5B8, 0x548);
+		MVCLASS_FIELD(std::shared_ptr<LevelData>, levelData, 0xF8);
+		MVCLASS_FIELD(std::string, name, 0x290, 0x6C8, 0x698, 0x678, 0x5B8, 0x548);
+
+		const std::string& getLevelName();
 	};
 }
