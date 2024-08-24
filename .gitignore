@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 
 .idea/
+*.ifc
+*.ifc.d.json
