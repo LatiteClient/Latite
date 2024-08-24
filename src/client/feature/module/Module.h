@@ -23,7 +23,7 @@ public:
 			set->callback = [this](Setting& s) {
 				const bool val = std::get<BoolValue>(*s.value);
 
-				if (val)
+				if (val != std::get<BoolValue>(enabled))
 					this->setEnabled(val);
 			};
 
