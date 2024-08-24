@@ -130,7 +130,7 @@
     "client.textmodule.bowIndicator.visual.name": "Visual Indicator",
     "client.textmodule.bowIndicator.fgCol.name": "Color",
     "client.textmodule.bowIndicator.bgCol.name": "Background Color",
-    "client.textmodule.bowIndicator.horizontal.name": "Horizonta",
+    "client.textmodule.bowIndicator.horizontal.name": "Horizontal",
     "client.textmodule.bowIndicator.hideWhenCharged.name": "Hide when charged",
     "client.textmodule.bowIndicator.size.name": "Length",
     "client.textmodule.bowIndicator.width.name": "Width",
