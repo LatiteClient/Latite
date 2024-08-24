@@ -36,8 +36,10 @@ void __fastcall ItemPhysics::glm_rotate(glm::mat4x4& mat, float angle, float x, 
 
     yMod -= height * deltaTime;
 
-    if (yMod <= 0.f)
-        yMod = 0.f;
+    float threshold = curr->stack.block != nullptr ? 0.f : -0.125f;
+
+    if (yMod <= threshold)
+        yMod = threshold;
 
     Vec3 pos = physMod->renderData->position;
     pos.y += yMod;
@@ -45,7 +47,7 @@ void __fastcall ItemPhysics::glm_rotate(glm::mat4x4& mat, float angle, float x, 
     auto& vec = std::get<1>(physMod->actorData.at(curr));
     auto& sign = std::get<2>(physMod->actorData.at(curr));
 
-    if (!curr->isOnGround() || yMod > 0.f) {
+    if (!curr->isOnGround() || yMod > threshold) {
         vec.x += static_cast<float>(sign.x) * deltaTime * std::get<FloatValue>(physMod->speed) * std::get<FloatValue>(physMod->xMul);
         vec.y += static_cast<float>(sign.y) * deltaTime * std::get<FloatValue>(physMod->speed) * std::get<FloatValue>(physMod->yMul);
         vec.z += static_cast<float>(sign.z) * deltaTime * std::get<FloatValue>(physMod->speed) * std::get<FloatValue>(physMod->zMul);
@@ -71,7 +73,7 @@ void __fastcall ItemPhysics::glm_rotate(glm::mat4x4& mat, float angle, float x, 
 
     Vec3 renderVec = vec;
 
-    if (curr->isOnGround() && yMod == 0.f && !std::get<BoolValue>(physMod->preserveRotations) && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
+    if (curr->isOnGround() && yMod == threshold && !std::get<BoolValue>(physMod->preserveRotations) && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
         if (std::get<BoolValue>(physMod->smoothRotations) && (sign.x != 0 || sign.y != 0 && sign.z != 0)) {
             vec.x += static_cast<float>(sign.x) * deltaTime * std::get<FloatValue>(physMod->speed) * std::get<FloatValue>(physMod->xMul);
 
