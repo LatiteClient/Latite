@@ -6,6 +6,8 @@
 #include <memory>
 #include <exception>
 
+#include "util/Logger.h"
+
 using func_ptr_t = void*;
 
 class Hook {
@@ -21,11 +23,25 @@ public:
 	~Hook() = default;
 
 	void enable() {
-		MH_EnableHook(reinterpret_cast<void*>(target));
+		if (target != 0) {
+			const auto ret = MH_EnableHook(reinterpret_cast<void*>(target));
+
+#ifdef LATITE_DEBUG
+			if (ret != MH_OK)
+				Logger::Warn("Enabling of hook {} failed with status {}", this->funcName, MH_StatusToString(ret));
+#endif
+		}
 	}
 
 	void disable() {
-		MH_DisableHook(reinterpret_cast<void*>(target));
+		if (target != 0) {
+			const auto ret = MH_DisableHook(reinterpret_cast<void*>(target));
+			
+#ifdef LATITE_DEBUG
+			if (ret != MH_OK)
+				Logger::Warn("Disabling of hook {} failed with status {}", this->funcName, MH_StatusToString(ret));
+#endif
+		}
 	}
 
 	template <typename Func>

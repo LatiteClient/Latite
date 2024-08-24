@@ -122,7 +122,7 @@ void __fastcall ItemPhysics::glm_rotate(glm::mat4x4& mat, float angle, float x, 
     glm_rotate(mat, renderVec.z, 0.f, 0.f, 1.f);
 }
 
-void ItemPhysics::ItemRenderer_render(SDK::ItemRenderer* _this, SDK::BaseActorRenderContext* renderContext, SDK::ActorRenderData* actorRenderData) {
+void __fastcall ItemPhysics::ItemRenderer_render(SDK::ItemRenderer* _this, SDK::BaseActorRenderContext* renderContext, SDK::ActorRenderData* actorRenderData) {
     static auto physMod = reinterpret_cast<ItemPhysics*>(Latite::getModuleManager().find("ItemPhysics").get());
 
     physMod->renderData = actorRenderData;

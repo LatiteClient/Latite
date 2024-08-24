@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "ItemPhysics.h"
 
+#include "sdk/common/world/actor/ItemActor.h"
 #include "util/mem/buffer.h"
 
 ItemPhysics::ItemPhysics() : Module("ItemPhysics", LocalizeString::get("client.module.itemPhysics.name"),
@@ -24,16 +25,18 @@ ItemPhysics::ItemPhysics() : Module("ItemPhysics", LocalizeString::get("client.m
 static char data[0x5], data2[0x5];
 
 void ItemPhysics::onEnable() {
+    initialized = true;
+    
     static auto posAddr = Signatures::ItemPositionConst.result + 4;
     origPosRel = *reinterpret_cast<uint32_t*>(posAddr);
 
     static auto rotateAddr = reinterpret_cast<void*>(Signatures::glm_rotateRef.result);
 
     if (glm_rotateHook == nullptr)
-        glm_rotateHook = std::make_shared<Hook>(Signatures::glm_rotateRef.result, glm_rotate, "glm::rotateHook");
+        glm_rotateHook = std::make_shared<Hook>(Signatures::glm_rotateRef.result, glm_rotate, "glm::rotate");
 
     if (ItemRenderer_renderHook == nullptr)
-        ItemRenderer_renderHook = std::make_shared<Hook>(Signatures::ItemRenderer_render.result, ItemRenderer_render, "ItemRenderer_render");
+        ItemRenderer_renderHook = std::make_shared<Hook>(Signatures::ItemRenderer_render.result, ItemRenderer_render, "ItemRenderer::render");
 
     static auto translateAddr = reinterpret_cast<void*>(Signatures::glm_translateRef.result);
     static auto translateAddr2 = reinterpret_cast<void*>(Signatures::glm_translateRef2.result);
@@ -58,6 +61,11 @@ void ItemPhysics::onEnable() {
 }
 
 void ItemPhysics::onDisable() {
+    if (!initialized)
+        return;
+
+    initialized = false;
+
     static auto posAddr = Signatures::ItemPositionConst.result + 4;
     static auto translateAddr = reinterpret_cast<void*>(Signatures::glm_translateRef.result);
     static auto translateAddr2 = reinterpret_cast<void*>(Signatures::glm_translateRef2.result);
@@ -65,8 +73,11 @@ void ItemPhysics::onDisable() {
     memory::patchBytes(reinterpret_cast<void*>(posAddr), &origPosRel, 4);
     FreeBuffer(newPosRel);
 
-    glm_rotateHook->disable();
-    ItemRenderer_renderHook->disable();
+    if (glm_rotateHook != nullptr)
+        glm_rotateHook->disable();
+
+    if (ItemRenderer_renderHook != nullptr)
+        ItemRenderer_renderHook->disable();
 
     memory::patchBytes(translateAddr, data, 5);
     memory::patchBytes(translateAddr2, data2, 5);

@@ -21,7 +21,10 @@ public:
 			set->visible = false;
 			set->defaultValue = BoolValue(false);
 			set->callback = [this](Setting& s) {
-				this->setEnabled(std::get<BoolValue>(*s.value));
+				const bool val = std::get<BoolValue>(*s.value);
+
+				if (val)
+					this->setEnabled(val);
 			};
 
 			settings->addSetting(set);
