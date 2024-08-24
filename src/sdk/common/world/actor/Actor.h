@@ -50,5 +50,7 @@ namespace SDK {
 		float getSaturation();
 		bool isInvisible();
 		class ItemStack* getArmor(int armorSlot);
+
+		bool isOnGround();
 	};
 }

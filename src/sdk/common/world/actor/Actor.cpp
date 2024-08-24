@@ -4,6 +4,8 @@
 #include "sdk/common/world/Attribute.h"
 #include <sdk/common/entity/component/AttributesComponent.h>
 
+#include "ActorCollision.h"
+
 SDK::ActorDataFlagComponent* SDK::Actor::getActorDataFlagsComponent() {
 	return reinterpret_cast<SDK::ActorDataFlagComponent * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::actorDataFlagsComponent.result)(entityContext.getBasicRegistry(), &entityContext.getId());
 }
@@ -149,4 +151,8 @@ SDK::ItemStack* SDK::Actor::getArmor(int armorSlot) {
 	}
 
 	return memory::callVirtual<ItemStack*>(this, mvGetOffset<0x71, 0xB5, 0xCC, 0xCD>());
+}
+
+bool SDK::Actor::isOnGround() {
+	return ActorCollision::isOnGround(entityContext);
 }

@@ -24,6 +24,10 @@ public:
 		MH_EnableHook(reinterpret_cast<void*>(target));
 	}
 
+	void disable() {
+		MH_DisableHook(reinterpret_cast<void*>(target));
+	}
+
 	template <typename Func>
 	Func oFunc();
 };

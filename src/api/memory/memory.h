@@ -10,4 +10,8 @@ namespace memory {
 		TFunc* vtable = *reinterpret_cast<TFunc**>(thisptr);
 		return vtable[index](thisptr, argList...);
 	}
+	extern void nopBytes(void* dst, unsigned int size);
+	extern void copyBytes(void* src, void* dst, unsigned int size);
+	extern void patchBytes(void* dst, const void* src, unsigned int size);
+	extern std::array<std::byte, 4> getRipRel(uintptr_t instructionAddress, uintptr_t targetAddress);
 }

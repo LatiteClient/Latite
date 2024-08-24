@@ -20,6 +20,7 @@
 #include <chrono>
 #include <format>
 #include <array>
+#include <random>
 
 using namespace std::chrono_literals;
 
@@ -99,4 +100,8 @@ using namespace std::chrono_literals;
 #include "util/Json.h"
 #include "util/DxContext.h"
 #include "util/FNV32.h"
+
+// GLM
+#include <glm/glm.hpp>
+#include <glm/ext/matrix_transform.hpp>
 #endif
