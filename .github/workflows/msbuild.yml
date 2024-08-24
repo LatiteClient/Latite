@@ -45,4 +45,4 @@ jobs:
       
     - name: Find those damn dlls
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: dir /s /p "*.dll"
+      run: Get-ChildItem -Path . -Recurse -Filter "*.dll"
