@@ -44,7 +44,7 @@ jobs:
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
       
     - name: Upload Release DLL to artifacts
-      uses: actions/upload-artifacts@v4
+      uses: actions/upload-artifact@v4
       with:
         name: Latite-Release
         path: D:\a\Latite\Latite\x64\Release\LatiteRewrite.dll
