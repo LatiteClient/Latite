@@ -8,7 +8,10 @@ LocalizeData::LocalizeData() {
 
     languages = {
         fallbackLanguage,
-        std::make_shared<Language>(LANG_ES_ES)
+        std::make_shared<Language>(LANG_ES_ES),
+        std::make_shared<Language>(LANG_PT_PT),
+        std::make_shared<Language>(LANG_ZH_CN),
+        std::make_shared<Language>(LANG_ZH_TW),
     };
 
     for (auto& lang : languages) {

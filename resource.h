@@ -30,3 +30,6 @@
 
 #define LANG_EN_US 101
 #define LANG_ES_ES 102
+#define LANG_PT_PT 103
+#define LANG_ZH_CN 104
+#define LANG_ZH_TW 105
