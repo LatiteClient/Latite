@@ -1086,7 +1086,6 @@
     <ClCompile Include="deps\mnem\scan\scanner.cpp" />
     <ClCompile Include="deps\mnem\scan\scanner_avx2.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\ItemPhysics.cpp" />
-    <ClCompile Include="src\client\feature\module\impl\visual\ItemPhysicsHooks.cpp" />
     <ClCompile Include="src\client\feature\module\impl\visual\NoHurtCam.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\EnvironmentChanger.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\Freelook.cpp" />

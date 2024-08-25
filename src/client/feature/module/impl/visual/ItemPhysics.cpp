@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 #include "ItemPhysics.h"
 
-#include "sdk/common/world/actor/ItemActor.h"
 #include "util/mem/buffer.h"
 
 ItemPhysics::ItemPhysics() : Module("ItemPhysics", LocalizeString::get("client.module.itemPhysics.name"),
@@ -30,14 +29,6 @@ void ItemPhysics::onEnable() {
     static auto posAddr = Signatures::ItemPositionConst.result + 4;
     origPosRel = *reinterpret_cast<uint32_t*>(posAddr);
 
-    static auto rotateAddr = reinterpret_cast<void*>(Signatures::glm_rotateRef.result);
-
-    if (glm_rotateHook == nullptr)
-        glm_rotateHook = std::make_shared<Hook>(Signatures::glm_rotateRef.result, glm_rotate, "glm::rotate");
-
-    if (ItemRenderer_renderHook == nullptr)
-        ItemRenderer_renderHook = std::make_shared<Hook>(Signatures::ItemRenderer_render.result, ItemRenderer_render, "ItemRenderer::render");
-
     static auto translateAddr = reinterpret_cast<void*>(Signatures::glm_translateRef.result);
     static auto translateAddr2 = reinterpret_cast<void*>(Signatures::glm_translateRef2.result);
 
@@ -47,11 +38,6 @@ void ItemPhysics::onEnable() {
     const auto newRipRel = memory::getRipRel(posAddr, reinterpret_cast<uintptr_t>(newPosRel));
 
     memory::patchBytes(reinterpret_cast<void*>(posAddr), newRipRel.data(), 4);
-
-    glm_rotateHook->enable();
-    ItemRenderer_renderHook->enable();
-
-    memory::patchBytes(rotateAddr, (BYTE*)"\xE8", 1);
 
     memory::copyBytes(translateAddr, data, 5);
     memory::copyBytes(translateAddr2, data2, 5);
@@ -72,12 +58,6 @@ void ItemPhysics::onDisable() {
 
     memory::patchBytes(reinterpret_cast<void*>(posAddr), &origPosRel, 4);
     FreeBuffer(newPosRel);
-
-    if (glm_rotateHook != nullptr)
-        glm_rotateHook->disable();
-
-    if (ItemRenderer_renderHook != nullptr)
-        ItemRenderer_renderHook->disable();
 
     memory::patchBytes(translateAddr, data, 5);
     memory::patchBytes(translateAddr2, data2, 5);

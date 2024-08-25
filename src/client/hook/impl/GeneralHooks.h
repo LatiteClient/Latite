@@ -7,6 +7,8 @@
 #include <sdk/common/world/Weather.h>
 #include <sdk/common/client/renderer/game/CameraComponent.h>
 
+#include "sdk/common/world/actor/ActorRenderData.h"
+
 class GenericHooks : public HookGroup {
     static void __fastcall Level_tick(SDK::Level* level);
     static void* __fastcall ChatScreenController_sendChatMessage(void* controller, std::string& message);
@@ -51,6 +53,8 @@ class GenericHooks : public HookGroup {
     static void hkUpdatePlayer(SDK::CameraComponent* obj, void* a, void* b);
     static void hkOnUri(void* obj, void* uri);
     static void hkBobHurt(void* obj, void*, void*);
+    static void __fastcall ItemRenderer_render(SDK::ItemRenderer* _this, SDK::BaseActorRenderContext* renderContext, SDK::ActorRenderData* actorRenderData);
+    static void __fastcall glm_rotate(glm::mat4x4& mat, float angle, float x, float y, float z);
 public:
     GenericHooks();
 };
