@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "../../Module.h"
-#include "sdk/common/client/renderer/ItemRenderer.h"
 #include "sdk/common/world/actor/ActorRenderData.h"
 
 class ItemPhysics : public Module {
@@ -10,6 +9,8 @@ class ItemPhysics : public Module {
     bool initialized = false;
     
     void onRenderGame(Event&);
+    void onPreRenderItem(Event& event);
+    void onRenderItemRotate(Event& event);
     
 public:
     ItemPhysics();

@@ -768,6 +768,8 @@
     <ClInclude Include="src\client\event\impl\LatiteClientMessageEvent.h" />
     <ClInclude Include="src\client\event\impl\OutlineSelectionEvent.h" />
     <ClInclude Include="src\client\event\impl\PacketReceiveEvent.h" />
+    <ClInclude Include="src\client\event\impl\PreRenderItemEvent.h" />
+    <ClInclude Include="src\client\event\impl\RenderItemRotateEvent.h" />
     <ClInclude Include="src\client\event\impl\SendPacketEvent.h" />
     <ClInclude Include="src\client\event\impl\RenderGuiItemEvent.h" />
     <ClInclude Include="src\client\event\impl\UpdatePlayerCameraEvent.h" />
