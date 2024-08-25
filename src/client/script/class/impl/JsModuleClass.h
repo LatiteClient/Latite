@@ -50,6 +50,8 @@ protected:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK moduleAddColorSetting(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK moduleAddEnumSetting(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 public:
 	inline static const wchar_t* class_name = L"Module";
 
@@ -82,5 +84,6 @@ public:
 		Chakra::DefineFunc(prototype, moduleAddKeySetting, XW("addKeySetting"), this);
 		Chakra::DefineFunc(prototype, moduleAddTextSetting, XW("addTextSetting"), this);
 		Chakra::DefineFunc(prototype, moduleAddColorSetting, XW("addColorSetting"), this);
+		Chakra::DefineFunc(prototype, moduleAddEnumSetting, XW("addEnumSetting"), this);
 	};
 };

@@ -10,4 +10,6 @@ public:
 	}
 
 	ValueType jsVal = BoolValue(false);
+
+	std::optional<EnumData> scriptEnumData;
 };
