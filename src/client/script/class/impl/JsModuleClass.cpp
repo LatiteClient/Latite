@@ -265,3 +265,46 @@ JsValueRef JsModuleClass::moduleAddColorSetting(JsValueRef callee, bool isConstr
 
 	return setClass->construct(set.get(), false /*do not destroy the setting once it goes out of scope, as module manager will handle that*/);
 }
+
+JsValueRef JsModuleClass::moduleAddEnumSetting(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 4)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, { arguments[2], JsString}, {arguments[3], JsString}, {arguments[4], JsObject} })) return JS_INVALID_REFERENCE;
+
+	JsValueRef options = arguments[4];
+	JsValueRef values = Chakra::GetProperty(options, L"values");
+	int defaultValue = Chakra::GetIntProperty(options, L"default_value");
+
+	if (!values) {
+		Chakra::ThrowError(L"Invalid enum data");
+		return JS_INVALID_REFERENCE;
+	}
+
+	auto name = Chakra::GetString(arguments[1]);
+	auto disp = Chakra::GetString(arguments[2]);
+	auto desc = Chakra::GetString(arguments[3]);
+
+	auto set = std::make_shared<JsSetting>(util::WStrToStr(name), disp, desc);
+
+	*set->value = EnumValue(defaultValue);
+
+	set->scriptEnumData = EnumData{};
+	set->enumData = &*set->scriptEnumData;
+
+	for (int i = 0; i < Chakra::GetIntProperty(values, L"length"); i++) {
+		JsValueRef obj = JS_INVALID_REFERENCE;
+		JS::JsGetIndexedProperty(values, Chakra::MakeInt(i), &obj);
+		auto entryName = Chakra::GetStringProperty(obj, L"name");
+		auto entryDesc = Chakra::GetStringProperty(obj, L"desc");
+		if (obj != JS_INVALID_REFERENCE) {
+			set->enumData->addEntry(EnumEntry{ i, entryName, entryDesc });
+		}
+	}
+
+	auto thi = reinterpret_cast<JsModuleClass*>(callbackState);
+	auto mod = Get(arguments[0]);
+
+	auto setClass = thi->owner->getClass<JsSettingClass>();
+	mod->settings->addSetting(set);
+
+	return setClass->construct(set.get(), false /*do not destroy the setting once it goes out of scope, as module manager will handle that*/);
+}

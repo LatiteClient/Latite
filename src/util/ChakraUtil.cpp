@@ -215,7 +215,7 @@ int Chakra::GetIntProperty(JsValueRef ref, std::wstring name) {
 	JsValueRef val;
 	JS::JsGetProperty(ref, nameId, &val);
 
-	int b;
+	int b = 0;
 	JS::JsNumberToInt(val, &b);
 	Release(val);
 	return b;
