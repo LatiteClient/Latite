@@ -246,7 +246,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         Logger::Info(XOR_STRING("Loaded master config"));
     }
 
-
+    Latite::get().initSettings();
+    Latite::getConfigManager().applyGlobalConfig();
 
     new (mmgrBuf) ModuleManager;
     new (commandMgrBuf) CommandManager;
@@ -286,9 +287,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     while (!SDK::ClientInstance::get()) {
         std::this_thread::sleep_for(10ms);
     }
-
-    Latite::get().initSettings();
-    Latite::getConfigManager().applyGlobalConfig();
 
     Latite::get().initialize(dll);
 

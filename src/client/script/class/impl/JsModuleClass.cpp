@@ -293,9 +293,10 @@ JsValueRef JsModuleClass::moduleAddEnumSetting(JsValueRef callee, bool isConstru
 	for (int i = 0; i < Chakra::GetIntProperty(values, L"length"); i++) {
 		JsValueRef obj = JS_INVALID_REFERENCE;
 		JS::JsGetIndexedProperty(values, Chakra::MakeInt(i), &obj);
-		auto entryName = Chakra::GetStringProperty(obj, L"name");
-		auto entryDesc = Chakra::GetStringProperty(obj, L"desc");
+
 		if (obj != JS_INVALID_REFERENCE) {
+			auto entryName = Chakra::GetStringProperty(obj, L"name");
+			auto entryDesc = Chakra::GetStringProperty(obj, L"desc");
 			set->enumData->addEntry(EnumEntry{ i, entryName, entryDesc });
 		}
 	}
