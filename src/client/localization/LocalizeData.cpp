@@ -8,7 +8,10 @@ LocalizeData::LocalizeData() {
 
     languages = {
         fallbackLanguage,
-        std::make_shared<Language>(LANG_ES_ES)
+        std::make_shared<Language>(LANG_ES_ES),
+        std::make_shared<Language>(LANG_PT_PT),
+        std::make_shared<Language>(LANG_ZH_CN),
+        std::make_shared<Language>(LANG_ZH_TW),
     };
 
     for (auto& lang : languages) {
@@ -18,8 +21,6 @@ LocalizeData::LocalizeData() {
 
 std::string LocalizeData::getResourceContent(const std::variant<int, std::string>& resource) {
     if (auto res = std::get_if<int>(&resource)) {
-
-        // TODO: Doesn't account for unicode
         return Latite::get().getTextAsset(*res);
     }
 
