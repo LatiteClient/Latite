@@ -245,13 +245,13 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     else {
         Logger::Info(XOR_STRING("Loaded master config"));
     }
+    new (mainSettingGroup) SettingGroup("global");
 
     Latite::get().initSettings();
     Latite::getConfigManager().applyGlobalConfig();
 
     new (mmgrBuf) ModuleManager;
     new (commandMgrBuf) CommandManager;
-    new (mainSettingGroup) SettingGroup("global");
     new (scnMgrBuf) ScreenManager(); // needs to be before renderer
 
     new (scriptMgrBuf) PluginManager();
