@@ -236,6 +236,13 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(_updatePlayer),
         MVSIG(GameArguments__onUri),
         MVSIG(_bobHurt),
+        MVSIG(ItemPositionConst),
+        MVSIG(glm_rotate),
+        MVSIG(glm_rotateRef),
+        MVSIG(glm_translateRef),
+        MVSIG(glm_translateRef2),
+        MVSIG(ActorCollision_isOnGround),
+        MVSIG(ItemRenderer_render),
     };
     
     new (configMgrBuf) ConfigManager();

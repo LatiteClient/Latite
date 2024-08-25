@@ -34,6 +34,8 @@ namespace {
 	std::shared_ptr<Hook> UpdatePlayerHook;
 	std::shared_ptr<Hook> OnUriHook;
 	std::shared_ptr<Hook> BobHurtHook;
+	std::shared_ptr<Hook> ItemRenderer_renderHook;
+	std::shared_ptr<Hook> ItemRenderer_render_glm_rotateHook;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -405,6 +407,24 @@ void GenericHooks::hkBobHurt(void* obj, void* a2, void* a3) {
 	BobHurtHook->oFunc<decltype(&hkBobHurt)>()(obj, a2, a3);
 }
 
+void __fastcall GenericHooks::ItemRenderer_render(SDK::ItemRenderer* _this, SDK::BaseActorRenderContext* renderContext, SDK::ActorRenderData* actorRenderData) {
+	PreRenderItemEvent ev{_this, renderContext, actorRenderData};
+	Eventing::get().dispatch(ev);
+    
+	ItemRenderer_renderHook->oFunc<decltype(&GenericHooks::ItemRenderer_render)>()(_this, renderContext, actorRenderData);
+}
+
+void __fastcall GenericHooks::glm_rotate(glm::mat4x4& mat, float angle, float x, float y, float z) {
+    static auto rotateSig = Signatures::glm_rotate.result;
+    using glm_rotate_t = void(__fastcall*)(glm::mat4x4&, float, float, float, float);
+    static auto glm_rotate = reinterpret_cast<glm_rotate_t>(rotateSig);
+
+	RenderItemRotateEvent ev{mat, angle, x, y, z};
+
+	if (!Eventing::get().dispatch(ev))
+		glm_rotate(mat, angle, x, y, z);
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
 	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
@@ -454,5 +474,8 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	UpdatePlayerHook = addHook(Signatures::_updatePlayer.result, hkUpdatePlayer, "`anonymous namespace'::_updatePlayer");
 	OnUriHook = addHook(Signatures::GameArguments__onUri.result, hkOnUri, "GameArguments::_onUri");
 	BobHurtHook = addHook(Signatures::_bobHurt.result, hkBobHurt, "`anonymous namespace`::_bobHurt");
+
+	ItemRenderer_renderHook = addHook(Signatures::ItemRenderer_render.result, ItemRenderer_render, "ItemRenderer::render");
+	ItemRenderer_render_glm_rotateHook = addHook(Signatures::glm_rotateRef.result, glm_rotate, "glm::rotate");
 }
 

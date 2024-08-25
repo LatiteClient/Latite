@@ -306,6 +306,39 @@ public:
 	inline static SigImpl _bobHurt{ [](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5c 24 ? 55 48 8d 6c 24 ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 45 ? 49 8b 00"_sig,
 		"anonymous namespace::_bobHurt" };
+
+	inline static SigImpl ItemRenderer_render{ [](memory::signature_store&, uintptr_t res) { return res; },
+		"48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 49 8B D8"_sig,
+		"ItemRenderer::render" };
+
+	// Inside ItemRenderer::render, ask marioCST for help if you can't figure out how to update it
+	inline static SigImpl ItemPositionConst{ [](memory::signature_store&, uintptr_t res) { return res; },
+		"F3 0F 10 1D ? ? ? ? F3 0F 59 C3 F3 0F 58 C7"_sig,
+		"ItemPositionConst" };
+
+	// Inside ItemRenderer::render, ask marioCST for help if you can't figure out how to update it
+	inline static SigImpl glm_rotate{ [](memory::signature_store&, uintptr_t res) { return res; },
+		"40 53 48 83 EC ? F3 0F 59 0D ? ? ? ? 4C 8D 4C 24"_sig,
+		"glm::rotate" };
+
+	// Inside ItemRenderer::render, ask marioCST for help if you can't figure out how to update it
+	inline static SigImpl glm_rotateRef{ [](memory::signature_store&, uintptr_t res) { return res; },
+		"E8 ? ? ? ? 41 BD ? ? ? ? 41 0F B6 46"_sig,
+		"glm::rotateRef" };
+
+	// Inside ItemRenderer::render, ask marioCST for help if you can't figure out how to update it
+	inline static SigImpl glm_translateRef{ [](memory::signature_store&, uintptr_t res) { return res; },
+		"E8 ? ? ? ? 4C 8D 05 ? ? ? ? 44 0F 28 05"_sig,
+		"glm::translateRef" };
+
+	// Inside ItemRenderer::render, ask marioCST for help if you can't figure out how to update it
+	inline static SigImpl glm_translateRef2{ [](memory::signature_store&, uintptr_t res) { return res; },
+		"E8 ? ? ? ? C6 46 ? ? F3 0F 11 74 24 ? F3 0F 10 1D"_sig,
+		"glm::translateRef2" };
+
+	inline static SigImpl ActorCollision_isOnGround{ [](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"E8 ? ? ? ? 84 C0 49 8B 87"_sig,
+		"ActorCollision::isOnGround" };
 };
 
 // after adding sigs here, add them in latite.cpp

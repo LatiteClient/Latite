@@ -50,6 +50,7 @@
 #include "impl/hud/MovableCoordinates.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
+#include "impl/visual/ItemPhysics.h"
 
 ModuleManager::ModuleManager() {
 #ifdef LATITE_DEBUG
@@ -95,6 +96,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<CustomCoordinates>());
 	this->items.push_back(std::make_shared<MovableCoordinates>());
 	this->items.push_back(std::make_shared<NoHurtCam>());
+	this->items.push_back(std::make_shared<ItemPhysics>());
 
 	for (auto& mod : items) {
 		mod->onInit();
