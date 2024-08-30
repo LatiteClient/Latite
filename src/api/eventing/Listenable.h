@@ -6,5 +6,7 @@ public:
 	Listener() = default;
 	virtual ~Listener() = default;
 
-	virtual bool shouldListen() { return true; }
+	bool isListening() { return shouldListen; }
+protected:
+	bool shouldListen = false;
 };

@@ -19,10 +19,10 @@ public:
 	[[nodiscard]] bool isActive() { return active; }
 	void setActive(bool b, bool ignoreAnims = false) { 
 		this->active = b;
+		shouldListen = b;
 		b ? onEnable(ignoreAnims) : onDisable();
 	}
 
-	[[nodiscard]] bool shouldListen() override { return isActive(); }
 	[[nodiscard]] virtual std::string getName() = 0;
 
 	// TODO: grabMouse and releaseMouse
