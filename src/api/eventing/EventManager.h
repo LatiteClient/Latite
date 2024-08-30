@@ -2,6 +2,7 @@
 #include "Listenable.h"
 #include "Event.h"
 #include <algorithm>
+#include <shared_mutex>
 
 class IEventManager {
 public:
@@ -26,17 +27,16 @@ public:
 
 	template <typename T>
 	void listen(Listener* ptr, EventListenerFunc listener, int priority = 0, bool callWhileInactive = false) requires std::derived_from<T, Event> {
-		mutex.lock();
+		std::shared_lock lock{ mutex };
 		listeners.push_back({ T::hash, EventListener{ listener, ptr, callWhileInactive, priority } });
 		std::sort(listeners.begin(), listeners.end(), [](std::pair<uint32_t, EventListener> const& left,
 			std::pair<uint32_t, EventListener> const& right) {
 				return left.second.priority > right.second.priority;
 		});
-		mutex.unlock();
 	}
 
 	void unlisten(Listener* ptr) {
-		mutex.lock();
+		std::shared_lock lock{ mutex };
 		for (auto it = listeners.begin(); it != listeners.end();) {
 			if (it->second.listener == ptr) {
 				listeners.erase(it);
@@ -44,11 +44,9 @@ public:
 			}
 			++it;
 		}
-		mutex.unlock();
 	}
 
-	//virtual void init() = 0;
 protected:
-	std::mutex mutex;
+	std::shared_mutex mutex;
 	std::vector<std::pair<uint32_t, EventListener>> listeners;
 };
