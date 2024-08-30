@@ -12,6 +12,7 @@ LocalizeData::LocalizeData() {
         std::make_shared<Language>(LANG_PT_PT),
         std::make_shared<Language>(LANG_ZH_CN),
         std::make_shared<Language>(LANG_ZH_TW),
+        std::make_shared<Language>(LANG_AR_AR),
     };
 
     for (auto& lang : languages) {

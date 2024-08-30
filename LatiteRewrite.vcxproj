@@ -825,6 +825,7 @@
     <ClInclude Include="assets\lang\zh_TW.json">
       <FileType>Document</FileType>
     </ClInclude>
+    <None Include="assets\lang\ar_AR.json" />
     <None Include="CMakePresets.json" />
     <None Include="CppProperties.json" />
     <None Include="src\client\script\js\latiteapi.js" />

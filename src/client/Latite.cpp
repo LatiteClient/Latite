@@ -248,6 +248,10 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     }
     new (mainSettingGroup) SettingGroup("global");
 
+    // The Language setting is a special case because we need it to apply names to other global settings.
+    Latite::get().initLanguageSetting();
+    Latite::getConfigManager().applyLanguageConfig("language");
+
     Latite::get().initSettings();
     Latite::getConfigManager().applyGlobalConfig();
 
@@ -696,24 +700,6 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("language", LocalizeString::get("client.settings.language.name"),
-            LocalizeString::get("client.settings.language.desc"));
-        set->enumData = &this->clientLanguage;
-        set->value = set->enumData->getValue();
-        set->callback = [](Setting&) {
-            Latite::getClientMessageQueue().push(util::WFormat(LocalizeString::get("client.message.languageSwitchHelper.name")));
-            };
-
-        for (int i = 0; auto & lang : l10nData->getLanguages()) {
-            set->enumData->addEntry({
-                i, util::StrToWStr(lang->name)
-                });
-            i++;
-        }
-        this->getSettings().addSetting(set);
-    }
-
-    {
         //auto set = std::make_shared<Setting>("broadcastClientUsage", "Latite Client Presence", "If you leave this on, others with Latite will see that you are using Latite and you will see other people who use Latite.");
         //set->value = &this->broadcastUsage;
         //this->getSettings().addSetting(set);
@@ -828,6 +814,24 @@ void Latite::downloadChakraCore() {
         this->downloadingAssets = true;
         doDownloadAssets();
     }
+}
+
+void Latite::initLanguageSetting() {
+    auto set = std::make_shared<Setting>("language", L"Language",
+        L"The client's language.");
+    set->enumData = &this->clientLanguage;
+    set->value = set->enumData->getValue();
+    set->callback = [](Setting&) {
+        Latite::getClientMessageQueue().push(util::WFormat(LocalizeString::get("client.message.languageSwitchHelper.name")));
+        };
+
+    for (int i = 0; auto & lang : l10nData->getLanguages()) {
+        set->enumData->addEntry({
+            i, util::StrToWStr(lang->name)
+            });
+        i++;
+    }
+    this->getSettings().addSetting(set);
 }
 
 void Latite::onUpdate(Event& evGeneric) {
@@ -1057,6 +1061,17 @@ void Latite::onPacketReceive(Event& evG) {
 
 void Latite::onTick(Event& ev) {
     updateModuleBlocking();
+}
+
+void Latite::loadLanguageConfig(std::shared_ptr<Setting> languageSetting) {
+    this->getSettings().forEach([&](std::shared_ptr<Setting> set) {
+        if (set->name() == languageSetting->name()) {
+            std::visit([&](auto&& obj) {
+                *set->value = obj;
+                set->update();
+                }, languageSetting->resolvedValue);
+        }
+        });
 }
 
 void Latite::loadConfig(SettingGroup& gr) {

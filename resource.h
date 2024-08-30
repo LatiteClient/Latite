@@ -33,3 +33,4 @@
 #define LANG_PT_PT 103
 #define LANG_ZH_CN 104
 #define LANG_ZH_TW 105
+#define LANG_AR_AR 106

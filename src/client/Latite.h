@@ -43,6 +43,7 @@ public:
 
 	std::string getTextAsset(int resource);
 	void downloadChakraCore();
+	void initLanguageSetting();
 	void initSettings();
 
 	void queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback);
@@ -115,6 +116,7 @@ public:
 
 	void initL10n();
 
+	void loadLanguageConfig(std::shared_ptr<Setting> languageSetting);
 	void loadConfig(class SettingGroup& resolvedGroup);
 	float getRGBHue() const { return rgbHue; }
 

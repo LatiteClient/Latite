@@ -14,6 +14,21 @@ bool ConfigManager::loadMaster() {
 	return load(masterConfig);
 }
 
+void ConfigManager::applyLanguageConfig(std::string_view languageSettingName) {
+	for (auto& item : loadedConfig->getOutput()) {
+
+		// Might be a bit hacky
+		if (Latite::getSettings().name() == item->name()) {
+			item->forEach([&](std::shared_ptr<Setting> set) {
+				if (set->name() == languageSettingName) {
+					Latite::get().loadLanguageConfig(set);
+				}
+				});
+			Latite::get().loadConfig(*item.get());
+		}
+	}
+}
+
 void ConfigManager::applyGlobalConfig() {
 	for (auto& item : loadedConfig->getOutput()) {
 

@@ -8,6 +8,7 @@ public:
 
 	bool loadMaster();
 
+	void applyLanguageConfig(std::string_view languageSettingName);
 	void applyGlobalConfig();
 	void applyModuleConfig();
 
