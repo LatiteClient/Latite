@@ -6,16 +6,9 @@
 #include "sdk/signature/storage.h"
 #include "api/memory/Memory.h"
 
-SDK::TextPacket::TextPacket() {
-	*reinterpret_cast<uintptr_t*>(this) = Signatures::Vtable::TextPacket.result;
-
-	memset(pad, 0x0, sizeof(pad));
-	memset(pad2, 0, sizeof(pad2));
-}
-
-void SDK::TextPacket::chat(String const& message) {
+void SDK::TextPacket::chat(std::string const& message) {
 	this->str = message;
-	this->source.setString(SDK::ClientInstance::get()->getLocalPlayer()->playerName.c_str());
-	this->xboxUserId.setString(SDK::ClientInstance::get()->minecraftGame->xuid.c_str());
+	this->source = SDK::ClientInstance::get()->getLocalPlayer()->playerName;
+	this->xboxUserId = SDK::ClientInstance::get()->minecraftGame->xuid;
 	this->type = TextPacketType::CHAT;
 }

@@ -14,8 +14,8 @@ void Nickname::onClientTextPacket(Event& evG) {
 
     if (!SDK::ClientInstance::get()->getLocalPlayer()) return;
 
-    auto message = textPacket->str.str();
-    auto source = textPacket->source.str();
+    auto message = textPacket->str;
+    auto source = textPacket->source;
 
     auto replaceAll = [](std::string& s, std::string from, std::string to) {
         if (!from.empty())
@@ -29,6 +29,6 @@ void Nickname::onClientTextPacket(Event& evG) {
     replaceAll(message, currentPlayerName, newName);
     replaceAll(source, currentPlayerName, newName);
 
-    textPacket->str.setString(message.c_str());
-    textPacket->source.setString(source.c_str());
+    textPacket->str = message;
+    textPacket->source = source;
 }

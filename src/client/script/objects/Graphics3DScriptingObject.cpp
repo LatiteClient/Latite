@@ -32,7 +32,7 @@ void Graphics3DScriptingObject::onRenderLevel(Event& evG) {
 			tess->vertex(vertex.position.x - origin.x, vertex.position.y - origin.y, vertex.position.z - origin.z);
 		}
 
-		SDK::MeshHelpers::renderMeshImmediately(screenContext, tess, command.renderThrough ? levelRenderer->getLevelRendererPlayer()->getSelectionBoxMaterial() : SDK::MaterialPtr::getUIColor());
+		SDK::MeshHelpers::renderMeshImmediately(screenContext, tess, command.renderThrough ? SDK::MaterialPtr::getSelectionBoxMaterial() : SDK::MaterialPtr::getUIColor());
 	}
 
 	commands.clear();

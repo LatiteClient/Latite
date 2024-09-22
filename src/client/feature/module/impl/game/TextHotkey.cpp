@@ -2,6 +2,8 @@
 #include "TextHotkey.h"
 #include <sdk/common/network/packet/CommandRequestPacket.h>
 
+#include "sdk/common/network/MinecraftPackets.h"
+
 TextHotkey::TextHotkey() : Module("TextHotkey", LocalizeString::get("client.module.textHotkey.name"),
                                   LocalizeString::get("client.module.textHotkey.desc"), GAME, nokeybind) {
     addSetting("commandMode", LocalizeString::get("client.module.textHotkey.commandMode.name"),
@@ -26,18 +28,19 @@ void TextHotkey::onKey(Event& evG) {
 			}
 
 			if (std::get<BoolValue>(commandMode)) {
-				SDK::CommandRequestPacket pkt = SDK::CommandRequestPacket("/" + msg);
-				SDK::ClientInstance::get()->getLocalPlayer()->packetSender->sendToServer(pkt);
+				auto pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::COMMAND_REQUEST);
+				SDK::CommandRequestPacket* cmd = static_cast<SDK::CommandRequestPacket*>(pkt.get());
+				cmd->applyCommand("/"+msg);
+				SDK::ClientInstance::get()->getLocalPlayer()->packetSender->sendToServer(*pkt);
 				lastSend = now;
 			}
 			else {
-				SDK::TextPacket pkt{};
+				auto pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::TEXT);
+				SDK::TextPacket* tp = static_cast<SDK::TextPacket*>(pkt.get());
+				
+				tp->chat(util::WStrToStr(std::get<TextValue>(this->textMessage).str));
 
-				String str{};
-				str.setString(util::WStrToStr(std::get<TextValue>(this->textMessage).str).c_str());
-				pkt.chat(str);
-
-				SDK::ClientInstance::get()->getLocalPlayer()->packetSender->sendToServer(pkt);
+				SDK::ClientInstance::get()->getLocalPlayer()->packetSender->sendToServer(*pkt);
 
 				lastSend = now;
 			}

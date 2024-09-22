@@ -20,20 +20,14 @@ namespace SDK {
 	class TextPacket : public Packet {
 	public:
 		TextPacketType type;
-		String source;
-		String str;
-
+		std::string source;
+		std::string str;
 	private:
-		[[maybe_unused]] char pad[9 * 8];
+		std::vector<std::string> params;
+		bool translationNeeded = false;
 	public:
-		String xboxUserId, platformChatId;
-		// theres probably more stuff
-	private:
-		[[maybe_unused]] char pad2[100];
-
+		std::string xboxUserId, platformChatId;
 	public:
-		TextPacket();
-
-		void chat(String const& message);
+		void chat(std::string const& message);
 	};
 }

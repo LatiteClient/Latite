@@ -84,8 +84,8 @@ void ChunkBorders::onRender3d(Event& evG) {
 	auto& ev = reinterpret_cast<RenderLevelEvent&>(evG);
 	MCDrawUtil3D dc{ SDK::ClientInstance::get()->levelRenderer, ev.getScreenContext(),
 		std::get<BoolValue>(this->transparent) ?
-			ev.getLevelRenderer()->getLevelRendererPlayer()->getSelectionOverlayMaterial() :
-			ev.getLevelRenderer()->getLevelRendererPlayer()->getSelectionBoxMaterial() };
+			SDK::MaterialPtr::getSelectionOverlayMaterial() :
+			SDK::MaterialPtr::getSelectionBoxMaterial() };
 
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!lp) return;

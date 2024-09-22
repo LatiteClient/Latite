@@ -4,15 +4,46 @@
 #include "sdk/Util.h"
 
 namespace SDK {
-	class CommandRequestPacket : public Packet {
-		char pad[0x9C - sizeof(Packet)];
+	// LeviLamina
+	class mcUUID {
 	public:
-		CLASS_FIELD(int, unkInt1, 0x8); // should be 2
-		CLASS_FIELD(int, unkInt2, 0xC); // should be 1
-		CLASS_FIELD(int, type, 0x24);// should be 0
-		CLASS_FIELD(String, command, 0x30); // includes '/'
-		CLASS_FIELD(bool, unkBool, 0x94); //should be false
+		uint64_t mostSig, leastSig;
+	};
 
-		CommandRequestPacket(std::string command);
+	enum class CommandOriginType : int8_t {
+		Player = 0x0,
+		CommandBlock = 0x1,
+		MinecartCommandBlock = 0x2,
+		DevConsole = 0x3,
+		Test = 0x4,
+		AutomationPlayer = 0x5,
+		ClientAutomation = 0x6,
+		DedicatedServer = 0x7,
+		Entity = 0x8,
+		Virtual = 0x9,
+		GameArgument = 0xA,
+		EntityServer = 0xB,
+		Precompiled = 0xC,
+		GameDirectorEntityServer = 0xD,
+		Scripting = 0xE,
+		ExecuteContext = 0xF,
+	};
+
+	class CommandOriginData {
+	public:
+		CommandOriginType type;
+		mcUUID uuid;
+		std::string requestId;
+		int64_t playerId;
+	};
+
+	class CommandRequestPacket : public Packet {
+
+	public:
+		std::string command;
+		CommandOriginData origin;
+		bool InternalSource;
+
+		void applyCommand(std::string const& command);
 	};
 }

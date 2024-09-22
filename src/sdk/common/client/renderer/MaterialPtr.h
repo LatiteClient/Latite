@@ -19,5 +19,8 @@ namespace SDK {
 		// TODO: construct own materials
 		static MaterialPtr* getUIColor();
 		static MaterialPtr* getUITextureAndColor();
+		static MaterialPtr* createMaterial(const HashedString& name);
+		static MaterialPtr* getSelectionBoxMaterial();
+		static MaterialPtr* getSelectionOverlayMaterial();
 	};
 }
