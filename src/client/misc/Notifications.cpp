@@ -4,7 +4,7 @@
 #include <client/Latite.h>
 
 Notifications::Notifications() {
-	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Notifications::onRender, 10);
+	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Notifications::onRender, 10, true);
 }
 
 void Notifications::onRender(Event& evG) {
