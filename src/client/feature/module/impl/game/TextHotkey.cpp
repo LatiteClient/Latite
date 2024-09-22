@@ -29,14 +29,14 @@ void TextHotkey::onKey(Event& evG) {
 
 			if (std::get<BoolValue>(commandMode)) {
 				auto pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::COMMAND_REQUEST);
-				SDK::CommandRequestPacket* cmd = static_cast<SDK::CommandRequestPacket*>(pkt.get());
+				SDK::CommandRequestPacket* cmd = reinterpret_cast<SDK::CommandRequestPacket*>(pkt.get());
 				cmd->applyCommand("/"+msg);
 				SDK::ClientInstance::get()->getLocalPlayer()->packetSender->sendToServer(*pkt);
 				lastSend = now;
 			}
 			else {
 				auto pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::TEXT);
-				SDK::TextPacket* tp = static_cast<SDK::TextPacket*>(pkt.get());
+				SDK::TextPacket* tp = reinterpret_cast<SDK::TextPacket*>(pkt.get());
 				
 				tp->chat(util::WStrToStr(std::get<TextValue>(this->textMessage).str));
 

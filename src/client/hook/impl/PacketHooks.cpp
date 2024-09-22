@@ -12,8 +12,8 @@ namespace {
 	std::array<std::shared_ptr<Hook>, (size_t)SDK::PacketID::COUNT> PacketHookArray;
 }
 
-void PacketHooks::PacketSender_sendToServer(SDK::PacketSender* sender, SDK::Packet* packet) {
-	SendPacketEvent ev{ packet };
+void PacketHooks::PacketSender_sendToServer(SDK::PacketSender* sender, SDK::Packet& packet) {
+	SendPacketEvent ev{ &packet };
 
 	if (Eventing::get().dispatch(ev)) {
 		return;
