@@ -7,7 +7,7 @@
 #include <client/Latite.h>
 
 Keyboard::Keyboard(int* gameKeyMap) : keyMap(gameKeyMap) {
-	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Keyboard::onKey, 4);
+	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Keyboard::onKey, 4, true);
 }
 
 void Keyboard::findTextInput() {
