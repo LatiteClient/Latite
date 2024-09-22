@@ -31,7 +31,7 @@ void TextHotkey::onKey(Event& evG) {
 				auto pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::COMMAND_REQUEST);
 				SDK::CommandRequestPacket* cmd = reinterpret_cast<SDK::CommandRequestPacket*>(pkt.get());
 				cmd->applyCommand("/"+msg);
-				SDK::ClientInstance::get()->getLocalPlayer()->packetSender->sendToServer(*pkt);
+				SDK::ClientInstance::get()->getLocalPlayer()->packetSender->sendToServer(pkt.get());
 				lastSend = now;
 			}
 			else {
@@ -40,7 +40,7 @@ void TextHotkey::onKey(Event& evG) {
 				
 				tp->chat(util::WStrToStr(std::get<TextValue>(this->textMessage).str));
 
-				SDK::ClientInstance::get()->getLocalPlayer()->packetSender->sendToServer(*pkt);
+				SDK::ClientInstance::get()->getLocalPlayer()->packetSender->sendToServer(pkt.get());
 
 				lastSend = now;
 			}

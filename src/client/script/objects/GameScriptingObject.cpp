@@ -293,7 +293,7 @@ JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConst
 			auto pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::TEXT);
 			SDK::TextPacket* tp = reinterpret_cast<SDK::TextPacket*>(pkt.get());
 			tp->chat(util::WStrToStr(Chakra::GetString(arguments[1])));
-			lp->packetSender->sendToServer(*pkt);
+			lp->packetSender->sendToServer(pkt.get());
 		}
 
 		return Chakra::GetUndefined();
@@ -316,7 +316,7 @@ JsValueRef GameScriptingObject::executeCommand(JsValueRef callee, bool isConstru
 		SDK::CommandRequestPacket* cmd = reinterpret_cast<SDK::CommandRequestPacket*>(pkt.get());
 		cmd->applyCommand(util::WStrToStr(Chakra::GetString(arguments[1])));
 		
-		lp->packetSender->sendToServer(*pkt);
+		lp->packetSender->sendToServer(pkt.get());
 	}
 	return Chakra::GetUndefined();
 }
