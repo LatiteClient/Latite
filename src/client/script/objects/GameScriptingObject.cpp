@@ -21,6 +21,7 @@
 #include <sdk/common/network/packet/CommandRequestPacket.h>
 #include <client/script/class/impl/game/JsBlock.h>
 #include <client/script/class/impl/JsVec3.h>
+#include "sdk/common/network/MinecraftPackets.h"
 
 void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	this->createWorldObject();
@@ -289,11 +290,10 @@ JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConst
 		&& Chakra::GetString(arguments[1]).size() < 250) {
 		auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 		if (lp) {
-			SDK::TextPacket tp{};
-			String s{};
-			s.setString(util::WStrToStr(Chakra::GetString(arguments[1])).c_str());
-			tp.chat(s);
-			lp->packetSender->sendToServer(tp);
+			auto pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::TEXT);
+			SDK::TextPacket* tp = reinterpret_cast<SDK::TextPacket*>(pkt.get());
+			tp->chat(util::WStrToStr(Chakra::GetString(arguments[1])));
+			lp->packetSender->sendToServer(pkt.get());
 		}
 
 		return Chakra::GetUndefined();
@@ -312,9 +312,11 @@ JsValueRef GameScriptingObject::executeCommand(JsValueRef callee, bool isConstru
 
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (lp) {
-		auto str = util::WStrToStr(Chakra::GetString(arguments[1]));
-		SDK::CommandRequestPacket req{str};
-		lp->packetSender->sendToServer(req);
+		auto pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::COMMAND_REQUEST);
+		SDK::CommandRequestPacket* cmd = reinterpret_cast<SDK::CommandRequestPacket*>(pkt.get());
+		cmd->applyCommand(util::WStrToStr(Chakra::GetString(arguments[1])));
+		
+		lp->packetSender->sendToServer(pkt.get());
 	}
 	return Chakra::GetUndefined();
 }

@@ -51,12 +51,7 @@ namespace SDK {
         ScreenContext* screenContext;
 
         void flushText(float lastFlush) {
-            if (internalVers >= V1_20_60) {
-                memory::callVirtual<void>(this, 6, 0, lastFlush);
-            }
-            else {
-                memory::callVirtual<void>(this, 6, lastFlush);
-            }
+            memory::callVirtual<void>(this, 6, lastFlush);
         }
 
         void drawImage(TexturePtr const& texture, Vec2 const& pos, Vec2 const& size, Vec2 const& uvPos, Vec2 const& uvSize) {

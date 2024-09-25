@@ -38,6 +38,8 @@ public:
 	[[nodiscard]] std::string getCommandPrefix() { return util::WStrToStr(std::get<TextValue>(commandPrefix).str); }
 	[[nodiscard]] int getSelectedLanguage() { return clientLanguage.getSelectedKey(); }
 
+	[[nodiscard]] bool isListening() override { return true; }
+
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);
 

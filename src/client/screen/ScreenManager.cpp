@@ -6,7 +6,7 @@
 #include "client/event/impl/KeyUpdateEvent.h"
 
 ScreenManager::ScreenManager() {
-	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc)&ScreenManager::onKey);
+	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc)&ScreenManager::onKey, 0, true);
 }
 
 void ScreenManager::exitCurrentScreen() {

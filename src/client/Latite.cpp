@@ -137,9 +137,10 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int deadCount = 0;
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
-        { "1.21.20", SDK::VLATEST },
-        { "1.21.21", SDK::VLATEST },
-        { "1.21.22", SDK::VLATEST },
+        { "1.21.30", SDK::VLATEST },
+        // { "1.21.20", SDK::VLATEST },
+        // { "1.21.21", SDK::VLATEST },
+        // { "1.21.22", SDK::VLATEST },
         //{ "1.21.0", SDK::V1_21 },
         //{ "1.21.1", SDK::V1_21 },
         //{ "1.21.2", SDK::V1_21 },
@@ -237,6 +238,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(_updatePlayer),
         MVSIG(GameArguments__onUri),
         MVSIG(_bobHurt),
+        MVSIG(RenderMaterialGroup__common)
     };
     
     new (configMgrBuf) ConfigManager();

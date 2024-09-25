@@ -7,7 +7,7 @@ MCDrawUtil3D::MCDrawUtil3D(SDK::LevelRenderer* renderer, SDK::ScreenContext* ctx
     : levelRenderer(renderer), screenContext(ctx), material(material) {
     
     if (!material) {
-        this->material = renderer->getLevelRendererPlayer()->getSelectionBoxMaterial();
+        this->material = SDK::MaterialPtr::getSelectionBoxMaterial();
     }
 }
 

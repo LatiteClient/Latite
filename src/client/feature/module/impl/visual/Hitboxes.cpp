@@ -26,8 +26,8 @@ void Hitboxes::onEntityRender(Event& evG) {
 	auto& ev = reinterpret_cast<AfterRenderEntityEvent&>(evG);
 
 	auto material = std::get<BoolValue>(transparent) ?
-		SDK::ClientInstance::get()->levelRenderer->getLevelRendererPlayer()->getSelectionOverlayMaterial() :
-		SDK::ClientInstance::get()->levelRenderer->getLevelRendererPlayer()->getSelectionBoxMaterial();
+		SDK::MaterialPtr::getSelectionOverlayMaterial() :
+		SDK::MaterialPtr::getSelectionBoxMaterial();
 
 	auto dc = MCDrawUtil3D(SDK::ClientInstance::get()->levelRenderer, SDK::ScreenContext::instance3d, material);
 

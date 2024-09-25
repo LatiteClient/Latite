@@ -10,6 +10,7 @@ Vec3& SDK::LevelRendererPlayer::getOrigin() {
 }
 
 float& SDK::LevelRendererPlayer::getFovX() {
+    if (SDK::internalVers >= SDK::V1_21_30) return util::directAccess<float>(this, 0xE28);
     if (SDK::internalVers >= SDK::V1_21) return util::directAccess<float>(this, 0xDF0);
     if (SDK::internalVers >= SDK::V1_20_80) return util::directAccess<float>(this, 0xDF8);
     if (SDK::internalVers >= SDK::V1_20_71) return util::directAccess<float>(this, 0xDD8);
@@ -20,6 +21,7 @@ float& SDK::LevelRendererPlayer::getFovX() {
 }
 
 float& SDK::LevelRendererPlayer::getFovY() {
+    if (SDK::internalVers >= SDK::V1_21_30) return util::directAccess<float>(this, 0xE3C);
     if (SDK::internalVers >= SDK::V1_21) return util::directAccess<float>(this, 0xE04);
     if (SDK::internalVers >= SDK::V1_20_80) return util::directAccess<float>(this, 0xE0C);
     if (SDK::internalVers >= SDK::V1_20_71) return util::directAccess<float>(this, 0xDEC);
