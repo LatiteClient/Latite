@@ -19,7 +19,7 @@ JsValueRef Filesystem::initialize(JsValueRef parent) {
 	Chakra::DefineFunc(ret, createDirectorySync, L"createDirectory", this);
 	Chakra::DefineFunc(ret, appendSync, L"append", this);
 	Chakra::DefineFunc(ret, deleteFile, L"delete", this);
-	Chakra::DefineFunc(ret, readdirSync, L"readDirectorySync", this);
+	Chakra::DefineFunc(ret, readdirSync, L"readDirectory", this);
 	return ret;
 }
 
@@ -284,7 +284,7 @@ JsValueRef Filesystem::readdirSync(JsValueRef callee, bool isConstructor, JsValu
 	std::vector<std::wstring> entries;
 
 	for (auto& entry : fs::directory_iterator(path)) {
-		entries.push_back(entry.path().wstring());
+		entries.push_back(entry.path().filename()));
 	}
 
 	JsValueRef array;
