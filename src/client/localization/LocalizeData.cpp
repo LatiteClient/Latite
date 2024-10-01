@@ -12,7 +12,13 @@ LocalizeData::LocalizeData() {
         std::make_shared<Language>(LANG_PT_PT),
         std::make_shared<Language>(LANG_ZH_CN),
         std::make_shared<Language>(LANG_ZH_TW),
+#ifdef LATITE_DEBUG
         std::make_shared<Language>(LANG_AR_AR),
+#endif
+        std::make_shared<Language>(LANG_CS_CZ),
+        std::make_shared<Language>(LANG_FR_FR),
+        std::make_shared<Language>(LANG_JA_JP),
+        std::make_shared<Language>(LANG_PT_BR),
     };
 
     for (auto& lang : languages) {

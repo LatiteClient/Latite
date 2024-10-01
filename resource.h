@@ -34,3 +34,7 @@
 #define LANG_ZH_CN 104
 #define LANG_ZH_TW 105
 #define LANG_AR_AR 106
+#define LANG_CS_CZ 107
+#define LANG_FR_FR 108
+#define LANG_JA_JP 109
+#define LANG_PT_BR 110

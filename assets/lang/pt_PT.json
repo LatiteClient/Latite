@@ -15,7 +15,7 @@
     "client.settings.textShadow.name": "Sombras no Texto de Minecraft",
     "client.settings.secondaryFont.name": "Fonte de HUD",
     "client.settings.mcRendererFont.name": "Fonte de HUD do Minecraft",
-    "client.settings.centerCursor.name": "Cursor Central ao abrir UIs",
+    "client.settings.centerCursor.name": "Cursor Central ao abrir IUs",
     "client.settings.snapLines.name": "Linhas de Ajuste",
     "client.settings.menuKey.desc": "A tecla usada para abrir o menu",
     "client.settings.ejectKey.desc": "A tecla usada para desinjetar o client",
