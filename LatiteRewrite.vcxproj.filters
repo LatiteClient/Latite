@@ -319,8 +319,6 @@
     <ClInclude Include="src\client\Latite.h" />
     <ClInclude Include="src\client\localization\LocalizeData.h" />
     <ClInclude Include="src\client\localization\LocalizeString.h" />
-    <ClInclude Include="src\client\misc\AuthWindow.h" />
-    <ClInclude Include="src\client\misc\ClientMessageSink.h" />
     <ClInclude Include="src\api\feature\module\Module.h" />
     <ClInclude Include="src\api\feature\module\ModuleManager.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\TestModule.h" />
@@ -759,6 +757,9 @@
     <ClInclude Include="src\util\Util.h" />
     <ClInclude Include="src\util\XorString.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\TabList.h" />
+    <ClInclude Include="assets\lang\pt_PT.json" />
+    <ClInclude Include="assets\lang\zh_CN.json" />
+    <ClInclude Include="assets\lang\zh_TW.json" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />
@@ -786,9 +787,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\hook\Hook.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\misc\ClientMessageSink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp">
@@ -858,9 +856,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\util\DxUtil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\misc\AuthWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\client\render\Renderer.cpp">
@@ -1236,9 +1231,11 @@
     <None Include="CMakePresets.json" />
     <None Include="CppProperties.json" />
     <None Include="src\client\script\js\latiteapi.js" />
-    <None Include="assets\lang\pt_PT.json" />
-    <None Include="assets\lang\zh_CN.json" />
-    <None Include="assets\lang\zh_TW.json" />
+    <None Include="assets\lang\ar_AR.json" />
+    <None Include="assets\lang\cs_CZ.json" />
+    <None Include="assets\lang\fr_FR.json" />
+    <None Include="assets\lang\ja_JP.json" />
+    <None Include="assets\lang\pt_BR.json" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc">
