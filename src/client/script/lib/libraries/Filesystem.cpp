@@ -5,6 +5,8 @@
 #include "../../JsScript.h"
 #include "util/ChakraUtil.h"
 
+namespace fs = std::filesystem;
+
 JsValueRef Filesystem::initialize(JsValueRef parent) {
 	JsValueRef ret;
 	JS::JsCreateObject(&ret);
@@ -17,12 +19,13 @@ JsValueRef Filesystem::initialize(JsValueRef parent) {
 	Chakra::DefineFunc(ret, createDirectorySync, L"createDirectory", this);
 	Chakra::DefineFunc(ret, appendSync, L"append", this);
 	Chakra::DefineFunc(ret, deleteFile, L"delete", this);
+	Chakra::DefineFunc(ret, readdirSync, L"readDirectorySync", this);
 	return ret;
 }
 
 std::wstring Filesystem::getPath(std::wstring relPath) {
 	try {
-		if (std::filesystem::exists(relPath)) {
+		if (fs::exists(relPath)) {
 			return relPath;
 		}
 	}
@@ -92,7 +95,7 @@ JsValueRef Filesystem::read(JsValueRef callee, bool isConstructor, JsValueRef* a
 
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 	auto path = thi->getPath(Chakra::GetString(arguments[1]));
-	if (std::filesystem::is_directory(path)) {
+	if (fs::is_directory(path)) {
 		Chakra::ThrowError(L"Filesystem read: File is a directory");
 		return JS_INVALID_REFERENCE;
 	}
@@ -160,7 +163,7 @@ JsValueRef Filesystem::readSync(JsValueRef callee, bool isConstructor, JsValueRe
 	if (!Chakra::VerifyParameters({ {arguments[1], JsString} })) return ret;
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 	auto path = thi->getPath(Chakra::GetString(arguments[1]));
-	if (std::filesystem::is_directory(path)) {
+	if (fs::is_directory(path)) {
 		Chakra::ThrowError(L"Filesystem readSync: File is a directory");
 		return JS_INVALID_REFERENCE;
 	}
@@ -199,7 +202,7 @@ JsValueRef Filesystem::existsSync(JsValueRef callee, bool isConstructor, JsValue
 	std::wstringstream wss;
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 
-	return std::filesystem::exists(thi->getPath(Chakra::GetString(arguments[1]))) ? Chakra::GetTrue() : Chakra::GetFalse();
+	return fs::exists(thi->getPath(Chakra::GetString(arguments[1]))) ? Chakra::GetTrue() : Chakra::GetFalse();
 }
 
 JsValueRef Filesystem::createDirectorySync(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
@@ -209,7 +212,7 @@ JsValueRef Filesystem::createDirectorySync(JsValueRef callee, bool isConstructor
 
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 	std::error_code errCode;
-	if (!std::filesystem::create_directory(thi->getPath(Chakra::GetString(arguments[1])), errCode)) {
+	if (!fs::create_directory(thi->getPath(Chakra::GetString(arguments[1])), errCode)) {
 		if (errCode.value() != ERROR_ALREADY_EXISTS && errCode.value() != 0) {
 			Chakra::ThrowError(L"Filesystem error: " + util::StrToWStr(errCode.message()));
 		}
@@ -252,8 +255,47 @@ JsValueRef Filesystem::deleteFile(JsValueRef callee, bool isConstructor, JsValue
 	std::wstringstream wss;
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 
-	std::filesystem::remove(thi->getPath(Chakra::GetString(arguments[1])));
+	auto path = thi->getPath(Chakra::GetString(arguments[1]));
+	if (fs::exists(path)) {
+		fs::remove(path);
+	}
+	else {
+		errno = ENOENT;
+		throwFsError();
+		return JS_INVALID_REFERENCE;
+	}
 	return Chakra::GetUndefined();
+}
+
+JsValueRef Filesystem::readdirSync(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	auto ret = Chakra::GetUndefined();
+	if (!Chakra::VerifyArgCount(argCount, 2)) return ret;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString} })) return ret;
+	std::wifstream ifs;
+	std::wstringstream wss;
+	auto thi = reinterpret_cast<Filesystem*>(callbackState);
+
+	auto path = thi->getPath(Chakra::GetString(arguments[1]));
+	if (!fs::is_directory(path)) {
+		Chakra::ThrowError(L"Filesystem error: " + path + L": Not a directory");
+		return JS_INVALID_REFERENCE;
+	}
+
+	std::vector<std::wstring> entries;
+
+	for (auto& entry : fs::directory_iterator(path)) {
+		entries.push_back(entry.path().wstring());
+	}
+
+	JsValueRef array;
+	JS::JsCreateArray(entries.size(), &array);
+
+	for (size_t i = 0; auto & entry : entries) {
+		JS::JsSetIndexedProperty(array, Chakra::MakeInt(i), Chakra::MakeString(entry));
+		i++;
+	}
+
+	return array;
 }
 
 void Filesystem::FSAsyncOperation::getArgs() {
