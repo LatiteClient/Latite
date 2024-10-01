@@ -16,6 +16,7 @@ JsValueRef Filesystem::initialize(JsValueRef parent) {
 	Chakra::DefineFunc(ret, existsSync, L"exists", this);
 	Chakra::DefineFunc(ret, createDirectorySync, L"createDirectory", this);
 	Chakra::DefineFunc(ret, appendSync, L"append", this);
+	Chakra::DefineFunc(ret, deleteFile, L"delete", this);
 	return ret;
 }
 
@@ -241,6 +242,18 @@ JsValueRef Filesystem::appendSync(JsValueRef callee, bool isConstructor, JsValue
 	}
 	ofs.close();
 	return undef;
+}
+
+JsValueRef Filesystem::deleteFile(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	auto ret = Chakra::GetUndefined();
+	if (!Chakra::VerifyArgCount(argCount, 2)) return ret;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString} })) return ret;
+	std::wifstream ifs;
+	std::wstringstream wss;
+	auto thi = reinterpret_cast<Filesystem*>(callbackState);
+
+	std::filesystem::remove(thi->getPath(Chakra::GetString(arguments[1])));
+	return Chakra::GetUndefined();
 }
 
 void Filesystem::FSAsyncOperation::getArgs() {

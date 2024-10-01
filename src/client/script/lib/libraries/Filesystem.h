@@ -80,5 +80,8 @@ private:
 	static JsValueRef CALLBACK appendSync(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount,
 		void* callbackState);
+	static JsValueRef CALLBACK deleteFile(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount,
+		void* callbackState);
 	
 };
