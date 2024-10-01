@@ -284,7 +284,7 @@ JsValueRef Filesystem::readdirSync(JsValueRef callee, bool isConstructor, JsValu
 	std::vector<std::wstring> entries;
 
 	for (auto& entry : fs::directory_iterator(path)) {
-		entries.push_back(entry.path().filename()));
+		entries.push_back(entry.path().filename());
 	}
 
 	JsValueRef array;
