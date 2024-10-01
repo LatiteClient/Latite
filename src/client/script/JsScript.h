@@ -107,20 +107,16 @@ public:
 	JsErrorCode compileScript();
 
 	struct Resource {
-		void* ptr;
+		std::shared_ptr<void> ptr;
 		std::function<void(void* object)> finalize;
 
-		Resource(void* ptr, decltype(finalize) finalizer) : ptr(ptr), finalize(finalizer) {}
-
-		~Resource() {
-			finalize(ptr);
-		}
+		Resource(void* ptr, decltype(finalize) finalizer) : ptr(ptr, finalizer), finalize(finalizer) {}
 	};
 
 	void addResource(void* object, decltype(Resource::finalize) finalizer) { this->resources.emplace_back(object, finalizer); };
 	void removeResource(void* object) { 
 		for (auto it = resources.begin(); it != resources.end(); ++it) {
-			if (it->ptr == object) resources.erase(it);
+			if (it->ptr.get() == object) resources.erase(it);
 		}
 	}
 protected:
