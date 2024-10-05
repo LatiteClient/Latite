@@ -22,6 +22,7 @@ namespace SDK {
 		TextPacketType type;
 		std::string source;
 		std::string str;
+		std::optional<std::string> filteredMessage;
 		std::vector<std::string> params;
 		bool translationNeeded = false;
 		std::string xboxUserId;
