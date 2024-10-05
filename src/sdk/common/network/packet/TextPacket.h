@@ -22,6 +22,10 @@ namespace SDK {
 		TextPacketType type;
 		std::string source;
 		std::string str;
+		std::vector<std::string> params;
+		bool translationNeeded = false;
+		std::string xboxUserId;
+		std::string platformChatId;
 
 		TextPacket() = default;
 		
