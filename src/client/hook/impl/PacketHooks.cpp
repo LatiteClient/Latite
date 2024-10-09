@@ -133,7 +133,7 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 			val2.val = util::StrToWStr(pkt->source);
 
 			PluginManager::Event::Value val3{ L"xuid" };
-			val3.val = L""; // No longer exists
+			val3.val = util::StrToWStr(pkt->xboxUserId);
 
 			PluginManager::Event::Value isChat{ L"isChat" };
 			isChat.val = (pkt->type == SDK::TextPacketType::CHAT || pkt->type == SDK::TextPacketType::RAW
