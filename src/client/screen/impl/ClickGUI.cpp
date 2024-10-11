@@ -527,6 +527,12 @@ void ClickGUI::onRender(Event&) {
 
 			{
 				float textHeight = 0.4f * modHeight;
+				float modTextHeight = 0.4f * modHeight;
+				// this is so scuffed but im desperate to get portuguese
+			    // module names to stop overflowing
+				if (mod.name.length() > 22) {
+					modTextHeight = 0.3f * modHeight;
+				}
 				float rlBounds = modWidth * 0.04561f;
 
 				// toggle width/height
@@ -633,14 +639,8 @@ void ClickGUI::onRender(Event&) {
 
 				// text
 				auto textRect = modRect;
-				// this is so scuffed but im desperate to get portuguese
-				// module names to stop overflowing
-				if (mod.name.length() > 22) {
-					textRect.left += modRect.getWidth() / 7.f;
-				} else {
-					textRect.left += modRect.getWidth() / 6.f;
-				}
-				dc.drawText(textRect, mod.name, { 1.f, 1.f, 1.f, 1.f }, FontSelection::PrimaryLight, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+				textRect.left += modRect.getWidth() / 6.f;
+				dc.drawText(textRect, mod.name, { 1.f, 1.f, 1.f, 1.f }, FontSelection::PrimaryLight, modTextHeight, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 				// toggle
 
