@@ -35,8 +35,8 @@ namespace util {
 		uint32_t hash = FNV_OFFSET_BASIS;
 
 		for (char c : str) {
-			hash *= FNV_PRIME;
 			hash ^= static_cast<uint32_t>(c);
+			hash *= FNV_PRIME;
 		}
 
 		return hash;
@@ -46,8 +46,8 @@ namespace util {
 		uint64_t hash = FNV_OFFSET_BASIS_64;
 
 		for (char c : str) {
-			hash *= FNV_PRIME_64;
 			hash ^= static_cast<uint64_t>(c);
+			hash *= FNV_PRIME_64;
 		}
 
 		return hash;
@@ -58,8 +58,8 @@ namespace util {
 		uint64_t hash = FNV_OFFSET_BASIS_64;
 
 		for (wchar_t c : str) {
-			hash *= FNV_PRIME_64;
 			hash ^= static_cast<uint64_t>(c);
+			hash *= FNV_PRIME_64;
 		}
 
 		return hash;
