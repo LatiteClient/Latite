@@ -8,7 +8,7 @@ Notifications::Notifications() {
 }
 
 void Notifications::push(std::wstring message) {
-	if (toasts.back().message == message) {
+	if (!toasts.empty() && toasts.back().message == message) {
 		toasts.back().createTime = std::chrono::system_clock::now();
 		return;
 	}
