@@ -78,7 +78,7 @@
     "client.textmodule.breakIndicator.desc": "Mostra o progresso de quebra do bloco que esta quebrando.",
     "client.textmodule.breakIndicator.lastProgress.name": "Ultimo progresso",
     "client.textmodule.breakIndicator.lastProgress.desc": "Se salva o progresso depois que a quebra é interrompida ou não",
-    "client.textmodule.speedDisplay.name": "Speed Display",
+    "client.textmodule.speedDisplay.name": "Display de velocidade",
     "client.textmodule.speedDisplay.decimals.name": "Decimais",
     "client.textmodule.speedDisplay.includeY.name": "Movimento Y",
     "client.textmodule.speedDisplay.desc": "Mostrar sua velocidade em blocos (metros) por segundo.",
