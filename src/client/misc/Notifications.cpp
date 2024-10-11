@@ -7,6 +7,15 @@ Notifications::Notifications() {
 	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Notifications::onRender, 10, true);
 }
 
+void Notifications::push(std::wstring message) {
+	if (toasts.back().message == message) {
+		toasts.back().createTime = std::chrono::system_clock::now();
+		return;
+	}
+
+	toasts.emplace(std::move(message));
+}
+
 void Notifications::onRender(Event& evG) {
 	auto& ev = reinterpret_cast<RenderOverlayEvent&>(evG);
 

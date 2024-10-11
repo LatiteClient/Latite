@@ -5,7 +5,7 @@ class Notifications : public Listener {
 public:
 	Notifications();
 
-	void push(std::wstring message) { toasts.emplace(std::move(message)); };
+	void push(std::wstring message);
 private:
 	void onRender(Event& ev);
 
