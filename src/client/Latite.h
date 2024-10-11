@@ -50,7 +50,7 @@ public:
 	void queueForClientThread(std::function<void()> callback);
 	void queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callback);
 
-	Latite() { shouldListen = true; };
+	Latite() = default;
 	~Latite() = default;
 
 	static constexpr std::string_view version = "v2.3.0";

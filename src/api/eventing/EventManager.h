@@ -10,7 +10,7 @@ public:
 	bool dispatch(T& ev) requires std::derived_from<T, Event> {
 		for (auto& pair : listeners) {
 			if (pair.first == T::hash) {
-				if (pair.second.listener->isListening() || pair.second.callWhileInactive) {
+				if (pair.second.listener->shouldListen() || pair.second.callWhileInactive) {
 					auto isCancel = ev.isCancellable();
 					(pair.second.listener->*pair.second.fptr)(ev);
 					if (isCancel) {

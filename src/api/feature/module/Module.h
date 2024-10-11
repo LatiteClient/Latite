@@ -33,14 +33,7 @@ public:
 	[[nodiscard]] bool isTextual() const { return textual; };
 	[[nodiscard]] bool isVisible() const { return visible; };
 	[[nodiscard]] bool isBlocked() const { return blocked; };
-	void setEnabled(bool b, bool blockedOverride = false) {
-		if (!blockedOverride && isBlocked()) {
-			return;
-		}
-		b ? onEnable() : onDisable();
-		std::get<BoolValue>(enabled) = b;
-		shouldListen = b;
-	}
+	void setEnabled(bool b, bool blockedOverride = false) { if (!blockedOverride && isBlocked()) return; b ? onEnable() : onDisable(); std::get<BoolValue>(enabled) = b; }
 	void setBlocked(bool b) {
 		if (b) {
 			if (isEnabled()) {
@@ -50,6 +43,8 @@ public:
 
 		blocked = b;
 	}
+
+	bool shouldListen() { return isEnabled(); }
 
 	virtual void afterLoadConfig() {}
 	virtual void loadConfig(SettingGroup& resolvedGroup) = 0;
