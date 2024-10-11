@@ -824,7 +824,7 @@ void Latite::initLanguageSetting() {
     set->enumData = &this->clientLanguage;
     set->value = set->enumData->getValue();
     set->userUpdateCallback = [](Setting&) {
-        Latite::getClientMessageQueue().push(util::WFormat(LocalizeString::get("client.message.languageSwitchHelper.name")));
+        Latite::getNotifications().push(LocalizeString::get("client.message.languageSwitchHelper.name"));
         };
 
     for (int i = 0; auto & lang : l10nData->getLanguages()) {
