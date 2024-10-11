@@ -99,7 +99,7 @@ ModuleManager::ModuleManager() {
 	for (auto& mod : items) {
 		mod->onInit();
 	}
-	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc) & ModuleManager::onKey, 0, true);
+	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc) & ModuleManager::onKey);
 }
 
 ModuleManager::~ModuleManager() {

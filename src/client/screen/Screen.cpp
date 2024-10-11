@@ -18,7 +18,7 @@ Screen::Screen() {
 
 	Eventing::get().listen<UpdateEvent>(this, (EventListenerFunc)&Screen::onUpdate, 0);
 	Eventing::get().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Screen::onRenderOverlay, 0, true);
-	Eventing::get().listen<ClickEvent>(this, (EventListenerFunc)&Screen::onClick, 3, false);
+	Eventing::get().listen<ClickEvent>(this, (EventListenerFunc)&Screen::onClick, 3, true);
 }
 
 void Screen::onUpdate(Event& ev) {

@@ -11,15 +11,15 @@ public:
 		for (auto& pair : listeners) {
 			if (pair.first == T::hash) {
 				if (pair.second.listener->isListening() || pair.second.callWhileInactive) {
+					auto isCancel = ev.isCancellable();
 					(pair.second.listener->*pair.second.fptr)(ev);
+					if (isCancel) {
+						auto& cEv = reinterpret_cast<Cancellable&>(ev);
+						if (cEv.isCancelled()) {
+							return true;
+						}
+					}
 				}
-			}
-		}
-		auto isCancel = ev.isCancellable();
-		if (isCancel) {
-			auto& cEv = reinterpret_cast<Cancellable&>(ev);
-			if (cEv.isCancelled()) {
-				return true;
 			}
 		}
 		return false;

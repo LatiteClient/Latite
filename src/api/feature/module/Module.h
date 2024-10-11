@@ -55,8 +55,6 @@ public:
 	virtual void loadConfig(SettingGroup& resolvedGroup) = 0;
 	virtual bool shouldHoldToToggle() { return false; }
 
-	bool isListening() override { return this->isEnabled(); };
-
 	[[nodiscard]] std::string name() override { return modName; }
 	[[nodiscard]] std::wstring desc() override { return description; }
 	[[nodiscard]] std::wstring getDisplayName() { return displayName; }
