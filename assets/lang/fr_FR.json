@@ -376,6 +376,6 @@
     "client.commands.plugin.startup.name": "Dossier du plugin {} déplacé avec succès vers le démarrage.",
     "client.commands.plugin.startup.error.name": "Impossible de trouver le plugin {}",
     "client.commands.plugin.install.name": "Plugin installé. Entrez &e{}plugin load &7{}&r pour exécuter le plugin.\nCe plugin se chargera à chaque fois que vous lancez Minecraft.",
-    "client.message.languageSwitchHelper.name": "&7Veuillez redémarrer le jeu pour appliquer correctement le changement de langue !"
+    "client.message.languageSwitchHelper.name": "Veuillez redémarrer le jeu pour appliquer correctement le changement de langue !"
   }
 }

@@ -376,6 +376,6 @@
         "client.commands.plugin.startup.name": "プラグインフォルダー {} をスタートアップに正常に移動しました。",
         "client.commands.plugin.startup.error.name": "プラグイン {} が見つかりません",
         "client.commands.plugin.install.name": "プラグインをインストールしました。プラグインを実行するには &7{}plugin load &7{}&r を実行してください。\nこのプラグインはMinecraftを読み込むたびに読み込まれます。",
-        "client.message.languageSwitchHelper.name": "&7言語の変更を完全に適用するにはゲームを再起動してください!"
+        "client.message.languageSwitchHelper.name": "言語の変更を完全に適用するにはゲームを再起動してください!"
     }
 }

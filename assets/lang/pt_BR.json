@@ -376,6 +376,6 @@
     "client.commands.plugin.startup.name": "Pasta plugin {} movido com sucesso para inicialização.",
     "client.commands.plugin.startup.error.name": "Plugin {} não encontrado",
     "client.commands.plugin.install.name": "Plugin instalado. Faça &7{}plugin carregar &7{}&r para executar o plugin.\nEste plugin será carregado toda vez que você carregar o Minecraft.",
-    "client.message.languageSwitchHelper.name": "&7Por favor reinicie o seu jogo para aplicar completamente as alterações de idioma!"
+    "client.message.languageSwitchHelper.name": "Por favor reinicie o seu jogo para aplicar completamente as alterações de idioma!"
   }
 }

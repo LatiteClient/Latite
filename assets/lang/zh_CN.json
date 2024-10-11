@@ -376,6 +376,6 @@
     "client.commands.plugin.startup.name": "已成功将插件文件夹 {} 移至启动项。",
     "client.commands.plugin.startup.error.name": "找不到插件 {}",
     "client.commands.plugin.install.name": "插件已安装。执行 &7{}plugin load &7{}&r 以运行插件。\n每次加载 Minecraft 时都会加载此插件。",
-    "client.message.languageSwitchHelper.name": "&7请重新启动游戏以完全应用语言更改！"
+    "client.message.languageSwitchHelper.name": "请重新启动游戏以完全应用语言更改！"
   }
 }

@@ -376,6 +376,6 @@
     "client.commands.plugin.startup.name": "Složka pluginu {} byla úspěšně přesunuta do startupu.",
     "client.commands.plugin.startup.error.name": "Nelze najít Plugin {}",
     "client.commands.plugin.install.name": "Plugin nainstalován. Můžeš ho aktivovat pomocí &7{}plugin load &7{}&r.\nTento plugin bude aktivován pokaždé co zapneš Minecraft.",
-    "client.message.languageSwitchHelper.name": "&7Prosím restartuj hru, aby se plně projevila změna jazyka! (Please restart your game to fully apply language changes!)"
+    "client.message.languageSwitchHelper.name": "Prosím restartuj hru, aby se plně projevila změna jazyka! (Please restart your game to fully apply language changes!)"
   }
 }

@@ -376,6 +376,6 @@
     "client.commands.plugin.startup.name": "Pasta de plugins foi movida com sucesso para o arranque.",
     "client.commands.plugin.startup.error.name": "Não foi possível encontrar a plugin {}",
     "client.commands.plugin.install.name": "Plugin instalada. Escreve &7{}plugin load &7{}&r para executar a plugin.\nEsta plugin vai carregar sempre que abres o Minecraft.",
-    "client.message.languageSwitchHelper.name": "&7Por favor reinicia o jogo para aplicar as alterações linguísticas completamente!"
+    "client.message.languageSwitchHelper.name": "Por favor reinicia o jogo para aplicar as alterações linguísticas completamente!"
   }
 }

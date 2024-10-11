@@ -376,6 +376,6 @@
     "client.commands.plugin.startup.name": "Se ha movido correctamente la carpeta del complemento {} a startup.",
     "client.commands.plugin.startup.error.name": "No se puede encontrar el complemento {}",
     "client.commands.plugin.install.name": "Complemento instalado. Escribe &7{}plugin load &7{}&r para ejecutar el complemento\nEste complemento se cargará cada vez que cargues Minecraft.",
-    "client.message.languageSwitchHelper.name": "&7¡Por favor reinicie su juego para que los cambios de idiomas puedan aplicarse correctamente!"
+    "client.message.languageSwitchHelper.name": "¡Por favor reinicie su juego para que los cambios de idiomas puedan aplicarse correctamente!"
   }
 }
