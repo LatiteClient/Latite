@@ -633,6 +633,9 @@ void ClickGUI::onRender(Event&) {
 				// text
 				auto textRect = modRect;
 				textRect.left += modRect.getWidth() / 6.f;
+
+				// Make the text end before the toggle rectangle
+				textRect.right = toggleRect.left;
 				dc.drawText(textRect, mod.name, { 1.f, 1.f, 1.f, 1.f }, FontSelection::PrimaryLight, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 				// toggle
