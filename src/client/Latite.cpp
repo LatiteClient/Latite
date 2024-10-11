@@ -823,7 +823,7 @@ void Latite::initLanguageSetting() {
         L"The client's language.");
     set->enumData = &this->clientLanguage;
     set->value = set->enumData->getValue();
-    set->callback = [](Setting&) {
+    set->userUpdateCallback = [](Setting&) {
         Latite::getClientMessageQueue().push(util::WFormat(LocalizeString::get("client.message.languageSwitchHelper.name")));
         };
 

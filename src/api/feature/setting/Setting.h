@@ -378,9 +378,14 @@ public:
 	
 
 	std::optional<std::function<void(Setting&)>> callback;
+	std::optional<std::function<void(Setting&)>> userUpdateCallback;
 
 	void update() {
 		if (callback) callback.value()(*this);
+	}
+
+	void userUpdate() {
+		if (userUpdateCallback) userUpdateCallback.value()(*this);
 	}
 
 	EnumData* enumData = nullptr;

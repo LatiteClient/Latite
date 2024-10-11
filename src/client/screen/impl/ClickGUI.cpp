@@ -758,6 +758,7 @@ void ClickGUI::onRender(Event&) {
 			auto d2dCol = d2d::Color(util::HSVToColor(colorPicker.pickerColor)).asAlpha(colorPicker.opacityMod);
 			*colorPicker.selectedColor = { d2dCol.r, d2dCol.g, d2dCol.b, d2dCol.a };
 			colorPicker.setting->update();
+			colorPicker.setting->userUpdate();
 			colorPicker = ColorPicker();
 		}
 	}
@@ -939,6 +940,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 		if (contains && justClicked[0]) {
 			std::get<BoolValue>(*set->value) = !std::get<BoolValue>(*set->value);
 			set->update();
+			set->userUpdate();
 			playClickSound();
 		}
 
@@ -1013,6 +1015,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 		if (activeSetting == set && this->capturedKey > 0) {
 			std::get<KeyValue>(*set->value) = capturedKey;
 			set->update();
+			set->userUpdate();
 			activeSetting = 0;
 			capturedKey = 0;
 		}
@@ -1039,6 +1042,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 				activeSetting = nullptr;
 				std::get<KeyValue>(*set->value) = 0;
 				set->update();
+				set->userUpdate();
 				playClickSound();
 			}
 		}
@@ -1103,6 +1107,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 				// cycle
 				set->enumData->next();
 				set->update();
+				set->userUpdate();
 				playClickSound();
 			}
 		}
@@ -1231,6 +1236,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 
 				std::get<FloatValue>(*set->value) = newVal;
 				set->update();
+				set->userUpdate();
 			}
 		}
 
