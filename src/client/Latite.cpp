@@ -138,6 +138,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
         { "1.21.30", SDK::VLATEST },
+        { "1.21.31", SDK::VLATEST }
         // { "1.21.20", SDK::VLATEST },
         // { "1.21.21", SDK::VLATEST },
         // { "1.21.22", SDK::VLATEST },
