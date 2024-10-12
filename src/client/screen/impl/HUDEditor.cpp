@@ -109,31 +109,36 @@ void HUDEditor::onRender(Event& ev) {
 
 void HUDEditor::onClick(Event& evGeneric) {
 	auto& ev = reinterpret_cast<ClickEvent&>(evGeneric);
-		Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
-			if (!mod->isHud()) return;
-			auto hudMod = reinterpret_cast<HUDModule*>(mod.get());
+	
+	if (ev.getMouseButton() == 4) {
+		ev.setCancelled();
+	}
 
-			if (!hudMod->isActive()) return;
-			
-			if (!shouldSelect(hudMod->getRect(), SDK::ClientInstance::get()->cursorPos)) return;
-			ev.setCancelled(true);
+	Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
+		if (!mod->isHud()) return;
+		auto hudMod = reinterpret_cast<HUDModule*>(mod.get());
 
-			if (ev.getMouseButton() == 4) {
-				if (!hudMod->isResizable()) return;
-				hudMod->setScale(std::clamp(hudMod->getScale() - static_cast<float>(ev.getWheelDelta()) / 1000.f, HUDModule::min_scale, HUDModule::max_scale));
-			}
-			else if (ev.getMouseButton() == 3) {
-				hudMod->setEnabled(false);
-			}
-			else if (ev.getMouseButton() == 2) {
-				Latite::getScreenManager().get<ClickGUI>().jumpToModule(hudMod->name());
-				close();
-				Latite::getScreenManager().showScreen<ClickGUI>(true);
-			}
-			else {
-				ev.setCancelled(false);
-			}
-			});
+		if (!hudMod->isActive()) return;
+
+		if (!shouldSelect(hudMod->getRect(), SDK::ClientInstance::get()->cursorPos)) return;
+		ev.setCancelled(true);
+
+		if (ev.getMouseButton() == 4) {
+			if (!hudMod->isResizable()) return;
+			hudMod->setScale(std::clamp(hudMod->getScale() - static_cast<float>(ev.getWheelDelta()) / 1000.f, HUDModule::min_scale, HUDModule::max_scale));
+		}
+		else if (ev.getMouseButton() == 3) {
+			hudMod->setEnabled(false);
+		}
+		else if (ev.getMouseButton() == 2) {
+			Latite::getScreenManager().get<ClickGUI>().jumpToModule(hudMod->name());
+			close();
+			Latite::getScreenManager().showScreen<ClickGUI>(true);
+		}
+		else {
+			ev.setCancelled(false);
+		}
+		});
 }
 
 void HUDEditor::onRenderLayer(Event& evGeneric) {
@@ -192,7 +197,7 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 	}
 
 	//auto view = ev.getScreenView();
-	
+
 	//float uiscale = sdk::ClientInstance::get()->getGuiData()->guiScale;
 
 	//auto root = view->visualTree->rootControl;
@@ -242,7 +247,7 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
 			rec.bottom *= uiscale;
 			controls.push_back(rec);
 		}*/
-	//}
+		//}
 }
 
 void HUDEditor::onKey(Event& evGeneric) {
@@ -333,7 +338,7 @@ void HUDEditor::renderModule(HUDModule* mod, SDK::MinecraftUIRenderContext* ctx)
 			if (hovering) mod->renderSelected(dc);
 			mod->renderPost(dc);
 		}
-		
+
 	}
 }
 
@@ -368,14 +373,14 @@ void HUDEditor::doDragging() {
 					}
 				}
 				});
-				
-			}
+
 		}
+	}
 }
 
 void HUDEditor::doSnapping(Vec2 const&) {
 	auto ssx = Latite::getRenderer().getScreenSize();
-	Vec2 ss = {ssx.width, ssx.height};
+	Vec2 ss = { ssx.width, ssx.height };
 	auto& mousePos = SDK::ClientInstance::get()->cursorPos;
 
 	std::vector<float> snapLinesX = { 0.f, ss.x / 4.f, ss.x / 2.f, ss.x / 2 + (ss.x / 4), ss.x };
@@ -385,7 +390,7 @@ void HUDEditor::doSnapping(Vec2 const&) {
 	std::vector<float> snapLinesControlsY = {};
 
 	// Be able to snap to the minecraft ui (like hotbar)
-	
+
 	for (auto& rec : controls) {
 		if (rec.left > 0.f && rec.bottom < ss.y) snapLinesControlsX.emplace_back(rec.left, rec.top);
 		if (rec.right > 0.f && rec.bottom < ss.y) snapLinesControlsX.emplace_back(rec.right, rec.top);
@@ -562,7 +567,7 @@ void HUDEditor::doSnapping(Vec2 const&) {
 						auto idk = snapLinesX[idx];
 
 						// TODO: controls
-						
+
 						if (type == Snapping::MCUI && snapLinesControlsX.size() > 0) {
 							idk = snapLinesControlsX[idx].first;
 						}
@@ -596,7 +601,7 @@ void HUDEditor::doSnapping(Vec2 const&) {
 						auto idk = snapLinesY[idx];
 
 						// TODO: controls
-						
+
 						if (type == Snapping::MCUI && snapLinesControlsY.size() > 0) {
 							idk = snapLinesControlsY[idx];
 						}
@@ -648,10 +653,10 @@ void HUDEditor::keepModulesInBounds(Vec2 const& ss) {
 				rMod->setPos({ modPos.x, ss.y - rc.getHeight() });
 			}
 
-			auto round2 = [](float& f){
+			auto round2 = [](float& f) {
 				f = std::round(f);
-			};
-			
+				};
+
 			//auto oPos = rc.getPos();
 			//round2(rc.left);
 			//round2(rc.top);
