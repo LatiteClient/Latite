@@ -61,9 +61,9 @@ void Screen::onClick(Event& evGeneric) {
 					this->activeMouseButtons[ev.getMouseButton() - 1] = ev.isDown();
 				this->mouseButtons[ev.getMouseButton() - 1] = ev.isDown();
 			}
+			if (isActive()) ev.setCancelled(true);
 		}
 
-		if (isActive()) ev.setCancelled(true);
 	}
 }
 
