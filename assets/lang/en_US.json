@@ -276,7 +276,7 @@
     "client.module.textHotkey.commandMode.name": "Command Mode",
     "client.module.textHotkey.textKey.name": "Hotkey",
     "client.module.textHotkey.text.name": "Text",
-    "client.module.textHotkey.desc": "Binds a chat message or a command to a text message.",
+    "client.module.textHotkey.desc": "Binds a chat message or a command to a hotkey.",
     "client.module.textHotkey.commandMode.desc": "Send a command instead of a chat message",
     "client.module.textHotkey.textKey.desc": "The hotkey to bind the text message or command to",
     "client.module.textHotkey.text.desc": "The text or command",
