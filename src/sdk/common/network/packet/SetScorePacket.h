@@ -1,11 +1,10 @@
 #pragma once
-#include "sdk/Util.h"
 #include "../Packet.h"
 #include "sdk/String.h"
 
 namespace SDK {
 
-	enum class ScorePacketType : uint8_t {
+	enum class PacketType : uint8_t {
 		Change = 0x0,
 		Remove = 0x1
 	};
@@ -17,53 +16,43 @@ namespace SDK {
 		FakePlayer = 0x3
 	};
 
-	struct ActorUniqueID {
-		int64_t id{};
+	enum class DefinitionType : unsigned char {
+		Invalid = 0x0,
+		Player = 0x1,
+		Entity = 0x2,
+		FakePlayer = 0x3
 	};
 
-	struct PlayerScoreboardId {
-		int64_t mActorUniqueId;
-	};
-
-	class IdentityDefinition;
+	class IdentityDef;
 
 	struct ScoreboardId {
-		int64_t				mRawId;
-		IdentityDefinition* mIdentityDef;
+		int64_t		 rawId;
+		IdentityDef* identityDef;
 	};
 
-	class IdentityDefinition {
-	public:
-		enum class Type : unsigned char {
-			Invalid = 0x0,
-			Player = 0x1,
-			Entity = 0x2,
-			FakePlayer = 0x3,
-		};
-
-		ScoreboardId       mScoreboardId;
-		bool               mIsHiddenFakePlayer;
-		PlayerScoreboardId mPlayerId;
-		ActorUniqueID      mEntityId;
-		std::string        mPlayerName;
-		Type               mIdentityType;
+	class IdentityDef {
+		ScoreboardId	scoreboardId;
+		bool			isHiddenFakePlayer;
+		int64_t			playerId;
+		int64_t			entityId;
+		std::string		playerName;
+		DefinitionType  identityType;
 	};
 
-	struct ScorePacketInfo {
-		ScoreboardId			 mScoreboardId;
-		std::string				 mObjectiveName;
-		int						 mScoreValue;
-		IdentityDefinition::Type mIdentityType;
-		PlayerScoreboardId		 mPlayerId;
-		ActorUniqueID            mEntityId;
-		std::string				 mFakePlayerName;
+	struct ScoreInfo {
+		ScoreboardId   scoreboardId;
+		std::string	   objectiveName;
+		int			   scoreValue;
+		DefinitionType identityType;
+		int64_t		   playerId;
+		int64_t        entityId;
+		std::string	   fakePlayerName;
 	};
 
 	class SetScorePacket : public Packet {
 	public:
-		ScorePacketType mType;
-		std::vector<ScorePacketInfo> mScoreInfo;
+		PacketType  type;
+		std::vector<ScoreInfo> scoreInfo;
+		std::wstring serialize() const;
 	};
-
-	nlohmann::json serializeSetScorePacket(const std::shared_ptr<SDK::SetScorePacket>& pkt);
 }
