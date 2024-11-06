@@ -65,5 +65,5 @@ namespace SDK {
 		std::vector<ScorePacketInfo> mScoreInfo;
 	};
 
-	std::string makeJson(const SetScorePacket& packet);
+	nlohmann::json serializeSetScorePacket(const std::shared_ptr<SDK::SetScorePacket>& pkt);
 }

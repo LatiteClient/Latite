@@ -45,8 +45,8 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 			auto pkt = std::static_pointer_cast<SDK::SetScorePacket>(packet);
 
 			auto data = PluginManager::Event::Value(L"data");
-			std::string json = SDK::makeJson(*pkt);
-			data.val = util::StrToWStr(json);
+			json jsonPacket = SDK::serializeSetScorePacket(pkt);
+			data.val = util::StrToWStr(jsonPacket.dump());
 
 			PluginManager::Event sEv{ XW("set-score"), { data }, false };
 			Latite::getPluginManager().dispatchEvent(sEv);
