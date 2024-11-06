@@ -159,6 +159,7 @@
     <ClCompile Include="src\client\script\objects\OptionsScriptingObject.cpp" />
     <ClCompile Include="src\sdk\common\client\gui\screens\ContainerScreenController.cpp" />
     <ClCompile Include="src\sdk\common\world\level\LevelData.cpp" />
+    <ClCompile Include="src\sdk\common\network\packet\SetScorePacket.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assets\lang\en_US.json" />
@@ -760,6 +761,7 @@
     <ClInclude Include="assets\lang\pt_PT.json" />
     <ClInclude Include="assets\lang\zh_CN.json" />
     <ClInclude Include="assets\lang\zh_TW.json" />
+    <ClInclude Include="src\sdk\common\network\packet\SetScorePacket.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />

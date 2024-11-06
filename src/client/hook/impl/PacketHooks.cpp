@@ -41,6 +41,16 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 			PluginManager::Event sEv{ XW("change-dimension"), {}, false };
 			Latite::getPluginManager().dispatchEvent(sEv);
 		}
+		else if (packetId == SDK::PacketID::SET_SCORE) {
+			auto pkt = std::static_pointer_cast<SDK::SetScorePacket>(packet);
+
+			auto data = PluginManager::Event::Value(L"data");
+			std::string json = SDK::makeJson(*pkt);
+			data.val = util::StrToWStr(json);
+
+			PluginManager::Event sEv{ XW("set-score"), { data }, false };
+			Latite::getPluginManager().dispatchEvent(sEv);
+		}
 		else if (packetId == SDK::PacketID::TRANSFER) {
 			PluginManager::Event sEv{ XW("transfer"), {}, false };
 			Latite::getPluginManager().dispatchEvent(sEv);

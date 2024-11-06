@@ -10,6 +10,7 @@ namespace SDK {
 		SET_TITLE = 0x58,
 		COMMAND_REQUEST = 0x4D,
 		TOAST_REQUEST = 0xBA,
+		SET_SCORE = 0x6c,
 		COUNT,
 	};
 
