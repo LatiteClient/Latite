@@ -15,5 +15,6 @@ int AppPlatformHooks::_fireAppFocusLost(SDK::AppPlatform* plat) {
 }
 
 AppPlatformHooks::AppPlatformHooks() {
-	FocusLostHook = addHook(Signatures::AppPlatform__fireAppFocusLost.result, _fireAppFocusLost, "AppPlatform::_fireAppFocusLost");
+	// TODO: FIX ME
+	//FocusLostHook = addHook(Signatures::AppPlatform__fireAppFocusLost.result, _fireAppFocusLost, "AppPlatform::_fireAppFocusLost");
 }

@@ -9,6 +9,11 @@ namespace SDK {
 	public:
 		std::unordered_map<unsigned int, AttributeInstance> instances;
 
+	private:
+		char pad[0x18];
+
+	public:
+
 		AttributeInstance* getInstance(unsigned int id) {
 			using func_t = AttributeInstance&(*)(BaseAttributeMap*, unsigned int);
 			static auto func = reinterpret_cast<func_t>(Signatures::BaseAttributeMap_getInstance.result);

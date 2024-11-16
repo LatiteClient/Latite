@@ -45,7 +45,7 @@ class GenericHooks : public HookGroup {
     static void LevelRendererPlayer_renderOutlineSelection(SDK::LevelRendererPlayer* obj, SDK::ScreenContext* scn, void* block, void* region, BlockPos pos);
     static void* hkRenderGuiItemNew(void* obj, SDK::BaseActorRenderContext* baseActorRenderContext, SDK::ItemStack* itemStack, int mode, float x, float y, float opacity, float scale, float a9, bool ench);
     static float hkGetTimeOfDay(SDK::Dimension* obj);
-    static void hkWeatherTick(SDK::Weather* obj);
+    static void hkDimensionTick(SDK::Dimension* obj);
     static Color* hkGetFogColor(SDK::Dimension* obj, Color* out, SDK::Actor* ent, float f);
     static void hkAddMessage(SDK::GuiData* obj, void* msg, uint32_t profanityContext);
     static void hkUpdatePlayer(SDK::CameraComponent* obj, void* a, void* b);

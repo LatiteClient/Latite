@@ -137,11 +137,15 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int deadCount = 0;
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
-        { "1.21.30", SDK::VLATEST },
-        { "1.21.31", SDK::VLATEST }
-        // { "1.21.20", SDK::VLATEST },
-        // { "1.21.21", SDK::VLATEST },
-        // { "1.21.22", SDK::VLATEST },
+        { "1.21.44", SDK::VLATEST},
+        { "1.21.43", SDK::VLATEST},
+        { "1.21.41", SDK::VLATEST},
+        { "1.21.40", SDK::VLATEST},
+        // { "1.21.30", SDK::V1_21_30 },
+        // { "1.21.31", SDK::V1_21_30 }
+        // { "1.21.20", SDK::V1_21_20 },
+        // { "1.21.21", SDK::V1_21_20 },
+        // { "1.21.22", SDK::V1_21_20 },
         //{ "1.21.0", SDK::V1_21 },
         //{ "1.21.1", SDK::V1_21 },
         //{ "1.21.2", SDK::V1_21 },
@@ -221,7 +225,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(BaseActorRenderContext_BaseActorRenderContext),
         MVSIG(ItemRenderer_renderGuiItemNew),
         MVSIG(BaseAttributeMap_getInstance),
-        MVSIG(UIControl_setPosition),
+        MVSIG(UIControl_getPosition),
         MVSIG(MinecraftGame_getPrimaryClientInstance),
         MVSIG(Components::actorTypeComponent),
         MVSIG(ActorRenderDispatcher_render),
@@ -229,7 +233,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Components::attributesComponent),
         MVSIG(Dimension_getSkyColor),
         MVSIG(Dimension_getTimeOfDay),
-        MVSIG(Weather_tick),
+        MVSIG(Dimension_tick),
         MVSIG(Misc::thirdPersonNametag),
         MVSIG(ItemStackBase_getDamageValue),
         MVSIG(MinecraftPackets_createPacket),

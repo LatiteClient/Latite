@@ -562,8 +562,12 @@
     <ClInclude Include="src\sdk\common\client\renderer\Tessellator.h" />
     <ClInclude Include="src\sdk\common\client\renderer\TexturePtr.h" />
     <ClInclude Include="src\sdk\common\client\util\JpegCommentWriter.h" />
+    <ClInclude Include="src\sdk\common\entity\component\ActorDataFlagComponent.h" />
+    <ClInclude Include="src\sdk\common\entity\component\ActorEquipmentComponent.h" />
+    <ClInclude Include="src\sdk\common\entity\component\ActorTypeComponent.h" />
     <ClInclude Include="src\sdk\common\entity\component\AttributesComponent.h" />
     <ClInclude Include="src\sdk\common\entity\component\MoveInputComponent.h" />
+    <ClInclude Include="src\sdk\common\entity\component\RuntimeIDComponent.h" />
     <ClInclude Include="src\sdk\common\nbt\CompoundTag.h" />
     <ClInclude Include="src\sdk\common\nbt\Tag.h" />
     <ClInclude Include="src\sdk\common\network\MinecraftPackets.h" />
