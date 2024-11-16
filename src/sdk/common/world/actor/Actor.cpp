@@ -102,7 +102,7 @@ bool SDK::Actor::isPlayer() {
 }
 
 SDK::AttributesComponent* SDK::Actor::getAttributesComponent() {
-	return reinterpret_cast<SDK::AttributesComponent * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::attributesComponent.result)(entityContext.getBasicRegistry(), &entityContext.getId());
+	return reinterpret_cast<SDK::AttributesComponent * (__fastcall*)(EntityContext&)>(Signatures::Components::attributesComponent.result)(entityContext);
 }
 
 SDK::AttributeInstance* SDK::Actor::getAttribute(SDK::Attribute& attribute) {

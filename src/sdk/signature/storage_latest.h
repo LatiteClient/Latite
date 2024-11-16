@@ -57,7 +57,7 @@ public:
 
 		inline static SigImpl attributesComponent{[](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC 30 8B 59 18 48 8B FA 48 8B 49 10 BA 44 94 B2 B6"_sig,
+			"4C 8B 51 08 41 BB 44 94 B2 B6"_sig,
 			"AttributesComponent"};
 
 		inline static SigImpl actorEquipmentPersistentComponent{ [](memory::signature_store&, uintptr_t res) { return res; },
@@ -241,7 +241,7 @@ public:
 		"ItemRenderer::renderGuiItemNew"};
 
 	inline static SigImpl BaseAttributeMap_getInstance{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"E8 ? ? ? ? F3 0F 10 90"_sig,
+		"E8 ? ? ? ? 48 89 44 24 ? 48 8D 55 ? 48 8B 4C 24"_sig,
 		"BaseAttributeMap::getInstance"};
 
 	inline static SigImpl UIControl_getPosition{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
