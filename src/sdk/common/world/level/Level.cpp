@@ -17,7 +17,7 @@ std::vector<SDK::Actor*> SDK::Level::getRuntimeActorList() {
 
 std::unordered_map<UUID, SDK::PlayerListEntry>* SDK::Level::getPlayerList() {
 	if (internalVers >= SDK::V1_21_40) {
-		return reinterpret_cast<std::unordered_map<UUID, SDK::PlayerListEntry>*>(reinterpret_cast<uintptr_t>(this) + 0xBF0);
+		return *reinterpret_cast<std::unordered_map<UUID, SDK::PlayerListEntry>**>(reinterpret_cast<uintptr_t>(this) + 0xBF0);
 	}
 	
 	static int index = SDK::mvGetOffset<0x112, 0x111, 0x120, 0x120, 0x128, 0x137>();

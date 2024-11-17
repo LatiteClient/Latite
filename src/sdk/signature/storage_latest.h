@@ -33,7 +33,7 @@ public:
 			"48 8B 05 ? ? ? ? 4C 8B AD"_sig,
 			"UIFillColorMaterial"};
 		inline static SigImpl thirdPersonNametag{ [](memory::signature_store&, uintptr_t res) { return res; },
-			"0F 84 ? ? ? ? 49 8B D4 49 8B CD"_sig,
+			"0F 84 ? ? ? ? 49 8B 07 49 8B CF 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 0F 85 ? ? ? ? 41 8B 47"_sig,
 			"ThirdPersonNametag" };
 		
 	};
@@ -99,7 +99,7 @@ public:
 		"LevelRenderer::renderLevel"};
 
 	inline static SigImpl Keyboard_feed{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 83 ec ? 0f b6 c1 4c 8d 05"_sig,
+		"48 83 EC ? ? ? C1 4C 8D 05"_sig,
 		"Keyboard::feed"};
 
 	// The signature is big but it hasn't died in a while soo
@@ -189,7 +189,7 @@ public:
 		"RakPeer::GetAveragePing"};
 
 	inline static SigImpl LocalPlayer_applyTurnDelta{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 74 24 ? 57 48 81 EC ? ? ? ? 48 8D 4A ? 48 8B F2"_sig,
+		"48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 50 ? 48 8B 05"_sig,
 		"LocalPlayer::applyTurnDelta"};
 
 	// see what accesses things in moveinputhandler

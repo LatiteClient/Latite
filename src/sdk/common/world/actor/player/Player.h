@@ -21,6 +21,6 @@ namespace SDK {
 		// @dump-wbds Player::getName, 3
 		MVCLASS_FIELD(std::string, playerName, 0xCB0, 0xCA0, 0xC88, 0x1D30, 0x1CB8, 0x1C78, 0x8C0, 0x2478); // xref: getName
 		// @dump-wbds ServerPlayer::sendNetworkPacket, 18
-		MVCLASS_FIELD(PacketSender*, packetSender, 0x8A0, 0x890, 0x890, 0xC48, 0xC70, 0xC70, 0x1020, 0x1438); // xref: Player::Player a3
+		MVCLASS_FIELD(PacketSender*, packetSender, 0x898, 0x890, 0x890, 0xC48, 0xC70, 0xC70, 0x1020, 0x1438); // xref: Player::Player a3
 	};
 }
