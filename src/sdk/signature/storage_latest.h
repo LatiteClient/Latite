@@ -139,9 +139,9 @@ public:
 		"E8 ? ? ? ? 90 EB ? 41 80 BF"_sig,
 		"GameRenderer::_renderCurrentFrame"}; // near  "and (displayProperties/realmsPlusEndDate" (below it 1 arg func with 1 arg called src)
 
-	inline static SigImpl AppPlatform__fireAppFocusLost{[](memory::signature_store& store, uintptr_t) { return store.deref(1); }, // Call in question is inlined, this is not the correct name anymore
-		"E8 ? ? ? ? 48 8B 7B ? 0F 1F 80"_sig,
-		"AppPlatform::_fireAppFocusLost"};
+	inline static SigImpl MinecraftGame_onDeviceLost{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5C 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 4C 8B F9 C7 44 24"_sig,
+		"MinecraftGame::onDeviceLost"};
 
 	inline static SigImpl onClick{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 8b c4 48 89 58 ? 48 89 68 ? 48 89 70 ? 57 41 54 41 55 41 56 41 57 48 83 ec ? 44 0f b7 bc 24"_sig,

@@ -197,7 +197,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(ChatScreenController_sendChatMessage),
         MVSIG(GameRenderer__renderCurrentFrame),
         MVSIG(onClick),
-        MVSIG(AppPlatform__fireAppFocusLost),
+        MVSIG(MinecraftGame_onDeviceLost),
         MVSIG(MinecraftGame_onAppSuspended),
         MVSIG(RenderController_getOverlayColor),
         MVSIG(ScreenView_setupAndRender),

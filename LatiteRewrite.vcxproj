@@ -468,7 +468,6 @@
     <ClInclude Include="src\client\feature\setting\script\JsSetting.h" />
     <ClInclude Include="src\client\hook\Hook.h" />
     <ClInclude Include="src\client\hook\Hooks.h" />
-    <ClInclude Include="src\client\hook\impl\AppPlatformHooks.h" />
     <ClInclude Include="src\client\hook\impl\DXHooks.h" />
     <ClInclude Include="src\client\hook\impl\PlayerHooks.h" />
     <ClInclude Include="src\client\hook\impl\GeneralHooks.h" />
@@ -726,7 +725,6 @@
     <ClCompile Include="src\client\feature\module\TextModule.cpp" />
     <ClCompile Include="src\client\hook\Hook.cpp" />
     <ClCompile Include="src\client\hook\Hooks.cpp" />
-    <ClCompile Include="src\client\hook\impl\AppPlatformHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\DXHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\GeneralHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\LevelRendererHooks.cpp" />
