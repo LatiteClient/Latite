@@ -28,7 +28,7 @@ namespace {
 	std::shared_ptr<Hook> OutlineSelectionHook;
 	std::shared_ptr<Hook> RenderGuiItemNewHook;
 	std::shared_ptr<Hook> GetTimeOfDayHook;
-	std::shared_ptr<Hook> WeatherHook;
+	std::shared_ptr<Hook> DimensionHook;
 	std::shared_ptr<Hook> FogColorHook;
 	std::shared_ptr<Hook> AddMessageHook;
 	std::shared_ptr<Hook> UpdatePlayerHook;
@@ -328,15 +328,15 @@ float GenericHooks::hkGetTimeOfDay(SDK::Dimension* obj) {
 	return ev.getTime();
 }
 
-void GenericHooks::hkWeatherTick(SDK::Weather* obj) {
+void GenericHooks::hkDimensionTick(SDK::Dimension* obj) {
 	WeatherEvent ev{};
 	Eventing::get().dispatch(ev);
 
 	if (!ev.shouldShowWeather()) {
-		obj->data = SDK::Weather::WeatherData{};
+		obj->weather->data = SDK::Weather::WeatherData{};
 	}
 
-	WeatherHook->oFunc<decltype(&hkWeatherTick)>()(obj);
+	DimensionHook->oFunc<decltype(&hkDimensionTick)>()(obj);
 }
 
 Color* GenericHooks::hkGetFogColor(SDK::Dimension* obj, Color* out, SDK::Actor* ent, float f) {
@@ -449,7 +449,7 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 
 	FogColorHook = addHook(Signatures::Dimension_getSkyColor.result, hkGetFogColor, "Dimension::getFogColor");
 	GetTimeOfDayHook = addHook(Signatures::Dimension_getTimeOfDay.result, hkGetTimeOfDay, "Dimension::getTimeOfDay");
-	WeatherHook = addHook(Signatures::Weather_tick.result, hkWeatherTick, "Weather::tick");
+	DimensionHook = addHook(Signatures::Dimension_tick.result, hkDimensionTick, "Dimension::tick");
 	AddMessageHook = addHook(Signatures::GuiData__addMessage.result, hkAddMessage, "GuiData::_addMessage");
 	UpdatePlayerHook = addHook(Signatures::_updatePlayer.result, hkUpdatePlayer, "`anonymous namespace'::_updatePlayer");
 	OnUriHook = addHook(Signatures::GameArguments__onUri.result, hkOnUri, "GameArguments::_onUri");

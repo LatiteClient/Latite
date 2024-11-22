@@ -4,5 +4,6 @@
 #include "sdk/signature/storage.h"
 
 void SDK::UIControl::updatePos() {
-	reinterpret_cast<void(*)(UIControl*)>(Signatures::UIControl_setPosition.result)(this);
+	flags |= 1;
+	reinterpret_cast<void(*)(UIControl*)>(Signatures::UIControl_getPosition.result)(this);
 }

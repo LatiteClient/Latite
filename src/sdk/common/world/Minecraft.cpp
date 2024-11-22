@@ -13,6 +13,8 @@ SDK::Level* SDK::Minecraft::getLevel() {
 	}
 
 	if (gameSession) {
+		if (SDK::internalVers >= V1_21_40)
+			return reinterpret_cast<Level*>(gameSession->level);
 		auto v2 = gameSession->level;
 		if (v2)
 			return *v2;

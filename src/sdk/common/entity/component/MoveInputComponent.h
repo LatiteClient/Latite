@@ -3,7 +3,10 @@
 
 namespace SDK {
 	// or MoveInputHandler in older versions
-	class MoveInputComponent {
+	struct MoveInputComponent {
+	private:
+		char pad[0x88];
+		
 	public:
 		MVCLASS_FIELD(bool, sneak, 0x00, 0x4C, 0x4C);
 		MVCLASS_FIELD(bool, jump, 0x06, 0x4B, 0x4B);

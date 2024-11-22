@@ -8,6 +8,7 @@
 
 namespace {
 	std::shared_ptr<Hook> onAppSuspendedHook;
+	std::shared_ptr<Hook> onDeviceLostHook;
 	std::shared_ptr<Hook> _updateHook;
 }
 
@@ -20,6 +21,15 @@ void* MinecraftGameHooks::onAppSuspended(SDK::MinecraftGame* game,void*a,void*b,
 	}
 
 	return onAppSuspendedHook->oFunc<decltype(&onAppSuspended)>()(game,a,b,c);
+}
+
+void MinecraftGameHooks::onDeviceLost(SDK::MinecraftGame* game) {
+	FocusLostEvent ev{};
+	
+	if (Eventing::get().dispatch(ev))
+		return;
+	
+	onDeviceLostHook->oFunc<decltype(&onDeviceLost)>()(game);
 }
 
 void __fastcall MinecraftGameHooks::_update(SDK::MinecraftGame* game) {
@@ -37,6 +47,8 @@ void __fastcall MinecraftGameHooks::_update(SDK::MinecraftGame* game) {
 MinecraftGameHooks::MinecraftGameHooks() {
 	onAppSuspendedHook = addHook(Signatures::MinecraftGame_onAppSuspended.result, onAppSuspended,
 		"MinecraftGame::onAppSuspended");
+	onDeviceLostHook = addHook(Signatures::MinecraftGame_onDeviceLost.result, onDeviceLost,
+		"MinecraftGame::onDeviceLost");
 	_updateHook = addHook(Signatures::MinecraftGame__update.result, _update,
 		"MinecraftGame::_update");
 }
