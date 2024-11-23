@@ -4,6 +4,8 @@
 #include "sdk/common/util/MolangVariableMap.h"
 #include <memory>
 
+#include "sdk/common/entity/component/ActorDataFlagComponent.h"
+
 namespace SDK {
 	class Actor {
 	public:

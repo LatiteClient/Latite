@@ -51,7 +51,7 @@ namespace SDK {
         ScreenContext* screenContext;
 
         void flushText(float lastFlush) {
-            memory::callVirtual<void>(this, 6, lastFlush);
+            memory::callVirtual<void, float, std::optional<float>>(this, 6, lastFlush, {});
         }
 
         void drawImage(TexturePtr const& texture, Vec2 const& pos, Vec2 const& size, Vec2 const& uvPos, Vec2 const& uvSize) {

@@ -56,8 +56,4 @@ namespace SDK {
 		Vec2 rotation; //0x0000
 		Vec2 rotationOld; //0x0008
 	}; //Size: 0x0010
-
-	struct ActorDataFlagComponent {
-		std::bitset<119> flags;
-	};
 }

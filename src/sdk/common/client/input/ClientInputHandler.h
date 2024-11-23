@@ -10,6 +10,6 @@ namespace SDK {
 
 	class ClientInputHandler {
 	public:
-		MVCLASS_FIELD(ClientInputMappingFactory*, mappingFactory, 0x20, 0x18, 0x18); // ClientInputHandler::getMappingFactory
+		MVCLASS_FIELD(ClientInputMappingFactory*, mappingFactory, 0x28, 0x20, 0x20, 0x20, 0x20, 0x20, 0x18, 0x18); // ClientInputHandler::getMappingFactory
 	};
 }

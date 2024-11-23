@@ -468,7 +468,6 @@
     <ClInclude Include="src\client\feature\setting\script\JsSetting.h" />
     <ClInclude Include="src\client\hook\Hook.h" />
     <ClInclude Include="src\client\hook\Hooks.h" />
-    <ClInclude Include="src\client\hook\impl\AppPlatformHooks.h" />
     <ClInclude Include="src\client\hook\impl\DXHooks.h" />
     <ClInclude Include="src\client\hook\impl\PlayerHooks.h" />
     <ClInclude Include="src\client\hook\impl\GeneralHooks.h" />
@@ -562,8 +561,12 @@
     <ClInclude Include="src\sdk\common\client\renderer\Tessellator.h" />
     <ClInclude Include="src\sdk\common\client\renderer\TexturePtr.h" />
     <ClInclude Include="src\sdk\common\client\util\JpegCommentWriter.h" />
+    <ClInclude Include="src\sdk\common\entity\component\ActorDataFlagComponent.h" />
+    <ClInclude Include="src\sdk\common\entity\component\ActorEquipmentComponent.h" />
+    <ClInclude Include="src\sdk\common\entity\component\ActorTypeComponent.h" />
     <ClInclude Include="src\sdk\common\entity\component\AttributesComponent.h" />
     <ClInclude Include="src\sdk\common\entity\component\MoveInputComponent.h" />
+    <ClInclude Include="src\sdk\common\entity\component\RuntimeIDComponent.h" />
     <ClInclude Include="src\sdk\common\nbt\CompoundTag.h" />
     <ClInclude Include="src\sdk\common\nbt\Tag.h" />
     <ClInclude Include="src\sdk\common\network\MinecraftPackets.h" />
@@ -723,7 +726,6 @@
     <ClCompile Include="src\client\feature\module\TextModule.cpp" />
     <ClCompile Include="src\client\hook\Hook.cpp" />
     <ClCompile Include="src\client\hook\Hooks.cpp" />
-    <ClCompile Include="src\client\hook\impl\AppPlatformHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\DXHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\GeneralHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\LevelRendererHooks.cpp" />

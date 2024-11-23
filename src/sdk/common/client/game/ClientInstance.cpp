@@ -39,7 +39,10 @@ SDK::BlockSource* SDK::ClientInstance::getRegion() {
     if (SDK::internalVers < SDK::V1_20_50) {
         return memory::callVirtual<BlockSource*>(this, 0x1A);
     }
-    return memory::callVirtual<BlockSource*>(this, 0x1C);
+    if (SDK::internalVers < SDK::V1_21_40) {
+        return memory::callVirtual<BlockSource*>(this, 0x1C);
+    }
+    return memory::callVirtual<BlockSource*>(this, 0x1D);
 }
 
 
@@ -50,7 +53,10 @@ SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
     if (SDK::internalVers < SDK::V1_20_50) {
         return memory::callVirtual<LocalPlayer*>(this, 0x1B);
     }
-    return memory::callVirtual<LocalPlayer*>(this, 0x1D);
+    if (SDK::internalVers < SDK::V1_21_40) {
+        return memory::callVirtual<LocalPlayer*>(this, 0x1D);
+    }
+    return memory::callVirtual<LocalPlayer*>(this, 0x1E);
 }
 
 SDK::GuiData* SDK::ClientInstance::getGuiData() {
@@ -64,13 +70,16 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
         {
             return util::directAccess<GuiData*>(this, 0x558);
         }
+        if (internalVers >= V1_21_40) {
+            return util::directAccess<GuiData*>(this, 0x590);
+        }
         return util::directAccess<GuiData*>(this, 0x588);
     }
     return nullptr;
 }
 
 SDK::Options* SDK::ClientInstance::getOptions() {
-    return memory::callVirtual<Options*>(this, 0xBD);
+    return memory::callVirtual<Options*>(this, 0xBE);
 }
 
 void SDK::ClientInstance::grabCursor() {

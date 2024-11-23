@@ -6,7 +6,6 @@
 #include "impl/LevelRendererHooks.h"
 #include "impl/OptionHooks.h"
 #include "impl/DXHooks.h"
-#include "impl/AppPlatformHooks.h"
 #include "impl/MinecraftGameHooks.h"
 #include "impl/RenderControllerHooks.h"
 #include "impl/ScreenViewHooks.h"
@@ -19,7 +18,6 @@ class LatiteHooks final : public StaticManager<HookGroup,
 	OptionHooks,
 	DXHooks,
 	PlayerHooks,
-	AppPlatformHooks,
 	MinecraftGameHooks,
 	RenderControllerHooks,
 	ScreenViewHooks,
