@@ -26,11 +26,11 @@ namespace SDK {
 		}
 
 		bool isGlint(class ItemStackBase* item) {
-			return memory::callVirtual<bool>(this, mvGetOffset<0x26, 0x32, 0x32, 0x2B, 0x32>(), item);
+			return memory::callVirtual<bool>(this, mvGetOffset<0x27, 0x26, 0x26, 0x26, 0x32, 0x32, 0x2B, 0x32>(), item);
 		}
 
 		int getMaxDamage() {
-			return memory::callVirtual<int>(this, mvGetOffset<0x22, 0x2F, 0x2F, 0x28, 0x2F>());
+			return memory::callVirtual<int>(this, mvGetOffset<0x23, 0x22, 0x22, 0x22, 0x2F, 0x2F, 0x28, 0x2F>());
 		}
 
 		short getDamageValue(class CompoundTag* tag) {
