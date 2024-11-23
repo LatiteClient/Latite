@@ -360,6 +360,7 @@ void PluginManager::initListeners()
 	eventListeners[L"change-dimension"] = {};
 	eventListeners[L"pre-move"] = {};
 	eventListeners[L"post-move"] = {};
+	eventListeners[L"set-score"] = {};
 }
 
 void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr) {
