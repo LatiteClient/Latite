@@ -23,6 +23,10 @@ namespace SDK {
 		std::string getHoverName();
 
 		short getDamageValue() {
+			if (internalVers >= V1_21_40) {
+				return reinterpret_cast<short(*)(ItemStackBase*)>(Signatures::ItemStackBase_getDamageValue.result)(this);
+			}
+			
 			if (!item) return 0;
 			
 			return getItem()->getDamageValue(this->tag.get());

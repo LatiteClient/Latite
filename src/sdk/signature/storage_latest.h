@@ -273,7 +273,7 @@ public:
 		"Dimension::getSkyColor"};
 
 	inline static SigImpl ItemStackBase_getDamageValue{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5c 24 ? 57 48 83 ec ? 48 8b da 48 85 d2"_sig,
+		"40 53 48 83 EC ? 48 8B 51 ? 33 DB 48 85 D2"_sig,
 		"ItemStackBase::getDamageValue" };
 
 	inline static SigImpl MinecraftPackets_createPacket{ [](memory::signature_store&, uintptr_t res) { return res; },
