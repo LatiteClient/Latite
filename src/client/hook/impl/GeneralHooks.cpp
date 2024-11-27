@@ -320,8 +320,8 @@ void* GenericHooks::hkRenderGuiItemNew(void* obj, SDK::BaseActorRenderContext* b
 	return RenderGuiItemNewHook->oFunc<decltype(&hkRenderGuiItemNew)>()(obj, baseActorRenderContext, itemStack, mode, x, y, opacity, scale, a9, ench);
 }
 
-float GenericHooks::hkGetTimeOfDay(SDK::Dimension* obj) {
-	auto o = GetTimeOfDayHook->oFunc<decltype(&hkGetTimeOfDay)>()(obj);
+float GenericHooks::hkGetTimeOfDay(SDK::Dimension* obj, int time, float a) {
+	auto o = GetTimeOfDayHook->oFunc<decltype(&hkGetTimeOfDay)>()(obj, time, a);
 	GetTimeEvent ev{o};
 	Eventing::get().dispatch(ev);
 
