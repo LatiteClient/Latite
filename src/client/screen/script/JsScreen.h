@@ -6,14 +6,14 @@
 #include <array>
 #include <map>
 #include <optional>
+#include "client/script/feature/JsEvented.h"
 
-class JsScreen : public Screen {
+
+class JsScreen : public Screen, public JsEvented {
 public:
 	JsScreen(JsValueRef object, JsValueRef renderFunc);
 
 	void onRender(class Event& ev);
-	void onCleanup(Event& ev);
-	void onInit(Event& ev);
 	void onKey(Event& ev);
 	void onClick(Event& ev);
 
@@ -22,7 +22,9 @@ protected:
 	void onEnable(bool ignoreAnims) override;
 	void onDisable() override;
 private:
-	JsValueRef object;
-	JsValueRef renderFunc;
+	JsValueRef object = JS_INVALID_REFERENCE;
+	JsValueRef renderFunc = JS_INVALID_REFERENCE;
+	JsContextRef ctx = JS_INVALID_REFERENCE;
+
 	std::string name;
 };

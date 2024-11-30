@@ -33,6 +33,7 @@
 #include "class/impl/JsSettingClass.h"
 #include "class/impl/JsCommandClass.h"
 #include "class/impl/JsNativeModule.h"
+#include "class/impl/JsScreenClass.h"
 #include "class/impl/game/JsEntityClass.h"
 #include "class/impl/game/JsPlayerClass.h"
 #include "class/impl/game/JsLocalPlayerClass.h"
@@ -497,6 +498,7 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsTextureClass>(this));
 	this->classes.push_back(std::make_shared<JsNativeModule>(this));
 	this->classes.push_back(std::make_shared<JsBlock>(this));
+	this->classes.push_back(std::make_shared<JsScreenClass>(this));
 	JsErrorCode err;
 
 	JsValueRef globalObj = Chakra::GetGlobalObject();
