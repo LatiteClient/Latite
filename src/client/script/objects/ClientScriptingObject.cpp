@@ -91,6 +91,11 @@ void ClientScriptingObject::initCommandManager() {
 	JS::JsAddRef(commandManager, nullptr);
 }
 
+void ClientScriptingObject::initScreenManager() {
+	JS::JsCreateObject(&this->commandManager);
+	JS::JsAddRef(commandManager, nullptr);
+}
+
 void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 #if LATITE_DEBUG
 	Chakra::DefineFunc(object, testCallback, L"test", this);
@@ -101,9 +106,11 @@ void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(object, showNotifCallback, XW("showNotification"));
 	Chakra::DefineFunc(object, getMmgrCallback, XW("getModuleManager"), this);
 	Chakra::DefineFunc(object, getCmgrCallback, XW("getCommandManager"), this);
+	Chakra::DefineFunc(object, getSmgrCallback, XW("getScreenManager"), this);
 
 	initModuleManager();
 	initCommandManager();
+	initScreenManager();
 
 	Chakra::DefineFunc(moduleManager, mmgrRegisterModuleCallback, XW("registerModule"));
 	Chakra::DefineFunc(moduleManager, mmgrGetModuleByName, XW("getModuleByName"));
@@ -115,8 +122,7 @@ void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 }
 
 
-JsValueRef ClientScriptingObject::mmgrRegisterModuleCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
-{
+JsValueRef ClientScriptingObject::mmgrRegisterModuleCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	JsValueRef undefined;
 	JS::JsGetUndefinedValue(&undefined);
 	if (!Chakra::VerifyArgCount(argCount, 2)) return undefined;
@@ -334,4 +340,8 @@ JsValueRef ClientScriptingObject::cmgrDeregisterCommandCallback(JsValueRef calle
 
 JsValueRef ClientScriptingObject::cmgrGetPrefixCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState){
 	return Chakra::MakeString(util::StrToWStr(Latite::getCommandManager().prefix));
+}
+
+JsValueRef ClientScriptingObject::smgrRegisterScreenCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	return JsValueRef();
 }

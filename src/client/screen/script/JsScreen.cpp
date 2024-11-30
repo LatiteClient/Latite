@@ -37,6 +37,8 @@ void JsScreen::onRender(Event& evG) {
 }
 
 void JsScreen::onKey(Event& evG) {
+	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evG);
+	Event sEv{ L"key", {Chakra::MakeInt(ev.getKey()), ev.isDown() ? Chakra::GetTrue() : Chakra::GetFalse() }};
 	auto ret = dispatchEvent(sEv.name, sEv);
 	if (ret != JS_INVALID_REFERENCE) {
 		Chakra::Release(ret);

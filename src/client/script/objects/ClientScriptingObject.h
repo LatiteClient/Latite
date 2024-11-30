@@ -13,6 +13,8 @@ class ClientScriptingObject final : public ScriptingObject {
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK getCmgrCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+	static JsValueRef CALLBACK getSmgrCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 
 
 	static JsValueRef CALLBACK testCallback(JsValueRef callee, bool isConstructor,
@@ -25,6 +27,7 @@ public:
 
 	void initModuleManager();
 	void initCommandManager();
+	void initScreenManager();
 	void initialize(JsContextRef ctx, JsValueRef parentObj) override;
 
 	~ClientScriptingObject() {
@@ -35,6 +38,7 @@ public:
 
 	JsValueRef moduleManager = JS_INVALID_REFERENCE;
 	JsValueRef commandManager = JS_INVALID_REFERENCE;
+	JsValueRef screenManager = JS_INVALID_REFERENCE;
 private:
 	static JsValueRef CALLBACK mmgrRegisterModuleCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
@@ -55,4 +59,9 @@ private:
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 	static JsValueRef CALLBACK cmgrGetPrefixCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+
+	// screen manager
+	static JsValueRef CALLBACK smgrRegisterScreenCallback(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+
 };
