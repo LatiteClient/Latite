@@ -13,9 +13,9 @@ class JsScreen : public Screen, public JsEvented {
 public:
 	JsScreen(JsValueRef object, JsValueRef renderFunc);
 
-	void onRender(class Event& ev);
-	void onKey(Event& ev);
-	void onClick(Event& ev);
+	void onRender(class ::Event& ev);
+	void onKey(::Event& ev);
+	void onClick(::Event& ev);
 
 	std::string getName() override { return name; }
 

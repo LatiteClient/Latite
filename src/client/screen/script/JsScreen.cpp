@@ -22,7 +22,7 @@ JsScreen::JsScreen(JsValueRef object, JsValueRef renderFunc) : renderFunc(render
 	this->eventListeners[L"click"] = {};
 }
 
-void JsScreen::onRender(Event& evG) {
+void JsScreen::onRender(::Event& evG) {
 	auto& ev = reinterpret_cast<RenderLayerEvent&>(evG);
 	auto view = ev.getScreenView();
 	if (view->visualTree->rootControl->name == "debug_screen") {
@@ -36,7 +36,7 @@ void JsScreen::onRender(Event& evG) {
 	}
 }
 
-void JsScreen::onKey(Event& evG) {
+void JsScreen::onKey(::Event& evG) {
 	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evG);
 	Event sEv{ L"key", {Chakra::MakeInt(ev.getKey()), ev.isDown() ? Chakra::GetTrue() : Chakra::GetFalse() }};
 	auto ret = dispatchEvent(sEv.name, sEv);
@@ -45,7 +45,7 @@ void JsScreen::onKey(Event& evG) {
 	}
 }
 
-void JsScreen::onClick(Event& evG) {
+void JsScreen::onClick(::Event& evG) {
 	auto& ev = reinterpret_cast<ClickEvent&>(evG);
 	Event sEv{ L"click", {Chakra::MakeInt(ev.getMouseButton()), Chakra::MakeInt(ev.getWheelDelta()), ev.isDown() ? Chakra::GetTrue() : Chakra::GetFalse() } };
 	auto ret = dispatchEvent(sEv.name, sEv);
