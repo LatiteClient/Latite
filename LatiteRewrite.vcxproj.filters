@@ -6,6 +6,7 @@
     <ClCompile Include="deps\mnem\os\win32\process.cpp" />
     <ClCompile Include="deps\mnem\scan\scanner.cpp" />
     <ClCompile Include="deps\mnem\scan\scanner_avx2.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\visual\NoHurtCam.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\EnvironmentChanger.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\Freelook.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\TextHotkey.cpp" />
@@ -75,7 +76,6 @@
     <ClCompile Include="src\client\feature\module\TextModule.cpp" />
     <ClCompile Include="src\client\hook\Hook.cpp" />
     <ClCompile Include="src\client\hook\Hooks.cpp" />
-    <ClCompile Include="src\client\hook\impl\AppPlatformHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\DXHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\GeneralHooks.cpp" />
     <ClCompile Include="src\client\hook\impl\LevelRendererHooks.cpp" />
@@ -89,6 +89,7 @@
     <ClCompile Include="src\client\Latite.cpp" />
     <ClCompile Include="src\client\localization\LocalizeData.cpp" />
     <ClCompile Include="src\client\localization\LocalizeString.cpp" />
+    <ClCompile Include="src\client\misc\ClientMessageQueue.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\TestModule.cpp" />
     <ClCompile Include="src\client\feature\module\ModuleManager.cpp" />
     <ClCompile Include="src\client\misc\Notifications.cpp" />
@@ -101,6 +102,7 @@
     <ClCompile Include="src\client\screen\Screen.cpp" />
     <ClCompile Include="src\client\screen\ScreenManager.cpp" />
     <ClCompile Include="src\client\feature\module\script\JsModule.cpp" />
+    <ClCompile Include="src\client\screen\script\JsScreen.cpp" />
     <ClCompile Include="src\client\script\class\impl\game\JsEntityClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\game\JsLocalPlayerClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\game\JsPlayerClass.cpp" />
@@ -108,6 +110,7 @@
     <ClCompile Include="src\client\script\class\impl\JsHudModuleClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsModuleClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsSettingClass.cpp" />
+    <ClCompile Include="src\client\script\class\impl\JsTextModuleClass.cpp" />
     <ClCompile Include="src\client\script\event\ScriptListener.cpp" />
     <ClCompile Include="src\client\script\feature\JsEvented.cpp" />
     <ClCompile Include="src\client\script\interop\classes\JsEntity.cpp" />
@@ -122,6 +125,7 @@
     <ClCompile Include="src\client\script\objects\D2DScriptingObject.cpp" />
     <ClCompile Include="src\client\script\objects\GameScriptingObject.cpp" />
     <ClCompile Include="src\client\script\objects\Graphics3DScriptingObject.cpp" />
+    <ClCompile Include="src\client\script\objects\OptionsScriptingObject.cpp" />
     <ClCompile Include="src\client\script\ScriptingObject.cpp" />
     <ClCompile Include="src\client\script\PluginManager.cpp" />
     <ClCompile Include="src\client\ui\TextBox.cpp" />
@@ -129,6 +133,7 @@
     <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp" />
     <ClCompile Include="src\sdk\common\client\game\MinecraftGame.cpp" />
     <ClCompile Include="src\sdk\common\client\gui\controls\UIControl.cpp" />
+    <ClCompile Include="src\sdk\common\client\gui\screens\ContainerScreenController.cpp" />
     <ClCompile Include="src\sdk\common\client\input\RemappingLayout.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\game\BaseActorRenderContext.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\game\LevelRendererPlayer.cpp" />
@@ -138,11 +143,13 @@
     <ClCompile Include="src\sdk\common\client\renderer\Tessellator.cpp" />
     <ClCompile Include="src\sdk\common\client\util\JpegCommentWriter.cpp" />
     <ClCompile Include="src\sdk\common\network\packet\CommandRequestPacket.cpp" />
+    <ClCompile Include="src\sdk\common\network\packet\SetScorePacket.cpp" />
     <ClCompile Include="src\sdk\common\network\packet\TextPacket.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\Actor.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp" />
     <ClCompile Include="src\sdk\common\world\ItemStackBase.cpp" />
     <ClCompile Include="src\sdk\common\world\level\Level.cpp" />
+    <ClCompile Include="src\sdk\common\world\level\LevelData.cpp" />
     <ClCompile Include="src\sdk\common\world\Minecraft.cpp" />
     <ClCompile Include="src\sdk\deps\Application\AppPlatform.cpp" />
     <ClCompile Include="src\sdk\misc\ClickMap.cpp" />
@@ -153,308 +160,10 @@
     <ClCompile Include="src\util\Logger.cpp" />
     <ClCompile Include="src\util\Util.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\TabList.cpp" />
-    <ClCompile Include="src\client\feature\module\impl\visual\NoHurtCam.cpp" />
-    <ClCompile Include="src\client\misc\ClientMessageQueue.cpp" />
-    <ClCompile Include="src\client\script\class\impl\JsTextModuleClass.cpp" />
-    <ClCompile Include="src\client\script\objects\OptionsScriptingObject.cpp" />
-    <ClCompile Include="src\sdk\common\client\gui\screens\ContainerScreenController.cpp" />
-    <ClCompile Include="src\sdk\common\world\level\LevelData.cpp" />
-    <ClCompile Include="src\sdk\common\network\packet\SetScorePacket.cpp" />
+    <ClCompile Include="src\client\script\objects\OSScriptingObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assets\lang\en_US.json" />
-    <ClInclude Include="deps\include\mnemosyne\core\memory_range.hpp" />
-    <ClInclude Include="deps\include\mnemosyne\core\vfunc_index.hpp" />
-    <ClInclude Include="deps\include\mnemosyne\defines.hpp" />
-    <ClInclude Include="deps\include\mnemosyne\internal\abi\microsoft\vfunc_index_impl.hpp" />
-    <ClInclude Include="deps\include\mnemosyne\internal\string_literal.hpp" />
-    <ClInclude Include="deps\include\mnemosyne\mem\process.hpp" />
-    <ClInclude Include="deps\include\mnemosyne\scan\scanner.hpp" />
-    <ClInclude Include="deps\include\mnemosyne\scan\signature.hpp" />
-    <ClInclude Include="deps\mnem\cpuid.hpp" />
-    <ClInclude Include="deps\mnem\scan\scanner_impls.hpp" />
-    <ClInclude Include="src\client\event\impl\AttackEvent.h" />
-    <ClInclude Include="src\client\event\impl\ChatMessageEvent.h" />
-    <ClInclude Include="src\client\event\impl\ClientTextEvent.h" />
-    <ClInclude Include="src\client\event\impl\FogColorEvent.h" />
-    <ClInclude Include="src\client\event\impl\GetTimeEvent.h" />
-    <ClInclude Include="src\client\event\impl\LatiteClientMessageEvent.h" />
-    <ClInclude Include="src\client\event\impl\OutlineSelectionEvent.h" />
-    <ClInclude Include="src\client\event\impl\PacketReceiveEvent.h" />
-    <ClInclude Include="src\client\event\impl\SendPacketEvent.h" />
-    <ClInclude Include="src\client\event\impl\RenderGuiItemEvent.h" />
-    <ClInclude Include="src\client\event\impl\UpdatePlayerCameraEvent.h" />
-    <ClInclude Include="src\client\event\impl\WeatherEvent.h" />
-    <ClInclude Include="src\client\feature\command\impl\WaypointCommand.h" />
-    <ClInclude Include="src\client\feature\module\impl\game\EnvironmentChanger.h" />
-    <ClInclude Include="src\client\feature\module\impl\game\Freelook.h" />
-    <ClInclude Include="src\client\feature\module\impl\game\TextHotkey.h" />
-    <ClInclude Include="src\client\feature\module\impl\game\ThirdPersonNametag.h" />
-    <ClInclude Include="src\client\feature\module\impl\game\Waypoints.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\Chat.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\ComboCounter.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\CustomCoordinates.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\ItemCounter.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\MovableBossbar.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\MovableCoordinates.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\MovableScoreboard.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\ReachDisplay.h" />
-    <ClInclude Include="src\client\feature\module\impl\misc\CommandShortcuts.h" />
-    <ClInclude Include="src\client\feature\module\impl\misc\ItemTweaks.h" />
-    <ClInclude Include="src\client\feature\module\impl\misc\JavaDrop.h" />
-    <ClInclude Include="src\client\feature\module\impl\misc\Nickname.h" />
-    <ClInclude Include="src\client\feature\module\impl\visual\BlockOutline.h" />
-    <ClInclude Include="deps\include\vhook\vtable_hook.h" />
-    <ClInclude Include="src\client\event\impl\AfterEntityRenderEvent.h" />
-    <ClInclude Include="src\client\event\impl\HideHandEvent.h" />
-    <ClInclude Include="src\client\event\impl\PerspectiveEvent.h" />
-    <ClInclude Include="src\client\event\impl\SensitivityEvent.h" />
-    <ClInclude Include="src\client\feature\module\impl\game\BehindYou.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\ArmorHUD.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\HealthWarning.h" />
-    <ClInclude Include="src\client\event\Events.h" />
-    <ClInclude Include="src\client\event\impl\BobMovementEvent.h" />
-    <ClInclude Include="src\client\event\impl\DrawHUDModulesEvent.h" />
-    <ClInclude Include="src\client\event\impl\LeaveGameEvent.h" />
-    <ClInclude Include="src\client\feature\command\impl\SignCommand.h" />
-    <ClInclude Include="src\client\feature\module\impl\game\CinematicCamera.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\BreakIndicator.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\GuiscaleChanger.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\Keystrokes.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\MovablePaperdoll.h" />
-    <ClInclude Include="src\client\feature\module\impl\misc\DebugInfo.h" />
-    <ClInclude Include="src\client\feature\module\impl\game\DynamicLight.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\Clock.h" />
-    <ClInclude Include="deps\include\chakra\ChakraCommon.h" />
-    <ClInclude Include="deps\include\chakra\ChakraCommonWindows.h" />
-    <ClInclude Include="deps\include\chakra\ChakraCore.h" />
-    <ClInclude Include="deps\include\chakra\ChakraCoreWindows.h" />
-    <ClInclude Include="deps\include\chakra\ChakraDebug.h" />
-    <ClInclude Include="deps\include\json\json.hpp" />
-    <ClInclude Include="deps\include\MinHook.h" />
-    <ClInclude Include="deps\include\xorstr.hpp" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="src\api\eventing\Event.h" />
-    <ClInclude Include="src\api\eventing\EventManager.h" />
-    <ClInclude Include="src\api\eventing\Listenable.h" />
-    <ClInclude Include="src\api\feature\command\Command.h" />
-    <ClInclude Include="src\api\feature\command\CommandManager.h" />
-    <ClInclude Include="src\api\feature\Feature.h" />
-    <ClInclude Include="src\api\feature\setting\Setting.h" />
-    <ClInclude Include="src\api\feature\setting\SettingGroup.h" />
-    <ClInclude Include="src\api\manager\FeatureManager.h" />
-    <ClInclude Include="src\api\manager\Manager.h" />
-    <ClInclude Include="src\api\manager\StaticManager.h" />
-    <ClInclude Include="src\api\memory\memory.h" />
-    <ClInclude Include="src\api\memory\signature\signature.h" />
-    <ClInclude Include="src\api\scanner\scanner.h" />
-    <ClInclude Include="src\client\config\ConfigManager.h" />
-    <ClInclude Include="src\client\event\impl\AfterMoveEvent.h" />
-    <ClInclude Include="src\client\event\impl\AppSuspendedEvent.h" />
-    <ClInclude Include="src\client\event\impl\AveragePingEvent.h" />
-    <ClInclude Include="src\client\event\impl\BeforeMoveEvent.h" />
-    <ClInclude Include="src\client\event\impl\CharEvent.h" />
-    <ClInclude Include="src\client\event\impl\ChatEvent.h" />
-    <ClInclude Include="src\client\event\impl\CinematicCameraEvent.h" />
-    <ClInclude Include="src\client\event\impl\ClickEvent.h" />
-    <ClInclude Include="src\client\event\impl\FocusLostEvent.h" />
-    <ClInclude Include="src\client\event\impl\OverlayColorEvent.h" />
-    <ClInclude Include="src\client\event\impl\RendererCleanupEvent.h" />
-    <ClInclude Include="src\client\event\impl\RendererInitEvent.h" />
-    <ClInclude Include="src\client\event\impl\GammaEvent.h" />
-    <ClInclude Include="src\client\event\impl\KeyUpdateEvent.h" />
-    <ClInclude Include="src\client\event\impl\RenderGameEvent.h" />
-    <ClInclude Include="src\client\event\impl\RenderLayerEvent.h" />
-    <ClInclude Include="src\client\event\impl\RenderLevelEvent.h" />
-    <ClInclude Include="src\client\event\impl\RenderOverlayEvent.h" />
-    <ClInclude Include="src\client\event\impl\UpdateEvent.h" />
-    <ClInclude Include="src\client\feature\command\Command.h" />
-    <ClInclude Include="src\client\feature\command\CommandManager.h" />
-    <ClInclude Include="src\api\config\Config.h" />
-    <ClInclude Include="src\api\config\ConfigManager.h" />
-    <ClInclude Include="src\client\feature\command\impl\ConfigCommand.h" />
-    <ClInclude Include="src\client\feature\command\impl\EjectCommand.h" />
-    <ClInclude Include="src\client\feature\command\impl\HelpCommand.h" />
-    <ClInclude Include="src\client\feature\command\impl\ScriptCommand.h" />
-    <ClInclude Include="src\client\feature\command\impl\SetPrefixCommand.h" />
-    <ClInclude Include="src\client\feature\command\impl\TestCommand.h" />
-    <ClInclude Include="src\client\event\Eventing.h" />
-    <ClInclude Include="src\client\event\impl\TickEvent.h" />
-    <ClInclude Include="src\client\feature\command\impl\ToggleCommand.h" />
-    <ClInclude Include="src\client\feature\command\script\JsCommand.h" />
-    <ClInclude Include="src\client\feature\module\HUDModule.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\BowIndicator.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\CPSCounter.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\FPSCounter.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\ServerDisplay.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\PingDisplay.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\SpeedDisplay.h" />
-    <ClInclude Include="src\client\feature\module\impl\game\ToggleSprintSneak.h" />
-    <ClInclude Include="src\client\feature\module\impl\visual\ChunkBorders.h" />
-    <ClInclude Include="src\client\feature\module\impl\visual\Hitboxes.h" />
-    <ClInclude Include="src\client\feature\module\script\JsHudModule.h" />
-    <ClInclude Include="src\client\feature\module\script\JsTextModule.h" />
-    <ClInclude Include="src\client\feature\module\TextModule.h" />
-    <ClInclude Include="src\client\feature\module\impl\misc\InputLagTest.h" />
-    <ClInclude Include="src\client\feature\module\impl\misc\Screenshot.h" />
-    <ClInclude Include="src\client\feature\module\impl\visual\Fullbright.h" />
-    <ClInclude Include="src\client\feature\module\impl\visual\HurtColor.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\Minimap.h" />
-    <ClInclude Include="src\client\feature\module\impl\visual\MotionBlur.h" />
-    <ClInclude Include="src\client\feature\module\impl\game\Zoom.h" />
-    <ClInclude Include="src\client\feature\module\Module.h" />
-    <ClInclude Include="src\client\feature\setting\script\JsSetting.h" />
-    <ClInclude Include="src\client\hook\Hook.h" />
-    <ClInclude Include="src\client\hook\Hooks.h" />
-    <ClInclude Include="src\client\hook\impl\AppPlatformHooks.h" />
-    <ClInclude Include="src\client\hook\impl\DXHooks.h" />
-    <ClInclude Include="src\client\hook\impl\PlayerHooks.h" />
-    <ClInclude Include="src\client\hook\impl\GeneralHooks.h" />
-    <ClInclude Include="src\client\hook\impl\LevelRendererHooks.h" />
-    <ClInclude Include="src\client\hook\impl\MinecraftGameHooks.h" />
-    <ClInclude Include="src\client\hook\impl\OptionHooks.h" />
-    <ClInclude Include="src\client\hook\impl\PacketHooks.h" />
-    <ClInclude Include="src\client\hook\impl\RenderControllerHooks.h" />
-    <ClInclude Include="src\client\hook\impl\ScreenViewHooks.h" />
-    <ClInclude Include="src\client\input\Keyboard.h" />
-    <ClInclude Include="src\client\Latite.h" />
-    <ClInclude Include="src\client\localization\LocalizeData.h" />
-    <ClInclude Include="src\client\localization\LocalizeString.h" />
-    <ClInclude Include="src\api\feature\module\Module.h" />
-    <ClInclude Include="src\api\feature\module\ModuleManager.h" />
-    <ClInclude Include="src\client\feature\module\impl\misc\TestModule.h" />
-    <ClInclude Include="src\client\feature\module\ModuleManager.h" />
-    <ClInclude Include="src\client\misc\Notifications.h" />
-    <ClInclude Include="src\client\misc\Timings.h" />
-    <ClInclude Include="src\client\render\Assets.h" />
-    <ClInclude Include="src\client\render\asset\Asset.h" />
-    <ClInclude Include="src\client\render\Renderer.h" />
-    <ClInclude Include="src\client\screen\impl\ClickGUI.h" />
-    <ClInclude Include="src\client\screen\impl\HUDEditor.h" />
-    <ClInclude Include="src\client\screen\Screen.h" />
-    <ClInclude Include="src\client\screen\ScreenManager.h" />
-    <ClInclude Include="src\client\feature\module\script\JsModule.h" />
-    <ClInclude Include="src\client\script\class\impl\game\JsBlock.h" />
-    <ClInclude Include="src\client\script\class\impl\game\JsEntityClass.h" />
-    <ClInclude Include="src\client\script\class\impl\game\JsInventory.h" />
-    <ClInclude Include="src\client\script\class\impl\game\JsItem.h" />
-    <ClInclude Include="src\client\script\class\impl\game\JsItemStack.h" />
-    <ClInclude Include="src\client\script\class\impl\game\JsLocalPlayerClass.h" />
-    <ClInclude Include="src\client\script\class\impl\game\JsPlayerClass.h" />
-    <ClInclude Include="src\client\script\class\impl\JsColor.h" />
-    <ClInclude Include="src\client\script\class\impl\JsHudModuleClass.h" />
-    <ClInclude Include="src\client\script\class\impl\JsModuleClass.h" />
-    <ClInclude Include="src\client\script\class\impl\JsNativeModule.h" />
-    <ClInclude Include="src\client\script\class\impl\JsRect.h" />
-    <ClInclude Include="src\client\script\class\impl\JsSettingClass.h" />
-    <ClInclude Include="src\client\script\class\impl\JsTextModuleClass.h" />
-    <ClInclude Include="src\client\script\class\impl\JsTextureClass.h" />
-    <ClInclude Include="src\client\script\class\impl\JsVec2.h" />
-    <ClInclude Include="src\client\script\class\impl\JsVec3.h" />
-    <ClInclude Include="src\client\script\class\JsClass.h" />
-    <ClInclude Include="src\client\script\class\impl\JsCommandClass.h" />
-    <ClInclude Include="src\client\script\class\JsWrapperClass.h" />
-    <ClInclude Include="src\client\script\event\ScriptListener.h" />
-    <ClInclude Include="src\client\script\feature\JsEvented.h" />
-    <ClInclude Include="src\client\script\interop\classes\JsEntity.h" />
-    <ClInclude Include="src\client\script\interop\classes\JsTexture.h" />
-    <ClInclude Include="src\client\script\JsPlugin.h" />
-    <ClInclude Include="src\client\script\JsScript.h" />
-    <ClInclude Include="src\client\script\lib\JsLibrary.h" />
-    <ClInclude Include="src\client\script\lib\libraries\Clipboard.h" />
-    <ClInclude Include="src\client\script\lib\libraries\Filesystem.h" />
-    <ClInclude Include="src\client\script\lib\libraries\Network.h" />
-    <ClInclude Include="src\client\script\objects\ClientScriptingObject.h" />
-    <ClInclude Include="src\client\script\objects\D2DScriptingObject.h" />
-    <ClInclude Include="src\client\script\objects\DimensionObject.h" />
-    <ClInclude Include="src\client\script\objects\GameScriptingObject.h" />
-    <ClInclude Include="src\client\script\ScriptCertificate.h" />
-    <ClInclude Include="src\client\script\ScriptingObject.h" />
-    <ClInclude Include="src\client\script\PluginManager.h" />
-    <ClInclude Include="src\client\ui\TextBox.h" />
-    <ClInclude Include="src\sdk\common\client\game\FontRepository.h" />
-    <ClInclude Include="src\sdk\common\client\gui\controls\UIControl.h" />
-    <ClInclude Include="src\sdk\common\client\gui\controls\VisualTree.h" />
-    <ClInclude Include="src\sdk\common\client\gui\Font.h" />
-    <ClInclude Include="src\sdk\common\client\gui\GuiData.h" />
-    <ClInclude Include="src\sdk\common\client\gui\ScreenView.h" />
-    <ClInclude Include="src\sdk\common\client\input\ClientInputHandler.h" />
-    <ClInclude Include="src\sdk\common\client\input\RemappingLayout.h" />
-    <ClInclude Include="src\sdk\common\client\renderer\game\BaseActorRenderContext.h" />
-    <ClInclude Include="src\sdk\common\client\renderer\game\CameraComponent.h" />
-    <ClInclude Include="src\sdk\common\client\renderer\game\LevelRenderer.h" />
-    <ClInclude Include="src\sdk\common\client\renderer\game\LevelRendererPlayer.h" />
-    <ClInclude Include="src\sdk\common\client\renderer\HudPlayerRenderer.h" />
-    <ClInclude Include="src\sdk\common\client\renderer\ItemRenderer.h" />
-    <ClInclude Include="src\sdk\common\client\renderer\MaterialPtr.h" />
-    <ClInclude Include="src\sdk\common\client\renderer\MatrixStack.h" />
-    <ClInclude Include="src\sdk\common\client\renderer\MeshUtils.h" />
-    <ClInclude Include="src\sdk\common\client\renderer\screen\MinecraftUIRenderContext.h" />
-    <ClInclude Include="src\sdk\common\client\renderer\screen\ScreenContext.h" />
-    <ClInclude Include="src\sdk\common\client\renderer\Tessellator.h" />
-    <ClInclude Include="src\sdk\common\client\renderer\TexturePtr.h" />
-    <ClInclude Include="src\sdk\common\client\util\JpegCommentWriter.h" />
-    <ClInclude Include="src\sdk\common\entity\component\AttributesComponent.h" />
-    <ClInclude Include="src\sdk\common\entity\component\MoveInputComponent.h" />
-    <ClInclude Include="src\sdk\common\network\MinecraftPackets.h" />
-    <ClInclude Include="src\sdk\common\network\Packet.h" />
-    <ClInclude Include="src\sdk\common\network\PacketSender.h" />
-    <ClInclude Include="src\sdk\common\network\packet\ActorEventPacket.h" />
-    <ClInclude Include="src\sdk\common\network\packet\CommandRequestPacket.h" />
-    <ClInclude Include="src\sdk\common\network\packet\SetTitlePacket.h" />
-    <ClInclude Include="src\sdk\common\network\packet\TextPacket.h" />
-    <ClInclude Include="src\sdk\common\network\RakPeer.h" />
-    <ClInclude Include="src\sdk\common\util\MolangVariable.h" />
-    <ClInclude Include="src\sdk\common\util\MolangVariableMap.h" />
-    <ClInclude Include="src\sdk\common\world\actor\player\GameMode.h" />
-    <ClInclude Include="src\sdk\common\world\actor\player\Inventory.h" />
-    <ClInclude Include="src\sdk\common\world\actor\player\PlayerInventory.h" />
-    <ClInclude Include="src\sdk\common\world\Attribute.h" />
-    <ClInclude Include="src\sdk\common\world\Item.h" />
-    <ClInclude Include="src\sdk\common\world\ItemStack.h" />
-    <ClInclude Include="src\sdk\common\world\ItemStackBase.h" />
-    <ClInclude Include="src\sdk\common\world\level\BlockSource.h" />
-    <ClInclude Include="src\sdk\common\world\level\block\Block.h" />
-    <ClInclude Include="src\sdk\common\world\level\block\BlockLegacy.h" />
-    <ClInclude Include="src\sdk\common\world\level\HitResult.h" />
-    <ClInclude Include="src\sdk\common\world\Weather.h" />
-    <ClInclude Include="src\sdk\deps\Application\AppPlatform.h" />
-    <ClInclude Include="src\sdk\deps\CoreGraphics\ImageBuffer.h" />
-    <ClInclude Include="src\sdk\deps\Core\StringUtils.h" />
-    <ClInclude Include="src\sdk\misc\ClickMap.h" />
-    <ClInclude Include="src\sdk\signature\storage.h" />
-    <ClInclude Include="src\pch.h" />
-    <ClInclude Include="src\sdk\common\client\game\ClientInstance.h" />
-    <ClInclude Include="src\sdk\common\client\game\MinecraftGame.h" />
-    <ClInclude Include="src\sdk\common\client\player\LocalPlayer.h" />
-    <ClInclude Include="src\sdk\common\client\win\winrt\HidControllerWinRT.h" />
-    <ClInclude Include="src\sdk\common\entity\EntityContext.h" />
-    <ClInclude Include="src\sdk\common\network\RakNetConnector.h" />
-    <ClInclude Include="src\sdk\common\server\ServerInstance.h" />
-    <ClInclude Include="src\sdk\common\world\actor\Actor.h" />
-    <ClInclude Include="src\sdk\common\world\actor\Mob.h" />
-    <ClInclude Include="src\sdk\common\world\actor\player\Player.h" />
-    <ClInclude Include="src\sdk\common\world\level\Dimension.h" />
-    <ClInclude Include="src\sdk\common\world\level\Level.h" />
-    <ClInclude Include="src\sdk\common\world\Minecraft.h" />
-    <ClInclude Include="src\sdk\common\world\Timer.h" />
-    <ClInclude Include="src\sdk\signature\storage_latest.h" />
-    <ClInclude Include="src\sdk\String.h" />
-    <ClInclude Include="src\sdk\Util.h" />
-    <ClInclude Include="src\sdk\Version.h" />
-    <ClInclude Include="src\util\ChakraUtil.h" />
-    <ClInclude Include="src\util\DrawUtil3D.h" />
-    <ClInclude Include="src\util\FNV32.h" />
-    <ClInclude Include="src\util\DxContext.h" />
-    <ClInclude Include="src\util\DxUtil.h" />
-    <ClInclude Include="src\util\Json.h" />
-    <ClInclude Include="src\util\Logger.h" />
-    <ClInclude Include="src\util\LMath.h" />
-    <ClInclude Include="src\util\Meta.h" />
-    <ClInclude Include="src\util\Util.h" />
-    <ClInclude Include="src\util\XorString.h" />
-    <ClInclude Include="src\client\feature\module\impl\hud\TabList.h" />
-    <ClInclude Include="assets\lang\es_ES.json" />
     <ClInclude Include="deps\include\mnemosyne\core\memory_range.hpp" />
     <ClInclude Include="deps\include\mnemosyne\core\vfunc_index.hpp" />
     <ClInclude Include="deps\include\mnemosyne\defines.hpp" />
@@ -600,7 +309,6 @@
     <ClInclude Include="src\client\feature\setting\script\JsSetting.h" />
     <ClInclude Include="src\client\hook\Hook.h" />
     <ClInclude Include="src\client\hook\Hooks.h" />
-    <ClInclude Include="src\client\hook\impl\AppPlatformHooks.h" />
     <ClInclude Include="src\client\hook\impl\DXHooks.h" />
     <ClInclude Include="src\client\hook\impl\PlayerHooks.h" />
     <ClInclude Include="src\client\hook\impl\GeneralHooks.h" />
@@ -612,6 +320,7 @@
     <ClInclude Include="src\client\hook\impl\ScreenViewHooks.h" />
     <ClInclude Include="src\client\input\Keyboard.h" />
     <ClInclude Include="src\client\Latite.h" />
+    <ClInclude Include="src\client\localization\LocalizeData.h" />
     <ClInclude Include="src\client\localization\LocalizeString.h" />
     <ClInclude Include="src\client\misc\ClientMessageQueue.h" />
     <ClInclude Include="src\api\feature\module\Module.h" />
@@ -628,6 +337,7 @@
     <ClInclude Include="src\client\screen\Screen.h" />
     <ClInclude Include="src\client\screen\ScreenManager.h" />
     <ClInclude Include="src\client\feature\module\script\JsModule.h" />
+    <ClInclude Include="src\client\screen\script\JsScreen.h" />
     <ClInclude Include="src\client\script\class\impl\game\JsBlock.h" />
     <ClInclude Include="src\client\script\class\impl\game\JsEntityClass.h" />
     <ClInclude Include="src\client\script\class\impl\game\JsInventory.h" />
@@ -640,6 +350,7 @@
     <ClInclude Include="src\client\script\class\impl\JsModuleClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsNativeModule.h" />
     <ClInclude Include="src\client\script\class\impl\JsRect.h" />
+    <ClInclude Include="src\client\script\class\impl\JsScreenClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsSettingClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsTextModuleClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsTextureClass.h" />
@@ -693,8 +404,12 @@
     <ClInclude Include="src\sdk\common\client\renderer\Tessellator.h" />
     <ClInclude Include="src\sdk\common\client\renderer\TexturePtr.h" />
     <ClInclude Include="src\sdk\common\client\util\JpegCommentWriter.h" />
+    <ClInclude Include="src\sdk\common\entity\component\ActorDataFlagComponent.h" />
+    <ClInclude Include="src\sdk\common\entity\component\ActorEquipmentComponent.h" />
+    <ClInclude Include="src\sdk\common\entity\component\ActorTypeComponent.h" />
     <ClInclude Include="src\sdk\common\entity\component\AttributesComponent.h" />
     <ClInclude Include="src\sdk\common\entity\component\MoveInputComponent.h" />
+    <ClInclude Include="src\sdk\common\entity\component\RuntimeIDComponent.h" />
     <ClInclude Include="src\sdk\common\nbt\CompoundTag.h" />
     <ClInclude Include="src\sdk\common\nbt\Tag.h" />
     <ClInclude Include="src\sdk\common\network\MinecraftPackets.h" />
@@ -702,6 +417,7 @@
     <ClInclude Include="src\sdk\common\network\PacketSender.h" />
     <ClInclude Include="src\sdk\common\network\packet\ActorEventPacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\CommandRequestPacket.h" />
+    <ClInclude Include="src\sdk\common\network\packet\SetScorePacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\SetTitlePacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\TextPacket.h" />
     <ClInclude Include="src\sdk\common\network\RakPeer.h" />
@@ -758,468 +474,16 @@
     <ClInclude Include="src\util\Util.h" />
     <ClInclude Include="src\util\XorString.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\TabList.h" />
+    <ClInclude Include="assets\lang\es_ES.json" />
     <ClInclude Include="assets\lang\pt_PT.json" />
     <ClInclude Include="assets\lang\zh_CN.json" />
     <ClInclude Include="assets\lang\zh_TW.json" />
-    <ClInclude Include="src\sdk\common\network\packet\SetScorePacket.h" />
+    <ClInclude Include="src\client\script\objects\OSScriptingObject.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\util\Logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\util\Util.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\Latite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\api\memory\memory.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\api\scanner\legacyScanner.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\command\Command.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\command\CommandManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\hook\Hook.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\api\memory\signature\signature.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\hook\impl\GeneralHooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\ModuleManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\world\Minecraft.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\api\config\Config.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\command\impl\TestCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\hook\Hooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\command\impl\HelpCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\command\impl\EjectCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\event\Eventing.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\misc\TestModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\command\impl\ToggleCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\config\ConfigManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\Module.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\hook\impl\LevelRendererHooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\game\Zoom.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\client\game\MinecraftGame.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\hook\impl\OptionHooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\visual\Fullbright.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\hook\impl\DXHooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\util\DxUtil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\render\Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\visual\MotionBlur.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\screen\impl\ClickGUI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\screen\ScreenManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\util\DxContext.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\render\asset\Asset.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\render\Assets.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\hook\impl\AppPlatformHooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\JsPlugin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\util\ChakraUtil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\lib\JsLibrary.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\lib\libraries\Filesystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\lib\libraries\Network.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\ScriptingObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\PluginManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\command\impl\ScriptCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\objects\ClientScriptingObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\event\ScriptListener.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\hook\impl\MinecraftGameHooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\world\level\Level.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\screen\Screen.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\screen\impl\HUDEditor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\visual\HurtColor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\hook\impl\RenderControllerHooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\script\JsModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\class\impl\JsModuleClass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\objects\GameScriptingObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\objects\D2DScriptingObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\HUDModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\hook\impl\ScreenViewHooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\misc\Screenshot.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\input\Keyboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\ui\TextBox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\TextModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\FPSCounter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\misc\Timings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\api\feature\setting\Setting.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\class\impl\JsSettingClass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\CPSCounter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\command\impl\SetPrefixCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\command\impl\ConfigCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\feature\JsEvented.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\command\script\JsCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\class\impl\JsCommandClass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\ServerDisplay.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\PingDisplay.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\SpeedDisplay.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\deps\Application\AppPlatform.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\game\ToggleSprintSneak.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\client\renderer\MaterialPtr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\client\renderer\MeshUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\client\renderer\Tessellator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\client\renderer\game\LevelRendererPlayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\BowIndicator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\Clock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\GuiscaleChanger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\game\DynamicLight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\misc\DebugInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\class\impl\game\JsEntityClass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\interop\classes\JsEntity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\client\input\RemappingLayout.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\network\packet\TextPacket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\world\actor\Actor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\pch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\network\packet\CommandRequestPacket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\class\impl\game\JsPlayerClass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\TabList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\Keystrokes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\game\CinematicCamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\misc\ClickMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\class\impl\game\JsLocalPlayerClass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\world\ItemStackBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\command\impl\SignCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\hook\impl\PacketHooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="deps\include\vhook\vtable_hook.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\BreakIndicator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\HealthWarning.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\lib\libraries\Clipboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\script\JsHudModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\class\impl\JsHudModuleClass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\game\BehindYou.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\client\renderer\game\BaseActorRenderContext.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\client\renderer\ItemRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\visual\Hitboxes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\visual\ChunkBorders.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\util\DrawUtil3D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\interop\classes\JsTexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\ArmorHUD.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\client\util\JpegCommentWriter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\JsScript.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\sdk\common\client\gui\controls\UIControl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\MovablePaperdoll.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\script\JsTextModule.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\visual\BlockOutline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\MovableScoreboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\misc\Nickname.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\misc\ItemTweaks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\ReachDisplay.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\hook\impl\PlayerHooks.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\MovableBossbar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\game\ThirdPersonNametag.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\game\EnvironmentChanger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\misc\CommandShortcuts.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\misc\JavaDrop.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\game\Waypoints.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\ItemCounter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\script\objects\Graphics3DScriptingObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="deps\mnem\cpuid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="deps\mnem\mnemosyne.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="deps\mnem\os\win32\process.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="deps\mnem\scan\scanner.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="deps\mnem\scan\scanner_avx2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\Chat.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\game\TextHotkey.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\misc\Notifications.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\game\Freelook.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\ComboCounter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\CustomCoordinates.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\feature\module\impl\hud\MovableCoordinates.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\client\localization\LocalizeString.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <Image Include="assets\arrow.png" />
     <Image Include="assets\arrow_back.png" />
     <Image Include="assets\checkmark.png" />
@@ -1230,45 +494,16 @@
     <Image Include="assets\x.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="CMakePresets.json" />
-    <None Include="CppProperties.json" />
-    <None Include="src\client\script\js\latiteapi.js" />
     <None Include="assets\lang\ar_AR.json" />
     <None Include="assets\lang\cs_CZ.json" />
     <None Include="assets\lang\fr_FR.json" />
     <None Include="assets\lang\ja_JP.json" />
     <None Include="assets\lang\pt_BR.json" />
+    <None Include="CMakePresets.json" />
+    <None Include="CppProperties.json" />
+    <None Include="src\client\script\js\latiteapi.js" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="LatiteRewrite.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="assets\arrow.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="assets\arrow_back.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="assets\checkmark.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="assets\cog.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="assets\hudedit.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="assets\logo.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="assets\searchicon.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="assets\x.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Text Include="CMakeLists.txt" />
     <Text Include="src\api\CMakeLists.txt" />
     <Text Include="src\api\feature\CMakeLists.txt" />

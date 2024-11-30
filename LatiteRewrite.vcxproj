@@ -496,6 +496,7 @@
     <ClInclude Include="src\client\screen\Screen.h" />
     <ClInclude Include="src\client\screen\ScreenManager.h" />
     <ClInclude Include="src\client\feature\module\script\JsModule.h" />
+    <ClInclude Include="src\client\screen\script\JsScreen.h" />
     <ClInclude Include="src\client\script\class\impl\game\JsBlock.h" />
     <ClInclude Include="src\client\script\class\impl\game\JsEntityClass.h" />
     <ClInclude Include="src\client\script\class\impl\game\JsInventory.h" />
@@ -508,6 +509,7 @@
     <ClInclude Include="src\client\script\class\impl\JsModuleClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsNativeModule.h" />
     <ClInclude Include="src\client\script\class\impl\JsRect.h" />
+    <ClInclude Include="src\client\script\class\impl\JsScreenClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsSettingClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsTextModuleClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsTextureClass.h" />
@@ -532,6 +534,7 @@
     <ClInclude Include="src\client\script\objects\GameScriptingObject.h" />
     <ClInclude Include="src\client\script\objects\Graphics3DScriptingObject.h" />
     <ClInclude Include="src\client\script\objects\OptionsScriptingObject.h" />
+    <ClInclude Include="src\client\script\objects\OSScriptingObject.h" />
     <ClInclude Include="src\client\script\ScriptCertificate.h" />
     <ClInclude Include="src\client\script\ScriptingObject.h" />
     <ClInclude Include="src\client\script\PluginManager.h" />
@@ -752,6 +755,7 @@
     <ClCompile Include="src\client\screen\Screen.cpp" />
     <ClCompile Include="src\client\screen\ScreenManager.cpp" />
     <ClCompile Include="src\client\feature\module\script\JsModule.cpp" />
+    <ClCompile Include="src\client\screen\script\JsScreen.cpp" />
     <ClCompile Include="src\client\script\class\impl\game\JsEntityClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\game\JsLocalPlayerClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\game\JsPlayerClass.cpp" />
@@ -775,6 +779,7 @@
     <ClCompile Include="src\client\script\objects\GameScriptingObject.cpp" />
     <ClCompile Include="src\client\script\objects\Graphics3DScriptingObject.cpp" />
     <ClCompile Include="src\client\script\objects\OptionsScriptingObject.cpp" />
+    <ClCompile Include="src\client\script\objects\OSScriptingObject.cpp" />
     <ClCompile Include="src\client\script\ScriptingObject.cpp" />
     <ClCompile Include="src\client\script\PluginManager.cpp" />
     <ClCompile Include="src\client\ui\TextBox.cpp" />
