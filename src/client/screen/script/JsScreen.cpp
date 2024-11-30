@@ -7,3 +7,9 @@ JsScreen::JsScreen(JsValueRef object) {
 	key = Chakra::GetIntProperty(object, L"key");
 	
 }
+
+void JsScreen::onEnable(bool ignoreAnims) {
+}
+
+void JsScreen::onDisable() {
+}
