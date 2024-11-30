@@ -9,7 +9,7 @@
 
 class JsScreen : public Screen {
 public:
-	JsScreen(JsValueRef object);
+	JsScreen(JsValueRef object, JsValueRef renderFunc);
 
 	void onRender(class Event& ev);
 	void onCleanup(Event& ev);
