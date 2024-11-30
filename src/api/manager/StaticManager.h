@@ -14,10 +14,6 @@ public:
 	StaticManager(StaticManager<Base, Items...>&) = delete;
 	StaticManager(StaticManager<Base, Items...>&&) = delete;
 
-	template <typename T, typename ... Params>
-	void addDynamicItem(Params&&... args) {
-		dynamicItems.push_back(std::make_shared<T>(...args);
-	}
 
 	void forEach(std::function<void(Base&)> const& func) {
 		forEachImpl(func, items);
