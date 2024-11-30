@@ -18,6 +18,8 @@ public:
 	void onClick(Event& ev);
 
 	std::string getName() override { return name; }
+
+	JsValueRef getObject() const { return object; }
 protected:
 	void onEnable(bool ignoreAnims) override;
 	void onDisable() override;
