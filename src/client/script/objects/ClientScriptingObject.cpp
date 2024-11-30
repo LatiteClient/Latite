@@ -12,6 +12,7 @@
 #include "client/feature/command/script/JsCommand.h"
 #include <client/feature/module/script/JsTextModule.h>
 #include <client/script/class/impl/JsTextModuleClass.h>
+#include <client/screen/ScreenManager.h>
 
 JsValueRef ClientScriptingObject::registerEventCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	JsValueRef undefined;
@@ -117,6 +118,7 @@ void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(moduleManager, mmgrForEachModule, XW("forEachModule"));
 	Chakra::DefineFunc(commandManager, cmgrRegisterCommandCallback, XW("registerCommand"));
 	Chakra::DefineFunc(commandManager, cmgrGetPrefixCallback, XW("getPrefix"));
+	Chakra::DefineFunc(commandManager, smgrRegisterScreenCallback, XW("registerScreen"));
 
 	Chakra::SetPropertyString(object, L"version", util::StrToWStr(std::string(Latite::version.data(), Latite::version.size())));
 }
@@ -292,7 +294,7 @@ JsValueRef ClientScriptingObject::cmgrRegisterCommandCallback(JsValueRef callee,
 		return undefined;
 	}
 
-	JsCommand* cmd;
+	JsCommand* cmd = nullptr;
 
 	JS::JsGetExternalData(arguments[1], reinterpret_cast<void**>(&cmd));
 
@@ -304,7 +306,7 @@ JsValueRef ClientScriptingObject::cmgrRegisterCommandCallback(JsValueRef callee,
 	if (Latite::getCommandManager().registerScriptCommand(cmd)) {
 		JsScript::getThis()->addResource(cmd, [](void* obj) {
 			if (!Latite::getCommandManager().deregisterScriptCommand(reinterpret_cast<JsCommand*>(obj))) {
-				Logger::Warn("Script is already deregistered");
+				Logger::Warn("Script command is already deregistered");
 			}
 
 			// hoepfully this doesnt double delete...
@@ -326,7 +328,7 @@ JsValueRef ClientScriptingObject::cmgrDeregisterCommandCallback(JsValueRef calle
 		return undefined;
 	}
 
-	JsCommand* cmd;
+	JsCommand* cmd = nullptr;
 
 	// TODO: check if its a script command
 
@@ -343,5 +345,32 @@ JsValueRef ClientScriptingObject::cmgrGetPrefixCallback(JsValueRef callee, bool 
 }
 
 JsValueRef ClientScriptingObject::smgrRegisterScreenCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	return JsValueRef();
+	JsValueRef undefined;
+	JS::JsGetUndefinedValue(&undefined);
+	if (!Chakra::VerifyArgCount(argCount, 2)) return undefined;
+
+	auto sz = Chakra::VerifyParameters({ {arguments[1], JsObject} });
+	if (!sz.success) {
+		// handle
+		Chakra::ThrowError(sz.str);
+		return undefined;
+	}
+
+	JsScreen* scn = nullptr;
+
+	JS::JsGetExternalData(arguments[1], reinterpret_cast<void**>(&scn));
+
+	if (!scn) {
+		Chakra::ThrowError(L"Object is not a command");
+		return undefined;
+	}
+
+	if (Latite::getScreenManager().registerScriptScreen(scn)) {
+		JsScript::getThis()->addResource(scn, [](void* obj) {
+			if (!Latite::getScreenManager().deregisterScriptScreen(reinterpret_cast<JsScreen*>(obj))) {
+				Logger::Warn("Screen is already deregistered");
+			}
+			});
+	}
+	return undefined;
 }
