@@ -78,6 +78,13 @@ JsValueRef ClientScriptingObject::getCmgrCallback(JsValueRef callee, bool isCons
 	return reinterpret_cast<ClientScriptingObject*>(callbackState)->commandManager;
 }
 
+JsValueRef ClientScriptingObject::getSmgrCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	JsValueRef undefined;
+	JS::JsGetUndefinedValue(&undefined);
+	if (!Chakra::VerifyArgCount(argCount, 1)) return undefined;
+	return reinterpret_cast<ClientScriptingObject*>(callbackState)->screenManager;
+}
+
 JsValueRef ClientScriptingObject::testCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState){
 	return JsScript::getThis()->getClass<JsItemStack>()->construct(SDK::ClientInstance::get()->getLocalPlayer()->supplies->inventory->getItem(0), false);
 }
