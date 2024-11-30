@@ -331,7 +331,7 @@ void D2DScriptingObject::DrawVisitor::operator()(OpDrawImage& op) {
 	if (!op.texture->getBitmap()) return;
 	D2DUtil dc;
 	//dc.drawText(op.rect, op.text, op.col, op.font, op.size, op.alignment, op.vertAlign);
-	dc.ctx->DrawBitmap(op.texture->getBitmap(), { op.pos.x, op.pos.y, op.pos.x + op.sx, op.pos.y + op.sy });
+	dc.ctx->DrawBitmap(op.texture->getBitmap(), { op.pos.x, op.pos.y, op.pos.x + op.sx, op.pos.y + op.sy }, op.col.a);
 }
 
 void D2DScriptingObject::DrawVisitor::operator()(OpClip& op) {
