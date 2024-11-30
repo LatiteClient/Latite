@@ -5,7 +5,7 @@
 #include "sdk/common/client/gui/controls/VisualTree.h"
 #include "sdk/common/client/gui/controls/UIControl.h"
 
-JsScreen::JsScreen(JsValueRef object, JsValueRef renderFunc) : renderFunc(renderFunc) {
+JsScreen::JsScreen(JsValueRef object, std::string name) : name(std::move(name)) {
 	JS::JsGetCurrentContext(&this->ctx);
 
 	Chakra::GetStringProperty(object, L"name");

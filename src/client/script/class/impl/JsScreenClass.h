@@ -8,10 +8,10 @@ protected:
 	static JsValueRef CALLBACK jsConstructor(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 		auto thi = reinterpret_cast<JsScreenClass*>(callbackState);
-		if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
-		if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsFunction} })) return JS_INVALID_REFERENCE;
+		if (!Chakra::VerifyArgCount(argCount, 1)) return JS_INVALID_REFERENCE;
+		if (!Chakra::VerifyParameters({ {arguments[1], JsString} })) return JS_INVALID_REFERENCE;
 
-		auto screen = new JsScreen(arguments[0], arguments[2]);
+		auto screen = new JsScreen(arguments[0], util::WStrToStr(Chakra::GetString(arguments[1])));
 		JsValueRef obj = thi->construct(screen, false);
 		return obj;
 	}

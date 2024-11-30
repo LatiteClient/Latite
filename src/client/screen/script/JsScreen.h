@@ -11,7 +11,7 @@
 
 class JsScreen : public Screen, public JsEvented {
 public:
-	JsScreen(JsValueRef object, JsValueRef renderFunc);
+	JsScreen(JsValueRef object, std::string name);
 
 	void onRender(class ::Event& ev);
 	void onKey(::Event& ev);
@@ -25,7 +25,6 @@ protected:
 	void onDisable() override;
 private:
 	JsValueRef object = JS_INVALID_REFERENCE;
-	JsValueRef renderFunc = JS_INVALID_REFERENCE;
 	JsContextRef ctx = JS_INVALID_REFERENCE;
 
 	std::string name;
