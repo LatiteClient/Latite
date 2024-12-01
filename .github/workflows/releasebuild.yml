@@ -46,5 +46,5 @@ jobs:
     - name: Upload release DLL to artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: Latite-Release
-        path: D:\a\Latite\Latite\x64\Release\LatiteRewrite.dll
+        name: Latite-Nightly
+        path: D:\a\Latite\Latite\x64\Nightly\LatiteRewrite.dll
