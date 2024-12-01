@@ -32,6 +32,7 @@ public:
 		JS::JsSetPrototype(obj, getPrototype());
 		Chakra::SetPropertyString(obj, XW("name"), util::StrToWStr(item->namespacedId.getString()));
 		Chakra::SetPropertyString(obj, XW("translateName"), util::StrToWStr(item->translateName));
+		Chakra::SetPropertyNumber(obj, XW("maxDamage"), item->getMaxDamage());
 		return obj;
 	}
 
