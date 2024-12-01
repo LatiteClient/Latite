@@ -1,3 +1,7 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
 name: Build Latite from source
 
 on:
@@ -28,11 +32,10 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
 
-    - name: Fetch Commit Hash
-      run: echo "COMMIT_HASH=${{ github.sha }}" >> $GITHUB_ENV
-
-    - name: Set Additional Compiler Options
-      run: set ExternalCompilerOptions=/DCOMMIT_HASH=${{github.sha}}
+    # - name: Restore NuGet packages
+    #   working-directory: ${{env.GITHUB_WORKSPACE}}
+    #   run: nuget restore ${{env.SOLUTION_FILE_PATH}}
+    # apparently this thing isnt really needed
 
     - name: Build Latite
       working-directory: ${{env.GITHUB_WORKSPACE}}

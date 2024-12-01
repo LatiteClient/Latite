@@ -476,12 +476,8 @@ void Latite::threadsafeInit() {
 
     auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     std::string vstr(this->version);
-#define STRINGIFY(x) #x
 #ifdef LATITE_NIGHTLY
-#ifndef COMMIT_HASH
-#error Invalid nightly build - No Commit Hash
-#endif
-    auto ws = util::StrToWStr("Latite Client [NIGHTLY] commit #" + STRINGIFY(COMMIT_HASH) + " game version " + gameVersion);
+    auto ws = util::StrToWStr("Latite Client [NIGHTLY] " + std::string(__DATE__) + " " + std::string(__TIME__) + " game version " + gameVersion);
 #else
     auto ws = util::StrToWStr("Latite Client " + vstr);
 #endif
