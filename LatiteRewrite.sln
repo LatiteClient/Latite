@@ -11,6 +11,8 @@ Global
 		Beta|x86 = Beta|x86
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Nightly|x64 = Nightly|x64
+		Nightly|x86 = Nightly|x86
 		NoPCH|x64 = NoPCH|x64
 		NoPCH|x86 = NoPCH|x86
 		Release|x64 = Release|x64
@@ -25,6 +27,10 @@ Global
 		{5B4BAE65-3D2D-4E71-854E-53438E690DAD}.Debug|x64.Build.0 = Debug|x64
 		{5B4BAE65-3D2D-4E71-854E-53438E690DAD}.Debug|x86.ActiveCfg = Debug|Win32
 		{5B4BAE65-3D2D-4E71-854E-53438E690DAD}.Debug|x86.Build.0 = Debug|Win32
+		{5B4BAE65-3D2D-4E71-854E-53438E690DAD}.Nightly|x64.ActiveCfg = Nightly|x64
+		{5B4BAE65-3D2D-4E71-854E-53438E690DAD}.Nightly|x64.Build.0 = Nightly|x64
+		{5B4BAE65-3D2D-4E71-854E-53438E690DAD}.Nightly|x86.ActiveCfg = Nightly|Win32
+		{5B4BAE65-3D2D-4E71-854E-53438E690DAD}.Nightly|x86.Build.0 = Nightly|Win32
 		{5B4BAE65-3D2D-4E71-854E-53438E690DAD}.NoPCH|x64.ActiveCfg = NoPCH|x64
 		{5B4BAE65-3D2D-4E71-854E-53438E690DAD}.NoPCH|x64.Build.0 = NoPCH|x64
 		{5B4BAE65-3D2D-4E71-854E-53438E690DAD}.NoPCH|x86.ActiveCfg = NoPCH|Win32
