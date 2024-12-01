@@ -20,6 +20,7 @@ JsValueRef Filesystem::initialize(JsValueRef parent) {
 	Chakra::DefineFunc(ret, appendSync, L"append", this);
 	Chakra::DefineFunc(ret, deleteFile, L"delete", this);
 	Chakra::DefineFunc(ret, readdirSync, L"readDirectory", this);
+	Chakra::DefineFunc(ret, moveSync, L"move", this);
 	return ret;
 }
 
@@ -271,8 +272,6 @@ JsValueRef Filesystem::readdirSync(JsValueRef callee, bool isConstructor, JsValu
 	auto ret = Chakra::GetUndefined();
 	if (!Chakra::VerifyArgCount(argCount, 2)) return ret;
 	if (!Chakra::VerifyParameters({ {arguments[1], JsString} })) return ret;
-	std::wifstream ifs;
-	std::wstringstream wss;
 	auto thi = reinterpret_cast<Filesystem*>(callbackState);
 
 	auto path = thi->getPath(Chakra::GetString(arguments[1]));
@@ -296,6 +295,28 @@ JsValueRef Filesystem::readdirSync(JsValueRef callee, bool isConstructor, JsValu
 	}
 
 	return array;
+}
+
+JsValueRef Filesystem::moveSync(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	auto ret = Chakra::GetUndefined();
+	if (!Chakra::VerifyArgCount(argCount, 3)) return ret;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[1], JsString} })) return ret;
+	std::wifstream ifs;
+	std::wstringstream wss;
+	auto thi = reinterpret_cast<Filesystem*>(callbackState);
+
+	auto path1 = thi->getPath(Chakra::GetString(arguments[1]));
+	auto path2 = thi->getPath(Chakra::GetString(arguments[1]));
+
+	std::error_code errCode;
+	fs::rename(path1, path2, errCode);
+
+	if (errCode.value() != ERROR_ALREADY_EXISTS && errCode.value() != 0) {
+		Chakra::ThrowError(L"Filesystem error: " + util::StrToWStr(errCode.message()));
+		return JS_INVALID_REFERENCE;
+	}
+
+	return Chakra::GetUndefined();
 }
 
 void Filesystem::FSAsyncOperation::getArgs() {

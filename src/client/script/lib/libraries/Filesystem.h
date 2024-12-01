@@ -11,31 +11,6 @@ public:
 	Filesystem(JsScript* owner) : JsLibrary(owner, L"filesystem") {}
 private:
 
-
-	//template <typename T>
-	//void runAsyncOperation(std::function<void(T)> func)
-
-	// can someone tell past me about std::vector....
-	/*
-	struct BufferRef {
-		BYTE* data;
-		size_t size;
-
-		BufferRef(size_t sz) : size(sz), data(nullptr) {}
-
-		void alloc(size_t sz) {
-			if (data) delete[] data;
-			data = new BYTE[sz];
-			size = sz;
-		}
-
-		~BufferRef() {
-			if (data) {
-				delete[] data;
-			}
-		}
-	};*/
-
 	class FSAsyncOperation : public JsScript::AsyncOperation {
 	public:
 		
@@ -84,6 +59,9 @@ private:
 		JsValueRef* arguments, unsigned short argCount,
 		void* callbackState);
 	static JsValueRef CALLBACK readdirSync(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount,
+		void* callbackState);
+	static JsValueRef CALLBACK moveSync(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount,
 		void* callbackState);
 	
