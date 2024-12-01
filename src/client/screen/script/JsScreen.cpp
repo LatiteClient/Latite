@@ -19,7 +19,7 @@ JsScreen::JsScreen(JsValueRef object, std::string name) : name(std::move(name)) 
 	this->eventListeners[L"disable"] = {};
 	this->eventListeners[L"render"] = {};
 	this->eventListeners[L"key"] = {};
-	this->eventListeners[L"click"] = {};
+	this->eventListeners[L"mouse"] = {};
 }
 
 void JsScreen::onRender(::Event& evG) {
@@ -41,15 +41,17 @@ void JsScreen::onKey(::Event& evG) {
 	Event sEv{ L"key", {Chakra::MakeInt(ev.getKey()), ev.isDown() ? Chakra::GetTrue() : Chakra::GetFalse() }};
 	auto ret = dispatchEvent(sEv.name, sEv);
 	if (ret != JS_INVALID_REFERENCE) {
+		ev.setCancelled(Chakra::GetBool(ret));
 		Chakra::Release(ret);
 	}
 }
 
 void JsScreen::onClick(::Event& evG) {
 	auto& ev = reinterpret_cast<ClickEvent&>(evG);
-	Event sEv{ L"click", {Chakra::MakeInt(ev.getMouseButton()), Chakra::MakeInt(ev.getWheelDelta()), ev.isDown() ? Chakra::GetTrue() : Chakra::GetFalse() } };
+	Event sEv{ L"mouse", {Chakra::MakeInt(ev.getMouseButton()), Chakra::MakeInt(ev.getWheelDelta()), ev.isDown() ? Chakra::GetTrue() : Chakra::GetFalse() } };
 	auto ret = dispatchEvent(sEv.name, sEv);
 	if (ret != JS_INVALID_REFERENCE) {
+		ev.setCancelled(Chakra::GetBool(ret));
 		Chakra::Release(ret);
 	}
 }
