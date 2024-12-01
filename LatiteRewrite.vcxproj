@@ -333,6 +333,7 @@
       <ModuleOutputFile>$(TargetName)</ModuleOutputFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
+      <AdditionalOptions>$(ExternalCompilerOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
