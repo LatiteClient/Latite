@@ -915,6 +915,7 @@
     <None Include="assets\lang\cs_CZ.json" />
     <None Include="assets\lang\fr_FR.json" />
     <None Include="assets\lang\ja_JP.json" />
+    <None Include="assets\lang\nl_NL.json" />
     <None Include="assets\lang\pt_BR.json" />
     <None Include="CMakePresets.json" />
     <None Include="CppProperties.json" />

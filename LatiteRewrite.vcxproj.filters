@@ -502,6 +502,7 @@
     <None Include="CMakePresets.json" />
     <None Include="CppProperties.json" />
     <None Include="src\client\script\js\latiteapi.js" />
+    <None Include="assets\lang\nl_NL.json" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />

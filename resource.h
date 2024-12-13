@@ -38,3 +38,4 @@
 #define LANG_FR_FR 108
 #define LANG_JA_JP 109
 #define LANG_PT_BR 110
+#define LANG_NL_NL 111
