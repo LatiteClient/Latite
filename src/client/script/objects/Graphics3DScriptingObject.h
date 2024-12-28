@@ -46,7 +46,7 @@ private:
 
 		void reset() {
 			renderThrough = false;
-			primitive = SDK::Primitive::Linestrip;
+			primitive = SDK::Primitive::LineList;
 			vertexBuffer.clear();
 		}
 	};

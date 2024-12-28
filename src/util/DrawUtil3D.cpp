@@ -15,7 +15,7 @@ void MCDrawUtil3D::drawLine(Vec3 const& p1, Vec3 const& p2, d2d::Color const& co
     auto scn = screenContext;
 	auto tess = scn->tess;
 	*scn->shaderColor = {1.f,1.f,1.f,1.f};
-	tess->begin(SDK::Primitive::Linestrip , 1); // linestrip
+	tess->begin(SDK::Primitive::LineList, 1);
 	tess->color(color);
 	auto& origin = levelRenderer->getLevelRendererPlayer()->getOrigin();
 	Vec3 a = p1;
@@ -37,7 +37,7 @@ void MCDrawUtil3D::drawQuad(Vec3 a, Vec3 b, Vec3 c, Vec3 d, d2d::Color const& co
 	auto scn = screenContext;
 	auto tess = scn->tess;
 	*scn->shaderColor = { 1.f, 1.f, 1.f, 1.f };
-	tess->begin(SDK::Primitive::Linestrip, 1); // linestrip
+	tess->begin(SDK::Primitive::LineList, 1);
 	tess->color(col);
 	auto origin = levelRenderer->getLevelRendererPlayer()->getOrigin();
 	a = a - (origin);
@@ -49,17 +49,17 @@ void MCDrawUtil3D::drawQuad(Vec3 a, Vec3 b, Vec3 c, Vec3 d, d2d::Color const& co
 	tess->vertex(b.x, b.y, b.z);
 
 
-	tess->begin(SDK::Primitive::Linestrip, 1);
+	tess->begin(SDK::Primitive::LineList, 1);
 	tess->color(col);
 	tess->vertex(b.x, b.y, b.z);
 	tess->vertex(c.x, c.y, c.z);
 
-	tess->begin(SDK::Primitive::Linestrip, 1);
+	tess->begin(SDK::Primitive::LineList, 1);
 	tess->color(col);
 	tess->vertex(c.x, c.y, c.z);
 	tess->vertex(d.x, d.y, d.z);
 
-	tess->begin(SDK::Primitive::Linestrip, 1);
+	tess->begin(SDK::Primitive::LineList, 1);
 	tess->color(col);
 	tess->vertex(d.x, d.y, d.z);
 	tess->vertex(a.x, a.y, a.z);
@@ -70,7 +70,7 @@ void MCDrawUtil3D::fillQuad(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4, d2d::Color const
 	
 	auto tess = scn->tess;
 	*scn->shaderColor = Color(1.f, 1.f, 1.f, 1.f);
-	tess->begin(SDK::Primitive::Quad, 4); // linestrip
+	tess->begin(SDK::Primitive::Quad, 4);
 	tess->color(color);
 	auto& origin = levelRenderer->getLevelRendererPlayer()->getOrigin();
 	Vec3 a = p1;

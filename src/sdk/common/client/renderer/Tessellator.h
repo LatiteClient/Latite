@@ -8,7 +8,7 @@ namespace SDK {
 		Quad = 1,
 		TriangleFan,
 		Trianglestrip,
-		Linestrip
+		LineList
 	};
 
 	class Tessellator {

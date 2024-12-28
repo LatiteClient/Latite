@@ -42,7 +42,7 @@ JsValueRef Graphics3DScriptingObject::drawLineCallback(JsValueRef callee, bool i
 	if (!Chakra::VerifyArgCount(argCount, 3)) return JS_INVALID_REFERENCE;
 	if (!Chakra::VerifyParameters({ { arguments[1], JsObject }, { arguments[2], JsObject }})) return JS_INVALID_REFERENCE;
 	auto obj = reinterpret_cast<Graphics3DScriptingObject*>(callbackState);
-	obj->currentCommand.primitive = SDK::Primitive::Linestrip;
+	obj->currentCommand.primitive = SDK::Primitive::LineList;
 
 	auto p1 = JsVec3::ToVec3(arguments[1]);
 	auto p2 = JsVec3::ToVec3(arguments[2]);
