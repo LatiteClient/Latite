@@ -5,11 +5,13 @@
 namespace SDK {
 	class InputMapping {
 	public:
-		std::string name; // 0x0000
-		int* value; //0x0020
-		void* ptr1; //0x0028 ptr to 8 bytes more than value
-		void* ptr2; //0x0030 same as ptr1
-		int64_t bool1; //0x0038
+		std::string name; // 0x00
+		std::vector<int> keys; // 0x20
+		bool allowRemap; //0x38
+
+		int getFirstKey() const {
+			return keys.at(0);
+		}
 	};
 
 	class RemappingLayout {

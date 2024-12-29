@@ -3,7 +3,7 @@
 
 class PlayerHooks : public HookGroup {
 private:
-	static void hkGameModeAttack(SDK::GameMode* obj, SDK::Actor* entity);
+	static void hkActorAttack(SDK::Actor* obj, SDK::Actor* target, void* cause, bool a4);
 public:
 	void init(SDK::LocalPlayer* lp);
 

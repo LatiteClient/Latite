@@ -33,7 +33,7 @@ public:
 			"48 8B 05 ? ? ? ? 4C 8B AD"_sig,
 			"UIFillColorMaterial"};
 		inline static SigImpl thirdPersonNametag{ [](memory::signature_store&, uintptr_t res) { return res; },
-			"0F 84 ? ? ? ? 49 8B 07 49 8B CF 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 0F 85 ? ? ? ? 41 8B 47"_sig,
+			"0F 84 ? ? ? ? 49 8B 04 ? 49 8B CC 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 0F 85"_sig,
 			"ThirdPersonNametag" };
 		
 	};
@@ -95,7 +95,7 @@ public:
 	};
 
 	inline static SigImpl LevelRenderer_renderLevel{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 55 56 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 49 8B F8 48 8B DA 48 8B E9 33 D2"_sig,
+		"48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 ? ? 44 0F 29 ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 89 44 24 ? 4C 8B EA"_sig,
 		"LevelRenderer::renderLevel"};
 
 	inline static SigImpl Keyboard_feed{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -159,7 +159,7 @@ public:
 		"MinecraftGame::onAppSuspended"}; // "OnAppSuspend" "SuspendAudio" "CancelJoinGameTelemetry"
 
 	inline static SigImpl RenderController_getOverlayColor{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"E8 ? ? ? ? 0F 28 05 ? ? ? ? 0F 11 85"_sig,
+		"E8 ? ? ? ? 0F 28 05 ? ? ? ? 0F 11 85 ? ? ? ? 4C 8D 8D"_sig,
 		"RenderController::getOverlayColor"};
 
 	inline static SigImpl ScreenView_setupAndRender{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
@@ -171,7 +171,7 @@ public:
 		"KeyMap"};
 
 	inline static SigImpl MinecraftGame__update{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"e8 ? ? ? ? 48 8b 8b ? ? ? ? ba ? ? ? ? 48 83 c4"_sig,
+		"E8 ? ? ? ? 48 8B 8B ? ? ? ? BA ? ? ? ? 48 83 C4"_sig,
 		"MinecraftGame::_update"};
 
 	inline static SigImpl RakNetConnector_tick{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -193,9 +193,9 @@ public:
 		"LocalPlayer::applyTurnDelta"};
 
 	// see what accesses things in moveinputhandler
-	inline static SigImpl MovePlayer{[](memory::signature_store&, uintptr_t res) { return res; },
-		"4C 89 4C 24 ? 4C 89 44 24 ? 48 89 54 24 ? 48 89 4C 24 ? 55 57"_sig,
-		"MovePlayer"};
+	inline static SigImpl ClientInputUpdateSystem_tickBaseInput{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 74 24 ? 48 89 7C 24 ? 4C 89 64 24 ? 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 7D"_sig,
+		"ClientInputUpdateSystem::tickBaseInput"};
 
 	inline static SigImpl MoveInputHandler_tick{};
 
@@ -237,7 +237,7 @@ public:
 		"BaseActorRenderContext::BaseActorRenderContext"};
 
 	inline static SigImpl ItemRenderer_renderGuiItemNew{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 D8 48 81 EC 28 01 00 00 0F 29 B4 24 10 01 00 00 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 00 44"_sig,
+		"40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 44 89 4D"_sig,
 		"ItemRenderer::renderGuiItemNew"};
 
 	inline static SigImpl BaseAttributeMap_getInstance{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
@@ -277,15 +277,15 @@ public:
 		"ItemStackBase::getDamageValue" };
 
 	inline static SigImpl MinecraftPackets_createPacket{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 8B F9 48 89 4C 24 ? 33 ED 81 FA"_sig,
+		"48 89 5C 24 ? 48 89 74 24 ? 55 57 41 56 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 48 8B F9 48 89 4D ? 45 33 F6"_sig,
 		"MinecraftPackets::createPacket" };
 
-	inline static SigImpl GameMode_attack{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5c 24 ? 48 89 74 24 ? 55 57 41 56 48 8d 6c 24 ? 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 45 ? 48 8b f2 48 8b f9 45 33 f6 4c 89 75 ? 48 8d 4d ? e8 ? ? ? ? 90 c6 45"_sig,
-		"GameMode::attack" };
+	inline static SigImpl Actor_attack{ [](memory::signature_store&, uintptr_t res) { return res; },
+		"48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 41 0F B6 D9 4D 8B E0"_sig,
+		"Actor::attack" };
 
 	inline static SigImpl GuiData__addMessage{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 55 56 57 41 56 41 57 48 83 EC ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 45 8B F0 48 8B FA"_sig,
+		"40 53 55 56 57 41 56 48 83 EC ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 41 8B E8 48 8B FA"_sig,
 		"GuiData::_addMessage(MessageContext*, UIProfanityContext)" };
 
 	inline static SigImpl Actor_getArmor{ [](memory::signature_store& store, uintptr_t) { return store.deref(1); },
@@ -293,7 +293,7 @@ public:
 		"Actor::getArmor" };
 
 	inline static SigImpl _updatePlayer{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"4C 8B DC 49 89 5B ? 49 89 7B ? 55"_sig,
+		"4C 8B DC 49 89 5B ? 49 89 7B ? 55 41 56"_sig,
 		"UpdatePlayerFromCameraSystemUtil::_updatePlayer" };
 
 	inline static SigImpl GameArguments__onUri{ [](memory::signature_store&, uintptr_t res) { return res; },

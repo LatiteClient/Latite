@@ -18,7 +18,7 @@ class GenericHooks : public HookGroup {
     static int __fastcall RakPeer_getAveragePing(void* obj, char* guidOrAddy);
     static void __fastcall LocalPlayer_applyTurnDelta(void* obj, Vec2& vec);
     static void __fastcall MoveInputHandler_tick(void* obj, void* proxy);
-    static void __fastcall MovePlayer(
+    static void __fastcall ClientInputUpdateSystem_tickBaseInput(
         uintptr_t** a1,
         void* a2,
         uintptr_t* a3,

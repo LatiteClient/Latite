@@ -20,7 +20,7 @@ namespace {
 	std::shared_ptr<Hook> AveragePingHook;
 	std::shared_ptr<Hook> TurnDeltaHook;
 	std::shared_ptr<Hook> MoveInputHandler_tickHook;
-	std::shared_ptr<Hook> MovePlayerHook;
+	std::shared_ptr<Hook> ClientInputUpdateSystem_tickBaseInputHook;
 	std::shared_ptr<Hook> ViewBobHook;
 	std::shared_ptr<Hook> Level_initializeHook;
 	std::shared_ptr<Hook> Level_startLeaveGameHook;
@@ -223,7 +223,7 @@ void __fastcall GenericHooks::MoveInputHandler_tick(void* obj, void* proxy) {
 	}
 }
 
-void GenericHooks::MovePlayer(uintptr_t** a1, void* a2, uintptr_t* a3, uintptr_t a4, uintptr_t a5, uintptr_t a6, uintptr_t a7, uintptr_t a8, uintptr_t a9, uintptr_t a10, uintptr_t a11,
+void GenericHooks::ClientInputUpdateSystem_tickBaseInput(uintptr_t** a1, void* a2, uintptr_t* a3, uintptr_t a4, uintptr_t a5, uintptr_t a6, uintptr_t a7, uintptr_t a8, uintptr_t a9, uintptr_t a10, uintptr_t a11,
 	void* a12,
 	uintptr_t a13,
 	uintptr_t a14,
@@ -247,7 +247,7 @@ void GenericHooks::MovePlayer(uintptr_t** a1, void* a2, uintptr_t* a3, uintptr_t
 		if (Eventing::get().dispatch(ev)) return;
 	}
 
-	MovePlayerHook->oFunc<decltype(&MovePlayer)>()(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a15, a15, a16, a17, a18, a19);
+	ClientInputUpdateSystem_tickBaseInputHook->oFunc<decltype(&ClientInputUpdateSystem_tickBaseInput)>()(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a15, a15, a16, a17, a18, a19);
 	{
 		AfterMoveEvent ev{ hand };
 		Eventing::get().dispatch(ev);
@@ -429,8 +429,8 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	
 	TurnDeltaHook = addHook(Signatures::LocalPlayer_applyTurnDelta.result, LocalPlayer_applyTurnDelta, "LocalPlayer::applyTurnDelta");
 
-	if (Signatures::MovePlayer.result) {
-		MovePlayerHook = addHook(Signatures::MovePlayer.result, MovePlayer, "MovePlayer");
+	if (Signatures::ClientInputUpdateSystem_tickBaseInput.result) {
+		ClientInputUpdateSystem_tickBaseInputHook = addHook(Signatures::ClientInputUpdateSystem_tickBaseInput.result, ClientInputUpdateSystem_tickBaseInput, "ClientInputUpdateSystem::tickBaseInput");
 	}
 	else {
 		MoveInputHandler_tickHook = addHook(Signatures::MoveInputHandler_tick.result, MoveInputHandler_tick, "MoveInputHandler::tick");

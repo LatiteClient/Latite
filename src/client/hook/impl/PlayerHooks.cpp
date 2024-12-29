@@ -1,26 +1,26 @@
 #include "pch.h"
 #include "PlayerHooks.h"
 
-static std::shared_ptr<Hook> GameModeAttackHook;
+static std::shared_ptr<Hook> ActorAttackHook;
 
-void PlayerHooks::hkGameModeAttack(SDK::GameMode* obj, SDK::Actor* entity) {
+void PlayerHooks::hkActorAttack(SDK::Actor* obj, SDK::Actor* target, void* cause, bool a4) {
 
-	if (obj->plr == SDK::ClientInstance::get()->getLocalPlayer()) {
-		AttackEvent ev{ entity };
+	if (obj == SDK::ClientInstance::get()->getLocalPlayer()) {
+		AttackEvent ev{ target };
 		Eventing::get().dispatch(ev);
 	}
 
-	GameModeAttackHook->oFunc<decltype(&hkGameModeAttack)>()(obj, entity);
+	ActorAttackHook->oFunc<decltype(&hkActorAttack)>()(obj, target, cause, a4);
 }
 
 void PlayerHooks::init(SDK::LocalPlayer* lp) {
-	uintptr_t* vtable = *reinterpret_cast<uintptr_t**>(lp);
-	uintptr_t* gmTable = *reinterpret_cast<uintptr_t**>(lp->gameMode);
+	//uintptr_t* vtable = *reinterpret_cast<uintptr_t**>(lp);
+	//uintptr_t* gmTable = *reinterpret_cast<uintptr_t**>(lp->gameMode);
 	
 	//GameModeAttackHook = this->addTableSwapHook((uintptr_t)(gmTable + 14), &hkGameModeAttack, "GameMode::attack");
 	//GameModeAttackHook->enable();
 }
 
 PlayerHooks::PlayerHooks() {
-	GameModeAttackHook = this->addHook(Signatures::GameMode_attack.result, &hkGameModeAttack, "GameMode::attack");
+	ActorAttackHook = this->addHook(Signatures::Actor_attack.result, &hkActorAttack, "Actor::attack");
 }

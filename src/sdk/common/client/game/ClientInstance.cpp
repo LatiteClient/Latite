@@ -79,7 +79,7 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
 }
 
 SDK::Options* SDK::ClientInstance::getOptions() {
-    return memory::callVirtual<Options*>(this, 0xBE);
+    return memory::callVirtual<Options*>(this, 0xC4);
 }
 
 void SDK::ClientInstance::grabCursor() {
