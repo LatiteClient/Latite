@@ -481,7 +481,7 @@ void Latite::threadsafeInit() {
     auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     std::string vstr(this->version);
 #ifdef LATITE_NIGHTLY
-    auto ws = util::StrToWStr("Latite Client [NIGHTLY] " + gameVersion + " " + fetchCurrentGitHash() + "/Latite/"; + vstr);
+    auto ws = util::StrToWStr("Latite Client [NIGHTLY] " + gameVersion + " " + calcCurrentDLLHash() + "/Latite/"; + vstr);
 #else
     auto ws = util::StrToWStr("Latite Client " + vstr);
 #endif
@@ -637,7 +637,7 @@ std::string Latite::fetchLatestGitHash() {
     return json["sha"];
 }
 
-std::string Latite::fetchCurrentGitHash() {
+std::string Latite::calcCurrentDLLHash() {
     std::wstring dllPath = Latite::get().GetCurrentModuleFilePath(dllInst);
 
     std::ifstream file(dllPath, std::ios::binary);
