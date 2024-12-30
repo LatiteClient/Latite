@@ -14,7 +14,7 @@ protected:
 		std::string id = "air";
 
 		if (block->legacyBlock) {
-			id = block->legacyBlock->namespacedId;
+			id = block->legacyBlock->namespacedId.string;
 		}
 
 		std::string add = std::format("{} ({})", util::WStrToStr(thi->name), id);
@@ -40,7 +40,7 @@ public:
 		JS::JsSetPrototype(obj, getPrototype());
 
 		if (block->legacyBlock) {
-			Chakra::SetPropertyString(obj, L"name", util::StrToWStr(block->legacyBlock->namespacedId));
+			Chakra::SetPropertyString(obj, L"name", util::StrToWStr(block->legacyBlock->namespacedId.string));
 			Chakra::SetPropertyString(obj, L"translateName", util::StrToWStr(block->legacyBlock->translateName.getString()));
 		}
 		else {
