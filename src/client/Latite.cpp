@@ -34,6 +34,8 @@
 #include "sdk/common/client/game/FontRepository.h"
 #include <winrt/windows.ui.viewmanagement.h>
 #include <winrt/windows.storage.streams.h>
+#include <winrt/windows.security.cryptography.h>
+#include <winrt/windows.security.cryptography.core.h>
 
 #include <sdk/common/client/gui/ScreenView.h>
 #include <sdk/common/client/gui/controls/VisualTree.h>
@@ -477,7 +479,7 @@ void Latite::threadsafeInit() {
     auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     std::string vstr(this->version);
 #ifdef LATITE_NIGHTLY
-    auto ws = util::StrToWStr("Latite Client [NIGHTLY] " + std::string(__DATE__) + " " + std::string(__TIME__) + " game version " + gameVersion);
+    auto ws = util::StrToWStr("Latite Client [NIGHTLY] " + gameVersion + " " + fetchCurrentGitHash() + "/Latite/"; + vstr);
 #else
     auto ws = util::StrToWStr("Latite Client " + vstr);
 #endif
@@ -612,6 +614,80 @@ void Latite::fetchLatiteUsers() {
             }
         }
         });
+}
+
+std::string Latite::fetchLatestGitHash() {
+    std::string url = "https://api.github.com/repos/LatiteClient/Latite/commits/master";
+    HttpClient client;
+    winrt::Windows::Foundation::Uri uri(winrt::to_hstring(url));
+
+    HttpRequestMessage request(HttpMethod::Get(), uri);
+    request.Headers().Insert(winrt::to_hstring("User-Agent"), winrt::to_hstring("WinRTApp"));
+
+    auto response = client.SendRequestAsync(request).get();
+    if (response.StatusCode() != HttpStatusCode::Ok) {
+        return "hash unknown";
+    }
+
+    auto jsonResponse = winrt::to_string(response.Content().ReadAsStringAsync().get());
+
+    auto json = nlohmann::json::parse(jsonResponse);
+    return json["sha"];
+}
+
+std::string Latite::fetchCurrentGitHash() {
+    std::wstring dllPath = Latite::get().GetCurrentModuleFilePath(dllInst);
+
+    std::ifstream file(dllPath, std::ios::binary);
+    if (!file.is_open()) {
+        return "Failed to open file";
+    }
+
+    std::vector<char> fileContent((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    std::string header = "blob " + std::to_string(fileContent.size()) + '\0';
+
+    std::vector<unsigned char> data(header.begin(), header.end());
+    data.insert(data.end(), fileContent.begin(), fileContent.end());
+
+    IBuffer inputBuffer = winrt::Windows::Security::Cryptography::CryptographicBuffer::CreateFromByteArray(data);
+
+    winrt::Windows::Security::Cryptography::Core::HashAlgorithmProvider sha1Provider =
+        winrt::Windows::Security::Cryptography::Core::HashAlgorithmProvider::OpenAlgorithm(L"SHA1");
+
+    IBuffer hashBuffer = sha1Provider.HashData(inputBuffer);
+
+    if (hashBuffer.Length() != sha1Provider.HashLength()) {
+        return "Hash computation failed";
+    }
+
+    winrt::com_array<uint8_t> hashData;
+    winrt::Windows::Security::Cryptography::CryptographicBuffer::CopyToByteArray(hashBuffer, hashData);
+
+    std::ostringstream hashString;
+    for (unsigned char byte : hashData) {
+        hashString << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(byte);
+    }
+
+    return hashString.str().substr(0, 7);
+}
+
+std::wstring Latite::GetCurrentModuleFilePath(HMODULE hModule) {
+    std::vector<wchar_t> buffer(MAX_PATH);
+
+    DWORD result = GetModuleFileName(hModule, buffer.data(), static_cast<DWORD>(buffer.size()));
+
+    if (result > 0 && result < buffer.size()) {
+        return std::wstring(buffer.data());
+    }
+    else if (result >= buffer.size()) {
+        buffer.resize(result + 1);
+        result = GetModuleFileName(hModule, buffer.data(), static_cast<DWORD>(buffer.size()));
+        if (result > 0 && result < buffer.size()) {
+            return std::wstring(buffer.data());
+        }
+    }
+
+    return std::wstring(L"couldn't get file path");
 }
 
 void Latite::initSettings() {
