@@ -16,6 +16,7 @@
 #include "impl/game/EnvironmentChanger.h"
 #include "impl/game/TextHotkey.h"
 #include "impl/game/Freelook.h"
+#include "impl/game/AutoGG.h"
 
 #include "impl/visual/Fullbright.h"
 #include "impl/visual/MotionBlur.h"
@@ -95,6 +96,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<CustomCoordinates>());
 	this->items.push_back(std::make_shared<MovableCoordinates>());
 	this->items.push_back(std::make_shared<NoHurtCam>());
+	this->items.push_back(std::make_shared<AutoGG>());
 
 	for (auto& mod : items) {
 		mod->onInit();
