@@ -21,7 +21,7 @@ void AutoGG::onText(Event& evG) {
     std::wstring hiveDetectMessage = L"§r§c§lGame OVER!";
     SDK::LocalPlayer* localPlayer = SDK::ClientInstance::get()->getLocalPlayer();
 
-    if (localPlayer && chatMessage == hiveDetectMessage) {
+    if (localPlayer && chatMessage.find(hiveDetectMessage) != std::string::npos) {
         std::shared_ptr<SDK::Packet> pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::TEXT);
         SDK::TextPacket* tp = reinterpret_cast<SDK::TextPacket*>(pkt.get());
 
