@@ -50,6 +50,13 @@ public:
 	void queueForClientThread(std::function<void()> callback);
 	void queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callback);
 
+	static void* networkIdentifier;
+	static void* netEventCallback;
+
+	static void setNetwork(void* netId, void* netEv);
+	static void* getNetId();
+	static void* getNetEv();
+
 	Latite() = default;
 	~Latite() = default;
 

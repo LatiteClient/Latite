@@ -654,6 +654,8 @@
     <ClInclude Include="src\sdk\common\network\PacketSender.h" />
     <ClInclude Include="src\sdk\common\network\packet\ActorEventPacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\CommandRequestPacket.h" />
+    <ClInclude Include="src\sdk\common\network\packet\ModalFormRequestPacket.h" />
+    <ClInclude Include="src\sdk\common\network\packet\ModalFormResponsePacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\SetScorePacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\SetTitlePacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\TextPacket.h" />

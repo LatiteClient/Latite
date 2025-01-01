@@ -19,6 +19,7 @@
 #include "../class/impl/game/JsPlayerClass.h"
 #include "../class/impl/game/JsLocalPlayerClass.h"
 #include <sdk/common/network/packet/CommandRequestPacket.h>
+#include <sdk/common/network/packet/ModalFormRequestPacket.h>
 #include <client/script/class/impl/game/JsBlock.h>
 #include <client/script/class/impl/JsVec3.h>
 #include "sdk/common/network/MinecraftPackets.h"
@@ -44,6 +45,7 @@ void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	Chakra::DefineFunc(object, captureCursor, XW("captureCursor"));
 	Chakra::DefineFunc(object, releaseCursor, XW("releaseCursor"));
 	Chakra::DefineFunc(object, isKeyDown, XW("isKeyDown"));
+	Chakra::DefineFunc(object, openModalForm, XW("openModalForm"));
 }
 
 void GameScriptingObject::createWorldObject() {
@@ -193,6 +195,34 @@ JsValueRef GameScriptingObject::dimensionGetBlock(JsValueRef callee, bool isCons
 	
 	return scr->getClass<JsBlock>()->construct(block, false);
 }
+
+JsValueRef GameScriptingObject::openModalForm(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 3)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsNumber} , {arguments[2], JsValueType::JsObject} })) return JS_INVALID_REFERENCE;
+
+	JsValueRef JSON = Chakra::GetProperty(Chakra::GetGlobalObject(), L"JSON");
+	JsValueRef stringify = Chakra::GetProperty(JSON, L"stringify");
+	
+	JsValueRef stringifyArgs[2] = { JSON, arguments[2] };
+	JsValueRef result;
+	
+	Chakra::CallFunction(stringify, stringifyArgs, 2, &result);
+
+	int packetId = Chakra::GetInt(arguments[1]);
+	std::string json = util::WStrToStr(Chakra::GetString(result));
+
+	using MFRP = SDK::ModalFormRequestPacket;
+
+	std::shared_ptr<MFRP> packet = std::static_pointer_cast<MFRP>(SDK::MinecraftPackets::createPacket(SDK::PacketID::MODAL_FORM_REQUEST));
+
+	packet->Id = packetId;
+	packet->Json = json;
+
+	memory::callVirtual<void>(packet->handler, 1, (void*)Latite::getNetId(), (void*)Latite::getNetEv(), (std::shared_ptr<MFRP>&)packet);
+
+	return Chakra::GetUndefined();
+}
+
 
 JsValueRef GameScriptingObject::getMousePosCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	JsScript* script = JsScript::getThis();
