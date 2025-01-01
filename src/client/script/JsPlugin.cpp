@@ -222,7 +222,8 @@ std::optional<std::wstring> JsPlugin::getHash(std::filesystem::path const& main)
 	//iterate(std::filesystem::path(indexPath).parent_path());
 	if (hasRead) {
 		auto input = CryptographicBuffer::ConvertStringToBinary(toHash.str(), BinaryStringEncoding::Utf8);
-		auto hasher = HashAlgorithmProvider::OpenAlgorithm(util::StrToWStr(XOR_STRING("SHA256")));
+		auto hasher = HashAlgorithmProvider::OpenAlgorithm(
+            winrt::Windows::Security::Cryptography::Core::HashAlgorithmNames::Sha256());
 		auto hashed = hasher.HashData(input);
 
 		auto htostr = CryptographicBuffer::EncodeToHexString(hashed);
