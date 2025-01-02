@@ -13,6 +13,7 @@ public:
 	class NetAsyncOperation : public JsScript::AsyncOperation {
 	public:
 		std::wstring url = L"";
+		std::unordered_map<std::wstring, std::wstring> postDataMap;
 
 		int err = 0;
 		std::optional<winrt::Windows::Storage::Streams::IBuffer> data = std::nullopt;
@@ -25,6 +26,8 @@ public:
 		{
 		}
 	};
+
+
 
 private:
 
