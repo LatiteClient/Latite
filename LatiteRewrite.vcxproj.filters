@@ -479,6 +479,8 @@
     <ClInclude Include="assets\lang\zh_CN.json" />
     <ClInclude Include="assets\lang\zh_TW.json" />
     <ClInclude Include="src\client\script\objects\OSScriptingObject.h" />
+    <ClInclude Include="src\sdk\common\network\packet\ModalFormRequestPacket.h" />
+    <ClInclude Include="src\sdk\common\network\packet\ModalFormResponsePacket.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />
