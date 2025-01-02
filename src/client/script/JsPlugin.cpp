@@ -244,7 +244,8 @@ bool JsPlugin::isTrusted() {
 
     HttpResponseMessage response = client.SendRequestAsync(request).get();
     if (response.StatusCode() != HttpStatusCode::Ok) {
-        return "Non-ok status code";
+		Logger::Info("Plugin trust check request failed: {}", static_cast<int>(response.StatusCode()));
+        return false;
     }
 
     std::string stringResponse = to_string(response.Content().ReadAsStringAsync().get());
