@@ -56,7 +56,7 @@ std::shared_ptr<SDK::Packet> PacketHooks::MinecraftPackets_createPacket(SDK::Pac
 }
 
 void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* networkIdentifier, void* netEventCallback, std::shared_ptr<SDK::Packet>& packet) {
-	Latite::setNetwork(networkIdentifier, netEventCallback);
+	Latite::setNetEv(netEventCallback);
 
 	auto& hook = PacketHookArray[(size_t)packet->getID()];
 

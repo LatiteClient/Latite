@@ -218,7 +218,13 @@ JsValueRef GameScriptingObject::openModalForm(JsValueRef callee, bool isConstruc
 	packet->Id = packetId;
 	packet->Json = json;
 
-	memory::callVirtual<void>(packet->handler, 1, (void*)Latite::getNetId(), (void*)Latite::getNetEv(), (std::shared_ptr<MFRP>&)packet);
+	SDK::RakNetConnector* raknetConnector = SDK::RakNetConnector::get();
+	void* networkIdentifier = raknetConnector->getNetworkIdentifier();
+
+	// TODO: Replace this with proper retrieving for netevent
+	void* networkEventCallback = Latite::getNetEv();
+
+	memory::callVirtual<void>(packet->handler, 1, networkIdentifier, networkEventCallback, (std::shared_ptr<MFRP>&)packet);
 
 	return Chakra::GetUndefined();
 }

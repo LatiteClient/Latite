@@ -1202,16 +1202,10 @@ void Latite::writeServerIP() {
     lastServer = server;
 }
 
-void* Latite::networkIdentifier = nullptr;
 void* Latite::netEventCallback = nullptr;
 
-void Latite::setNetwork(void* netId, void* netEv) {
-    networkIdentifier = netId;
+void Latite::setNetEv(void* netEv) {
     netEventCallback = netEv;
-}
-
-void* Latite::getNetId() {
-    return networkIdentifier;
 }
 
 void* Latite::getNetEv() {
