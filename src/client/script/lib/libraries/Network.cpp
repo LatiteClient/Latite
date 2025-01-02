@@ -1,10 +1,6 @@
 #include "pch.h"
 #include "Network.h"
 
-#include <winrt/base.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Web.Http.h>
-#include <winrt/windows.web.http.headers.h>
 
 using namespace winrt;
 using namespace winrt::Windows::Web::Http;
@@ -21,7 +17,30 @@ JsValueRef Network::initialize(JsValueRef parent) {
     return obj;
 }
 
+void Network::deserializeHeaders(winrt::Windows::Web::Http::IHttpContent& content, JsValueRef jsArray) {
+	JsValueType type;
+	JS::JsGetValueType(jsArray, &type);
+	if (jsArray != JS_INVALID_REFERENCE && type == JsArray) {
+		for (int i = 0; i < Chakra::GetIntProperty(jsArray, L"length"); i++) {
+			JsValueRef jsArrayItem;
+			JS::JsGetIndexedProperty(jsArray, Chakra::MakeInt(i), &jsArrayItem);
+
+			JS::JsGetValueType(jsArrayItem, &type);
+			if (type == JsObject) {
+				std::wstring name = Chakra::GetStringProperty(jsArrayItem, L"name");
+				std::wstring value = Chakra::GetStringProperty(jsArrayItem, L"value");
+
+				content.Headers().Append(name, value);
+			}
+		}
+	}
+}
+
 JsValueRef Network::get(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	// TODO: Does not support contentType or custom headers
+	// This whole function and NetAsyncOperation should probably be rewritten to not use threads, because we don't even need 
+	// another thread to do async network operations in the first place.
+	
 	auto ret = Chakra::GetUndefined();
 	if (!Chakra::VerifyArgCount(argCount, 4)) return ret;
 	if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsObject}, {arguments[3], JsFunction}})) return ret;
@@ -88,6 +107,9 @@ JsValueRef Network::getSync(JsValueRef callee, bool isConstructor, JsValueRef* a
 				content.Headers().ContentType().MediaType(contTyp);
 			}
 
+			auto headers = Chakra::GetProperty(arg2, L"headers");
+			deserializeHeaders(content, headers);
+
 			request.Content(content);
 		}
 	}
@@ -123,7 +145,9 @@ JsValueRef Network::getSync(JsValueRef callee, bool isConstructor, JsValueRef* a
 }
 
 JsValueRef Network::post(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-	return JsValueRef();
+	// TODO: Not Implemented!
+	Chakra::ThrowError(L"Network::post not implemented");
+	return JS_INVALID_REFERENCE;
 }
 
 JsValueRef Network::postSync(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
@@ -151,6 +175,9 @@ JsValueRef Network::postSync(JsValueRef callee, bool isConstructor, JsValueRef* 
 				contTyp = L"text/plain";
 				content.Headers().ContentType().MediaType(contTyp);
 			}
+
+			auto headers = Chakra::GetProperty(arg2, L"headers");
+			deserializeHeaders(content, headers);
 
 			request.Content(content);
 		}

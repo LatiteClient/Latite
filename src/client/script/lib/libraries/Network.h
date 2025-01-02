@@ -3,6 +3,11 @@
 #include "../../JsPlugin.h"
 
 #include <winrt/windows.storage.streams.h>
+#include <winrt/base.h>
+#include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Web.Http.h>
+#include <winrt/windows.web.http.headers.h>
+
 
 class Network : public JsLibrary {
 public:
@@ -27,6 +32,8 @@ public:
 	};
 
 private:
+
+	static void deserializeHeaders(winrt::Windows::Web::Http::IHttpContent& content, JsValueRef jsArray);
 
 	virtual bool shouldInclude(std::wstring const& str) override {
 		// deprecated name
