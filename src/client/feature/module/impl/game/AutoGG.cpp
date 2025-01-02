@@ -13,8 +13,6 @@ AutoGG::AutoGG() : Module("AutoGG", LocalizeString::get("client.module.autoGG.na
 }
 
 void AutoGG::onText(Event& evG) {
-    // surely i remember to update this to work with cubecraft and galaxite, right?
-
     ChatMessageEvent& ev = reinterpret_cast<ChatMessageEvent&>(evG);
 
     std::wstring chatMessage = util::StrToWStr(ev.getMessage());
