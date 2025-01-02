@@ -12,7 +12,7 @@
 class JsPlugin final {
 public:
 	JsSourceContext sCtx = 1;
-	[[nodiscard]] bool isTrusted() { return trusted; }
+	[[nodiscard]] bool isTrusted();
 	[[nodiscard]] JsRuntimeHandle getRuntime() { return runtime; }
 	[[nodiscard]] std::filesystem::path getMainIndexPath() { return mainScript->getPath(); }
 	[[nodiscard]] std::filesystem::path getPath() { return path; }
