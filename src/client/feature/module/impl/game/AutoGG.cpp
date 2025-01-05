@@ -16,7 +16,7 @@ void AutoGG::onText(Event& evG) {
     ChatMessageEvent& ev = reinterpret_cast<ChatMessageEvent&>(evG);
 
     std::wstring chatMessage = util::StrToWStr(ev.getMessage());
-    std::wstring hiveDetectMessage = L"§r§c§lGame OVER!";
+    std::wstring hiveDetectMessage = L"\u00a7r\u00a7c\u00a7lGame OVER!";
     SDK::LocalPlayer* localPlayer = SDK::ClientInstance::get()->getLocalPlayer();
 
     if (localPlayer && chatMessage.find(hiveDetectMessage) != std::string::npos) {
