@@ -17,6 +17,7 @@
 #include "impl/game/TextHotkey.h"
 #include "impl/game/Freelook.h"
 #include "impl/game/AutoGG.h"
+#include "impl/game/AutoQueue.h"
 
 #include "impl/visual/Fullbright.h"
 #include "impl/visual/MotionBlur.h"
@@ -97,6 +98,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<MovableCoordinates>());
 	this->items.push_back(std::make_shared<NoHurtCam>());
 	this->items.push_back(std::make_shared<AutoGG>());
+	this->items.push_back(std::make_shared<AutoQueue>());
 
 	for (auto& mod : items) {
 		mod->onInit();
