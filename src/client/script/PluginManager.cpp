@@ -68,7 +68,7 @@ std::shared_ptr<JsPlugin> PluginManager::loadPlugin(std::wstring const& folderPa
 
 std::shared_ptr<JsPlugin> PluginManager::getPluginByName(std::wstring const& name) {
 	for (auto& script : items) {
-		if (script->getFolderName() == name) {
+		if (script->getName() == name) {
 			return script;
 		}
 	}
