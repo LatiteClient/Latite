@@ -1,6 +1,7 @@
 #pragma once
 #include <sdk/signature/storage.h>
 
+#pragma optimize("", off)
 namespace SDK {
 	class MinecraftPackets {
 	public:
@@ -9,3 +10,4 @@ namespace SDK {
 		}
 	};
 }
+#pragma optimize("", on)

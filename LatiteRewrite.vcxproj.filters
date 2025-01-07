@@ -161,6 +161,7 @@
     <ClCompile Include="src\util\Util.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\TabList.cpp" />
     <ClCompile Include="src\client\script\objects\OSScriptingObject.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\game\AutoGG.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assets\lang\en_US.json" />
@@ -191,6 +192,7 @@
     <ClInclude Include="src\client\feature\module\impl\game\EnvironmentChanger.h" />
     <ClInclude Include="src\client\feature\module\impl\game\Freelook.h" />
     <ClInclude Include="src\client\feature\module\impl\game\TextHotkey.h" />
+    <ClInclude Include="src\client\feature\module\impl\game\AutoGG.h" />
     <ClInclude Include="src\client\feature\module\impl\game\ThirdPersonNametag.h" />
     <ClInclude Include="src\client\feature\module\impl\game\Waypoints.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\Chat.h" />
