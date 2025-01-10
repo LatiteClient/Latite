@@ -361,6 +361,8 @@ void PluginManager::initListeners()
 	eventListeners[L"pre-move"] = {};
 	eventListeners[L"post-move"] = {};
 	eventListeners[L"set-score"] = {};
+	eventListeners[L"modal-request"] = {};
+	eventListeners[L"modal-response"] = {};
 }
 
 void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr) {
