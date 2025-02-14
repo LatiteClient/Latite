@@ -41,7 +41,7 @@ public:
 
 		if (block->legacyBlock) {
 			Chakra::SetPropertyString(obj, L"name", util::StrToWStr(block->legacyBlock->namespacedId.string));
-			Chakra::SetPropertyString(obj, L"translateName", util::StrToWStr(block->legacyBlock->translateName.getString()));
+			Chakra::SetPropertyString(obj, L"translateName", util::StrToWStr(block->legacyBlock->translateName));
 		}
 		else {
 			Chakra::SetPropertyString(obj, L"name", L"air");

@@ -139,12 +139,13 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int deadCount = 0;
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
-        { "1.21.51", SDK::VLATEST},
-        { "1.21.50", SDK::VLATEST},
-        //{ "1.21.44", SDK::V1_21_40},
-        //{ "1.21.43", SDK::V1_21_40},
-        //{ "1.21.41", SDK::V1_21_40},
-        //{ "1.21.40", SDK::V1_21_40},
+        { "1.21.60", SDK::VLATEST },
+        //{ "1.21.51", SDK::V1_21_50 },
+        //{ "1.21.50", SDK::V1_21_50 },
+        //{ "1.21.44", SDK::V1_21_40 },
+        //{ "1.21.43", SDK::V1_21_40 },
+        //{ "1.21.41", SDK::V1_21_40 },
+        //{ "1.21.40", SDK::V1_21_40 },
         //{ "1.21.30", SDK::V1_21_30 },
         //{ "1.21.31", SDK::V1_21_30 }
         //{ "1.21.20", SDK::V1_21_20 },
@@ -199,7 +200,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(ClientInstance_releaseCursor),
         MVSIG(Level_tick),
         MVSIG(ChatScreenController_sendChatMessage),
-        MVSIG(GameRenderer__renderCurrentFrame),
         MVSIG(onClick),
         MVSIG(MinecraftGame_onDeviceLost),
         MVSIG(MinecraftGame_onAppSuspended),
@@ -247,7 +247,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(_updatePlayer),
         MVSIG(GameArguments__onUri),
         MVSIG(_bobHurt),
-        MVSIG(RenderMaterialGroup__common)
+        MVSIG(RenderMaterialGroup__common),
+        MVSIG(GuiData_displayClientMessage)
     };
     
     new (configMgrBuf) ConfigManager();
