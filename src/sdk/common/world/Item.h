@@ -8,11 +8,11 @@
 namespace SDK {
 	class Item {
 	public:
-		std::string atlas; // atlas.items
-		CLASS_FIELD(std::string, translateName, 0xB8); // item.bow
-		CLASS_FIELD(HashedString, id, 0xD8); // bow
-		CLASS_FIELD(HashedString, _namespace, 0x100); // minecraft
-		CLASS_FIELD(HashedString, namespacedId, 0x128); // minecraft:bow 
+		CLASS_FIELD(std::string, atlas, 0x10); // atlas.items
+		CLASS_FIELD(std::string, translateName, 0xB0); // item.bow
+		CLASS_FIELD(HashedString, id, 0xD0); // bow
+		CLASS_FIELD(std::string, _namespace, 0x100); // minecraft
+		CLASS_FIELD(HashedString, namespacedId, 0x120); // minecraft:bow 
 
 		int getMaxUseDuration(class ItemStackBase* item) {
 			if (internalVers >= V1_20_50) {
