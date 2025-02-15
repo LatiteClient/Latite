@@ -17,7 +17,7 @@ void ClientMessageQueue::doPrint(int numMessages) {
 			LatiteClientMessageEvent ev{ msg };
 			Eventing::get().dispatch(ev);
 
-			lp->displayClientMessage(msg);
+			cInst->getGuiData()->displayClientMessage(std::string(msg)); // new string has to be created as it crashes otherwise
 			messages.erase(it);
 			continue;
 		}
@@ -43,7 +43,7 @@ void ClientMessageQueue::display(std::string const& message) {
 	if (lp) {
 		LatiteClientMessageEvent ev{ message };
 		Eventing::get().dispatch(ev);
-		lp->displayClientMessage(message);
+		cInst->getGuiData()->displayClientMessage(message);
 	}
 }
 

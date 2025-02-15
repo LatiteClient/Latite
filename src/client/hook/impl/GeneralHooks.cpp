@@ -350,7 +350,7 @@ Color* GenericHooks::hkGetFogColor(SDK::Dimension* obj, Color* out, SDK::Actor* 
 
 void GenericHooks::hkAddMessage(SDK::GuiData* obj, void* msg, uint32_t profanityContext) {
 	// MessageContext
-	std::string& str = util::directAccess<std::string>(msg, 0x28);
+	std::string& str = util::directAccess<std::string>(msg, 0x8);
 
 	ChatMessageEvent ev{ str };
 	if (Eventing::get().dispatch(ev)) {

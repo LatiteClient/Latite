@@ -74,7 +74,7 @@ Vec3& SDK::Actor::getPosOld() {
 
 int SDK::Actor::getCommandPermissionLevel() {
 	// @dump-wbds vtable Actor, getCommandPermissionLevel
-	return memory::callVirtual<int>(this, mvGetOffset<0x69, 0x6A, 0x6B, 0x6B, 0x6D, 0x7C, 0xB5, 0xCC, 0xCD>());
+	return memory::callVirtual<int>(this, mvGetOffset<0x67, 0x69, 0x6A, 0x6B, 0x6B, 0x6D, 0x7C, 0xB5, 0xCC, 0xCD>());
 }
 
 int64_t SDK::Actor::getRuntimeID() {
@@ -94,7 +94,7 @@ uint8_t SDK::Actor::getEntityTypeID() {
 
 void SDK::Actor::swing() {
 	// @dump-wbds vtable Actor, swing
-	return memory::callVirtual<void>(this, SDK::mvGetOffset<0x71, 0x72, 0x73, 0x73, 0x75, 0x86, 0xC4, 0xDB, 0xDC>());
+	return memory::callVirtual<void>(this, SDK::mvGetOffset<0x6F, 0x71, 0x72, 0x73, 0x73, 0x75, 0x86, 0xC4, 0xDB, 0xDC>());
 }
 
 bool SDK::Actor::isPlayer() {
