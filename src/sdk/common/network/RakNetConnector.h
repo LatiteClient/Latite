@@ -35,5 +35,10 @@ namespace SDK {
 			}
 			return util::directAccess<RakPeer*>(this, 0x230);
 		}
+
+		void* getNetworkIdentifier() {
+			return memory::callVirtual<void*>(this, 0xE);
+		}
+		
 	};
 }

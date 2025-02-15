@@ -19,16 +19,45 @@ void PacketHooks::PacketSender_sendToServer(SDK::PacketSender* sender, SDK::Pack
 		return;
 	}
 
+	if (packet->getID() == SDK::PacketID::MODAL_FORM_RESPONSE) {
+		using MFRP = SDK::ModalFormResponsePacket;
+		MFRP* pkt = static_cast<MFRP*>(packet);
+
+		auto id = PluginManager::Event::Value(L"id");
+		id.val = (double)pkt->Id;
+
+		auto json = PluginManager::Event::Value(L"json");
+		json.val = L"";
+
+		auto cancelreason = PluginManager::Event::Value(L"cancelreason");
+		cancelreason.val = L"";
+
+		if (pkt->Json.has_value()) {
+			nlohmann::json value = pkt->Json.value();
+			json.val = util::StrToWStr(value.dump());
+		}
+
+		if (pkt->CancelReason.has_value()) {
+			cancelreason.val = pkt->CancelReason.value() == MFRP::Reason::UserBusy ? L"UserBusy" : L"UserClosed";
+		}
+
+		PluginManager::Event sEv{ XW("modal-response"), { id,  json, cancelreason }, true };
+
+		if (Latite::getPluginManager().dispatchEvent(sEv)) return;
+	}
+
 	SendToServerHook->oFunc<decltype(&PacketSender_sendToServer)>()(sender, packet);
 }
 
 std::shared_ptr<SDK::Packet> PacketHooks::MinecraftPackets_createPacket(SDK::PacketID packetId) {
 	auto genPacket = CreatePacketHook->oFunc<decltype(&MinecraftPackets_createPacket)>()(packetId);
-	
+
 	return genPacket;
 }
 
 void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* networkIdentifier, void* netEventCallback, std::shared_ptr<SDK::Packet>& packet) {
+	Latite::setNetEv(netEventCallback);
+
 	auto& hook = PacketHookArray[(size_t)packet->getID()];
 
 	if (Latite::isMainThread()) {
@@ -50,10 +79,23 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 			PluginManager::Event sEv{ XW("set-score"), { data }, false };
 			Latite::getPluginManager().dispatchEvent(sEv);
 		}
+		else if (packetId == SDK::PacketID::MODAL_FORM_REQUEST) {
+			auto pkt = std::static_pointer_cast<SDK::ModalFormRequestPacket>(packet);
+
+			auto id = PluginManager::Event::Value(L"id");
+			id.val = (double)pkt->Id;
+
+			auto json = PluginManager::Event::Value(L"json");
+			json.val = util::StrToWStr(pkt->Json);
+
+			PluginManager::Event sEv{ XW("modal-request"), { id, json }, false };
+			Latite::getPluginManager().dispatchEvent(sEv);
+		}
 		else if (packetId == SDK::PacketID::TRANSFER) {
 			PluginManager::Event sEv{ XW("transfer"), {}, false };
 			Latite::getPluginManager().dispatchEvent(sEv);
-		} else if (packetId == SDK::PacketID::SET_TITLE) {
+		}
+		else if (packetId == SDK::PacketID::SET_TITLE) {
 			auto pkt = std::static_pointer_cast<SDK::SetTitlePacket>(packet);
 			auto v1 = PluginManager::Event::Value(L"type");
 

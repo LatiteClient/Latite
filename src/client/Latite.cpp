@@ -1202,3 +1202,13 @@ void Latite::writeServerIP() {
     }
     lastServer = server;
 }
+
+void* Latite::netEventCallback = nullptr;
+
+void Latite::setNetEv(void* netEv) {
+    netEventCallback = netEv;
+}
+
+void* Latite::getNetEv() {
+    return netEventCallback;
+}
