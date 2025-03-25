@@ -1,6 +1,7 @@
-#include "pch.h"
+﻿#include "pch.h"
 // LatiteRecode.cpp : Defines the entry point for the application.
 //
+#include <regex>
 
 #include "Latite.h"
 #include "localization/LocalizeString.h"
@@ -36,6 +37,9 @@
 #include <winrt/windows.storage.streams.h>
 #include <winrt/windows.security.cryptography.h>
 #include <winrt/windows.security.cryptography.core.h>
+#include <winrt/windows.system.userprofile.h>
+// this looks like its unused, but this provides types for language.DisplayName(). compilation will fail without it.
+#include <winrt/windows.globalization.h>
 
 #include <sdk/common/client/gui/ScreenView.h>
 #include <sdk/common/client/gui/controls/VisualTree.h>
@@ -268,6 +272,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     Latite::get().initSettings();
     Latite::getConfigManager().applyGlobalConfig();
+
+    Latite::get().detectLanguage();
 
     new (mmgrBuf) ModuleManager;
     new (commandMgrBuf) CommandManager;
@@ -812,6 +818,14 @@ void Latite::initSettings() {
         this->getSettings().addSetting(set);
     }
 
+    // TODO: Translate this setting
+    {
+        auto set = std::make_shared<Setting>("detectLanguage", L"Detect language",
+            L"Automatically switch Latite Client's language based off of the system language.");
+        set->value = &this->detectLanguageSetting;
+        this->getSettings().addSetting(set);
+    }
+
     {
         auto set = std::make_shared<Setting>("rgbSpeed", L"RGB Speed", L"How fast the RGB color cycles");
         set->value = &this->rgbSpeed;
@@ -925,6 +939,46 @@ void Latite::initLanguageSetting() {
         i++;
     }
     this->getSettings().addSetting(set);
+}
+
+void Latite::detectLanguage() {
+    if (!this->getDetectLanguageSetting()) return;
+
+    winrt::hstring topUserLanguage = winrt::Windows::System::UserProfile::GlobalizationPreferences::Languages().GetAt(0);
+    winrt::Windows::Globalization::Language language{ topUserLanguage };
+    std::wstring systemLanguage = util::StrToWStr(winrt::to_string(language.DisplayName()));
+
+    // Get the language name by itself
+    // English (United States) -> English
+    std::wregex pattern(LR"((.*?)\s*\(.*\))");
+    std::wsmatch match;
+    if (std::regex_match(systemLanguage, match, pattern) && systemLanguage.find(L"Português") == std::string::npos &&
+        systemLanguage.find(L"中文") == std::string::npos) {
+        systemLanguage = match[1].str();
+    }
+
+    Latite::getSettings().forEach([&](std::shared_ptr<Setting> set) {
+        if (set->name() == "language") {
+            std::vector<std::wstring> microsoftLanguages = Latite::getL10nData().getMicrosoftLanguages();
+
+            for (size_t i = 0; i < microsoftLanguages.size(); ++i) {
+                std::wstring microsoftLanguage = microsoftLanguages[i];
+
+                if (systemLanguage == microsoftLanguage) {
+                    ValueType* value = set->enumData->getValue();
+                    if (value) {
+                        // a little silly I think but oh well
+#ifdef LATITE_DEBUG
+                        *value = EnumValue(static_cast<int>(i));
+#else
+                        *value = EnumValue(static_cast<int>(i - 1));
+#endif
+                        return;
+                    }
+                }
+            }
+        }
+    });
 }
 
 void Latite::onUpdate(Event& evGeneric) {

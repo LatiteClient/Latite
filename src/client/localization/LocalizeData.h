@@ -23,9 +23,14 @@ public:
 		return languages;
 	}
 
+	const std::vector<std::wstring>& getMicrosoftLanguages() const {
+		return microsoftLanguages;
+	}
+
 	std::wstring get(const std::string& key);
 private:
 	std::optional<std::wstring> tryGetKey(Language& lang, const std::string& key);
 	std::shared_ptr<Language> fallbackLanguage;
 	std::vector<std::shared_ptr<Language>> languages;
+	std::vector<std::wstring> microsoftLanguages;
 };

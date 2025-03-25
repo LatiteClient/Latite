@@ -45,6 +45,7 @@ public:
 	void downloadChakraCore();
 	void initLanguageSetting();
 	void initSettings();
+	void detectLanguage();
 
 	void queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback);
 	void queueForClientThread(std::function<void()> callback);
@@ -106,6 +107,10 @@ public:
 		return std::get<BoolValue>(snapLines);
 	}
 
+	[[nodiscard]] bool getDetectLanguageSetting() {
+		return std::get<BoolValue>(detectLanguageSetting);
+	}
+
 	[[nodiscard]] SDK::Font* getFont();
 
 	void fetchLatiteUsers();
@@ -155,6 +160,7 @@ private:
 	ValueType broadcastUsage = BoolValue(true);
 	ValueType centerCursorMenus = BoolValue(false);
 	ValueType snapLines = BoolValue(true);
+	ValueType detectLanguageSetting = BoolValue(true);
 	ValueType secondaryFont = TextValue(L"Segoe UI");
 	ValueType rgbSpeed = FloatValue(1.f);
 

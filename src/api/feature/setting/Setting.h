@@ -320,6 +320,10 @@ public:
 		return &selectedIdx;
 	}
 
+	[[nodiscard]] std::vector<EnumEntry>* getEntries() {
+		return &entries;
+	}
+
 	[[nodiscard]] int getSelectedKey() {
 		return std::get<EnumValue>(selectedIdx);
 	}

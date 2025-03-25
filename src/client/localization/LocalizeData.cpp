@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "LocalizeData.h"
 #include <client/Latite.h>
 #include "resource.h"
@@ -20,6 +20,20 @@ LocalizeData::LocalizeData() {
         std::make_shared<Language>(LANG_PT_BR),
         std::make_shared<Language>(LANG_ZH_CN),
         std::make_shared<Language>(LANG_ZH_TW),
+    };
+
+    microsoftLanguages = {
+        L"English",
+        L"العربية",
+        L"Čeština",
+        L"Nederlands",
+        L"Français",
+        L"Español",
+        L"日本語",
+        L"Português (Portugal)",
+        L"Português (Brasil)",
+        L"中文(简体，中国)",
+        L"中文(繁體，台灣)"
     };
 
     for (auto& lang : languages) {
