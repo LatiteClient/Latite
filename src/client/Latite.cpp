@@ -969,17 +969,7 @@ void Latite::detectLanguage() {
                 if (systemLanguage == lang->langCode) {
                     ValueType* value = set->enumData->getValue();
                     if (value) {
-                        // a little silly I think but oh well
-#ifdef LATITE_DEBUG
                         *value = EnumValue(i);
-#else
-                        if (i > 0) {
-                            *value = EnumValue(i - 1);
-                        }
-                        else {
-                            *value = EnumValue(0);
-                        }
-#endif
                         return;
                     }
                 }
