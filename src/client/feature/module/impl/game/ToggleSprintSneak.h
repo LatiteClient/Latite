@@ -8,6 +8,7 @@ public:
 	void onTick(Event& ev);
 	void beforeMove(Event& ev);
 	void afterMove(Event& ev);
+	void onKey(Event& ev);
 
 private:
 	ValueType label = BoolValue(true);
