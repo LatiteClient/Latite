@@ -4,13 +4,15 @@ class LocalizeData {
 public:
 	struct Language {
 		std::string name;
+		std::string langCode;
 
 		// int: An embedded resource
 		// string: A network resource
 		std::variant<int, std::string> resource;
 		std::unordered_map<std::string, std::wstring> localizeCache;
 
-		Language(std::variant<int, std::string> resource) : resource(resource) {}
+		Language(std::variant<int, std::string> resource, const std::string& langCode)
+			: resource(resource), langCode(langCode) {}
 	};
 
 	LocalizeData();
@@ -23,14 +25,9 @@ public:
 		return languages;
 	}
 
-	const std::vector<std::wstring>& getMicrosoftLanguages() const {
-		return microsoftLanguages;
-	}
-
 	std::wstring get(const std::string& key);
 private:
 	std::optional<std::wstring> tryGetKey(Language& lang, const std::string& key);
 	std::shared_ptr<Language> fallbackLanguage;
 	std::vector<std::shared_ptr<Language>> languages;
-	std::vector<std::wstring> microsoftLanguages;
 };

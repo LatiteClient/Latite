@@ -945,33 +945,35 @@ void Latite::detectLanguage() {
     if (!this->getDetectLanguageSetting()) return;
 
     winrt::hstring topUserLanguage = winrt::Windows::System::UserProfile::GlobalizationPreferences::Languages().GetAt(0);
-    winrt::Windows::Globalization::Language language{ topUserLanguage };
-    std::wstring systemLanguage = util::StrToWStr(winrt::to_string(language.DisplayName()));
+    winrt::Windows::Globalization::Language language{topUserLanguage};
+    std::string systemLanguage = winrt::to_string(language.LanguageTag());
 
-    // Get the language name by itself
-    // English (United States) -> English
-    std::wregex pattern(LR"((.*?)\s*\(.*\))");
-    std::wsmatch match;
-    if (std::regex_match(systemLanguage, match, pattern) && systemLanguage.find(L"Português") == std::string::npos &&
-        systemLanguage.find(L"中文") == std::string::npos) {
+    // Get the language code by itself EXCEPT for portuguese and chinese variants
+    // en-US -> en
+    std::regex pattern(R"(^([a-z]{2})-[A-Z]{2}$)");
+    std::smatch match;
+    if (std::regex_match(systemLanguage, match, pattern) && systemLanguage.find("pt") == std::string::npos &&
+        systemLanguage.find("zh") == std::string::npos) {
         systemLanguage = match[1].str();
     }
 
     Latite::getSettings().forEach([&](std::shared_ptr<Setting> set) {
         if (set->name() == "language") {
-            std::vector<std::wstring> microsoftLanguages = Latite::getL10nData().getMicrosoftLanguages();
-
-            for (size_t i = 0; i < microsoftLanguages.size(); ++i) {
-                std::wstring microsoftLanguage = microsoftLanguages[i];
-
-                if (systemLanguage == microsoftLanguage) {
+            for (int i = 0; i < l10nData->getLanguages().size(); ++i) {
+                const std::shared_ptr<LocalizeData::Language>& lang = l10nData->getLanguages()[i];
+                if (systemLanguage == lang->langCode) {
                     ValueType* value = set->enumData->getValue();
                     if (value) {
                         // a little silly I think but oh well
 #ifdef LATITE_DEBUG
-                        *value = EnumValue(static_cast<int>(i));
+                        *value = EnumValue(i);
 #else
-                        *value = EnumValue(static_cast<int>(i - 1));
+                        if (i > 0) {
+                            *value = EnumValue(i - 1);
+                        }
+                        else {
+                            *value = EnumValue(0);
+                        }
 #endif
                         return;
                     }

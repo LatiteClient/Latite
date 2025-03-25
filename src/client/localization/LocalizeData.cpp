@@ -4,36 +4,22 @@
 #include "resource.h"
 
 LocalizeData::LocalizeData() {
-    fallbackLanguage = std::make_shared<Language>(LANG_EN_US);
+    fallbackLanguage = std::make_shared<Language>(LANG_EN_US, "en");
 
     languages = {
         fallbackLanguage,
 #ifdef LATITE_DEBUG
-        std::make_shared<Language>(LANG_AR_AR),
+        std::make_shared<Language>(LANG_AR_AR, "ar"),
 #endif
-        std::make_shared<Language>(LANG_CS_CZ),
-        std::make_shared<Language>(LANG_NL_NL),
-        std::make_shared<Language>(LANG_FR_FR),
-        std::make_shared<Language>(LANG_ES_ES),
-        std::make_shared<Language>(LANG_JA_JP),
-        std::make_shared<Language>(LANG_PT_PT),
-        std::make_shared<Language>(LANG_PT_BR),
-        std::make_shared<Language>(LANG_ZH_CN),
-        std::make_shared<Language>(LANG_ZH_TW),
-    };
-
-    microsoftLanguages = {
-        L"English",
-        L"العربية",
-        L"Čeština",
-        L"Nederlands",
-        L"Français",
-        L"Español",
-        L"日本語",
-        L"Português (Portugal)",
-        L"Português (Brasil)",
-        L"中文(简体，中国)",
-        L"中文(繁體，台灣)"
+        std::make_shared<Language>(LANG_CS_CZ, "cs"),
+        std::make_shared<Language>(LANG_NL_NL, "nl"),
+        std::make_shared<Language>(LANG_FR_FR, "fr"),
+        std::make_shared<Language>(LANG_ES_ES, "es"),
+        std::make_shared<Language>(LANG_JA_JP, "ja"),
+        std::make_shared<Language>(LANG_PT_PT, "pt-PT"),
+        std::make_shared<Language>(LANG_PT_BR, "pt-BR"),
+        std::make_shared<Language>(LANG_ZH_CN, "zh-CN"),
+        std::make_shared<Language>(LANG_ZH_TW, "zh-TW"),
     };
 
     for (auto& lang : languages) {
