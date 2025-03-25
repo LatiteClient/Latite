@@ -31,6 +31,8 @@
         "client.settings.mcRendererFont.desc": "Minecraft HUD font",
         "client.settings.centerCursor.desc": "Crosshair will be centered when you open the menu.",
         "client.settings.snapLines.desc": "Snap lines to help you align modules",
+        "client.settings.detectLanguage.name": "Detect language",
+        "client.settings.detectLanguage.desc": "Automatically switch Latite Client's language based off of the system language.",
         "client.settings.mcRendererFont.default.name": "Default",
         "client.settings.mcRendererFont.notoSans.name": "Noto Sans",
         "client.settings.mcRendererFont.default.desc": "The default UI font (Mojangles by default)",

@@ -818,8 +818,13 @@ void Latite::initSettings() {
         this->getSettings().addSetting(set);
     }
 
-    // TODO: Translate this setting
+    // TODO: Add in LocalizeString calls when this setting has been translated to other languages.
     {
+        /*
+         auto set = std::make_shared<Setting>("detectLanguage",
+                                             LocalizeString::get("client.settings.detectLanguage.name"),
+                                             LocalizeString::get("client.settings.detectLanguage.desc"));
+        */
         auto set = std::make_shared<Setting>("detectLanguage", L"Detect language",
             L"Automatically switch Latite Client's language based off of the system language.");
         set->value = &this->detectLanguageSetting;
