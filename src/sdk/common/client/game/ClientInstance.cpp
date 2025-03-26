@@ -70,6 +70,9 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
         {
             return util::directAccess<GuiData*>(this, 0x558);
         }
+        if (internalVers >= V1_21_70) {
+            return util::directAccess<GuiData*>(this, 0x5B0);
+        }
         if (internalVers >= V1_21_40) {
             return util::directAccess<GuiData*>(this, 0x590);
         }
@@ -79,7 +82,7 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
 }
 
 SDK::Options* SDK::ClientInstance::getOptions() {
-    return memory::callVirtual<Options*>(this, 0xC4);
+    return memory::callVirtual<Options*>(this, 0xC7);
 }
 
 void SDK::ClientInstance::grabCursor() {
