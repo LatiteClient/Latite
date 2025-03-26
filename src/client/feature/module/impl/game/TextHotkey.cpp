@@ -38,7 +38,7 @@ void TextHotkey::onKey(Event& evG) {
 				auto pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::TEXT);
 				SDK::TextPacket* tp = reinterpret_cast<SDK::TextPacket*>(pkt.get());
 				
-				tp->chat(util::WStrToStr(std::get<TextValue>(this->textMessage).str));
+				tp->chat(msg);
 
 				SDK::ClientInstance::get()->getLocalPlayer()->packetSender->sendToServer(pkt.get());
 
