@@ -15,7 +15,7 @@ public:
 		//89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? f3 0f 10 0d
 
 		inline static SigImpl LevelRendererPlayer_origin{[](memory::signature_store& store, uintptr_t) { return store.ref(4); },
-			"F3 0F 58 BB ? ? ? ? 45 0F 57 C9"_sig,
+			"F3 0F 58 BB ? ? ? ? 48 8B 8B"_sig,
 			"LevelRendererPlayer->origin"};
 
 	};
@@ -208,7 +208,7 @@ public:
 		"CameraViewBob"};
 
 	inline static SigImpl ItemStackBase_getHoverName{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 55 56 57 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B FA 48 8B D9"_sig,
+		"48 89 5C 24 ? 48 89 6C 24 ? 56 57 41 56 48 81 EC ? ? ? ? 48 8B FA 48 8B F1 48 89 54 24 ? 33 DB"_sig,
 		"ItemStackBase::getHoverName"};
 
 
@@ -237,7 +237,7 @@ public:
 		"ItemRenderer::renderGuiItemNew"};
 
 	inline static SigImpl BaseAttributeMap_getInstance{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"E8 ? ? ? ? 4C 8B F8 48 89 45 ? 48 8B 56"_sig,
+		"E8 ? ? ? ? 4C 8B E8 48 89 45 ? 48 8D 55 ? 48 8B 4C 24"_sig,
 		"BaseAttributeMap::getInstance"};
 
 	inline static SigImpl UIControl_getPosition{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
@@ -277,7 +277,7 @@ public:
 		"MinecraftPackets::createPacket" };
 
 	inline static SigImpl Actor_attack{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 41 0F B6 D9 4D 8B E0"_sig,
+		"48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 41 0F B6 F1"_sig,
 		"Actor::attack" };
 
 	inline static SigImpl GuiData__addMessage{ [](memory::signature_store&, uintptr_t res) { return res; },
@@ -289,7 +289,7 @@ public:
 		"Actor::getArmor" };
 
 	inline static SigImpl _updatePlayer{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"4C 8B DC 49 89 5B ? 49 89 7B ? 55 41 56"_sig,
+		"4C 8B DC 49 89 7B"_sig,
 		"UpdatePlayerFromCameraSystemUtil::_updatePlayer" };
 
 	inline static SigImpl GameArguments__onUri{ [](memory::signature_store&, uintptr_t res) { return res; },
