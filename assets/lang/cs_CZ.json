@@ -31,6 +31,8 @@
     "client.settings.mcRendererFont.desc": "Font uživatelského rozhraní (s použitím Minecraft vykreslování)",
     "client.settings.centerCursor.desc": "Kurzor bude po otevření menu vycentrován.",
     "client.settings.snapLines.desc": "Pomocné čáry, které ti pomohou zarovnat moduly",
+    "client.settings.detectLanguage.name": "Detekce jazyka",
+    "client.settings.detectLanguage.desc": "Automaticky přepínat jazyk Latite Clientu podle systémového nastavení.",
     "client.settings.mcRendererFont.default.name": "Výchozí",
     "client.settings.mcRendererFont.notoSans.name": "Noto Sans",
     "client.settings.mcRendererFont.default.desc": "Základní font uživatelského rozhraní (Mojangles)",

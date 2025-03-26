@@ -31,6 +31,8 @@
     "client.settings.mcRendererFont.desc": "خط ماينكرافت المستخدم بإضافات الكلاينت",
     "client.settings.centerCursor.desc": "سيتم وضع الكروسهير في المنتصف عند فتح القائمة.",
     "client.settings.snapLines.desc": "خطوط ارتكاز تساعدك بمحاذاة الإضافات بدقة على الشاشة",
+    "client.settings.detectLanguage.name": "Detect language",
+    "client.settings.detectLanguage.desc": "Automatically switch Latite Client's language based off of the system language.",
     "client.settings.mcRendererFont.default.name": "الافتراضي",
     "client.settings.mcRendererFont.notoSans.name": "Noto Sans",
     "client.settings.mcRendererFont.default.desc": "خط واجهة المستخدم الافتراضي (عادةً، خط Mojangles)",

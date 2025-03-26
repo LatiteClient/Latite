@@ -31,6 +31,8 @@
     "client.settings.mcRendererFont.desc": "Police de l'interface de Minecraft",
     "client.settings.centerCursor.desc": "Le curseur sera centré lorsque vous ouvrirez le menu.",
     "client.settings.snapLines.desc": "Afficher ou non les lignes d'aide pour aligner les modules",
+    "client.settings.detectLanguage.name": "Détecter la langue",
+    "client.settings.detectLanguage.desc": "Sélectionne automatiquement la langue selon celle du système.",
     "client.settings.mcRendererFont.default.name": "Défaut",
     "client.settings.mcRendererFont.notoSans.name": "Noto Sans",
     "client.settings.mcRendererFont.default.desc": "La police par défaut de l'interface (Mojangles par défaut)",

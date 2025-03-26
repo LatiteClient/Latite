@@ -31,6 +31,8 @@
     "client.settings.mcRendererFont.desc": "Fonte do HUD do Minecraft",
     "client.settings.centerCursor.desc": "A mira sera centralizada quando você abrir o menu.",
     "client.settings.snapLines.desc": "Linhas guias para ajudar no alinhamento dos módulos",
+    "client.settings.detectLanguage.name": "Detect language",
+    "client.settings.detectLanguage.desc": "Automatically switch Latite Client's language based off of the system language.",
     "client.settings.mcRendererFont.default.name": "Padrão",
     "client.settings.mcRendererFont.notoSans.name": "Noto Sans",
     "client.settings.mcRendererFont.default.desc": "A fonte padrão do UI (Mojangles por padrão)",

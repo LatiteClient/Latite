@@ -31,6 +31,8 @@
     "client.settings.mcRendererFont.desc": "MinecraftのHUDフォント",
     "client.settings.centerCursor.desc": "メニューを開くとクロスヘアーが中央に表示されます。",
     "client.settings.snapLines.desc": "スナップラインはモジュールの配置に役立ちます",
+    "client.settings.detectLanguage.name": "言語を検出",
+    "client.settings.detectLanguage.desc": "システム言語に基づいてLatiteクライアントの言語を自動で切り替えます。",
     "client.settings.mcRendererFont.default.name": "デフォルト",
     "client.settings.mcRendererFont.notoSans.name": "Noto Sans",
     "client.settings.mcRendererFont.default.desc": "デフォルトのUIフォント (デフォルトではMojangles)",

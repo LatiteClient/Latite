@@ -31,6 +31,8 @@
     "client.settings.mcRendererFont.desc": "Minecraft HUD 字體",
     "client.settings.centerCursor.desc": "打開菜單時遊標將居中。",
     "client.settings.snapLines.desc": "對齊模塊的對齊線",
+    "client.settings.detectLanguage.name": "偵測語言",
+    "client.settings.detectLanguage.desc": "根據系統語言自動切換 Latite Client 的語言。",
     "client.settings.mcRendererFont.default.name": "預設",
     "client.settings.mcRendererFont.notoSans.name": "Noto Sans",
     "client.settings.mcRendererFont.default.desc": "預設 UI 字體（預設情況下為 Mojangles）",
