@@ -5,7 +5,7 @@
 // TODO: Make this module translatable
 FrameTimeDisplay::FrameTimeDisplay() : TextModule("FrameTimeDisplay", L"Frame Time Display",
                                                   L"Displays the time it takes to render and display a frame (in milliseconds)",
-                                                  HUD, 400.f, 0, true) {
+                                                  HUD) {
 
     addSliderSetting("interval", L"Interval",
         L"The amount of time it takes to update the display (in milliseconds)", interval, FloatValue(0.f),
