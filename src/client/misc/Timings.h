@@ -18,9 +18,11 @@ public:
 	[[nodiscard]] int getFPS() { return fps; }
 	[[nodiscard]] int getCPSL() { return cpsL; }
 	[[nodiscard]] int getCPSR() { return cpsR; }
+	[[nodiscard]] float getFrameTime() { return frameTime; }
 private:
 
 	std::chrono::steady_clock::time_point beginTime{};
+	std::chrono::high_resolution_clock::time_point lastFrameTimeUpdate;
 	float injectTime = 0.f;
 
 	int cpsL = 0;
@@ -28,6 +30,9 @@ private:
 	int frames = 0;
 	int fps = 0;
 	float tps = 0;
+
+	std::chrono::high_resolution_clock::time_point lastFrameTime;
+	float frameTime = 0.0f;
 
 	std::vector<std::chrono::steady_clock::time_point> cpsLV;
 	std::vector<std::chrono::steady_clock::time_point> cpsRV;

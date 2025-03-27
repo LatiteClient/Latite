@@ -17,6 +17,12 @@ int Timings::getPerSecond(std::vector<std::chrono::steady_clock::time_point>& li
 
 void Timings::update()
 {
+	std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::high_resolution_clock::now();
+
+	auto currentFrameDuration = now - lastFrameTime;
+	frameTime = std::chrono::duration<float, std::milli>(currentFrameDuration).count();
+	lastFrameTime = now;
+
 	auto dur = std::chrono::high_resolution_clock::now() - lastFPSTime;
 	float dir = std::chrono::duration<float, std::milli>(dur).count();
 	if (dir > 1000) {
