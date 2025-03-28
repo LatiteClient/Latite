@@ -2,16 +2,15 @@
 #include "FrameTimeDisplay.h"
 #include "client/Latite.h"
 
-// TODO: Make this module translatable
-FrameTimeDisplay::FrameTimeDisplay() : TextModule("FrameTimeDisplay", L"Frame Time Display",
-                                                  L"Displays the time it takes to render and display a frame (in milliseconds)",
+FrameTimeDisplay::FrameTimeDisplay() : TextModule("FrameTimeDisplay",
+                                                  LocalizeString::get("client.textmodule.frameTimeDisplay.name"),
+                                                  LocalizeString::get("client.textmodule.frameTimeDisplay.desc"),
                                                   HUD) {
-
-    addSliderSetting("interval", L"Interval",
-        L"The amount of time it takes to update the display (in milliseconds)", interval, FloatValue(0.f),
-        FloatValue(1000.f), FloatValue(100.f));
-	this->prefix = TextValue(L"Frame time: ");
-	this->suffix = TextValue(L"ms");
+    addSliderSetting("interval", LocalizeString::get("client.textmodule.frameTimeDisplay.interval.name"),
+                     LocalizeString::get("client.textmodule.frameTimeDisplay.interval.desc"), interval, FloatValue(0.f),
+                     FloatValue(1000.f), FloatValue(100.f));
+    this->prefix = TextValue(L"Frame time: ");
+    this->suffix = TextValue(L"ms");
 }
 
 std::wstringstream FrameTimeDisplay::text(bool isDefault, bool inEditor) {
