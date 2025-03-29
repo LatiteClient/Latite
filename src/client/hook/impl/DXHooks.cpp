@@ -4,9 +4,50 @@
 #include "client/render/Renderer.h"
 
 namespace {
+	typedef HRESULT(WINAPI* CreateSwapChainForCoreWindow_t)(
+		IDXGIFactory2*,
+		IUnknown*,
+		IUnknown*,
+		const DXGI_SWAP_CHAIN_DESC1*,
+		IDXGIOutput*,
+		IDXGISwapChain1**);
+
+	bool tearingSupported = false;
 	std::shared_ptr<Hook> PresentHook;
 	std::shared_ptr<Hook> ResizeBuffersHook;
 	std::shared_ptr<Hook> ExecuteCommandListsHook;
+}
+
+void CheckTearingSupport() {
+	ComPtr<IDXGIFactory5> factory5;
+	if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory5)))) {
+		BOOL allowTearing = FALSE;
+		if (SUCCEEDED(factory5->CheckFeatureSupport(
+			DXGI_FEATURE_PRESENT_ALLOW_TEARING,
+			&allowTearing,
+			sizeof(allowTearing)))) {
+			tearingSupported = allowTearing;
+		}
+	}
+}
+
+CreateSwapChainForCoreWindow_t origCreateSwapChain = nullptr;
+
+HRESULT WINAPI DXHooks::CreateSwapChainForCoreWindowHook(
+	IDXGIFactory2* factory,
+	IUnknown* device,
+	IUnknown* window,
+	const DXGI_SWAP_CHAIN_DESC1* desc,
+	IDXGIOutput* output,
+	IDXGISwapChain1** swapChain) {
+
+	DXGI_SWAP_CHAIN_DESC1 modifiedDesc = *desc;
+	if (tearingSupported) {
+		modifiedDesc.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+	}
+
+	return origCreateSwapChain(factory, device, window, &modifiedDesc,
+		output, swapChain);
 }
 
 HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInterval, UINT Flags) {
@@ -28,18 +69,42 @@ HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInt
 	//	hasKilled = true;
 	//}
 
-	return PresentHook->oFunc<decltype(&SwapChain_Present)>()(chain, SyncInterval, Flags);
+	UINT presentFlags = Flags;
+	UINT syncInterval;
+	if (tearingSupported) {
+		syncInterval = 0;
+		presentFlags |= DXGI_PRESENT_ALLOW_TEARING;
+	} else {
+		syncInterval = SyncInterval;
+	}
+
+	return PresentHook->oFunc<decltype(&SwapChain_Present)>()(chain, syncInterval, presentFlags);
 }
 
-HRESULT __stdcall DXHooks::SwapChain_ResizeBuffers(IDXGISwapChain* chain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags) {
+HRESULT __stdcall DXHooks::SwapChain_ResizeBuffers(
+	IDXGISwapChain* chain,
+	UINT BufferCount,
+	UINT Width,
+	UINT Height,
+	DXGI_FORMAT NewFormat,
+	UINT SwapChainFlags) {
+
 	Latite::getRenderer().reinit();
-	return ResizeBuffersHook->oFunc<decltype(&SwapChain_ResizeBuffers)>()(chain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+	UINT newFlags = SwapChainFlags;
+	if (tearingSupported) {
+		newFlags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+	}
+
+	return ResizeBuffersHook->oFunc<decltype(&SwapChain_ResizeBuffers)>()(
+		chain, BufferCount, Width, Height, NewFormat, newFlags);
 }
 
-HRESULT __stdcall DXHooks::CommandQueue_ExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists) {
-	auto lock = Latite::getRenderer().lock();
-	Latite::getRenderer().setCommandQueue(queue);
-	return ExecuteCommandListsHook->oFunc<decltype(&CommandQueue_ExecuteCommandLists)>()(queue, NumCommandLists, ppCommandLists);
+HRESULT __stdcall DXHooks::CommandQueue_ExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists,
+                                                            ID3D12CommandList* const* ppCommandLists) {
+    auto lock = Latite::getRenderer().lock();
+    Latite::getRenderer().setCommandQueue(queue);
+    return ExecuteCommandListsHook->oFunc<decltype(&CommandQueue_ExecuteCommandLists)>()(
+        queue, NumCommandLists, ppCommandLists);
 }
 
 DXHooks::DXHooks() : HookGroup("DirectX") {
@@ -50,6 +115,8 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 	ComPtr<ID3D12Device> device12;
 	ComPtr<ID3D11DeviceContext> dctx;
 	ComPtr<ID3D12CommandQueue> cqueue;
+
+	CheckTearingSupport();
 
 	ThrowIfFailed(CreateDXGIFactory(IID_PPV_ARGS(&factory)));
 	ThrowIfFailed(factory->EnumAdapters(0, adapter.GetAddressOf()));
@@ -84,8 +151,9 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 	D3D_FEATURE_LEVEL lvl[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1 };
 
 	D3D_FEATURE_LEVEL featureLevel;
-	auto hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, lvl, 2, D3D11_SDK_VERSION,
-		&swapChainDesc, swapChain.GetAddressOf(), device.GetAddressOf(), &featureLevel, dctx.GetAddressOf());
+    auto hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, lvl, 2, D3D11_SDK_VERSION,
+                                            &swapChainDesc, swapChain.GetAddressOf(), device.GetAddressOf(),
+                                            &featureLevel, dctx.GetAddressOf());
 
 	uintptr_t* vftable = *reinterpret_cast<uintptr_t**>(swapChain.Get());
 	uintptr_t* cqueueVftable = nullptr;
@@ -108,6 +176,14 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 
 	DestroyWindow(hWnd);
 	UnregisterClass(L"dummywnd", Latite::get().dllInst);
+
+    ComPtr<IDXGIFactory2> factory2;
+    if (SUCCEEDED(factory.As(&factory2))) {
+        void** vtable = *(void***)factory2.Get();
+        MH_CreateHook(vtable[16], DXHooks::CreateSwapChainForCoreWindowHook,
+                      (void**)&origCreateSwapChain);
+        MH_EnableHook(vtable[16]);
+    }
 
 	PresentHook = addHook(vftable[8], SwapChain_Present, "IDXGISwapChain::Present");
 	ResizeBuffersHook = addHook(vftable[13], SwapChain_ResizeBuffers, "IDXGISwapChain::ResizeBuffers");
