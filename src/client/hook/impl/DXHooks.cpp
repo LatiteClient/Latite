@@ -18,7 +18,36 @@ namespace {
 	std::shared_ptr<Hook> ExecuteCommandListsHook;
 }
 
-void CheckTearingSupport() {
+// doing file read operations in DXHooks is a little silly but im too tired to find a better way
+bool DXHooks::IsGfxVSyncEnabled() {
+	wchar_t userProfile[MAX_PATH];
+	DWORD pathLen = GetEnvironmentVariableW(L"USERPROFILE", userProfile, MAX_PATH);
+	if (pathLen == 0 || pathLen >= MAX_PATH) {
+		return true;
+	}
+
+	std::wstring optionsPath(userProfile);
+	optionsPath +=
+	    L"\\AppData\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\LocalState\\games\\com.mojang\\minecraftpe\\options.txt";
+
+	std::ifstream file(optionsPath.c_str());
+	if (!file.is_open()) {
+		return true;
+	}
+
+	std::string line;
+	while (std::getline(file, line)) {
+		std::erase(line, '\r');
+		if (line.find("gfx_vsync:") == 0) {
+			return line != "gfx_vsync:0";
+		}
+	}
+
+	// default to enabled
+	return true;
+}
+
+void DXHooks::CheckTearingSupport() {
 	ComPtr<IDXGIFactory5> factory5;
 	if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory5)))) {
 		BOOL allowTearing = FALSE;
@@ -26,7 +55,9 @@ void CheckTearingSupport() {
 			DXGI_FEATURE_PRESENT_ALLOW_TEARING,
 			&allowTearing,
 			sizeof(allowTearing)))) {
-			tearingSupported = allowTearing;
+			if (allowTearing && !DXHooks::IsGfxVSyncEnabled()) {
+				tearingSupported = true;
+			}
 		}
 	}
 }
@@ -100,11 +131,11 @@ HRESULT __stdcall DXHooks::SwapChain_ResizeBuffers(
 }
 
 HRESULT __stdcall DXHooks::CommandQueue_ExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists,
-                                                            ID3D12CommandList* const* ppCommandLists) {
-    auto lock = Latite::getRenderer().lock();
-    Latite::getRenderer().setCommandQueue(queue);
-    return ExecuteCommandListsHook->oFunc<decltype(&CommandQueue_ExecuteCommandLists)>()(
-        queue, NumCommandLists, ppCommandLists);
+	ID3D12CommandList* const* ppCommandLists) {
+	auto lock = Latite::getRenderer().lock();
+	Latite::getRenderer().setCommandQueue(queue);
+	return ExecuteCommandListsHook->oFunc<decltype(&CommandQueue_ExecuteCommandLists)>()(
+		queue, NumCommandLists, ppCommandLists);
 }
 
 DXHooks::DXHooks() : HookGroup("DirectX") {
@@ -116,7 +147,7 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 	ComPtr<ID3D11DeviceContext> dctx;
 	ComPtr<ID3D12CommandQueue> cqueue;
 
-	CheckTearingSupport();
+	DXHooks::CheckTearingSupport();
 
 	ThrowIfFailed(CreateDXGIFactory(IID_PPV_ARGS(&factory)));
 	ThrowIfFailed(factory->EnumAdapters(0, adapter.GetAddressOf()));
@@ -147,13 +178,13 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 	swapChainDesc.OutputWindow = hWnd;
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.Windowed = TRUE;
-	
+
 	D3D_FEATURE_LEVEL lvl[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1 };
 
 	D3D_FEATURE_LEVEL featureLevel;
-    auto hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, lvl, 2, D3D11_SDK_VERSION,
-                                            &swapChainDesc, swapChain.GetAddressOf(), device.GetAddressOf(),
-                                            &featureLevel, dctx.GetAddressOf());
+	auto hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, lvl, 2, D3D11_SDK_VERSION,
+		&swapChainDesc, swapChain.GetAddressOf(), device.GetAddressOf(),
+		&featureLevel, dctx.GetAddressOf());
 
 	uintptr_t* vftable = *reinterpret_cast<uintptr_t**>(swapChain.Get());
 	uintptr_t* cqueueVftable = nullptr;
@@ -168,7 +199,7 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 			D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 			queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-			
+
 			ThrowIfFailed(device12->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&cqueue)));
 			cqueueVftable = *reinterpret_cast<uintptr_t**>(cqueue.Get());
 		}
@@ -177,13 +208,13 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
 	DestroyWindow(hWnd);
 	UnregisterClass(L"dummywnd", Latite::get().dllInst);
 
-    ComPtr<IDXGIFactory2> factory2;
-    if (SUCCEEDED(factory.As(&factory2))) {
-        void** vtable = *(void***)factory2.Get();
-        MH_CreateHook(vtable[16], DXHooks::CreateSwapChainForCoreWindowHook,
-                      (void**)&origCreateSwapChain);
-        MH_EnableHook(vtable[16]);
-    }
+	ComPtr<IDXGIFactory2> factory2;
+	if (SUCCEEDED(factory.As(&factory2))) {
+		void** vtable = *(void***)factory2.Get();
+		MH_CreateHook(vtable[16], DXHooks::CreateSwapChainForCoreWindowHook,
+			(void**)&origCreateSwapChain);
+		MH_EnableHook(vtable[16]);
+	}
 
 	PresentHook = addHook(vftable[8], SwapChain_Present, "IDXGISwapChain::Present");
 	ResizeBuffersHook = addHook(vftable[13], SwapChain_ResizeBuffers, "IDXGISwapChain::ResizeBuffers");
