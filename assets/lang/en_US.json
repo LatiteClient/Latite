@@ -23,7 +23,7 @@
         "client.settings.language.desc": "Language selection",
         "client.settings.menuBlurEnabled.desc": "Whether blur is enabled or disabled for the menu",
         "client.settings.useDX11.desc": "Causes an FPS boost for some systems and may degrade performance for more high-end systems: but may cause issues.\nRestart your game upon disabling this setting.",
-        "client.settings.forceDisableVSync.desc": "Forces VSync in fullscreen. May cause freezing, overheating, and screen tearing on some devices.\nRestart your game upon disabling this setting.",
+        "client.settings.forceDisableVSync.desc": "Forces VSync in fullscreen. May cause freezing, overheating, and screen tearing on some devices.\nRestart your game upon changing this setting.",
         "client.settings.commandPrefix.desc": "Command Prefix",
         "client.settings.menuIntensity.desc": "The intensity of the menu blur",
         "client.settings.accentColor.desc": "Accent Color",
