@@ -8,7 +8,7 @@ AutoGG::AutoGG() : Module("AutoGG", LocalizeString::get("client.module.autoGG.na
     addSetting("useCustomMessage", LocalizeString::get("client.module.autoGG.useCustomMessage.name"),
                LocalizeString::get("client.module.autoGG.useCustomMessage.desc"), useCustomMessage);
     addSetting("customMessage", LocalizeString::get("client.module.autoGG.customMessage.name"),
-               LocalizeString::get("client.module.autoGG.customMessage.desc"), customMessage);
+               LocalizeString::get("client.module.autoGG.customMessage.desc"), customMessage, "useCustomMessage"_istrue);
     listen<ChatMessageEvent>(static_cast<EventListenerFunc>(&AutoGG::onText));
 }
 
