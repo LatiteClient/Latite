@@ -87,6 +87,10 @@ public:
 		return std::get<BoolValue>(useDX11);
 	}
 
+	[[nodiscard]] bool shouldForceDisableVSync() {
+		return std::get<BoolValue>(forceDisableVSync);
+	}
+
 	[[nodiscard]] bool shoulBlurHUD() {
 		return std::get<BoolValue>(hudBlur);
 	}
@@ -152,6 +156,7 @@ private:
 	ValueType menuBlurEnabled = BoolValue(true);
 	// TODO: add disabled settings, for people who already only support dx11, gray it out
 	ValueType useDX11 = BoolValue(false);
+	ValueType forceDisableVSync = BoolValue(false);
 	ValueType menuBlur = FloatValue(20.f);
 	ValueType accentColor = ColorValue(static_cast<float>(0x32) / 255.f, static_cast<float>(0x39) / 255.f, static_cast<float>(0x76) / 255.f);
 	ValueType minimalViewBob = BoolValue(false);
