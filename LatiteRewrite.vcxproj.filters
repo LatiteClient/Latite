@@ -163,6 +163,7 @@
     <ClCompile Include="src\client\script\objects\OSScriptingObject.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\AutoGG.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\FrameTimeDisplay.cpp" />
+    <ClCompile Include="src\sdk\common\client\game\Options.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assets\lang\en_US.json" />

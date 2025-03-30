@@ -873,6 +873,7 @@
     </ClCompile>
     <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp" />
     <ClCompile Include="src\sdk\common\client\game\MinecraftGame.cpp" />
+    <ClCompile Include="src\sdk\common\client\game\Options.cpp" />
     <ClCompile Include="src\sdk\common\client\gui\controls\UIControl.cpp" />
     <ClCompile Include="src\sdk\common\client\gui\screens\ContainerScreenController.cpp" />
     <ClCompile Include="src\sdk\common\client\input\RemappingLayout.cpp" />

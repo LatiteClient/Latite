@@ -10,7 +10,6 @@ private:
 	static HRESULT __stdcall CommandQueue_ExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists, ID3D12CommandList* const* ppCommandLists);
 
 	static void CheckTearingSupport();
-	static bool IsGfxVSyncEnabled();
 public:
 	DXHooks();
 };
