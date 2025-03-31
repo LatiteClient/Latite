@@ -3,26 +3,26 @@
 #include "client/Latite.h"
 #include "client/render/Assets.h"
 
-BlockGame::BlockGame() : Module("BlockGame", L"Block Game",
-                                            L"The better one", HUD, nokeybind) {
+BlockGame::BlockGame() : Module("BlockGame", LocalizeString::get("client.module.blockGame.name"),
+                                LocalizeString::get("client.module.blockGame.desc"), HUD, nokeybind) {
     listen<RenderOverlayEvent>(static_cast<EventListenerFunc>(&BlockGame::onRenderOverlay));
     listen<KeyUpdateEvent>(static_cast<EventListenerFunc>(&BlockGame::onKeyUpdate));
     listen<DrawHUDModulesEvent>(static_cast<EventListenerFunc>(&BlockGame::onRenderHUDModules), false, 2);
 
-    addSetting("moveLeftSetting", L"Left",
-               L"Key to move left", leftKey);
-    addSetting("moveRightSetting", L"Right",
-               L"Key to move right", rightKey);
-    addSetting("hardDropSetting", L"Hard drop",
-               L"Key to instantly drop a piece", hardDropKey);
-    addSetting("softDropSetting", L"Soft drop",
-        L"Key to slowly drop a piece", softDropKey);
-    addSetting("rotateSetting", L"Rotate",
-               L"Rotate key", rotateKey);
-    addSetting("pauseSetting", L"Pause",
-               L"Pause key", pauseKey);
-    addSetting("restartSetting", L"Restart",
-        L"Restart game key", restartKey);
+    addSetting("moveLeftSetting", LocalizeString::get("client.module.blockGame.moveLeftSetting.name"),
+               LocalizeString::get("client.module.blockGame.moveLeftSetting.desc"), leftKey);
+    addSetting("moveRightSetting", LocalizeString::get("client.module.blockGame.moveRightSetting.name"),
+               LocalizeString::get("client.module.blockGame.moveRightSetting.desc"), rightKey);
+    addSetting("hardDropSetting", LocalizeString::get("client.module.blockGame.hardDropSetting.name"),
+               LocalizeString::get("client.module.blockGame.hardDropSetting.desc"), hardDropKey);
+    addSetting("softDropSetting", LocalizeString::get("client.module.blockGame.softDropSetting.name"),
+               LocalizeString::get("client.module.blockGame.softDropSetting.desc"), softDropKey);
+    addSetting("rotateSetting", LocalizeString::get("client.module.blockGame.rotateSetting.name"),
+               LocalizeString::get("client.module.blockGame.rotateSetting.desc"), rotateKey);
+    addSetting("pauseSetting", LocalizeString::get("client.module.blockGame.pauseSetting.name"),
+               LocalizeString::get("client.module.blockGame.pauseSetting.desc"), pauseKey);
+    addSetting("restartSetting", LocalizeString::get("client.module.blockGame.restartSetting.name"),
+               LocalizeString::get("client.module.blockGame.restartSetting.desc"), restartKey);
 
     createTetrominoShapes();
     restartGame();
@@ -48,7 +48,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
     if (paused) {
         // just chose a random place for this honestly cant find a better place to put it
         dc.drawText({ 0, 0, 300, 100 },
-            L"Paused",
+            LocalizeString::get("client.module.blockGame.pausedText.name"),
             d2d::Colors::WHITE,
             Renderer::FontSelection::PrimaryRegular,
             48.0f,
@@ -62,8 +62,9 @@ void BlockGame::onRenderOverlay(Event& evG) {
         long long elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - gameOverTime).count();
         int remaining = 5 - elapsed;
 
-        std::wstring statusText = L"Game Over!";
-        std::wstring countdown = L"Restarting in " + std::to_wstring(remaining) + L" seconds...";
+        std::wstring statusText = LocalizeString::get("client.module.blockGame.gameOverText.name");
+        std::wstring countdown = util::FormatWString(
+            LocalizeString::get("client.module.blockGame.restartCountdown.name"), { std::to_wstring(remaining) });
 
         if (remaining <= 0) {
             restartGame();
@@ -71,9 +72,11 @@ void BlockGame::onRenderOverlay(Event& evG) {
         }
 
         // score n other shit
-        std::wstring stats = L"Score: " + std::to_wstring(score) + L"\n"
-            L"Level: " + std::to_wstring(level) + L"\n"
-            L"Lines: " + std::to_wstring(linesCleared);
+        std::wstring stats = util::FormatWString(LocalizeString::get("client.module.blockGame.scoreText.name"),
+                                                  { std::to_wstring(score) }) + L"\n" + util::FormatWString(
+            LocalizeString::get("client.module.blockGame.levelText.name"),
+            { std::to_wstring(level) }) + L"\n" + util::FormatWString(
+            LocalizeString::get("client.module.blockGame.linesClearedText.name"), { std::to_wstring(linesCleared) });
         dc.drawText({ nextLeft, nextTop + 150, nextLeft + 200, nextTop + 250 },
             stats, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular);
 
@@ -141,7 +144,8 @@ void BlockGame::onRenderOverlay(Event& evG) {
 
     // next piece preview
     dc.drawText({ nextLeft, nextTop, nextLeft + 100, nextTop + 30 },
-        L"Next:", d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular);
+                LocalizeString::get("client.module.blockGame.nextPiecePreviewText.name"), d2d::Colors::WHITE,
+                Renderer::FontSelection::PrimaryRegular);
 
     for (int y = 0; y < nextTetromino.dimension; y++) {
         for (int x = 0; x < nextTetromino.dimension; x++) {
@@ -158,9 +162,11 @@ void BlockGame::onRenderOverlay(Event& evG) {
     }
 
     // score n other shit
-    std::wstring stats = L"Score: " + std::to_wstring(score) + L"\n"
-        L"Level: " + std::to_wstring(level) + L"\n"
-        L"Lines: " + std::to_wstring(linesCleared);
+    std::wstring stats = util::FormatWString(LocalizeString::get("client.module.blockGame.scoreText.name"),
+                                             { std::to_wstring(score) }) + L"\n" + util::FormatWString(
+        LocalizeString::get("client.module.blockGame.levelText.name"),
+        { std::to_wstring(level) }) + L"\n" + util::FormatWString(
+        LocalizeString::get("client.module.blockGame.linesClearedText.name"), { std::to_wstring(linesCleared) });
     dc.drawText({ nextLeft, nextTop + 150, nextLeft + 200, nextTop + 250 },
         stats, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular);
 
