@@ -15,11 +15,17 @@ namespace SDK {
 		}
 
 		bool getVsync() {
-			for (auto& option : options) {
-				if (option->impl->id == OptionID::Vsync) {
-					return static_cast<SDK::BoolOption*>(option.get())->value;
+			auto it = std::find_if(options.begin(), options.end(), [](std::unique_ptr<Option>& option) {
+				if (option && option->impl->id == OptionID::Vsync) {
+					return true;
 				}
+				});
+
+			if (it == options.end()) {
+				return false;
 			}
+
+			return static_cast<BoolOption*>(it->get())->value;
 		}
 
 	private:
