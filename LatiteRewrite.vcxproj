@@ -618,6 +618,7 @@
     <ClInclude Include="src\client\script\PluginManager.h" />
     <ClInclude Include="src\client\ui\TextBox.h" />
     <ClInclude Include="src\sdk\common\client\game\FontRepository.h" />
+    <ClInclude Include="src\sdk\common\client\game\Option.h" />
     <ClInclude Include="src\sdk\common\client\game\Options.h" />
     <ClInclude Include="src\sdk\common\client\gui\controls\UIControl.h" />
     <ClInclude Include="src\sdk\common\client\gui\controls\VisualTree.h" />

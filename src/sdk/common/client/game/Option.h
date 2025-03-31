@@ -16,7 +16,7 @@ namespace SDK {
 
 
 		std::unique_ptr<Impl> impl;
-	private:
+
 		virtual ~Option() = 0;
 	};
 
