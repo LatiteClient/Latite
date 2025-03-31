@@ -83,12 +83,10 @@ HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInt
     //}
 
     UINT presentFlags = Flags;
-    UINT syncInterval;
+    UINT syncInterval = SyncInterval;
     if (tearingSupported && isForceDisableVSync) {
         syncInterval = 0;
         presentFlags |= DXGI_PRESENT_ALLOW_TEARING;
-    } else {
-        syncInterval = SyncInterval;
     }
 
     return PresentHook->oFunc<decltype(&SwapChain_Present)>()(chain, syncInterval, presentFlags);
