@@ -13,6 +13,7 @@ namespace {
         IDXGIOutput*,
         IDXGISwapChain1**);
 
+    SDK::Options* options = new SDK::Options();
     bool tearingSupported = false;
     bool isForceDisableVSync = false;
     std::shared_ptr<Hook> PresentHook;
@@ -36,7 +37,7 @@ void DXHooks::CheckTearingSupport() {
             DXGI_FEATURE_PRESENT_ALLOW_TEARING,
             &allowTearing,
             sizeof(allowTearing)))) {
-            if (allowTearing && !SDK::Options::get().IsGfxVSyncEnabled()) {
+            if (allowTearing && !options->IsGfxVSyncEnabled()) {
                 tearingSupported = true;
             }
         }
@@ -54,7 +55,7 @@ HRESULT WINAPI DXHooks::CreateSwapChainForCoreWindowHook(
     IDXGISwapChain1** swapChain) {
 
     DXGI_SWAP_CHAIN_DESC1 modifiedDesc = *desc;
-    if (isForceDisableVSync) {
+    if (tearingSupported && isForceDisableVSync) {
         modifiedDesc.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
     }
 
@@ -82,12 +83,10 @@ HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInt
     //}
 
     UINT presentFlags = Flags;
-    UINT syncInterval;
-    if (isForceDisableVSync) {
+    UINT syncInterval = SyncInterval;
+    if (tearingSupported && isForceDisableVSync) {
         syncInterval = 0;
         presentFlags |= DXGI_PRESENT_ALLOW_TEARING;
-    } else {
-        syncInterval = SyncInterval;
     }
 
     return PresentHook->oFunc<decltype(&SwapChain_Present)>()(chain, syncInterval, presentFlags);
@@ -103,7 +102,7 @@ HRESULT __stdcall DXHooks::SwapChain_ResizeBuffers(
 
     Latite::getRenderer().reinit();
     UINT newFlags = SwapChainFlags;
-    if (isForceDisableVSync) {
+    if (tearingSupported && isForceDisableVSync) {
         newFlags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
     }
 

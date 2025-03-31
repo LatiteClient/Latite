@@ -1,13 +1,6 @@
 #include "pch.h"
 #include "Options.h"
 
-SDK::Options* SDK::Options::instance = nullptr;
-
-SDK::Options& SDK::Options::get() {
-    static Options instance;
-    return instance;
-}
-
 bool SDK::Options::IsGfxVSyncEnabled() {
 	wchar_t userProfile[MAX_PATH];
 	DWORD pathLen = GetEnvironmentVariableW(L"USERPROFILE", userProfile, MAX_PATH);
