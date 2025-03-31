@@ -13,6 +13,7 @@ namespace {
         IDXGIOutput*,
         IDXGISwapChain1**);
 
+    SDK::Options* options = new SDK::Options();
     bool tearingSupported = false;
     bool isForceDisableVSync = false;
     std::shared_ptr<Hook> PresentHook;
@@ -36,7 +37,7 @@ void DXHooks::CheckTearingSupport() {
             DXGI_FEATURE_PRESENT_ALLOW_TEARING,
             &allowTearing,
             sizeof(allowTearing)))) {
-            if (allowTearing && !SDK::Options::get().IsGfxVSyncEnabled()) {
+            if (allowTearing && !options->IsGfxVSyncEnabled()) {
                 tearingSupported = true;
             }
         }
