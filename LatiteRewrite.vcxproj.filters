@@ -164,7 +164,7 @@
     <ClCompile Include="src\client\feature\module\impl\game\AutoGG.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\FrameTimeDisplay.cpp" />
     <ClCompile Include="src\sdk\common\client\game\Options.cpp" />
-    <ClCompile Include="src\client\feature\module\impl\misc\BetterBlockGame.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\misc\BlockGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assets\lang\en_US.json" />
@@ -485,7 +485,7 @@
     <ClInclude Include="assets\lang\zh_TW.json" />
     <ClInclude Include="src\client\script\objects\OSScriptingObject.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\FrameTimeDisplay.h" />
-    <ClInclude Include="src\client\feature\module\impl\misc\BetterBlockGame.h" />
+    <ClInclude Include="src\client\feature\module\impl\misc\BlockGame.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />

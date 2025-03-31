@@ -399,7 +399,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="assets\lang\en_US.json" />
-    <ClInclude Include="src\client\feature\module\impl\misc\BetterBlockGame.h" />
+    <ClInclude Include="src\client\feature\module\impl\misc\BlockGame.h" />
     <ClInclude Include="deps\include\mnemosyne\core\memory_range.hpp" />
     <ClInclude Include="deps\include\mnemosyne\core\vfunc_index.hpp" />
     <ClInclude Include="deps\include\mnemosyne\defines.hpp" />
@@ -733,7 +733,7 @@
     <Text Include="src\util\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\client\feature\module\impl\misc\BetterBlockGame.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\misc\BlockGame.cpp" />
     <ClCompile Include="deps\mnem\cpuid.cpp" />
     <ClCompile Include="deps\mnem\mnemosyne.cpp" />
     <ClCompile Include="deps\mnem\os\win32\process.cpp" />

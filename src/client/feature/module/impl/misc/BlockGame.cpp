@@ -1,13 +1,13 @@
 #include "pch.h"
-#include "BetterBlockGame.h"
+#include "BlockGame.h"
 #include "client/Latite.h"
 #include "client/render/Assets.h"
 
-BetterBlockGame::BetterBlockGame() : Module("BetterBlockGame", L"Better Block Game",
+BlockGame::BlockGame() : Module("BlockGame", L"Block Game",
                                             L"The better one", HUD, nokeybind) {
-    listen<RenderOverlayEvent>(static_cast<EventListenerFunc>(&BetterBlockGame::onRenderOverlay));
-    listen<KeyUpdateEvent>(static_cast<EventListenerFunc>(&BetterBlockGame::onKeyUpdate));
-    listen<DrawHUDModulesEvent>(static_cast<EventListenerFunc>(&BetterBlockGame::onRenderHUDModules), false, 2);
+    listen<RenderOverlayEvent>(static_cast<EventListenerFunc>(&BlockGame::onRenderOverlay));
+    listen<KeyUpdateEvent>(static_cast<EventListenerFunc>(&BlockGame::onKeyUpdate));
+    listen<DrawHUDModulesEvent>(static_cast<EventListenerFunc>(&BlockGame::onRenderHUDModules), false, 2);
 
     addSetting("moveLeftSetting", L"Left",
                L"Key to move left", leftKey);
@@ -28,7 +28,7 @@ BetterBlockGame::BetterBlockGame() : Module("BetterBlockGame", L"Better Block Ga
     restartGame();
 }
 
-void BetterBlockGame::onRenderOverlay(Event& evG) {
+void BlockGame::onRenderOverlay(Event& evG) {
     RenderOverlayEvent& ev = reinterpret_cast<RenderOverlayEvent&>(evG);
 
     if (!SDK::ClientInstance::get()->getLocalPlayer() || !SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) return;
@@ -195,7 +195,7 @@ void BetterBlockGame::onRenderOverlay(Event& evG) {
 
 }
 
-void BetterBlockGame::onKeyUpdate(Event& evG) {
+void BlockGame::onKeyUpdate(Event& evG) {
     KeyUpdateEvent& ev = reinterpret_cast<KeyUpdateEvent&>(evG);
     if (!ev.isDown()) {
         softDropActive = false;
@@ -228,7 +228,7 @@ void BetterBlockGame::onKeyUpdate(Event& evG) {
     }
 }
 
-void BetterBlockGame::createTetrominoShapes() {
+void BlockGame::createTetrominoShapes() {
     tetrominoShapes = {
         // I-shape
         { {{1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, d2d::Color::RGB(0, 240, 240), 4 },
@@ -251,7 +251,7 @@ void BetterBlockGame::createTetrominoShapes() {
     }
 }
 
-void BetterBlockGame::spawnTetromino() {
+void BlockGame::spawnTetromino() {
     if (tetrominoShapes.empty()) {
         createTetrominoShapes();
     }
@@ -291,7 +291,7 @@ void BetterBlockGame::spawnTetromino() {
     }
 }
 
-void BetterBlockGame::restartGame() {
+void BlockGame::restartGame() {
     board = std::vector(BOARD_HEIGHT, std::vector<int>(BOARD_WIDTH, 0));
     nextBoard = std::vector(NEXT_SIZE, std::vector<int>(NEXT_SIZE, 0));
     score = 0;
@@ -304,7 +304,7 @@ void BetterBlockGame::restartGame() {
     gameOverTime = std::chrono::steady_clock::time_point::min();
 }
 
-bool BetterBlockGame::isValidMove(const Tetromino& tetro, Vec2 pos) {
+bool BlockGame::isValidMove(const Tetromino& tetro, Vec2 pos) {
     for (int y = 0; y < tetro.dimension; y++) {
         for (int x = 0; x < tetro.dimension; x++) {
             if (tetro.shape[y][x]) {
@@ -321,7 +321,7 @@ bool BetterBlockGame::isValidMove(const Tetromino& tetro, Vec2 pos) {
     return true;
 }
 
-void BetterBlockGame::moveHorizontal(int dx) {
+void BlockGame::moveHorizontal(int dx) {
     Vec2 newPos = piecePosition;
     newPos.x += dx;
     if (isValidMove(currentTetromino, newPos)) {
@@ -329,7 +329,7 @@ void BetterBlockGame::moveHorizontal(int dx) {
     }
 }
 
-void BetterBlockGame::rotateTetromino() {
+void BlockGame::rotateTetromino() {
     Tetromino rotated = currentTetromino;
     for (int y = 0; y < rotated.dimension; y++) {
         for (int x = 0; x < rotated.dimension; x++) {
@@ -342,7 +342,7 @@ void BetterBlockGame::rotateTetromino() {
     }
 }
 
-void BetterBlockGame::hardDrop() {
+void BlockGame::hardDrop() {
     int dropDistance = 0;
     while (isValidMove(currentTetromino, piecePosition + Vec2{ 0, 1 })) {
         piecePosition.y++;
@@ -355,7 +355,7 @@ void BetterBlockGame::hardDrop() {
     softDropScore = 0;
 }
 
-void BetterBlockGame::mergeTetromino() {
+void BlockGame::mergeTetromino() {
     for (int y = 0; y < currentTetromino.dimension; y++) {
         for (int x = 0; x < currentTetromino.dimension; x++) {
             if (currentTetromino.shape[y][x]) {
@@ -368,7 +368,7 @@ void BetterBlockGame::mergeTetromino() {
     }
 }
 
-void BetterBlockGame::clearLines() {
+void BlockGame::clearLines() {
     int linesClearedThisTurn = 0;
     for (int y = BOARD_HEIGHT - 1; y >= 0; y--) {
         bool full = true;
@@ -396,7 +396,7 @@ void BetterBlockGame::clearLines() {
     }
 }
 
-void BetterBlockGame::onRenderHUDModules(Event& evGeneric) {
+void BlockGame::onRenderHUDModules(Event& evGeneric) {
     DrawHUDModulesEvent& ev = reinterpret_cast<DrawHUDModulesEvent&>(evGeneric);
     ev.setCancelled(true);
 }

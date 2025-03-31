@@ -9,9 +9,9 @@ struct Tetromino {
     int dimension;
 };
 
-class BetterBlockGame : public Module {
+class BlockGame : public Module {
 public:
-    BetterBlockGame();
+    BlockGame();
 
     void onRenderOverlay(Event&);
     void onRenderHUDModules(Event& ev);
