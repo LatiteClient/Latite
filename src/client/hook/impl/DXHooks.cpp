@@ -13,12 +13,40 @@ namespace {
         IDXGIOutput*,
         IDXGISwapChain1**);
 
-    SDK::Options* options = new SDK::Options();
     bool tearingSupported = false;
     bool isForceDisableVSync = false;
     std::shared_ptr<Hook> PresentHook;
     std::shared_ptr<Hook> ResizeBuffersHook;
     std::shared_ptr<Hook> ExecuteCommandListsHook;
+
+    // TODO: temporary, remove this
+    bool isGfxVsyncDisabled() {
+        wchar_t userProfile[MAX_PATH];
+        DWORD pathLen = GetEnvironmentVariableW(L"USERPROFILE", userProfile, MAX_PATH);
+        if (pathLen == 0 || pathLen >= MAX_PATH) {
+            return true;
+        }
+
+        std::wstring optionsPath(userProfile);
+        optionsPath +=
+            L"\\AppData\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\LocalState\\games\\com.mojang\\minecraftpe\\options.txt";
+
+        std::ifstream file(optionsPath.c_str());
+        if (!file.is_open()) {
+            return true;
+        }
+
+        std::string line;
+        while (std::getline(file, line)) {
+            std::erase(line, '\r');
+            if (line.find("gfx_vsync:") == 0) {
+                return line != "gfx_vsync:0";
+            }
+        }
+
+        // default to enabled
+        return true;
+    }
 }
 
 void DXHooks::CheckForceDisableVSync() {
@@ -37,7 +65,7 @@ void DXHooks::CheckTearingSupport() {
             DXGI_FEATURE_PRESENT_ALLOW_TEARING,
             &allowTearing,
             sizeof(allowTearing)))) {
-            if (allowTearing && !options->IsGfxVSyncEnabled()) {
+            if (allowTearing && !isGfxVsyncDisabled()) {
                 tearingSupported = true;
             }
         }

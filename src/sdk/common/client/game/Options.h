@@ -11,6 +11,6 @@ namespace SDK {
 			return 0;
 		}
 
-		bool IsGfxVSyncEnabled();
+
 	};
 }
