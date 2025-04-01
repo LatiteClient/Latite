@@ -42,6 +42,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
     const float blockSize = width * 0.025f;
     const float boardLeft = width * 0.55f;
     const float boardHeight = BOARD_HEIGHT * blockSize;
+    const float boardWidth = BOARD_WIDTH * blockSize;
     const float boardTop = (height - boardHeight) / 2.0f;
 
     float nextLeft = boardLeft + BOARD_WIDTH * blockSize + 20;
@@ -69,6 +70,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
             LocalizeString::get("client.module.blockGame.restartCountdown.name"), { std::to_wstring(remaining) });
 
         if (remaining <= 0) {
+            util::PlaySoundUI("note.snare");
             restartGame();
             return;
         }
@@ -100,6 +102,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
         return;
     }
 
+    // game border
     const float borderThickness = 2.0f;
     dc.drawRectangle(
         {
@@ -111,6 +114,29 @@ void BlockGame::onRenderOverlay(Event& evG) {
         d2d::Colors::WHITE,
         borderThickness
     );
+
+    // grid lines
+    const float gridAlpha = 0.2f;
+    const auto gridColor = d2d::Color::Hex("FFFFFF", gridAlpha);
+    const float lineThickness = 0.5f;
+
+    for (int x = 0; x < BOARD_WIDTH; x++) {
+        float xPos = boardLeft + x * blockSize;
+        dc.fillRectangle(
+            { xPos - lineThickness, boardTop,
+             xPos + lineThickness, boardTop + boardHeight },
+            gridColor
+        );
+    }
+
+    for (int y = 0; y < BOARD_HEIGHT; y++) {
+        float yPos = boardTop + y * blockSize;
+        dc.fillRectangle(
+            { boardLeft, yPos - lineThickness,
+             boardLeft + boardWidth, yPos + lineThickness },
+            gridColor
+        );
+    }
 
     // game board
     for (int y = 0; y < BOARD_HEIGHT; y++) {
@@ -232,6 +258,7 @@ void BlockGame::onKeyUpdate(Event& evG) {
     } else if (key == std::get<KeyValue>(rotateKey)) {
         rotateTetromino();
     } else if (key == std::get<KeyValue>(restartKey)) {
+        util::PlaySoundUI("note.snare");
         restartGame();
     }
 }
@@ -301,7 +328,6 @@ void BlockGame::spawnTetromino() {
 }
 
 void BlockGame::restartGame() {
-    util::PlaySoundUI("note.snare");
     board = std::vector(BOARD_HEIGHT, std::vector<int>(BOARD_WIDTH, 0));
     nextBoard = std::vector(NEXT_SIZE, std::vector<int>(NEXT_SIZE, 0));
     score = 0;
