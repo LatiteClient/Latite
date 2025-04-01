@@ -301,6 +301,7 @@ void BlockGame::spawnTetromino() {
 }
 
 void BlockGame::restartGame() {
+    util::PlaySoundUI("note.snare");
     board = std::vector(BOARD_HEIGHT, std::vector<int>(BOARD_WIDTH, 0));
     nextBoard = std::vector(NEXT_SIZE, std::vector<int>(NEXT_SIZE, 0));
     score = 0;
