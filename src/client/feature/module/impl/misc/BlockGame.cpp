@@ -10,7 +10,7 @@ BlockGame::BlockGame() : Module("BlockGame", LocalizeString::get("client.module.
     listen<DrawHUDModulesEvent>(static_cast<EventListenerFunc>(&BlockGame::onRenderHUDModules), false, 2);
 
     addSetting("audioSetting", LocalizeString::get("client.module.blockGame.audioSetting.name"),
-        LocalizeString::get("client.module.blockGame.audioSetting.desc"), audio);
+               LocalizeString::get("client.module.blockGame.audioSetting.desc"), audio);
     addSetting("moveLeftSetting", LocalizeString::get("client.module.blockGame.moveLeftSetting.name"),
                LocalizeString::get("client.module.blockGame.moveLeftSetting.desc"), leftKey);
     addSetting("moveRightSetting", LocalizeString::get("client.module.blockGame.moveRightSetting.name"),
@@ -25,6 +25,11 @@ BlockGame::BlockGame() : Module("BlockGame", LocalizeString::get("client.module.
                LocalizeString::get("client.module.blockGame.pauseSetting.desc"), pauseKey);
     addSetting("restartSetting", LocalizeString::get("client.module.blockGame.restartSetting.name"),
                LocalizeString::get("client.module.blockGame.restartSetting.desc"), restartKey);
+    addSetting("holdSetting", LocalizeString::get("client.module.blockGame.holdSetting.name"),
+               LocalizeString::get("client.module.blockGame.holdSetting.desc"), holdKey);
+    addSetting("rotateCCWSetting", LocalizeString::get("client.module.blockGame.rotateCCWSetting.name"),
+               LocalizeString::get("client.module.blockGame.rotateCCWSetting.desc"), rotateCCWKey);
+
 
     createTetrominoShapes();
     restartGame();
@@ -51,11 +56,11 @@ void BlockGame::onRenderOverlay(Event& evG) {
     if (paused) {
         // just chose a random place for this honestly cant find a better place to put it
         dc.drawText({ 0, 0, 300, 100 },
-            LocalizeString::get("client.module.blockGame.pausedText.name"),
-            d2d::Colors::WHITE,
-            Renderer::FontSelection::PrimaryRegular,
-            48.0f,
-            DWRITE_TEXT_ALIGNMENT_CENTER
+                    LocalizeString::get("client.module.blockGame.pausedText.name"),
+                    d2d::Colors::WHITE,
+                    Renderer::FontSelection::PrimaryRegular,
+                    48.0f,
+                    DWRITE_TEXT_ALIGNMENT_CENTER
         );
         return;
     }
@@ -77,27 +82,27 @@ void BlockGame::onRenderOverlay(Event& evG) {
 
         // score n other shit
         std::wstring stats = util::FormatWString(LocalizeString::get("client.module.blockGame.scoreText.name"),
-                                                  { std::to_wstring(score) }) + L"\n" + util::FormatWString(
+                                                 { std::to_wstring(score) }) + L"\n" + util::FormatWString(
             LocalizeString::get("client.module.blockGame.levelText.name"),
             { std::to_wstring(level) }) + L"\n" + util::FormatWString(
             LocalizeString::get("client.module.blockGame.linesClearedText.name"), { std::to_wstring(linesCleared) });
         dc.drawText({ nextLeft, nextTop + 150, nextLeft + 200, nextTop + 250 },
-            stats, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular);
+                    stats, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular);
 
         dc.drawText({ 0, 0, 300, 100 },
-            statusText,
-            d2d::Colors::WHITE,
-            Renderer::FontSelection::PrimaryRegular,
-            48.0f,
-            DWRITE_TEXT_ALIGNMENT_CENTER
+                    statusText,
+                    d2d::Colors::WHITE,
+                    Renderer::FontSelection::PrimaryRegular,
+                    48.0f,
+                    DWRITE_TEXT_ALIGNMENT_CENTER
         );
 
         dc.drawText({ 0, 120, 300, 160 },
-            countdown,
-            d2d::Colors::YELLOW,
-            Renderer::FontSelection::PrimaryRegular,
-            24.0f,
-            DWRITE_TEXT_ALIGNMENT_CENTER
+                    countdown,
+                    d2d::Colors::YELLOW,
+                    Renderer::FontSelection::PrimaryRegular,
+                    24.0f,
+                    DWRITE_TEXT_ALIGNMENT_CENTER
         );
         return;
     }
@@ -124,7 +129,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
         float xPos = boardLeft + x * blockSize;
         dc.fillRectangle(
             { xPos - lineThickness, boardTop,
-             xPos + lineThickness, boardTop + boardHeight },
+                xPos + lineThickness, boardTop + boardHeight },
             gridColor
         );
     }
@@ -133,7 +138,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
         float yPos = boardTop + y * blockSize;
         dc.fillRectangle(
             { boardLeft, yPos - lineThickness,
-             boardLeft + boardWidth, yPos + lineThickness },
+                boardLeft + boardWidth, yPos + lineThickness },
             gridColor
         );
     }
@@ -170,6 +175,29 @@ void BlockGame::onRenderOverlay(Event& evG) {
         }
     }
 
+    // hold piece display
+    float holdLeft = boardLeft - 150;
+    float holdTop = boardTop;
+    dc.drawText({ holdLeft, holdTop, holdLeft + 100, holdTop + 30 },
+                LocalizeString::get("client.module.blockGame.holdPieceText.name"), d2d::Colors::WHITE,
+                Renderer::FontSelection::PrimaryRegular);
+
+    if (hasHold) {
+        for (int y = 0; y < holdTetromino.dimension; y++) {
+            for (int x = 0; x < holdTetromino.dimension; x++) {
+                if (holdTetromino.shape[y][x]) {
+                    dc.fillRectangle(
+                        {
+                            holdLeft + x * blockSize, holdTop + 40 + y * blockSize,
+                            holdLeft + (x + 1) * blockSize, holdTop + 40 + (y + 1) * blockSize
+                        },
+                        holdTetromino.color
+                    );
+                }
+            }
+        }
+    }
+
     // next piece preview
     dc.drawText({ nextLeft, nextTop, nextLeft + 100, nextTop + 30 },
                 LocalizeString::get("client.module.blockGame.nextPiecePreviewText.name"), d2d::Colors::WHITE,
@@ -196,7 +224,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
         { std::to_wstring(level) }) + L"\n" + util::FormatWString(
         LocalizeString::get("client.module.blockGame.linesClearedText.name"), { std::to_wstring(linesCleared) });
     dc.drawText({ nextLeft, nextTop + 150, nextLeft + 200, nextTop + 250 },
-        stats, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular);
+                stats, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular);
 
     // auto fall
     std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
@@ -215,7 +243,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
             softDropScore = 0;
             mergeTetromino();
             clearLines();
-            spawnTetromino();
+            spawnTetromino(false);
         }
         lastFall = now;
     }
@@ -224,7 +252,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
     if (softDropActive) {
         std::wstring dropScore = L"+" + std::to_wstring(softDropScore);
         dc.drawText({ nextLeft, nextTop + 300, nextLeft + 350, nextTop + 400 },
-            dropScore, d2d::Colors::GREEN, Renderer::FontSelection::PrimaryRegular);
+                    dropScore, d2d::Colors::GREEN, Renderer::FontSelection::PrimaryRegular);
     }
 
 }
@@ -260,25 +288,58 @@ void BlockGame::onKeyUpdate(Event& evG) {
     } else if (key == std::get<KeyValue>(restartKey)) {
         util::PlaySoundUI("note.snare");
         restartGame();
+    } else if (key == std::get<KeyValue>(holdKey)) {
+        if (canHold) handleHold();
+    } else if (key == std::get<KeyValue>(rotateCCWKey)) {
+        rotateTetromino(false);
     }
+}
+
+void BlockGame::handleHold() {
+    if (!hasHold) {
+        holdTetromino = tetrominoShapes[currentTetromino.type];
+        holdTetromino.rotationState = STATE_0;
+        hasHold = true;
+        spawnTetromino(false);
+    }
+    else {
+        Tetromino temp = holdTetromino;
+        temp.rotationState = STATE_0;
+        holdTetromino = currentTetromino;
+        holdTetromino.rotationState = STATE_0;
+
+        currentTetromino = temp;
+        currentTetromino.rotationState = STATE_0;
+
+        piecePosition = {
+            static_cast<float>(BOARD_WIDTH / 2 - currentTetromino.dimension / 2),
+            0
+        };
+
+        if (!isValidMove(currentTetromino, piecePosition)) {
+            gameOver = true;
+            gameOverTime = std::chrono::steady_clock::now();
+        }
+    }
+    canHold = false;
 }
 
 void BlockGame::createTetrominoShapes() {
     tetrominoShapes = {
-        // I-shape
-        { {{1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, d2d::Color::RGB(0, 240, 240), 4 },
-        // J-shape
-        { {{2, 0, 0}, {2, 2, 2}, {0, 0, 0}}, d2d::Color::RGB(0, 0, 240), 3 },
-        // L-shape
-        { {{0, 0, 3}, {3, 3, 3}, {0, 0, 0}}, d2d::Color::RGB(240, 160, 0), 3 },
-        // O-shape
-        { {{4, 4}, {4, 4}}, d2d::Color::RGB(240, 240, 0), 2 },
-        // S-shape
-        { {{0, 5, 5}, {5, 5, 0}}, d2d::Color::RGB(0, 240, 0), 3 },
-        // T-shape
-        { {{0, 6, 0}, {6, 6, 6}}, d2d::Color::RGB(160, 0, 240), 3 },
-        // Z-shape
-        { {{7, 7, 0}, {0, 7, 7}}, d2d::Color::RGB(240, 0, 0), 3 }
+        // I-shape (type 0)
+        { {{1,1,1,1},{0,0,0,0},{0,0,0,0},{0,0,0,0}}, d2d::Color::RGB(0,240,240), 4, 0, STATE_0 },
+        // J-shape (type 1)
+        { {{2,0,0},{2,2,2},{0,0,0}}, d2d::Color::RGB(0,0,240), 3, 1, STATE_0 },
+        // L-shape (type 2)
+        { {{0,0,3},{3,3,3},{0,0,0}}, d2d::Color::RGB(240,160,0), 3, 2, STATE_0 },
+        // O-shape (type 3)
+        { {{4,4},{4,4}}, d2d::Color::RGB(240,240,0), 2, 3, STATE_0 },
+        // S-shape (type 4)
+        { {{0,5,5},{5,5,0}}, d2d::Color::RGB(0,240,0), 3, 4, STATE_0 },
+        // T-shape (type 5)
+        { {{0,6,0},{6,6,6}}, d2d::Color::RGB(160,0,240), 3, 5, STATE_0 },
+        // Z-shape (type 6)
+        { {{7,7,0},{0,7,7}}, d2d::Color::RGB(240,0,0), 3, 6, STATE_0 }
     };
 
     if (tetrominoShapes.empty()) {
@@ -286,58 +347,106 @@ void BlockGame::createTetrominoShapes() {
     }
 }
 
-void BlockGame::spawnTetromino() {
-    if (tetrominoShapes.empty()) {
-        createTetrominoShapes();
+
+void BlockGame::spawnTetromino(bool firstSpawn) {
+    if (!firstSpawn) {
+        currentTetromino = nextTetromino;
     }
 
-    if (nextTetromino.dimension > 0 && nextTetromino.dimension <= 4) {
-        currentTetromino = nextTetromino;
-    } else {
-        if (!tetrominoShapes.empty()) {
-            currentTetromino = tetrominoShapes[0];
-        } else {
-            Logger::Fatal("No tetromino shapes available");
+    if (tetrominoBag.empty()) {
+        tetrominoBag = { 0, 1, 2, 3, 4, 5, 6 };
+
+        std::random_device rd;
+        std::mt19937 rng(rd());
+        std::shuffle(tetrominoBag.begin(), tetrominoBag.end(), rng);
+    }
+
+    nextTetromino = tetrominoShapes[tetrominoBag.back()];
+    tetrominoBag.pop_back();
+
+    if (!firstSpawn) {
+        switch (currentTetromino.type) {
+        case 0: // I-piece (4x4)
+            piecePosition = { 3.0f, -1.0f };
+            break;
+        case 3: // O-piece (2x2)
+            piecePosition = { 4.0f, 0.0f };
+            break;
+        default: // JLSTZ (3x3)
+            piecePosition = { 4.0f, 0.0f };
+            break;
+        }
+
+        if (!isValidMove(currentTetromino, piecePosition)) {
+            gameOver = true;
+            gameOverTime = std::chrono::steady_clock::now();
+            util::PlaySoundUI("game.player.die");
+            return;
         }
     }
 
-    if (!tetrominoShapes.empty()) {
-        nextTetromino = tetrominoShapes[rand() % tetrominoShapes.size()];
+    // Initialize next piece preview board
+    const int previewOffset = (NEXT_SIZE - nextTetromino.dimension) / 2;
+    nextBoard = std::vector(NEXT_SIZE, std::vector<int>(NEXT_SIZE, 0));
 
-        // Initialize next board
-        const int offset = (NEXT_SIZE - nextTetromino.dimension) / 2;
-        for (int y = 0; y < nextTetromino.dimension; y++) {
-            for (int x = 0; x < nextTetromino.dimension; x++) {
-                if (y + offset < NEXT_SIZE && x + offset < NEXT_SIZE) {
-                    nextBoard[y + offset][x + offset] = nextTetromino.shape[y][x];
+    for (int y = 0; y < nextTetromino.dimension; y++) {
+        for (int x = 0; x < nextTetromino.dimension; x++) {
+            if (nextTetromino.shape[y][x]) {
+                int px = x + previewOffset;
+                int py = y + previewOffset;
+                if (px >= 0 && px < NEXT_SIZE && py >= 0 && py < NEXT_SIZE) {
+                    nextBoard[py][px] = nextTetromino.shape[y][x];
                 }
             }
         }
     }
 
-    piecePosition = {
-        static_cast<float>(BOARD_WIDTH / 2 - currentTetromino.dimension / 2),
-        0
-    };
+    canHold = true;
+}
 
-    if (!isValidMove(currentTetromino, piecePosition)) {
-        util::PlaySoundUI("game.player.die");
-        gameOver = true;
-        gameOverTime = std::chrono::steady_clock::now();
+std::vector<Vec2> BlockGame::getKicks(int type, int fromState, int toState) {
+    if (type == 0) {
+        return I_KICKS[(fromState % 4)];
+    } else if (type == 3) {
+        return { {0,0} };
+    } else {
+        return JLSTZ_KICKS[(fromState % 4)];
     }
 }
 
+
 void BlockGame::restartGame() {
     board = std::vector(BOARD_HEIGHT, std::vector<int>(BOARD_WIDTH, 0));
-    nextBoard = std::vector(NEXT_SIZE, std::vector<int>(NEXT_SIZE, 0));
     score = 0;
     level = 1;
     linesCleared = 0;
     gameOver = false;
     paused = false;
-    spawnTetromino();
+    hasHold = false;
+    canHold = true;
+
+    tetrominoBag.clear();
+    for (int i = 0; i < 7; ++i)
+        tetrominoBag.push_back(i);
+
+    std::random_device rd;
+    std::mt19937 rng(rd());
+    std::shuffle(tetrominoBag.begin(), tetrominoBag.end(), rng);
+
+    currentTetromino = tetrominoShapes[tetrominoBag.back()];
+    tetrominoBag.pop_back();
+
+    switch (currentTetromino.type) {
+    case 0: piecePosition = {3.0f, -1.0f};
+        break;
+    case 3: piecePosition = {4.0f, 0.0f};
+        break;
+    default: piecePosition = {4.0f, 0.0f};
+        break;
+    }
+
+    spawnTetromino(true);
     lastFall = std::chrono::steady_clock::now();
-    gameOverTime = std::chrono::steady_clock::time_point::min();
 }
 
 bool BlockGame::isValidMove(const Tetromino& tetro, Vec2 pos) {
@@ -366,18 +475,56 @@ void BlockGame::moveHorizontal(int dx) {
     util::PlaySoundUI("random.pop");
 }
 
-void BlockGame::rotateTetromino() {
-    Tetromino rotated = currentTetromino;
-    for (int y = 0; y < rotated.dimension; y++) {
-        for (int x = 0; x < rotated.dimension; x++) {
-            rotated.shape[y][x] = currentTetromino.shape[rotated.dimension - x - 1][y];
-        }
+void BlockGame::rotateTetromino(bool clockwise) {
+    // O doesn't rotate
+    if (currentTetromino.type == 3) return;
+
+    const int currentState = currentTetromino.rotationState;
+    const int direction = clockwise ? 1 : -1;
+    const int newState = (currentState + direction + 4) % 4;
+
+    const auto& offsets = (currentTetromino.type == 0) ?
+        I_OFFSETS : JLSTZ_OFFSETS;
+
+    std::vector<Vec2> kicks;
+    for (int i = 0; i < 5; ++i) {
+        Vec2 currentOffset = offsets[currentState][i];
+        Vec2 newOffset = offsets[newState][i];
+        kicks.push_back(currentOffset - newOffset);
     }
 
-    if (isValidMove(rotated, piecePosition)) {
-        currentTetromino = rotated;
-        util::PlaySoundUI("random.pop2");
+    if (currentTetromino.type == 0 && currentState == STATE_0 && clockwise) {
+        kicks = { {0,0}, {-2,0}, {1,0}, {-2,-1}, {1,2} };
     }
+
+    Tetromino rotated = rotateMatrix(currentTetromino, clockwise);
+    for (const auto& kick : kicks) {
+        Vec2 newPos = piecePosition + kick;
+        if (isValidMove(rotated, newPos)) {
+            currentTetromino = rotated;
+            currentTetromino.rotationState = newState;
+            piecePosition = newPos;
+            util::PlaySoundUI("random.pop2");
+            return;
+        }
+    }
+}
+
+Tetromino BlockGame::rotateMatrix(const Tetromino& original, bool clockwise) {
+    Tetromino rotated = original;
+    const int size = rotated.dimension;
+
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            if (clockwise) {
+                rotated.shape[x][size - 1 - y] = original.shape[y][x];
+            }
+            else {
+                rotated.shape[size - 1 - x][y] = original.shape[y][x];
+            }
+        }
+    }
+    return rotated;
 }
 
 void BlockGame::hardDrop() {
@@ -389,12 +536,13 @@ void BlockGame::hardDrop() {
     score += dropDistance * 2 * level;
     mergeTetromino();
     clearLines();
-    spawnTetromino();
+    spawnTetromino(false);
     softDropScore = 0;
 }
 
 void BlockGame::mergeTetromino() {
     // tetromino placed sound
+    canHold = false;
     util::PlaySoundUI("note.bd");
 
     for (int y = 0; y < currentTetromino.dimension; y++) {
@@ -421,7 +569,6 @@ void BlockGame::clearLines() {
         }
 
         if (full) {
-            // clear line sound
             util::PlaySoundUI("note.pling");
             board.erase(board.begin() + y);
             board.insert(board.begin(), std::vector(BOARD_WIDTH, 0));
@@ -434,7 +581,6 @@ void BlockGame::clearLines() {
         linesCleared += linesClearedThisTurn;
         score += (linesClearedThisTurn * 100) * level;
         if (linesCleared >= level * 10) {
-            // level up sound
             util::PlaySoundUI("random.levelup");
             level++;
         }
