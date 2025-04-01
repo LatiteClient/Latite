@@ -9,6 +9,8 @@ BlockGame::BlockGame() : Module("BlockGame", LocalizeString::get("client.module.
     listen<KeyUpdateEvent>(static_cast<EventListenerFunc>(&BlockGame::onKeyUpdate));
     listen<DrawHUDModulesEvent>(static_cast<EventListenerFunc>(&BlockGame::onRenderHUDModules), false, 2);
 
+    addSetting("audioSetting", LocalizeString::get("client.module.blockGame.audioSetting.name"),
+        LocalizeString::get("client.module.blockGame.audioSetting.desc"), audio);
     addSetting("moveLeftSetting", LocalizeString::get("client.module.blockGame.moveLeftSetting.name"),
                LocalizeString::get("client.module.blockGame.moveLeftSetting.desc"), leftKey);
     addSetting("moveRightSetting", LocalizeString::get("client.module.blockGame.moveRightSetting.name"),
@@ -292,6 +294,7 @@ void BlockGame::spawnTetromino() {
     };
 
     if (!isValidMove(currentTetromino, piecePosition)) {
+        util::PlaySoundUI("game.player.die");
         gameOver = true;
         gameOverTime = std::chrono::steady_clock::now();
     }
@@ -333,6 +336,7 @@ void BlockGame::moveHorizontal(int dx) {
     if (isValidMove(currentTetromino, newPos)) {
         piecePosition = newPos;
     }
+    util::PlaySoundUI("random.pop");
 }
 
 void BlockGame::rotateTetromino() {
@@ -345,6 +349,7 @@ void BlockGame::rotateTetromino() {
 
     if (isValidMove(rotated, piecePosition)) {
         currentTetromino = rotated;
+        util::PlaySoundUI("random.pop2");
     }
 }
 
@@ -362,6 +367,9 @@ void BlockGame::hardDrop() {
 }
 
 void BlockGame::mergeTetromino() {
+    // tetromino placed sound
+    util::PlaySoundUI("note.bd");
+
     for (int y = 0; y < currentTetromino.dimension; y++) {
         for (int x = 0; x < currentTetromino.dimension; x++) {
             if (currentTetromino.shape[y][x]) {
@@ -386,6 +394,8 @@ void BlockGame::clearLines() {
         }
 
         if (full) {
+            // clear line sound
+            util::PlaySoundUI("note.pling");
             board.erase(board.begin() + y);
             board.insert(board.begin(), std::vector(BOARD_WIDTH, 0));
             linesClearedThisTurn++;
@@ -397,6 +407,8 @@ void BlockGame::clearLines() {
         linesCleared += linesClearedThisTurn;
         score += (linesClearedThisTurn * 100) * level;
         if (linesCleared >= level * 10) {
+            // level up sound
+            util::PlaySoundUI("random.levelup");
             level++;
         }
     }

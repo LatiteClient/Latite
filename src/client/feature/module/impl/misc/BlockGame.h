@@ -50,6 +50,7 @@ private:
     void moveHorizontal(int dx);
     void hardDrop();
 
+    ValueType audio = BoolValue(true);
     ValueType leftKey = KeyValue(VK_LEFT);
     ValueType rightKey = KeyValue(VK_RIGHT);
     ValueType hardDropKey = KeyValue(VK_SPACE);
