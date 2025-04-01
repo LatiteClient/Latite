@@ -484,6 +484,7 @@
     <ClInclude Include="assets\lang\zh_TW.json" />
     <ClInclude Include="src\client\script\objects\OSScriptingObject.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\FrameTimeDisplay.h" />
+    <ClInclude Include="src\sdk\common\client\game\Option.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />

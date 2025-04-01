@@ -1,16 +1,37 @@
 #pragma once
+#include "Option.h"
+
 namespace SDK {
-	class Options {
+	
+
+	class Options : std::enable_shared_from_this<Options> {
 	public:
-		void setPlayerViewPerspective(int) {
-			// TODO: lol
+		void setPlayerViewPerspective(int perspective) {
+			memory::callVirtual<void>(this, 136, perspective);
 		}
 
 		int getPlayerViewPerspective() {
-			// TODO: lol
-			return 0;
+			return memory::callVirtual<int>(this, 137);
 		}
 
-		bool IsGfxVSyncEnabled();
+		bool getVsync() {
+			auto it = std::find_if(options.begin(), options.end(), [](std::unique_ptr<Option>& option) {
+				if (option && option->impl->id == OptionID::Vsync) {
+					return true;
+				}
+				});
+
+			if (it == options.end()) {
+				return false;
+			}
+
+			return static_cast<BoolOption*>(it->get())->value;
+		}
+
+	private:
+		void* unknown;
+		std::array<std::unique_ptr<class Option>, 788> options;
+
+		virtual ~Options() = 0;
 	};
 }
