@@ -75,7 +75,9 @@ void BlockGame::onRenderOverlay(Event& evG) {
             LocalizeString::get("client.module.blockGame.restartCountdown.name"), { std::to_wstring(remaining) });
 
         if (remaining <= 0) {
-            util::PlaySoundUI("note.snare");
+            if (std::get<BoolValue>(audio)) {
+                util::PlaySoundUI("note.snare");
+            }
             restartGame();
             return;
         }
@@ -286,7 +288,9 @@ void BlockGame::onKeyUpdate(Event& evG) {
     } else if (key == std::get<KeyValue>(rotateKey)) {
         rotateTetromino();
     } else if (key == std::get<KeyValue>(restartKey)) {
-        util::PlaySoundUI("note.snare");
+        if (std::get<BoolValue>(audio)) {
+            util::PlaySoundUI("note.snare");
+        }
         restartGame();
     } else if (key == std::get<KeyValue>(holdKey)) {
         if (canHold) handleHold();
@@ -380,7 +384,9 @@ void BlockGame::spawnTetromino(bool firstSpawn) {
         if (!isValidMove(currentTetromino, piecePosition)) {
             gameOver = true;
             gameOverTime = std::chrono::steady_clock::now();
-            util::PlaySoundUI("game.player.die");
+            if (std::get<BoolValue>(audio)) {
+                util::PlaySoundUI("game.player.die");
+            }
             return;
         }
     }
@@ -472,7 +478,9 @@ void BlockGame::moveHorizontal(int dx) {
     if (isValidMove(currentTetromino, newPos)) {
         piecePosition = newPos;
     }
-    util::PlaySoundUI("random.pop");
+    if (std::get<BoolValue>(audio)) {
+        util::PlaySoundUI("random.pop");
+    }
 }
 
 void BlockGame::rotateTetromino(bool clockwise) {
@@ -504,7 +512,9 @@ void BlockGame::rotateTetromino(bool clockwise) {
             currentTetromino = rotated;
             currentTetromino.rotationState = newState;
             piecePosition = newPos;
-            util::PlaySoundUI("random.pop2");
+            if (std::get<BoolValue>(audio)) {
+                util::PlaySoundUI("random.pop2");
+            }
             lastWasRotation = true;
             lastKickOffset = kick;
             return;
@@ -545,7 +555,9 @@ void BlockGame::hardDrop() {
 void BlockGame::mergeTetromino() {
     // tetromino placed sound
     canHold = false;
-    util::PlaySoundUI("note.bd");
+    if (std::get<BoolValue>(audio)) {
+        util::PlaySoundUI("note.bd");
+    }
 
     if (currentTetromino.type == 5 && lastWasRotation) {
         float baseX = piecePosition.x;
@@ -651,7 +663,9 @@ void BlockGame::clearLines() {
         }
 
         if (full) {
-            util::PlaySoundUI("note.pling");
+            if (std::get<BoolValue>(audio)) {
+                util::PlaySoundUI("note.pling");
+            }
             board.erase(board.begin() + y);
             board.insert(board.begin(), std::vector(BOARD_WIDTH, 0));
             linesClearedThisTurn++;
@@ -690,7 +704,9 @@ void BlockGame::clearLines() {
         linesCleared += linesClearedThisTurn;
 
         if (linesCleared >= level * 10) {
-            util::PlaySoundUI("random.levelup");
+            if (std::get<BoolValue>(audio)) {
+                util::PlaySoundUI("random.levelup");
+            }
             level++;
         }
     }
