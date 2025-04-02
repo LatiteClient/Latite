@@ -108,7 +108,7 @@ private:
     bool isValidMove(const Tetromino& tetro, Vec2 pos);
     void mergeTetromino();
     void clearLines();
-    void rotateTetromino(bool clockwise = true);
+    void rotateTetromino(bool clockwise = true, bool is180 = false);
     Tetromino rotateMatrix(const Tetromino& original, bool clockwise);
     void moveHorizontal(int dx);
     void hardDrop();

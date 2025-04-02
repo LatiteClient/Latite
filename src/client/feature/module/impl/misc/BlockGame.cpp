@@ -21,15 +21,16 @@ BlockGame::BlockGame() : Module("BlockGame", LocalizeString::get("client.module.
                LocalizeString::get("client.module.blockGame.softDropSetting.desc"), softDropKey);
     addSetting("rotateSetting", LocalizeString::get("client.module.blockGame.rotateSetting.name"),
                LocalizeString::get("client.module.blockGame.rotateSetting.desc"), rotateKey);
+    addSetting("rotateCCWSetting", LocalizeString::get("client.module.blockGame.rotateCCWSetting.name"),
+        LocalizeString::get("client.module.blockGame.rotateCCWSetting.desc"), rotateCCWKey);
+    addSetting("rotate180Setting", LocalizeString::get("client.module.blockGame.rotate180Setting.name"),
+        LocalizeString::get("client.module.blockGame.rotate180Setting.desc"), rotateCCWKey);
     addSetting("pauseSetting", LocalizeString::get("client.module.blockGame.pauseSetting.name"),
                LocalizeString::get("client.module.blockGame.pauseSetting.desc"), pauseKey);
     addSetting("restartSetting", LocalizeString::get("client.module.blockGame.restartSetting.name"),
                LocalizeString::get("client.module.blockGame.restartSetting.desc"), restartKey);
     addSetting("holdSetting", LocalizeString::get("client.module.blockGame.holdSetting.name"),
                LocalizeString::get("client.module.blockGame.holdSetting.desc"), holdKey);
-    addSetting("rotateCCWSetting", LocalizeString::get("client.module.blockGame.rotateCCWSetting.name"),
-               LocalizeString::get("client.module.blockGame.rotateCCWSetting.desc"), rotateCCWKey);
-
 
     createTetrominoShapes();
     restartGame();
@@ -296,6 +297,8 @@ void BlockGame::onKeyUpdate(Event& evG) {
         if (canHold) handleHold();
     } else if (key == std::get<KeyValue>(rotateCCWKey)) {
         rotateTetromino(false);
+    } else if (key == 65) {
+        rotateTetromino(false, true);
     }
 }
 
@@ -483,41 +486,73 @@ void BlockGame::moveHorizontal(int dx) {
     }
 }
 
-void BlockGame::rotateTetromino(bool clockwise) {
-    // O doesn't rotate
+void BlockGame::rotateTetromino(bool clockwise, bool is180) {
     if (currentTetromino.type == 3) return;
 
-    const int currentState = currentTetromino.rotationState;
-    const int direction = clockwise ? 1 : -1;
-    const int newState = (currentState + direction + 4) % 4;
-
-    const auto& offsets = (currentTetromino.type == 0) ?
-        I_OFFSETS : JLSTZ_OFFSETS;
-
-    std::vector<Vec2> kicks;
-    for (int i = 0; i < 5; ++i) {
-        Vec2 currentOffset = offsets[currentState][i];
-        Vec2 newOffset = offsets[newState][i];
-        kicks.push_back(currentOffset - newOffset);
-    }
-
-    if (currentTetromino.type == 0 && currentState == STATE_0 && clockwise) {
-        kicks = { {0,0}, {-2,0}, {1,0}, {-2,-1}, {1,2} };
-    }
-
-    Tetromino rotated = rotateMatrix(currentTetromino, clockwise);
-    for (const auto& kick : kicks) {
-        Vec2 newPos = piecePosition + kick;
-        if (isValidMove(rotated, newPos)) {
-            currentTetromino = rotated;
-            currentTetromino.rotationState = newState;
-            piecePosition = newPos;
-            if (std::get<BoolValue>(audio)) {
-                util::PlaySoundUI("random.pop2");
+    if (is180) {
+        Tetromino rotated = currentTetromino;
+        const int size = rotated.dimension;
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                rotated.shape[y][x] = currentTetromino.shape[size - 1 - y][size - 1 - x];
             }
-            lastWasRotation = true;
-            lastKickOffset = kick;
-            return;
+        }
+        int newState = (currentTetromino.rotationState + 2) % 4;
+        std::vector<Vec2> candidateOffsets = { {0,0}, {1,0}, {-1,0}, {0,1}, {0,-1} };
+        for (const auto& off : candidateOffsets) {
+            Vec2 newPos = piecePosition + off;
+            if (isValidMove(rotated, newPos)) {
+                currentTetromino = rotated;
+                currentTetromino.rotationState = newState;
+                piecePosition = newPos;
+                util::PlaySoundUI("random.pop2");
+                lastWasRotation = true;
+                lastKickOffset = off;
+                return;
+            }
+        }
+    }
+    else {
+        const int currentState = currentTetromino.rotationState;
+        int direction = clockwise ? 1 : -1;
+        int newState = (currentState + direction + 4) % 4;
+        const auto& offsets = (currentTetromino.type == 0) ? I_OFFSETS : JLSTZ_OFFSETS;
+        std::vector<Vec2> kicks;
+        for (int i = 0; i < 5; ++i) {
+            Vec2 currentOffset = offsets[currentState][i];
+            Vec2 newOffset = offsets[newState][i];
+            kicks.push_back(currentOffset - newOffset);
+        }
+
+        Tetromino rotated = rotateMatrix(currentTetromino, clockwise);
+        for (const auto& kick : kicks) {
+            Vec2 newPos = piecePosition + kick;
+            if (isValidMove(rotated, newPos)) {
+                currentTetromino = rotated;
+                currentTetromino.rotationState = newState;
+                piecePosition = newPos;
+                util::PlaySoundUI("random.pop2");
+                lastWasRotation = true;
+                lastKickOffset = kick;
+                return;
+            }
+        }
+
+        // FIXME: VERY scuffed clockwise t-spins. cant do openers like TKI or PCO with this
+        if (currentTetromino.type == 5 && clockwise) {
+            std::vector<Vec2> extraOffsets = { {1,0}, {1,-1} };
+            for (const auto& extra : extraOffsets) {
+                Vec2 newPos = piecePosition + extra;
+                if (isValidMove(rotated, newPos)) {
+                    currentTetromino = rotated;
+                    currentTetromino.rotationState = newState;
+                    piecePosition = newPos;
+                    util::PlaySoundUI("random.pop2");
+                    lastWasRotation = true;
+                    lastKickOffset = extra;
+                    return;
+                }
+            }
         }
     }
 }
