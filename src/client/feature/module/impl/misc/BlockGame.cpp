@@ -505,6 +505,8 @@ void BlockGame::rotateTetromino(bool clockwise) {
             currentTetromino.rotationState = newState;
             piecePosition = newPos;
             util::PlaySoundUI("random.pop2");
+            lastWasRotation = true;
+            lastKickOffset = kick;
             return;
         }
     }
@@ -545,6 +547,84 @@ void BlockGame::mergeTetromino() {
     canHold = false;
     util::PlaySoundUI("note.bd");
 
+    if (currentTetromino.type == 5 && lastWasRotation) {
+        float baseX = piecePosition.x;
+        float baseY = piecePosition.y;
+
+        Vec2 topLeft = { baseX, baseY };
+        Vec2 topRight = { baseX + 2, baseY };
+        Vec2 bottomLeft = { baseX, baseY + 2 };
+        Vec2 bottomRight = { baseX + 2, baseY + 2 };
+
+        Vec2 front1, front2, back1, back2;
+        switch (currentTetromino.rotationState) {
+        case STATE_0:
+            front1 = topLeft;
+            front2 = topRight;
+            back1 = bottomLeft;
+            back2 = bottomRight;
+            break;
+        case STATE_R:
+            front1 = topRight;
+            front2 = bottomRight;
+            back1 = topLeft;
+            back2 = bottomLeft;
+            break;
+        case STATE_2:
+            front1 = bottomLeft;
+            front2 = bottomRight;
+            back1 = topLeft;
+            back2 = topRight;
+            break;
+        case STATE_L:
+            front1 = topLeft;
+            front2 = bottomLeft;
+            back1 = topRight;
+            back2 = bottomRight;
+            break;
+        default:
+            front1 = topLeft;
+            front2 = topRight;
+            back1 = bottomLeft;
+            back2 = bottomRight;
+            break;
+        }
+
+        auto isOccupied = [&](const Vec2& pos) -> bool {
+            float x = pos.x;
+            float y = pos.y;
+            if (x < 0 || x >= BOARD_WIDTH || y < 0 || y >= BOARD_HEIGHT) {
+                return true;
+            }
+            return board[y][x] != 0;
+        };
+
+        int frontCount = 0;
+        if (isOccupied(front1)) frontCount++;
+        if (isOccupied(front2)) frontCount++;
+        int backCount = 0;
+        if (isOccupied(back1)) backCount++;
+        if (isOccupied(back2)) backCount++;
+
+        if ((abs(lastKickOffset.x) == 1 && abs(lastKickOffset.y) == 2) ||
+            (abs(lastKickOffset.x) == 2 && abs(lastKickOffset.y) == 1)) {
+            lastMoveWasTSpin = true;
+            lastMoveWasMiniTSpin = false;
+        } else if (frontCount >= 2 && backCount >= 1) {
+            lastMoveWasTSpin = true;
+            lastMoveWasMiniTSpin = false;
+        } else if (frontCount == 1 && backCount == 2) {
+            lastMoveWasTSpin = true;
+            lastMoveWasMiniTSpin = true;
+        } else {
+            lastMoveWasTSpin = false;
+            lastMoveWasMiniTSpin = false;
+        }
+    } else {
+        lastMoveWasTSpin = false;
+        lastMoveWasMiniTSpin = false;
+    }
+
     for (int y = 0; y < currentTetromino.dimension; y++) {
         for (int x = 0; x < currentTetromino.dimension; x++) {
             if (currentTetromino.shape[y][x]) {
@@ -555,6 +635,8 @@ void BlockGame::mergeTetromino() {
             }
         }
     }
+
+    lastWasRotation = false;
 }
 
 void BlockGame::clearLines() {
@@ -578,13 +660,43 @@ void BlockGame::clearLines() {
     }
 
     if (linesClearedThisTurn > 0) {
+        if (!lastMoveWasTSpin) {
+            score += (linesClearedThisTurn * 100) * level;
+        }
+    } else {
+        if (lastMoveWasTSpin) {
+            // todo: figure out scoring for t-spin with no clear (afaik most tetris game will still award points)
+        }
+    }
+
+    if (lastMoveWasTSpin) {
+        int bonus = 0;
+        if (lastMoveWasMiniTSpin) {
+            // mini t-spin:
+            if (linesClearedThisTurn == 0) bonus = 100;
+            else if (linesClearedThisTurn == 1) bonus = 200;
+            else if (linesClearedThisTurn == 2) bonus = 400;
+        } else {
+            // the COOL way to t-spin:
+            if (linesClearedThisTurn == 0) bonus = 400;
+            else if (linesClearedThisTurn == 1) bonus = 800;
+            else if (linesClearedThisTurn == 2) bonus = 1200;
+            else if (linesClearedThisTurn == 3) bonus = 1600;
+        }
+        score += bonus * level;
+    }
+
+    if (linesClearedThisTurn > 0) {
         linesCleared += linesClearedThisTurn;
-        score += (linesClearedThisTurn * 100) * level;
+
         if (linesCleared >= level * 10) {
             util::PlaySoundUI("random.levelup");
             level++;
         }
     }
+
+    lastMoveWasTSpin = false;
+    lastMoveWasMiniTSpin = false;
 }
 
 void BlockGame::onRenderHUDModules(Event& evGeneric) {

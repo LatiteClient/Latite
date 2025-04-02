@@ -70,11 +70,15 @@ private:
     std::vector<int> tetrominoBag;
     bool hasHold = false;
     bool canHold = true;
+    bool lastWasRotation = false;
+    bool lastMoveWasTSpin = false;
+    bool lastMoveWasMiniTSpin = false;
 
     int score;
     int level;
     int linesCleared;
     Vec2 piecePosition;
+    Vec2 lastKickOffset = { 0,0 };
     bool gameOver;
     bool paused;
     bool softDropActive = false;
