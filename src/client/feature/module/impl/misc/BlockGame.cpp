@@ -511,8 +511,7 @@ void BlockGame::rotateTetromino(bool clockwise, bool is180) {
                 return;
             }
         }
-    }
-    else {
+    } else {
         const int currentState = currentTetromino.rotationState;
         int direction = clockwise ? 1 : -1;
         int newState = (currentState + direction + 4) % 4;
@@ -525,6 +524,7 @@ void BlockGame::rotateTetromino(bool clockwise, bool is180) {
         }
 
         Tetromino rotated = rotateMatrix(currentTetromino, clockwise);
+
         for (const auto& kick : kicks) {
             Vec2 newPos = piecePosition + kick;
             if (isValidMove(rotated, newPos)) {
@@ -535,23 +535,6 @@ void BlockGame::rotateTetromino(bool clockwise, bool is180) {
                 lastWasRotation = true;
                 lastKickOffset = kick;
                 return;
-            }
-        }
-
-        // FIXME: VERY scuffed clockwise t-spins. cant do openers like TKI or PCO with this
-        if (currentTetromino.type == 5 && clockwise) {
-            std::vector<Vec2> extraOffsets = { {1,0}, {1,-1} };
-            for (const auto& extra : extraOffsets) {
-                Vec2 newPos = piecePosition + extra;
-                if (isValidMove(rotated, newPos)) {
-                    currentTetromino = rotated;
-                    currentTetromino.rotationState = newState;
-                    piecePosition = newPos;
-                    util::PlaySoundUI("random.pop2");
-                    lastWasRotation = true;
-                    lastKickOffset = extra;
-                    return;
-                }
             }
         }
     }
