@@ -232,23 +232,36 @@ void BlockGame::onRenderOverlay(Event& evG) {
     // auto fall
     std::chrono::time_point<std::chrono::steady_clock> now = std::chrono::steady_clock::now();
     std::chrono::milliseconds baseDelay = std::chrono::milliseconds(1000 - (level - 1) * 100);
+    std::chrono::milliseconds lockDelay = std::chrono::milliseconds(500 - (level - 1) * 100);
     auto fallDelay = softDropActive ? baseDelay / 20 : baseDelay;
 
     if (now - lastFall > fallDelay) {
         if (isValidMove(currentTetromino, piecePosition + Vec2{ 0, 1 })) {
             piecePosition.y++;
+            isLocking = false;
             if (softDropActive) {
                 softDropScore += level;
             }
         }
         else {
+            if (!isLocking) {
+                isLocking = true;
+                lockStartTime = now;
+            }
+        }
+        lastFall = now;
+    }
+
+    if (isLocking) {
+        auto timeInLock = std::chrono::duration_cast<std::chrono::milliseconds>(now - lockStartTime);
+        if (timeInLock >= lockDelay) {
             score += softDropScore;
             softDropScore = 0;
             mergeTetromino();
             clearLines();
             spawnTetromino(false);
+            isLocking = false;
         }
-        lastFall = now;
     }
 
     // soft drop score preview
@@ -508,6 +521,7 @@ void BlockGame::rotateTetromino(bool clockwise, bool is180) {
                 util::PlaySoundUI("random.pop2");
                 lastWasRotation = true;
                 lastKickOffset = off;
+                isLocking = false;
                 return;
             }
         }
@@ -534,6 +548,7 @@ void BlockGame::rotateTetromino(bool clockwise, bool is180) {
                 util::PlaySoundUI("random.pop2");
                 lastWasRotation = true;
                 lastKickOffset = kick;
+                isLocking = false;
                 return;
             }
         }
@@ -563,6 +578,7 @@ void BlockGame::hardDrop() {
         piecePosition.y++;
         dropDistance++;
     }
+    isLocking = false;
     score += dropDistance * 2 * level;
     mergeTetromino();
     clearLines();

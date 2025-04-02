@@ -82,9 +82,11 @@ private:
     bool gameOver;
     bool paused;
     bool softDropActive = false;
+    bool isLocking = false;
     int softDropScore = 0;
 
     std::chrono::time_point<std::chrono::steady_clock> lastFall;
+    std::chrono::time_point<std::chrono::steady_clock> lockStartTime;
     std::vector<Tetromino> tetrominoShapes;
     std::chrono::steady_clock::time_point gameOverTime;
 
