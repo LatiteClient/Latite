@@ -364,7 +364,7 @@ BOOL WINAPI DllMain(
         if (g_mainSettingGroup) g_mainSettingGroup.reset();
         if (g_hooks) g_hooks.reset();
         if (g_renderer) g_renderer.reset();
-        if (g_assets) g_assets.reset();
+        if (g_assets) g_assets.reset(); // this stops the rest from running for some reason idk why
         if (g_screenManager) g_screenManager.reset();
         if (g_pluginManager) g_pluginManager.reset();
         if (g_configManager) g_configManager.reset();
