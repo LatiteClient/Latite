@@ -27,7 +27,3 @@ void Assets::unloadAll() {
 		asset->unload();
 	}
 }
-
-Assets::~Assets() {
-    unloadAll();
-}
