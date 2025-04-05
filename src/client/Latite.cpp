@@ -303,6 +303,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     Logger::Info("Resolved {} signatures ({} dead)", sigCount, deadCount);
 #endif
 
+    MH_Initialize();
     new (hooks) LatiteHooks();
 
     new (keyboardBuf) Keyboard(reinterpret_cast<int*>(Signatures::KeyMap.result));

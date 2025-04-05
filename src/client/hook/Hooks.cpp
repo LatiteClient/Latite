@@ -15,9 +15,7 @@
 using namespace std::chrono_literals;
 
 
-LatiteHooks::LatiteHooks() {
-	MH_Initialize();
-}
+LatiteHooks::LatiteHooks() {}
 
 LatiteHooks::~LatiteHooks() {
 	MH_Uninitialize();
