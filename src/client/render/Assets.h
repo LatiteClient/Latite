@@ -5,7 +5,7 @@
 class Assets final {
 public:
 	Assets();
-	~Assets();
+	~Assets() = default;
 	Assets(Assets&) = delete;
 	Assets(Assets&&) = delete;
 

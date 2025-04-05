@@ -64,20 +64,20 @@ int SDK::internalVers = SDK::VLATEST;
 using namespace std;
 
 namespace {
-    std::shared_ptr<Eventing> g_eventing;
-    std::shared_ptr<Latite> g_latite;
-    std::shared_ptr<Renderer> g_renderer;
-    std::shared_ptr<ModuleManager> g_moduleManager;
-    std::shared_ptr<ClientMessageQueue> g_clientMessageQueue;
-    std::shared_ptr<CommandManager> g_commandManager;
-    std::shared_ptr<ConfigManager> g_configManager;
-    std::shared_ptr<SettingGroup> g_mainSettingGroup;
-    std::shared_ptr<LatiteHooks> g_hooks;
-    std::shared_ptr<ScreenManager> g_screenManager;
-    std::shared_ptr<Assets> g_assets;
-    std::shared_ptr<PluginManager> g_pluginManager;
-    std::shared_ptr<Keyboard> g_keyboard;
-    std::shared_ptr<Notifications> g_notifications;
+    alignas(Eventing) char eventing[sizeof(Eventing)] = {};
+    alignas(Latite) char latiteBuf[sizeof(Latite)] = {};
+    alignas(Renderer) char rendererBuf[sizeof(Renderer)] = {};
+    alignas(ModuleManager) char mmgrBuf[sizeof(ModuleManager)] = {};
+    alignas(ClientMessageQueue) char messageSinkBuf[sizeof(ClientMessageQueue)] = {};
+    alignas(CommandManager) char commandMgrBuf[sizeof(CommandManager)] = {};
+    alignas(ConfigManager) char configMgrBuf[sizeof(ConfigManager)] = {};
+    alignas(SettingGroup) char mainSettingGroup[sizeof(SettingGroup)] = {};
+    alignas(LatiteHooks) char hooks[sizeof(LatiteHooks)] = {};
+    alignas(ScreenManager) char scnMgrBuf[sizeof(ScreenManager)] = {};
+    alignas(Assets) char assetsBuf[sizeof(Assets)] = {};
+    alignas(PluginManager) char scriptMgrBuf[sizeof(PluginManager)] = {};
+    alignas(Keyboard) char keyboardBuf[sizeof(Keyboard)] = {};
+    alignas(Notifications) char notificaitonsBuf[sizeof(Notifications)] = {};
 
     bool hasInjected = false;
 }
@@ -95,11 +95,11 @@ namespace shared {
 )()
 
 DWORD __stdcall startThread(HINSTANCE dll) {
-    g_clientMessageQueue = std::make_shared<ClientMessageQueue>(); // needed for Logger
-    g_eventing = std::make_shared<Eventing>();
-    g_latite = std::make_shared<Latite>();
-    g_notifications = std::make_shared<Notifications>();
-    g_screenManager = std::make_shared<ScreenManager>(); // needs to be before renderer
+    // Needed for Logger
+    new (messageSinkBuf) ClientMessageQueue;
+    new (eventing) Eventing();
+    new (latiteBuf) Latite;
+    new (notificaitonsBuf) Notifications;
 
     std::filesystem::create_directory(util::GetLatitePath());
     std::filesystem::create_directory(util::GetLatitePath() / "Assets");
@@ -258,14 +258,14 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(GuiData_displayClientMessage)
     };
     
-    g_configManager = std::make_shared<ConfigManager>();
+    new (configMgrBuf) ConfigManager();
     if (!Latite::getConfigManager().loadMaster()) {
         Logger::Fatal(XOR_STRING("Could not load master config!"));
     }
     else {
         Logger::Info(XOR_STRING("Loaded master config"));
     }
-    g_mainSettingGroup = std::make_shared<SettingGroup>("global");
+    new (mainSettingGroup) SettingGroup("global");
 
     // The Language setting is a special case because we need it to apply names to other global settings.
     Latite::get().initLanguageSetting();
@@ -276,12 +276,13 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     Latite::get().detectLanguage();
 
-    g_moduleManager = std::make_shared<ModuleManager>();
-    g_commandManager = std::make_shared<CommandManager>();
+    new (mmgrBuf) ModuleManager;
+    new (commandMgrBuf) CommandManager;
+    new (scnMgrBuf) ScreenManager(); // needs to be initialized before renderer
 
-    g_pluginManager = std::make_shared<PluginManager>();
-    g_renderer = std::make_shared<Renderer>();
-    g_assets = std::make_shared<Assets>();
+    new (scriptMgrBuf) PluginManager();
+    new (rendererBuf) Renderer();
+    new (assetsBuf) Assets();
 
     for (auto& entry : sigList) {
         if (!entry.first->mod) continue;
@@ -302,17 +303,12 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     Logger::Info("Resolved {} signatures ({} dead)", sigCount, deadCount);
 #endif
 
-    MH_Initialize();
-    g_hooks = std::make_shared<LatiteHooks>();
+    new (hooks) LatiteHooks();
 
-    if (Signatures::KeyMap.result) {
-        g_keyboard = std::make_shared<Keyboard>(reinterpret_cast<int*>(Signatures::KeyMap.result));
-    } else {
-        Logger::Fatal("KeyMap signature failed to resolve, Keyboard cannot be initialized!");
-    }
-
+    new (keyboardBuf) Keyboard(reinterpret_cast<int*>(Signatures::KeyMap.result));
 
     Logger::Info(XOR_STRING("Waiting for game to load.."));
+
     while (!SDK::ClientInstance::get()) {
         std::this_thread::sleep_for(10ms);
     }
@@ -331,127 +327,106 @@ BOOL WINAPI DllMain(
     if (GetModuleHandleA("Minecraft.Windows.exe") != GetModuleHandleA(NULL)) return TRUE;
 
     if (fdwReason == DLL_PROCESS_ATTACH) {
+
         if (hasInjected) {
             FreeLibrary(hinstDLL);
             return TRUE;
         }
-        hasInjected = true;
-        DisableThreadLibraryCalls(hinstDLL);
 
-        HANDLE hThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)startThread, hinstDLL, 0, nullptr);
-        if (hThread) {
-            CloseHandle(hThread);
-        }
-        else {
-            hasInjected = false;
-            return FALSE;
-        }
+        hasInjected = true;
+
+        DisableThreadLibraryCalls(hinstDLL);
+        CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)startThread, hinstDLL, 0, nullptr));
     }
     else if (fdwReason == DLL_PROCESS_DETACH) {
-        Logger::Info("Detaching Latite Client...");
+        // Remove singletons
 
-        if (g_hooks) g_hooks->disable();
+        Latite::getHooks().disable();
 
-        // sleep is not ideal i think
+        // Wait for all running hooks accross different threads to stop executing
         std::this_thread::sleep_for(200ms);
 
-        g_configManager->saveCurrentConfig();
+        Latite::getConfigManager().saveCurrentConfig();
 
-        if (g_keyboard) g_keyboard.reset();
-        if (g_moduleManager) g_moduleManager.reset();
-        if (g_clientMessageQueue) g_clientMessageQueue.reset();
-        if (g_commandManager) g_commandManager.reset();
-        if (g_mainSettingGroup) g_mainSettingGroup.reset();
-        if (g_hooks) g_hooks.reset();
-        if (g_renderer) g_renderer.reset();
-        if (g_assets) g_assets.reset(); // this stops the rest from running for some reason idk why
-        if (g_screenManager) g_screenManager.reset();
-        if (g_pluginManager) g_pluginManager.reset();
-        if (g_configManager) g_configManager.reset();
-        if (g_notifications) g_notifications.reset();
-        if (g_latite) g_latite.reset();
+        Latite::getKeyboard().~Keyboard();
+        Latite::getModuleManager().~ModuleManager();
+        Latite::getClientMessageQueue().~ClientMessageQueue();
+        Latite::getCommandManager().~CommandManager();
+        Latite::getSettings().~SettingGroup();
+        Latite::getHooks().~LatiteHooks();
+        Latite::getEventing().~Eventing();
+        Latite::getRenderer().~Renderer();
+        Latite::getAssets().~Assets();
+        Latite::getScreenManager().~ScreenManager();
+        Latite::getPluginManager().~PluginManager();
+        Latite::getNotifications().~Notifications();
+        Latite::get().~Latite();
 
         MH_Uninitialize();
 
         hasInjected = false;
         Logger::Info("Latite Client detached.");
     }
-    return TRUE;
+    return TRUE;  // Successful DLL_PROCESS_ATTACH.
 }
 
-
 Latite& Latite::get() noexcept {
-    assert(g_latite != nullptr && "Latite accessed before initialization!");
-    return *g_latite;
+    return *std::launder(reinterpret_cast<Latite*>(latiteBuf));
 }
 
 ModuleManager& Latite::getModuleManager() noexcept {
-    assert(g_moduleManager != nullptr && "ModuleManager accessed before initialization!");
-    return *g_moduleManager;
+    return *std::launder(reinterpret_cast<ModuleManager*>(mmgrBuf));
 }
 
 CommandManager& Latite::getCommandManager() noexcept {
-    assert(g_commandManager != nullptr && "CommandManager accessed before initialization!");
-    return *g_commandManager;
+    return *std::launder(reinterpret_cast<CommandManager*>(commandMgrBuf));
 }
 
 ConfigManager& Latite::getConfigManager() noexcept {
-    assert(g_configManager != nullptr && "ConfigManager accessed before initialization!");
-    return *g_configManager;
+    return *std::launder(reinterpret_cast<ConfigManager*>(configMgrBuf));
 }
 
 ClientMessageQueue& Latite::getClientMessageQueue() noexcept {
-    assert(g_clientMessageQueue != nullptr && "ClientMessageQueue accessed before initialization!");
-    return *g_clientMessageQueue;
+    return *std::launder(reinterpret_cast<ClientMessageQueue*>(messageSinkBuf));
 }
 
 SettingGroup& Latite::getSettings() noexcept {
-    assert(g_mainSettingGroup != nullptr && "SettingGroup accessed before initialization!");
-    return *g_mainSettingGroup;
+    return *std::launder(reinterpret_cast<SettingGroup*>(mainSettingGroup));
 }
 
 LatiteHooks& Latite::getHooks() noexcept {
-    assert(g_hooks != nullptr && "LatiteHooks accessed before initialization!");
-    return *g_hooks;
+    return *std::launder(reinterpret_cast<LatiteHooks*>(hooks));
 }
 
 Eventing& Latite::getEventing() noexcept {
-    assert(g_eventing != nullptr && "Eventing accessed before initialization!");
-    return *g_eventing;
+    return *std::launder(reinterpret_cast<Eventing*>(eventing));
 }
 
 Renderer& Latite::getRenderer() noexcept {
-    assert(g_renderer != nullptr && "Renderer accessed before initialization!");
-    return *g_renderer;
+    return *std::launder(reinterpret_cast<Renderer*>(rendererBuf));
 }
 
 ScreenManager& Latite::getScreenManager() noexcept {
-    assert(g_screenManager != nullptr && "ScreenManager accessed before initialization!");
-    return *g_screenManager;
+    return *std::launder(reinterpret_cast<ScreenManager*>(scnMgrBuf));
 }
 
 Assets& Latite::getAssets() noexcept {
-    assert(g_assets != nullptr && "Assets accessed before initialization!");
-    return *g_assets;
+    return *std::launder(reinterpret_cast<Assets*>(assetsBuf));
 }
 
 PluginManager& Latite::getPluginManager() noexcept {
-    assert(g_pluginManager != nullptr && "PluginManager accessed before initialization!");
-    return *g_pluginManager;
+    return *std::launder(reinterpret_cast<PluginManager*>(scriptMgrBuf));
 }
 
 Keyboard& Latite::getKeyboard() noexcept {
-    assert(g_keyboard != nullptr && "Keyboard accessed before initialization!");
-    return *g_keyboard;
+    return *std::launder(reinterpret_cast<Keyboard*>(keyboardBuf));
 }
 
 Notifications& Latite::getNotifications() noexcept {
-    assert(g_notifications != nullptr && "Notifications accessed before initialization!");
-    return *g_notifications;
+    return *std::launder(reinterpret_cast<Notifications*>(notificaitonsBuf));
 }
 
 std::optional<float> Latite::getMenuBlur() {
-    if (!g_latite) return std::nullopt;
     if (std::get<BoolValue>(this->menuBlurEnabled)) {
         return std::get<FloatValue>(this->menuBlur);
     }
