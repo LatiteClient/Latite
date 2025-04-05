@@ -7,7 +7,7 @@ public:
 	Asset(std::wstring const& relPath);
 	Asset(Asset&) = delete;
 	Asset(Asset&&) = delete;
-	~Asset() { unload(); }
+	~Asset() = default;
 
 	void load(IWICImagingFactory* factory, ID2D1DeviceContext* dc);
 	void unload();
