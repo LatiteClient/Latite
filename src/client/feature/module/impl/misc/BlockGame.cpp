@@ -1071,7 +1071,7 @@ int BlockGame::clearLinesAndScore(bool tspin, bool miniTspin) {
     }
 
     int scoreGained = 0;
-    bool currentClearIsDifficult = (linesClearedThisTurn >= 4 || tspin);
+    bool currentClearIsDifficult = (linesClearedThisTurn >= 4 || tspin && linesClearedThisTurn != 0);
     bool applyB2B = false;
 
     if (linesClearedThisTurn > 0) {
