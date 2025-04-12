@@ -169,7 +169,9 @@ private:
     void tryMoveHorizontal(int dx);
 
     ValueType audio = BoolValue(true);
+    ValueType backgroundEnabled = BoolValue(false);
     ValueType drawGrid = BoolValue(true);
+    ValueType backgroundColor = ColorValue{ 1.f, 0.f, 0.f, 1.f };
     ValueType leftKey = KeyValue(VK_LEFT);
     ValueType rightKey = KeyValue(VK_RIGHT);
     ValueType hardDropKey = KeyValue(VK_SPACE);

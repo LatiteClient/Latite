@@ -30,6 +30,11 @@ BlockGame::BlockGame() : Module("BlockGame", LocalizeString::get("client.module.
                LocalizeString::get("client.module.blockGame.audioSetting.desc"), audio);
     addSetting("drawGridSetting", LocalizeString::get("client.module.blockGame.drawGridSetting.name"),
                LocalizeString::get("client.module.blockGame.drawGridSetting.desc"), drawGrid);
+    addSetting("backgroundEnabledSetting", LocalizeString::get("client.module.blockGame.backgroundEnabledSetting.name"),
+               LocalizeString::get("client.module.blockGame.backgroundEnabledSetting.desc"), backgroundEnabled);
+    addSetting("backgroundColorSetting", LocalizeString::get("client.module.blockGame.backgroundColorSetting.name"),
+               LocalizeString::get("client.module.blockGame.backgroundColorSetting.desc"), backgroundColor,
+               "backgroundEnabledSetting"_istrue);
     addSetting("moveLeftSetting", LocalizeString::get("client.module.blockGame.moveLeftSetting.name"),
                LocalizeString::get("client.module.blockGame.moveLeftSetting.desc"), leftKey);
     addSetting("moveRightSetting", LocalizeString::get("client.module.blockGame.moveRightSetting.name"),
@@ -299,6 +304,8 @@ void BlockGame::onRenderOverlay(Event& evG) {
     const float holdPreviewX = boardLeft - (HOLD_SIZE + 1) * blockSize;
     const float holdPreviewY = boardTop;
 
+    StoredColor bgColor = std::get<ColorValue>(backgroundColor).getMainColor();
+
     // draw pause/game over text
     if (paused) {
         dc.drawText({
@@ -354,13 +361,22 @@ void BlockGame::onRenderOverlay(Event& evG) {
 
     // draw board
     const float borderThickness = 2.0f;
-    // Draw border slightly outset
+    // draw border slightly outset
     dc.drawRectangle(
         {
             boardLeft - borderThickness, boardTop - borderThickness,
             boardLeft + boardWidthPixels + borderThickness, boardTop + boardHeightPixels + borderThickness
         },
         d2d::Colors::WHITE, borderThickness);
+
+    // draw board background
+    if (bgColor.a > 0.0f && std::get<BoolValue>(backgroundEnabled)) {
+        d2d::Color backgroundColor = d2d::Color::RGB(bgColor.r * 255.f, bgColor.b * 255.f, bgColor.g * 255.f, bgColor.a * 255.f);
+        dc.fillRectangle(
+            { boardLeft, boardTop, boardLeft + boardWidthPixels, boardTop + boardHeightPixels },
+            backgroundColor
+        );
+    }
 
     // draw grid lines
     if (std::get<BoolValue>(drawGrid)) {
@@ -440,6 +456,18 @@ void BlockGame::onRenderOverlay(Event& evG) {
         }
     }
 
+    // draw hold piece area background
+    if (bgColor.a > 0.0f && std::get<BoolValue>(backgroundEnabled)) {
+        d2d::Color backgroundColor = d2d::Color::RGB(bgColor.r * 255.f, bgColor.b * 255.f, bgColor.g * 255.f, bgColor.a * 255.f);
+        dc.fillRectangle(
+            {
+                holdPreviewX - 2, holdPreviewY + 35, holdPreviewX + HOLD_SIZE * blockSize + 2,
+                holdPreviewY + 45 + HOLD_SIZE * blockSize
+            },
+            backgroundColor
+        );
+    }
+
     // draw hold piece
     dc.drawText({ holdPreviewX, holdPreviewY, holdPreviewX + HOLD_SIZE * blockSize, holdPreviewY + 30 },
                 LocalizeString::get("client.module.blockGame.holdPieceText.name"),
@@ -467,12 +495,23 @@ void BlockGame::onRenderOverlay(Event& evG) {
         }
     }
 
-    // draw box around hold area
+    // draw hold piece area
     dc.drawRectangle({
                          holdPreviewX - 2, holdPreviewY + 35, holdPreviewX + HOLD_SIZE * blockSize + 2,
                          holdPreviewY + 45 + HOLD_SIZE * blockSize
                      }, d2d::Colors::WHITE, 1.0f);
 
+    // draw next piece area background
+    if (bgColor.a > 0.0f && std::get<BoolValue>(backgroundEnabled)) {
+        d2d::Color backgroundColor = d2d::Color::RGB(bgColor.r * 255.f, bgColor.b * 255.f, bgColor.g * 255.f, bgColor.a * 255.f);
+        dc.fillRectangle(
+            {
+                nextPreviewX - 2, nextPreviewY + 35, nextPreviewX + NEXT_SIZE * blockSize + 2,
+                nextPreviewY + 45 + NEXT_SIZE * blockSize
+            },
+            backgroundColor
+        );
+    }
 
     // draw next piece
     dc.drawText({ nextPreviewX, nextPreviewY, nextPreviewX + NEXT_SIZE * blockSize, nextPreviewY + 30 },
@@ -496,7 +535,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
         }
     }
 
-    // draw box around next area
+    // draw next piece area
     dc.drawRectangle({
                          nextPreviewX - 2, nextPreviewY + 35, nextPreviewX + NEXT_SIZE * blockSize + 2,
                          nextPreviewY + 45 + NEXT_SIZE * blockSize
