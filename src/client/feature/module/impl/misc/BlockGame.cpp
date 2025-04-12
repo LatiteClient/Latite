@@ -30,6 +30,8 @@ BlockGame::BlockGame() : Module("BlockGame", LocalizeString::get("client.module.
                LocalizeString::get("client.module.blockGame.audioSetting.desc"), audio);
     addSetting("drawGridSetting", LocalizeString::get("client.module.blockGame.drawGridSetting.name"),
                LocalizeString::get("client.module.blockGame.drawGridSetting.desc"), drawGrid);
+    addSetting("drawGhostPiece", LocalizeString::get("client.module.blockGame.drawGhostPiece.name"),
+        LocalizeString::get("client.module.blockGame.drawGhostPiece.desc"), drawGhostPiece);
     addSetting("backgroundEnabledSetting", LocalizeString::get("client.module.blockGame.backgroundEnabledSetting.name"),
                LocalizeString::get("client.module.blockGame.backgroundEnabledSetting.desc"), backgroundEnabled);
     addSetting("backgroundColorSetting", LocalizeString::get("client.module.blockGame.backgroundColorSetting.name"),
@@ -417,27 +419,28 @@ void BlockGame::onRenderOverlay(Event& evG) {
     }
 
     // draw ghost piece
-    Tetromino ghostPiece = currentTetromino;
-    Vec2 ghostPosition = piecePosition;
-    while (isValidPosition(ghostPiece, { ghostPosition.x, ghostPosition.y + 1 })) {
-        ghostPosition.y++;
-    }
-    float ghostAlpha = 0.3f;
-    for (int y = 0; y < ghostPiece.dimension; ++y) {
-        for (int x = 0; x < ghostPiece.dimension; ++x) {
-            if (ghostPiece.shape[y][x] != 0) {
-                float drawX = boardLeft + (ghostPosition.x + x) * blockSize;
-                float drawY = boardTop + (ghostPosition.y + y - BOARD_BUFFER) * blockSize;
-                if (ghostPosition.y + y >= BOARD_BUFFER) {
-                    dc.fillRectangle(
-                        { drawX, drawY, drawX + blockSize, drawY + blockSize },
-                        d2d::Color::Hex(ghostPiece.color.getHex(), ghostAlpha)
-                    );
+    if (std::get<BoolValue>(drawGhostPiece)) {
+        Tetromino ghostPiece = currentTetromino;
+        Vec2 ghostPosition = piecePosition;
+        while (isValidPosition(ghostPiece, {ghostPosition.x, ghostPosition.y + 1})) {
+            ghostPosition.y++;
+        }
+        float ghostAlpha = 0.3f;
+        for (int y = 0; y < ghostPiece.dimension; ++y) {
+            for (int x = 0; x < ghostPiece.dimension; ++x) {
+                if (ghostPiece.shape[y][x] != 0) {
+                    float drawX = boardLeft + (ghostPosition.x + x) * blockSize;
+                    float drawY = boardTop + (ghostPosition.y + y - BOARD_BUFFER) * blockSize;
+                    if (ghostPosition.y + y >= BOARD_BUFFER) {
+                        dc.fillRectangle(
+                            {drawX, drawY, drawX + blockSize, drawY + blockSize},
+                            d2d::Color::Hex(ghostPiece.color.getHex(), ghostAlpha)
+                        );
+                    }
                 }
             }
         }
     }
-
 
     // draw current piece
     for (int y = 0; y < currentTetromino.dimension; ++y) {
