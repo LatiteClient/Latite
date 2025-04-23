@@ -60,8 +60,10 @@ private:
     int lockResets = 0;
     const int MAX_LOCK_RESETS = 15;
 
+    bool currentClearIsDifficult = false;
+
     bool lastActionWasRotation = false;
-    Vec2 lastKickOffset = {0, 0};
+    Vec2 lastKickOffset = { 0, 0 };
     bool lastMoveWasTSpin = false;
     bool lastMoveWasMiniTSpin = false;
     bool lastClearWasDifficult = false;

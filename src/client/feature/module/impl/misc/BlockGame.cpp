@@ -580,6 +580,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
 
         dc.drawText({ nextPreviewX, otherStatsY + textHeight * 2 + 5, nextPreviewX + 200, otherStatsX + tSpinTextSize },
             tSpinText, tSpinTextColor, Renderer::FontSelection::PrimaryRegular, tSpinTextSize);
+        otherStatsY += tSpinTextSize + lineSpacing;
     }
 
     if (b2bCount > 1) {
@@ -976,8 +977,6 @@ void BlockGame::hardDrop() {
         score += dropDistance * 2;
     }
 
-    playSound("note.bd");
-
     mergeTetromino();
 
     int lines = clearLinesAndScore(lastMoveWasTSpin, lastMoveWasMiniTSpin);
@@ -1062,8 +1061,14 @@ int BlockGame::clearLinesAndScore(bool tspin, bool miniTspin) {
         }
     }
 
+    currentClearIsDifficult = (linesClearedThisTurn >= 4 || tspin && linesClearedThisTurn != 0);
+
     if (linesClearedThisTurn > 0) {
-        playSound("note.pling");
+        if (currentClearIsDifficult) {
+            playSound("note.bit");
+        } else {
+            playSound("note.pling");
+        }
 
         int destY = TOTAL_BOARD_HEIGHT - 1;
         for (int srcY = TOTAL_BOARD_HEIGHT - 1; srcY >= 0; --srcY) {
@@ -1084,7 +1089,6 @@ int BlockGame::clearLinesAndScore(bool tspin, bool miniTspin) {
     }
 
     int scoreGained = 0;
-    bool currentClearIsDifficult = (linesClearedThisTurn >= 4 || tspin && linesClearedThisTurn != 0);
     bool applyB2B = false;
 
     if (linesClearedThisTurn > 0) {
