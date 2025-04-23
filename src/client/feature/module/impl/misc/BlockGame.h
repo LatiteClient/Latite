@@ -81,6 +81,10 @@ private:
     std::chrono::steady_clock::time_point b2bUpdateTime;
     const std::chrono::milliseconds displayFlashDuration{300};
 
+    std::wstring tSpinText;
+    std::chrono::steady_clock::time_point tSpinDisplayTime;
+    const std::chrono::milliseconds tSpinDisplayDuration{ 1000 };
+
     bool leftKeyHeld = false;
     bool rightKeyHeld = false;
     bool softDropKeyHeld = false;

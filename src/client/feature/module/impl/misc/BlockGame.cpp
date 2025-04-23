@@ -422,7 +422,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
     if (std::get<BoolValue>(drawGhostPiece)) {
         Tetromino ghostPiece = currentTetromino;
         Vec2 ghostPosition = piecePosition;
-        while (isValidPosition(ghostPiece, {ghostPosition.x, ghostPosition.y + 1})) {
+        while (isValidPosition(ghostPiece, { ghostPosition.x, ghostPosition.y + 1 })) {
             ghostPosition.y++;
         }
         float ghostAlpha = 0.3f;
@@ -569,19 +569,17 @@ void BlockGame::onRenderOverlay(Event& evG) {
     dc.drawText({ nextPreviewX, mainStatsY + textHeight * 2 + 10, nextPreviewX + 200, mainStatsX + textHeight * 3 + 10 },
                 linesStr, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, textHeight);
 
-    if (comboCount > 1) {
-        std::wstring comboText = L"Combo " + std::to_wstring(comboCount) + L"x";
-        float comboSize = textHeight * 1.1f;
-        auto comboColor = d2d::Color::Hex("FFA500");
+    if (!tSpinText.empty() && now - tSpinDisplayTime < tSpinDisplayDuration) {
+        float tSpinTextSize = textHeight * 1.1f;
+        auto tSpinTextColor = d2d::Color::RGB(160, 0, 240);
 
-        if (now - comboUpdateTime < displayFlashDuration) {
-            comboSize *= 1.1f;
-            comboColor = d2d::Colors::YELLOW;
+        if (now - tSpinDisplayTime < displayFlashDuration) {
+            tSpinTextSize *= 1.2f;
+            tSpinTextColor = d2d::Color::RGB(200, 115, 242);;
         }
 
-        dc.drawText({ nextPreviewX, otherStatsY + textHeight + 5, nextPreviewX + 200, otherStatsX + comboSize },
-                    comboText, comboColor, Renderer::FontSelection::PrimaryRegular, comboSize);
-        otherStatsY += comboSize + lineSpacing;
+        dc.drawText({ nextPreviewX, otherStatsY + textHeight * 2 + 5, nextPreviewX + 200, otherStatsX + tSpinTextSize },
+            tSpinText, tSpinTextColor, Renderer::FontSelection::PrimaryRegular, tSpinTextSize);
     }
 
     if (b2bCount > 1) {
@@ -595,8 +593,23 @@ void BlockGame::onRenderOverlay(Event& evG) {
         }
 
         dc.drawText({ nextPreviewX, otherStatsY + textHeight * 2 + 10, nextPreviewX + 200, otherStatsX + b2bSize },
-                    b2bText, b2bColor, Renderer::FontSelection::PrimaryRegular, b2bSize);
+            b2bText, b2bColor, Renderer::FontSelection::PrimaryRegular, b2bSize);
         otherStatsY += b2bSize + lineSpacing;
+    }
+
+    if (comboCount > 1) {
+        std::wstring comboText = L"Combo " + std::to_wstring(comboCount) + L"x";
+        float comboSize = textHeight * 1.1f;
+        auto comboColor = d2d::Color::Hex("FFA500");
+
+        if (now - comboUpdateTime < displayFlashDuration) {
+            comboSize *= 1.1f;
+            comboColor = d2d::Colors::YELLOW;
+        }
+
+        dc.drawText({ nextPreviewX, otherStatsY + textHeight + 15, nextPreviewX + 200, otherStatsX + comboSize },
+                    comboText, comboColor, Renderer::FontSelection::PrimaryRegular, comboSize);
+        otherStatsY += comboSize + lineSpacing;
     }
 }
 
@@ -1106,19 +1119,31 @@ int BlockGame::clearLinesAndScore(bool tspin, bool miniTspin) {
             if (linesClearedThisTurn == 0) baseScore = 100;
             else if (linesClearedThisTurn == 1) baseScore = 200;
             else if (linesClearedThisTurn == 2) baseScore = 400;
-        } else {
+        }
+        else {
             // Regular T-Spin
             if (linesClearedThisTurn == 0) baseScore = 400;
             else if (linesClearedThisTurn == 1) baseScore = 800;
             else if (linesClearedThisTurn == 2) baseScore = 1200;
             else if (linesClearedThisTurn == 3) baseScore = 1600;
         }
-    } else {
+        if (miniTspin) {
+            tSpinText = L"MINI T-SPIN";
+        }
+        else {
+            if (linesClearedThisTurn == 1) tSpinText = L"T-SPIN SINGLE";
+            else if (linesClearedThisTurn == 2) tSpinText = L"T-SPIN DOUBLE";
+            else if (linesClearedThisTurn == 3) tSpinText = L"T-SPIN TRIPLE";
+        }
+        tSpinDisplayTime = std::chrono::steady_clock::now();
+    }
+    else {
         // Standard Line Clears
         if (linesClearedThisTurn == 1) baseScore = 100; // Single
         else if (linesClearedThisTurn == 2) baseScore = 300; // Double
         else if (linesClearedThisTurn == 3) baseScore = 500; // Triple
         else if (linesClearedThisTurn >= 4) baseScore = 800; // Tetris (4 lines)
+        tSpinText = L"";
     }
     baseScore *= level;
 
