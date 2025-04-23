@@ -10,19 +10,19 @@ BlockGame::BlockGame() : Module("BlockGame", LocalizeString::get("client.module.
     listen<KeyUpdateEvent>(static_cast<EventListenerFunc>(&BlockGame::onKey));
     listen<DrawHUDModulesEvent>(static_cast<EventListenerFunc>(&BlockGame::onRenderHUDModules), false, 2);
 
-    addSliderSetting("arrSetting", LocalizeString::get("client.module.blockGame.arrSetting.name"),
+    addSliderSetting("arrSetting", L"ARR",
                      LocalizeString::get("client.module.blockGame.arrSetting.desc"),
                      arrIntervalSetting, FloatValue(0.f),
                      FloatValue(83.f), FloatValue(1.f));
-    addSliderSetting("dasSetting", LocalizeString::get("client.module.blockGame.dasSetting.name"),
+    addSliderSetting("dasSetting", L"DAS",
                      LocalizeString::get("client.module.blockGame.dasSetting.desc"),
                      dasDelaySetting, FloatValue(17.f),
                      FloatValue(333.f), FloatValue(1.f));
-    addSliderSetting("dcdSetting", LocalizeString::get("client.module.blockGame.dcdSetting.name"),
+    addSliderSetting("dcdSetting", L"DCD",
                      LocalizeString::get("client.module.blockGame.dcdSetting.desc"),
                      dcdDelaySetting, FloatValue(0.f),
                      FloatValue(333.f), FloatValue(1.f));
-    addSliderSetting("sdfSetting", LocalizeString::get("client.module.blockGame.sdfSetting.name"),
+    addSliderSetting("sdfSetting", L"SDF",
                      LocalizeString::get("client.module.blockGame.sdfSetting.desc"),
                      sdfSetting, FloatValue(5.f), FloatValue(41.f), FloatValue(1.f));
 
