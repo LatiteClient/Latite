@@ -7,6 +7,7 @@
 #include "impl/misc/ItemTweaks.h"
 #include "impl/misc/DebugInfo.h"
 #include "impl/misc/CommandShortcuts.h"
+#include "impl/misc/BlockGame.h"
 
 #include "impl/game/Zoom.h"
 #include "impl/game/CinematicCamera.h"
@@ -99,6 +100,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<NoHurtCam>());
 	this->items.push_back(std::make_shared<AutoGG>());
 	this->items.push_back(std::make_shared<FrameTimeDisplay>());
+	this->items.push_back(std::make_shared<BlockGame>());
 
 	for (auto& mod : items) {
 		mod->onInit();
