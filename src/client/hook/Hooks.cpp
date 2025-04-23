@@ -14,7 +14,10 @@
 
 using namespace std::chrono_literals;
 
-void LatiteHooks::uninit() {
+
+LatiteHooks::LatiteHooks() {}
+
+LatiteHooks::~LatiteHooks() {
 	MH_Uninitialize();
 }
 

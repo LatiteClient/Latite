@@ -23,10 +23,8 @@ class LatiteHooks final : public StaticManager<HookGroup,
 	ScreenViewHooks,
 	PacketHooks> {
 public:
-	LatiteHooks() = default;
-	~LatiteHooks() = default;
-
-	void uninit();
+	LatiteHooks();
+	~LatiteHooks();
 
 	void enable();
 	void disable();
