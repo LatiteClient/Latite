@@ -574,7 +574,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
         auto tSpinTextColor = d2d::Color::RGB(160, 0, 240);
 
         if (now - tSpinDisplayTime < displayFlashDuration) {
-            tSpinTextSize *= 1.2f;
+            tSpinTextSize *= 1.1f;
             tSpinTextColor = d2d::Color::RGB(200, 115, 242);;
         }
 
