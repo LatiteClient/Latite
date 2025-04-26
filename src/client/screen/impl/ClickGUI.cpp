@@ -1210,6 +1210,10 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 		float max = std::get<FloatValue>(set->max);
 		float interval = std::get<FloatValue>(set->interval);
 
+		if (!set->desc().empty() && (shouldSelect(textRect, cursorPos) || shouldSelect(sliderRect, cursorPos))) {
+			setTooltip(set->desc());
+		}
+
 		if (!this->activeSetting) {
 			if (justClicked[0] && shouldSelect(sliderRect, cursorPos)) {
 				activeSetting = set;
