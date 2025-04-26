@@ -87,6 +87,10 @@ private:
     std::chrono::steady_clock::time_point tSpinDisplayTime;
     const std::chrono::milliseconds tSpinDisplayDuration{ 1000 };
 
+    std::wstring lineClearText;
+    std::chrono::steady_clock::time_point lineClearDisplayTime;
+    const std::chrono::milliseconds lineClearDisplayDuration{ 1000 };
+
     bool leftKeyHeld = false;
     bool rightKeyHeld = false;
     bool softDropKeyHeld = false;

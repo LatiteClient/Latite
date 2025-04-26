@@ -574,13 +574,33 @@ void BlockGame::onRenderOverlay(Event& evG) {
         auto tSpinTextColor = d2d::Color::RGB(160, 0, 240);
 
         if (now - tSpinDisplayTime < displayFlashDuration) {
-            tSpinTextSize *= 1.1f;
-            tSpinTextColor = d2d::Color::RGB(200, 115, 242);;
+            tSpinTextSize *= 1.2f;
+            tSpinTextColor = d2d::Color::RGB(200, 115, 242);
         }
 
         dc.drawText({ nextPreviewX, otherStatsY + textHeight * 2 + 5, nextPreviewX + 200, otherStatsX + tSpinTextSize },
             tSpinText, tSpinTextColor, Renderer::FontSelection::PrimaryRegular, tSpinTextSize);
         otherStatsY += tSpinTextSize + lineSpacing;
+    }
+
+    if (!lineClearText.empty() && now - lineClearDisplayTime < lineClearDisplayDuration) {
+        float lineClearTextSize = textHeight * 1.1f;
+        auto lineClearTextColor = d2d::Colors::WHITE;
+
+        if (now - lineClearDisplayTime < displayFlashDuration) {
+            lineClearTextSize *= 1.1f;
+            if (lineClearText == L"TETRIS") {
+                lineClearTextSize *= 1.2f;
+                lineClearTextColor = d2d::Color::Hex("D53D3D");
+            } else {
+                lineClearTextSize *= 1.1f;
+                lineClearTextColor = d2d::Color::Hex("FB6464");
+            }
+        }
+
+        dc.drawText({ nextPreviewX, otherStatsY + textHeight * 2 + 10, nextPreviewX + 200, otherStatsX + lineClearTextSize },
+            lineClearText, lineClearTextColor, Renderer::FontSelection::PrimaryRegular, lineClearTextSize);
+        otherStatsY += lineClearTextSize + lineSpacing;
     }
 
     if (b2bCount > 1) {
@@ -593,7 +613,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
             b2bColor = d2d::Color::Hex("ADD8E6");
         }
 
-        dc.drawText({ nextPreviewX, otherStatsY + textHeight * 2 + 10, nextPreviewX + 200, otherStatsX + b2bSize },
+        dc.drawText({ nextPreviewX, otherStatsY + textHeight * 2 + 15, nextPreviewX + 200, otherStatsX + b2bSize },
             b2bText, b2bColor, Renderer::FontSelection::PrimaryRegular, b2bSize);
         otherStatsY += b2bSize + lineSpacing;
     }
@@ -608,7 +628,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
             comboColor = d2d::Colors::YELLOW;
         }
 
-        dc.drawText({ nextPreviewX, otherStatsY + textHeight + 15, nextPreviewX + 200, otherStatsX + comboSize },
+        dc.drawText({ nextPreviewX, otherStatsY + textHeight * 2 + 20, nextPreviewX + 200, otherStatsX + comboSize },
                     comboText, comboColor, Renderer::FontSelection::PrimaryRegular, comboSize);
         otherStatsY += comboSize + lineSpacing;
     }
@@ -1149,6 +1169,14 @@ int BlockGame::clearLinesAndScore(bool tspin, bool miniTspin) {
         else if (linesClearedThisTurn >= 4) baseScore = 800; // Tetris (4 lines)
         tSpinText = L"";
     }
+
+    if (linesClearedThisTurn == 1) lineClearText = L"SINGLE";
+    else if (linesClearedThisTurn == 2) lineClearText = L"DOUBLE";
+    else if (linesClearedThisTurn == 3) lineClearText = L"TRIPLE";
+    else if (linesClearedThisTurn >= 4) lineClearText = L"TETRIS";
+    else lineClearText = L"";
+    if (linesClearedThisTurn > 0) lineClearDisplayTime = std::chrono::steady_clock::now();
+
     baseScore *= level;
 
     if (applyB2B) {
