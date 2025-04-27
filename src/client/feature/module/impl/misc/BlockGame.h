@@ -18,12 +18,15 @@ public:
     void restartGame();
 
 private:
+    enum RotationState { STATE_0, STATE_R, STATE_2, STATE_L };
+    enum TetrominoType { I_PIECE, J_PIECE, L_PIECE, O_PIECE, S_PIECE, T_PIECE, Z_PIECE };
+
     struct Tetromino {
-        int shape[4][4];
+        std::array<std::array<int, 4>, 4> shape;
         d2d::Color color;
         int dimension;
-        int type;
-        int rotationState = 0;
+        TetrominoType type;
+        RotationState rotationState = STATE_0;
     };
 
     static constexpr int BOARD_WIDTH = 10;
@@ -33,9 +36,6 @@ private:
     static constexpr int NEXT_SIZE = 4;
     static constexpr int HOLD_SIZE = 4;
     static constexpr int TETROMINO_SHAPES_COUNT = 7;
-
-    enum RotationState { STATE_0, STATE_R, STATE_2, STATE_L };
-    enum TetrominoType { I_PIECE, J_PIECE, L_PIECE, O_PIECE, S_PIECE, T_PIECE, Z_PIECE };
 
     std::array<std::array<int, BOARD_WIDTH>, TOTAL_BOARD_HEIGHT> board;
     std::array<Tetromino, TETROMINO_SHAPES_COUNT> tetrominoShapes;

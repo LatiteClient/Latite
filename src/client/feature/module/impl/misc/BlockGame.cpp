@@ -680,31 +680,31 @@ void BlockGame::createTetrominoShapes() {
     // Using 4x4 grid internally simplifies rotation logic.
     // I-shape (Type 1, Index 0) - Cyan - Uses 4x4
     tetrominoShapes[0] = {
-        {{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}}, d2d::Color::RGB(0, 240, 240), 4, 0, 0
+        std::to_array<std::array<int, 4>>({{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}}), d2d::Color::RGB(0, 240, 240), 4, TetrominoType::I_PIECE
     };
     // J-shape (Type 2, Index 1) - Blue - Uses 3x3 (padded to 4x4)
     tetrominoShapes[1] = {
-        {{2, 0, 0, 0}, {2, 2, 2, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, d2d::Color::RGB(0, 0, 240), 3, 1, 0
+        std::to_array<std::array<int, 4>>({{2, 0, 0, 0}, {2, 2, 2, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}), d2d::Color::RGB(0, 0, 240), 3, TetrominoType::J_PIECE
     };
     // L-shape (Type 3, Index 2) - Orange - Uses 3x3
     tetrominoShapes[2] = {
-        {{0, 0, 3, 0}, {3, 3, 3, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, d2d::Color::RGB(240, 160, 0), 3, 2, 0
+        std::to_array<std::array<int, 4>>({{0, 0, 3, 0}, {3, 3, 3, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}), d2d::Color::RGB(240, 160, 0), 3, TetrominoType::L_PIECE
     };
     // O-shape (Type 4, Index 3) - Yellow - Uses 2x2
     tetrominoShapes[3] = {
-        {{4, 4, 0, 0}, {4, 4, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, d2d::Color::RGB(240, 240, 0), 2, 3, 0
+        std::to_array<std::array<int, 4>>({{4, 4, 0, 0}, {4, 4, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}), d2d::Color::RGB(240, 240, 0), 2, TetrominoType::O_PIECE
     };
     // S-shape (Type 5, Index 4) - Green - Uses 3x3
     tetrominoShapes[4] = {
-        {{0, 5, 5, 0}, {5, 5, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, d2d::Color::RGB(0, 240, 0), 3, 4, 0
+        std::to_array<std::array<int, 4>>({{0, 5, 5, 0}, {5, 5, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}), d2d::Color::RGB(0, 240, 0), 3, TetrominoType::S_PIECE
     };
     // T-shape (Type 6, Index 5) - Purple - Uses 3x3
     tetrominoShapes[5] = {
-        {{0, 6, 0, 0}, {6, 6, 6, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, d2d::Color::RGB(160, 0, 240), 3, 5, 0
+        std::to_array<std::array<int, 4>>({{0, 6, 0, 0}, {6, 6, 6, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}), d2d::Color::RGB(160, 0, 240), 3, TetrominoType::T_PIECE
     };
     // Z-shape (Type 7, Index 6) - Red - Uses 3x3
     tetrominoShapes[6] = {
-        {{7, 7, 0, 0}, {0, 7, 7, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}, d2d::Color::RGB(240, 0, 0), 3, 6, 0
+        std::to_array<std::array<int, 4>>({{7, 7, 0, 0}, {0, 7, 7, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}), d2d::Color::RGB(240, 0, 0), 3, TetrominoType::Z_PIECE
     };
 
     // hopefully resize fixes
@@ -852,7 +852,7 @@ bool BlockGame::rotateTetromino(bool clockwise) {
     int newState = (currentState + direction + 4) % 4;
 
     Tetromino rotated = getRotatedTetromino(currentTetromino, clockwise);
-    rotated.rotationState = newState;
+    rotated.rotationState = static_cast<RotationState>(newState);
 
     const KickTable* kicks = nullptr;
     if (currentTetromino.type == TetrominoType::I_PIECE) {
@@ -961,7 +961,7 @@ bool BlockGame::handle180Rotation() {
 
 BlockGame::Tetromino BlockGame::get180RotatedTetromino(const Tetromino& original) {
     Tetromino rotated = original;
-    rotated.rotationState = (original.rotationState + 2) % 4;
+    rotated.rotationState = static_cast<RotationState>((original.rotationState + 2) % 4);
 
     int tempShape[4][4] = {{0}};
     const int size = original.dimension;
@@ -1212,7 +1212,7 @@ void BlockGame::onRenderHUDModules(Event& evGeneric) {
 }
 
 bool BlockGame::isKeyDown(int vkCode) {
-    return Latite::get().getKeyboard().isKeyDown(vkCode);
+    return Latite::getKeyboard().isKeyDown(vkCode);
 }
 
 void BlockGame::playSound(const std::string& soundId) {
