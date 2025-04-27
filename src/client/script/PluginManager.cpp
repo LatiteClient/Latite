@@ -256,18 +256,26 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 				auto operation = http.SendRequestAsync(request);
 				auto response = operation.get();
 				auto cont = response.Content();
-				auto strs = cont.ReadAsStringAsync().get();
+				auto buffer = cont.ReadAsBufferAsync().get();
+
+				// convert winrt IBuffer to something we can pass to std::ofstream
+				auto reader = winrt::Windows::Storage::Streams::DataReader::FromBuffer(buffer);
+
+				std::vector<uint8_t> bytes(buffer.Length());
+				reader.ReadBytes(bytes);
 
 				auto downloadPath = path / fws;
-				std::filesystem::create_directories(downloadPath);
+
+				// make sure the directory we write the file to exists
+				std::filesystem::create_directories(downloadPath.parent_path());
 
 				std::ofstream ofs;
-				ofs.open(path / fws);
+				ofs.open(path / fws, std::ios::binary);
 				if (ofs.fail()) {
 					message("Error opening file: " + std::to_string(*_errno()), true);
 					return *_errno();
 				}
-				ofs << winrt::to_string(strs);
+				ofs.write(reinterpret_cast<char*>(bytes.data()), bytes.size());
 				ofs.close();
 			}
 			return std::nullopt;
