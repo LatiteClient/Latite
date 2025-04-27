@@ -257,13 +257,17 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 				auto response = operation.get();
 				auto cont = response.Content();
 				auto strs = cont.ReadAsStringAsync().get();
-				std::wofstream ofs;
+
+				auto downloadPath = path / fws;
+				std::filesystem::create_directories(downloadPath);
+
+				std::ofstream ofs;
 				ofs.open(path / fws);
 				if (ofs.fail()) {
 					message("Error opening file: " + std::to_string(*_errno()), true);
 					return *_errno();
 				}
-				ofs << strs.c_str();
+				ofs << winrt::to_string(strs);
 				ofs.close();
 			}
 			return std::nullopt;
