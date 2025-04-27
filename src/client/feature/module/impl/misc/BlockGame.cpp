@@ -122,7 +122,7 @@ void BlockGame::updateGameLogic(std::chrono::steady_clock::time_point now) {
             return;
         } else {
             // regular scuffed sdf
-            long long acceleratedMs = baseGravityDelay.count() / sdfValue;
+            auto acceleratedMs = static_cast<int64_t>(baseGravityDelay.count() / sdfValue);
             currentGravityInterval = std::chrono::milliseconds(std::max(1LL, acceleratedMs));
         }
     }
@@ -373,7 +373,8 @@ void BlockGame::onRenderOverlay(Event& evG) {
 
     // draw board background
     if (bgColor.a > 0.0f && std::get<BoolValue>(backgroundEnabled)) {
-        d2d::Color backgroundColor = d2d::Color::RGB(bgColor.r * 255.f, bgColor.b * 255.f, bgColor.g * 255.f, bgColor.a * 255.f);
+        d2d::Color backgroundColor = {bgColor.r, bgColor.b,
+            bgColor.g, bgColor.a};
         dc.fillRectangle(
             { boardLeft, boardTop, boardLeft + boardWidthPixels, boardTop + boardHeightPixels },
             backgroundColor
@@ -461,7 +462,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
 
     // draw hold piece area background
     if (bgColor.a > 0.0f && std::get<BoolValue>(backgroundEnabled)) {
-        d2d::Color backgroundColor = d2d::Color::RGB(bgColor.r * 255.f, bgColor.b * 255.f, bgColor.g * 255.f, bgColor.a * 255.f);
+        d2d::Color backgroundColor = { bgColor.r, bgColor.b, bgColor.g, bgColor.a };
         dc.fillRectangle(
             {
                 holdPreviewX - 2, holdPreviewY + 35, holdPreviewX + HOLD_SIZE * blockSize + 2,
@@ -506,7 +507,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
 
     // draw next piece area background
     if (bgColor.a > 0.0f && std::get<BoolValue>(backgroundEnabled)) {
-        d2d::Color backgroundColor = d2d::Color::RGB(bgColor.r * 255.f, bgColor.b * 255.f, bgColor.g * 255.f, bgColor.a * 255.f);
+        d2d::Color backgroundColor = { bgColor.r, bgColor.b, bgColor.g, bgColor.a };
         dc.fillRectangle(
             {
                 nextPreviewX - 2, nextPreviewY + 35, nextPreviewX + NEXT_SIZE * blockSize + 2,
@@ -677,8 +678,6 @@ void BlockGame::handleHold() {
 void BlockGame::createTetrominoShapes() {
     // Shapes defined with their rotation=0 state. Values 1-7 correspond to types.
     // Using 4x4 grid internally simplifies rotation logic.
-    tetrominoShapes.resize(7);
-
     // I-shape (Type 1, Index 0) - Cyan - Uses 4x4
     tetrominoShapes[0] = {
         {{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}}, d2d::Color::RGB(0, 240, 240), 4, 0, 0
@@ -773,7 +772,7 @@ void BlockGame::spawnTetromino(bool firstSpawn) {
 }
 
 void BlockGame::restartGame() {
-    board = std::vector(TOTAL_BOARD_HEIGHT, std::vector<int>(BOARD_WIDTH, 0)); // Initialize with buffer
+    board = {}; // Initialize with buffer
     score = 0;
     level = 1;
     linesCleared = 0;
@@ -906,7 +905,7 @@ bool BlockGame::rotateTetromino(bool clockwise) {
     return false;
 }
 
-Tetromino BlockGame::getRotatedTetromino(const Tetromino& original, bool clockwise) {
+BlockGame::Tetromino BlockGame::getRotatedTetromino(const Tetromino& original, bool clockwise) {
     Tetromino rotated = original;
     const int size = rotated.dimension;
 
@@ -927,13 +926,13 @@ bool BlockGame::handle180Rotation() {
 
     Tetromino rotated = get180RotatedTetromino(currentTetromino);
 
-    const std::vector<Vec2> kicks180 = {
+    static constexpr auto kicks180 = std::to_array<Vec2>({
         { 0, 0 },
         { 1, 0 },
         { -1, 0 },
         { 0, 1 },
         { 0, -1 }
-    };
+        });
 
     for (const auto& kick : kicks180) {
         Vec2 testPos = piecePosition + kick;
@@ -960,7 +959,7 @@ bool BlockGame::handle180Rotation() {
     return false;
 }
 
-Tetromino BlockGame::get180RotatedTetromino(const Tetromino& original) {
+BlockGame::Tetromino BlockGame::get180RotatedTetromino(const Tetromino& original) {
     Tetromino rotated = original;
     rotated.rotationState = (original.rotationState + 2) % 4;
 

@@ -18,6 +18,7 @@
 #include <winrt/Windows.Web.Http.h>
 #include <winrt/windows.foundation.collections.h>
 #include <winrt/Windows.Web.Http.Headers.h>
+#include <winrt/windows.storage.streams.h>
 
 #include "util/XorString.h"
 #include "JsPlugin.h"
@@ -309,7 +310,7 @@ std::vector<PluginManager::PluginInfo> PluginManager::fetchPluginsFromMarket() {
 				try {
 					scriptsJson = nlohmann::json::parse(std::wstring(strs.c_str()));
 				}
-				catch (nlohmann::json::parse_error& e) {
+				catch (nlohmann::json::parse_error&) {
 					return list;
 				}
 			}

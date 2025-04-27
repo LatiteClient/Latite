@@ -5,13 +5,6 @@
 #include <random>
 #include <array>
 
-struct Tetromino {
-    int shape[4][4];
-    d2d::Color color;
-    int dimension;
-    int type;
-    int rotationState = 0;
-};
 
 class BlockGame : public Module {
 public:
@@ -25,18 +18,27 @@ public:
     void restartGame();
 
 private:
-    static const int BOARD_WIDTH = 10;
-    static const int BOARD_HEIGHT = 20;
-    static const int BOARD_BUFFER = 2;
-    static const int TOTAL_BOARD_HEIGHT = BOARD_HEIGHT + BOARD_BUFFER;
-    static const int NEXT_SIZE = 4;
-    static const int HOLD_SIZE = 4;
+    struct Tetromino {
+        int shape[4][4];
+        d2d::Color color;
+        int dimension;
+        int type;
+        int rotationState = 0;
+    };
+
+    static constexpr int BOARD_WIDTH = 10;
+    static constexpr int BOARD_HEIGHT = 20;
+    static constexpr int BOARD_BUFFER = 2;
+    static constexpr int TOTAL_BOARD_HEIGHT = BOARD_HEIGHT + BOARD_BUFFER;
+    static constexpr int NEXT_SIZE = 4;
+    static constexpr int HOLD_SIZE = 4;
+    static constexpr int TETROMINO_SHAPES_COUNT = 7;
 
     enum RotationState { STATE_0, STATE_R, STATE_2, STATE_L };
     enum TetrominoType { I_PIECE, J_PIECE, L_PIECE, O_PIECE, S_PIECE, T_PIECE, Z_PIECE };
 
-    std::vector<std::vector<int>> board;
-    std::vector<Tetromino> tetrominoShapes;
+    std::array<std::array<int, BOARD_WIDTH>, TOTAL_BOARD_HEIGHT> board;
+    std::array<Tetromino, TETROMINO_SHAPES_COUNT> tetrominoShapes;
     Tetromino currentTetromino;
     Tetromino nextTetromino;
     Tetromino holdTetromino;
