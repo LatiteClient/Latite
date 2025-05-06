@@ -50,6 +50,18 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 			PluginManager::Event sEv{ XW("set-score"), { data }, false };
 			Latite::getPluginManager().dispatchEvent(sEv);
 		}
+		else if (packetId == SDK::PacketID::MODAL_FORM_REQUEST) {
+			auto pkt = std::static_pointer_cast<SDK::ModalFormRequestPacket>(packet);
+		
+			auto formId = PluginManager::Event::Value(L"formId");
+			formId.val = (double)pkt->mFormId;
+		
+			auto formJson = PluginManager::Event::Value(L"formJson");
+			formJson.val = util::StrToWStr(pkt->mFormJSON);
+		
+			PluginManager::Event sEv{ XW("modal-form-request"), { formId, formJson }, false };
+			if (Latite::getPluginManager().dispatchEvent(sEv)) return;
+		}
 		else if (packetId == SDK::PacketID::TRANSFER) {
 			PluginManager::Event sEv{ XW("transfer"), {}, false };
 			Latite::getPluginManager().dispatchEvent(sEv);
