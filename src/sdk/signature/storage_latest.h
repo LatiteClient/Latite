@@ -297,7 +297,7 @@ public:
 		"GameArguments::_onUri" };
 
 	inline static SigImpl _bobHurt{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5c 24 ? 48 89 74 24 ? 4c 89 44 24 ? 57 48 83 ec ? 0f 29 74 24 ? 0f 29 7c 24"_sig,
+		"48 89 5C 24 ? 55 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 49 8B 00"_sig,
 		"anonymous namespace::_bobHurt" };
 
 	inline static SigImpl RenderMaterialGroup__common{ [](memory::signature_store& store, uintptr_t) { return store.deref(3); },
