@@ -5,6 +5,6 @@ namespace SDK {
 	class ServerInstance {
 		void* vtable;
 	public:
-		CLASS_FIELD(class Minecraft*, minecraft, 0xA8);
+		CLASS_FIELD(class Minecraft*, minecraft, 0xB8);
 	};
 }
