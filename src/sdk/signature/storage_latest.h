@@ -83,7 +83,7 @@ public:
 		// "Client%d camera ticking system"
 		// 1st of 3 data LEA's
 		inline static SigImpl Level{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-			"48 8D 05 ? ? ? ? 48 89 07 48 8D 05 ? ? ? ? 48 89 47 ? 48 8D 05 ? ? ? ? 48 89 47 ? E8"_sig,
+			"48 8D 05 ? ? ? ? 48 89 07 48 8D 05 ? ? ? ? 48 89 47 ? 48 8D 05 ? ? ? ? 48 89 47 ? 4C 8D 35"_sig,
 			"const Level::`vftable'"};
 		inline static SigImpl SetTitlePacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8d 05 ? ? ? ? 48 89 01 89 51 ? 48 83 c1 ? 0f 57 c0 0f 11 01 48 89 79"_sig,
@@ -171,7 +171,7 @@ public:
 		"MinecraftGame::_update"};
 
 	inline static SigImpl RakNetConnector_tick{[](memory::signature_store&, uintptr_t res) { return res; },
-		"4C 8B DC 49 89 5B ? 49 89 6B ? 56 57 41 56 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 8B F1 33 ED"_sig,
+		"4C 8B DC 49 89 5B ? 49 89 6B ? 56 57 41 56 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 8B F1 49 C7 43"_sig,
 		"RakNetConnector::tick"};
 	
 	// ref: your GPU ("AMD Radeon RX 5500")
@@ -185,7 +185,7 @@ public:
 		"RakPeer::GetAveragePing"};
 
 	inline static SigImpl LocalPlayer_applyTurnDelta{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 58"_sig,
+		"48 8B C4 48 89 58 ? 48 89 70 ? 55 57 41 54 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 58"_sig,
 		"LocalPlayer::applyTurnDelta"};
 
 	// see what accesses things in moveinputhandler
@@ -233,11 +233,11 @@ public:
 		"BaseActorRenderContext::BaseActorRenderContext"};
 
 	inline static SigImpl ItemRenderer_renderGuiItemNew{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 44 89 4D ? 49 8B F8"_sig,
+		"40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 44 89 4D ? 49 8B F8"_sig,
 		"ItemRenderer::renderGuiItemNew"};
 
 	inline static SigImpl BaseAttributeMap_getInstance{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"E8 ? ? ? ? 4C 8B E8 48 89 45 ? 48 8D 55 ? 48 8B 4C 24"_sig,
+		"E8 ? ? ? ? 48 89 44 24 ? 48 8D 55 ? 48 8B 4C 24"_sig,
 		"BaseAttributeMap::getInstance"};
 
 	inline static SigImpl UIControl_getPosition{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
@@ -297,7 +297,7 @@ public:
 		"GameArguments::_onUri" };
 
 	inline static SigImpl _bobHurt{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5c 24 ? 48 89 74 24 ? 4c 89 44 24 ? 57 48 83 ec ? 0f 29 74 24 ? 0f 29 7c 24"_sig,
+		"48 89 5C 24 ? 55 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 49 8B 00"_sig,
 		"anonymous namespace::_bobHurt" };
 
 	inline static SigImpl RenderMaterialGroup__common{ [](memory::signature_store& store, uintptr_t) { return store.deref(3); },
