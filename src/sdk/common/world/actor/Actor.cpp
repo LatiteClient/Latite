@@ -136,7 +136,7 @@ float SDK::Actor::getSaturation() {
 
 bool SDK::Actor::isInvisible() {
 	// @dump-wbds Actor, isInvisible
-	return memory::callVirtual<bool>(this, SDK::mvGetOffset<0x20, 0x22, 0x25, 0x34, 0x3B, 0x3D>());
+	return memory::callVirtual<bool>(this, SDK::mvGetOffset<0x1F, 0x1F, 0x1F, 0x20, 0x20, 0x20, 0x20, 0x22, 0x25, 0x34, 0x3B, 0x3D>());
 }
 
 SDK::ItemStack* SDK::Actor::getArmor(int armorSlot) {
