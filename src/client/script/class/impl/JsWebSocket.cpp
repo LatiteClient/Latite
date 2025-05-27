@@ -38,37 +38,61 @@ JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor
 			// create a string with the received data
 
 			winrt::hstring message = reader.ReadString(reader.UnconsumedBufferLength());
-			JsEvented::Event ev{ std::wstring(WebSocketHolder::receiveEventId), {Chakra::MakeString(std::wstring(message)) } };
-			holder->dispatchEvent(ev);
+			Latite::get().queueForClientThread([=] {
+				JsEvented::Event ev{ std::wstring(WebSocketHolder::receiveEventId), {Chakra::MakeString(std::wstring(message)) } };
+				holder->dispatchEvent(ev);
+				});
+
+			
 		}
 		else if (socket.Control().MessageType() == SocketMessageType::Binary) {
 			// create a Uint8Array with the received data
 
 			uint32_t size = reader.UnconsumedBufferLength();
 
-			JsValueRef array;
-			JS::JsCreateTypedArray(JsArrayTypeUint8, nullptr, 0, static_cast<unsigned int>(size), &array);
-
-			BYTE* chakraData;
-			JS::JsGetTypedArrayStorage(array, &chakraData, nullptr, nullptr, nullptr);
-
 			auto buf = reader.ReadBuffer(reader.UnconsumedBufferLength());
 
+			std::vector<uint8_t> bytes;
+			bytes.reserve(size);
+
 			for (size_t i = 0; i < buf.Length(); ++i) {
-				chakraData[i] = buf.data()[i];
+				bytes[i] = buf.data()[i];
 			}
 
-			JsEvented::Event ev{ std::wstring(WebSocketHolder::receiveEventId), {array} };
-			holder->dispatchEvent(ev);
+			Latite::get().queueForClientThread([=] {
+				JsValueRef array;
+				JS::JsCreateTypedArray(JsArrayTypeUint8, nullptr, 0, static_cast<unsigned int>(bytes.size()), &array);
+
+				BYTE* chakraData;
+				JS::JsGetTypedArrayStorage(array, &chakraData, nullptr, nullptr, nullptr);
+
+				for (size_t i = 0; i < bytes.size(); ++i) {
+					chakraData[i] = bytes[i];
+				}
+
+				JsEvented::Event ev{ std::wstring(WebSocketHolder::receiveEventId), {array} };
+				holder->dispatchEvent(ev);
+				});
 		}
 		});
 
 	// fire JS websocket closed event
 	socket.Closed([holder](const IWebSocket& socket, const WebSocketClosedEventArgs& args) {
-		JsEvented::Event ev{ std::wstring(WebSocketHolder::closeEventId), {} };
-		holder->dispatchEvent(ev);
+		Latite::get().queueForClientThread([=] {
+			JsEvented::Event ev{ std::wstring(WebSocketHolder::closeEventId), {} };
+			holder->dispatchEvent(ev);
+			});
+
 		});
-	
+
+	try {
+		socket.ConnectAsync(Uri(url)).get();
+	}
+	catch (winrt::hresult_error&) {
+		Chakra::ThrowError(L"Unable to connect to websocket server");
+		return JS_INVALID_REFERENCE;
+	}
+
 	return this_->construct(holder, true);
 }
 
@@ -79,7 +103,7 @@ JsValueRef JsWebSocketClass::send(JsValueRef callee, bool isConstructor, JsValue
 	JsValueType type;
 	JS::JsGetValueType(arguments[1], &type);
 	
-	auto holder = Get(callee);
+	auto holder = Get(arguments[0]);
 	
 	DataWriter writer(holder->socket.OutputStream());
 	if (type == JsString) {
@@ -140,7 +164,7 @@ JsValueRef JsWebSocketClass::close(JsValueRef callee, bool isConstructor, JsValu
 		reason = Chakra::GetString(arguments[2]);
 	}
 	
-	auto holder = Get(callee);
+	auto holder = Get(arguments[0]);
 	holder->socket.Close(static_cast<uint16_t>(code), reason);
 
 	return Chakra::GetUndefined();
@@ -159,4 +183,28 @@ JsValueRef JsWebSocketClass::construct(WebSocketHolder* ptr, bool del) {
 	}
 	JS::JsSetPrototype(obj, getPrototype());
 	return obj;
+}
+
+JsValueRef JsWebSocketClass::on(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 3)) return Chakra::GetUndefined();
+
+	if (!Chakra::VerifyParameters({ {arguments[1], JsString }, {arguments[2], JsFunction} })) return JS_INVALID_REFERENCE;
+
+	auto holder = Get(arguments[0]);
+	if (!holder) {
+		Chakra::ThrowError(L"Object is not a WebSocket");
+		return Chakra::GetUndefined();
+	}
+
+	auto str = Chakra::GetString(arguments[1]);
+
+	if (holder->eventListeners.find(str) != holder->eventListeners.end()) {
+		JsContextRef ctx;
+		JS::JsGetCurrentContext(&ctx);
+		JS::JsAddRef(arguments[2], nullptr);
+		holder->eventListeners[str].push_back(std::make_pair(arguments[2], ctx));
+		return arguments[0];
+	}
+	Chakra::ThrowError(L"Unknown event " + str);
+	return Chakra::GetUndefined();
 }

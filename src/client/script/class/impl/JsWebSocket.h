@@ -34,6 +34,9 @@ protected:
 	static JsValueRef CALLBACK close(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState);
 
+	static JsValueRef CALLBACK on(JsValueRef callee, bool isConstructor,
+		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+
 	static JsValueRef CALLBACK toStringCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 		return Chakra::MakeString(L"[object " + std::wstring(reinterpret_cast<JsWebSocketClass*>(callbackState)->name) + L"]");
@@ -52,6 +55,7 @@ public:
 		// Member functions
 		Chakra::DefineFunc(prototype, send, XW("send"), this);
 		Chakra::DefineFunc(prototype, close, XW("close"), this);
+		Chakra::DefineFunc(prototype, on, XW("on"), this);
 		Chakra::DefineFunc(prototype, toStringCallback, XW("toString"), this);
 	};
 private:
