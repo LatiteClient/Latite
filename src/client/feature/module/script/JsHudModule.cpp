@@ -22,7 +22,7 @@ void JsHUDModule::onEnable() {
 		Latite::get().queueForClientThread([this]() {
 			Chakra::SetContext(ctx);
 			Event ev{ L"enable", {  } };
-			auto ret = dispatchEvent(ev.name, ev);
+			auto ret = dispatchEvent(ev);
 			if (ret != JS_INVALID_REFERENCE) {
 				Chakra::Release(ret);
 			}
@@ -31,7 +31,7 @@ void JsHUDModule::onEnable() {
 	}
 	Chakra::SetContext(ctx);
 	Event ev{ L"enable", {  } };
-	auto ret = dispatchEvent(ev.name, ev);
+	auto ret = dispatchEvent(ev);
 	if (ret != JS_INVALID_REFERENCE) {
 		Chakra::Release(ret);
 	}
@@ -43,7 +43,7 @@ void JsHUDModule::onDisable() {
 		Latite::get().queueForClientThread([this]() {
 			Chakra::SetContext(ctx);
 			Event ev{ L"disable", {  } };
-			auto ret = dispatchEvent(ev.name, ev);
+			auto ret = dispatchEvent(ev);
 			if (ret != JS_INVALID_REFERENCE) {
 				Chakra::Release(ret);
 			}
@@ -53,7 +53,7 @@ void JsHUDModule::onDisable() {
 
 	Chakra::SetContext(ctx);
 	Event ev{ L"disable", {  } };
-	auto ret = dispatchEvent(ev.name, ev);
+	auto ret = dispatchEvent(ev);
 	if (ret != JS_INVALID_REFERENCE) {
 		Chakra::Release(ret);
 	}
@@ -66,7 +66,7 @@ bool JsHUDModule::shouldHoldToToggle() {
 
 	Chakra::SetContext(ctx);
 	Event ev{ L"get-hold-to-toggle", {  } };
-	auto ret = dispatchEvent(ev.name, ev);
+	auto ret = dispatchEvent(ev);
 	if (ret != JS_INVALID_REFERENCE) {
 		bool b;
 		if (JS::JsBooleanToBool(ret, &b) == JsNoError) {
@@ -91,6 +91,6 @@ void JsHUDModule::preRender(bool mcRend, bool isPreview, bool isEditor) {
 	bool oMinecraftRend = obj->usingMinecraftRend();
 	obj->setUseMinecraftRend(mcRend);
 	Event ev{ L"render", { isPreview ? Chakra::GetTrue() : Chakra::GetFalse(), isEditor ? Chakra::GetTrue() : Chakra::GetFalse()} };
-	dispatchEvent(ev.name, ev);
+	dispatchEvent(ev);
 	obj->setUseMinecraftRend(oMinecraftRend);
 }

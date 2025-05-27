@@ -24,7 +24,7 @@ void JsTextModule::onEnable() {
 		Latite::get().queueForClientThread([this]() {
 			Chakra::SetContext(ctx);
 			Event ev{ L"enable", {  } };
-			auto ret = dispatchEvent(ev.name, ev);
+			auto ret = dispatchEvent(ev);
 			if (ret != JS_INVALID_REFERENCE) {
 				Chakra::Release(ret);
 			}
@@ -33,7 +33,7 @@ void JsTextModule::onEnable() {
 	}
 	Chakra::SetContext(ctx);
 	Event ev{ L"enable", {  } };
-	auto ret = dispatchEvent(ev.name, ev);
+	auto ret = dispatchEvent(ev);
 	if (ret != JS_INVALID_REFERENCE) {
 		Chakra::Release(ret);
 	}
@@ -45,7 +45,7 @@ void JsTextModule::onDisable() {
 		Latite::get().queueForClientThread([this]() {
 			Chakra::SetContext(ctx);
 			Event ev{ L"disable", {  } };
-			auto ret = dispatchEvent(ev.name, ev);
+			auto ret = dispatchEvent(ev);
 			if (ret != JS_INVALID_REFERENCE) {
 				Chakra::Release(ret);
 			}
@@ -55,7 +55,7 @@ void JsTextModule::onDisable() {
 
 	Chakra::SetContext(ctx);
 	Event ev{ L"disable", {  } };
-	auto ret = dispatchEvent(ev.name, ev);
+	auto ret = dispatchEvent(ev);
 	if (ret != JS_INVALID_REFERENCE) {
 		Chakra::Release(ret);
 	}
@@ -68,7 +68,7 @@ bool JsTextModule::shouldHoldToToggle() {
 
 	Chakra::SetContext(ctx);
 	Event ev{ L"get-hold-to-toggle", {  } };
-	auto ret = dispatchEvent(ev.name, ev);
+	auto ret = dispatchEvent(ev);
 	if (ret != JS_INVALID_REFERENCE) {
 		bool b;
 		if (JS::JsBooleanToBool(ret, &b) == JsNoError) {
@@ -99,7 +99,7 @@ void JsTextModule::preRender(bool mcRend, bool isPreview, bool isEditor) {
 		//JS::JsBoolToBoolean(isEditor, &isEditorBool);
 
 		Event ev{ L"text", {} };
-		auto ret = dispatchEvent(ev.name, ev);
+		auto ret = dispatchEvent(ev);
 		if (ret != JS_INVALID_REFERENCE) {
 			const wchar_t* b;
 			size_t len;

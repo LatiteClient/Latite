@@ -18,7 +18,7 @@ void JsModule::onEnable() {
 		Latite::get().queueForClientThread([this]() {
 			Chakra::SetContext(ctx);
 			Event ev{ L"enable", {  } };
-			auto ret = dispatchEvent(ev.name, ev);
+			auto ret = dispatchEvent(ev);
 			if (ret != JS_INVALID_REFERENCE) {
 				Chakra::Release(ret);
 			}
@@ -27,7 +27,7 @@ void JsModule::onEnable() {
 	}
 	Chakra::SetContext(ctx);
 	Event ev{ L"enable", {  } };
-	auto ret = dispatchEvent(ev.name, ev);
+	auto ret = dispatchEvent(ev);
 	if (ret != JS_INVALID_REFERENCE) {
 		Chakra::Release(ret);
 	}
@@ -39,7 +39,7 @@ void JsModule::onDisable() {
 		Latite::get().queueForClientThread([this]() {
 			Chakra::SetContext(ctx);
 			Event ev{ L"disable", {  } };
-			auto ret = dispatchEvent(ev.name, ev);
+			auto ret = dispatchEvent(ev);
 			if (ret != JS_INVALID_REFERENCE) {
 				Chakra::Release(ret);
 			}
@@ -49,7 +49,7 @@ void JsModule::onDisable() {
 
 	Chakra::SetContext(ctx);
 	Event ev{ L"disable", {  } };
-	auto ret = dispatchEvent(ev.name, ev);
+	auto ret = dispatchEvent(ev);
 	if (ret != JS_INVALID_REFERENCE) {
 		Chakra::Release(ret);
 	}
@@ -63,7 +63,7 @@ bool JsModule::shouldHoldToToggle() {
 
 	Chakra::SetContext(ctx);
 	Event ev{ L"get-hold-to-toggle", {  } };
-	auto ret = dispatchEvent(ev.name, ev);
+	auto ret = dispatchEvent(ev);
 	if (ret != JS_INVALID_REFERENCE) {
 		bool b;
 		if (JS::JsBooleanToBool(ret, &b) == JsNoError) {
