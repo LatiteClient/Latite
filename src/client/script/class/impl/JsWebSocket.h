@@ -10,16 +10,19 @@
 using namespace std::string_view_literals;
 
 using winrt::Windows::Networking::Sockets::MessageWebSocket;
+using winrt::Windows::Storage::Streams::DataWriter;
 
 struct WebSocketHolder : public JsEvented {
 	inline static std::wstring_view receiveEventId = L"receive"sv;
 	inline static std::wstring_view closeEventId = L"close"sv;
 
 	MessageWebSocket socket;
+	DataWriter writer{ nullptr };
 
 	WebSocketHolder(MessageWebSocket&& ptr) : socket(ptr) {
 		this->eventListeners[receiveEventId] = {};
 		this->eventListeners[closeEventId] = {};
+		writer = DataWriter(socket.OutputStream());
 	}
 };
 

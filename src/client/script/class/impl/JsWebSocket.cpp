@@ -99,13 +99,13 @@ JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor
 // (data: string | Uint8Array) -> void
 JsValueRef JsWebSocketClass::send(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
-	
+
 	JsValueType type;
 	JS::JsGetValueType(arguments[1], &type);
-	
+
 	auto holder = Get(arguments[0]);
-	
-	DataWriter writer(holder->socket.OutputStream());
+	auto& writer = holder->writer;
+
 	if (type == JsString) {
 		writer.UnicodeEncoding(UnicodeEncoding::Utf8);
 		writer.WriteString(Chakra::GetString(arguments[1]));
