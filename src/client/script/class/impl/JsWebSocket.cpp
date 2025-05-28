@@ -29,8 +29,11 @@ JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor
 		return JS_INVALID_REFERENCE;
 	}
 
+	JsContextRef ctx;
+	JS::JsGetCurrentContext(&ctx);
+
 	// fire JS message received event
-	socket.MessageReceived([holder](const MessageWebSocket& socket, const MessageWebSocketMessageReceivedEventArgs& args) {
+	socket.MessageReceived([ctx, holder](const MessageWebSocket& socket, const MessageWebSocketMessageReceivedEventArgs& args) {
 		DataReader reader = args.GetDataReader();
 		reader.UnicodeEncoding(UnicodeEncoding::Utf8);
 
@@ -38,7 +41,11 @@ JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor
 			// create a string with the received data
 
 			winrt::hstring message = reader.ReadString(reader.UnconsumedBufferLength());
+
+			JsContextRef ctx;
+			JS::JsGetCurrentContext(&ctx);
 			Latite::get().queueForClientThread([=] {
+				Chakra::SetContext(ctx);
 				JsEvented::Event ev{ std::wstring(WebSocketHolder::receiveEventId), {Chakra::MakeString(std::wstring(message)) } };
 				holder->dispatchEvent(ev);
 				});
@@ -56,17 +63,21 @@ JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor
 			bytes.reserve(size);
 
 			for (size_t i = 0; i < buf.Length(); ++i) {
-				bytes[i] = buf.data()[i];
+				bytes.push_back(buf.data()[i]);
 			}
 
+			
 			Latite::get().queueForClientThread([=] {
+				Chakra::SetContext(ctx);
 				JsValueRef array;
+				uint32_t bufferSize;
+
 				JS::JsCreateTypedArray(JsArrayTypeUint8, nullptr, 0, static_cast<unsigned int>(bytes.size()), &array);
 
 				BYTE* chakraData;
-				JS::JsGetTypedArrayStorage(array, &chakraData, nullptr, nullptr, nullptr);
+				JS::JsGetTypedArrayStorage(array, &chakraData, &bufferSize, nullptr, nullptr);
 
-				for (size_t i = 0; i < bytes.size(); ++i) {
+				for (size_t i = 0; i < bufferSize; ++i) {
 					chakraData[i] = bytes[i];
 				}
 
@@ -77,8 +88,10 @@ JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor
 		});
 
 	// fire JS websocket closed event
-	socket.Closed([holder](const IWebSocket& socket, const WebSocketClosedEventArgs& args) {
+	socket.Closed([ctx, holder](const IWebSocket& socket, const WebSocketClosedEventArgs& args) {
+		
 		Latite::get().queueForClientThread([=] {
+			Chakra::SetContext(ctx);
 			JsEvented::Event ev{ std::wstring(WebSocketHolder::closeEventId), {} };
 			holder->dispatchEvent(ev);
 			});
@@ -130,8 +143,13 @@ JsValueRef JsWebSocketClass::send(JsValueRef callee, bool isConstructor, JsValue
 		return JS_INVALID_REFERENCE;
 	}
 
-	writer.StoreAsync().get();
-	writer.FlushAsync().get();
+	try {
+		writer.StoreAsync().get();
+		writer.FlushAsync().get();
+	}
+	catch (winrt::hresult_error& err) {
+		Chakra::ThrowError(L"Failed to send WebSocket data");
+	}
 
 	return Chakra::GetUndefined();
 }
