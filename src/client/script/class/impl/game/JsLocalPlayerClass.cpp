@@ -2,6 +2,7 @@
 #include "JsLocalPlayerClass.h"
 #include <sdk/common/world/level/HitResult.h>
 #include <client/script/class/impl/JsVec3.h>
+#include <client/script/class/impl/JsVec2.h>
 
 JsValueRef JsLocalPlayerClass::getBreakProgress(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
@@ -96,4 +97,20 @@ JsValueRef JsLocalPlayerClass::getMovementState(JsValueRef callee, bool isConstr
 	Chakra::SetPropertyBool(obj, L"sprintHeld", move->sprintKey);
 
 	return obj;
+}
+
+JsValueRef JsLocalPlayerClass::turn(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsObject} })) return JS_INVALID_REFERENCE;
+	
+	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
+	if (!lp) {
+		Chakra::ThrowError(XW("Invalid local player"));
+		return JS_INVALID_REFERENCE;
+	}
+
+	Vec2 delta = JsVec2::ToVec2(arguments[1]);
+	lp->applyTurnDelta(delta);
+
+	return Chakra::GetUndefined();
 }
