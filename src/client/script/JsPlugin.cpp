@@ -22,8 +22,9 @@ using namespace winrt::Windows::Web::Http::Filters;
 
 
 void JsPlugin::checkTrusted() {
-#ifdef DEBUG
+#ifdef LATITE_DEBUG
 	trusted = true;
+	return;
 #else
 
 	trusted = false;
