@@ -61,9 +61,14 @@ JsValueRef JsLocalPlayerClass::setMovementState(JsValueRef callee, bool isConstr
 
 	auto move = lp->getMoveInputComponent();
 	
-	auto setMoveState = [&](bool& state, const std::wstring& name) {
+	auto setMoveState = [&](auto& state, const std::wstring& name) {
 		if (auto prop = Chakra::GetProperty(obj, name)) {
-			state = Chakra::GetBool(prop);
+			if constexpr (std::is_same_v<bool, std::remove_reference_t<decltype(state)>()>) {
+				state = Chakra::GetBool(prop);
+			}
+			else if constexpr (std::is_floating_point_v<std::remove_reference_t<decltype(state)>()>()) {
+				state = Chakra::GetNumber(prop);
+			}
 		}
 		};
 
@@ -73,6 +78,8 @@ JsValueRef JsLocalPlayerClass::setMovementState(JsValueRef callee, bool isConstr
 	setMoveState(move->right, L"right");
 	setMoveState(move->jump, L"jump");
 	setMoveState(move->sneak, L"sneak");
+	setMoveState(move->joystickX, L"joystickX");
+	setMoveState(move->joystickX, L"joystickY");
 	
 	return obj;
 }
@@ -95,6 +102,8 @@ JsValueRef JsLocalPlayerClass::getMovementState(JsValueRef callee, bool isConstr
 	Chakra::SetPropertyBool(obj, L"jump", move->jump);
 	Chakra::SetPropertyBool(obj, L"sneak", move->sneak);
 	Chakra::SetPropertyBool(obj, L"sprintHeld", move->sprintKey);
+	Chakra::SetPropertyNumber(obj, L"joystickX", move->joystickX);
+	Chakra::SetPropertyNumber(obj, L"joystickY", move->joystickY);
 
 	return obj;
 }
