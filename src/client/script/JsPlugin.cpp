@@ -22,6 +22,10 @@ using namespace winrt::Windows::Web::Http::Filters;
 
 
 void JsPlugin::checkTrusted() {
+#ifdef DEBUG
+	trusted = true;
+#else
+
 	trusted = false;
 	std::string url = "https://raw.githubusercontent.com/Imrglop/Latite-Releases/refs/heads/main/script_hashes.txt";
 	HttpClient client;
@@ -41,12 +45,13 @@ void JsPlugin::checkTrusted() {
 
 	std::istringstream stream(stringResponse);
 	std::string hash;
-	while (std::getline(stream, hash)) {
-		if (currentHash == util::StrToWStr(hash)) {
-			trusted = true;
-			return;
-		}
+	std::getline(stream, hash);
+
+	if (currentHash == util::StrToWStr(hash)) {
+		trusted = true;
+		return;
 	}
+#endif
 }
 
 JsPlugin::JsPlugin(std::wstring const& relPath) {
