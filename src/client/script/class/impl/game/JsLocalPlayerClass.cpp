@@ -61,12 +61,12 @@ JsValueRef JsLocalPlayerClass::setMovementState(JsValueRef callee, bool isConstr
 
 	auto move = lp->getMoveInputComponent();
 	
-	auto setMoveState = [&](auto& state, const std::wstring& name) {
+	auto setMoveState = [&]<typename T>(T& state, const std::wstring& name) {
 		if (auto prop = Chakra::GetProperty(obj, name)) {
-			if constexpr (std::is_same_v<bool, std::remove_reference_t<decltype(state)>()>) {
+			if constexpr (std::is_same_v<bool, T>) {
 				state = Chakra::GetBool(prop);
 			}
-			else if constexpr (std::is_floating_point_v<std::remove_reference_t<decltype(state)>()>()) {
+			else if constexpr (std::is_floating_point_v<T>) {
 				state = Chakra::GetNumber(prop);
 			}
 		}

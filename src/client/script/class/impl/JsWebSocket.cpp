@@ -42,11 +42,10 @@ JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor
 
 			winrt::hstring message = reader.ReadString(reader.UnconsumedBufferLength());
 
-			JsContextRef ctx;
-			JS::JsGetCurrentContext(&ctx);
 			Latite::get().queueForClientThread([=] {
 				Chakra::SetContext(ctx);
-				JsEvented::Event ev{ std::wstring(WebSocketHolder::receiveEventId), {Chakra::MakeString(std::wstring(message)) } };
+				auto wstr = std::wstring(message);
+				JsEvented::Event ev{ std::wstring(WebSocketHolder::receiveEventId), {Chakra::MakeString(wstr) } };
 				holder->dispatchEvent(ev);
 				});
 
