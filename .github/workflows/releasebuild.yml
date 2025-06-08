@@ -59,4 +59,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Latite-Nightly
-        path: D:\a\Latite\Latite\x64\Nightly\LatiteRewrite.dll
+        path: ${{ github.workspace }}/x64/Nightly/LatiteRewrite.dll
