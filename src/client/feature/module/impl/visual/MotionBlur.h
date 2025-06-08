@@ -13,7 +13,7 @@ public:
 	void onEnable() override;
 	void onDisable() override;
 
-	void onRender(Event& genericEv);
+	void onRenderOverlay(Event& genericEv);
 	void onCleanup(Event& genericEv);
 	void onRendererInit(Event& genericEv);
 

@@ -14,7 +14,7 @@ MotionBlur::MotionBlur() : Module("MotionBlur", LocalizeString::get("client.modu
         FloatValue(2.f), FloatValue(16.f), FloatValue(1.f));
 
     listen<RendererCleanupEvent>(&MotionBlur::onCleanup);
-    listen<RenderOverlayEvent>(&MotionBlur::onRender, true, 10);
+    listen<RenderOverlayEvent>(&MotionBlur::onRenderOverlay, true, 100);
     listen<RendererInitEvent>(&MotionBlur::onRendererInit, true);
 }
 
@@ -43,7 +43,7 @@ void MotionBlur::onRendererInit(Event&) {
     clearFrames();
 }
 
-void MotionBlur::onRender(Event& genericEv) {
+void MotionBlur::onRenderOverlay(Event& genericEv) {
     if (!this->isEnabled()) {
         return;
     }
