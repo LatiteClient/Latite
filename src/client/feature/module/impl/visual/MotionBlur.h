@@ -3,6 +3,7 @@
 #include "client/event/impl/RenderOverlayEvent.h"
 #include "client/event/impl/RendererCleanupEvent.h"
 #include "../../Module.h"
+#include <vector>
 
 class MotionBlur : public Module {
 public:
@@ -15,10 +16,19 @@ public:
 	void onRender(Event& genericEv);
 	void onCleanup(Event& genericEv);
 	void onRendererInit(Event& genericEv);
+
 private:
-	std::vector<ID2D1Bitmap1*> motionBlurList = {};
-	ID2D1Bitmap1* mbBitmap = nullptr;
-	ID2D1Bitmap1* oBitmap = nullptr;
-	ValueType intensity = FloatValue(7.f);
-	ValueType antiBleed = FloatValue(0.3f);
+	void clearFrames();
+
+	// For "Pixel average" mode
+	std::vector<ID2D1Bitmap1*> m_frameHistory;
+
+	// For "Single frame" mode
+	ID2D1Bitmap1* m_previousFrameBitmap = nullptr;
+
+	bool m_lastModeWasPixelAverage = false;
+
+	ValueType usePixelAverage = BoolValue(true);
+	ValueType intensity = FloatValue(5.f);
+	ValueType opacity = FloatValue(5.f);
 };
