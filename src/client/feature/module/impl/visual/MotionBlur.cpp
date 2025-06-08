@@ -23,6 +23,7 @@ void MotionBlur::clearFrames() {
     for (auto& frame : m_frameHistory) {
         SafeRelease(&frame);
     }
+	
     m_frameHistory.clear();
 }
 
