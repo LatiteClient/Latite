@@ -7,8 +7,20 @@ name: Build Latite from source
 on:
   push:
     branches: [ "master" ]
+    paths:
+      - '**.cpp'
+      - '**.h'
+      - '**.hpp'
+      - '**.vcxproj'
+      - '**.sln'
   pull_request:
     branches: [ "master" ]
+    paths:
+      - '**.cpp'
+      - '**.h'
+      - '**.hpp'
+      - '**.vcxproj'
+      - '**.sln'
 
 env:
   # Path to the solution file relative to the root of the project.
