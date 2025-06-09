@@ -1,4 +1,6 @@
 #pragma once
+#include "sdk/Util.h"
+#include "NetworkSystem.h"
 #include "Packet.h"
 
 namespace SDK {
@@ -9,5 +11,7 @@ namespace SDK {
 		virtual void send(Packet*) = 0;
 		virtual void sendTo(void* networkIdentifier, uint8_t subClientId, Packet* pkt);
 		virtual void sendToServer(Packet* pkt) = 0;
+
+		CLASS_FIELD(NetworkSystem*, networkSystem, 0x20);
 	};
 }

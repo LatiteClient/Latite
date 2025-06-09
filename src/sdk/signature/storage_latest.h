@@ -170,10 +170,6 @@ public:
 		"E8 ? ? ? ? 48 8B 8B ? ? ? ? BA ? ? ? ? 48 83 C4"_sig,
 		"MinecraftGame::_update"};
 
-	inline static SigImpl RakNetConnector_tick{[](memory::signature_store&, uintptr_t res) { return res; },
-		"4C 8B DC 49 89 5B ? 49 89 6B ? 56 57 41 56 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 8B F1 49 C7 43"_sig,
-		"RakNetConnector::tick"};
-	
 	// ref: your GPU ("AMD Radeon RX 5500")
 	inline static SigImpl GpuInfo{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 		"48 8d 15 ? ? ? ? 48 c7 c7 ? ? ? ? 4c 8b c7 49 ff c0 42 80 3c 02 ? 75 ? 48 8d 4c 24"_sig,
