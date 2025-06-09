@@ -16,7 +16,6 @@ namespace {
 	std::shared_ptr<Hook> OnClickHook;
 	std::shared_ptr<Hook> LoadLibraryWHook;
 	std::shared_ptr<Hook> LoadLibraryAHook;
-	std::shared_ptr<Hook> ConnectorTickHook;
 	std::shared_ptr<Hook> AveragePingHook;
 	std::shared_ptr<Hook> TurnDeltaHook;
 	std::shared_ptr<Hook> MoveInputHandler_tickHook;
@@ -161,13 +160,6 @@ BOOL __stdcall GenericHooks::hkLoadLibraryW(LPCWSTR lib) {
 	abort();
 #endif
 	return 0;
-}
-
-void* __fastcall GenericHooks::RakNetConnector_tick(void* connector) {
-	if (Latite::isMainThread()) {
-		SDK::RakNetConnector::setInstance(reinterpret_cast<SDK::RakNetConnector*>(connector));
-	}
-	return ConnectorTickHook->oFunc<decltype(&RakNetConnector_tick)>()(connector);
 }
 
 int __fastcall GenericHooks::RakPeer_getAveragePing(void* obj, char* guidOrAddy) {
@@ -422,8 +414,6 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	Keyboard_feedHook = addHook(Signatures::Keyboard_feed.result, Keyboard_feed, "Keyboard::feed");
 
 	OnClickHook = addHook(Signatures::onClick.result, onClick, "onClick");
-
-	ConnectorTickHook = addHook(Signatures::RakNetConnector_tick.result, RakNetConnector_tick, "RakNetConnector::tick");
 
 	AveragePingHook = addHook(Signatures::RakPeer_GetAveragePing.result, RakPeer_getAveragePing, "RakPeer::GetAveragePing");
 	

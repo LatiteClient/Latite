@@ -220,7 +220,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(ScreenView_setupAndRender),
         MVSIG(KeyMap),
         MVSIG(MinecraftGame__update),
-        MVSIG(RakNetConnector_tick),
         MVSIG(GpuInfo),
         MVSIG(RakPeer_GetAveragePing),
         MVSIG(MoveInputHandler_tick),

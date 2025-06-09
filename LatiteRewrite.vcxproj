@@ -653,6 +653,7 @@
     <ClInclude Include="src\sdk\common\nbt\CompoundTag.h" />
     <ClInclude Include="src\sdk\common\nbt\Tag.h" />
     <ClInclude Include="src\sdk\common\network\MinecraftPackets.h" />
+    <ClInclude Include="src\sdk\common\network\NetworkSystem.h" />
     <ClInclude Include="src\sdk\common\network\Packet.h" />
     <ClInclude Include="src\sdk\common\network\PacketSender.h" />
     <ClInclude Include="src\sdk\common\network\packet\ActorEventPacket.h" />
@@ -661,6 +662,7 @@
     <ClInclude Include="src\sdk\common\network\packet\SetTitlePacket.h" />
     <ClInclude Include="src\sdk\common\network\packet\TextPacket.h" />
     <ClInclude Include="src\sdk\common\network\RakPeer.h" />
+    <ClInclude Include="src\sdk\common\network\RemoteConnectorComposite.h" />
     <ClInclude Include="src\sdk\common\util\BasicDataOutput.h" />
     <ClInclude Include="src\sdk\common\util\BasicPrintStream.h" />
     <ClInclude Include="src\sdk\common\util\MolangVariable.h" />
@@ -890,6 +892,7 @@
     <ClCompile Include="src\sdk\common\network\packet\CommandRequestPacket.cpp" />
     <ClCompile Include="src\sdk\common\network\packet\SetScorePacket.cpp" />
     <ClCompile Include="src\sdk\common\network\packet\TextPacket.cpp" />
+    <ClCompile Include="src\sdk\common\network\RakNetConnector.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\Actor.cpp" />
     <ClCompile Include="src\sdk\common\world\actor\player\Player.cpp" />
     <ClCompile Include="src\sdk\common\world\ItemStackBase.cpp" />

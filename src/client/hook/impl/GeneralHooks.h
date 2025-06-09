@@ -14,7 +14,6 @@ class GenericHooks : public HookGroup {
     static void __fastcall Keyboard_feed(int key, bool isDown);
     static void __fastcall onClick(ClickMap*, char clickType, char isDownWheelDelta, uintptr_t a4, int16_t a5, int16_t a6, int16_t, char a8);
     static BOOL __stdcall hkLoadLibraryW(LPCWSTR lib);
-    static void* __fastcall RakNetConnector_tick(void* connector);
     static int __fastcall RakPeer_getAveragePing(void* obj, char* guidOrAddy);
     static void __fastcall LocalPlayer_applyTurnDelta(void* obj, Vec2& vec);
     static void __fastcall MoveInputHandler_tick(void* obj, void* proxy);
