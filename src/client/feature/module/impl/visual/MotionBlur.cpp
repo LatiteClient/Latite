@@ -9,7 +9,7 @@ MotionBlur::MotionBlur() : Module("MotionBlur", LocalizeString::get("client.modu
     LocalizeString::get("client.module.motionBlur.desc"), GAME) {
     addSetting("usePixelAverage", LocalizeString::get("client.module.motionBlur.usePixelAverage.name"), LocalizeString::get("client.module.motionBlur.usePixelAverage.desc"), usePixelAverage);
     addSliderSetting("intensity", LocalizeString::get("client.module.motionBlur.intensity.name"), LocalizeString::get("client.module.motionBlur.intensity.desc"), intensity,
-        FloatValue(0.f), FloatValue(20.f), FloatValue(1.f));
+        FloatValue(0.f), FloatValue(20.f), FloatValue(1.f), "usePixelAverage"_istrue);
     addSliderSetting("opacity", LocalizeString::get("client.module.motionBlur.opacity.name"), LocalizeString::get("client.module.motionBlur.opacity.desc"), opacity,
         FloatValue(2.f), FloatValue(16.f), FloatValue(1.f));
 
