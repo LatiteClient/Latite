@@ -706,6 +706,7 @@
     <ClInclude Include="src\sdk\Version.h" />
     <ClInclude Include="src\util\ChakraUtil.h" />
     <ClInclude Include="src\util\DrawUtil3D.h" />
+    <ClInclude Include="src\util\ErrorHandler.h" />
     <ClInclude Include="src\util\FNV32.h" />
     <ClInclude Include="src\util\DxContext.h" />
     <ClInclude Include="src\util\DxUtil.h" />

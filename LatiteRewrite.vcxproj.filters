@@ -165,6 +165,7 @@
     <ClCompile Include="src\client\feature\module\impl\hud\FrameTimeDisplay.cpp" />
     <ClCompile Include="src\sdk\common\client\game\Options.cpp" />
     <ClCompile Include="src\client\feature\module\impl\misc\BlockGame.cpp" />
+    <ClCompile Include="src\sdk\common\network\RakNetConnector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assets\lang\en_US.json" />
@@ -487,6 +488,9 @@
     <ClInclude Include="src\client\feature\module\impl\hud\FrameTimeDisplay.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\BlockGame.h" />
     <ClInclude Include="src\sdk\common\client\game\Option.h" />
+    <ClInclude Include="src\sdk\common\network\NetworkSystem.h" />
+    <ClInclude Include="src\sdk\common\network\RemoteConnectorComposite.h" />
+    <ClInclude Include="src\util\ErrorHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />
