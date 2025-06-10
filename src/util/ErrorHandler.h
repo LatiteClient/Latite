@@ -1,14 +1,20 @@
 #pragma once
 
 #ifdef LATITE_DEBUG
-#include <windows.h>
+#include "util/ExceptionHandler.h"
+#include "util/Logger.h"
 
-int LogCrashDetails(struct _EXCEPTION_POINTERS* exceptionInfo);
+int LogCrashDetails(StructuredException& ex);
 
-#define BEGIN_ERROR_HANDLER __try {
+#define BEGIN_ERROR_HANDLER try {
 
 #define END_ERROR_HANDLER \
-    } __except(LogCrashDetails(GetExceptionInformation())) { \
+    } catch (StructuredException& ex) { \
+        LogCrashDetails(ex); \
+    } catch (const std::exception& e) { \
+        Logger::Fatal("A C++ exception occurred: {}", e.what()); \
+    } catch (...) { \
+        Logger::Fatal("An unknown exception occurred."); \
     }
 
 #else

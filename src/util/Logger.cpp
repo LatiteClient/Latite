@@ -10,7 +10,7 @@
 #include <dbghelp.h>
 #include <string>
 
-#pragma comment(lib, "dbghelp.lib")
+#include "util/ExceptionHandler.h"
 
 std::string GenerateStackTrace(EXCEPTION_POINTERS* exceptionInfo) {
     HANDLE process = GetCurrentProcess();
@@ -89,8 +89,9 @@ std::string GenerateStackTrace(EXCEPTION_POINTERS* exceptionInfo) {
     return stackTraceStr;
 }
 
-int LogCrashDetails(EXCEPTION_POINTERS* exceptionInfo) {
-    Logger::Fatal("An unrecoverable error occurred (unhandled exception).");
+int LogCrashDetails(StructuredException& ex) {
+    EXCEPTION_POINTERS* exceptionInfo = ex.getExceptionPointers();
+
     Logger::Fatal("Exception Code: {:#x}", exceptionInfo->ExceptionRecord->ExceptionCode);
     Logger::Fatal("Exception Address: {:#x}", (DWORD64)exceptionInfo->ExceptionRecord->ExceptionAddress);
 
