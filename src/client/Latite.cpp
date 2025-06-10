@@ -45,6 +45,8 @@
 #include <sdk/common/client/gui/controls/VisualTree.h>
 #include <sdk/common/client/gui/controls/UIControl.h>
 
+#include "util/ErrorHandler.h"
+
 using namespace winrt;
 using namespace winrt::Windows::Web::Http;
 using namespace winrt::Windows::Web::Http::Filters;
@@ -95,6 +97,7 @@ namespace shared {
 )()
 
 DWORD __stdcall startThread(HINSTANCE dll) {
+    BEGIN_ERROR_HANDLER
     // Needed for Logger
     new (messageSinkBuf) ClientMessageQueue;
     new (eventing) Eventing();
@@ -262,6 +265,13 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(RenderMaterialGroup__common),
         MVSIG(GuiData_displayClientMessage)
     };
+
+    /*
+    int* ptr = new int;
+    *ptr = 10;
+    delete ptr;
+    std::cout << *ptr << std::endl; // Error: ptr is now invalid
+    */
     
     new (configMgrBuf) ConfigManager();
     if (!Latite::getConfigManager().loadMaster()) {
@@ -323,6 +333,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     Logger::Info(XOR_STRING("Initialized Latite Client"));
     return 0ul;
+    END_ERROR_HANDLER
 }
 
 BOOL WINAPI DllMain(
@@ -330,15 +341,10 @@ BOOL WINAPI DllMain(
     DWORD fdwReason,     // reason for calling function
     LPVOID)  // reserved
 {
+    BEGIN_ERROR_HANDLER
     if (GetModuleHandleA("Minecraft.Windows.exe") != GetModuleHandleA(NULL)) return TRUE;
 
     if (fdwReason == DLL_PROCESS_ATTACH) {
-
-        if (hasInjected) {
-            FreeLibrary(hinstDLL);
-            return TRUE;
-        }
-
         hasInjected = true;
 
         DisableThreadLibraryCalls(hinstDLL);
@@ -374,6 +380,7 @@ BOOL WINAPI DllMain(
         Logger::Info("Latite Client detached.");
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
+    END_ERROR_HANDLER
 }
 
 Latite& Latite::get() noexcept {
