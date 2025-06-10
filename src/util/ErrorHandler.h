@@ -13,10 +13,13 @@ void LogExceptionDetails(const std::exception& e);
 #define END_ERROR_HANDLER \
     } catch (StructuredException& ex) { \
         LogExceptionDetails(ex); \
+        ExitProcess(1); \
     } catch (const std::exception& e) { \
         LogExceptionDetails(e); \
+        ExitProcess(1); \
     } catch (...) { \
         LogExceptionDetails(std::runtime_error("An unknown exception occurred.")); \
+        ExitProcess(1); \
     }
 
 #else
