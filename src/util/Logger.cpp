@@ -16,9 +16,13 @@ std::string GenerateStackTrace(EXCEPTION_POINTERS* exceptionInfo) {
     HANDLE process = GetCurrentProcess();
     HANDLE thread = GetCurrentThread();
 
-    SymSetOptions(SYMOPT_UNDNAME | SYMOPT_LOAD_LINES | SYMOPT_FAIL_CRITICAL_ERRORS);
+    SymSetOptions(SYMOPT_UNDNAME | SYMOPT_LOAD_LINES | SYMOPT_DEFERRED_LOADS | SYMOPT_FAIL_CRITICAL_ERRORS);
+    if (!SymInitialize(process, NULL, TRUE)) {
+        Logger::Warn("GenerateStackTrace: SymInitialize failed with error code: {}", GetLastError());
+        return "Stack trace generation failed: SymInitialize error.";
+    }
 
-    char dllPath[MAX_PATH];
+    char modulePathRaw[MAX_PATH];
     HMODULE hModule = NULL;
 
     GetModuleHandleExA(
@@ -27,13 +31,24 @@ std::string GenerateStackTrace(EXCEPTION_POINTERS* exceptionInfo) {
         &hModule
     );
 
-    GetModuleFileNameA(hModule, dllPath, sizeof(dllPath));
+    GetModuleFileNameA(hModule, modulePathRaw, sizeof(modulePathRaw));
 
-    std::string searchPath = std::filesystem::path(dllPath).parent_path().string();
+    std::filesystem::path modulePath(modulePathRaw);
+    std::filesystem::path moduleDir = modulePath.parent_path();
+    std::string moduleName = modulePath.stem().string();
 
-    if (!SymInitialize(process, searchPath.c_str(), TRUE)) {
-        Logger::Warn("GenerateStackTrace: SymInitialize failed with error code: {}", GetLastError());
-        return "Stack trace generation failed: SymInitialize error.";
+    std::filesystem::path strippedPdbPath = moduleDir / (moduleName + ".stripped.pdb");
+    std::filesystem::path fullPdbPath = moduleDir / (moduleName + ".pdb");
+
+    DWORD64 dllBaseAddr = SymGetModuleBase64(process, (DWORD64)hModule);
+
+    if (!SymLoadModuleEx(process, NULL, strippedPdbPath.string().c_str(), NULL, dllBaseAddr, 0, NULL, 0)) {
+        Logger::Warn("Could not find or load stripped PDB at '{}'. Falling back to full PDB. Error: {}",
+                     strippedPdbPath.string(), GetLastError());
+        if (!SymLoadModuleEx(process, NULL, fullPdbPath.string().c_str(), NULL, dllBaseAddr, 0, NULL, 0)) {
+            Logger::Warn("Could not find or load full PDB either at '{}'. Stack trace will not have symbols. Error: {}",
+                         fullPdbPath.string(), GetLastError());
+        }
     }
 
     STACKFRAME64 stackFrame;
@@ -92,6 +107,7 @@ std::string GenerateStackTrace(EXCEPTION_POINTERS* exceptionInfo) {
 int LogCrashDetails(StructuredException& ex) {
     EXCEPTION_POINTERS* exceptionInfo = ex.getExceptionPointers();
 
+    Logger::Fatal("An unrecoverable error occurred (unhandled exception).");
     Logger::Fatal("Exception Code: {:#x}", exceptionInfo->ExceptionRecord->ExceptionCode);
     Logger::Fatal("Exception Address: {:#x}", (DWORD64)exceptionInfo->ExceptionRecord->ExceptionAddress);
 
