@@ -3,18 +3,20 @@
 #ifdef LATITE_DEBUG
 #include "util/ExceptionHandler.h"
 #include "util/Logger.h"
+#include <stdexcept>
 
-int LogCrashDetails(StructuredException& ex);
+void LogExceptionDetails(StructuredException& ex);
+void LogExceptionDetails(const std::exception& e);
 
 #define BEGIN_ERROR_HANDLER try {
 
 #define END_ERROR_HANDLER \
     } catch (StructuredException& ex) { \
-        LogCrashDetails(ex); \
+        LogExceptionDetails(ex); \
     } catch (const std::exception& e) { \
-        Logger::Fatal("A C++ exception occurred: {}", e.what()); \
+        LogExceptionDetails(e); \
     } catch (...) { \
-        Logger::Fatal("An unknown exception occurred."); \
+        LogExceptionDetails(std::runtime_error("An unknown exception occurred.")); \
     }
 
 #else

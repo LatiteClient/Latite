@@ -2,66 +2,74 @@
 #include "Logger.h"
 #include "util/Util.h"
 #include <ctime>
+
 #include "client/Latite.h"
 #include "client/misc/ClientMessageQueue.h"
 
 #ifdef LATITE_DEBUG
 #include <windows.h>
 #include <dbghelp.h>
+#include <psapi.h>
 #include <string>
+#include <iomanip>
+#include <sstream>
 
-#include "util/ExceptionHandler.h"
-
-std::string GenerateStackTrace(EXCEPTION_POINTERS* exceptionInfo) {
+std::string GenerateStackTrace(EXCEPTION_POINTERS* exceptionInfo = nullptr) {
     HANDLE process = GetCurrentProcess();
     HANDLE thread = GetCurrentThread();
 
-    SymSetOptions(SYMOPT_UNDNAME | SYMOPT_LOAD_LINES | SYMOPT_DEFERRED_LOADS | SYMOPT_FAIL_CRITICAL_ERRORS);
-    if (!SymInitialize(process, NULL, TRUE)) {
-        Logger::Warn("GenerateStackTrace: SymInitialize failed with error code: {}", GetLastError());
-        return "Stack trace generation failed: SymInitialize error.";
-    }
+    SymSetOptions(SYMOPT_UNDNAME | SYMOPT_LOAD_LINES | SYMOPT_FAIL_CRITICAL_ERRORS | SYMOPT_DEBUG);
 
-    char modulePathRaw[MAX_PATH];
+    char dllPath[MAX_PATH];
     HMODULE hModule = NULL;
-
     GetModuleHandleExA(
         GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
         (LPCSTR)&GenerateStackTrace,
         &hModule
+
     );
 
-    GetModuleFileNameA(hModule, modulePathRaw, sizeof(modulePathRaw));
+    GetModuleFileNameA(hModule, dllPath, sizeof(dllPath));
+    std::string searchPath = std::filesystem::path(dllPath).parent_path().string();
 
-    std::filesystem::path modulePath(modulePathRaw);
-    std::filesystem::path moduleDir = modulePath.parent_path();
-    std::string moduleName = modulePath.stem().string();
+    if (!SymInitialize(process, searchPath.c_str(), FALSE)) {
+        Logger::Warn("GenerateStackTrace: SymInitialize failed with error code: {}", GetLastError());
+        return "Stack trace generation failed: SymInitialize error.";
+    }
 
-    std::filesystem::path strippedPdbPath = moduleDir / (moduleName + ".stripped.pdb");
-    std::filesystem::path fullPdbPath = moduleDir / (moduleName + ".pdb");
+    DWORD64 baseAddress = (DWORD64)hModule;
 
-    DWORD64 dllBaseAddr = SymGetModuleBase64(process, (DWORD64)hModule);
+    MODULEINFO moduleInfo = { 0 };
+    DWORD dllSize = 0;
+    if (GetModuleInformation(process, hModule, &moduleInfo, sizeof(moduleInfo))) {
+        dllSize = moduleInfo.SizeOfImage;
+    }
 
-    if (!SymLoadModuleEx(process, NULL, strippedPdbPath.string().c_str(), NULL, dllBaseAddr, 0, NULL, 0)) {
-        Logger::Warn("Could not find or load stripped PDB at '{}'. Falling back to full PDB. Error: {}",
-                     strippedPdbPath.string(), GetLastError());
-        if (!SymLoadModuleEx(process, NULL, fullPdbPath.string().c_str(), NULL, dllBaseAddr, 0, NULL, 0)) {
-            Logger::Warn("Could not find or load full PDB either at '{}'. Stack trace will not have symbols. Error: {}",
-                         fullPdbPath.string(), GetLastError());
+    std::string strippedPdbPath = (std::filesystem::path(searchPath) / "LatiteRewrite.stripped.pdb").string();
+    if (!SymLoadModule64(process, NULL, strippedPdbPath.c_str(), NULL, baseAddress, dllSize)) {
+        std::string regularPdbPath = (std::filesystem::path(searchPath) / "LatiteRewrite.pdb").string();
+        if (!SymLoadModule64(process, NULL, regularPdbPath.c_str(), NULL, baseAddress, dllSize)) {
+            SymLoadModule64(process, NULL, dllPath, NULL, baseAddress, dllSize);
         }
+    }
+
+    SymRefreshModuleList(process);
+
+    CONTEXT context;
+    if (exceptionInfo != nullptr) {
+        context = *exceptionInfo->ContextRecord;
+    } else {
+        RtlCaptureContext(&context);
     }
 
     STACKFRAME64 stackFrame;
     memset(&stackFrame, 0, sizeof(STACKFRAME64));
-    DWORD machineType;
-    CONTEXT* context = exceptionInfo->ContextRecord;
-
-    machineType = IMAGE_FILE_MACHINE_AMD64;
-    stackFrame.AddrPC.Offset = context->Rip;
+    DWORD machineType = IMAGE_FILE_MACHINE_AMD64;
+    stackFrame.AddrPC.Offset = context.Rip;
     stackFrame.AddrPC.Mode = AddrModeFlat;
-    stackFrame.AddrFrame.Offset = context->Rbp;
+    stackFrame.AddrFrame.Offset = context.Rbp;
     stackFrame.AddrFrame.Mode = AddrModeFlat;
-    stackFrame.AddrStack.Offset = context->Rsp;
+    stackFrame.AddrStack.Offset = context.Rsp;
     stackFrame.AddrStack.Mode = AddrModeFlat;
 
     std::string stackTraceStr = "\n--- Stack Trace ---\n";
@@ -71,32 +79,27 @@ std::string GenerateStackTrace(EXCEPTION_POINTERS* exceptionInfo) {
     symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
     symbol->MaxNameLen = MAX_SYM_NAME;
 
-    while (StackWalk64(machineType, process, thread, &stackFrame, context, NULL, SymFunctionTableAccess64,
-                       SymGetModuleBase64, NULL)) {
+    while (StackWalk64(machineType, process, thread, &stackFrame, &context, NULL, SymFunctionTableAccess64,
+        SymGetModuleBase64, NULL)) {
         std::string frameStr = "";
-
-        IMAGEHLP_LINE64 line;
-        memset(&line, 0, sizeof(IMAGEHLP_LINE64));
-        line.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
-        DWORD lineDisplacement = 0;
-
-        char buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME * sizeof(TCHAR)];
-        PSYMBOL_INFO symbol = (PSYMBOL_INFO)buffer;
-        symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-        symbol->MaxNameLen = MAX_SYM_NAME;
         DWORD64 displacement = 0;
 
         if (SymFromAddr(process, stackFrame.AddrPC.Offset, &displacement, symbol)) {
             frameStr += "at " + std::string(symbol->Name);
 
+            IMAGEHLP_LINE64 line;
+            memset(&line, 0, sizeof(IMAGEHLP_LINE64));
+            line.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
+            DWORD lineDisplacement = 0;
             if (SymGetLineFromAddr64(process, stackFrame.AddrPC.Offset, &lineDisplacement, &line)) {
                 frameStr += " in " + std::string(line.FileName) + ":" + std::to_string(line.LineNumber);
             }
         }
         else {
-            frameStr += "at [unknown function] (0x" + std::to_string(stackFrame.AddrPC.Offset) + ")";
+            std::stringstream ss;
+            ss << "0x" << std::hex << std::setfill('0') << std::setw(8) << stackFrame.AddrPC.Offset;
+            frameStr += "at [unknown function] (" + ss.str() + ")";
         }
-
         stackTraceStr += frameStr + "\n";
     }
 
@@ -104,10 +107,10 @@ std::string GenerateStackTrace(EXCEPTION_POINTERS* exceptionInfo) {
     return stackTraceStr;
 }
 
-int LogCrashDetails(StructuredException& ex) {
+void LogExceptionDetails(StructuredException& ex) {
     EXCEPTION_POINTERS* exceptionInfo = ex.getExceptionPointers();
 
-    Logger::Fatal("An unrecoverable error occurred (unhandled exception).");
+    Logger::Fatal("An unrecoverable SEH exception occurred.");
     Logger::Fatal("Exception Code: {:#x}", exceptionInfo->ExceptionRecord->ExceptionCode);
     Logger::Fatal("Exception Address: {:#x}", (DWORD64)exceptionInfo->ExceptionRecord->ExceptionAddress);
 
@@ -116,8 +119,16 @@ int LogCrashDetails(StructuredException& ex) {
 
     // scuffed way to hope the file is written before termination
     Sleep(1000);
+}
 
-    return EXCEPTION_EXECUTE_HANDLER;
+void LogExceptionDetails(const std::exception& e) {
+    Logger::Fatal("An unrecoverable C++ exception occurred: {}", e.what());
+
+    std::string stackTrace = GenerateStackTrace();
+    Logger::Fatal(stackTrace);
+
+    // scuffed way to hope the file is written before termination
+    Sleep(1000);
 }
 #endif
 
