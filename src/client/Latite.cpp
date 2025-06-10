@@ -265,13 +265,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(RenderMaterialGroup__common),
         MVSIG(GuiData_displayClientMessage)
     };
-
-    /*
-    int* ptr = new int;
-    *ptr = 10;
-    delete ptr;
-    std::cout << *ptr << std::endl; // Error: ptr is now invalid
-    */
     
     new (configMgrBuf) ConfigManager();
     if (!Latite::getConfigManager().loadMaster()) {
