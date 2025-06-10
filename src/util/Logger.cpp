@@ -45,12 +45,11 @@ std::string GenerateStackTrace(EXCEPTION_POINTERS* exceptionInfo = nullptr) {
         dllSize = moduleInfo.SizeOfImage;
     }
 
-    std::string strippedPdbPath = (std::filesystem::path(searchPath) / "LatiteRewrite.stripped.pdb").string();
-    if (!SymLoadModule64(process, NULL, strippedPdbPath.c_str(), NULL, baseAddress, dllSize)) {
-        std::string regularPdbPath = (std::filesystem::path(searchPath) / "LatiteRewrite.pdb").string();
-        if (!SymLoadModule64(process, NULL, regularPdbPath.c_str(), NULL, baseAddress, dllSize)) {
-            SymLoadModule64(process, NULL, dllPath, NULL, baseAddress, dllSize);
-        }
+    std::string regularPdbPath = (std::filesystem::path(searchPath) / "LatiteRewrite.pdb").string();
+    if (!SymLoadModule64(process, NULL, regularPdbPath.c_str(), NULL, baseAddress, dllSize)) {
+        Logger::Warn(
+            "Could not find or load PDB either at {}. Stack trace will not have symbols. System error code: {}",
+            regularPdbPath, GetLastError());
     }
 
     SymRefreshModuleList(process);
