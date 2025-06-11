@@ -57,7 +57,7 @@ public:
 		if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
 		if (!Chakra::VerifyParameters({ {arguments[1], JsString} })) return JS_INVALID_REFERENCE;
 
-		if (!JsScript::getThis()->getPlugin()->hasPermission(JsPlugin::UserPermission::SYSTEM_ACCESS)) {
+		if (!JsScript::getThis()->getPlugin()->isTrusted() && !JsScript::getThis()->getPlugin()->hasPermission(JsPlugin::UserPermission::SYSTEM_ACCESS)) {
 			return Chakra::GetNull();
 		}
 
@@ -108,14 +108,13 @@ public:
 			return JS_INVALID_REFERENCE;
 		}
 
-		for (auto& banned : banList) {
-			if (proc == banned) {
-#ifdef LATITE_DEBUG
-				Chakra::ThrowError(util::StrToWStr(XOR_STRING("You cannot use this function.")));
-#endif
-				return JS_INVALID_REFERENCE;
+		if (!JsScript::getThis()->getPlugin()->isTrusted())
+			for (auto& banned : banList) {
+				if (proc == banned) {
+					Chakra::ThrowError(XW("This function is banned in non-trusted plugins."));
+					return JS_INVALID_REFERENCE;
+				}
 			}
-		}
 
 		std::array<void*, 15> args = {};
 		for (size_t i = 0; i < args.size(); i++) {

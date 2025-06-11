@@ -34,6 +34,8 @@
 #include "class/impl/JsCommandClass.h"
 #include "class/impl/JsNativeModule.h"
 #include "class/impl/JsScreenClass.h"
+#include "class/impl/JsWebSocket.h"
+
 #include "class/impl/game/JsEntityClass.h"
 #include "class/impl/game/JsPlayerClass.h"
 #include "class/impl/game/JsLocalPlayerClass.h"
@@ -471,6 +473,7 @@ namespace {
 
 void JsScript::loadScriptObjects() {
 	Chakra::SetContext(ctx);
+
 	int i = 0;
 	this->objects.clear();
 	this->objects.push_back(std::make_shared<ClientScriptingObject>(i++));
@@ -499,6 +502,7 @@ void JsScript::loadScriptObjects() {
 	this->classes.push_back(std::make_shared<JsNativeModule>(this));
 	this->classes.push_back(std::make_shared<JsBlock>(this));
 	this->classes.push_back(std::make_shared<JsScreenClass>(this));
+	this->classes.push_back(std::make_shared<JsWebSocketClass>(this));
 	JsErrorCode err;
 
 	JsValueRef globalObj = Chakra::GetGlobalObject();

@@ -26,7 +26,7 @@ public:
 		}
 	};
 
-	std::map<std::wstring, std::vector<std::pair<JsValueRef, JsContextRef>>> eventListeners = {};
+	std::map<std::wstring_view, std::vector<std::pair<JsValueRef, JsContextRef>>> eventListeners = {};
 
-	JsValueRef dispatchEvent(std::wstring name, Event& ev);
+	JsValueRef dispatchEvent(Event& ev);
 };

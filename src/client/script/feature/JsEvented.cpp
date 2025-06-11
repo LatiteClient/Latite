@@ -3,8 +3,8 @@
 #include "client/Latite.h"
 #include "client/script/PluginManager.h"
 
-JsValueRef JsEvented::dispatchEvent(std::wstring name, Event& ev) {
-	for (auto& evs : this->eventListeners[name]) {
+JsValueRef JsEvented::dispatchEvent(Event& ev) {
+	for (auto& evs : this->eventListeners[ev.name]) {
 		Chakra::SetContext(evs.second);
 
 		ev.arguments.insert(ev.arguments.begin(), evs.first);

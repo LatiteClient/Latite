@@ -594,6 +594,7 @@
     <ClInclude Include="src\client\script\class\impl\JsTextureClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsVec2.h" />
     <ClInclude Include="src\client\script\class\impl\JsVec3.h" />
+    <ClInclude Include="src\client\script\class\impl\JsWebSocket.h" />
     <ClInclude Include="src\client\script\class\JsClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsCommandClass.h" />
     <ClInclude Include="src\client\script\class\JsWrapperClass.h" />
@@ -849,6 +850,7 @@
     <ClCompile Include="src\client\script\class\impl\JsModuleClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsSettingClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsTextModuleClass.cpp" />
+    <ClCompile Include="src\client\script\class\impl\JsWebSocket.cpp" />
     <ClCompile Include="src\client\script\event\ScriptListener.cpp" />
     <ClCompile Include="src\client\script\feature\JsEvented.cpp" />
     <ClCompile Include="src\client\script\interop\classes\JsEntity.cpp" />
@@ -882,6 +884,7 @@
     <ClCompile Include="src\sdk\common\client\gui\controls\UIControl.cpp" />
     <ClCompile Include="src\sdk\common\client\gui\screens\ContainerScreenController.cpp" />
     <ClCompile Include="src\sdk\common\client\input\RemappingLayout.cpp" />
+    <ClCompile Include="src\sdk\common\client\player\LocalPlayer.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\game\BaseActorRenderContext.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\game\LevelRendererPlayer.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\ItemRenderer.cpp" />
