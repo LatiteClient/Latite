@@ -34,7 +34,18 @@ JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor
 
 	// fire JS message received event
 	socket.MessageReceived([ctx, holder](const MessageWebSocket& socket, const MessageWebSocketMessageReceivedEventArgs& args) {
-		DataReader reader = args.GetDataReader();
+
+		try {
+			args.GetDataReader();
+		}
+		catch (winrt::hresult_error& err) {
+			// Should be because the websocket server was closed abnormally. We don't need to do anything here.
+			return;
+		}
+		
+		auto reader = args.GetDataReader();
+		
+		
 		reader.UnicodeEncoding(UnicodeEncoding::Utf8);
 
 		if (socket.Control().MessageType() == SocketMessageType::Utf8) {
@@ -101,7 +112,7 @@ JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor
 		socket.ConnectAsync(Uri(url)).get();
 	}
 	catch (winrt::hresult_error&) {
-		Chakra::ThrowError(L"Unable to connect to websocket server");
+		Chakra::ThrowError(L"Unable to connect to WebSocket server");
 		return JS_INVALID_REFERENCE;
 	}
 
