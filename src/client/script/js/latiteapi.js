@@ -141,11 +141,8 @@ util = {
         return str;
     },
     stringToBuffer: function (str) {
-        let buf = new Uint8Array(str.length);
-        for (let i = 0; i < str.length; ++i) {
-            buf[i] = str.charCodeAt(i);
-        }
-        return buf;
+        let arr = encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (s, a) => String.fromCharCode('0x' + a)).split('');
+        return new Uint8Array(arr.map(c => c.charCodeAt(0)));
     }
 };
 
