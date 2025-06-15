@@ -399,6 +399,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="assets\lang\en_US.json" />
+    <ClInclude Include="src\client\event\impl\GetFormattedNameTagEvent.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\BlockGame.h" />
     <ClInclude Include="deps\include\mnemosyne\core\memory_range.hpp" />
     <ClInclude Include="deps\include\mnemosyne\core\vfunc_index.hpp" />

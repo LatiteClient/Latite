@@ -167,6 +167,7 @@
     <ClCompile Include="src\client\feature\module\impl\misc\BlockGame.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsWebSocket.cpp" />
     <ClCompile Include="src\sdk\common\client\player\LocalPlayer.cpp" />
+    <ClCompile Include="src\sdk\common\network\RakNetConnector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assets\lang\en_US.json" />
@@ -490,6 +491,9 @@
     <ClInclude Include="src\client\feature\module\impl\misc\BlockGame.h" />
     <ClInclude Include="src\sdk\common\client\game\Option.h" />
     <ClInclude Include="src\client\script\class\impl\JsWebSocket.h" />
+    <ClInclude Include="src\sdk\common\network\NetworkSystem.h" />
+    <ClInclude Include="src\sdk\common\network\RemoteConnectorComposite.h" />
+    <ClInclude Include="src\client\event\impl\GetFormattedNameTagEvent.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />
