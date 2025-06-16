@@ -7,6 +7,7 @@ Nickname::Nickname() : Module("Nickname", LocalizeString::get("client.module.nic
                LocalizeString::get("client.module.nickname.newNick.desc"), this->nickname);
 
     listen<ClientTextEvent>((EventListenerFunc)&Nickname::onClientTextPacket);
+    listen<GetFormattedNameTagEvent>((EventListenerFunc)&Nickname::onGetFormattedNameTag);
 }
 
 void Nickname::onClientTextPacket(Event& evG) {
@@ -31,4 +32,9 @@ void Nickname::onClientTextPacket(Event& evG) {
 
     textPacket->str = message;
     textPacket->source = source;
+}
+
+void Nickname::onGetFormattedNameTag(Event& evG) {
+    GetFormattedNameTagEvent& ev = reinterpret_cast<GetFormattedNameTagEvent&>(evG);
+    *ev.getNametag() = util::WStrToStr(std::get<TextValue>(this->nickname).str);
 }
