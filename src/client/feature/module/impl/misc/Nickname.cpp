@@ -36,5 +36,22 @@ void Nickname::onClientTextPacket(Event& evG) {
 
 void Nickname::onGetFormattedNameTag(Event& evG) {
     GetFormattedNameTagEvent& ev = reinterpret_cast<GetFormattedNameTagEvent&>(evG);
-    *ev.getNametag() = util::WStrToStr(std::get<TextValue>(this->nickname).str);
+
+    std::string nickname = util::WStrToStr(std::get<TextValue>(this->nickname).str);
+
+    if (nickname.empty() || !SDK::ClientInstance::get()->getLocalPlayer()) {
+        return;
+    }
+
+    std::string& currentNametag = *ev.getNametag();
+    const std::string& originalName = SDK::ClientInstance::get()->getLocalPlayer()->playerName;
+
+    auto replaceAll = [](std::string& s, std::string from, std::string to) {
+        if (!from.empty())
+            for (size_t pos = 0; (pos = s.find(from, pos)) != std::string::npos; pos += to.size())
+                s.replace(pos, from.size(), to);
+        return s;
+    };
+
+    replaceAll(currentNametag, originalName, nickname);
 }
