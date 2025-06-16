@@ -284,6 +284,10 @@ public:
 		"e8 ? ? ? ? 48 85 c0 0f 84 ? ? ? ? 48 8b 08 48 8b 01 ba ? ? ? ? 48 8b 40 ? ff 15 ? ? ? ? 48 8b f8 80 78 ? ? 0f 84 ? ? ? ? 48 8b 40 ? 48 85 c0 0f 84"_sig,
 		"Actor::getArmor" };
 
+	inline static SigImpl Actor_setNameTag{ [](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5C 24 18 48 89 74 24 20 57 48 83 EC 60 48 8B F2 48 8B F9 48 8B 89"_sig,
+		"Actor::setNameTag" };
+
 	inline static SigImpl _updatePlayer{ [](memory::signature_store&, uintptr_t res) { return res; },
 		"4C 8B DC 49 89 7B"_sig,
 		"UpdatePlayerFromCameraSystemUtil::_updatePlayer" };
