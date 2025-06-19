@@ -17,7 +17,7 @@ void PlayerHooks::hkActorAttack(SDK::Actor* obj, SDK::Actor* target, void* cause
 
 std::string* PlayerHooks::hkActorGetFormattedNameTag(SDK::LocalPlayer* obj, std::string* result) {
     ActorGetFormattedNameTag->oFunc<decltype(&hkActorGetFormattedNameTag)>()(obj, result);
-    if (obj == SDK::ClientInstance::get()->getLocalPlayer()) {
+    if (obj == SDK::ClientInstance::get()->getLocalPlayer() && Latite::get().isMainThread()) {
         GetFormattedNameTagEvent ev{ result, obj };
         Eventing::get().dispatch(ev);
     }
