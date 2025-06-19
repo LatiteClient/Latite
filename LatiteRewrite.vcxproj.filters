@@ -494,6 +494,9 @@
     <ClInclude Include="src\sdk\common\network\NetworkSystem.h" />
     <ClInclude Include="src\sdk\common\network\RemoteConnectorComposite.h" />
     <ClInclude Include="src\client\event\impl\GetFormattedNameTagEvent.h" />
+    <ClInclude Include="src\util\WorldToScreen.h" />
+    <ClInclude Include="src\sdk\common\client\game\ClientHMDState.h" />
+    <ClInclude Include="src\sdk\common\client\renderer\MinecraftMatrix.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />

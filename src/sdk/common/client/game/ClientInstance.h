@@ -17,6 +17,7 @@ namespace SDK {
 		class LocalPlayer* getLocalPlayer();
 		class GuiData* getGuiData();
 		class Options* getOptions();
+		class ClientHMDState* getClientHMDState();
 
 		void grabCursor();
 		void releaseCursor();

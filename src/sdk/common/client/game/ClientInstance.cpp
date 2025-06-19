@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "ClientInstance.h"
+
+#include "ClientHMDState.h"
 #include "util/Util.h"
 
 SDK::ClientInstance* SDK::ClientInstance::instance = nullptr;
@@ -92,6 +94,10 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
 
 SDK::Options* SDK::ClientInstance::getOptions() {
     return memory::callVirtual<Options*>(this, 0xC5);
+}
+
+SDK::ClientHMDState* SDK::ClientInstance::getClientHMDState() {
+    return memory::callVirtual<ClientHMDState*>(this, 0x194);
 }
 
 void SDK::ClientInstance::grabCursor() {

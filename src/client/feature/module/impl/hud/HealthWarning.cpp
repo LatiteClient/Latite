@@ -3,6 +3,7 @@
 #include "client/event/impl/RenderLayerEvent.h"
 #include "sdk/common/client/gui/controls/VisualTree.h"
 #include "sdk/common/client/gui/controls/UIControl.h"
+#include "util/WorldToScreen.h"
 
 HealthWarning::HealthWarning() : Module("HealthWarning", LocalizeString::get("client.hudmodule.healthWarning.name"), LocalizeString::get("client.hudmodule.healthWarning.desc"), HUD, nokeybind) {
 	this->listen<RenderLayerEvent>(&HealthWarning::onRenderLayer);
@@ -21,7 +22,8 @@ void HealthWarning::onRenderLayer(Event& evG) {
 	StoredColor vignette = std::get<ColorValue>(vignetteColor).getMainColor();
 
 	MCDrawUtil dc{ ev.getUIRenderContext(), SDK::ClientInstance::get()->minecraftGame->minecraftFont };
+
 	if (std::get<FloatValue>(healthPointThreshold) > SDK::ClientInstance::get()->getLocalPlayer()->getHealth() && screenView->visualTree->rootControl->name == "hud_screen") {
 		dc.drawVignette({ vignette.r, vignette.g, vignette.b, vignette.a }, std::get<FloatValue>(vignetteFade));
-	}
+	} 
 }
