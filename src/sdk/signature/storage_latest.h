@@ -95,7 +95,7 @@ public:
 	};
 
 	inline static SigImpl LevelRenderer_renderLevel{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 8B C4 48 89 58 20 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 D8 FC FF FF 48 81 EC F0 03 00 00 0F 29 70 B8 0F 29 78 A8 44 0F 29 40 98 44 0F 29 48 88 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 85 A0 02 00 00 4D 8B E8 4C 8B E2 4C 8B F9 33 D2 41 B8 E8 02 00 00 48 8D 4D B0 E8"_sig,
+		"48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4D 8B E8 4C 8B E2 4C 8B F9"_sig,
 		"LevelRenderer::renderLevel"};
 
 	inline static SigImpl Keyboard_feed{[](memory::signature_store&, uintptr_t res) { return res; },
