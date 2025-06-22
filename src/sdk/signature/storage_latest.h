@@ -83,7 +83,7 @@ public:
 		// "Client%d camera ticking system"
 		// 1st of 3 data LEA's
 		inline static SigImpl Level{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-			"48 89 07 48 8D 05 ? ? ? ? 48 89 47 ? 48 8D 05 ? ? ? ? 48 89 47 ? 48 8B 0D"_sig,
+			"48 8D 05 ? ? ? ? 48 89 07 48 8D 05 ? ? ? ? 48 89 47 ? 48 8D 05 ? ? ? ? 48 89 47 ? 48 8B 0D"_sig,
 			"const Level::`vftable'"};
 		inline static SigImpl SetTitlePacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8d 05 ? ? ? ? 48 89 01 89 51 ? 48 83 c1 ? 0f 57 c0 0f 11 01 48 89 79"_sig,
