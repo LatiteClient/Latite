@@ -7,7 +7,7 @@ void SDK::Level::playSoundEvent(std::string const& text, Vec3 const& pos, float 
 		memory::callVirtual<void>(this, index, text, pos, vol, pitch);
 	}
 
-	memory::callVirtual<void>(this, 0xB3, text, pos, vol, pitch);
+	return memory::callVirtual<void>(this, 0xB2, text, pos, vol, pitch);
 }
 
 std::vector<SDK::Actor*> SDK::Level::getRuntimeActorList() {
