@@ -2,8 +2,12 @@
 #include "Level.h"
 
 void SDK::Level::playSoundEvent(std::string const& text, Vec3 const& pos, float vol, float pitch) {
-	static int index = mvGetOffset<0xB4, 0xB3, 0xB2, 0xB2, 0xA2, 0xA2, 0xA2, 0xA3, 0xA3, 0xBD, 0xC9>();
-	memory::callVirtual<void>(this, index, text, pos, vol, pitch);
+	if (internalVers <= SDK::V1_21_80) {
+		static int index = mvGetOffset<0xB4, 0xB3, 0xB2, 0xB2, 0xA2, 0xA2, 0xA2, 0xA3, 0xA3, 0xBD, 0xC9>();
+		memory::callVirtual<void>(this, index, text, pos, vol, pitch);
+	}
+
+	memory::callVirtual<void>(this, 0xB3, text, pos, vol, pitch);
 }
 
 std::vector<SDK::Actor*> SDK::Level::getRuntimeActorList() {
