@@ -8,7 +8,7 @@ void SDK::Level::playSoundEvent(std::string const& text, Vec3 const& pos, float 
 
 std::vector<SDK::Actor*> SDK::Level::getRuntimeActorList() {
 	std::vector<Actor*> list;
-	static int index = mvGetOffset<0x134, 0x136, 0x134, 0x132, 0x134, 0x117, 0x117, 0x116, 0x125, 0x125, 0x12D, 0x13C>();
+	static int index = mvGetOffset<0x135, 0x136, 0x134, 0x132, 0x134, 0x117, 0x117, 0x116, 0x125, 0x125, 0x12D, 0x13C>();
 
 	// TODO: this might return a vector too?
 	memory::callVirtual<void, std::vector<Actor*>&>(this, index, list);
@@ -17,7 +17,7 @@ std::vector<SDK::Actor*> SDK::Level::getRuntimeActorList() {
 
 std::unordered_map<UUID, SDK::PlayerListEntry>* SDK::Level::getPlayerList() {
 	if (internalVers >= SDK::V1_21_40) {
-		return *reinterpret_cast<std::unordered_map<UUID, SDK::PlayerListEntry>**>(reinterpret_cast<uintptr_t>(this) + 0x950);
+		return *reinterpret_cast<std::unordered_map<UUID, SDK::PlayerListEntry>**>(reinterpret_cast<uintptr_t>(this) + 0x4E0);
 	}
 	
 	static int index = SDK::mvGetOffset<0x112, 0x111, 0x120, 0x120, 0x128, 0x137>();
