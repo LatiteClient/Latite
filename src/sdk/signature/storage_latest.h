@@ -33,7 +33,7 @@ public:
 			"48 8B 05 ? ? ? ? 4C 8B AD"_sig,
 			"UIFillColorMaterial"};
 		inline static SigImpl thirdPersonNametag{ [](memory::signature_store&, uintptr_t res) { return res; },
-			"0F 85 ? ? ? ? 48 85 F6 74 ? 48 8B CE"_sig,
+			"0F 84 ? ? ? ? 49 8B 45 ? 49 8B CD 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 0F 85"_sig,
 			"ThirdPersonNametag" };
 		
 	};
