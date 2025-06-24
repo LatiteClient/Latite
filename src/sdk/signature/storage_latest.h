@@ -33,7 +33,7 @@ public:
 			"48 8B 05 ? ? ? ? 4C 8B AD"_sig,
 			"UIFillColorMaterial"};
 		inline static SigImpl thirdPersonNametag{ [](memory::signature_store&, uintptr_t res) { return res; },
-			"0F 84 ? ? ? ? 49 8B 04 ? 49 8B CC 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 0F 85"_sig,
+			"0F 84 ? ? ? ? 49 8B 45 ? 49 8B CD 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 0F 85"_sig,
 			"ThirdPersonNametag" };
 		
 	};
@@ -77,13 +77,13 @@ public:
 			"48 8d 05 ? ? ? ? 48 89 01 33 d2 48 89 51 ? 0f 57 c0 48 89 51 ? 48 8b c1 89 51"_sig,
 			"const TextPacket::`vftable'"};
 		inline static SigImpl CommandRequestPacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-			"48 8D 05 ? ? ? ? 48 89 45 ? 49 8B D5 48 8D 4D ? E8 ? ? ? ? 90 49 8B 4D"_sig,
+			"48 8D 05 ? ? ? ? 48 89 45 ? 49 8B D6 48 8D 4D ? E8 ? ? ? ? 90 49 8B 4E"_sig,
 			"const CommandRequestPacket::`vftable'"};
 
 		// "Client%d camera ticking system"
 		// 1st of 3 data LEA's
 		inline static SigImpl Level{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-			"48 8D 05 ? ? ? ? 48 89 07 48 8D 05 ? ? ? ? 48 89 47 ? 48 8D 05 ? ? ? ? 48 89 47 ? 4C 8D 35"_sig,
+			"48 8D 05 ? ? ? ? 48 89 07 48 8D 05 ? ? ? ? 48 89 47 ? 48 8D 05 ? ? ? ? 48 89 47 ? 48 8B 0D"_sig,
 			"const Level::`vftable'"};
 		inline static SigImpl SetTitlePacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8d 05 ? ? ? ? 48 89 01 89 51 ? 48 83 c1 ? 0f 57 c0 0f 11 01 48 89 79"_sig,
@@ -95,7 +95,7 @@ public:
 	};
 
 	inline static SigImpl LevelRenderer_renderLevel{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 ? ? 44 0F 29 ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 89 44 24 ? 4C 8B EA"_sig,
+		"48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4D 8B E8 4C 8B E2 4C 8B F9"_sig,
 		"LevelRenderer::renderLevel"};
 
 	inline static SigImpl Keyboard_feed{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -181,7 +181,7 @@ public:
 		"RakPeer::GetAveragePing"};
 
 	inline static SigImpl LocalPlayer_applyTurnDelta{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 8B C4 48 89 58 ? 48 89 70 ? 55 57 41 54 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 58"_sig,
+		"48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 50"_sig,
 		"LocalPlayer::applyTurnDelta"};
 
 	// see what accesses things in moveinputhandler
@@ -289,11 +289,11 @@ public:
 		"Actor::setNameTag" };
 
 	inline static SigImpl _updatePlayer{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"4C 8B DC 49 89 7B"_sig,
+		"48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 41 8B 58"_sig,
 		"UpdatePlayerFromCameraSystemUtil::_updatePlayer" };
 
 	inline static SigImpl GameArguments__onUri{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? B8 ? ? ? ? E8 ? ? ? ? 48 2B E0 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B F2 48 8B F1 45 33 FF"_sig,
+		"48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? B8 ? ? ? ? E8 ? ? ? ? 48 2B E0 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B FA 48 8B F1"_sig,
 		"GameArguments::_onUri" };
 
 	inline static SigImpl _bobHurt{ [](memory::signature_store&, uintptr_t res) { return res; },

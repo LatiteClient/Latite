@@ -7,6 +7,7 @@
 #include "client/script/PluginManager.h"
 #include "../Hooks.h"
 #include "PlayerHooks.h"
+#include "client/screen/ScreenManager.h"
 
 namespace {
 	std::shared_ptr<Hook> Level_tickHook;
@@ -33,6 +34,7 @@ namespace {
 	std::shared_ptr<Hook> UpdatePlayerHook;
 	std::shared_ptr<Hook> OnUriHook;
 	std::shared_ptr<Hook> BobHurtHook;
+	std::shared_ptr<Hook> GrabCursorHook;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -397,6 +399,11 @@ void GenericHooks::hkBobHurt(void* obj, void* a2, void* a3) {
 	BobHurtHook->oFunc<decltype(&hkBobHurt)>()(obj, a2, a3);
 }
 
+void GenericHooks::hkGrabCursor(SDK::ClientInstance* obj) {
+	if (Latite::get().getScreenManager().getActiveScreen()) return;
+	GrabCursorHook->oFunc<decltype(&hkGrabCursor)>()(obj);
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
 	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
@@ -444,5 +451,6 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	UpdatePlayerHook = addHook(Signatures::_updatePlayer.result, hkUpdatePlayer, "`anonymous namespace'::_updatePlayer");
 	OnUriHook = addHook(Signatures::GameArguments__onUri.result, hkOnUri, "GameArguments::_onUri");
 	BobHurtHook = addHook(Signatures::_bobHurt.result, hkBobHurt, "`anonymous namespace`::_bobHurt");
+	GrabCursorHook = addHook(Signatures::ClientInstance_grabCursor.result, hkGrabCursor, "`ClientInstance::grabCursor");
 }
 

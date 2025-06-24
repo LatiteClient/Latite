@@ -37,6 +37,9 @@ void BlockOutline::onOutlineSelection(Event& evG) {
 
 	auto hitResult = SDK::ClientInstance::get()->minecraft->getLevel()->getHitResult();
 
+	if (hitResult->hitType != SDK::HitType::BLOCK)
+		return;
+
 	auto lrp = SDK::ClientInstance::get()->levelRenderer->getLevelRendererPlayer();
 	MCDrawUtil3D dc{ SDK::ClientInstance::get()->levelRenderer, SDK::ScreenContext::instance3d,
 		std::get<BoolValue>(renderThrough) ? SDK::MaterialPtr::getUIColor() : (std::get<BoolValue>(transparent) ? SDK::MaterialPtr::getSelectionOverlayMaterial() : SDK::MaterialPtr::getSelectionBoxMaterial())};

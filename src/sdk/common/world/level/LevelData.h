@@ -2,5 +2,5 @@
 
 class LevelData {
 public:
-    MVCLASS_FIELD(std::string, levelName, 0x370);
+    MVCLASS_FIELD(std::string, levelName, 0x298);
 };
