@@ -97,7 +97,7 @@ SDK::Options* SDK::ClientInstance::getOptions() {
 }
 
 SDK::ClientHMDState* SDK::ClientInstance::getClientHMDState() {
-    return memory::callVirtual<ClientHMDState*>(this, 0x194);
+    return memory::callVirtual<ClientHMDState*>(this, 0x197);
 }
 
 void SDK::ClientInstance::grabCursor() {
