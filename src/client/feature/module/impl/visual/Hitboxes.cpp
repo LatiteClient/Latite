@@ -22,6 +22,7 @@ Hitboxes::Hitboxes() : Module("Hitboxes", LocalizeString::get("client.module.hit
     listen<AfterRenderEntityEvent>(static_cast<EventListenerFunc>(&Hitboxes::onEntityRender), false);
 }
 
+// FIXME: AfterRenderEntityEvent does not trigger after 1.21.92 due to actor rendering changes or some shit
 void Hitboxes::onEntityRender(Event& evG) {
 	auto& ev = reinterpret_cast<AfterRenderEntityEvent&>(evG);
 
