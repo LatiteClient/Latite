@@ -3,7 +3,7 @@
 
 class Hitboxes : public Module {
 public:
-	void onRenderLevel(Event& evG);
+	void onEntityRender(Event& evG);
 
 	Hitboxes();
 	virtual ~Hitboxes() = default;

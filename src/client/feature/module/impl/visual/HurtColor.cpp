@@ -11,7 +11,6 @@ HurtColor::HurtColor() : Module("HurtColor", LocalizeString::get("client.module.
     listen<OverlayColorEvent>(static_cast<EventListenerFunc>(&HurtColor::onActorOverlay));
 }
 
-// FIXME: either get a new function to hook if known in the future or find other way to get the actor color property
 void HurtColor::onActorOverlay(Event& evGeneric) {
 	auto& ev = reinterpret_cast<OverlayColorEvent&>(evGeneric);
 	auto setColor = std::get<ColorValue>(this->color).getMainColor();
