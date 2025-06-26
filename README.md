@@ -46,8 +46,8 @@ Enhance your experience with community-made plugins:
 <details>
 <summary>What versions are supported?</summary>
 Currently supports:
-- 1.21.81
-- 1.21.80
+- 1.21.92
+- 1.21.90
 </details>
 
 <details>
