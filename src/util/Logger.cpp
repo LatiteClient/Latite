@@ -48,7 +48,7 @@ std::string GenerateStackTrace(EXCEPTION_POINTERS* exceptionInfo = nullptr) {
     std::string regularPdbPath = (std::filesystem::path(searchPath) / "LatiteRewrite.pdb").string();
     if (!SymLoadModule64(process, NULL, regularPdbPath.c_str(), NULL, baseAddress, dllSize)) {
         Logger::Warn(
-            "Could not find or load PDB either at {}. Stack trace will not have symbols. System error code: {}",
+            "Could not find or load PDB at {}. Stack trace will not have symbols. System error code: {}",
             regularPdbPath, GetLastError());
     }
 
