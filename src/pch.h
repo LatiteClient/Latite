@@ -99,4 +99,5 @@ using namespace std::chrono_literals;
 #include "util/Json.h"
 #include "util/DxContext.h"
 #include "util/FNV32.h"
+#include "util/ErrorHandler.h"
 #endif
