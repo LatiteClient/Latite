@@ -51,6 +51,7 @@
 #include "impl/hud/CustomCoordinates.h"
 #include "impl/hud/MovableCoordinates.h"
 #include "impl/hud/FrameTimeDisplay.h"
+#include "impl/hud/Waypoints.h"
 
 #include "client/event/impl/KeyUpdateEvent.h"
 
@@ -101,6 +102,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<AutoGG>());
 	this->items.push_back(std::make_shared<FrameTimeDisplay>());
 	this->items.push_back(std::make_shared<BlockGame>());
+	this->items.push_back(std::make_shared<Waypoints>());
 
 	for (auto& mod : items) {
 		mod->onInit();

@@ -430,7 +430,7 @@
     <ClInclude Include="src\client\feature\module\impl\game\Freelook.h" />
     <ClInclude Include="src\client\feature\module\impl\game\TextHotkey.h" />
     <ClInclude Include="src\client\feature\module\impl\game\ThirdPersonNametag.h" />
-    <ClInclude Include="src\client\feature\module\impl\game\Waypoints.h" />
+    <ClInclude Include="src\client\feature\module\impl\hud\Waypoints.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\Chat.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\ComboCounter.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\CustomCoordinates.h" />
@@ -754,7 +754,7 @@
     <ClCompile Include="src\client\feature\module\impl\game\Freelook.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\TextHotkey.cpp" />
     <ClCompile Include="src\client\feature\module\impl\game\ThirdPersonNametag.cpp" />
-    <ClCompile Include="src\client\feature\module\impl\game\Waypoints.cpp" />
+    <ClCompile Include="src\client\feature\module\impl\hud\Waypoints.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\Chat.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\ComboCounter.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\CustomCoordinates.cpp" />
