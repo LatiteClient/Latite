@@ -33,6 +33,7 @@ void MinecraftGameHooks::onDeviceLost(SDK::MinecraftGame* game) {
 }
 
 void __fastcall MinecraftGameHooks::_update(SDK::MinecraftGame* game) {
+	BEGIN_ERROR_HANDLER
 	_updateHook->oFunc<decltype(&_update)>()(game);
 	UpdateEvent ev{};
 
@@ -42,6 +43,7 @@ void __fastcall MinecraftGameHooks::_update(SDK::MinecraftGame* game) {
 	}
 
 	Eventing::get().dispatch(ev);
+	END_ERROR_HANDLER
 }
 
 MinecraftGameHooks::MinecraftGameHooks() {

@@ -45,8 +45,6 @@
 #include <sdk/common/client/gui/controls/VisualTree.h>
 #include <sdk/common/client/gui/controls/UIControl.h>
 
-#include "util/ErrorHandler.h"
-
 using namespace winrt;
 using namespace winrt::Windows::Web::Http;
 using namespace winrt::Windows::Web::Http::Filters;
