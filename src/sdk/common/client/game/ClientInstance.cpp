@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "ClientInstance.h"
+
+#include "ClientHMDState.h"
 #include "util/Util.h"
 
 SDK::ClientInstance* SDK::ClientInstance::instance = nullptr;
@@ -45,7 +47,7 @@ SDK::BlockSource* SDK::ClientInstance::getRegion() {
     if (SDK::internalVers < SDK::V1_21_80) {
         return memory::callVirtual<BlockSource*>(this, 0x1D);
     }
-    return memory::callVirtual<BlockSource*>(this, 0x1F);
+    return memory::callVirtual<BlockSource*>(this, 0x1E);
 }
 
 
@@ -62,7 +64,7 @@ SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
     if (SDK::internalVers < SDK::V1_21_80) {
         return memory::callVirtual<LocalPlayer*>(this, 0x1E);
     }
-    return memory::callVirtual<LocalPlayer*>(this, 0x20);
+    return memory::callVirtual<LocalPlayer*>(this, 0x1F);
 }
 
 SDK::GuiData* SDK::ClientInstance::getGuiData() {
@@ -92,6 +94,10 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
 
 SDK::Options* SDK::ClientInstance::getOptions() {
     return memory::callVirtual<Options*>(this, 0xC5);
+}
+
+SDK::ClientHMDState* SDK::ClientInstance::getClientHMDState() {
+    return memory::callVirtual<ClientHMDState*>(this, 0x197);
 }
 
 void SDK::ClientInstance::grabCursor() {

@@ -7,6 +7,7 @@ Nickname::Nickname() : Module("Nickname", LocalizeString::get("client.module.nic
                LocalizeString::get("client.module.nickname.newNick.desc"), this->nickname);
 
     listen<ClientTextEvent>((EventListenerFunc)&Nickname::onClientTextPacket);
+    listen<GetFormattedNameTagEvent>((EventListenerFunc)&Nickname::onGetFormattedNameTag);
 }
 
 void Nickname::onClientTextPacket(Event& evG) {
@@ -31,4 +32,26 @@ void Nickname::onClientTextPacket(Event& evG) {
 
     textPacket->str = message;
     textPacket->source = source;
+}
+
+void Nickname::onGetFormattedNameTag(Event& evG) {
+    GetFormattedNameTagEvent& ev = reinterpret_cast<GetFormattedNameTagEvent&>(evG);
+
+    std::string nickname = util::WStrToStr(std::get<TextValue>(this->nickname).str);
+
+    if (nickname.empty() || !SDK::ClientInstance::get()->getLocalPlayer()) {
+        return;
+    }
+
+    std::string& currentNametag = *ev.getNametag();
+    const std::string& originalName = SDK::ClientInstance::get()->getLocalPlayer()->playerName;
+
+    auto replaceAll = [](std::string& s, std::string from, std::string to) {
+        if (!from.empty())
+            for (size_t pos = 0; (pos = s.find(from, pos)) != std::string::npos; pos += to.size())
+                s.replace(pos, from.size(), to);
+        return s;
+    };
+
+    replaceAll(currentNametag, originalName, nickname);
 }

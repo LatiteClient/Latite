@@ -15,5 +15,5 @@ bool JsCommand::tryRun(std::string const& label, std::vector<std::string> args, 
     }
 
     Event ev{ L"execute", { Chakra::MakeString(util::StrToWStr(label)), array, Chakra::MakeString(util::StrToWStr(line)) } };
-    return Chakra::GetBool(dispatchEvent(L"execute", ev));
+    return Chakra::GetBool(dispatchEvent(ev));
 }

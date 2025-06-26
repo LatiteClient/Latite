@@ -29,7 +29,7 @@ void JsScreen::onRender(::Event& evG) {
 		Chakra::SetContext(ctx);
 
 		Event ev{ L"render", {} };
-		auto ret = dispatchEvent(ev.name, ev);
+		auto ret = dispatchEvent(ev);
 		if (ret != JS_INVALID_REFERENCE) {
 			Chakra::Release(ret);
 		}
@@ -39,7 +39,7 @@ void JsScreen::onRender(::Event& evG) {
 void JsScreen::onKey(::Event& evG) {
 	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evG);
 	Event sEv{ L"key", {Chakra::MakeInt(ev.getKey()), ev.isDown() ? Chakra::GetTrue() : Chakra::GetFalse() }};
-	auto ret = dispatchEvent(sEv.name, sEv);
+	auto ret = dispatchEvent(sEv);
 	if (ret != JS_INVALID_REFERENCE) {
 		ev.setCancelled(Chakra::GetBool(ret));
 		Chakra::Release(ret);
@@ -49,7 +49,7 @@ void JsScreen::onKey(::Event& evG) {
 void JsScreen::onClick(::Event& evG) {
 	auto& ev = reinterpret_cast<ClickEvent&>(evG);
 	Event sEv{ L"mouse", {Chakra::MakeInt(ev.getMouseButton()), Chakra::MakeInt(ev.getWheelDelta()), ev.isDown() ? Chakra::GetTrue() : Chakra::GetFalse() } };
-	auto ret = dispatchEvent(sEv.name, sEv);
+	auto ret = dispatchEvent(sEv);
 	if (ret != JS_INVALID_REFERENCE) {
 		ev.setCancelled(Chakra::GetBool(ret));
 		Chakra::Release(ret);
@@ -61,7 +61,7 @@ void JsScreen::onEnable(bool ignoreAnims) {
 		Chakra::SetContext(ctx);
 
 		Event ev{ L"enable", { (ignoreAnims ? Chakra::GetTrue() : Chakra::GetFalse()) }};
-		auto ret = dispatchEvent(ev.name, ev);
+		auto ret = dispatchEvent(ev);
 		if (ret != JS_INVALID_REFERENCE) {
 			Chakra::Release(ret);
 		}
@@ -72,7 +72,7 @@ void JsScreen::onDisable() {
 	Latite::get().queueForClientThread([this]() {
 		Chakra::SetContext(ctx);
 		Event ev{ L"disable", {  } };
-		auto ret = dispatchEvent(ev.name, ev);
+		auto ret = dispatchEvent(ev);
 		if (ret != JS_INVALID_REFERENCE) {
 			Chakra::Release(ret);
 		}

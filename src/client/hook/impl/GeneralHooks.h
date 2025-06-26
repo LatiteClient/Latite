@@ -50,6 +50,7 @@ class GenericHooks : public HookGroup {
     static void hkUpdatePlayer(SDK::CameraComponent* obj, void* a, void* b);
     static void hkOnUri(void* obj, void* uri);
     static void hkBobHurt(void* obj, void*, void*);
+    static void hkGrabCursor(SDK::ClientInstance* obj);
 public:
     GenericHooks();
 };

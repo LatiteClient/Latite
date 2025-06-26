@@ -77,6 +77,10 @@ int SDK::Actor::getCommandPermissionLevel() {
 	return memory::callVirtual<int>(this, mvGetOffset<0x67, 0x69, 0x6A, 0x6B, 0x6B, 0x6D, 0x7C, 0xB5, 0xCC, 0xCD>());
 }
 
+void SDK::Actor::setNameTag(std::string* nametag) {
+	return reinterpret_cast<void(__fastcall*)(Actor*, std::string*)>(Signatures::Actor_setNameTag.result)(this, nametag);
+}
+
 int64_t SDK::Actor::getRuntimeID() {
 	if (internalVers < V1_19_51) {
 		return util::directAccess<int64_t>(this, 0x550);

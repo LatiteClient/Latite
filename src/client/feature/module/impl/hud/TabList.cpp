@@ -20,6 +20,7 @@ void TabList::onRenderOverlay(Event& evG) {
 
 	D2DUtil dc;
 	auto lvl = SDK::ClientInstance::get()->minecraft->getLevel();
+	auto name = lvl->getLevelName();
 
 	size_t size = lvl->getPlayerList()->size();
 

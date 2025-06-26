@@ -2,6 +2,7 @@
 #include "JsLocalPlayerClass.h"
 #include <sdk/common/world/level/HitResult.h>
 #include <client/script/class/impl/JsVec3.h>
+#include <client/script/class/impl/JsVec2.h>
 
 JsValueRef JsLocalPlayerClass::getBreakProgress(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
@@ -60,9 +61,14 @@ JsValueRef JsLocalPlayerClass::setMovementState(JsValueRef callee, bool isConstr
 
 	auto move = lp->getMoveInputComponent();
 	
-	auto setMoveState = [&](bool& state, const std::wstring& name) {
+	auto setMoveState = [&]<typename T>(T& state, const std::wstring& name) {
 		if (auto prop = Chakra::GetProperty(obj, name)) {
-			state = Chakra::GetBool(prop);
+			if constexpr (std::is_same_v<bool, T>) {
+				state = Chakra::GetBool(prop);
+			}
+			else if constexpr (std::is_floating_point_v<T>) {
+				state = Chakra::GetNumber(prop);
+			}
 		}
 		};
 
@@ -72,6 +78,8 @@ JsValueRef JsLocalPlayerClass::setMovementState(JsValueRef callee, bool isConstr
 	setMoveState(move->right, L"right");
 	setMoveState(move->jump, L"jump");
 	setMoveState(move->sneak, L"sneak");
+	setMoveState(move->joystickX, L"joystickX");
+	setMoveState(move->joystickX, L"joystickY");
 	
 	return obj;
 }
@@ -94,6 +102,24 @@ JsValueRef JsLocalPlayerClass::getMovementState(JsValueRef callee, bool isConstr
 	Chakra::SetPropertyBool(obj, L"jump", move->jump);
 	Chakra::SetPropertyBool(obj, L"sneak", move->sneak);
 	Chakra::SetPropertyBool(obj, L"sprintHeld", move->sprintKey);
+	Chakra::SetPropertyNumber(obj, L"joystickX", move->joystickX);
+	Chakra::SetPropertyNumber(obj, L"joystickY", move->joystickY);
 
 	return obj;
+}
+
+JsValueRef JsLocalPlayerClass::turn(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+	if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
+	if (!Chakra::VerifyParameters({ {arguments[1], JsObject} })) return JS_INVALID_REFERENCE;
+	
+	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
+	if (!lp) {
+		Chakra::ThrowError(XW("Invalid local player"));
+		return JS_INVALID_REFERENCE;
+	}
+
+	Vec2 delta = JsVec2::ToVec2(arguments[1]);
+	lp->applyTurnDelta(delta);
+
+	return Chakra::GetUndefined();
 }

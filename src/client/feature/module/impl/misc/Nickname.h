@@ -8,6 +8,7 @@ public:
 	virtual ~Nickname() = default;
 
 	void onClientTextPacket(Event& evG);
+	void onGetFormattedNameTag(Event& evG);
 private:
 	ValueType nickname = TextValue(L"Nickname");
 };

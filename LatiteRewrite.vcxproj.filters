@@ -167,6 +167,9 @@
     <ClCompile Include="src\client\feature\module\impl\misc\BlockGame.cpp" />
     <ClCompile Include="src\sdk\common\network\RakNetConnector.cpp" />
     <ClCompile Include="src\util\ExceptionHandler.cpp" />
+    <ClCompile Include="src\client\script\class\impl\JsWebSocket.cpp" />
+    <ClCompile Include="src\sdk\common\client\player\LocalPlayer.cpp" />
+    <ClCompile Include="src\sdk\common\network\RakNetConnector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assets\lang\en_US.json" />
@@ -489,10 +492,6 @@
     <ClInclude Include="src\client\feature\module\impl\hud\FrameTimeDisplay.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\BlockGame.h" />
     <ClInclude Include="src\sdk\common\client\game\Option.h" />
-    <ClInclude Include="src\sdk\common\network\NetworkSystem.h" />
-    <ClInclude Include="src\sdk\common\network\RemoteConnectorComposite.h" />
-    <ClInclude Include="src\util\ErrorHandler.h" />
-    <ClInclude Include="src\util\ExceptionHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />

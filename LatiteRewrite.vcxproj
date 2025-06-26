@@ -402,6 +402,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="assets\lang\en_US.json" />
+    <ClInclude Include="src\client\event\impl\GetFormattedNameTagEvent.h" />
     <ClInclude Include="src\client\feature\module\impl\misc\BlockGame.h" />
     <ClInclude Include="deps\include\mnemosyne\core\memory_range.hpp" />
     <ClInclude Include="deps\include\mnemosyne\core\vfunc_index.hpp" />
@@ -597,6 +598,7 @@
     <ClInclude Include="src\client\script\class\impl\JsTextureClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsVec2.h" />
     <ClInclude Include="src\client\script\class\impl\JsVec3.h" />
+    <ClInclude Include="src\client\script\class\impl\JsWebSocket.h" />
     <ClInclude Include="src\client\script\class\JsClass.h" />
     <ClInclude Include="src\client\script\class\impl\JsCommandClass.h" />
     <ClInclude Include="src\client\script\class\JsWrapperClass.h" />
@@ -621,6 +623,7 @@
     <ClInclude Include="src\client\script\ScriptingObject.h" />
     <ClInclude Include="src\client\script\PluginManager.h" />
     <ClInclude Include="src\client\ui\TextBox.h" />
+    <ClInclude Include="src\sdk\common\client\game\ClientHMDState.h" />
     <ClInclude Include="src\sdk\common\client\game\FontRepository.h" />
     <ClInclude Include="src\sdk\common\client\game\Option.h" />
     <ClInclude Include="src\sdk\common\client\game\Options.h" />
@@ -642,6 +645,7 @@
     <ClInclude Include="src\sdk\common\client\renderer\MaterialPtr.h" />
     <ClInclude Include="src\sdk\common\client\renderer\MatrixStack.h" />
     <ClInclude Include="src\sdk\common\client\renderer\MeshUtils.h" />
+    <ClInclude Include="src\sdk\common\client\renderer\MinecraftMatrix.h" />
     <ClInclude Include="src\sdk\common\client\renderer\screen\MinecraftUIRenderContext.h" />
     <ClInclude Include="src\sdk\common\client\renderer\screen\ScreenContext.h" />
     <ClInclude Include="src\sdk\common\client\renderer\Tessellator.h" />
@@ -719,6 +723,7 @@
     <ClInclude Include="src\util\LMath.h" />
     <ClInclude Include="src\util\Meta.h" />
     <ClInclude Include="src\util\Util.h" />
+    <ClInclude Include="src\util\WorldToScreen.h" />
     <ClInclude Include="src\util\XorString.h" />
     <ClInclude Include="src\client\feature\module\impl\hud\TabList.h" />
   </ItemGroup>
@@ -854,6 +859,7 @@
     <ClCompile Include="src\client\script\class\impl\JsModuleClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsSettingClass.cpp" />
     <ClCompile Include="src\client\script\class\impl\JsTextModuleClass.cpp" />
+    <ClCompile Include="src\client\script\class\impl\JsWebSocket.cpp" />
     <ClCompile Include="src\client\script\event\ScriptListener.cpp" />
     <ClCompile Include="src\client\script\feature\JsEvented.cpp" />
     <ClCompile Include="src\client\script\interop\classes\JsEntity.cpp" />
@@ -887,6 +893,7 @@
     <ClCompile Include="src\sdk\common\client\gui\controls\UIControl.cpp" />
     <ClCompile Include="src\sdk\common\client\gui\screens\ContainerScreenController.cpp" />
     <ClCompile Include="src\sdk\common\client\input\RemappingLayout.cpp" />
+    <ClCompile Include="src\sdk\common\client\player\LocalPlayer.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\game\BaseActorRenderContext.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\game\LevelRendererPlayer.cpp" />
     <ClCompile Include="src\sdk\common\client\renderer\ItemRenderer.cpp" />
@@ -914,6 +921,7 @@
     <ClCompile Include="src\util\Logger.cpp" />
     <ClCompile Include="src\util\Util.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\TabList.cpp" />
+    <ClCompile Include="src\util\WorldToScreen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assets\lang\es_ES.json">

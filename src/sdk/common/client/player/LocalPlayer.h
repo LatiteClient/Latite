@@ -3,6 +3,7 @@
 
 namespace SDK {
 	class LocalPlayer : public Player {
-
+	public:
+		void applyTurnDelta(const Vec2& delta);
 	};
 }

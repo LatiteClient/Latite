@@ -12,6 +12,7 @@
 #include "impl/CinematicCameraEvent.h"
 #include "impl/ClickEvent.h"
 #include "impl/ClientTextEvent.h"
+#include "impl/GetFormattedNameTagEvent.h"
 #include "impl/DrawHUDModulesEvent.h"
 #include "impl/FocusLostEvent.h"
 #include "impl/FogColorEvent.h"
