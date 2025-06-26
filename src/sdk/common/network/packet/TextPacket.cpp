@@ -9,6 +9,6 @@
 void SDK::TextPacket::chat(std::string const& message) {
 	this->str = message;
 	this->source = SDK::ClientInstance::get()->getLocalPlayer()->playerName;
-	//this->xboxUserId = SDK::ClientInstance::get()->minecraftGame->xuid;
+	this->xboxUserId = SDK::ClientInstance::get()->minecraftGame->xuid;
 	this->type = TextPacketType::CHAT;
 }
