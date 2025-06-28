@@ -1,12 +1,14 @@
 #include "pch.h"
 #include "Waypoints.h"
-#include "client/event/impl/RenderLayerEvent.h"
-#include "sdk/common/client/gui/controls/VisualTree.h"
+
 #include "sdk/common/client/gui/controls/UIControl.h"
 #include "util/WorldToScreen.h"
 
 Waypoints::Waypoints() : Module("Waypoints", L"Waypoints", L"Show saved locations", HUD, nokeybind) {
     this->listen<RenderOverlayEvent>(&Waypoints::onRenderOverlay);
+
+    addSetting("bgColor", L"Waypoint background color", L"", bgColorSetting);
+    addSetting("textColor", L"Waypoint text color", L"", textColorSetting);
 }
 
 void Waypoints::onRenderOverlay(Event& evG) {
@@ -43,8 +45,11 @@ void Waypoints::onRenderOverlay(Event& evG) {
         float rectRight = smoothedScreenPos->x + rectWidth;
         float rectBottom = smoothedScreenPos->y + rectHeight;
 
-        dc.fillRoundedRectangle({ smoothedScreenPos->x, smoothedScreenPos->y, rectRight, rectBottom }, d2d::Colors::BLACK);
-        dc.drawText({ smoothedScreenPos->x, smoothedScreenPos->y, rectRight, rectBottom }, L"M", d2d::Colors::WHITE,
+        StoredColor textColor = std::get<ColorValue>(textColorSetting).getMainColor();
+        StoredColor bgColor = std::get<ColorValue>(bgColorSetting).getMainColor();
+
+        dc.fillRoundedRectangle({ smoothedScreenPos->x, smoothedScreenPos->y, rectRight, rectBottom }, bgColor);
+        dc.drawText({ smoothedScreenPos->x, smoothedScreenPos->y, rectRight, rectBottom }, L"M", textColor,
                     Renderer::FontSelection::PrimaryRegular, 25, DWRITE_TEXT_ALIGNMENT_CENTER,
                     DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
     }

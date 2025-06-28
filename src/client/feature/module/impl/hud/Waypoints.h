@@ -9,4 +9,7 @@ private:
 	void onRenderOverlay(Event& ev);
 
 	std::optional<Vec2> smoothedScreenPos = std::nullopt;
+
+	ValueType bgColorSetting = ColorValue(1.f, 0.f, 0.f, 0.2f);
+	ValueType textColorSetting = ColorValue(1.f, 0.f, 0.f, 0.2f);
 };
