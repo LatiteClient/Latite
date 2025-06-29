@@ -39,9 +39,27 @@ private:
     std::vector<FormField> formFields;
     d2d::Color selectedColor;
 
-    // TODO: add some good colors here
+    // TODO: custom colors
     const std::vector<d2d::Color> waypointColors = {
-        d2d::Colors::AQUA, d2d::Colors::BLACK, d2d::Colors::BLUE, d2d::Colors::GREEN, d2d::Colors::PURPLE,
-        d2d::Colors::RED, d2d::Colors::WHITE, d2d::Colors::YELLOW
+        // White
+        d2d::Color::Hex("FFFFFF"),
+        // Bright Yellow
+        d2d::Color::Hex("FFFF00"),
+        // Cyan
+        d2d::Color::Hex("00FFFF"),
+        // Lime Green
+        d2d::Color::Hex("00FF00"),
+        // Magenta
+        d2d::Color::Hex("FF00FF"),
+        // Orange
+        d2d::Color::Hex("FFA500"),
+        // Light Blue
+        d2d::Color::Hex("87CEEB"),
+        // Goldenrod
+        d2d::Color::Hex("DAA520"),
+        // Hot Pink
+        d2d::Color::Hex("FF69B4"),
+        // Mint Green
+        d2d::Color::Hex("98FF98"),
     };
 };
