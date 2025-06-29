@@ -573,6 +573,7 @@
     <ClInclude Include="src\client\render\Renderer.h" />
     <ClInclude Include="src\client\screen\impl\ClickGUI.h" />
     <ClInclude Include="src\client\screen\impl\HUDEditor.h" />
+    <ClInclude Include="src\client\screen\impl\WaypointPopupScreen.h" />
     <ClInclude Include="src\client\screen\Screen.h" />
     <ClInclude Include="src\client\screen\ScreenManager.h" />
     <ClInclude Include="src\client\feature\module\script\JsModule.h" />
@@ -842,6 +843,7 @@
     <ClCompile Include="src\client\render\Renderer.cpp" />
     <ClCompile Include="src\client\screen\impl\ClickGUI.cpp" />
     <ClCompile Include="src\client\screen\impl\HUDEditor.cpp" />
+    <ClCompile Include="src\client\screen\impl\WaypointPopupScreen.cpp" />
     <ClCompile Include="src\client\screen\Screen.cpp" />
     <ClCompile Include="src\client\screen\ScreenManager.cpp" />
     <ClCompile Include="src\client\feature\module\script\JsModule.cpp" />

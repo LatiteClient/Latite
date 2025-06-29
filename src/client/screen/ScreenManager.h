@@ -1,6 +1,7 @@
 #pragma once
 #include "impl/ClickGUI.h"
 #include "impl/HUDEditor.h"
+#include "impl/WaypointPopupScreen.h"
 
 #include "api/manager/StaticManager.h"
 #include "api/eventing/Listenable.h"
@@ -11,7 +12,8 @@
 
 class ScreenManager : public Listener, public StaticManager<Screen,
 	ClickGUI,
-	HUDEditor> {
+	HUDEditor,
+    WaypointPopupScreen> {
 public:
 	ScreenManager();
 

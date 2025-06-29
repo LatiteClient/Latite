@@ -1,15 +1,27 @@
 #pragma once
 
 #include "../../Module.h"
+#include "client/screen/impl/WaypointPopupScreen.h"
+
+struct WaypointData {
+    std::wstring name;
+    std::wstring initials;
+    Color color;
+    Vec3 position;
+    std::wstring dimension;
+};
 
 class Waypoints : public Module {
 public:
-	Waypoints();
+    Waypoints();
+    void addWaypoint(const WaypointData& waypoint);
+
 private:
-	void onRenderOverlay(Event& ev);
+    void onRenderOverlay(Event& evG);
+    void onKey(Event& evG);
 
-	std::optional<Vec2> smoothedScreenPos = std::nullopt;
+    std::vector<WaypointData> waypoints;
 
-	ValueType bgColorSetting = ColorValue(1.f, 0.f, 0.f, 0.2f);
-	ValueType textColorSetting = ColorValue(1.f, 0.f, 0.f, 0.2f);
+    ValueType addWaypointKeySetting = KeyValue('B');
+    ValueType bgColorSetting = ColorValue(0.1f, 0.1f, 0.1f, 0.5f);
 };
