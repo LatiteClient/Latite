@@ -39,23 +39,44 @@ private:
     std::vector<FormField> formFields;
     d2d::Color selectedColor;
 
-    // TODO: custom colors
     const std::vector<d2d::Color> waypointColors = {
         // White
         d2d::Color::Hex("FFFFFF"),
-        // Cyan
-        d2d::Color::Hex("00FFFF"),
-        // Magenta
-        d2d::Color::Hex("FF00FF"),
-        // Orange
-        d2d::Color::Hex("FFA500"),
-        // Light Blue
-        d2d::Color::Hex("87CEEB"),
-        // Goldenrod
-        d2d::Color::Hex("DAA520"),
-        // Hot Pink
-        d2d::Color::Hex("FF69B4"),
-        // Mint Green
-        d2d::Color::Hex("98FF98"),
+        // Gray
+        d2d::Color::Hex("A8A8A8"),
+        // Dark Gray
+        d2d::Color::Hex("545454"),
+        // Black
+        d2d::Color::Hex("111111"),
+
+        // Yellow
+        d2d::Color::Hex("ECEC4E"),
+        // Gold
+        d2d::Color::Hex("FCA800"),
+
+        // Green
+        d2d::Color::Hex("54FC54"),
+        // Dark Green
+        d2d::Color::Hex("00A800"),
+
+        // Aqua
+        d2d::Color::Hex("54FCFC"),
+        // Dark Aqua
+        d2d::Color::Hex("00A8A8"),
+
+        // Blue
+        d2d::Color::Hex("5454FC"),
+        // Dark Blue
+        d2d::Color::Hex("0000A8"),
+
+        // Light Purple
+        d2d::Color::Hex("FC54FC"),
+        // Dark Purple
+        d2d::Color::Hex("A800A8"),
+
+        // Red
+        d2d::Color::Hex("FC5454"),
+        // Dark Red
+        d2d::Color::Hex("A80000"),
     };
 };

@@ -78,7 +78,7 @@ void WaypointPopupScreen::onRender(Event& evG) {
     D2D1_SIZE_F ss = Latite::getRenderer().getScreenSize();
 
     float popupWidth = 400.f;
-    float popupHeight = 360.f;
+    float popupHeight = 390.f;
 
     popupRect = {
         (ss.width - popupWidth) / 2.f,
