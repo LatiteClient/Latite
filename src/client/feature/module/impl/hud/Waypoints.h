@@ -21,6 +21,7 @@ private:
     void onKey(Event& evG);
 
     std::vector<WaypointData> waypoints;
+    std::optional<Vec2> smoothedScreenPos = std::nullopt;
 
     ValueType addWaypointKeySetting = KeyValue('B');
     ValueType bgColorSetting = ColorValue(0.1f, 0.1f, 0.1f, 0.5f);

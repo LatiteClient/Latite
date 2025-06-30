@@ -41,12 +41,23 @@ void Waypoints::onRenderOverlay(Event& evG) {
     SDK::LocalPlayer* localPlayer = SDK::ClientInstance::get()->getLocalPlayer();
     std::wstring currentDimension = util::StrToWStr(localPlayer->dimension->dimensionName);
 
-    for (const auto& waypoint : waypoints) {
+    for (const WaypointData& waypoint : waypoints) {
         if (waypoint.dimension != currentDimension) continue;
 
         std::optional<Vec2> screenPos = WorldToScreen::convert(waypoint.position);
 
         if (screenPos != std::nullopt) {
+            if (smoothedScreenPos == std::nullopt) {
+                smoothedScreenPos = screenPos;
+            }
+
+            if (smoothedScreenPos && screenPos) {
+                constexpr float smoothingFactor = 0.9f;
+                float deltaTime = Latite::get().getRenderer().getDeltaTime();
+                smoothedScreenPos->x += (screenPos->x - smoothedScreenPos->x) * smoothingFactor * deltaTime;
+                smoothedScreenPos->y += (screenPos->y - smoothedScreenPos->y) * smoothingFactor * deltaTime;
+            }
+
             Vec3 pos = waypoint.position;
             float dist = pos.distance(localPlayer->getPos());
 
@@ -60,10 +71,10 @@ void Waypoints::onRenderOverlay(Event& evG) {
             float rectHeight = textSize.y + 10.f;
 
             d2d::Rect bgRect = {
-                screenPos->x - rectWidth / 2.f,
-                screenPos->y - rectHeight / 2.f,
-                screenPos->x + rectWidth / 2.f,
-                screenPos->y + rectHeight / 2.f
+                smoothedScreenPos->x - rectWidth / 2.f,
+                smoothedScreenPos->y - rectHeight / 2.f,
+                smoothedScreenPos->x + rectWidth / 2.f,
+                smoothedScreenPos->y + rectHeight / 2.f
             };
 
             StoredColor bgColor = std::get<ColorValue>(bgColorSetting).getMainColor();

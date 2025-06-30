@@ -43,12 +43,8 @@ private:
     const std::vector<d2d::Color> waypointColors = {
         // White
         d2d::Color::Hex("FFFFFF"),
-        // Bright Yellow
-        d2d::Color::Hex("FFFF00"),
         // Cyan
         d2d::Color::Hex("00FFFF"),
-        // Lime Green
-        d2d::Color::Hex("00FF00"),
         // Magenta
         d2d::Color::Hex("FF00FF"),
         // Orange
