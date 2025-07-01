@@ -13,11 +13,9 @@ WaypointPopupScreen::WaypointPopupScreen() {
     Eventing::get().listen<KeyUpdateEvent>(this, static_cast<EventListenerFunc>(&WaypointPopupScreen::onKey));
 
     formFields = {
-        { L"Name:", &nameTextBox },
-        { L"Initials:", &initialsTextBox },
-        { L"X:", &xTextBox },
-        { L"Y:", &yTextBox },
-        { L"Z:", &zTextBox }
+        { L"Name: ", &nameTextBox },
+        { L"Initials: ", &initialsTextBox },
+        { L"Coordinates: ", &coordinatesTextBox},
     };
 
     for (FormField const& field : formFields) {
@@ -40,10 +38,14 @@ void WaypointPopupScreen::onEnable(bool ignoreAnims) {
 
     if (auto player = SDK::ClientInstance::get()->getLocalPlayer()) {
         Vec3 pos = player->getPos();
-        xTextBox.setText(std::to_wstring(static_cast<int>(pos.x)));
-        // very hacky fix to get vanilla y coordinate (probably not 100% accurate)
-        yTextBox.setText(std::to_wstring(lroundf(pos.y - 1.62f)));
-        zTextBox.setText(std::to_wstring(static_cast<int>(pos.z)));
+        std::wstring xPos = std::to_wstring(static_cast<int>(pos.x));
+        std::wstring yPos = std::to_wstring(lroundf(pos.y - 1.62f));
+        std::wstring zPos = std::to_wstring(static_cast<int>(pos.z));
+
+        std::wstringstream ss;
+        ss.precision(1);
+        ss << xPos << L" " << yPos << L" " << zPos;
+        coordinatesTextBox.setText(ss.str());
     }
 
     nameTextBox.setText(L"New Waypoint");
@@ -76,6 +78,7 @@ void WaypointPopupScreen::onRender(Event& evG) {
     if (!isActive()) justClicked = { false, false, false };
     D2DUtil dc;
 
+    /*
     if (isActive()) {
         float alpha = Latite::getRenderer().getDeltaTime() / 10.f;
         blurAnim = std::lerp(blurAnim, 1.f, alpha);
@@ -83,6 +86,7 @@ void WaypointPopupScreen::onRender(Event& evG) {
         float toBlur = Latite::get().getMenuBlur().value_or(0.f);
         if (Latite::get().getMenuBlur()) dc.drawGaussianBlur(toBlur * blurAnim);
     }
+    */
 
     D2D1_SIZE_F ss = Latite::getRenderer().getScreenSize();
 
@@ -104,7 +108,7 @@ void WaypointPopupScreen::onRender(Event& evG) {
 
     float fieldHeight = 25.f;
     float padding = 20.f;
-    float labelWidth = 60.f;
+    float labelWidth = 100.f;
     float spacing = 15.f;
 
     d2d::Rect titleRect = { popupRect.left, popupRect.top, popupRect.right, formFieldsTopY };
@@ -122,7 +126,7 @@ void WaypointPopupScreen::onRender(Event& evG) {
         d2d::Rect labelRect = { currentPos.x, currentPos.y, currentPos.x + labelWidth, currentPos.y + fieldHeight };
         field.inputRect = { labelRect.right, currentPos.y, labelRect.right + inputWidth, currentPos.y + fieldHeight };
 
-        dc.drawText(labelRect, field.label, labelColor, Renderer::FontSelection::PrimaryRegular, 16.f,
+        dc.drawText(labelRect, field.label, labelColor, Renderer::FontSelection::PrimaryRegular, 18.f,
                     DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
         field.textBox->setRect(field.inputRect);
@@ -133,7 +137,7 @@ void WaypointPopupScreen::onRender(Event& evG) {
 
     currentPos.y += 5;
     d2d::Rect colorLabelRect = { currentPos.x, currentPos.y, currentPos.x + labelWidth, currentPos.y + fieldHeight };
-    dc.drawText(colorLabelRect, L"Color:", labelColor, Renderer::FontSelection::PrimaryRegular, 16.f,
+    dc.drawText(colorLabelRect, L"Color: ", labelColor, Renderer::FontSelection::PrimaryRegular, 16.f,
         DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     float swatchAreaX = colorLabelRect.right;
@@ -176,11 +180,11 @@ void WaypointPopupScreen::onRender(Event& evG) {
     };
 
     dc.fillRoundedRectangle(cancelBtnRect, d2d::Color::RGB(251, 54, 54).asAlpha(0.8f), 5.f);
-    dc.drawText(cancelBtnRect, L"Cancel", fieldTextColor, Renderer::FontSelection::PrimaryRegular, 16.f,
+    dc.drawText(cancelBtnRect, L"Cancel", fieldTextColor, Renderer::FontSelection::PrimaryRegular, 18.f,
                 DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
     dc.fillRoundedRectangle(createBtnRect, d2d::Color(Latite::get().getAccentColor().getMainColor()).asAlpha(0.8f),
                             5.f);
-    dc.drawText(createBtnRect, L"Create", fieldTextColor, Renderer::FontSelection::PrimaryRegular, 16.f,
+    dc.drawText(createBtnRect, L"Create", fieldTextColor, Renderer::FontSelection::PrimaryRegular, 18.f,
                 DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
     if (this->justClicked[0]) {
@@ -220,9 +224,17 @@ void WaypointPopupScreen::onRender(Event& evG) {
                     newWaypoint.name = nameTextBox.getText();
                     newWaypoint.initials = initialsTextBox.getText();
                     newWaypoint.color = selectedColor;
-                    newWaypoint.position.x = std::stof(xTextBox.getText());
-                    newWaypoint.position.y = std::stof(yTextBox.getText());
-                    newWaypoint.position.z = std::stof(zTextBox.getText());
+
+                    std::wstringstream ss2(coordinatesTextBox.getText());
+                    int num;
+                    std::vector<int> numbers;
+
+                    while (ss2 >> num) {
+                        numbers.push_back(num);
+                    }
+                    newWaypoint.position.x = numbers.at(0);
+                    newWaypoint.position.y = numbers.at(1);
+                    newWaypoint.position.z = numbers.at(2);
 
                     if (auto player = SDK::ClientInstance::get()->getLocalPlayer(); player && player->dimension) {
                         newWaypoint.dimension = util::StrToWStr(player->dimension->dimensionName);

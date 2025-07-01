@@ -32,9 +32,7 @@ private:
     d2d::Rect popupRect = {};
     ui::TextBox nameTextBox = {};
     ui::TextBox initialsTextBox = { { 0, 0, 0, 0 }, 2 };
-    ui::TextBox xTextBox = {};
-    ui::TextBox yTextBox = {};
-    ui::TextBox zTextBox = {};
+    ui::TextBox coordinatesTextBox = {};
 
     std::vector<FormField> formFields;
     d2d::Color selectedColor;
