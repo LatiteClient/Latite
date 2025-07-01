@@ -106,6 +106,10 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     std::filesystem::create_directory(util::GetLatitePath() / "Assets");
     Logger::Setup();
 
+#ifdef LATITE_DEBUG
+    AddVectoredExceptionHandler(1, VectoredExceptionHandler);
+#endif
+
     Logger::Info(XOR_STRING("Latite Client {}"), Latite::version);
     winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
     winrt::Windows::ApplicationModel::PackageVersion version = package.Id().Version();
@@ -497,6 +501,13 @@ void Latite::threadsafeInit() {
     this->gameThreadId = std::this_thread::get_id();
     // TODO: latite beta only
     //if (SDK::ClientInstance::get()->minecraftGame->xuid.size() > 0) wnd->postXUID();
+
+
+#ifdef LATITE_DEBUG
+    // Set SEH translator for game thread
+    _set_se_translator(translate_seh_to_cpp_exception);
+#endif
+
 
     auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     std::string vstr(this->version);

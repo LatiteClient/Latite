@@ -15,7 +15,10 @@ public:
     EXCEPTION_POINTERS* getExceptionPointers() const { return m_exceptionPointers; }
 };
 
-// The translator function that converts an SEH exception to a C++ exception
 void __cdecl translate_seh_to_cpp_exception(unsigned int u, EXCEPTION_POINTERS* pExp);
+
+extern __declspec(thread) CONTEXT g_CxxExceptionContext;
+extern __declspec(thread) bool g_bHasCxxExceptionContext;
+LONG WINAPI VectoredExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo);
 
 #endif

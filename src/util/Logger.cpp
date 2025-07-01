@@ -14,11 +14,11 @@
 #include <iomanip>
 #include <sstream>
 
-std::string GenerateStackTrace(EXCEPTION_POINTERS* exceptionInfo = nullptr) {
+std::string GenerateStackTrace(CONTEXT* contextArg = nullptr) {
     HANDLE process = GetCurrentProcess();
     HANDLE thread = GetCurrentThread();
 
-    SymSetOptions(SYMOPT_UNDNAME | SYMOPT_LOAD_LINES | SYMOPT_FAIL_CRITICAL_ERRORS | SYMOPT_DEBUG);
+    SymSetOptions(SYMOPT_UNDNAME | SYMOPT_LOAD_LINES | SYMOPT_FAIL_CRITICAL_ERRORS);
 
     char dllPath[MAX_PATH];
     HMODULE hModule = NULL;
@@ -55,8 +55,8 @@ std::string GenerateStackTrace(EXCEPTION_POINTERS* exceptionInfo = nullptr) {
     SymRefreshModuleList(process);
 
     CONTEXT context;
-    if (exceptionInfo != nullptr) {
-        context = *exceptionInfo->ContextRecord;
+    if (contextArg) {
+        context = *contextArg;
     } else {
         RtlCaptureContext(&context);
     }
@@ -113,7 +113,7 @@ void LogExceptionDetails(StructuredException& ex) {
     Logger::Fatal("Exception Code: {:#x}", exceptionInfo->ExceptionRecord->ExceptionCode);
     Logger::Fatal("Exception Address: {:#x}", (DWORD64)exceptionInfo->ExceptionRecord->ExceptionAddress);
 
-    std::string stackTrace = GenerateStackTrace(exceptionInfo);
+    std::string stackTrace = GenerateStackTrace(exceptionInfo->ContextRecord);
     Logger::Fatal(stackTrace);
 
     // scuffed way to hope the file is written before termination
@@ -123,10 +123,15 @@ void LogExceptionDetails(StructuredException& ex) {
 void LogExceptionDetails(const std::exception& e) {
     Logger::Fatal("An unrecoverable C++ exception occurred: {}", e.what());
 
-    std::string stackTrace = GenerateStackTrace();
-    Logger::Fatal(stackTrace);
+    if (g_bHasCxxExceptionContext) {
+        std::string stackTrace = GenerateStackTrace(&g_CxxExceptionContext);
+        Logger::Fatal(stackTrace);
+        g_bHasCxxExceptionContext = false;
+    } else {
+        std::string stackTrace = GenerateStackTrace();
+        Logger::Fatal(stackTrace);
+    }
 
-    // scuffed way to hope the file is written before termination
     Sleep(1000);
 }
 #endif

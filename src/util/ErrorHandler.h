@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef LATITE_DEBUG
-#include "util/ExceptionHandler.h"
+#include "pch.h"
 #include "util/Logger.h"
 #include <stdexcept>
 
