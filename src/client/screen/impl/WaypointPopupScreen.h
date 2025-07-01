@@ -39,6 +39,8 @@ private:
     std::vector<FormField> formFields;
     d2d::Color selectedColor;
 
+    float blurAnim = 0.f;
+
     const std::vector<d2d::Color> waypointColors = {
         // White
         d2d::Color::Hex("FFFFFF"),
