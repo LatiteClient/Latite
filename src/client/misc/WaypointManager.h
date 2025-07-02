@@ -12,7 +12,7 @@ class WaypointManager {
 public:
     const std::vector<WaypointData>& getWaypoints() const;
     void addWaypoint(const WaypointData& waypoint);
-    void removeWaypoint(const Vec3& position);
+    void removeWaypoint(const WaypointData& waypoint);
 
     Vec2 getSmoothedPosition(const Vec3& key, const Vec2& target, float t);
 

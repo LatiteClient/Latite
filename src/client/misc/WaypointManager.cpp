@@ -5,17 +5,17 @@ void WaypointManager::addWaypoint(const WaypointData& waypoint) {
     waypoints.push_back(waypoint);
 }
 
-void WaypointManager::removeWaypoint(const Vec3& position) {
-    std::vector<WaypointData>::iterator newEnd = std::ranges::remove_if(
-        waypoints,
-        [&position](const WaypointData& waypoint) {
-            return waypoint.position == position;
-        }
-    ).begin();
+void WaypointManager::removeWaypoint(const WaypointData& waypoint) {
+    waypoints.erase(std::remove_if(waypoints.begin(), waypoints.end(),
+        [&waypoint](const WaypointData& wp) {
+            return wp.position == waypoint.position &&
+                wp.dimension == waypoint.dimension &&
+                wp.initials == waypoint.initials &&
+                wp.name == waypoint.name; // colors can be the same so it's not in the criteria here
+        }),
+        waypoints.end());
 
-    waypoints.erase(newEnd, waypoints.end());
-
-    smoothedPositions.erase(position);
+    smoothedPositions.erase(waypoint.position);
 }
 
 const std::vector<WaypointData>& WaypointManager::getWaypoints() const {
