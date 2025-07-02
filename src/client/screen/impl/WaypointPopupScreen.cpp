@@ -70,6 +70,7 @@ void WaypointPopupScreen::onRender(Event& evG) {
     if (!isActive()) justClicked = { false, false, false };
     D2DUtil dc;
 
+    // render blur
     if (isActive()) {
         float alpha = Latite::getRenderer().getDeltaTime() / 10.f;
         blurAnim = std::lerp(blurAnim, 1.f, alpha);
@@ -78,6 +79,7 @@ void WaypointPopupScreen::onRender(Event& evG) {
         if (Latite::get().getMenuBlur()) dc.drawGaussianBlur(toBlur * blurAnim);
     } 
 
+    // popup background and title
     D2D1_SIZE_F ss = Latite::getRenderer().getScreenSize();
 
     float popupWidth = 400.f;
@@ -96,6 +98,7 @@ void WaypointPopupScreen::onRender(Event& evG) {
 
     float formFieldsTopY = popupRect.top + 60.f;
 
+    // form fields
     float fieldHeight = 25.f;
     float padding = 20.f;
     float labelWidth = 100.f;
@@ -125,6 +128,7 @@ void WaypointPopupScreen::onRender(Event& evG) {
         currentPos.y += fieldHeight + spacing;
     }
 
+    // color swatches
     currentPos.y += 5;
     d2d::Rect colorLabelRect = { currentPos.x, currentPos.y, currentPos.x + labelWidth, currentPos.y + fieldHeight };
     dc.drawText(colorLabelRect, L"Color: ", labelColor, Renderer::FontSelection::PrimaryRegular, 16.f,
@@ -157,6 +161,7 @@ void WaypointPopupScreen::onRender(Event& evG) {
         colorSwatches.push_back({ color, swatchRect });
     }
 
+    // cancel and create buttons
     float buttonWidth = (popupRect.getWidth() - (padding * 2) - spacing) / 2.f;
     float buttonHeight = 35.f;
 
