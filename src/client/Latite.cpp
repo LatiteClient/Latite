@@ -502,6 +502,7 @@ void Latite::threadsafeInit() {
 
     auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     std::string vstr(this->version);
+    // scuffed
 #if defined(LATITE_NIGHTLY)
     auto ws = util::StrToWStr("Latite Client [NIGHTLY] " + gameVersion + " " + vstr + "/" + calcCurrentDLLHash());
 #elif defined(LATITE_DEBUG)
