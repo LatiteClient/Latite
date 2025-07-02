@@ -14,6 +14,7 @@
 
 #include "config/ConfigManager.h"
 #include "misc/ClientMessageQueue.h"
+#include "misc/WaypointManager.h"
 #include "input/Keyboard.h"
 #include "hook/Hooks.h"
 #include "event/Eventing.h"
@@ -71,6 +72,7 @@ namespace {
     alignas(ClientMessageQueue) char messageSinkBuf[sizeof(ClientMessageQueue)] = {};
     alignas(CommandManager) char commandMgrBuf[sizeof(CommandManager)] = {};
     alignas(ConfigManager) char configMgrBuf[sizeof(ConfigManager)] = {};
+    alignas(WaypointManager) char waypointMgrBuf[sizeof(WaypointManager)] = {};
     alignas(SettingGroup) char mainSettingGroup[sizeof(SettingGroup)] = {};
     alignas(LatiteHooks) char hooks[sizeof(LatiteHooks)] = {};
     alignas(ScreenManager) char scnMgrBuf[sizeof(ScreenManager)] = {};
@@ -291,6 +293,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     new (rendererBuf) Renderer();
     new (assetsBuf) Assets();
 
+    new (waypointMgrBuf) WaypointManager();
+
     for (auto& entry : sigList) {
         if (!entry.first->mod) continue;
         auto res = entry.first->resolve();
@@ -392,6 +396,10 @@ CommandManager& Latite::getCommandManager() noexcept {
 
 ConfigManager& Latite::getConfigManager() noexcept {
     return *std::launder(reinterpret_cast<ConfigManager*>(configMgrBuf));
+}
+
+WaypointManager& Latite::getWaypointManager() noexcept {
+    return *std::launder(reinterpret_cast<WaypointManager*>(waypointMgrBuf));
 }
 
 ClientMessageQueue& Latite::getClientMessageQueue() noexcept {

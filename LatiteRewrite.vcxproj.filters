@@ -170,6 +170,7 @@
     <ClCompile Include="src\sdk\common\network\RakNetConnector.cpp" />
     <ClCompile Include="src\util\WorldToScreen.cpp" />
     <ClCompile Include="src\client\screen\impl\WaypointPopupScreen.cpp" />
+    <ClCompile Include="src\client\misc\WaypointManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assets\lang\en_US.json" />
@@ -500,6 +501,7 @@
     <ClInclude Include="src\sdk\common\client\game\ClientHMDState.h" />
     <ClInclude Include="src\sdk\common\client\renderer\MinecraftMatrix.h" />
     <ClInclude Include="src\client\screen\impl\WaypointPopupScreen.h" />
+    <ClInclude Include="src\client\misc\WaypointManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />

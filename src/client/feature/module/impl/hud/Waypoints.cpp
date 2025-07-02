@@ -6,8 +6,9 @@
 #include "client/event/impl/KeyUpdateEvent.h"
 #include "client/render/Renderer.h"
 #include "client/Latite.h"
-
 #include "client/screen/ScreenManager.h"
+
+#include "client/misc/WaypointManager.h"
 
 Waypoints::Waypoints() : Module("Waypoints", L"Waypoints", L"Show saved locations", HUD, nokeybind) {
     this->listen<RenderOverlayEvent>(&Waypoints::onRenderOverlay);
@@ -20,15 +21,11 @@ Waypoints::Waypoints() : Module("Waypoints", L"Waypoints", L"Show saved location
 void Waypoints::onKey(Event& evG) {
     KeyUpdateEvent& ev = reinterpret_cast<KeyUpdateEvent&>(evG);
 
-    if (ev.isDown() && ev.getKey() == std::get<KeyValue>(addWaypointKeySetting) && SDK::ClientInstance::get()->
-        minecraftGame->isCursorGrabbed()) {
+    if (ev.isDown() && ev.getKey() == std::get<KeyValue>(addWaypointKeySetting) &&
+        SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
         ev.setCancelled(true);
         Latite::getScreenManager().showScreen<WaypointPopupScreen>();
     }
-}
-
-void Waypoints::addWaypoint(const WaypointData& waypoint) {
-    waypoints.push_back(waypoint);
 }
 
 void Waypoints::onRenderOverlay(Event& evG) {
@@ -41,31 +38,19 @@ void Waypoints::onRenderOverlay(Event& evG) {
     SDK::LocalPlayer* localPlayer = SDK::ClientInstance::get()->getLocalPlayer();
     std::wstring currentDimension = util::StrToWStr(localPlayer->dimension->dimensionName);
 
-    static std::unordered_map<Vec3, Vec2, Vec3Hasher> smoothedPositions;
-
-    for (const WaypointData& waypoint : waypoints) {
+    float deltaTime = Latite::get().getRenderer().getDeltaTime();
+    float smoothingSpeed = 12.0f;
+    float t = 1.0f - std::exp(-smoothingSpeed * deltaTime);
+    
+    for (const WaypointData& waypoint : Latite::get().getWaypointManager().getWaypoints()) {
         if (waypoint.dimension != currentDimension) continue;
 
         std::optional<Vec2> screenPos = WorldToScreen::convert(waypoint.position);
         if (!screenPos) continue;
 
-        Vec3 wpKey = waypoint.position;
-        Vec2& smoothedPos = smoothedPositions[wpKey];
+        Vec2 smoothedPos = Latite::get().getWaypointManager().getSmoothedPosition(waypoint.position, *screenPos, t);
 
-        float deltaTime = Latite::get().getRenderer().getDeltaTime();
-        float smoothingSpeed = 12.0f;
-        float t = 1.0f - std::exp(-smoothingSpeed * deltaTime);
-
-        if (smoothedPos.x == 0.0f && smoothedPos.y == 0.0f) {
-            smoothedPos = *screenPos;
-        }
-        else {
-            smoothedPos.x = std::lerp(smoothedPos.x, screenPos->x, t);
-            smoothedPos.y = std::lerp(smoothedPos.y, screenPos->y, t);
-        }
-
-        Vec3 pos = waypoint.position;
-        float dist = pos.distance(localPlayer->getPos());
+        float dist = waypoint.position.distance(localPlayer->getPos());
 
         std::wstringstream ss;
         ss.precision(1);

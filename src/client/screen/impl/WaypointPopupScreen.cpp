@@ -4,8 +4,7 @@
 #include "client/render/Renderer.h"
 #include "client/event/impl/KeyUpdateEvent.h"
 #include "client/event/impl/ClickEvent.h"
-
-#include "client/feature/module/impl/hud/Waypoints.h"
+#include "client/misc/WaypointManager.h"
 
 WaypointPopupScreen::WaypointPopupScreen() {
     Eventing::get().listen<RenderOverlayEvent>(this, static_cast<EventListenerFunc>(&WaypointPopupScreen::onRender));
@@ -21,13 +20,6 @@ WaypointPopupScreen::WaypointPopupScreen() {
     for (FormField const& field : formFields) {
         Latite::get().addTextBox(field.textBox);
     }
-
-    // TODO: fix this silliness with something a bit more elegant
-    Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
-        if (mod->name() == "Waypoints") {
-            this->parentModule = static_cast<Waypoints*>(mod.get());
-        }
-    });
 }
 
 void WaypointPopupScreen::onEnable(bool ignoreAnims) {
@@ -237,7 +229,7 @@ void WaypointPopupScreen::onRender(Event& evG) {
                     if (auto player = SDK::ClientInstance::get()->getLocalPlayer(); player && player->dimension) {
                         newWaypoint.dimension = util::StrToWStr(player->dimension->dimensionName);
                     }
-                    parentModule->addWaypoint(newWaypoint);
+                    Latite::get().getWaypointManager().addWaypoint(newWaypoint);
                 }
                 catch (...) {
                     // TODO: handle this in some non scuffed way

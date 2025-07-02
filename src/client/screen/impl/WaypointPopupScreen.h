@@ -26,9 +26,6 @@ protected:
     void onDisable() override;
 
 private:
-    // TODO: waypoint manager
-    Waypoints* parentModule;
-
     d2d::Rect popupRect = {};
     ui::TextBox nameTextBox = {};
     ui::TextBox initialsTextBox = { { 0, 0, 0, 0 }, 2 };

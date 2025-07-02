@@ -22,6 +22,7 @@ public:
 	[[nodiscard]] static class ModuleManager& getModuleManager() noexcept;
 	[[nodiscard]] static class CommandManager& getCommandManager() noexcept;
 	[[nodiscard]] static class ConfigManager& getConfigManager() noexcept;
+	[[nodiscard]] static class WaypointManager& getWaypointManager() noexcept;
 	[[nodiscard]] static class ClientMessageQueue& getClientMessageQueue() noexcept;
 	[[nodiscard]] static class SettingGroup& getSettings() noexcept;
 	[[nodiscard]] static class LatiteHooks& getHooks() noexcept;
