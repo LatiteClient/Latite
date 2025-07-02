@@ -86,5 +86,5 @@ jobs:
           Warning: This version may run slower than production builds.
         prerelease: true
         files: |
-          ${{ github.workspace }}\x64/Debug\LatiteDebug.dll
-          ${{ github.workspace }}\x64/Debug\LatiteDebug.pdb
+          ${{ github.workspace }}\x64\Debug\LatiteDebug.dll
+          ${{ github.workspace }}\x64\Debug\LatiteDebug.pdb
