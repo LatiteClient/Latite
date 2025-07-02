@@ -38,17 +38,13 @@ void Waypoints::onRenderOverlay(Event& evG) {
     SDK::LocalPlayer* localPlayer = SDK::ClientInstance::get()->getLocalPlayer();
     std::wstring currentDimension = util::StrToWStr(localPlayer->dimension->dimensionName);
 
-    float deltaTime = Latite::get().getRenderer().getDeltaTime();
-    float smoothingSpeed = 12.0f;
-    float t = 1.0f - std::exp(-smoothingSpeed * deltaTime);
-    
     for (const WaypointData& waypoint : Latite::get().getWaypointManager().getWaypoints()) {
         if (waypoint.dimension != currentDimension) continue;
 
         std::optional<Vec2> screenPos = WorldToScreen::convert(waypoint.position);
         if (!screenPos) continue;
 
-        Vec2 smoothedPos = Latite::get().getWaypointManager().getSmoothedPosition(waypoint.position, *screenPos, t);
+        Vec2 smoothedPos = Latite::get().getWaypointManager().getSmoothedPosition(waypoint.position, *screenPos);
 
         float dist = waypoint.position.distance(localPlayer->getPos());
 

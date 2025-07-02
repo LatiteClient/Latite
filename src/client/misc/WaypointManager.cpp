@@ -22,15 +22,22 @@ const std::vector<WaypointData>& WaypointManager::getWaypoints() const {
     return waypoints;
 }
 
-Vec2 WaypointManager::getSmoothedPosition(const Vec3& key, const Vec2& target, float t) {
-    Vec2& smoothed = smoothedPositions[key];
+Vec2 WaypointManager::getSmoothedPosition(const Vec3& key, const Vec2& target) {
+    Vec2& previous = smoothedPositions[key];
 
-    if (smoothed.x == 0.0f && smoothed.y == 0.0f) {
-        smoothed = target;
-    } else {
-        smoothed.x = std::lerp(smoothed.x, target.x, t);
-        smoothed.y = std::lerp(smoothed.y, target.y, t);
+    float alpha = SDK::ClientInstance::get()->minecraft->timer->alpha;
+
+    if (previous.x == 0.f && previous.y == 0.f) {
+        previous = target;
+        return target;
     }
 
-    return smoothed;
+    Vec2 interpolated = {
+        std::lerp(previous.x, target.x, alpha),
+        std::lerp(previous.y, target.y, alpha)
+    };
+
+    previous = interpolated;
+
+    return interpolated;
 }

@@ -14,7 +14,7 @@ public:
     void addWaypoint(const WaypointData& waypoint);
     void removeWaypoint(const WaypointData& waypoint);
 
-    Vec2 getSmoothedPosition(const Vec3& key, const Vec2& target, float t);
+    Vec2 getSmoothedPosition(const Vec3& key, const Vec2& target);
 
 private:
     std::vector<WaypointData> waypoints;
