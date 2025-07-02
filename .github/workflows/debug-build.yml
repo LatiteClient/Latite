@@ -39,13 +39,20 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: |
         msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
-        # Rename files to include Debug suffix
-        mv ${{ github.workspace }}/x64/Debug/LatiteRewrite.dll ${{ github.workspace }}/x64/Debug/LatiteDebug.dll
-        mv ${{ github.workspace }}/x64/Debug/LatiteRewrite.pdb ${{ github.workspace }}/x64/Debug/LatiteDebug.pdb
+        # Verify files exist before renaming
+        if (Test-Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.dll") {
+          Rename-Item -Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.dll" -NewName "LatiteDebug.dll"
+        } else {
+          Write-Error "LatiteRewrite.dll not found in Debug build output"
+          exit 1
+        }
+        if (Test-Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.pdb") {
+          Rename-Item -Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.pdb" -NewName "LatiteDebug.pdb"
+        }
       
     - name: Get DLL SHA1 hash
       id: sha1
-      working-directory: ${{ github.workspace }}/x64/Debug
+      working-directory: ${{ github.workspace }}\x64\Debug
       run: |
         function Get-GitStyleSha1 {
           param ([string]$FilePath)
@@ -57,7 +64,7 @@ jobs:
           $sha1 = [System.Security.Cryptography.SHA1]::Create()
           $hashBytes = $sha1.ComputeHash($combinedBytes)
           $hexHash = ($hashBytes | ForEach-Object { $_.ToString("x2") }) -join ""
-          return $hexHash
+          return $hexHash.Substring(0, 7)
         }
         $hash = Get-GitStyleSha1 -FilePath "LatiteDebug.dll"
         echo "sha1=$hash" >> $env:GITHUB_OUTPUT
@@ -70,7 +77,7 @@ jobs:
         body: |
           ### This is an automated, experimental DLL build of Latite Client.
           
-          **This release has a high chance of containing bugs or crashes.**
+          **This debug release has a high chance of containing bugs or crashes.**
           
           Includes:
           - Debug build (LatiteDebug.dll)

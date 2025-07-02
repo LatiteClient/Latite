@@ -53,7 +53,7 @@ jobs:
           $sha1 = [System.Security.Cryptography.SHA1]::Create()
           $hashBytes = $sha1.ComputeHash($combinedBytes)
           $hexHash = ($hashBytes | ForEach-Object { $_.ToString("x2") }) -join ""
-          return $hexHash
+          return $hexHash.Substring(0, 7)
         }
         $hash = Get-GitStyleSha1 -FilePath "LatiteRewrite.dll"
         echo "sha1=$hash" >> $env:GITHUB_OUTPUT
