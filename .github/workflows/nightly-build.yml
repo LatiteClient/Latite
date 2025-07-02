@@ -68,4 +68,4 @@ jobs:
           
           **This release has a high chance of containing bugs or crashes.**
         prerelease: true
-        files: ${{ github.workspace }}/x64/Nightly/LatiteRewrite.dll
+        files: ${{ github.workspace }}\x64/Nightly\LatiteRewrite.dll
