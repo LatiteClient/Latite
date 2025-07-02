@@ -75,6 +75,14 @@ struct Vec3 final {
 		return { x * right, y * right, z * right };
 	}
 
+	bool operator==(Vec3 const& right) const {
+		return x == right.x && y == right.y && z == right.z;
+	}
+
+	bool operator!=(Vec3 const& right) const {
+		return x != right.x || y != right.y || z != right.z;
+	}
+
 	inline float distance(Vec3& vec) {
 		return static_cast<float>(std::sqrt(std::pow(x - vec.x, 2) + std::pow(y - vec.y, 2) + std::pow(z - vec.z, 2)));
 	}
@@ -93,6 +101,16 @@ struct Vec3i final {
 	constexpr Vec3i() : x(0), y(0), z(0) {}
 	constexpr Vec3i(int x, int y, int z) : x(x), y(y), z(z) {}
 	constexpr Vec3i(Vec3 const& vec) : x(static_cast<int>(vec.x)), y(static_cast<int>(vec.y)), z(static_cast<int>(vec.z)) {}
+};
+
+struct Vec3Hasher final {
+	std::size_t operator()(const Vec3& v) const {
+		std::hash<float> hasher;
+		size_t hx = hasher(v.x);
+		size_t hy = hasher(v.y);
+		size_t hz = hasher(v.z);
+		return hx ^ (hy << 1) ^ (hz << 2);
+	}
 };
 
 //constexpr Vec3::Vec3(Vec3i const& vec) : x(static_cast<int>(std::round(vec.x))), y(static_cast<int>(std::round(vec.y))), z(static_cast<int>(std::round(vec.z))) {}
