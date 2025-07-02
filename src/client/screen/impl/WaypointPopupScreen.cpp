@@ -78,15 +78,13 @@ void WaypointPopupScreen::onRender(Event& evG) {
     if (!isActive()) justClicked = { false, false, false };
     D2DUtil dc;
 
-    /*
     if (isActive()) {
         float alpha = Latite::getRenderer().getDeltaTime() / 10.f;
         blurAnim = std::lerp(blurAnim, 1.f, alpha);
 
         float toBlur = Latite::get().getMenuBlur().value_or(0.f);
         if (Latite::get().getMenuBlur()) dc.drawGaussianBlur(toBlur * blurAnim);
-    }
-    */
+    } 
 
     D2D1_SIZE_F ss = Latite::getRenderer().getScreenSize();
 
