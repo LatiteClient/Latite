@@ -35,7 +35,7 @@ jobs:
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
 
-    - name: Build Latite (Debug)
+    - name: Build Latite Debug
       working-directory: ${{env.GITHUB_WORKSPACE}}
       run: |
         msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
@@ -49,31 +49,12 @@ jobs:
         if (Test-Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.pdb") {
           Rename-Item -Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.pdb" -NewName "LatiteDebug.pdb"
         }
-      
-    - name: Get DLL SHA1 hash
-      id: sha1
-      working-directory: ${{ github.workspace }}\x64\Debug
-      run: |
-        function Get-GitStyleSha1 {
-          param ([string]$FilePath)
-          $fileContent = [System.IO.File]::ReadAllBytes($FilePath)
-          $fileSize = $fileContent.Length
-          $header = "blob $fileSize`0"
-          $headerBytes = [System.Text.Encoding]::UTF8.GetBytes($header)
-          $combinedBytes = $headerBytes + $fileContent
-          $sha1 = [System.Security.Cryptography.SHA1]::Create()
-          $hashBytes = $sha1.ComputeHash($combinedBytes)
-          $hexHash = ($hashBytes | ForEach-Object { $_.ToString("x2") }) -join ""
-          return $hexHash.Substring(0, 7)
-        }
-        $hash = Get-GitStyleSha1 -FilePath "LatiteDebug.dll"
-        echo "sha1=$hash" >> $env:GITHUB_OUTPUT
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2.3.2
       with:
-        tag_name: debug-${{ steps.sha1.outputs.sha1 }}
-        name: Latite Debug ${{ steps.sha1.outputs.sha1 }}
+        tag_name: debug
+        name: Latite Debug
         body: |
           ### This is an automated, experimental DLL build of Latite Client.
           
