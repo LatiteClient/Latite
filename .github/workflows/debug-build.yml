@@ -70,7 +70,7 @@ jobs:
         echo "sha1=$hash" >> $env:GITHUB_OUTPUT
 
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2.3.2
       with:
         tag_name: debug-${{ steps.sha1.outputs.sha1 }}
         name: Latite Debug ${{ steps.sha1.outputs.sha1 }}
@@ -86,5 +86,5 @@ jobs:
           Warning: This version may run slower than production builds.
         prerelease: true
         files: |
-          ${{ github.workspace }}\x64\Debug\LatiteDebug.dll
-          ${{ github.workspace }}\x64\Debug\LatiteDebug.pdb
+          ${{ github.workspace }}/x64/Debug/LatiteDebug.dll
+          ${{ github.workspace }}/x64/Debug/LatiteDebug.pdb
