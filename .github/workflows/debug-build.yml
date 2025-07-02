@@ -1,0 +1,83 @@
+name: Latite Debug
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - '**.cpp'
+      - '**.h'
+      - '**.hpp'
+      - '**.vcxproj'
+      - '**.sln'
+  pull_request:
+    branches: [ "master" ]
+    paths:
+      - '**.cpp'
+      - '**.h'
+      - '**.hpp'
+      - '**.vcxproj'
+      - '**.sln'
+
+env:
+  SOLUTION_FILE_PATH: .
+  BUILD_CONFIGURATION: Debug
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Build Latite (Debug)
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: |
+        msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
+        # Rename files to include Debug suffix
+        mv ${{ github.workspace }}/x64/Debug/LatiteRewrite.dll ${{ github.workspace }}/x64/Debug/LatiteDebug.dll
+        mv ${{ github.workspace }}/x64/Debug/LatiteRewrite.pdb ${{ github.workspace }}/x64/Debug/LatiteDebug.pdb
+      
+    - name: Get DLL SHA1 hash
+      id: sha1
+      working-directory: ${{ github.workspace }}/x64/Debug
+      run: |
+        function Get-GitStyleSha1 {
+          param ([string]$FilePath)
+          $fileContent = [System.IO.File]::ReadAllBytes($FilePath)
+          $fileSize = $fileContent.Length
+          $header = "blob $fileSize`0"
+          $headerBytes = [System.Text.Encoding]::UTF8.GetBytes($header)
+          $combinedBytes = $headerBytes + $fileContent
+          $sha1 = [System.Security.Cryptography.SHA1]::Create()
+          $hashBytes = $sha1.ComputeHash($combinedBytes)
+          $hexHash = ($hashBytes | ForEach-Object { $_.ToString("x2") }) -join ""
+          return $hexHash
+        }
+        $hash = Get-GitStyleSha1 -FilePath "LatiteDebug.dll"
+        echo "sha1=$hash" >> $env:GITHUB_OUTPUT
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: debug-${{ steps.sha1.outputs.sha1 }}
+        name: Latite Debug ${{ steps.sha1.outputs.sha1 }}
+        body: |
+          ### This is an automated, experimental DLL build of Latite Client.
+          
+          **This release has a high chance of containing bugs or crashes.**
+          
+          Includes:
+          - Debug build (LatiteDebug.dll)
+          - PDB symbols (LatiteDebug.pdb)
+          
+          Warning: This version may run slower than production builds.
+        prerelease: true
+        files: |
+          ${{ github.workspace }}/x64/Debug/LatiteDebug.dll
+          ${{ github.workspace }}/x64/Debug/LatiteDebug.pdb
