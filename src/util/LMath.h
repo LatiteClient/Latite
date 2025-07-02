@@ -83,7 +83,7 @@ struct Vec3 final {
 		return x != right.x || y != right.y || z != right.z;
 	}
 
-	inline float distance(Vec3& vec) {
+	inline float distance(Vec3& vec) const {
 		return static_cast<float>(std::sqrt(std::pow(x - vec.x, 2) + std::pow(y - vec.y, 2) + std::pow(z - vec.z, 2)));
 	}
 };
