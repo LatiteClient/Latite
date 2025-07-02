@@ -95,6 +95,7 @@ namespace shared {
 )()
 
 DWORD __stdcall startThread(HINSTANCE dll) {
+    BEGIN_ERROR_HANDLER
     // Needed for Logger
     new (messageSinkBuf) ClientMessageQueue;
     new (eventing) Eventing();
@@ -104,6 +105,10 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     std::filesystem::create_directory(util::GetLatitePath());
     std::filesystem::create_directory(util::GetLatitePath() / "Assets");
     Logger::Setup();
+
+#ifdef LATITE_DEBUG
+    AddVectoredExceptionHandler(1, VectoredExceptionHandler);
+#endif
 
     Logger::Info(XOR_STRING("Latite Client {}"), Latite::version);
     winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
@@ -325,6 +330,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     Logger::Info(XOR_STRING("Initialized Latite Client"));
     return 0ul;
+    END_ERROR_HANDLER
 }
 
 BOOL WINAPI DllMain(
@@ -332,15 +338,10 @@ BOOL WINAPI DllMain(
     DWORD fdwReason,     // reason for calling function
     LPVOID)  // reserved
 {
+    BEGIN_ERROR_HANDLER
     if (GetModuleHandleA("Minecraft.Windows.exe") != GetModuleHandleA(NULL)) return TRUE;
 
     if (fdwReason == DLL_PROCESS_ATTACH) {
-
-        if (hasInjected) {
-            FreeLibrary(hinstDLL);
-            return TRUE;
-        }
-
         hasInjected = true;
 
         DisableThreadLibraryCalls(hinstDLL);
@@ -376,6 +377,7 @@ BOOL WINAPI DllMain(
         Logger::Info("Latite Client detached.");
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
+    END_ERROR_HANDLER
 }
 
 Latite& Latite::get() noexcept {
@@ -499,6 +501,13 @@ void Latite::threadsafeInit() {
     this->gameThreadId = std::this_thread::get_id();
     // TODO: latite beta only
     //if (SDK::ClientInstance::get()->minecraftGame->xuid.size() > 0) wnd->postXUID();
+
+
+#ifdef LATITE_DEBUG
+    // Set SEH translator for game thread
+    _set_se_translator(translate_seh_to_cpp_exception);
+#endif
+
 
     auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     std::string vstr(this->version);

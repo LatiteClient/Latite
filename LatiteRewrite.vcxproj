@@ -281,12 +281,15 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <AdditionalDependencies>winmm.lib;Dbghelp.lib;MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
+      <StripPrivateSymbols>
+      </StripPrivateSymbols>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -710,6 +713,8 @@
     <ClInclude Include="src\sdk\Version.h" />
     <ClInclude Include="src\util\ChakraUtil.h" />
     <ClInclude Include="src\util\DrawUtil3D.h" />
+    <ClInclude Include="src\util\ErrorHandler.h" />
+    <ClInclude Include="src\util\ExceptionHandler.h" />
     <ClInclude Include="src\util\FNV32.h" />
     <ClInclude Include="src\util\DxContext.h" />
     <ClInclude Include="src\util\DxUtil.h" />
@@ -912,6 +917,7 @@
     <ClCompile Include="src\util\DrawUtil3D.cpp" />
     <ClCompile Include="src\util\DxContext.cpp" />
     <ClCompile Include="src\util\DxUtil.cpp" />
+    <ClCompile Include="src\util\ExceptionHandler.cpp" />
     <ClCompile Include="src\util\Logger.cpp" />
     <ClCompile Include="src\util\Util.cpp" />
     <ClCompile Include="src\client\feature\module\impl\hud\TabList.cpp" />
