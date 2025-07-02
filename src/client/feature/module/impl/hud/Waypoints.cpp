@@ -41,47 +41,52 @@ void Waypoints::onRenderOverlay(Event& evG) {
     SDK::LocalPlayer* localPlayer = SDK::ClientInstance::get()->getLocalPlayer();
     std::wstring currentDimension = util::StrToWStr(localPlayer->dimension->dimensionName);
 
+    static std::unordered_map<Vec3, Vec2, Vec3Hasher> smoothedPositions;
+
     for (const WaypointData& waypoint : waypoints) {
         if (waypoint.dimension != currentDimension) continue;
 
         std::optional<Vec2> screenPos = WorldToScreen::convert(waypoint.position);
+        if (!screenPos) continue;
 
-        if (screenPos != std::nullopt) {
-            if (smoothedScreenPos == std::nullopt) {
-                smoothedScreenPos = screenPos;
-            }
+        Vec3 wpKey = waypoint.position;
+        Vec2& smoothedPos = smoothedPositions[wpKey];
 
-            if (smoothedScreenPos && screenPos) {
-                constexpr float smoothingFactor = 0.9f;
-                float deltaTime = Latite::get().getRenderer().getDeltaTime();
-                smoothedScreenPos->x += (screenPos->x - smoothedScreenPos->x) * smoothingFactor * deltaTime;
-                smoothedScreenPos->y += (screenPos->y - smoothedScreenPos->y) * smoothingFactor * deltaTime;
-            }
+        float deltaTime = Latite::get().getRenderer().getDeltaTime();
+        float smoothingSpeed = 12.0f;
+        float t = 1.0f - std::exp(-smoothingSpeed * deltaTime);
 
-            Vec3 pos = waypoint.position;
-            float dist = pos.distance(localPlayer->getPos());
-
-            std::wstringstream ss;
-            ss.precision(1);
-            ss << waypoint.initials << L"\n[" << static_cast<int>(dist) << L"m]";
-            std::wstring text = ss.str();
-
-            Vec2 textSize = dc.getTextSize(text, Renderer::FontSelection::PrimaryRegular, 14.f);
-            float rectWidth = textSize.x + 20.f;
-            float rectHeight = textSize.y + 10.f;
-
-            d2d::Rect bgRect = {
-                smoothedScreenPos->x - rectWidth / 2.f,
-                smoothedScreenPos->y - rectHeight / 2.f,
-                smoothedScreenPos->x + rectWidth / 2.f,
-                smoothedScreenPos->y + rectHeight / 2.f
-            };
-
-            StoredColor bgColor = std::get<ColorValue>(bgColorSetting).getMainColor();
-
-            dc.fillRoundedRectangle(bgRect, bgColor, 5.f);
-            dc.drawText(bgRect, text, waypoint.color, Renderer::FontSelection::PrimaryRegular, 14.f,
-                        DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+        if (smoothedPos.x == 0.0f && smoothedPos.y == 0.0f) {
+            smoothedPos = *screenPos;
         }
+        else {
+            smoothedPos.x = std::lerp(smoothedPos.x, screenPos->x, t);
+            smoothedPos.y = std::lerp(smoothedPos.y, screenPos->y, t);
+        }
+
+        Vec3 pos = waypoint.position;
+        float dist = pos.distance(localPlayer->getPos());
+
+        std::wstringstream ss;
+        ss.precision(1);
+        ss << waypoint.initials << L"\n[" << static_cast<int>(dist) << L"m]";
+        std::wstring text = ss.str();
+
+        Vec2 textSize = dc.getTextSize(text, Renderer::FontSelection::PrimaryRegular, 14.f);
+        float rectWidth = textSize.x + 20.f;
+        float rectHeight = textSize.y + 10.f;
+
+        d2d::Rect bgRect = {
+            smoothedPos.x - rectWidth / 2.f,
+            smoothedPos.y - rectHeight / 2.f,
+            smoothedPos.x + rectWidth / 2.f,
+            smoothedPos.y + rectHeight / 2.f
+        };
+
+        StoredColor bgColor = std::get<ColorValue>(bgColorSetting).getMainColor();
+
+        dc.fillRoundedRectangle(bgRect, bgColor, 5.f);
+        dc.drawText(bgRect, text, waypoint.color, Renderer::FontSelection::PrimaryRegular, 14.f,
+            DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
     }
 }
