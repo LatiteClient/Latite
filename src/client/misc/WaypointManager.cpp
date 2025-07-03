@@ -11,7 +11,7 @@ void WaypointManager::removeWaypoint(const WaypointData& waypoint) {
             return wp.position == waypoint.position &&
                 wp.dimension == waypoint.dimension &&
                 wp.initials == waypoint.initials &&
-                wp.name == waypoint.name; // colors can be the same so it's not in the criteria here
+                wp.name == waypoint.name; // colors can be the same, so it's not in the criteria here
         }),
         waypoints.end());
 
