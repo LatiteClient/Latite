@@ -1,17 +1,19 @@
 #include "pch.h"
 #include "Waypoints.h"
 
-#include "sdk/common/client/gui/controls/UIControl.h"
-#include "util/WorldToScreen.h"
 #include "client/event/impl/KeyUpdateEvent.h"
 #include "client/render/Renderer.h"
 #include "client/Latite.h"
 #include "client/screen/ScreenManager.h"
-
 #include "client/misc/WaypointManager.h"
 
+#include "sdk/common/client/gui/controls/UIControl.h"
+#include "sdk/common/client/gui/controls/VisualTree.h"
+
+#include "util/WorldToScreen.h"
+
 Waypoints::Waypoints() : Module("Waypoints", L"Waypoints", L"Show saved locations", HUD, nokeybind) {
-    this->listen<RenderOverlayEvent>(&Waypoints::onRenderOverlay);
+    this->listen<RenderLayerEvent>(&Waypoints::onRenderLayer);
     this->listen<KeyUpdateEvent>(&Waypoints::onKey);
 
     addSetting("addWaypointKey", L"Add waypoint", L"", addWaypointKeySetting);
@@ -28,23 +30,26 @@ void Waypoints::onKey(Event& evG) {
     }
 }
 
-void Waypoints::onRenderOverlay(Event& evG) {
+void Waypoints::onRenderLayer(Event& evG) {
     if (!SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) return;
     if (!SDK::ClientInstance::get()->getLocalPlayer()) return;
     if (!SDK::ClientInstance::get()->minecraft->getLevel()) return;
     if (!SDK::ClientInstance::get()->getLocalPlayer()->dimension) return;
 
-    D2DUtil dc;
+    RenderLayerEvent& ev = reinterpret_cast<RenderLayerEvent&>(evG);
+    SDK::ScreenView* screenView = ev.getScreenView();
+
+    MCDrawUtil dc{ ev.getUIRenderContext(), Latite::get().getFont() };
+
     SDK::LocalPlayer* localPlayer = SDK::ClientInstance::get()->getLocalPlayer();
     std::wstring currentDimension = util::StrToWStr(localPlayer->dimension->dimensionName);
 
     for (const WaypointData& waypoint : Latite::get().getWaypointManager().getWaypoints()) {
+        if (screenView->visualTree->rootControl->name == "hud_screen") return;
         if (waypoint.dimension != currentDimension) continue;
 
         std::optional<Vec2> screenPos = WorldToScreen::convert(waypoint.position);
         if (!screenPos) continue;
-
-        Vec2 smoothedPos = Latite::get().getWaypointManager().getSmoothedPosition(waypoint.position, *screenPos);
 
         float dist = waypoint.position.distance(localPlayer->getPos());
 
@@ -58,10 +63,10 @@ void Waypoints::onRenderOverlay(Event& evG) {
         float rectHeight = textSize.y + 10.f;
 
         d2d::Rect bgRect = {
-            smoothedPos.x - rectWidth / 2.f,
-            smoothedPos.y - rectHeight / 2.f,
-            smoothedPos.x + rectWidth / 2.f,
-            smoothedPos.y + rectHeight / 2.f
+            screenPos->x - rectWidth / 2.f,
+            screenPos->y - rectHeight / 2.f,
+            screenPos->x + rectWidth / 2.f,
+            screenPos->y + rectHeight / 2.f
         };
 
         StoredColor bgColor = std::get<ColorValue>(bgColorSetting).getMainColor();

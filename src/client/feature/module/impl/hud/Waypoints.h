@@ -8,7 +8,7 @@ public:
     Waypoints();
 
 private:
-    void onRenderOverlay(Event& evG);
+    void onRenderLayer(Event& evG);
     void onKey(Event& evG);
 
     ValueType addWaypointKeySetting = KeyValue('B');
