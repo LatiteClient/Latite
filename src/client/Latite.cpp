@@ -698,14 +698,14 @@ std::string Latite::calcCurrentDLLHash() {
 std::wstring Latite::GetCurrentModuleFilePath(HMODULE hModule) {
     std::vector<wchar_t> buffer(MAX_PATH);
 
-    DWORD result = GetModuleFileName(hModule, buffer.data(), static_cast<DWORD>(buffer.size()));
+    DWORD result = GetModuleFileNameW(hModule, buffer.data(), static_cast<DWORD>(buffer.size()));
 
     if (result > 0 && result < buffer.size()) {
         return std::wstring(buffer.data());
     }
     else if (result >= buffer.size()) {
         buffer.resize(result + 1);
-        result = GetModuleFileName(hModule, buffer.data(), static_cast<DWORD>(buffer.size()));
+        result = GetModuleFileNameW(hModule, buffer.data(), static_cast<DWORD>(buffer.size()));
         if (result > 0 && result < buffer.size()) {
             return std::wstring(buffer.data());
         }

@@ -4,16 +4,15 @@
 #include "util/FNV32.h"
 
 namespace SDK {
-	class FNVString {
+	class StringHash {
 	public:
 		std::string string;
 		int64_t hash;
 	private:
 	public:
-		FNVString(int64_t hash, std::string text) : hash(hash), string(text.c_str()) {};
+		StringHash(int64_t hash, std::string text) : hash(hash), string(text.c_str()) {};
 
-
-		bool operator==(uint64_t right) {
+		bool operator==(int64_t right) {
 			return right == hash;
 		}
 
@@ -21,7 +20,7 @@ namespace SDK {
 			return string == right;
 		}
 
-		bool operator!=(uint64_t right) {
+		bool operator!=(int64_t right) {
 			return !operator==(right);
 		}
 

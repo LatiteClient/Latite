@@ -134,7 +134,7 @@ void Config::saveSetting(std::shared_ptr<Setting> set, nlohmann::json& jout) {
 		nlohmann::json objc = json::object();
 		obj.store(objc);
 		jout["value"] = objc;
-		}, *set->value);
+		}, val);
 }
 
 std::vector<std::shared_ptr<SettingGroup>> Config::getOutput() noexcept {

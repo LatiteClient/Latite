@@ -169,7 +169,7 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
-    WNDCLASSEX wnd{ 0 };
+    WNDCLASSEXW wnd{ 0 };
     ZeroMemory(&wnd, sizeof(WNDCLASSEX));
 
     wnd.cbSize = sizeof(WNDCLASSEX);
@@ -179,9 +179,9 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
     wnd.lpszMenuName = 0;
     wnd.style = CS_SAVEBITS | CS_DROPSHADOW;
 
-    RegisterClassEx(&wnd);
+    RegisterClassExW(&wnd);
 
-    HWND hWnd = CreateWindowEx(0, L"dummywnd", L"hi", WS_MINIMIZEBOX,
+    HWND hWnd = CreateWindowExW(0, L"dummywnd", L"hi", WS_MINIMIZEBOX,
         0, 0, 100, 100, nullptr, nullptr, Latite::get().dllInst, nullptr);
 
     swapChainDesc.OutputWindow = hWnd;
@@ -215,7 +215,7 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
     }
 
     DestroyWindow(hWnd);
-    UnregisterClass(L"dummywnd", Latite::get().dllInst);
+    UnregisterClassW(L"dummywnd", Latite::get().dllInst);
 
     ComPtr<IDXGIFactory2> factory2;
     if (SUCCEEDED(factory.As(&factory2))) {

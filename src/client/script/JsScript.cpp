@@ -146,22 +146,6 @@ void JsScript::handleAsyncOperations() {
 		}
 		++i;
 	}
-	return;
-
-
-	for (auto it = pendingOperations.begin(); it != pendingOperations.end();) {
-		auto ptr = it->get();
-		if (ptr->flagDone) {
-			ptr->thr->join();
-			ptr->getArgs();
-			ptr->call();
-			if (ptr->shouldRemove) {
-				pendingOperations.erase(it);
-				continue;
-			}
-		}
-		++it;
-	}
 }
 
 JsErrorCode JsScript::runScript() {

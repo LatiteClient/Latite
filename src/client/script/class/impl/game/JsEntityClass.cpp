@@ -306,14 +306,9 @@ JsValueRef JsEntityClass::entitySetStatusFlag(JsValueRef callee, bool isConstruc
 		actor->setStatusFlag(Chakra::GetInt(arguments[1]), Chakra::GetBool(arguments[2]));
 		return Chakra::GetUndefined();
 	}
-	else {
-		Chakra::ThrowError(XW("Access denied, cannot use setStatusFlag"));
-		return Chakra::GetUndefined();
-	}
-	Chakra::ThrowError(XW("Invalid entity"));
-
-	return JS_INVALID_REFERENCE;
-
+	
+	Chakra::ThrowError(XW("Access denied, cannot use setStatusFlag"));
+	return Chakra::GetUndefined();
 }
 
 JsValueRef JsEntityClass::entityGetArmorSlot(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {

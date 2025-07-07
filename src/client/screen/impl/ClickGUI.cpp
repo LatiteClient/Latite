@@ -1268,7 +1268,6 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 	default:
 		return pos.y;
 	}
-	return pos.y;
 }
 
 bool ClickGUI::shouldSelect(d2d::Rect rc, Vec2 const& pt) {

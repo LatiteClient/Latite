@@ -127,21 +127,7 @@ void TestModule::onRender(Event& evG) {
 	jpegCommentWriter->_drawImage(scn, &img);
 }
 
-void TestModule::onKey(Event& ev)
-{
-	return;
-	[[maybe_unused]] auto& kev = reinterpret_cast<KeyUpdateEvent&>(ev);
-	if (kev.getKey() == 'K') {
-		auto lp = SDK::ClientInstance::get()->getLocalPlayer();
-		if (lp) {
-			std::string str;
-			auto& map = lp->molangVariableMap;
-			for (auto& var : map.mVariables) {
-				str += "\"" + var->mName.getString() + "\" |\n";
-			}
-			util::SetClipboardText(util::StrToWStr(str));
-		}
-	}
+void TestModule::onKey(Event& ev) {
 }
 
 void TestModule::onRenderLayer(Event& evG) {

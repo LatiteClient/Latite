@@ -111,9 +111,6 @@ JsValueRef JsSettingClass::setValueCallback(JsValueRef callee, bool isConstructo
 		Chakra::ThrowError(XW("Unsupported setting type for setValue"));
 		return JS_INVALID_REFERENCE;
 	}
-
-	Chakra::ThrowError(XW("Invalid type for setting type"));
-	return undef;
 }
 
 JsValueRef JsSettingClass::setCondition(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState){
