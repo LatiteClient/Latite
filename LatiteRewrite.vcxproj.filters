@@ -496,7 +496,7 @@
     <ClInclude Include="src\client\event\impl\GetFormattedNameTagEvent.h" />
     <ClInclude Include="src\util\WorldToScreen.h" />
     <ClInclude Include="src\sdk\common\client\game\ClientHMDState.h" />
-    <ClInclude Include="src\sdk\common\client\renderer\MinecraftMatrix.h" />
+    <ClInclude Include="src\sdk\common\client\renderer\Matrix.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LatiteRewrite.rc" />

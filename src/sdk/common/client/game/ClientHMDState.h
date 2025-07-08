@@ -1,26 +1,26 @@
 #pragma once
-#include "sdk/common/client/renderer/MinecraftMatrix.h"
+#include "sdk/common/client/renderer/Matrix.h"
 
 namespace SDK {
-    struct ClientHMDState {
+    class ClientHMDState {
         uint8_t pad_8[0xC8];
-
+    public:
         // mLastLevelViewMatrix | Offset: 0x0C8 (200)
-        SDK::MinecraftMatrix lastViewMatrix;
+        Matrix lastViewMatrix;
 
         // mLastLevelViewMatrixAbsolute | Offset: 0x108 (264)
-        SDK::MinecraftMatrix lastViewMatrixAbsolute;
+        Matrix lastViewMatrixAbsolute;
 
         // mLastLevelProjMatrix | Offset: 0x148 (328)
-        SDK::MinecraftMatrix lastProjectionMatrix;
+        Matrix lastProjectionMatrix;
 
         // mLastLevelWorldMatrix | Offset: 0x188 (392)
-        SDK::MinecraftMatrix lastWorldMatrix;
+        Matrix lastWorldMatrix;
 
         // mHUDMatrixPatch | Offset: 0x1C8 (456)
-        SDK::MinecraftMatrix hudMatrixPatch;
+        Matrix hudMatrixPatch;
 
         // mVRTransitionMatrixPatch | Offset: 0x208 (520)
-        SDK::MinecraftMatrix vrTransitionMatrixPatch;
+        Matrix vrTransitionMatrixPatch;
     };
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "Module.h"
 #include "util/DxContext.h"
-#include "json/json.hpp"
+#include <nlohmann/json.hpp>
 
 class HUDModule : public Module {
 public:

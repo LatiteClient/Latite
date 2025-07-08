@@ -6,7 +6,7 @@ if(NOT MSVC)
 	message(FATAL_ERROR "Compiler unsupported, must use MSVC")
 endif()
 
-# add all sources in src/* and deps/*
+# Add all sources in src/* and deps/*
 file(GLOB_RECURSE Latite_SRC CONFIGURE_DEPENDS
 	"src/*.h"
 	"src/*.cpp"
@@ -15,7 +15,7 @@ file(GLOB_RECURSE Latite_SRC CONFIGURE_DEPENDS
 	"deps/*.cpp"
 )
 
-# Enable Hot Reload for MSVC compilers if supported.
+# Enable Hot Reload for MSVC compilers if supported
 if (POLICY CMP0141)
   cmake_policy(SET CMP0141 NEW)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
@@ -29,7 +29,7 @@ add_library(Latite SHARED ${Latite_SRC})
 # C++ standard
 set_property(TARGET Latite PROPERTY CXX_STANDARD 20)
 
-# disable RTTI and set warning level
+# Disable RTTI and set warning level
 add_definitions(/GR- /D_HAS_STATIC_RTTI=0 /W4 /MT)
 add_compile_definitions(_UNICODE UNICODE)
 

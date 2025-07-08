@@ -1,6 +1,6 @@
 #pragma once
 #include "api/feature/Feature.h"
-#include "json/json.hpp"
+#include <nlohmann/json.hpp>
 #include <variant>
 
 struct NullValue {

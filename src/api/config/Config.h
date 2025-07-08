@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <optional>
 #include "api/feature/setting/SettingGroup.h"
-#include "json/json.hpp"
+#include <nlohmann/json.hpp>
 
 class Config {
 public:

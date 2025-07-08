@@ -23,6 +23,9 @@
 
 using namespace std::chrono_literals;
 
+// Libraries
+#include <glm/mat4x4.hpp>
+
 // COM
 #include <d2d1.h>
 #include <d3d11.h>

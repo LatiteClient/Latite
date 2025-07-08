@@ -2,7 +2,7 @@
 #include "ScriptCommand.h"
 #include "client/script/PluginManager.h"
 #include <filesystem>
-#include "json/json.hpp"
+#include <nlohmann/json.hpp>
 #include "../CommandManager.h"
 #include "client/Latite.h"
 #include <client/script/JsPlugin.h>
