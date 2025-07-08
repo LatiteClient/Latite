@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "Renderer.h"
 #include "client/event/Eventing.h"
-#include "client/event/impl/RenderOverlayEvent.h"
-#include "client/event/impl/RendererCleanupEvent.h"
-#include "client/event/impl/RendererInitEvent.h"
+#include "client/event/events/RenderOverlayEvent.h"
+#include "client/event/events/RendererCleanupEvent.h"
+#include "client/event/events/RendererInitEvent.h"
 #include "client/Latite.h"
 
 Renderer::~Renderer() {

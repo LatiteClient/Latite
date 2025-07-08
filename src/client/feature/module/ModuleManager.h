@@ -1,14 +1,14 @@
 #pragma once
-#include "api/feature/module/ModuleManager.h"
-#include "api/eventing/Event.h"
-#include "api/eventing/Listenable.h"
+#include "client/manager/Manager.h"
+#include "client/event/Event.h"
+#include "client/event/Listener.h"
 #include "Module.h"
 #include "script/JsModule.h"
 
-class ModuleManager : public Listener, public IModuleManager {
+class ModuleManager final : public Listener, public Manager<Module> {
 public:
 	ModuleManager();
-	~ModuleManager();
+    ~ModuleManager();
 
 	bool registerScriptModule(JsModule* mod) {
 		for (auto& mod_ : items) {
@@ -32,6 +32,24 @@ public:
 		}
 		return false;
 	}
+
+    virtual std::shared_ptr<Module> find(std::string const& name) {
+        for (auto& item : this->items) {
+            std::string c1 = name;
+            std::string c2 = item->name();
+#pragma warning(push)
+#pragma warning(disable : 4244)
+            std::transform(c1.begin(), c1.end(), c1.begin(), [](unsigned char c) { return std::tolower(c); });
+            std::transform(c2.begin(), c2.end(), c2.begin(), [](unsigned char c) { return std::tolower(c); });
+#pragma warning(pop)
+            if (c1 == c2) return item;
+        }
+        return nullptr;
+    }
+
+    [[nodiscard]] size_t size() const {
+        return items.size();
+    }
 
 	void onKey(Event& ev);
 };

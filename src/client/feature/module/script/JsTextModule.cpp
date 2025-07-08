@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "JsTextModule.h"
-#include <client/script/objects/D2DScriptingObject.h>
+#include <client/script/globals/D2DScriptingObject.h>
 
 JsTextModule::JsTextModule(std::string const& name,
 	std::wstring const& displayName, std::wstring const& desc, int key)

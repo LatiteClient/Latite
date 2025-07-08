@@ -1,12 +1,12 @@
 #pragma once
 #include "../Screen.h"
-#include "client/render/asset/Asset.h"
-#include "client/ui/TextBox.h"
+#include "client/asset/Asset.h"
+#include "client/screen/TextBox.h"
 #include <memory>
 #include <array>
 #include <map>
 #include <optional>
-#include "client/script/feature/JsEvented.h"
+#include "client/script/JsEvented.h"
 
 
 class JsScreen : public Screen, public JsEvented {

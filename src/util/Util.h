@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <filesystem>
-#include "api/scanner/Scanner.h"
 
 namespace d2d {
 	class Rect;
@@ -36,10 +35,6 @@ namespace util {
 	extern Color HSVToColor(HSV const& hsv);
 	extern Vec4 RotToQuaternion(Vec2 const& rotatoin);
 	extern Vec2 QuaternionToRot(const Vec4& quat);
-
-	extern inline uintptr_t FindSignature(std::string_view signature) {
-		return memory::findSignature(signature, "Minecraft.Windows.exe");
-	}
 
 	extern void KeepInBounds(d2d::Rect& targ, d2d::Rect const& bounds);
 	extern std::string GetProcessorInfo();

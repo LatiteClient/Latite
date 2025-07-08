@@ -4,7 +4,7 @@
 #include <functional>
 #include <string>
 #include "chakra/ChakraCore.h"
-#include "lib/JsLibrary.h"
+#include "JsLibrary.h"
 #include "ScriptingObject.h"
 #include "class/JsClass.h"
 #include "JsScript.h"

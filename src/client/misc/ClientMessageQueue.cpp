@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "ClientMessageQueue.h"
 #include "util/Logger.h"
-#include "sdk/common/client/player/LocalPlayer.h"
-#include "sdk/common/client/game/ClientInstance.h"
+#include "mc/common/client/player/LocalPlayer.h"
+#include "mc/common/client/game/ClientInstance.h"
 
 void ClientMessageQueue::doPrint(int numMessages) {
 	lock.lock();

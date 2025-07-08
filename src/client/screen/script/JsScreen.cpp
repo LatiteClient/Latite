@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "JsScreen.h"
-#include <client/event/impl/RendererInitEvent.h>
-#include <client/event/impl/RenderGameEvent.h>
-#include "sdk/common/client/gui/controls/VisualTree.h"
-#include "sdk/common/client/gui/controls/UIControl.h"
+#include <client/event/events/RendererInitEvent.h>
+#include <client/event/events/RenderGameEvent.h>
+#include "mc/common/client/gui/controls/VisualTree.h"
+#include "mc/common/client/gui/controls/UIControl.h"
 
 JsScreen::JsScreen(JsValueRef object, std::string name) : name(std::move(name)) {
 	JS::JsGetCurrentContext(&this->ctx);

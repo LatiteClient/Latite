@@ -4,10 +4,10 @@
 #include "client/Latite.h"
 #include "client/misc/ClientMessageQueue.h"
 #include "client/event/Eventing.h"
-#include "client/event/impl/UpdateEvent.h"
+#include "client/event/events/UpdateEvent.h"
 
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/client/player/LocalPlayer.h"
+#include "mc/common/client/game/ClientInstance.h"
+#include "mc/common/client/player/LocalPlayer.h"
 
 #include "util/Logger.h"
 #include <memory>

@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <string_view>
-#include "api/eventing/Listenable.h"
-#include "api/feature/setting/Setting.h"
+#include "client/event/Listener.h"
+#include "client/feature/setting/Setting.h"
 #include <optional>
 #include "misc/Timings.h"
 #include "misc/Notifications.h"
@@ -60,11 +60,11 @@ public:
 
 	std::optional<float> getMenuBlur();
 
-	void addTextBox(ui::TextBox* box) {
+	void addTextBox(TextBox* box) {
 		textBoxes.push_back(box);
 	}
 
-	void removeTextBox(ui::TextBox* box) {
+	void removeTextBox(TextBox* box) {
 		for (auto it = textBoxes.begin(); it != textBoxes.end(); ++it) {
 			if (*it == box) {
 				textBoxes.erase(it);
@@ -172,7 +172,7 @@ private:
 	EnumData mcRendFont;
 	EnumData clientLanguage;
 
-	std::vector<ui::TextBox*> textBoxes;
+	std::vector<TextBox*> textBoxes;
 	ComPtr<struct ID2D1Bitmap1> hudBlurBitmap;
 	ComPtr<struct ID2D1BitmapBrush1> hudBlurBrush;
 	ComPtr<struct ID2D1Effect> gaussianBlurEffect;

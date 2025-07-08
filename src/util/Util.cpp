@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "Util.h"
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/world/Minecraft.h"
-#include "sdk/common/client/renderer/game/LevelRendererPlayer.h"
-#include "sdk/common/client/renderer/game/LevelRenderer.h"
+#include "mc/common/client/game/ClientInstance.h"
+#include "mc/common/world/Minecraft.h"
+#include "mc/common/client/renderer/game/LevelRendererPlayer.h"
+#include "mc/common/client/renderer/game/LevelRenderer.h"
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
 
@@ -195,7 +195,7 @@ std::wstring util::WFormat(std::wstring const& s) {
 
     for (auto& ch : s) {
         if (ch == L'&') {
-            out += L'§';
+            out += L'ï¿½';
         }
         else out += ch;
     }

@@ -6,7 +6,7 @@
 #include "Latite.h"
 #include "localization/LocalizeString.h"
 
-#include "client/ui/TextBox.h"
+#include "client/screen/TextBox.h"
 
 #include "feature/module/ModuleManager.h"
 #include "feature/command/CommandManager.h"
@@ -15,24 +15,24 @@
 #include "config/ConfigManager.h"
 #include "misc/ClientMessageQueue.h"
 #include "input/Keyboard.h"
-#include "hook/Hooks.h"
+#include "memory/hook/Hooks.h"
 #include "event/Eventing.h"
-#include "event/impl/KeyUpdateEvent.h"
-#include "event/impl/RendererInitEvent.h"
-#include "event/impl/RendererCleanupEvent.h"
-#include "event/impl/FocusLostEvent.h"
-#include "event/impl/AppSuspendedEvent.h"
-#include "event/impl/UpdateEvent.h"
-#include "event/impl/CharEvent.h"
-#include "event/impl/ClickEvent.h"
-#include "event/impl/BobMovementEvent.h"
-#include "event/impl/LeaveGameEvent.h"
+#include "event/events/KeyUpdateEvent.h"
+#include "event/events/RendererInitEvent.h"
+#include "event/events/RendererCleanupEvent.h"
+#include "event/events/FocusLostEvent.h"
+#include "event/events/AppSuspendedEvent.h"
+#include "event/events/UpdateEvent.h"
+#include "event/events/CharEvent.h"
+#include "event/events/ClickEvent.h"
+#include "event/events/BobMovementEvent.h"
+#include "event/events/LeaveGameEvent.h"
 
-#include "sdk/signature/storage.h"
+#include "mc/Addresses.h"
 
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/client/game/MinecraftGame.h"
-#include "sdk/common/client/game/FontRepository.h"
+#include "mc/common/client/game/ClientInstance.h"
+#include "mc/common/client/game/MinecraftGame.h"
+#include "mc/common/client/game/FontRepository.h"
 #include <winrt/windows.ui.viewmanagement.h>
 #include <winrt/windows.storage.streams.h>
 #include <winrt/windows.security.cryptography.h>
@@ -41,9 +41,9 @@
 // this looks like its unused, but this provides types for language.DisplayName(). compilation will fail without it.
 #include <winrt/windows.globalization.h>
 
-#include <sdk/common/client/gui/ScreenView.h>
-#include <sdk/common/client/gui/controls/VisualTree.h>
-#include <sdk/common/client/gui/controls/UIControl.h>
+#include <mc/common/client/gui/ScreenView.h>
+#include <mc/common/client/gui/controls/VisualTree.h>
+#include <mc/common/client/gui/controls/UIControl.h>
 
 using namespace winrt;
 using namespace winrt::Windows::Web::Http;
@@ -54,10 +54,10 @@ using namespace winrt::Windows::Storage;
 
 #include "render/Renderer.h"
 #include "screen/ScreenManager.h"
-#include "render/Assets.h"
+#include "asset/Assets.h"
 #include "resource.h"
-#include "feature/module/impl/game/Freelook.h"
-#include "feature/module/impl/visual/NoHurtCam.h"
+#include "feature/module/modules/game/Freelook.h"
+#include "feature/module/modules/visual/NoHurtCam.h"
 
 int SDK::internalVers = SDK::VLATEST;
 
@@ -230,7 +230,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Vtable::TextPacket),
         MVSIG(Vtable::SetTitlePacket),
         MVSIG(Components::runtimeIDComponent),
-        MVSIG(Misc::clickMap),
+        MVSIG(Misc::mouseDevice),
         MVSIG(CameraViewBob),
         MVSIG(ItemStackBase_getHoverName),
         MVSIG(Vtable::CommandRequestPacket),
@@ -522,23 +522,6 @@ void Latite::threadsafeInit() {
 }
 
 void Latite::patchKey() {
-    // next to "certificateAuthority"
-    //                                           MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAE8ELkixyLcwlZryUQcu1TvPOmI2B7vX83ndnWRUaXm74wFfa5f/lwQNTfrLVHa2PmenpGI6JhIMUJaWZrjmMj90NoKNFSNBuKdm8rYiXsfaz3K36x/1U26HpG0ZxK/V1V
-    static constexpr std::string_view old_key = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAE8ELkixyLcwlZryUQcu1TvPOmI2B7vX83ndnWRUaXm74wFfa5f/lwQNTfrLVHa2PmenpGI6JhIMUJaWZrjmMj90NoKNFSNBuKdm8rYiXsfaz3K36x/1U26HpG0ZxK/V1V";
-    static constexpr std::string_view new_key = "MHYwEAYHKoZIzj0CAQYFK4EEACIDYgAECRXueJeTDqNRRgJi/vlRufByu/2G0i2Ebt6YMar5QX/R0DIIyrJMcUpruK4QveTfJSTp3Shlq4Gk34cD/4GUWwkv0DVuzeuB+tXija7HBxii03NHDbPAD0AKnLr2wdAp";
-
-    auto str = memory::findString(old_key, "Minecraft.Windows.exe");
-    if (!str) {
-        Logger::Info("No old key found");
-        return;
-    }
-
-    DWORD oProt;
-    VirtualProtect(str, old_key.size(), PAGE_EXECUTE_READWRITE, &oProt);
-    memcpy(str, new_key.data(), new_key.size());
-    VirtualProtect(str, old_key.size(), oProt, &oProt);
-
-    Logger::Info("Old and new keys patched");
 }
 
 
@@ -547,7 +530,7 @@ static void blockModules(std::string_view moduleName, std::string_view serverNam
 
     std::vector<std::wstring> blockedList;
     if (inst->dns.find(serverName) != std::string::npos) {
-        Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
+        Latite::getModuleManager().forEach([&](std::shared_ptr<Module> mod) {
             if (!mod->isBlocked()) {
                 if (mod->name() == moduleName) {
                     blockedList.push_back(mod->getDisplayName());
@@ -1013,7 +996,7 @@ void Latite::onUpdate(Event& evGeneric) {
 
     if (!rak || rak->ipAddress.empty()) {
         //updateModuleBlocking();
-        getModuleManager().forEach([](std::shared_ptr<IModule> mod) {
+        getModuleManager().forEach([](std::shared_ptr<Module> mod) {
             mod->setBlocked(false);
             });
     }

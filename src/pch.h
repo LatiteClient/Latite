@@ -25,6 +25,13 @@ using namespace std::chrono_literals;
 
 // Libraries
 #include <glm/mat4x4.hpp>
+#include <mnemosyne/scan/signature.hpp>
+using namespace mnem::sig_literals;
+
+#include <nlohmann/json.hpp>
+using nlohmann::json;
+
+#include <libhat.hpp>
 
 // COM
 #include <d2d1.h>
@@ -45,44 +52,32 @@ using namespace std::chrono_literals;
 #include <winrt/windows.security.cryptography.core.h>
 
 // SDK
-#include "sdk/Version.h"
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/client/game/MinecraftGame.h"
-#include "sdk/common/client/player/LocalPlayer.h"
-#include "sdk/common/world/Minecraft.h"
-#include "sdk/common/world/level/Dimension.h"
-#include "sdk/signature/storage.h"
-#include "sdk/common/client/gui/GuiData.h"
-#include "sdk/common/network/RakNetConnector.h"
-#include "sdk/misc/ClickMap.h"
+#include "mc/Version.h"
+#include "mc/common/client/game/ClientInstance.h"
+#include "mc/common/client/game/MinecraftGame.h"
+#include "mc/common/client/player/LocalPlayer.h"
+#include "mc/common/world/Minecraft.h"
+#include "mc/common/world/level/Dimension.h"
+#include "mc/Addresses.h"
+#include "mc/common/client/gui/GuiData.h"
+#include "mc/common/network/RakNetConnector.h"
+#include "mc/deps/input/MouseDevice.h"
 
 // Client
-#include "client/hook/Hook.h"
+#include "client/memory/hook/Hook.h"
 #include "client/script/JsPlugin.h"
 #include "client/script/PluginManager.h"
-#include "client/ui/TextBox.h"
+#include "client/screen/TextBox.h"
 #include "client/misc/Timings.h"
 #include "client/misc/ClientMessageQueue.h"
 #include "client/event/Events.h"
 #include "client/Latite.h"
 
-// API
-#include "api/eventing/Event.h"
-#include "api/eventing/Listenable.h"
-#include "api/eventing/EventManager.h"
-#include "api/feature/Feature.h"
-#include "api/feature/module/Module.h"
-#include "api/feature/setting/SettingGroup.h"
-#include "api/feature/setting/Setting.h"
-#include "api/feature/command/Command.h"
-#include "api/feature/command/CommandManager.h"
-#include "api/feature/module/Module.h"
-#include "api/feature/module/ModuleManager.h"
-#include "api/manager/Manager.h"
-#include "api/manager/FeatureManager.h"
-#include "api/manager/StaticManager.h"
-#include "api/memory/memory.h"
-#include "api/scanner/scanner.h"
+#include "client/event/Event.h"
+#include "client/event/Listener.h"
+#include "client/feature/Feature.h"
+#include "client/manager/Manager.h"
+#include "client/manager/StaticManager.h"
 
 // Features
 #include "client/feature/command/Command.h"
@@ -99,7 +94,8 @@ using namespace std::chrono_literals;
 #include "util/ChakraUtil.h"
 #include "util/DxUtil.h"
 #include "util/LMath.h"
-#include "util/Json.h"
-#include "util/DxContext.h"
-#include "util/FNV32.h"
+#include "util/DrawContext.h"
+#include "util/Crypto.h"
+#include "client/localization/LocalizeString.h"
+#include "util/memory.h"
 #endif

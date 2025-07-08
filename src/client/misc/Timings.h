@@ -2,6 +2,7 @@
 #include <chrono>
 #include <vector>
 
+// A class that stores frames per second, clicks per second, and frame time
 class Timings final
 {
 	std::chrono::high_resolution_clock::time_point lastFPSTime{};

@@ -1,9 +1,8 @@
 #pragma once
-#include "api/feature/command/CommandManager.h"
 #include "client/feature/command/script/JsCommand.h"
 #include "Command.h"
 
-class CommandManager final : public ICommandManager {
+class CommandManager final : public Manager<ICommand>  {
 public:
 	std::string prefix = ".";
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "../Command.h"
-#include "client/script/feature/JsEvented.h"
+#include "client/script/JsEvented.h"
 
 class JsCommand : public Command, public JsEvented {
 public:

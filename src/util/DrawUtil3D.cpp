@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "DrawUtil3D.h"
-#include "sdk/common/client/renderer/MeshUtils.h"
-#include <sdk/common/client/renderer/Tessellator.h>
+#include "mc/common/client/renderer/MeshUtils.h"
+#include <mc/common/client/renderer/Tessellator.h>
 
 MCDrawUtil3D::MCDrawUtil3D(SDK::LevelRenderer* renderer, SDK::ScreenContext* ctx, SDK::MaterialPtr* material)
     : levelRenderer(renderer), screenContext(ctx), material(material) {

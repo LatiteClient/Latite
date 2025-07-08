@@ -1,7 +1,7 @@
 #pragma once
 #include "ScriptingObject.h"
-#include "api/manager/Manager.h"
-#include "api/eventing/Listenable.h"
+#include "client/manager/Manager.h"
+#include "client/event/Listener.h"
 #include <queue>
 #include <variant>
 

@@ -94,7 +94,7 @@ bool ConfigManager::save(std::shared_ptr<Config> cfg) {
 	std::vector<SettingGroup*> groups = {};
 	groups.push_back(&Latite::getSettings());
 
-	Latite::getModuleManager().forEach([&](std::shared_ptr<IModule> mod) {
+	Latite::getModuleManager().forEach([&](std::shared_ptr<Module> mod) {
 		groups.push_back(mod->settings.get());
 		});
 

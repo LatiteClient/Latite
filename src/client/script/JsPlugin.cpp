@@ -7,11 +7,11 @@
 
 #include "PluginManager.h"
 
-#include "Lib/Libraries/Filesystem.h"
-#include "Lib/Libraries/Network.h"
-#include "Lib/Libraries/Clipboard.h"
+#include "libraries/Filesystem.h"
+#include "libraries/Network.h"
+#include "libraries/Clipboard.h"
 
-#include "objects/ClientScriptingObject.h"
+#include "globals/ClientScriptingObject.h"
 
 #include "util/XorString.h"
 #include "util/Logger.h"

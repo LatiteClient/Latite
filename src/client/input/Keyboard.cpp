@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Keyboard.h"
-#include "client/event/impl/CharEvent.h"
-#include "sdk/common/client/input/ClientInputHandler.h"
+#include "client/event/events/CharEvent.h"
+#include "mc/common/client/input/ClientInputHandler.h"
 #include <client/script/PluginManager.h>
 #include <chrono>
 #include <client/Latite.h>

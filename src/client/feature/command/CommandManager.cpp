@@ -6,14 +6,14 @@
 #include "util/Util.h"
 
 // Commands
-#include "impl/TestCommand.h"
-#include "impl/HelpCommand.h"
-#include "impl/EjectCommand.h"
-#include "impl/ToggleCommand.h"
-#include "impl/ScriptCommand.h"
-#include "impl/SetPrefixCommand.h"
-#include "impl/ConfigCommand.h"
-#include "impl/SignCommand.h"
+#include "commands/TestCommand.h"
+#include "commands/HelpCommand.h"
+#include "commands/EjectCommand.h"
+#include "commands/ToggleCommand.h"
+#include "commands/ScriptCommand.h"
+#include "commands/SetPrefixCommand.h"
+#include "commands/ConfigCommand.h"
+#include "commands/SignCommand.h"
 //
 
 CommandManager::CommandManager() {

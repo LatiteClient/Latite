@@ -1,3 +1,5 @@
+#include <utility>
+
 #pragma once
 
 class LocalizeData {
@@ -11,8 +13,8 @@ public:
 		std::variant<int, std::string> resource;
 		std::unordered_map<std::string, std::wstring> localizeCache;
 
-		Language(std::variant<int, std::string> resource, const std::string& langCode)
-			: resource(resource), langCode(langCode) {}
+		Language(std::variant<int, std::string> resource, std::string langCode)
+			: resource(std::move(resource)), langCode(std::move(langCode)) {}
 	};
 
 	LocalizeData();
@@ -21,7 +23,7 @@ public:
 	bool parseLangFile(Language& lang, const std::string& content, bool updateCache);
 	void loadLanguage(Language& lang, bool updateCache);
 
-	const std::vector<std::shared_ptr<Language>>& getLanguages() const {
+	[[nodiscard]] const std::vector<std::shared_ptr<Language>>& getLanguages() const {
 		return languages;
 	}
 

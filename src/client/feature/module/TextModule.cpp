@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "TextModule.h"
-#include "api/feature/setting/Setting.h"
+#include "client/feature/setting/Setting.h"
 
 void TextModule::onInit() {
 	addSetting("fillBg", LocalizeString::get("client.textmodule.props.background.name"), L"", fillBg);

@@ -1,6 +1,6 @@
 #pragma once
 #include "client/event/Eventing.h"
-#include "client/event/impl/KeyUpdateEvent.h"
+#include "client/event/events/KeyUpdateEvent.h"
 
 class Keyboard final : public Listener {
 public:

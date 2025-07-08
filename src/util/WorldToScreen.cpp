@@ -1,8 +1,8 @@
 #pragma once
 #include "WorldToScreen.h"
-#include "sdk/common/client/game/ClientHMDState.h"
-#include "sdk/common/client/game/ClientInstance.h"
-#include "sdk/common/client/gui/GuiData.h"
+#include "mc/common/client/game/ClientHMDState.h"
+#include "mc/common/client/game/ClientInstance.h"
+#include "mc/common/client/gui/GuiData.h"
 #include <glm/glm.hpp>
 
 namespace WorldToScreen {

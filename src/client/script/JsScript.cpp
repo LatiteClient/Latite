@@ -13,48 +13,47 @@
 #include <winrt/windows.ui.popups.h>
 #include <winrt/Windows.ApplicationModel.Core.h>
 
-#include "Lib/Libraries/Filesystem.h"
-#include "Lib/Libraries/Network.h"
-#include "Lib/Libraries/Clipboard.h"
+#include "libraries/Filesystem.h"
+#include "libraries/Network.h"
+#include "libraries/Clipboard.h"
 
-#include "objects/ClientScriptingObject.h"
+#include "globals/ClientScriptingObject.h"
 
 #include "client/Latite.h"
 #include "client/misc/ClientMessageQueue.h"
 
-#include "class/impl/JsVec2.h"
-#include "class/impl/JsVec3.h"
-#include "class/impl/JsRect.h"
-#include "class/impl/JsColor.h"
-#include "class/impl/JsModuleClass.h"
-#include "class/impl/JsHudModuleClass.h"
-#include "class/impl/JsTextModuleClass.h"
-#include "class/impl/JsTextureClass.h"
-#include "class/impl/JsSettingClass.h"
-#include "class/impl/JsCommandClass.h"
-#include "class/impl/JsNativeModule.h"
-#include "class/impl/JsScreenClass.h"
-#include "class/impl/JsWebSocket.h"
+#include "class/classes/JsVec2.h"
+#include "class/classes/JsVec3.h"
+#include "class/classes/JsRect.h"
+#include "class/classes/JsColor.h"
+#include "class/classes/JsModuleClass.h"
+#include "class/classes/JsHudModuleClass.h"
+#include "class/classes/JsTextModuleClass.h"
+#include "class/classes/game/JsTextureClass.h"
+#include "class/classes/JsSettingClass.h"
+#include "class/classes/JsCommandClass.h"
+#include "class/classes/JsNativeModule.h"
+#include "class/classes/JsScreenClass.h"
+#include "class/classes/JsWebSocket.h"
 
-#include "class/impl/game/JsEntityClass.h"
-#include "class/impl/game/JsPlayerClass.h"
-#include "class/impl/game/JsLocalPlayerClass.h"
-#include "class/impl/game/JsItem.h"
-#include "class/impl/game/JsItemStack.h"
-#include "class/impl/game/JsBlock.h"
+#include "class/classes/game/JsEntityClass.h"
+#include "class/classes/game/JsPlayerClass.h"
+#include "class/classes/game/JsLocalPlayerClass.h"
+#include "class/classes/game/JsItem.h"
+#include "class/classes/game/JsItemStack.h"
+#include "class/classes/game/JsBlock.h"
 
-#include "objects/GameScriptingObject.h"
-#include "objects/D2DScriptingObject.h"
-#include "objects/Graphics3DScriptingObject.h"
-#include "objects/OSScriptingObject.h"
+#include "globals/GameScriptingObject.h"
+#include "globals/D2DScriptingObject.h"
+#include "globals/Graphics3DScriptingObject.h"
+#include "globals/OSScriptingObject.h"
 #include "util/XorString.h"
 #include "util/Logger.h"
 
 #include <resource.h>
-#include "objects/OptionsScriptingObject.h"
+#include "globals/OptionsScriptingObject.h"
 
 using namespace winrt::Windows::Web::Http;
-
 
 bool JsScript::load() {
 	auto res = JS::JsCreateContext(plugin->getRuntime(), &this->ctx) == JsNoError;

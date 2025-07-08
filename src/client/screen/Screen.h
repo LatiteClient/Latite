@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
-#include "api/eventing/Listenable.h"
-#include "api/eventing/Event.h"
-#include "api/feature/setting/Setting.h"
-#include "client/event/impl/RenderGameEvent.h"
+#include "client/event/Listener.h"
+#include "client/event/Event.h"
+#include "client/feature/setting/Setting.h"
+#include "client/event/events/RenderGameEvent.h"
 #include <vector>
 #include "util/DXUtil.h"
 #include <optional>

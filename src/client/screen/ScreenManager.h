@@ -1,9 +1,9 @@
 #pragma once
-#include "impl/ClickGUI.h"
-#include "impl/HUDEditor.h"
+#include "screens/ClickGUI.h"
+#include "screens/HUDEditor.h"
 
-#include "api/manager/StaticManager.h"
-#include "api/eventing/Listenable.h"
+#include "client/manager/StaticManager.h"
+#include "client/event/Listener.h"
 #include "Screen.h"
 
 #include "util/Util.h"

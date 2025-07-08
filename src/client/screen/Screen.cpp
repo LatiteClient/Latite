@@ -3,10 +3,10 @@
 #include "client/Latite.h"
 #include "client/event/Eventing.h"
 #include "ScreenManager.h"
-#include "client/event/impl/ClickEvent.h"
-#include "client/event/impl/RenderOverlayEvent.h"
-#include "client/event/impl/UpdateEvent.h"
-#include "sdk/common/client/game/ClientInstance.h"
+#include "client/event/events/ClickEvent.h"
+#include "client/event/events/RenderOverlayEvent.h"
+#include "client/event/events/UpdateEvent.h"
+#include "mc/common/client/game/ClientInstance.h"
 
 Screen::Screen() {
 	/*

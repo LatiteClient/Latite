@@ -1,6 +1,6 @@
 #pragma once
 #include "util/ChakraUtil.h"
-#include "api/eventing/Listenable.h"
+#include "client/event/Listener.h"
 
 class ScriptingObject : public Listener {
 public:

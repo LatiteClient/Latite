@@ -1,7 +1,7 @@
 #pragma once
-#include "api/config/ConfigManager.h"
+#include "client/config/Config.h"
 
-class ConfigManager : public IConfigManager {
+class ConfigManager final : public Manager<Config> {
 public:
 	ConfigManager();
 	~ConfigManager() = default;
@@ -18,6 +18,9 @@ public:
 
 	std::filesystem::path getUserPath();
 private:
+    std::shared_ptr<Config> masterConfig;
+    std::shared_ptr<Config> loadedConfig;
+
 	bool load(std::shared_ptr<Config> cfg);
 	bool save(std::shared_ptr<Config> cfg);
 };

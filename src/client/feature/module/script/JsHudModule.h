@@ -1,5 +1,5 @@
 #pragma once
-#include "client/script/feature/JsEvented.h"
+#include "client/script/JsEvented.h"
 #include "client/feature/module/HUDModule.h"
 #include "util/ChakraUtil.h"
 
