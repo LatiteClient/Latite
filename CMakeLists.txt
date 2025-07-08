@@ -35,15 +35,22 @@ add_compile_definitions(_UNICODE UNICODE)
 
 # Link libraries
 target_link_libraries(Latite PRIVATE
+	# Needed for DirectX hooking and Direct2D rendering
 	d3d11
 	d3d12
-	d2d1
-	dwrite
-	SHCore
-	Dbghelp
 	dxguid
 	dxgi
+
+	# UI rendering
+	d2d1
+
+	# Text rendering
 	dwrite
+
+	# ImageNtHeader for mnemosyne
+	Dbghelp
+
+	# PlaySound for scripting
 	winmm
 )
 
