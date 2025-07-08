@@ -519,14 +519,25 @@ void util::KeepInBounds(d2d::Rect& targ, d2d::Rect const& bounds) {
 }
 
 std::string util::GetProcessorInfo() {
-    constexpr std::array<int, 3> cpuIds = { 0x80000002, 0x80000003, 0x80000004 };
+    constexpr std::array<int, 3> cpuIds = { static_cast<int>(0x80000002), static_cast<int>(0x80000003), static_cast<int>(0x80000004) };
     std::array<int, 4> data{};
     std::string model;
 
+#ifdef __clang__
+    for (auto& id : cpuIds) {
+        __asm__ __volatile__ (
+                "cpuid"
+                : "=a" (data[0]), "=b" (data[1]), "=c" (data[2]), "=d" (data[3])
+                : "a" (id)
+                );
+        model += std::string(reinterpret_cast<const char*>(data.data()), data.size() * sizeof(int));
+    }
+#else
     for (auto& id : cpuIds) {
         __cpuid(data.data(), id);
         model += std::string(reinterpret_cast<const char*>(data.data()), data.size() * sizeof(int));
     }
+#endif
 
     return model;
 }
