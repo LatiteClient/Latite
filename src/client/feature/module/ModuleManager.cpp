@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "ModuleManager.h"
 #include "impl/misc/TestModule.h"
-#include "impl/misc/Screenshot.h"
 #include "impl/misc/DebugInfo.h"
 #include "impl/misc/Nickname.h"
 #include "impl/misc/ItemTweaks.h"
