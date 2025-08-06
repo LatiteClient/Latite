@@ -30,7 +30,7 @@ namespace util {
 
 namespace SDK {
 	template <int offs_1_21_100, int offs_1_21_90, int offs_1_21_80, int offs_1_21_70, int offs_1_21_60, int offs_1_21_50, int offs_1_21_40, int offs_1_21_30, int offs_1_21_20, int offs_1_20_50, int offs_1_20_40, int offs_1_20_30, int offs_1_18_12, int offs_1_19_51>
-				extern inline const int mvGetOffset() {
+	extern inline const int mvGetOffset() {
 		switch (SDK::internalVers) {
 		case SDK::V1_21_100:
 		default:
@@ -64,7 +64,7 @@ namespace SDK {
 			return offs_1_18_12;
 		}
 	}
-	
+
 	template <int offs_1_21_90, int offs_1_21_80, int offs_1_21_70, int offs_1_21_60, int offs_1_21_50, int offs_1_21_40, int offs_1_21_30, int offs_1_21_20, int offs_1_20_50, int offs_1_20_40, int offs_1_20_30, int offs_1_18_12, int offs_1_19_51>
 			extern inline const int mvGetOffset() {
 		switch (SDK::internalVers) {
