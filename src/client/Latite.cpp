@@ -148,7 +148,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int deadCount = 0;
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
-        { "1.21.100", SDK::V1_21_100 },
+        { "1.21.111", SDK::V1_21_110 }, // 1.21.110 doesn't exist
+        //{ "1.21.100", SDK::V1_21_100 },
         //{ "1.21.94", SDK::V1_21_90 },
         //{ "1.21.93", SDK::V1_21_90 },
         //{ "1.21.92", SDK::V1_21_90 },

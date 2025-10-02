@@ -218,14 +218,9 @@ void __fastcall GenericHooks::MoveInputHandler_tick(void* obj, void* proxy) {
 }
 
 void GenericHooks::ClientInputUpdateSystem_tickBaseInput(uintptr_t** a1, void* a2, uintptr_t* a3, uintptr_t a4, uintptr_t a5, uintptr_t a6, uintptr_t a7, uintptr_t a8, uintptr_t a9, uintptr_t a10, uintptr_t a11,
-	void* a12,
-	uintptr_t a13,
-	uintptr_t a14,
-	char a15,
-	char a16,
-	char a17,
-	char a18,
-	char a19) {
+	char a12,
+	char a13,
+	char a14) {
 
 	SDK::MoveInputComponent* hand = SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent();
 	{
@@ -241,7 +236,7 @@ void GenericHooks::ClientInputUpdateSystem_tickBaseInput(uintptr_t** a1, void* a
 		if (Eventing::get().dispatch(ev)) return;
 	}
 
-	ClientInputUpdateSystem_tickBaseInputHook->oFunc<decltype(&ClientInputUpdateSystem_tickBaseInput)>()(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a15, a15, a16, a17, a18, a19);
+	ClientInputUpdateSystem_tickBaseInputHook->oFunc<decltype(&ClientInputUpdateSystem_tickBaseInput)>()(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14);
 	{
 		AfterMoveEvent ev{ hand };
 		Eventing::get().dispatch(ev);

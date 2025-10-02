@@ -7,7 +7,7 @@ class Signatures {
 public:
 	struct Offset {
 		inline static SigImpl MinecraftGame_cursorGrabbed{[](memory::signature_store& store, uintptr_t) { return store.ref(2); },
-			"38 99 ? ? ? ? 0f 85 ? ? ? ? 48 83 c1"_sig,
+			"38 99 ? ? ? ? 75 ? 48 83 C1"_sig,
 			"MinecraftGame->cursorGrabbed"};
 
 		inline static SigImpl LevelRendererPlayer_fovX{};
@@ -30,10 +30,10 @@ public:
 			"ClickMap"};
 
 		inline static SigImpl uiColorMaterial{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-			"48 8B 05 ? ? ? ? 4C 8B AD"_sig,
+			"48 8B 05 ? ? ? ? 4C 8B A5"_sig,
 			"UIFillColorMaterial"};
 		inline static SigImpl thirdPersonNametag{ [](memory::signature_store&, uintptr_t res) { return res; },
-			"0F 84 ? ? ? ? 49 8B 45 ? 49 8B CD 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 0F 85"_sig,
+			"0F 84 ? ? ? ? 49 8B 04 24 49 8B CC 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 0F 85 ? ? ? ? 41 8B 44 24"_sig,
 			"ThirdPersonNametag" };
 		
 	};
@@ -41,34 +41,34 @@ public:
 	struct Components {
 		inline static SigImpl moveInputComponent{[](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"4C 8B 41 48 4C 8B D1 48 8B 41 50 4C 8B 49 68 49 2B C0 8B 12 48 C1 F8 03 48 FF C8 25 2E CD 8B 46"_sig,
+			"48 83 EC 08 4C 8B 41 48 48 8B 41 50 4C 8B 49 68 49 2B C0 48 C1 F8 03 48 FF C8 25 2E CD 8B 46"_sig,
 			"MoveInputComponent::try_get"};
 
 		inline static SigImpl runtimeIDComponent{[](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"4C 8B 41 48 4C 8B D1 48 8B 41 50 4C 8B 49 68 49 2B C0 8B 12 48 C1 F8 03 48 FF C8 25 14 14 A1 3C"_sig,
+			"48 83 EC 08 4C 8B 41 48 4C 8B D1 48 8B 41 50 4C 8B 49 68 49 2B C0 8B 12 48 C1 F8 03 48 FF C8 25 14 14 A1 3C"_sig,
 			"ActorRuntimeIDComponent"};
 		
 
 		inline static SigImpl actorTypeComponent{[](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"4C 8B 41 48 4C 8B D1 48 8B 41 50 4C 8B 49 68 49 2B C0 8B 12 48 C1 F8 03 48 FF C8 25 14 AD F3 51"_sig,
+			"48 83 EC 08 4C 8B 41 48 4C 8B D1 48 8B 41 50 4C 8B 49 68 49 2B C0 8B 12 48 C1 F8 03 48 FF C8 25 14 AD F3 51"_sig,
 			"ActorTypeComponent"}; //51F3AD14
 
 		inline static SigImpl attributesComponent{[](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"4C 8B 51 08 41 BB 44 94 B2 B6"_sig,
+			"48 83 EC 08 4C 8B 41 48 41 BA 44 94 B2 B6"_sig,
 			"AttributesComponent"};
 
 		inline static SigImpl actorEquipmentPersistentComponent{ [](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"4C 8B 41 48 4C 8B D1 48 8B 41 50 4C 8B 49 68 49 2B C0 8B 12 48 C1 F8 03 48 FF C8 25 36 48 C4 71"_sig,
+			"48 83 EC 08 4C 8B 41 48 4C 8B D1 48 8B 41 50 4C 8B 49 68 49 2B C0 8B 12 48 C1 F8 03 48 FF C8 25 36 48 C4 71"_sig,
 			"struct ActorEquipmentComponent" };
 
 		//76 59 47 33
 		inline static SigImpl actorDataFlagsComponent{ [](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"4C 8B 41 48 4C 8B D1 48 8B 41 50 4C 8B 49 68 49 2B C0 8B 12 48 C1 F8 03 48 FF C8 25 76 59 47 33"_sig,
+			"48 83 EC 08 4C 8B 41 48 4C 8B D1 48 8B 41 50 4C 8B 49 68 49 2B C0 8B 12 48 C1 F8 03 48 FF C8 25 76 59 47 33"_sig,
 			"struct ActorDataFlagsComponent"};
 	};
 
@@ -77,7 +77,7 @@ public:
 			"48 8d 05 ? ? ? ? 48 89 01 33 d2 48 89 51 ? 0f 57 c0 48 89 51 ? 48 8b c1 89 51"_sig,
 			"const TextPacket::`vftable'"};
 		inline static SigImpl CommandRequestPacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-			"48 8D 05 ? ? ? ? 48 89 45 ? 49 8B D6 48 8D 4D ? E8 ? ? ? ? 90 49 8B 4E"_sig,
+			"48 8D 05 ? ? ? ? 48 89 45 ? 49 8B D7 48 8D 4D ? E8 ? ? ? ? 90 49 8B 4F"_sig,
 			"const CommandRequestPacket::`vftable'"};
 
 		// "Client%d camera ticking system"
@@ -86,7 +86,7 @@ public:
 			"48 8D 05 ? ? ? ? 48 89 07 48 8D 05 ? ? ? ? 48 89 47 ? 48 8D 05 ? ? ? ? 48 89 47 ? 48 8B 0D"_sig,
 			"const Level::`vftable'"};
 		inline static SigImpl SetTitlePacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-			"4C 8D 35 ? ? ? ? 4C 3B A5"_sig,
+			"48 8D 1D ? ? ? ? 4C 3B 6D"_sig,
 			"const SetTitlePacket::`vftable'"};
 
 		//
@@ -104,7 +104,7 @@ public:
 
 	// The signature is big but it hasn't died in a while soo
 	inline static SigImpl Options_getGamma{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 83 EC ? 48 8B 01 48 8D 54 ? ? 41 B8 33 00 00 00"_sig,
+		"48 83 EC ? 48 8B 01 48 8D 54 ? ? 41 B8 34 00 00 00"_sig,
 		"Options::getGamma"};
 
 	inline static SigImpl Options_getPerspective{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -132,11 +132,11 @@ public:
 	// callsites
 
 	inline static SigImpl ChatScreenController_sendChatMessage{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"E8 ? ? ? ? 3C ? 75 ? 48 8B 8F"_sig,
+		"E8 ? ? ? ? 3C ? 0F 85 ? ? ? ? 48 8B 8F ? ? ? ? 48 8B 01 4C 89 65 ? 48 8D 55"_sig,
 		"ClientInstanceScreenModel::sendChatMessage"};
 
 	inline static SigImpl MinecraftGame_onDeviceLost{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 4C 8B F9 C7 44 24"_sig,
+		"48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B F1 33 ED 89 6C 24"_sig,
 		"MinecraftGame::onDeviceLost"};
 
 	inline static SigImpl onClick{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -155,11 +155,11 @@ public:
 		"MinecraftGame::onAppSuspended"}; // "OnAppSuspend" "SuspendAudio" "CancelJoinGameTelemetry"
 
 	inline static SigImpl RenderController_getOverlayColor{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"E8 ? ? ? ? 0F 28 05 ? ? ? ? 0F 11 85 ? ? ? ? 4C 8D 8D"_sig,
+		"E8 ? ? ? ? 44 0F 11 44 24 ? 4C 8D 4C 24"_sig,
 		"RenderController::getOverlayColor"};
 
 	inline static SigImpl ScreenView_setupAndRender{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"e8 ? ? ? ? 48 8b 44 24 ? 48 8d 4c 24 ? 48 8b 80"_sig,
+		"E8 ? ? ? ? 48 8B 44 24 ? 48 8D 4C 24 ? 48 8B 80"_sig,
 		"ScreenView::setupAndRender"};
 
 	inline static SigImpl KeyMap{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
@@ -172,21 +172,21 @@ public:
 
 	// ref: your GPU ("AMD Radeon RX 5500")
 	inline static SigImpl GpuInfo{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-		"48 8d 15 ? ? ? ? 48 c7 c7 ? ? ? ? 4c 8b c7 49 ff c0 42 80 3c 02 ? 75 ? 48 8d 4c 24"_sig,
+		"4C 8D 25 ? ? ? ? 48 C7 C6 ? ? ? ? 48 8B DE"_sig,
 		"GpuInfo"};
 
-	// ref: RakPeer vtable
+	// ref: RakPeer vtable; 88 51 12 c3 -> xref -> third func above it
 	inline static SigImpl RakPeer_GetAveragePing{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 8B C4 48 81 EC ? ? ? ? 0F 10 4A ? 4C 8B 1A 4C 3B 1D ? ? ? ? 0F 29 70 ? 0F 29 78 ? 0F 10 7A ? 0F 11 4C 24 ? 74 ? 44 8B 49"_sig,
+		"48 8B C4 48 81 EC ? ? ? ? 0F 10 4A ? 4C 8B 1A 4C 3B 1D ? ? ? ? 48 89 58 ? 48 8B D9 0F 29 70 ? 0F 29 78 ? 0F 10 7A ? 0F 11 4C 24 ? 74 ? 44 8B 49"_sig,
 		"RakPeer::GetAveragePing"};
 
 	inline static SigImpl LocalPlayer_applyTurnDelta{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 50"_sig,
+		"48 8B C4 48 89 58 ? 48 89 70 ? 55 57 41 54 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 50 ? 44 0F 29 98 ? ? ? ? 48 8B 05"_sig,
 		"LocalPlayer::applyTurnDelta"};
 
 	// see what accesses things in moveinputhandler
 	inline static SigImpl ClientInputUpdateSystem_tickBaseInput{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 74 24 ? 48 89 7C 24 ? 4C 89 64 24 ? 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 7D"_sig,
+		"48 8B C4 4C 89 48 ? 4C 89 40 ? 48 89 48 ? 53 48 81 EC"_sig,
 		"ClientInputUpdateSystem::tickBaseInput"};
 
 	inline static SigImpl MoveInputHandler_tick{};
@@ -204,16 +204,16 @@ public:
 		"CameraViewBob"};
 
 	inline static SigImpl ItemStackBase_getHoverName{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 48 89 6C 24 ? 56 57 41 56 48 81 EC ? ? ? ? 48 8B FA 48 8B F1 48 89 54 24 ? 33 DB"_sig,
+		"48 89 5C 24 ? 48 89 54 24 ? 55 56 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 84 24 ? ? ? ? 48 8B FA"_sig,
 		"ItemStackBase::getHoverName"};
 
 
-	inline static SigImpl Tessellator_vertex{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"e8 ? ? ? ? f3 0f 10 5b ? f3 0f 10 13"_sig,
+	inline static SigImpl Tessellator_vertex{[](memory::signature_store&, uintptr_t res) { return res; },
+		"4C 8B DC 55 57 49 8D 6B ? 48 81 EC ? ? ? ? 45 0F 29 4B"_sig,
 		"Tessellator::vertex"};
 
 	inline static SigImpl Tessellator_begin{[](memory::signature_store&, uintptr_t res) { return res; },
-		"40 53 55 48 83 EC ? 80 B9 ? ? ? ? ? 44 0F B6 D2"_sig,
+		"48 89 74 24 ? 57 48 83 EC ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 80 B9 ? ? ? ? ? 45 0F B6 D9"_sig,
 		"Tessellator::begin"};
 
 	inline static SigImpl Tessellator_color{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -221,19 +221,19 @@ public:
 		"Tessellator::color"};
 
 	inline static SigImpl MeshHelpers_renderMeshImmediately{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"E8 ? ? ? ? 41 C6 44 24 ? ? F3 0F 10 1D"_sig,
+		"E8 ? ? ? ? C6 46 ? ? F3 41 0F 10 5F"_sig,
 		"MeshHelpers::renderMeshImmediately"};
 
 	inline static SigImpl BaseActorRenderContext_BaseActorRenderContext{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 4C 24 ? 57 48 83 EC ? 49 8B F8 48 8B DA 48 8B F1 48 8D 05"_sig,
+		"48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 48 89 4C 24 ? 57 48 83 EC ? 49 8B F8 48 8B DA 48 8B F1 48 8D 05 ? ? ? ? 48 89 01 33 ED"_sig,
 		"BaseActorRenderContext::BaseActorRenderContext"};
 
-	inline static SigImpl ItemRenderer_renderGuiItemNew{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 44 89 4D ? 49 8B F8"_sig,
+	inline static SigImpl ItemRenderer_renderGuiItemNew{ [](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"E8 ? ? ? ? 80 BF ? ? ? ? ? 74 ? F3 0F 11 74 24"_sig,
 		"ItemRenderer::renderGuiItemNew"};
 
 	inline static SigImpl BaseAttributeMap_getInstance{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"E8 ? ? ? ? 48 89 44 24 ? 48 8D 55 ? 48 8B 4C 24"_sig,
+		"E8 ? ? ? ? 48 89 44 24 ? 48 8B 4D ? E8"_sig,
 		"BaseAttributeMap::getInstance"};
 
 	inline static SigImpl UIControl_getPosition{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
@@ -245,11 +245,11 @@ public:
 		"MinecraftGame::getPrimaryClientInstance"};
 
 	inline static SigImpl ActorRenderDispatcher_render{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 4C 89 4C 24 ? 49 8B F8"_sig,
+		"48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 4C 89 4C 24 ? 4D 8B F0 4C 8B E2"_sig,
 		"ActorRenderDispatcher::render"}; // "No renderer found - have you set the entity's description:identifier correctly?"
 
 	inline static SigImpl LevelRendererPlayer_renderOutlineSelection{[](memory::signature_store& storage, uintptr_t) { return storage.deref(1); },
-		"E8 ? ? ? ? 90 48 8D 8D ? ? ? ? E8 ? ? ? ? 48 8B 83"_sig,
+		"E8 ? ? ? ? EB ? 0F B6 44 24 ? 88 44 24 ? C6 44 24"_sig,
 		"LevelRendererPlayer::renderOutlineSelection"};
 	
 	inline static SigImpl Dimension_getTimeOfDay{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -257,7 +257,7 @@ public:
 		"Dimension::getTimeOfDay"};
 	
 	inline static SigImpl Dimension_tick{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 48 8B F1 48 8B 99"_sig,
+		"48 89 5C 24 ? 48 89 74 24 ? 55 57 41 56 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 48 8B F9 48 8B 99 ? ? ? ? 48 8B 4B"_sig,
 		"Dimension::tick"};
 	
 	inline static SigImpl Dimension_getSkyColor{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -265,7 +265,7 @@ public:
 		"Dimension::getSkyColor"};
 
 	inline static SigImpl ItemStackBase_getDamageValue{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"40 53 48 83 EC ? 48 8B 51 ? 33 DB 48 85 D2"_sig,
+		"48 83 EC ? 48 8B 41 ? 48 85 C0 0F 84 ? ? ? ? 48 83 38"_sig,
 		"ItemStackBase::getDamageValue" };
 
 	inline static SigImpl MinecraftPackets_createPacket{ [](memory::signature_store&, uintptr_t res) { return res; },
@@ -273,7 +273,7 @@ public:
 		"MinecraftPackets::createPacket" };
 
 	inline static SigImpl Actor_attack{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 41 0F B6 F1"_sig,
+		"48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 41 0F B6 F9"_sig,
 		"Actor::attack" };
 
 	inline static SigImpl GuiData__addMessage{ [](memory::signature_store&, uintptr_t res) { return res; },
@@ -289,16 +289,16 @@ public:
 		"Actor::setNameTag" };
 
 	inline static SigImpl _updatePlayer{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 48 89 74 24 ? 48 89 7C 24 ? 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 41 8B 58"_sig,
+		"48 89 5C 24 ? 55 56 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 48 8B FA 48 C7 45"_sig,
 		"UpdatePlayerFromCameraSystemUtil::_updatePlayer" };
 
 	// showHowToPlayScreen
 	inline static SigImpl GameArguments__onUri{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? B8 ? ? ? ? E8 ? ? ? ? 48 2B E0 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B F2 4C 8B F1"_sig,
+		"48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B F2 4C 8B F9 45 33 E4 44 89 64 24"_sig,
 		"GameArguments::_onUri" };
 
-	inline static SigImpl _bobHurt{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 55 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 49 8B 00"_sig,
+	inline static SigImpl _bobHurt{ [](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+		"48 8D 15 ? ? ? ? 48 8D 4C 24 ? 4C 8B 00 E8 ? ? ? ? 48 8B CB"_sig,
 		"anonymous namespace::_bobHurt" };
 
 	inline static SigImpl RenderMaterialGroup__common{ [](memory::signature_store& store, uintptr_t) { return store.deref(3); },
