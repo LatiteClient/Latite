@@ -636,6 +636,7 @@
     <ClInclude Include="src\sdk\common\client\gui\ScreenView.h" />
     <ClInclude Include="src\sdk\common\client\input\ClientInputHandler.h" />
     <ClInclude Include="src\sdk\common\client\input\RemappingLayout.h" />
+    <ClInclude Include="src\sdk\common\client\renderer\GameRenderer.h" />
     <ClInclude Include="src\sdk\common\client\renderer\game\BaseActorRenderContext.h" />
     <ClInclude Include="src\sdk\common\client\renderer\game\CameraComponent.h" />
     <ClInclude Include="src\sdk\common\client\renderer\game\LevelRenderer.h" />
