@@ -37,7 +37,6 @@ using namespace std::chrono_literals;
 #include <winrt/windows.foundation.collections.h>
 #include <winrt/Windows.Web.Http.Headers.h>
 #include <winrt/windows.system.h>
-#include <winrt/Windows.ApplicationModel.Core.h>
 #include <winrt/windows.security.cryptography.h>
 #include <winrt/windows.security.cryptography.core.h>
 

@@ -286,7 +286,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
-      <AdditionalDependencies>winmm.lib;Dbghelp.lib;MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;Dbghelp.lib;MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;dxguid.lib;SHCore.lib;version.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
       <StripPrivateSymbols>
       </StripPrivateSymbols>
@@ -315,7 +315,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>winmm.lib;Dbghelp.lib;MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;Dbghelp.lib;MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;dxguid.lib;SHCore.lib;version.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -343,7 +343,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>winmm.lib;Dbghelp.lib;MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;Dbghelp.lib;MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;dxguid.lib;SHCore.lib;version.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -370,7 +370,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Dbghelp.lib;MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Dbghelp.lib;MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;dxguid.lib;SHCore.lib;version.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -396,7 +396,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;;dxguid.lib;SHCore.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;dxguid.lib;SHCore.lib;version.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
   </ItemDefinitionGroup>
@@ -625,6 +625,8 @@
     <ClInclude Include="src\client\ui\TextBox.h" />
     <ClInclude Include="src\sdk\common\client\game\ClientHMDState.h" />
     <ClInclude Include="src\sdk\common\client\game\FontRepository.h" />
+    <ClInclude Include="src\sdk\common\client\game\GameCore.h" />
+    <ClInclude Include="src\sdk\common\client\game\MouseInputPacket.h" />
     <ClInclude Include="src\sdk\common\client\game\Option.h" />
     <ClInclude Include="src\sdk\common\client\game\Options.h" />
     <ClInclude Include="src\sdk\common\client\gui\controls\UIControl.h" />
@@ -657,6 +659,7 @@
     <ClInclude Include="src\sdk\common\entity\component\ActorTypeComponent.h" />
     <ClInclude Include="src\sdk\common\entity\component\AttributesComponent.h" />
     <ClInclude Include="src\sdk\common\entity\component\MoveInputComponent.h" />
+    <ClInclude Include="src\sdk\common\entity\component\MoveInputState.h" />
     <ClInclude Include="src\sdk\common\entity\component\RuntimeIDComponent.h" />
     <ClInclude Include="src\sdk\common\nbt\CompoundTag.h" />
     <ClInclude Include="src\sdk\common\nbt\Tag.h" />
@@ -889,6 +892,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Beta|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\sdk\common\client\game\ClientInstance.cpp" />
+    <ClCompile Include="src\sdk\common\client\game\GameCore.cpp" />
     <ClCompile Include="src\sdk\common\client\game\MinecraftGame.cpp" />
     <ClCompile Include="src\sdk\common\client\game\Options.cpp" />
     <ClCompile Include="src\sdk\common\client\gui\controls\UIControl.cpp" />

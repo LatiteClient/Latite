@@ -7,7 +7,7 @@ class Signatures {
 public:
 	struct Offset {
 		inline static SigImpl MinecraftGame_cursorGrabbed{[](memory::signature_store& store, uintptr_t) { return store.ref(2); },
-			"38 99 ? ? ? ? 75 ? 48 83 C1"_sig,
+			"80 B9 ? ? ? ? ? 74 ? C6 81 ? ? ? ? ? 48 8D 4C 24 ? E8 ? ? ? ? 90"_sig,
 			"MinecraftGame->cursorGrabbed"};
 
 		inline static SigImpl LevelRendererPlayer_fovX{};
@@ -25,6 +25,9 @@ public:
 		inline static SigImpl minecraftGamePointer {[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"4C 89 35 ? ? ? ? 4C 89 35 ? ? ? ? 48 8B 1D"_sig,
 			"MinecraftGame"};
+		inline static SigImpl gameCorePointer{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+			"48 8B 3D ? ? ? ? 4C 89 B5"_sig,
+			"GameCore"}; // 0x770
 		inline static SigImpl clickMap{[](memory::signature_store& store, uintptr_t) { return store.deref(2); },
 			"89 0D ? ? ? ? 41 B7"_sig, // MouseDevice::_instance
 			"ClickMap"};
@@ -33,7 +36,7 @@ public:
 			"48 8B 05 ? ? ? ? 4C 8B A5"_sig,
 			"UIFillColorMaterial"};
 		inline static SigImpl thirdPersonNametag{ [](memory::signature_store&, uintptr_t res) { return res; },
-			"0F 84 ? ? ? ? 49 8B 04 24 49 8B CC 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 0F 85 ? ? ? ? 41 8B 44 24"_sig,
+			"0F 84 ? ? ? ? 49 8B 45 ? 49 8B CD 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 0F 85"_sig,
 			"ThirdPersonNametag" };
 		
 	};
@@ -41,7 +44,7 @@ public:
 	struct Components {
 		inline static SigImpl moveInputComponent{[](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"48 83 EC 08 4C 8B 41 48 48 8B 41 50 4C 8B 49 68 49 2B C0 48 C1 F8 03 48 FF C8 25 2E CD 8B 46"_sig,
+			"48 83 EC 08 4C 8B 41 48 4C 8B D1 48 8B 41 50 4C 8B 49 68 49 2B C0 8B 12 48 C1 F8 03 48 FF C8 25 2E CD 8B 46"_sig,
 			"MoveInputComponent::try_get"};
 
 		inline static SigImpl runtimeIDComponent{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -98,9 +101,9 @@ public:
 		"48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4D 8B E8 4C 8B E2 4C 8B F9"_sig,
 		"LevelRenderer::renderLevel"};
 
-	inline static SigImpl Keyboard_feed{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 83 EC ? ? ? C1 4C 8D 05"_sig,
-		"Keyboard::feed"};
+	inline static SigImpl MainWindow__windowProcCallback{[](memory::signature_store&, uintptr_t res) { return res; },
+		"40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4D 8B F1 49 8B F8 8B F2"_sig,
+		"MainWindow::_windowProcCallback"};
 
 	// The signature is big but it hasn't died in a while soo
 	inline static SigImpl Options_getGamma{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -112,7 +115,7 @@ public:
 		"Options::getPerspective"};
 
 	inline static SigImpl Options_getHideHand{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 83 EC ? 48 8B 01 48 8D 54 ? ? 41 B8 9F 01 00 00"_sig, // Will probably die every update from now on, but a good sig would be thousands of bytes long
+		"48 83 EC ? 48 8B 01 48 8D 54 ? ? 41 B8 A0 01 00 00"_sig, // Will probably die every update from now on, but a good sig would be thousands of bytes long
 		"Options::getHideHand"};
 
 	inline static SigImpl Options_getSensitivity{};
@@ -123,7 +126,7 @@ public:
 
 	inline static SigImpl ClientInstance_releaseCursor{[](memory::signature_store&, uintptr_t res) { return res; },
 		"40 53 48 83 EC ? 48 8B 01 48 8B D9 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 74 ? 48 8B 8B ? ? ? ? 48 8B 01 48 8B 80 ? ? ? ? 48 83 C4 ? 5B 48 FF 25 ? ? ? ? 48 83 C4 ? 5B C3 48 89 5C 24"_sig,
-		"ClientInstance::releaseCurosr"};
+		"ClientInstance::releaseCursor"};
 
 	inline static SigImpl Level_tick{ [](memory::signature_store& stor, uintptr_t res) { return stor.deref(1); },
 		"e8 ? ? ? ? 48 8b 4b ? 48 85 c9 74 ? 48 8b 41 ? 48 83 c1 ? 48 8b 40"_sig,
@@ -139,9 +142,13 @@ public:
 		"48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B F1 33 ED 89 6C 24"_sig,
 		"MinecraftGame::onDeviceLost"};
 
-	inline static SigImpl onClick{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 8b c4 48 89 58 ? 48 89 68 ? 48 89 70 ? 57 41 54 41 55 41 56 41 57 48 83 ec ? 44 0f b7 bc 24"_sig,
-		"onClick"};
+	inline static SigImpl GameCore_handleMouseInput{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 4C 89 44 24 ? 32 C0"_sig,
+		"GameCore::handleMouseInput"};
+
+	inline static SigImpl MouseInputVector{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
+		"48 2B 05 ? ? ? ? 8B 0D"_sig,
+		"MouseInputVector"};
 
 	//ff 15 ? ? ? ? 48 8d 4c 24 ? e8 ? ? ? ? 48 8b 4c 24 ? 48 3b cb
 	/*
@@ -155,15 +162,15 @@ public:
 		"MinecraftGame::onAppSuspended"}; // "OnAppSuspend" "SuspendAudio" "CancelJoinGameTelemetry"
 
 	inline static SigImpl RenderController_getOverlayColor{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"E8 ? ? ? ? 44 0F 11 44 24 ? 4C 8D 4C 24"_sig,
+		"E8 ? ? ? ? 44 0F 11 45"_sig,
 		"RenderController::getOverlayColor"};
 
 	inline static SigImpl ScreenView_setupAndRender{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"E8 ? ? ? ? 48 8B 44 24 ? 48 8D 4C 24 ? 48 8B 80"_sig,
+		"E8 ? ? ? ? 48 8B 4B ? 48 85 C9 74 ? 48 8B 01 48 8B D7 48 8B 40 ? FF 15 ? ? ? ? 90"_sig,
 		"ScreenView::setupAndRender"};
 
 	inline static SigImpl KeyMap{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-		"4c 8d 05 ? ? ? ? 89 54 24 ? 88 4c 24"_sig,
+		"48 8D 0D ? ? ? ? 48 8B 15 ? ? ? ? 48 8D 3C 99"_sig,
 		"KeyMap"};
 
 	inline static SigImpl MinecraftGame__update{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
@@ -186,7 +193,7 @@ public:
 
 	// see what accesses things in moveinputhandler
 	inline static SigImpl ClientInputUpdateSystem_tickBaseInput{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 8B C4 4C 89 48 ? 4C 89 40 ? 48 89 48 ? 53 48 81 EC"_sig,
+		"4C 8B DC 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 48 8B 9C 24"_sig,
 		"ClientInputUpdateSystem::tickBaseInput"};
 
 	inline static SigImpl MoveInputHandler_tick{};
@@ -289,16 +296,16 @@ public:
 		"Actor::setNameTag" };
 
 	inline static SigImpl _updatePlayer{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 55 56 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 0F 29 B4 24 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 48 8B FA 48 C7 45"_sig,
+		"48 89 5C 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 4C 8B FA 48 C7 45"_sig,
 		"UpdatePlayerFromCameraSystemUtil::_updatePlayer" };
 
 	// showHowToPlayScreen
 	inline static SigImpl GameArguments__onUri{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B F2 4C 8B F9 45 33 E4 44 89 64 24"_sig,
+		"48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B F2 4C 8B F9 33 FF"_sig,
 		"GameArguments::_onUri" };
 
 	inline static SigImpl _bobHurt{ [](memory::signature_store& store, uintptr_t) { return store.deref(3); },
-		"48 8D 15 ? ? ? ? 48 8D 4C 24 ? 4C 8B 00 E8 ? ? ? ? 48 8B CB"_sig,
+		"48 8D 15 ? ? ? ? 4C 8B 00 E8 ? ? ? ? 48 8B CF"_sig,
 		"anonymous namespace::_bobHurt" };
 
 	inline static SigImpl RenderMaterialGroup__common{ [](memory::signature_store& store, uintptr_t) { return store.deref(3); },

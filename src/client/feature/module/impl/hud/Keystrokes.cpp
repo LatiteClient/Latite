@@ -78,20 +78,24 @@ void Keystrokes::onClick(Event& evG) {
 }
 
 void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
-	auto input = SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent();
-
-	bool front = input->front;
-	bool left = input->left;
-	bool back = input->back;
-	bool right = input->right;
-
 	// W, S, A, D keys
 	// + sneak, space, LMB, RMB
 
-	static std::array<Stroke, 2> mouseButtons = { Stroke(primaryClickState), Stroke(secondaryClickState) };
+	// I fucking hate this, but Mojang decided to turn the input states into bits...
+#define CREATE_GET(field) [&] -> bool { return field; }
 
-	static std::array<Keystroke, 6> keystrokes = { Keystroke("forward", input->front), Keystroke("left", input->left),
-		Keystroke("back", input->back), Keystroke("right", input->right), Keystroke("sneak", input->sneak), Keystroke("jump", input->jump)};
+	static std::array<Stroke, 2> mouseButtons = { Stroke(CREATE_GET(primaryClickState)), Stroke(CREATE_GET(secondaryClickState)) };
+
+	static std::array<Keystroke, 6> keystrokes = {
+		Keystroke("forward", CREATE_GET(SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent()->rawInputState.up)),
+		Keystroke("left", CREATE_GET(SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent()->rawInputState.left)),
+		Keystroke("back", CREATE_GET(SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent()->rawInputState.down)),
+		Keystroke("right", CREATE_GET(SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent()->rawInputState.right)),
+		Keystroke("sneak", CREATE_GET(SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent()->rawInputState.sneakDown)),
+		Keystroke("jump", CREATE_GET(SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent()->rawInputState.jumpDown))
+	};
+
+#undef CREATE_GET
 	
 
 	float ls = std::get<FloatValue>(lerpSpeed);
@@ -99,24 +103,24 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 
 	for (auto& key : keystrokes) {
 		if (ls > 0.01f) {
-			key.col = util::LerpColorState(key.col, d2d::Color(std::get<ColorValue>(this->pressedColor).getMainColor()), d2d::Color(std::get<ColorValue>(this->unpressedColor).getMainColor()), key.input.get(), lerpT);
-			key.textCol = util::LerpColorState(key.textCol, d2d::Color(std::get<ColorValue>(this->pressedTextColor).getMainColor()), d2d::Color(std::get<ColorValue>(this->unpressedTextColor).getMainColor()), key.input.get(), lerpT);
+			key.col = util::LerpColorState(key.col, d2d::Color(std::get<ColorValue>(this->pressedColor).getMainColor()), d2d::Color(std::get<ColorValue>(this->unpressedColor).getMainColor()), key.get(), lerpT);
+			key.textCol = util::LerpColorState(key.textCol, d2d::Color(std::get<ColorValue>(this->pressedTextColor).getMainColor()), d2d::Color(std::get<ColorValue>(this->unpressedTextColor).getMainColor()), key.get(), lerpT);
 		}
 		else {
-			key.col = key.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedColor).getMainColor()) : d2d::Color(std::get<ColorValue>(this->unpressedColor).getMainColor());
-			key.textCol = key.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedTextColor).getMainColor()) : d2d::Color(std::get<ColorValue>(this->unpressedTextColor).getMainColor());
+			key.col = key.get() ? d2d::Color(std::get<ColorValue>(this->pressedColor).getMainColor()) : d2d::Color(std::get<ColorValue>(this->unpressedColor).getMainColor());
+			key.textCol = key.get() ? d2d::Color(std::get<ColorValue>(this->pressedTextColor).getMainColor()) : d2d::Color(std::get<ColorValue>(this->unpressedTextColor).getMainColor());
 		}
 	
 	}
 
 	for (auto& btn : mouseButtons) {
 		if (ls > 0.01f) {
-			btn.col = util::LerpColorState(btn.col, d2d::Color(std::get<ColorValue>(this->pressedColor).getMainColor()), d2d::Color(std::get<ColorValue>(this->unpressedColor).getMainColor()), btn.input.get(), lerpT);
-			btn.textCol = util::LerpColorState(btn.textCol, d2d::Color(std::get<ColorValue>(this->pressedTextColor).getMainColor()), d2d::Color(std::get<ColorValue>(this->unpressedTextColor).getMainColor()), btn.input.get(), lerpT);
+			btn.col = util::LerpColorState(btn.col, d2d::Color(std::get<ColorValue>(this->pressedColor).getMainColor()), d2d::Color(std::get<ColorValue>(this->unpressedColor).getMainColor()), btn.get(), lerpT);
+			btn.textCol = util::LerpColorState(btn.textCol, d2d::Color(std::get<ColorValue>(this->pressedTextColor).getMainColor()), d2d::Color(std::get<ColorValue>(this->unpressedTextColor).getMainColor()), btn.get(), lerpT);
 		}
 		else {
-			btn.col = btn.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedColor).getMainColor()) : d2d::Color(std::get<ColorValue>(this->unpressedColor).getMainColor());
-			btn.textCol = btn.input.get() ? d2d::Color(std::get<ColorValue>(this->pressedTextColor).getMainColor()) : d2d::Color(std::get<ColorValue>(this->unpressedTextColor).getMainColor());
+			btn.col = btn.get() ? d2d::Color(std::get<ColorValue>(this->pressedColor).getMainColor()) : d2d::Color(std::get<ColorValue>(this->unpressedColor).getMainColor());
+			btn.textCol = btn.get() ? d2d::Color(std::get<ColorValue>(this->pressedTextColor).getMainColor()) : d2d::Color(std::get<ColorValue>(this->unpressedTextColor).getMainColor());
 		}
 	}
 
@@ -207,7 +211,7 @@ void Keystrokes::render(DrawUtil& dc, bool, bool inEditor) {
 	this->rect.bottom = rect.top + pos.y;
 };
 
-Keystrokes::Keystroke::Keystroke(std::string const& inputMapping, bool& inputKey) : Stroke(inputKey)
+Keystrokes::Keystroke::Keystroke(std::string const& inputMapping, GetInputFunc getInput) : Stroke(getInput)
 	, mapping(inputMapping) {
 	vKey = Latite::getKeyboard().getMappedKey(inputMapping);
 	keyName = util::StrToWStr(util::KeyToString(vKey));
