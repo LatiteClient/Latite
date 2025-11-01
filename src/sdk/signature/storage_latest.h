@@ -243,8 +243,8 @@ public:
 		"E8 ? ? ? ? 48 89 44 24 ? 48 8B 4D ? E8"_sig,
 		"BaseAttributeMap::getInstance"};
 
-	inline static SigImpl UIControl_getPosition{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"E8 ? ? ? ? F3 0F 10 7E"_sig,
+	inline static SigImpl UIControl_getPosition{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 0F 29 74 24 ? 0F 29 7C 24 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 48 8B F9 F6 41"_sig,
 		"UIControl::getPosition"};
 
 	inline static SigImpl MinecraftGame_getPrimaryClientInstance{[](memory::signature_store&, uintptr_t res) { return res; },
