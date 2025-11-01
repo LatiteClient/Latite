@@ -192,7 +192,7 @@ std::wstring util::WFormat(std::wstring const& s) {
 
     for (auto& ch : s) {
         if (ch == L'&') {
-            out += L'�';
+            out += L'\u00A7';
         }
         else out += ch;
     }
