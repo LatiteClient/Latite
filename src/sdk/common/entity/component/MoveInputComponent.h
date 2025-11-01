@@ -6,7 +6,7 @@ namespace SDK {
 	struct MoveInputComponent {
 		MoveInputState inputState;
 		MoveInputState rawInputState;
-		int unk;
+		int8_t holdAutoJumpInWaterTicks;
 		Vec2 move;
 		Vec2 lookDelta;
 		Vec2 interactDir;
@@ -22,6 +22,8 @@ namespace SDK {
 		bool moveInputStateLocked : 1;
 		bool persistSneak : 1;
 		bool autoJumpEnabled : 1;
+		bool isCameraRelativeMovementEnabled : 1;
+		bool isRotControlledByMoveDirection : 1;
 		std::array<bool, 2> isPaddling;
 	};
 }
