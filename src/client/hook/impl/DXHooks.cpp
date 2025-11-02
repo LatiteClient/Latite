@@ -5,11 +5,12 @@
 #include "sdk/common/client/game/Options.h"
 
 namespace {
-    typedef HRESULT(WINAPI* CreateSwapChainForCoreWindow_t)(
+    typedef HRESULT(WINAPI* CreateSwapChainForHWND_t)(
         IDXGIFactory2*,
         IUnknown*,
-        IUnknown*,
+        HWND,
         const DXGI_SWAP_CHAIN_DESC1*,
+        const DXGI_SWAP_CHAIN_FULLSCREEN_DESC*,
         IDXGIOutput*,
         IDXGISwapChain1**);
 
@@ -75,13 +76,14 @@ void DXHooks::CheckTearingSupport() {
     }
 }
 
-CreateSwapChainForCoreWindow_t origCreateSwapChain = nullptr;
+CreateSwapChainForHWND_t origCreateSwapChain = nullptr;
 
-HRESULT WINAPI DXHooks::CreateSwapChainForCoreWindowHook(
+HRESULT WINAPI DXHooks::CreateSwapChainForHWNDHook(
     IDXGIFactory2* factory,
     IUnknown* device,
-    IUnknown* window,
+    HWND hwnd,
     const DXGI_SWAP_CHAIN_DESC1* desc,
+    const DXGI_SWAP_CHAIN_FULLSCREEN_DESC *pFullscreenDesc,
     IDXGIOutput* output,
     IDXGISwapChain1** swapChain) {
 
@@ -90,7 +92,7 @@ HRESULT WINAPI DXHooks::CreateSwapChainForCoreWindowHook(
         modifiedDesc.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
     }
 
-    return origCreateSwapChain(factory, device, window, &modifiedDesc,
+    return origCreateSwapChain(factory, device, hwnd, &modifiedDesc, pFullscreenDesc,
         output, swapChain);
 }
 
@@ -225,9 +227,9 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
     ComPtr<IDXGIFactory2> factory2;
     if (SUCCEEDED(factory.As(&factory2))) {
         void** vtable = *(void***)factory2.Get();
-        MH_CreateHook(vtable[16], DXHooks::CreateSwapChainForCoreWindowHook,
+        MH_CreateHook(vtable[15], DXHooks::CreateSwapChainForHWNDHook,
             (void**)&origCreateSwapChain);
-        MH_EnableHook(vtable[16]);
+        MH_EnableHook(vtable[15]);
     }
 
     PresentHook = addHook(vftable[8], SwapChain_Present, "IDXGISwapChain::Present");
