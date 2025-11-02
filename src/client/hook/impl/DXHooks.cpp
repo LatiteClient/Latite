@@ -129,7 +129,9 @@ HRESULT __stdcall DXHooks::SwapChain_ResizeBuffers(
     UINT Width,
     UINT Height,
     DXGI_FORMAT NewFormat,
-    UINT SwapChainFlags) {
+    UINT SwapChainFlags,
+    const UINT *pCreationNodeMask,
+    IUnknown *const *ppPresentQueue) {
 
     Latite::getRenderer().reinit();
     UINT newFlags = SwapChainFlags;
@@ -138,7 +140,7 @@ HRESULT __stdcall DXHooks::SwapChain_ResizeBuffers(
     }
 
     return ResizeBuffersHook->oFunc<decltype(&SwapChain_ResizeBuffers)>()(
-        chain, BufferCount, Width, Height, NewFormat, newFlags);
+        chain, BufferCount, Width, Height, NewFormat, newFlags, pCreationNodeMask, ppPresentQueue);
 }
 
 HRESULT __stdcall DXHooks::CommandQueue_ExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists,
@@ -229,7 +231,7 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
     }
 
     PresentHook = addHook(vftable[8], SwapChain_Present, "IDXGISwapChain::Present");
-    ResizeBuffersHook = addHook(vftable[13], SwapChain_ResizeBuffers, "IDXGISwapChain::ResizeBuffers");
+    ResizeBuffersHook = addHook(vftable[39], SwapChain_ResizeBuffers, "IDXGISwapChain3::ResizeBuffers");
 
     // Needed for D3D11On12 for DX12
     if (cqueueVftable) ExecuteCommandListsHook = addHook(cqueueVftable[10], CommandQueue_ExecuteCommandLists, "ID3D12CommandQueue::executeCommandLists");
