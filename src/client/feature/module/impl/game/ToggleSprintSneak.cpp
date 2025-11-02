@@ -51,7 +51,7 @@ void ToggleSprintSneak::onTick(Event& evGeneric) {
 				input->sprinting = true;
 			}
 		}*/
-		input->sprinting = true;
+		input->rawInputState.sprintDown = true;
 		if (toggleSprinting) {
 			right = L"Toggled";
 			if (std::get<BoolValue>(alwaysSprint)) right = L"Always";
