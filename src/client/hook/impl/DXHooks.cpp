@@ -21,15 +21,18 @@ namespace {
 
     // TODO: temporary, remove this
     bool isGfxVsyncDisabled() {
-        wchar_t userProfile[MAX_PATH];
-        DWORD pathLen = GetEnvironmentVariableW(L"USERPROFILE", userProfile, MAX_PATH);
+        wchar_t appdata[MAX_PATH];
+        DWORD pathLen = GetEnvironmentVariableW(L"APPDATA", appdata, MAX_PATH);
         if (pathLen == 0 || pathLen >= MAX_PATH) {
             return true;
         }
 
-        std::wstring optionsPath(userProfile);
+        std::wstring optionsPath(appdata);
         optionsPath +=
-            L"\\AppData\\Local\\Packages\\Microsoft.MinecraftUWP_8wekyb3d8bbwe\\LocalState\\games\\com.mojang\\minecraftpe\\options.txt";
+            L"\\Minecraft Bedrock\\Users\\" + util::StrToWStr(SDK::ClientInstance::get()->minecraftGame->xuid) + L"\\games\\com.mojang\\minecraftpe\\options.txt";
+
+        if (!std::filesystem::exists(optionsPath))
+            optionsPath = std::wstring(appdata) + L"\\Minecraft Bedrock\\Users\\Shared\\games\\com.mojang\\minecraftpe\\options.txt";
 
         std::ifstream file(optionsPath.c_str());
         if (!file.is_open()) {
