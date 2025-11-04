@@ -3,7 +3,7 @@
 
 namespace SDK {
     class GameRenderer {
-        char pad[0x340];
+        char pad[0x350];
     
     public:
         SDK::MinecraftMatrix lastViewMatrix;

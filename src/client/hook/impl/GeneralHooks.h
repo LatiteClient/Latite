@@ -11,8 +11,9 @@ class GenericHooks : public HookGroup {
     static void __fastcall Level_tick(SDK::Level* level);
     static void* __fastcall ChatScreenController_sendChatMessage(void* controller, std::string& message);
     static void* __fastcall GameRenderer_renderCurrentFrame(void* rend);
-    static void __fastcall Keyboard_feed(int key, bool isDown);
+    static LRESULT __fastcall MainWindow__windowProcCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
     static void __fastcall onClick(ClickMap*, char clickType, char isDownWheelDelta, uintptr_t a4, int16_t a5, int16_t a6, int16_t, char a8);
+    static bool __fastcall GameCore_handleMouseInput(void* a1, void* a2, void* a3);
     static BOOL __stdcall hkLoadLibraryW(LPCWSTR lib);
     static int __fastcall RakPeer_getAveragePing(void* obj, char* guidOrAddy);
     static void __fastcall LocalPlayer_applyTurnDelta(void* obj, Vec2& vec);

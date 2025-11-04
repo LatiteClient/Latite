@@ -7,11 +7,11 @@ namespace SDK {
 	class Options : std::enable_shared_from_this<Options> {
 	public:
 		void setPlayerViewPerspective(int perspective) {
-			memory::callVirtual<void>(this, 136, perspective);
+			memory::callVirtual<void>(this, 124, perspective);
 		}
 
 		int getPlayerViewPerspective() {
-			return memory::callVirtual<int>(this, 137);
+			return memory::callVirtual<int>(this, 125);
 		}
 
 		bool getVsync() {
@@ -30,7 +30,7 @@ namespace SDK {
 
 	private:
 		void* unknown;
-		std::array<std::unique_ptr<class Option>, 788> options;
+		std::array<std::unique_ptr<class Option>, 770> options;
 
 		virtual ~Options() = 0;
 	};

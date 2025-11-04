@@ -96,7 +96,7 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
 }
 
 SDK::Options* SDK::ClientInstance::getOptions() {
-    return memory::callVirtual<Options*>(this, 0xB6);
+    return memory::callVirtual<Options*>(this, 0xB1);
 }
 
 /*SDK::ClientHMDState* SDK::ClientInstance::getClientHMDState() {

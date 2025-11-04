@@ -28,13 +28,19 @@ private:
 	ValueType pressedTextColor = ColorValue(0.f, 0.f, 0.f, 1.f);
 	ValueType unpressedTextColor = ColorValue(1.f, 1.f, 1.f, 1.f);
 
+	typedef std::function<bool()> GetInputFunc;
+
 	struct Stroke {
 		d2d::Color col;
 		d2d::Color textCol;
 		std::wstring keyName;
-		std::reference_wrapper<bool> input;
+		GetInputFunc getInput;
 
-		Stroke(bool& input) : input(input) {
+		Stroke(GetInputFunc getInput) : getInput(getInput) {
+		}
+
+		[[nodiscard]] bool get() const {
+			return getInput();
 		}
 	};
 
@@ -42,7 +48,7 @@ private:
 		std::string mapping;
 		int vKey;
 
-		Keystroke(std::string const& inputMapping, bool& inputKey);
+		Keystroke(std::string const& inputMapping, GetInputFunc getInput);
 
 		void updateKeyName();
 	};

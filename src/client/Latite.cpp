@@ -45,6 +45,8 @@
 #include <sdk/common/client/gui/controls/VisualTree.h>
 #include <sdk/common/client/gui/controls/UIControl.h>
 
+#include "sdk/common/client/game/GameCore.h"
+
 using namespace winrt;
 using namespace winrt::Windows::Web::Http;
 using namespace winrt::Windows::Web::Http::Filters;
@@ -111,7 +113,34 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 #endif
 
     Logger::Info(XOR_STRING("Latite Client {}"), Latite::version);
-    winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
+
+    char path[MAX_PATH]{};
+    GetModuleFileNameA(nullptr, path, MAX_PATH);
+
+    DWORD handle;
+    DWORD size = GetFileVersionInfoSizeA(path, &handle);
+
+    if (size == 0) {
+        Logger::Fatal("Failed to get file version size");
+    }
+
+    std::vector<BYTE> data(size);
+    if (!GetFileVersionInfoA(path, handle, size, data.data())) {
+        Logger::Fatal("Failed to get file version");
+    }
+
+    VS_FIXEDFILEINFO* fileInfo = nullptr;
+    UINT len = 0;
+
+    if (VerQueryValueA(data.data(), "\\", reinterpret_cast<LPVOID*>(&fileInfo), &len)) {
+        const auto major = HIWORD(fileInfo->dwFileVersionMS);
+        const auto minor = LOWORD(fileInfo->dwFileVersionMS);
+        const auto build = HIWORD(fileInfo->dwFileVersionLS);
+
+        Latite::get().gameVersion = std::format("{}.{}.{}", major, minor, build);
+    }
+    
+    /*winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
     winrt::Windows::ApplicationModel::PackageVersion version = package.Id().Version();
 
     {
@@ -122,7 +151,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         std::stringstream ss;
         ss << version.Major << "." << version.Minor << "." << ps;// hacky
         Latite::get().gameVersion = ss.str();
-    }
+    }*/
     Logger::Info("Minecraft {}", Latite::get().gameVersion);
 
     Logger::Info(XOR_STRING("Loading assets"));
@@ -148,9 +177,10 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int deadCount = 0;
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
-        { "1.21.114", SDK::V1_21_110 },
-        { "1.21.113", SDK::V1_21_110 },
-        { "1.21.111", SDK::V1_21_110 }, // 1.21.110 doesn't exist
+        { "1.21.120", SDK::V1_21_120 },
+        //{ "1.21.114", SDK::V1_21_110 },
+        //{ "1.21.113", SDK::V1_21_110 },
+        //{ "1.21.111", SDK::V1_21_110 }, // 1.21.110 doesn't exist
         //{ "1.21.100", SDK::V1_21_100 },
         //{ "1.21.94", SDK::V1_21_90 },
         //{ "1.21.93", SDK::V1_21_90 },
@@ -212,7 +242,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     std::vector<std::pair<SigImpl*, SigImpl*>> sigList = {
         MVSIG(Misc::minecraftGamePointer),
         MVSIG(Misc::clientInstance),
-        MVSIG(Keyboard_feed),
+        MVSIG(MainWindow__windowProcCallback),
         MVSIG(LevelRenderer_renderLevel),
         MVSIG(Offset::LevelRendererPlayer_fovX),
         MVSIG(Offset::LevelRendererPlayer_origin),
@@ -226,7 +256,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(ClientInstance_releaseCursor),
         MVSIG(Level_tick),
         MVSIG(ChatScreenController_sendChatMessage),
-        MVSIG(onClick),
+        MVSIG(GameCore_handleMouseInput),
         MVSIG(MinecraftGame_onDeviceLost),
         MVSIG(MinecraftGame_onAppSuspended),
         MVSIG(RenderController_getOverlayColor),
@@ -273,7 +303,9 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(GameArguments__onUri),
         MVSIG(_bobHurt),
         MVSIG(RenderMaterialGroup__common),
-        MVSIG(GuiData_displayClientMessage)
+        MVSIG(GuiData_displayClientMessage),
+        MVSIG(Misc::gameCorePointer),
+        MVSIG(MouseInputVector)
     };
     
     new (configMgrBuf) ConfigManager();
@@ -454,8 +486,9 @@ std::vector<std::string> Latite::getLatiteUsers() {
 }
 
 void Latite::queueEject() noexcept {
-    auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
-    app.Title(L"");
+    //auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
+    //app.Title(L"");
+    SetWindowTextW(SDK::GameCore::get()->hwnd, L"Minecraft");
     this->shouldEject = true;
     CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)FreeLibraryAndExitThread, dllInst, 0, nullptr));
 }
@@ -515,7 +548,7 @@ void Latite::threadsafeInit() {
 #endif
 
 
-    auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
+    //auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     std::string vstr(this->version);
 	
 #if defined(LATITE_NIGHTLY)
@@ -526,7 +559,8 @@ void Latite::threadsafeInit() {
     auto ws = util::StrToWStr("Latite Client " + vstr);
 #endif
 
-    app.Title(ws);
+    //app.Title(ws);
+    SetWindowTextW(SDK::GameCore::get()->hwnd, ws.c_str());
     Latite::getPluginManager().loadPrerunScripts();
     Logger::Info(XOR_STRING("Loaded startup scripts"));
     
@@ -898,7 +932,8 @@ void Latite::initAsset(int resource, std::wstring const& filename) {
     HRSRC hRes = FindResource((HMODULE)dllInst, MAKEINTRESOURCE(resource), RT_RCDATA);
     if (!hRes) {
         Logger::Fatal(XOR_STRING("Could not find resource {}"), util::WStrToStr(filename));
-        winrt::terminate();
+        //winrt::terminate();
+        exit(0);
         return;
     }
 
