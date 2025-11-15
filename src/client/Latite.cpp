@@ -177,6 +177,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int deadCount = 0;
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
+        { "1.21.122", SDK::V1_21_120 },
+        { "1.21.121", SDK::V1_21_120 },
         { "1.21.120", SDK::V1_21_120 },
         //{ "1.21.114", SDK::V1_21_110 },
         //{ "1.21.113", SDK::V1_21_110 },
@@ -508,6 +510,9 @@ SDK::Font* Latite::getFont() {
 void Latite::initialize(HINSTANCE hInst) {
     this->dllInst = hInst;
 
+    Latite::getPluginManager().init();
+    Logger::Info(XOR_STRING("Script manager initialized."));
+
     Latite::getEventing().listen<UpdateEvent>(this, (EventListenerFunc)&Latite::onUpdate, 2);
     Latite::getEventing().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Latite::onKey, 2);
     Latite::getEventing().listen<RendererInitEvent>(this, (EventListenerFunc)&Latite::onRendererInit, 2);
@@ -526,9 +531,6 @@ void Latite::initialize(HINSTANCE hInst) {
     Logger::Info(XOR_STRING("Initialized Hooks"));
     getHooks().enable();
     Logger::Info(XOR_STRING("Enabled Hooks"));
-
-    Latite::getPluginManager().init();
-    Logger::Info(XOR_STRING("Script manager initialized."));
 
     // doesn't work, maybe it's stored somewhere else too
     //if (SDK::internalVers < SDK::V1_20) {
