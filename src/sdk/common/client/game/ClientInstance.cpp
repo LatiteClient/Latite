@@ -78,6 +78,9 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
         {
             return util::directAccess<GuiData*>(this, 0x558);
         }
+        if (internalVers >= V1_21_110) {
+            return util::directAccess<GuiData*>(this, 0x578);
+        }
         if (internalVers >= V1_21_80) {
             return util::directAccess<GuiData*>(this, 0x5B8);
         }
@@ -93,12 +96,12 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
 }
 
 SDK::Options* SDK::ClientInstance::getOptions() {
-    return memory::callVirtual<Options*>(this, 0xC5);
+    return memory::callVirtual<Options*>(this, 0xB1);
 }
 
-SDK::ClientHMDState* SDK::ClientInstance::getClientHMDState() {
+/*SDK::ClientHMDState* SDK::ClientInstance::getClientHMDState() {
     return memory::callVirtual<ClientHMDState*>(this, 0x197);
-}
+}*/
 
 void SDK::ClientInstance::grabCursor() {
     if (internalVers == V1_18_12) {

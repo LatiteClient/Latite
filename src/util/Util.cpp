@@ -131,30 +131,27 @@ namespace util {
 }
 
 std::filesystem::path util::GetRootPath() {
-    wchar_t* env;
-    size_t size;
-    if (!_wdupenv_s(&env, &size, L"localappdata") && env) {
-        auto str = std::wstring(env).substr(0, lstrlenW(env) - 2);
-        delete env;
-        return str;
-    }
+    wchar_t buf[MAX_PATH]{};
+    const auto res = GetEnvironmentVariableW(L"LOCALAPPDATA", buf, MAX_PATH);
+
+    if (res > 0)
+        return std::wstring(buf, res);
+    
     return std::wstring();
 }
 
 std::filesystem::path util::GetRoamingPath() {
-    wchar_t* env;
-    size_t size;
-    if (!_wdupenv_s(&env, &size, L"localappdata") && env) {
-        auto str = std::wstring(env).substr(0, lstrlenW(env) - 2) + L"RoamingState";
-        delete env;
-        return str;
-    }
+    wchar_t buf[MAX_PATH]{};
+    const auto res = GetEnvironmentVariableW(L"LOCALAPPDATA", buf, MAX_PATH);
+
+    if (res > 0)
+        return std::wstring(buf, res);
+    
     return std::wstring();
 }
 
 std::filesystem::path util::GetLatitePath() {
-    // TODO: Rename to Latite
-    return GetRoamingPath()/"LatiteRecode";
+    return GetRoamingPath()/"Latite";
 }
 
 std::wstring util::StrToWStr(std::string const& s) {
@@ -195,7 +192,7 @@ std::wstring util::WFormat(std::wstring const& s) {
 
     for (auto& ch : s) {
         if (ch == L'&') {
-            out += L'§';
+            out += L'\u00A7';
         }
         else out += ch;
     }

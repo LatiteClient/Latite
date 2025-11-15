@@ -8,8 +8,8 @@ namespace SDK {
 	public:
 		Level* getLevel();
 
-		CLASS_FIELD(class GameSession*, gameSession, 0xD0);
-		CLASS_FIELD(Timer*, timer, 0xE8);
+		CLASS_FIELD(class GameSession*, gameSession, 0xD8);
+		CLASS_FIELD(Timer*, timer, 0xF0);
 	};
 
 	class GameSession {

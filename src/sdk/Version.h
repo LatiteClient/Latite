@@ -24,7 +24,9 @@ namespace SDK {
 		V1_21_80 = 12180,
 		V1_21_90 = 12190,
 		V1_21_100 = 121100,
-		VLATEST = V1_21_100,
+		V1_21_110 = 121110,
+		V1_21_120 = 121120,
+		VLATEST = V1_21_120,
 	};
 
 	extern int internalVers;

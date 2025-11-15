@@ -72,14 +72,40 @@ JsValueRef JsLocalPlayerClass::setMovementState(JsValueRef callee, bool isConstr
 		}
 		};
 
-	setMoveState(move->front, L"forward");
-	setMoveState(move->back, L"backward");
-	setMoveState(move->left, L"left");
-	setMoveState(move->right, L"right");
-	setMoveState(move->jump, L"jump");
-	setMoveState(move->sneak, L"sneak");
-	setMoveState(move->joystickX, L"joystickX");
-	setMoveState(move->joystickX, L"joystickY");
+	// Can't be used anymore as the fields are bits instead of bytes, so no reference possible
+	/*setMoveState(move->rawInputState.up, L"forward");
+	setMoveState(move->rawInputState.down, L"backward");
+	setMoveState(move->rawInputState.left, L"left");
+	setMoveState(move->rawInputState.right, L"right");
+	setMoveState(move->rawInputState.jumpDown, L"jump");
+	setMoveState(move->rawInputState.sneakDown, L"sneak");*/
+
+	if (auto prop = Chakra::GetProperty(obj, L"forward")) {
+		move->rawInputState.up = Chakra::GetBool(prop);
+	}
+
+	if (auto prop = Chakra::GetProperty(obj, L"backward")) {
+		move->rawInputState.down = Chakra::GetBool(prop);
+	}
+
+	if (auto prop = Chakra::GetProperty(obj, L"left")) {
+		move->rawInputState.left = Chakra::GetBool(prop);
+	}
+
+	if (auto prop = Chakra::GetProperty(obj, L"right")) {
+		move->rawInputState.right = Chakra::GetBool(prop);
+	}
+
+	if (auto prop = Chakra::GetProperty(obj, L"jump")) {
+		move->rawInputState.jumpDown = Chakra::GetBool(prop);
+	}
+
+	if (auto prop = Chakra::GetProperty(obj, L"sneak")) {
+		move->rawInputState.sneakDown = Chakra::GetBool(prop);
+	}
+	
+	setMoveState(move->rawInputState.analogMoveVector.x, L"joystickX");
+	setMoveState(move->rawInputState.analogMoveVector.y, L"joystickY");
 	
 	return obj;
 }
@@ -95,15 +121,15 @@ JsValueRef JsLocalPlayerClass::getMovementState(JsValueRef callee, bool isConstr
 	JS::JsCreateObject(&obj);
 
 	auto move = lp->getMoveInputComponent();
-	Chakra::SetPropertyBool(obj, L"forward", move->front);
-	Chakra::SetPropertyBool(obj, L"backward", move->back);
-	Chakra::SetPropertyBool(obj, L"left", move->left);
-	Chakra::SetPropertyBool(obj, L"right", move->right);
-	Chakra::SetPropertyBool(obj, L"jump", move->jump);
-	Chakra::SetPropertyBool(obj, L"sneak", move->sneak);
-	Chakra::SetPropertyBool(obj, L"sprintHeld", move->sprintKey);
-	Chakra::SetPropertyNumber(obj, L"joystickX", move->joystickX);
-	Chakra::SetPropertyNumber(obj, L"joystickY", move->joystickY);
+	Chakra::SetPropertyBool(obj, L"forward", move->rawInputState.up);
+	Chakra::SetPropertyBool(obj, L"backward", move->rawInputState.down);
+	Chakra::SetPropertyBool(obj, L"left", move->rawInputState.left);
+	Chakra::SetPropertyBool(obj, L"right", move->rawInputState.right);
+	Chakra::SetPropertyBool(obj, L"jump", move->rawInputState.jumpDown);
+	Chakra::SetPropertyBool(obj, L"sneak", move->rawInputState.sneakDown);
+	Chakra::SetPropertyBool(obj, L"sprintHeld", move->rawInputState.sprintDown);
+	Chakra::SetPropertyNumber(obj, L"joystickX", move->rawInputState.analogMoveVector.x);
+	Chakra::SetPropertyNumber(obj, L"joystickY", move->rawInputState.analogMoveVector.y);
 
 	return obj;
 }
