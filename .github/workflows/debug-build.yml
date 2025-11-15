@@ -2,21 +2,21 @@ name: Latite Debug
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
     paths:
-      - '**.cpp'
-      - '**.h'
-      - '**.hpp'
-      - '**.vcxproj'
-      - '**.sln'
+      - "**.cpp"
+      - "**.h"
+      - "**.hpp"
+      - "**.vcxproj"
+      - "**.sln"
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
     paths:
-      - '**.cpp'
-      - '**.h'
-      - '**.hpp'
-      - '**.vcxproj'
-      - '**.sln'
+      - "**.cpp"
+      - "**.h"
+      - "**.hpp"
+      - "**.vcxproj"
+      - "**.sln"
   workflow_dispatch:
 
 env:
@@ -31,42 +31,42 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
 
-    - name: Build Latite Debug
-      working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: |
-        msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
-        # Verify files exist before renaming
-        if (Test-Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.dll") {
-          Rename-Item -Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.dll" -NewName "LatiteDebug.dll"
-        } else {
-          Write-Error "LatiteRewrite.dll not found in Debug build output"
-          exit 1
-        }
-        if (Test-Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.pdb") {
-          Rename-Item -Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.pdb" -NewName "LatiteDebug.pdb"
-        }
+      - name: Build Latite Debug
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: |
+          msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=x64 ${{env.SOLUTION_FILE_PATH}}
+          # Verify files exist before renaming
+          if (Test-Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.dll") {
+            Rename-Item -Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.dll" -NewName "LatiteDebug.dll"
+          } else {
+            Write-Error "LatiteRewrite.dll not found in Debug build output"
+            exit 1
+          }
+          if (Test-Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.pdb") {
+            Rename-Item -Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.pdb" -NewName "LatiteDebug.pdb"
+          }
 
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2.3.2
-      with:
-        tag_name: debug
-        name: Latite Debug
-        body: |
-          ### This is an automated, experimental DLL build of Latite Client.
-          
-          **This debug release has a high chance of containing bugs or crashes.**
-          
-          Includes:
-          - Debug build (LatiteDebug.dll)
-          - PDB symbols (LatiteDebug.pdb)
-          
-          Warning: This version may run slower than production builds.
-        prerelease: true
-        files: |
-          ${{ github.workspace }}/x64/Debug/LatiteDebug.dll
-          ${{ github.workspace }}/x64/Debug/LatiteDebug.pdb
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2.3.2
+        with:
+          tag_name: debug
+          name: Latite Debug
+          body: |
+            ### This is an automated, experimental DLL build of Latite Client.
+
+            **This debug release has a high chance of containing bugs or crashes.**
+
+            Includes:
+            - Debug build (LatiteDebug.dll)
+            - PDB symbols (LatiteDebug.pdb)
+
+            Warning: This version may run slower than production builds.
+          prerelease: true
+          files: |
+            ${{ github.workspace }}/x64/Debug/LatiteDebug.dll
+            ${{ github.workspace }}/x64/Debug/LatiteDebug.pdb
