@@ -40,6 +40,16 @@ jobs:
         working-directory: ${{env.GITHUB_WORKSPACE}}
         run: |
           msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=x64 ${{env.SOLUTION_FILE_PATH}}
+          Write-Host "--- Diagnostics: Listing DLLs under workspace ---"
+          $allDlls = Get-ChildItem -Path "${{ github.workspace }}\x64\*" -Include *.dll,*.pdb,*.exe -Recurse -ErrorAction SilentlyContinue
+          if ($allDlls) {
+            $allDlls | ForEach-Object { Write-Host $_.FullName }
+          } else {
+            Write-Host "No DLL/PDB/EXE found under x64 after build. Searching entire workspace..."
+            Get-ChildItem -Path "${{ github.workspace }}\*" -Include *.dll,*.pdb,*.exe -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
+          }
+          Write-Host "--- Diagnostics: Any Latite* DLLs anywhere? ---"
+          Get-ChildItem -Path "${{ github.workspace }}\*" -Include Latite*.dll -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
           # Verify files exist before renaming
           if (Test-Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.dll") {
             Rename-Item -Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.dll" -NewName "LatiteDebug.dll"
