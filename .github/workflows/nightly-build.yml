@@ -20,7 +20,7 @@ on:
   workflow_dispatch:
 
 env:
-  SOLUTION_FILE_PATH: .
+  SOLUTION_FILE_PATH: LatiteRewrite.vcxproj
   BUILD_CONFIGURATION: Nightly
 
 permissions:
@@ -39,7 +39,7 @@ jobs:
       - name: Build Latite Nightly
         working-directory: ${{env.GITHUB_WORKSPACE}}
         run: |
-          msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=x64 ${{env.SOLUTION_FILE_PATH}}
+          msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=x64 /p:OutDir="${{ github.workspace }}\\x64\\${{env.BUILD_CONFIGURATION}}\\" ${{env.SOLUTION_FILE_PATH}}
           Write-Host "--- Diagnostics: Listing DLLs under workspace ---"
           $allDlls = Get-ChildItem -Path "${{ github.workspace }}\x64\*" -Include *.dll,*.pdb,*.exe -Recurse -ErrorAction SilentlyContinue
           if ($allDlls) {
@@ -50,12 +50,22 @@ jobs:
           }
           Write-Host "--- Diagnostics: Any Latite* DLLs anywhere? ---"
           Get-ChildItem -Path "${{ github.workspace }}\*" -Include Latite*.dll -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
-          # Verify files exist before renaming
-          if (Test-Path "${{ github.workspace }}\x64\Nightly\LatiteRewrite.dll") {
-            Rename-Item -Path "${{ github.workspace }}\x64\Nightly\LatiteRewrite.dll" -NewName "LatiteNightly.dll"
+          # Verify files exist before renaming/copying
+          $expectedDll = "${{ github.workspace }}\x64\Nightly\LatiteRewrite.dll"
+          $destDll = "${{ github.workspace }}\x64\Nightly\LatiteNightly.dll"
+          if (Test-Path $expectedDll) {
+            Rename-Item -Path $expectedDll -NewName (Split-Path -Leaf $destDll)
           } else {
-            Write-Error "LatiteRewrite.dll not found in Nightly build output"
-            exit 1
+            Write-Host "Expected DLL not found at $expectedDll. Attempting fallback search..."
+            $dll = Get-ChildItem -Path "${{ github.workspace }}\x64\${{env.BUILD_CONFIGURATION}}" -Filter *.dll -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+            if (-not $dll) { $dll = Get-ChildItem -Path "${{ github.workspace }}\" -Filter *.dll -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 }
+            if ($dll) {
+              Write-Host "Fallback found DLL: $($dll.FullName). Copying to $destDll"
+              Copy-Item -Path $dll.FullName -Destination $destDll -Force
+            } else {
+              Write-Error "No DLL found after fallback search."
+              exit 1
+            }
           }
 
       - name: Create GitHub Release

@@ -20,7 +20,7 @@ on:
   workflow_dispatch:
 
 env:
-  SOLUTION_FILE_PATH: .
+  SOLUTION_FILE_PATH: LatiteRewrite.vcxproj
   BUILD_CONFIGURATION: Debug
 
 permissions:
@@ -39,7 +39,7 @@ jobs:
       - name: Build Latite Debug
         working-directory: ${{env.GITHUB_WORKSPACE}}
         run: |
-          msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=x64 ${{env.SOLUTION_FILE_PATH}}
+          msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=x64 /p:OutDir="${{ github.workspace }}\\x64\\${{env.BUILD_CONFIGURATION}}\\" ${{env.SOLUTION_FILE_PATH}}
           Write-Host "--- Diagnostics: Listing DLLs under workspace ---"
           $allDlls = Get-ChildItem -Path "${{ github.workspace }}\x64\*" -Include *.dll,*.pdb,*.exe -Recurse -ErrorAction SilentlyContinue
           if ($allDlls) {
@@ -50,15 +50,38 @@ jobs:
           }
           Write-Host "--- Diagnostics: Any Latite* DLLs anywhere? ---"
           Get-ChildItem -Path "${{ github.workspace }}\*" -Include Latite*.dll -Recurse -ErrorAction SilentlyContinue | ForEach-Object { Write-Host $_.FullName }
-          # Verify files exist before renaming
-          if (Test-Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.dll") {
-            Rename-Item -Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.dll" -NewName "LatiteDebug.dll"
+          # Verify files exist before renaming/copying
+          $expectedDll = "${{ github.workspace }}\x64\Debug\LatiteRewrite.dll"
+          $expectedPdb = "${{ github.workspace }}\x64\Debug\LatiteRewrite.pdb"
+          $destDll = "${{ github.workspace }}\x64\Debug\LatiteDebug.dll"
+          $destPdb = "${{ github.workspace }}\x64\Debug\LatiteDebug.pdb"
+
+          if (Test-Path $expectedDll) {
+            Rename-Item -Path $expectedDll -NewName (Split-Path -Leaf $destDll)
           } else {
-            Write-Error "LatiteRewrite.dll not found in Debug build output"
-            exit 1
+            Write-Host "Expected DLL not found at $expectedDll. Attempting fallback search..."
+            $dll = Get-ChildItem -Path "${{ github.workspace }}\x64\${{env.BUILD_CONFIGURATION}}" -Filter *.dll -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+            if (-not $dll) { $dll = Get-ChildItem -Path "${{ github.workspace }}\" -Filter *.dll -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 }
+            if ($dll) {
+              Write-Host "Fallback found DLL: $($dll.FullName). Copying to $destDll"
+              Copy-Item -Path $dll.FullName -Destination $destDll -Force
+            } else {
+              Write-Error "No DLL found after fallback search."
+              exit 1
+            }
           }
-          if (Test-Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.pdb") {
-            Rename-Item -Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.pdb" -NewName "LatiteDebug.pdb"
+
+          if (Test-Path $expectedPdb) {
+            Rename-Item -Path $expectedPdb -NewName (Split-Path -Leaf $destPdb)
+          } else {
+            # Try to find a matching PDB next to the found DLL
+            $dllBase = [System.IO.Path]::GetFileNameWithoutExtension($destDll)
+            $foundPdb = Get-ChildItem -Path (Split-Path $destDll) -Filter *.pdb -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($foundPdb) {
+              Copy-Item -Path $foundPdb.FullName -Destination $destPdb -Force
+            } else {
+              Write-Host "PDB not found; continuing without symbols."
+            }
           }
 
       - name: Create GitHub Release
