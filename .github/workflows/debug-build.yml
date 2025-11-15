@@ -17,6 +17,7 @@ on:
       - '**.hpp'
       - '**.vcxproj'
       - '**.sln'
+  workflow_dispatch:
 
 env:
   SOLUTION_FILE_PATH: .
