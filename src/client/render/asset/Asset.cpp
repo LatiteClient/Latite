@@ -3,7 +3,6 @@
 #include "Asset.h"
 
 #include <Shlwapi.h>   // SHCreateMemStream
-#pragma comment(lib, "Shlwapi.lib")
 
 IStream* CreateStreamFromBuffer(const uint8_t* begin, const uint8_t* end) {
 	size_t size = end - begin;
