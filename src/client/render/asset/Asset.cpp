@@ -1,18 +1,28 @@
 #include "pch.h"
+#include "../../resource/Resource.h"
 #include "Asset.h"
 
-Asset::Asset(std::wstring const& relPath) : relPath(relPath) {
+#include <Shlwapi.h>   // SHCreateMemStream
+#pragma comment(lib, "Shlwapi.lib")
+
+IStream* CreateStreamFromBuffer(const uint8_t* begin, const uint8_t* end) {
+	size_t size = end - begin;
+
+	// SHCreateMemStream takes BYTE*, UINT
+	return SHCreateMemStream(reinterpret_cast<const BYTE*>(begin),
+							 static_cast<UINT>(size));
 }
 
 void Asset::load(IWICImagingFactory* factory, ID2D1DeviceContext* dc) {
-	auto path = util::GetLatitePath() / "Assets" / relPath;
-
 	ComPtr<IWICBitmapDecoder> pDecoder = NULL;
 
-	auto res = factory->CreateDecoderFromFilename(
-		path.wstring().c_str(),
+	auto stream = ComPtr<IStream>(SHCreateMemStream(reinterpret_cast<const BYTE*>(resource.begin()),
+		resource.end() - resource.begin()));
+
+
+	factory->CreateDecoderFromStream(
+		stream.Get(),
 		nullptr,// Do not prefer a particular vendor
-		GENERIC_READ,                    // Desired read access to the file
 		WICDecodeMetadataCacheOnDemand,  // Cache metadata when needed
 		pDecoder.GetAddressOf()                        // Pointer to the decoder
 	);
@@ -32,7 +42,7 @@ void Asset::load(IWICImagingFactory* factory, ID2D1DeviceContext* dc) {
 		0.0,
 		WICBitmapPaletteTypeCustom);
 
-	ThrowIfFailed(dc->CreateBitmapFromWicBitmap(conv.Get(), NULL, &bitmap));
+	ThrowIfFailed(dc->CreateBitmapFromWicBitmap(conv.Get(), nullptr, &bitmap));
 }
 
 void Asset::unload() {

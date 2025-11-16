@@ -3,16 +3,7 @@
 #include <sstream>
 #include "util/Chakrautil.h"
 #include "util/Util.h"
-#include "resource.h"
-
 #include "PluginManager.h"
-
-#include "libraries/Filesystem.h"
-#include "libraries/Network.h"
-#include "libraries/Clipboard.h"
-
-#include "globals/ClientScriptingObject.h"
-
 #include "util/XorString.h"
 #include "util/Logger.h"
 

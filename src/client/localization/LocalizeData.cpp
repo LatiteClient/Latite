@@ -1,25 +1,28 @@
 ﻿#include "pch.h"
 #include "LocalizeData.h"
 #include <client/Latite.h>
-#include "resource.h"
+#include "client/resource/Resource.h"
+#include "client/resource/InitResources.h"
 
 LocalizeData::LocalizeData() {
-    fallbackLanguage = std::make_shared<Language>(LANG_EN_US, "en");
+    // Lang file resources defined in client/resource/InitResources.h
+
+    fallbackLanguage = std::make_shared<Language>(GET_RESOURCE(lang_en_US_json), "en");
 
     languages = {
         fallbackLanguage,
 #ifdef LATITE_DEBUG
         std::make_shared<Language>(LANG_AR_AR, "ar"),
 #endif
-        std::make_shared<Language>(LANG_CS_CZ, "cs"),
-        std::make_shared<Language>(LANG_NL_NL, "nl"),
-        std::make_shared<Language>(LANG_FR_FR, "fr"),
-        std::make_shared<Language>(LANG_ES_ES, "es"),
-        std::make_shared<Language>(LANG_JA_JP, "ja"),
-        std::make_shared<Language>(LANG_PT_PT, "pt-PT"),
-        std::make_shared<Language>(LANG_PT_BR, "pt-BR"),
-        std::make_shared<Language>(LANG_ZH_CN, "zh-CN"),
-        std::make_shared<Language>(LANG_ZH_TW, "zh-TW"),
+        std::make_shared<Language>(GET_RESOURCE(lang_cs_CZ_json), "cs"),
+        std::make_shared<Language>(GET_RESOURCE(lang_nl_NL_json), "nl"),
+        std::make_shared<Language>(GET_RESOURCE(lang_fr_FR_json), "fr"),
+        std::make_shared<Language>(GET_RESOURCE(lang_es_ES_json), "es"),
+        std::make_shared<Language>(GET_RESOURCE(lang_ja_JP_json), "ja"),
+        std::make_shared<Language>(GET_RESOURCE(lang_pt_PT_json), "pt-PT"),
+        std::make_shared<Language>(GET_RESOURCE(lang_pt_BR_json), "pt-BR"),
+        std::make_shared<Language>(GET_RESOURCE(lang_zh_CN_json), "zh-CN"),
+        std::make_shared<Language>(GET_RESOURCE(lang_zh_TW_json), "zh-TW"),
     };
 
     for (auto& lang : languages) {
@@ -27,17 +30,11 @@ LocalizeData::LocalizeData() {
     }
 }
 
-std::string LocalizeData::getResourceContent(const std::variant<int, std::string>& resource) {
-    if (auto res = std::get_if<int>(&resource)) {
-        return Latite::get().getTextAsset(*res);
-    }
 
-    throw std::runtime_error("Network resource is not implemented");
-}
 
 void LocalizeData::loadLanguage(Language& lang, bool cache) {
-    std::string content = getResourceContent(lang.resource);
-    parseLangFile(lang, content, cache);
+    auto str = std::string(lang.resource.begin(), lang.resource.end());
+    parseLangFile(lang, str, cache);
 }
 
 bool LocalizeData::parseLangFile(Language& lang, const std::string& content, bool cache) {

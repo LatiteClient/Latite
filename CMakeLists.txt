@@ -24,7 +24,31 @@ endif ()
 # MSVC library release ABI compatibility with game
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
-add_library(Latite SHARED ${Latite_SRC})
+# Assets
+
+function(ADD_RESOURCES out_var)
+    set(result)
+    foreach (in_f ${ARGN})
+        file(RELATIVE_PATH src_f ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${in_f})
+        set(out_f "${PROJECT_BINARY_DIR}/${in_f}.o")
+        add_custom_command(OUTPUT ${out_f}
+                COMMAND ld.exe -r -b binary -o ${out_f} ${src_f}
+                DEPENDS ${in_f}
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                COMMENT "Building object ${out_f}"
+                VERBATIM
+        )
+        list(APPEND result ${out_f})
+    endforeach()
+    set(${out_var} "${result}" PARENT_SCOPE)
+endfunction()
+
+# Add all files in assets/ as resources
+
+file(GLOB_RECURSE RESOURCE_FILES RELATIVE ${CMAKE_CURRENT_LIST_DIR} CONFIGURE_DEPENDS "assets/*")
+add_resources(EMBEDDED_RESOURCES ${RESOURCE_FILES})
+
+add_library(Latite SHARED ${Latite_SRC} ${EMBEDDED_RESOURCES})
 
 # C++ standard
 set_property(TARGET Latite PROPERTY CXX_STANDARD 20)
@@ -37,6 +61,7 @@ add_compile_definitions(_UNICODE UNICODE)
 target_link_libraries(Latite PRIVATE
         # WinRT
         WindowsApp.lib
+        Shlwapi.lib
 
         # Needed for getting app version
         Version.lib

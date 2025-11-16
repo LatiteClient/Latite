@@ -12,7 +12,7 @@
 #include "client/feature/module/Module.h"
 #include "client/feature/module/ModuleManager.h"
 #include "util/DrawContext.h"
-#include "client/asset/Assets.h"
+#include "../../render/asset/Assets.h"
 #include "client/config/ConfigManager.h"
 
 #include "../ScreenManager.h"
@@ -654,8 +654,8 @@ void ClickGUI::onRender(Event&) {
 
 					}
 					else {
-						bool selecToggle;
-						if (selecToggle = this->shouldSelect(toggleRect, cursorPos)) {
+						bool selecToggle = this->shouldSelect(toggleRect, cursorPos);
+						if (selecToggle) {
 							if (justClicked[0]) {
 								mod.mod->setEnabled(!mod.mod->isEnabled());
 								playClickSound();
@@ -709,7 +709,7 @@ void ClickGUI::onRender(Event&) {
 					dc.ctx->SetTransform(oMatr);
 				}
 				else if (mod.isMarketScript) {
-					dc.ctx->DrawBitmap(Latite::getAssets().document.getBitmap(), arrowRc.get());
+					//dc.ctx->DrawBitmap(Latite::getAssets().document.getBitmap(), arrowRc.get());
 
 					// TODO
 				}
@@ -913,7 +913,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 			else tb->setSelected(false);
 		}
 
-		textVal.str = std::move(tb->getText()); // I think im supposed to std::move this?
+		textVal.str = tb->getText();
 		dc.drawText(rightRc, set->getDisplayName(), { 1.f, 1.f, 1.f, 1.f }, Renderer::FontSelection::PrimarySemilight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 		return rightRc.bottom;
 	}
@@ -1375,14 +1375,14 @@ void ClickGUI::drawColorPicker() {
 		float hueMod = 0.f;
 
 		const D2D1_GRADIENT_STOP stops[] = {
-			0.f, d2d::Color(util::HSVToColor({ 0.f, 1.f, 1.f })).get(),
-			1.f / 7.f, d2d::Color(util::HSVToColor({ (1.f / 7.f) * 360.f, 1.f, 1.f })).get(),
-			2.f / 7.f, d2d::Color(util::HSVToColor({ (2.f / 7.f) * 360.f, 1.f, 1.f })).get(),
-			3.f / 7.f, d2d::Color(util::HSVToColor({ (3.f / 7.f) * 360.f, 1.f, 1.f })).get(),
-			4.f / 7.f, d2d::Color(util::HSVToColor({ (4.f / 7.f) * 360.f, 1.f, 1.f })).get(),
-			5.f / 7.f, d2d::Color(util::HSVToColor({ (5.f / 7.f) * 360.f, 1.f, 1.f })).get(),
-			6.f / 7.f, d2d::Color(util::HSVToColor({ (6.f / 7.f) * 360.f, 1.f, 1.f })).get(),
-			1.f, d2d::Color(util::HSVToColor({ 0.f, 1.f, 1.f })).get(),
+			{0.f, d2d::Color(util::HSVToColor({ 0.f, 1.f, 1.f })).get()},
+			{1.f / 7.f, d2d::Color(util::HSVToColor({ (1.f / 7.f) * 360.f, 1.f, 1.f })).get()},
+			{2.f / 7.f, d2d::Color(util::HSVToColor({ (2.f / 7.f) * 360.f, 1.f, 1.f })).get()},
+			{3.f / 7.f, d2d::Color(util::HSVToColor({ (3.f / 7.f) * 360.f, 1.f, 1.f })).get()},
+			{4.f / 7.f, d2d::Color(util::HSVToColor({ (4.f / 7.f) * 360.f, 1.f, 1.f })).get()},
+			{5.f / 7.f, d2d::Color(util::HSVToColor({ (5.f / 7.f) * 360.f, 1.f, 1.f })).get()},
+			{6.f / 7.f, d2d::Color(util::HSVToColor({ (6.f / 7.f) * 360.f, 1.f, 1.f })).get()},
+			{1.f, d2d::Color(util::HSVToColor({ 0.f, 1.f, 1.f })).get()},
 		};
 
 		dc.ctx->CreateGradientStopCollection(stops, 8, gradientStopCollection.GetAddressOf());

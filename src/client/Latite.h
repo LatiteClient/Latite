@@ -41,7 +41,6 @@ public:
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);
 
-	std::string getTextAsset(int resource);
 	void downloadChakraCore();
 	void initLanguageSetting();
 	void initSettings();
@@ -123,8 +122,6 @@ public:
 	std::string calcCurrentDLLHash();
 
 	void writeServerIP();
-
-	void initAsset(int resource, std::wstring const& filename);
 
 	void initL10n();
 

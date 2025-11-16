@@ -10,6 +10,7 @@ Keyboard::Keyboard(int* gameKeyMap) : keyMap(gameKeyMap) {
 	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Keyboard::onKey, 4);
 }
 
+// TODO: better method
 void Keyboard::findTextInput() {
 	bool backspaceHeld = keyMapAdjusted['\b'];
 	static std::chrono::high_resolution_clock::time_point backspaceStart = std::chrono::high_resolution_clock::now();

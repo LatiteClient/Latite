@@ -1,4 +1,7 @@
+#pragma once
 #include <utility>
+
+#include "client/resource/Resource.h"
 
 #pragma once
 
@@ -7,19 +10,16 @@ public:
 	struct Language {
 		std::string name;
 		std::string langCode;
+		Resource resource;
 
-		// int: An embedded resource
-		// string: A network resource
-		std::variant<int, std::string> resource;
 		std::unordered_map<std::string, std::wstring> localizeCache;
 
-		Language(std::variant<int, std::string> resource, std::string langCode)
-			: resource(std::move(resource)), langCode(std::move(langCode)) {}
+		explicit Language(const Resource resource, std::string langCode)
+			: langCode(std::move(langCode)), resource(resource) {}
 	};
 
 	LocalizeData();
 
-	std::string getResourceContent(const std::variant<int, std::string>& resource);
 	bool parseLangFile(Language& lang, const std::string& content, bool updateCache);
 	void loadLanguage(Language& lang, bool updateCache);
 

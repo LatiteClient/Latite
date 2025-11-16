@@ -5,7 +5,7 @@
 #include "client/feature/setting/Setting.h"
 #include "client/event/events/RenderGameEvent.h"
 #include <vector>
-#include "util/DXUtil.h"
+#include "util/DxUtil.h"
 #include <optional>
 
 class Screen : public Listener {

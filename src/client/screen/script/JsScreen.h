@@ -1,6 +1,6 @@
 #pragma once
 #include "../Screen.h"
-#include "client/asset/Asset.h"
+#include "../../render/asset/Asset.h"
 #include "client/screen/TextBox.h"
 #include <memory>
 #include <array>

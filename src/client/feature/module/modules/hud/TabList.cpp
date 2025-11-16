@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "TabList.h"
 #include "client/Latite.h"
-#include "client/asset/Assets.h"
+#include "../../../../render/asset/Assets.h"
 
 TabList::TabList() : Module("PlayerList", LocalizeString::get("client.module.tabList.name"),
                             LocalizeString::get("client.module.tabList.desc"), HUD, VK_TAB) {

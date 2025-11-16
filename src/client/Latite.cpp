@@ -56,8 +56,8 @@ using namespace winrt::Windows::Storage;
 
 #include "render/Renderer.h"
 #include "screen/ScreenManager.h"
-#include "asset/Assets.h"
-#include "resource.h"
+#include "render/asset/Assets.h"
+#include "resource/Resource.h"
 #include "feature/module/modules/game/Freelook.h"
 #include "feature/module/modules/visual/NoHurtCam.h"
 
@@ -159,19 +159,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     // ... init assets
     Latite::get().initL10n();
 
-    Latite::get().initAsset(ICON_LOGO, L"logo.png");
-    Latite::get().initAsset(ICON_SEARCH, L"searchicon.png");
-    Latite::get().initAsset(ICON_ARROW, L"arrow.png");
-    Latite::get().initAsset(ICON_X, L"x.png");
-    Latite::get().initAsset(ICON_HUDEDIT, L"hudedit.png");
-    Latite::get().initAsset(ICON_ARROWBACK, L"arrow_back.png");
-    Latite::get().initAsset(ICON_COG, L"cog.png");
-    Latite::get().initAsset(ICON_CHECKMARK, L"checkmark.png");
-    Latite::get().initAsset(ICON_LOGOWHITE, L"latitewhite.png");
-    //
-#if LATITE_DEBUG
     Logger::Info("Resolving signatures..");
-#endif
 
     int sigCount = 0;
     int deadCount = 0;
@@ -180,47 +168,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         { "1.21.122", SDK::V1_21_120 },
         { "1.21.121", SDK::V1_21_120 },
         { "1.21.120", SDK::V1_21_120 },
-        //{ "1.21.114", SDK::V1_21_110 },
-        //{ "1.21.113", SDK::V1_21_110 },
-        //{ "1.21.111", SDK::V1_21_110 }, // 1.21.110 doesn't exist
-        //{ "1.21.100", SDK::V1_21_100 },
-        //{ "1.21.94", SDK::V1_21_90 },
-        //{ "1.21.93", SDK::V1_21_90 },
-        //{ "1.21.92", SDK::V1_21_90 },
-        //{ "1.21.90", SDK::V1_21_90 },
-        //{ "1.21.82", SDK::V1_21_80 },
-        //{ "1.21.81", SDK::V1_21_80 },
-        //{ "1.21.80", SDK::V1_21_80 },
-        //{ "1.21.73", SDK::V1_21_70 },
-        //{ "1.21.72", SDK::V1_21_70 },
-        //{ "1.21.71", SDK::V1_21_70 },
-        //{ "1.21.70", SDK::V1_21_70 },
-        //{ "1.21.62", SDK::V1_21_60 },
-        //{ "1.21.61", SDK::V1_21_60 },
-        //{ "1.21.60", SDK::V1_21_60 },
-        //{ "1.21.51", SDK::V1_21_50 },
-        //{ "1.21.50", SDK::V1_21_50 },
-        //{ "1.21.44", SDK::V1_21_40 },
-        //{ "1.21.43", SDK::V1_21_40 },
-        //{ "1.21.41", SDK::V1_21_40 },
-        //{ "1.21.40", SDK::V1_21_40 },
-        //{ "1.21.30", SDK::V1_21_30 },
-        //{ "1.21.31", SDK::V1_21_30 }
-        //{ "1.21.20", SDK::V1_21_20 },
-        //{ "1.21.21", SDK::V1_21_20 },
-        //{ "1.21.22", SDK::V1_21_20 },
-        //{ "1.21.0", SDK::V1_21 },
-        //{ "1.21.1", SDK::V1_21 },
-        //{ "1.21.2", SDK::V1_21 },
-        //{ "1.20.41", SDK::V1_20_40 },
-        //{ "1.20.40", SDK::V1_20_40 },
-        //{ "1.20.32", SDK::V1_20_30 },
-        //{ "1.20.31", SDK::V1_20_30 },
-        //{ "1.20.30", SDK::V1_20_30 },
-        //{ "1.19.50", SDK::V1_19_51 },
-        //{ "1.19.51", SDK::V1_19_51 },
-        //{ "1.18.12", SDK::V1_18_12 },
-        //{ "1.18.10", SDK::V1_18_12 },
     };
 
     if (versNumMap.contains(Latite::get().gameVersion)) {
@@ -908,49 +855,8 @@ void Latite::queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callb
     this->dxRenderQueue.push(callback);
 }
 
-void Latite::initAsset(int resource, std::wstring const& filename) {
-#ifdef DEBUG
-    Logger::Info("Getting asset: {} ({})", util::WStrToStr(filename), resource);
-#endif
-
-    HRSRC hRes = FindResource((HMODULE)dllInst, MAKEINTRESOURCE(resource), RT_RCDATA);
-    if (!hRes) {
-        Logger::Fatal(XOR_STRING("Could not find resource {}"), util::WStrToStr(filename));
-        //winrt::terminate();
-        exit(0);
-        return;
-    }
-
-    HGLOBAL hData = LoadResource((HMODULE)dllInst, hRes);
-    DWORD hSize = SizeofResource((HMODULE)dllInst, hRes);
-    char* hFinal = (char*)LockResource(hData);
-
-    auto path = util::GetLatitePath() / XOR_STRING("Assets");
-    std::filesystem::create_directory(path);
-
-    auto fullPath = path / filename;
-
-    auto ofs = std::ofstream(fullPath.c_str(), std::ios::binary);
-    ofs << std::string(hFinal, hSize);
-    ofs.flush();
-}
-
 void Latite::initL10n() {
     l10nData = LocalizeData();
-}
-
-std::string Latite::getTextAsset(int resource) {
-    HRSRC hRes = FindResource((HMODULE)dllInst, MAKEINTRESOURCE(resource), MAKEINTRESOURCE(TEXTFILE));
-    if (!hRes) {
-        Logger::Fatal("Could not find text resource {}", resource);
-        throw std::runtime_error("Could not find resource");
-    }
-
-    HGLOBAL hData = LoadResource((HMODULE)dllInst, hRes);
-    DWORD hSize = SizeofResource((HMODULE)dllInst, hRes);
-    char* hFinal = (char*)LockResource(hData);
-
-    return std::string(hFinal, hSize);
 }
 
 namespace {
@@ -1176,6 +1082,8 @@ void Latite::onChar(Event& evGeneric) {
                     break;
                 case 0x3:
                     tb->reset();
+                    break;
+                default:
                     break;
                 }
             }

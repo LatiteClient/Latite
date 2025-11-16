@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "BlockGame.h"
 #include "client/Latite.h"
-#include "client/asset/Assets.h"
+#include "../../../../render/asset/Assets.h"
 #include "client/input/Keyboard.h"
 
 BlockGame::BlockGame() : Module("BlockGame", LocalizeString::get("client.module.blockGame.name"),

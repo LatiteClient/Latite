@@ -50,8 +50,9 @@
 #include "util/XorString.h"
 #include "util/Logger.h"
 
-#include <resource.h>
 #include "globals/OptionsScriptingObject.h"
+#include "client/resource/Resource.h"
+#include "client/resource/InitResources.h"
 
 using namespace winrt::Windows::Web::Http;
 
@@ -188,11 +189,21 @@ JsErrorCode JsScript::compileScript() {
 void JsScript::loadJSApi() {
 	Chakra::SetContext(ctx);
 	JsValueRef res;
-	auto err = JS::JsRunScript(util::StrToWStr(Latite::get().getTextAsset(JS_LATITEAPI)).c_str(), sCtx, L"latiteapi.js", &res);
+
+	auto resource = GET_RESOURCE(latiteapi_js);
+
+	// null-terminate the data because Chakra accepts a null-terminated string only
+	auto ptr = new char[resource.size() + 1];
+	ptr[resource.size()] = 0;
+
+	auto err = JS::JsRunScript(util::StrToWStr(ptr).c_str(), sCtx, L"latiteapi.js", &res);
+	delete[] ptr;
+
 	Latite::getPluginManager().handleErrors(err);
 	if (!err) {
 		JS::JsRelease(res, nullptr);
 	}
+
 }
 
 JsScript* JsScript::getThis() {
