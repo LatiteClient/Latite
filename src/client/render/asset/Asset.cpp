@@ -4,14 +4,6 @@
 
 #include <Shlwapi.h>   // SHCreateMemStream
 
-IStream* CreateStreamFromBuffer(const uint8_t* begin, const uint8_t* end) {
-	size_t size = end - begin;
-
-	// SHCreateMemStream takes BYTE*, UINT
-	return SHCreateMemStream(reinterpret_cast<const BYTE*>(begin),
-							 static_cast<UINT>(size));
-}
-
 void Asset::load(IWICImagingFactory* factory, ID2D1DeviceContext* dc) {
 	ComPtr<IWICBitmapDecoder> pDecoder = NULL;
 
