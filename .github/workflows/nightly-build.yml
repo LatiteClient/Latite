@@ -1,0 +1,93 @@
+name: Latite Nightly
+
+on:
+  push:
+    branches: ["master"]
+    paths:
+      - "**.cpp"
+      - "**.h"
+      - "**.hpp"
+      - "**.vcxproj"
+      - "**.sln"
+  pull_request:
+    branches: ["master"]
+    paths:
+      - "**.cpp"
+      - "**.h"
+      - "**.hpp"
+      - "**.vcxproj"
+      - "**.sln"
+  workflow_dispatch:
+
+env:
+  SOLUTION_FILE_PATH: LatiteRewrite.vcxproj
+  BUILD_CONFIGURATION: Nightly
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Build Latite Nightly
+        working-directory: ${{env.GITHUB_WORKSPACE}}
+        run: |
+          msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=x64 /p:OutDir="${{ github.workspace }}\\x64\\${{env.BUILD_CONFIGURATION}}\\" ${{env.SOLUTION_FILE_PATH}}
+          if (Test-Path "${{ github.workspace }}\x64\Nightly\LatiteRewrite.dll") {
+            Rename-Item -Path "${{ github.workspace }}\x64\Nightly\LatiteRewrite.dll" -NewName "LatiteNightly.dll"
+          } else {
+            Write-Error "LatiteRewrite.dll not found in Nightly build output"
+            exit 1
+          }
+
+      - name: Compute build timestamp
+        shell: bash
+        run: |
+          TS=$(date -u +"%Y%m%d-%H%M%S")
+          echo "TIMESTAMP=$TS" >> "$GITHUB_ENV"
+
+      - name: Create timestamped archival release
+        uses: softprops/action-gh-release@v2.3.2
+        with:
+          tag_name: nightly-${{ env.TIMESTAMP }}
+          name: Latite Nightly ${{ env.TIMESTAMP }}
+          body: |
+            ### This is an automated, archived experimental DLL build of Latite Client.
+
+            Built at: ${{ env.TIMESTAMP }} UTC
+
+            Includes:
+            - Nightly build (LatiteNightly.dll)
+
+            Note: This is a snapshot with a unique tag for history.
+          prerelease: true
+          generate_release_notes: false
+          files: ${{ github.workspace }}/x64/Nightly/LatiteNightly.dll
+
+      - name: Recreate nightly release to refresh date
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete nightly -y || true
+          git push origin :refs/tags/nightly || true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2.3.2
+        with:
+          tag_name: nightly
+          name: Latite Nightly
+          body: |
+            ### This is an automated, experimental DLL build of Latite Client.
+
+            **This release has a high chance of containing bugs or crashes.**
+          prerelease: true
+          make_latest: true
+          files: ${{ github.workspace }}/x64/Nightly/LatiteNightly.dll

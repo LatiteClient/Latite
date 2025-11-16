@@ -5,6 +5,6 @@
 namespace SDK {
     class NetworkSystem {
     public:
-        CLASS_FIELD(RemoteConnectorComposite*, remoteConnector, 0x90);
+        CLASS_FIELD(RemoteConnectorComposite*, remoteConnector, 0xF0);
     };
 }

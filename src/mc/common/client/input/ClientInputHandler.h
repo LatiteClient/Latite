@@ -5,7 +5,7 @@
 namespace SDK {
 	class ClientInputMappingFactory {
 	public:
-		CLASS_FIELD(KeyboardLayout*, defaultKeyboardLayout, 0x140);
+		CLASS_FIELD(KeyboardLayout*, defaultKeyboardLayout, 0xE0);
 	};
 
 	class ClientInputHandler {

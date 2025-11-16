@@ -18,8 +18,8 @@ namespace WorldToScreen {
         SDK::LevelRendererPlayer* levelRendererPlayer = clientInstance->levelRenderer->getLevelRendererPlayer();
         if (!levelRendererPlayer) return std::nullopt;
 
-        SDK::ClientHMDState* clientHmdState = clientInstance->getClientHMDState();
-        if (!clientHmdState) return std::nullopt;
+        SDK::GameRenderer* gameRenderer = clientInstance->minecraftGame->gameRenderer;
+        if (!gameRenderer) return std::nullopt;
 
 
         const auto& screenSize = guiData->screenSize;
@@ -27,8 +27,8 @@ namespace WorldToScreen {
 
         Vec3 pos = worldPos - origin;
 
-        const glm::mat4x4& viewMatrix = clientHmdState->lastViewMatrix._m;
-        const glm::mat4x4& projMatrix = clientHmdState->lastProjectionMatrix._m;
+        const glm::mat4x4& viewMatrix = gameRenderer->lastViewMatrix._m;
+        const glm::mat4x4& projMatrix = gameRenderer->lastProjectionMatrix._m;
 
         glm::mat4x4 mvp = projMatrix * viewMatrix;
         glm::vec4 clipCoords = mvp * glm::vec4(pos.x, pos.y, pos.z, 1.0f);

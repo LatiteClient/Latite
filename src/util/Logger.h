@@ -2,6 +2,7 @@
 #include <string_view>
 #include <format>
 #include <filesystem>
+#include "ExceptionHandler.h"
 
 namespace Logger {
     enum class Level {
@@ -32,4 +33,9 @@ namespace Logger {
         std::string fm = std::vformat(fmt, std::make_format_args(args...));
         LogInternal(Level::Fatal, fm);
     }
+
+#ifdef LATITE_DEBUG
+    void LogExceptionDetails(StructuredException& ex);
+    void LogExceptionDetails(const std::exception& e);
+#endif
 }

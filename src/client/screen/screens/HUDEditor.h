@@ -2,7 +2,7 @@
 #include "../Screen.h"
 #include "util/LMath.h"
 #include "util/DxUtil.h"
-#include "client/feature/module/HudModule.h"
+#include "client/feature/module/HUDModule.h"
 
 class HUDEditor : public Screen {
 public:

@@ -1,25 +1,25 @@
-﻿cmake_minimum_required (VERSION 3.22)
+﻿cmake_minimum_required(VERSION 3.22)
 
 project(Latite)
 
-if(NOT MSVC)
-	message(FATAL_ERROR "Compiler unsupported, must use MSVC")
-endif()
+if (NOT MSVC)
+    message(FATAL_ERROR "Compiler unsupported, must use MSVC")
+endif ()
 
 # Add all sources in src/* and deps/*
 file(GLOB_RECURSE Latite_SRC CONFIGURE_DEPENDS
-	"src/*.h"
-	"src/*.cpp"
+        "src/*.h"
+        "src/*.cpp"
 
-	"deps/*.h"
-	"deps/*.cpp"
+        "deps/*.h"
+        "deps/*.cpp"
 )
 
 # Enable Hot Reload for MSVC compilers if supported
 if (POLICY CMP0141)
-  cmake_policy(SET CMP0141 NEW)
-  set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
-endif()
+    cmake_policy(SET CMP0141 NEW)
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
+endif ()
 
 # MSVC library release ABI compatibility with game
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
@@ -35,28 +35,34 @@ add_compile_definitions(_UNICODE UNICODE)
 
 # Link libraries
 target_link_libraries(Latite PRIVATE
-	# Needed for DirectX hooking and Direct2D rendering
-	d3d11
-	d3d12
-	dxguid
-	dxgi
+        # WinRT
+        WindowsApp.lib
 
-	# UI rendering
-	d2d1
+        # Needed for getting app version
+        Version.lib
 
-	# Text rendering
-	dwrite
+        # Needed for DirectX hooking and Direct2D rendering
+        d3d11
+        d3d12
+        dxguid
+        dxgi
 
-	# ImageNtHeader for mnemosyne
-	Dbghelp
+        # UI rendering
+        d2d1
 
-	# PlaySound for scripting
-	winmm
+        # Text rendering
+        dwrite
+
+        # ImageNtHeader for mnemosyne
+        Dbghelp
+
+        # PlaySound for scripting
+        winmm
 )
 
 target_include_directories(Latite PRIVATE
-	src
-	deps
+        src
+        deps
 )
 
 add_subdirectory(src)

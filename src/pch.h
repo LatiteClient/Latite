@@ -47,7 +47,6 @@ using nlohmann::json;
 #include <winrt/windows.foundation.collections.h>
 #include <winrt/Windows.Web.Http.Headers.h>
 #include <winrt/windows.system.h>
-#include <winrt/Windows.ApplicationModel.Core.h>
 #include <winrt/windows.security.cryptography.h>
 #include <winrt/windows.security.cryptography.core.h>
 
@@ -61,7 +60,6 @@ using nlohmann::json;
 #include "mc/Addresses.h"
 #include "mc/common/client/gui/GuiData.h"
 #include "mc/common/network/RakNetConnector.h"
-#include "mc/deps/input/MouseDevice.h"
 
 // Client
 #include "client/memory/hook/Hook.h"
@@ -96,6 +94,8 @@ using nlohmann::json;
 #include "util/LMath.h"
 #include "util/DrawContext.h"
 #include "util/Crypto.h"
-#include "client/localization/LocalizeString.h"
 #include "util/memory.h"
+#include "client/localization/LocalizeString.h"
+#include "util/ErrorHandler.h"
+#include "util/ExceptionHandler.h"
 #endif

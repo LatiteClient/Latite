@@ -282,7 +282,7 @@ void MCDrawUtil::drawVignette(d2d::Color const& innerCol, float fade) {
 
 void MCDrawUtil::drawImage(SDK::TexturePtr& texture, Vec2 const& pos, Vec2 const& size, d2d::Color const& flushCol) {
 	this->renderCtx->drawImage(texture, { pos.x * this->guiScale, pos.y * guiScale }, { size.x * guiScale, size.y * guiScale }, { 0.f, 0.f }, { 1.f, 1.f });
-	this->renderCtx->flushImages(flushCol, 1.f, SDK::HashedString("ui_grayscale") /*random hashed string*/);
+	this->renderCtx->flushImages(flushCol, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
 }
 
 d2d::Rect MCDrawUtil::drawItem(SDK::ItemStack* item, Vec2 const& pos, float sizeModifier, float opacity) {

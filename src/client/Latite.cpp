@@ -45,6 +45,8 @@
 #include <mc/common/client/gui/controls/VisualTree.h>
 #include <mc/common/client/gui/controls/UIControl.h>
 
+#include "mc/common/client/game/GameCore.h"
+
 using namespace winrt;
 using namespace winrt::Windows::Web::Http;
 using namespace winrt::Windows::Web::Http::Filters;
@@ -95,6 +97,7 @@ namespace shared {
 )()
 
 DWORD __stdcall startThread(HINSTANCE dll) {
+    BEGIN_ERROR_HANDLER
     // Needed for Logger
     new (messageSinkBuf) ClientMessageQueue;
     new (eventing) Eventing();
@@ -105,8 +108,39 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     std::filesystem::create_directory(util::GetLatitePath() / "Assets");
     Logger::Setup();
 
+#ifdef LATITE_DEBUG
+    AddVectoredExceptionHandler(1, VectoredExceptionHandler);
+#endif
+
     Logger::Info(XOR_STRING("Latite Client {}"), Latite::version);
-    winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
+
+    char path[MAX_PATH]{};
+    GetModuleFileNameA(nullptr, path, MAX_PATH);
+
+    DWORD handle;
+    DWORD size = GetFileVersionInfoSizeA(path, &handle);
+
+    if (size == 0) {
+        Logger::Fatal("Failed to get file version size");
+    }
+
+    std::vector<BYTE> data(size);
+    if (!GetFileVersionInfoA(path, handle, size, data.data())) {
+        Logger::Fatal("Failed to get file version");
+    }
+
+    VS_FIXEDFILEINFO* fileInfo = nullptr;
+    UINT len = 0;
+
+    if (VerQueryValueA(data.data(), "\\", reinterpret_cast<LPVOID*>(&fileInfo), &len)) {
+        const auto major = HIWORD(fileInfo->dwFileVersionMS);
+        const auto minor = LOWORD(fileInfo->dwFileVersionMS);
+        const auto build = HIWORD(fileInfo->dwFileVersionLS);
+
+        Latite::get().gameVersion = std::format("{}.{}.{}", major, minor, build);
+    }
+    
+    /*winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
     winrt::Windows::ApplicationModel::PackageVersion version = package.Id().Version();
 
     {
@@ -117,7 +151,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         std::stringstream ss;
         ss << version.Major << "." << version.Minor << "." << ps;// hacky
         Latite::get().gameVersion = ss.str();
-    }
+    }*/
     Logger::Info("Minecraft {}", Latite::get().gameVersion);
 
     Logger::Info(XOR_STRING("Loading assets"));
@@ -143,8 +177,17 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int deadCount = 0;
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
-        { "1.21.92", SDK::V1_21_90 },
-        { "1.21.90", SDK::V1_21_90 },
+        { "1.21.122", SDK::V1_21_120 },
+        { "1.21.121", SDK::V1_21_120 },
+        { "1.21.120", SDK::V1_21_120 },
+        //{ "1.21.114", SDK::V1_21_110 },
+        //{ "1.21.113", SDK::V1_21_110 },
+        //{ "1.21.111", SDK::V1_21_110 }, // 1.21.110 doesn't exist
+        //{ "1.21.100", SDK::V1_21_100 },
+        //{ "1.21.94", SDK::V1_21_90 },
+        //{ "1.21.93", SDK::V1_21_90 },
+        //{ "1.21.92", SDK::V1_21_90 },
+        //{ "1.21.90", SDK::V1_21_90 },
         //{ "1.21.82", SDK::V1_21_80 },
         //{ "1.21.81", SDK::V1_21_80 },
         //{ "1.21.80", SDK::V1_21_80 },
@@ -201,7 +244,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     std::vector<std::pair<SigImpl*, SigImpl*>> sigList = {
         MVSIG(Misc::minecraftGamePointer),
         MVSIG(Misc::clientInstance),
-        MVSIG(Keyboard_feed),
+        MVSIG(MainWindow__windowProcCallback),
         MVSIG(LevelRenderer_renderLevel),
         MVSIG(Offset::LevelRendererPlayer_fovX),
         MVSIG(Offset::LevelRendererPlayer_origin),
@@ -215,7 +258,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(ClientInstance_releaseCursor),
         MVSIG(Level_tick),
         MVSIG(ChatScreenController_sendChatMessage),
-        MVSIG(onClick),
+        MVSIG(GameCore_handleMouseInput),
         MVSIG(MinecraftGame_onDeviceLost),
         MVSIG(MinecraftGame_onAppSuspended),
         MVSIG(RenderController_getOverlayColor),
@@ -230,7 +273,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Vtable::TextPacket),
         MVSIG(Vtable::SetTitlePacket),
         MVSIG(Components::runtimeIDComponent),
-        MVSIG(Misc::mouseDevice),
         MVSIG(CameraViewBob),
         MVSIG(ItemStackBase_getHoverName),
         MVSIG(Vtable::CommandRequestPacket),
@@ -262,7 +304,9 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(GameArguments__onUri),
         MVSIG(_bobHurt),
         MVSIG(RenderMaterialGroup__common),
-        MVSIG(GuiData_displayClientMessage)
+        MVSIG(GuiData_displayClientMessage),
+        MVSIG(Misc::gameCorePointer),
+        MVSIG(MouseInputVector)
     };
     
     new (configMgrBuf) ConfigManager();
@@ -325,6 +369,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     Logger::Info(XOR_STRING("Initialized Latite Client"));
     return 0ul;
+    END_ERROR_HANDLER
 }
 
 BOOL WINAPI DllMain(
@@ -332,15 +377,10 @@ BOOL WINAPI DllMain(
     DWORD fdwReason,     // reason for calling function
     LPVOID)  // reserved
 {
+    BEGIN_ERROR_HANDLER
     if (GetModuleHandleA("Minecraft.Windows.exe") != GetModuleHandleA(NULL)) return TRUE;
 
     if (fdwReason == DLL_PROCESS_ATTACH) {
-
-        if (hasInjected) {
-            FreeLibrary(hinstDLL);
-            return TRUE;
-        }
-
         hasInjected = true;
 
         DisableThreadLibraryCalls(hinstDLL);
@@ -376,6 +416,7 @@ BOOL WINAPI DllMain(
         Logger::Info("Latite Client detached.");
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
+    END_ERROR_HANDLER
 }
 
 Latite& Latite::get() noexcept {
@@ -446,8 +487,9 @@ std::vector<std::string> Latite::getLatiteUsers() {
 }
 
 void Latite::queueEject() noexcept {
-    auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
-    app.Title(L"");
+    //auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
+    //app.Title(L"");
+    SetWindowTextW(SDK::GameCore::get()->hwnd, L"Minecraft");
     this->shouldEject = true;
     CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)FreeLibraryAndExitThread, dllInst, 0, nullptr));
 }
@@ -466,6 +508,9 @@ SDK::Font* Latite::getFont() {
 
 void Latite::initialize(HINSTANCE hInst) {
     this->dllInst = hInst;
+
+    Latite::getPluginManager().init();
+    Logger::Info(XOR_STRING("Script manager initialized."));
 
     Latite::getEventing().listen<UpdateEvent>(this, (EventListenerFunc)&Latite::onUpdate, 2);
     Latite::getEventing().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Latite::onKey, 2);
@@ -486,9 +531,6 @@ void Latite::initialize(HINSTANCE hInst) {
     getHooks().enable();
     Logger::Info(XOR_STRING("Enabled Hooks"));
 
-    Latite::getPluginManager().init();
-    Logger::Info(XOR_STRING("Script manager initialized."));
-
     // doesn't work, maybe it's stored somewhere else too
     //if (SDK::internalVers < SDK::V1_20) {
     //    patchKey();
@@ -500,15 +542,26 @@ void Latite::threadsafeInit() {
     // TODO: latite beta only
     //if (SDK::ClientInstance::get()->minecraftGame->xuid.size() > 0) wnd->postXUID();
 
-    auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
+
+#ifdef LATITE_DEBUG
+    // Set SEH translator for game thread
+    _set_se_translator(translate_seh_to_cpp_exception);
+#endif
+
+
+    //auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     std::string vstr(this->version);
-#ifdef LATITE_NIGHTLY
+	
+#if defined(LATITE_NIGHTLY)
     auto ws = util::StrToWStr("Latite Client [NIGHTLY] " + gameVersion + " " + vstr + "/" + calcCurrentDLLHash());
+#elif defined(LATITE_DEBUG)
+    auto ws = util::StrToWStr("Latite Client [DEBUG] " + gameVersion + " " + vstr + "/" + calcCurrentDLLHash());
 #else
     auto ws = util::StrToWStr("Latite Client " + vstr);
 #endif
 
-    app.Title(ws);
+    //app.Title(ws);
+    SetWindowTextW(SDK::GameCore::get()->hwnd, ws.c_str());
     Latite::getPluginManager().loadPrerunScripts();
     Logger::Info(XOR_STRING("Loaded startup scripts"));
     
@@ -863,7 +916,8 @@ void Latite::initAsset(int resource, std::wstring const& filename) {
     HRSRC hRes = FindResource((HMODULE)dllInst, MAKEINTRESOURCE(resource), RT_RCDATA);
     if (!hRes) {
         Logger::Fatal(XOR_STRING("Could not find resource {}"), util::WStrToStr(filename));
-        winrt::terminate();
+        //winrt::terminate();
+        exit(0);
         return;
     }
 

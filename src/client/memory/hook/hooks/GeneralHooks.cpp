@@ -8,13 +8,15 @@
 #include "../Hooks.h"
 #include "PlayerHooks.h"
 #include "client/screen/ScreenManager.h"
+#include "mc/common/client/game/MouseInputPacket.h"
 
 namespace {
 	std::shared_ptr<Hook> Level_tickHook;
 	std::shared_ptr<Hook> ChatScreenController_sendChatMesageHook;
 	std::shared_ptr<Hook> GameRenderer_renderCurrentFrameHook;
-	std::shared_ptr<Hook> Keyboard_feedHook;
-	std::shared_ptr<Hook> OnClickHook;
+	//std::shared_ptr<Hook> Keyboard_feedHook;
+	std::shared_ptr<Hook> MainWindow__windowProcCallbackHook;
+	std::shared_ptr<Hook> GameCore_handleMouseInputHook;
 	std::shared_ptr<Hook> LoadLibraryWHook;
 	std::shared_ptr<Hook> LoadLibraryAHook;
 	std::shared_ptr<Hook> AveragePingHook;
@@ -88,72 +90,90 @@ void* GenericHooks::GameRenderer_renderCurrentFrame(void* rend) {
 	return GameRenderer_renderCurrentFrameHook->oFunc<decltype(&GameRenderer_renderCurrentFrame)>()(rend);
 }
 
-void GenericHooks::Keyboard_feed(int key, bool isDown) {
-	
+LRESULT GenericHooks::MainWindow__windowProcCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) { // Name from China
+	if (msg == WM_KEYDOWN || msg == WM_KEYUP) {
+		const int key = wParam & 0xFF;
+		const bool isDown = msg == WM_KEYDOWN;
 
-	{
-		PluginManager::Event::Value val{L"isDown"};
-		val.val = isDown;
+		{
+			PluginManager::Event::Value val{L"isDown"};
+			val.val = isDown;
 
-		PluginManager::Event::Value val3{L"keyCode"};
-		val3.val = static_cast<double>(key);
+			PluginManager::Event::Value val3{L"keyCode"};
+			val3.val = static_cast<double>(key);
 
-		PluginManager::Event::Value val2{L"keyAsChar"};
+			PluginManager::Event::Value val2{L"keyAsChar"};
 
-		std::string str = "";
-		if (key > 31 && key < 128) {
-			str = (char)key;
+			std::string str = "";
+			if (key > 31 && key < 128) {
+				str = (char)key;
+			}
+			val2.val = util::StrToWStr(str);
+
+			PluginManager::Event sEv{L"key-press", { val, val2, val3 }, true};
+			if (Latite::getPluginManager().dispatchEvent(sEv)) return DefWindowProcW(hwnd, msg, wParam, lParam);
 		}
-		val2.val = util::StrToWStr(str);
 
-		PluginManager::Event sEv{L"key-press", { val, val2, val3 }, true};
-		if (Latite::getPluginManager().dispatchEvent(sEv)) return;
+		KeyUpdateEvent ev{ key, isDown };
+		if (Eventing::get().dispatch(ev)) return DefWindowProcW(hwnd, msg, wParam, lParam);
 	}
 
-	KeyUpdateEvent ev{ key, isDown };
-	if (Eventing::get().dispatch(ev)) return;
-
-	return Keyboard_feedHook->oFunc<decltype(&Keyboard_feed)>()(key, isDown);
+	return MainWindow__windowProcCallbackHook->oFunc<decltype(&MainWindow__windowProcCallback)>()(hwnd, msg, wParam, lParam);
 }
 
-void GenericHooks::onClick(MouseDevice* map, char clickType, char isDownWheelDelta, uintptr_t a4, int16_t a5, int16_t a6, int16_t a7, char a8) {
+bool GenericHooks::GameCore_handleMouseInput(void* a1, void* a2, void* a3) { // Made up name
+	const auto res = GameCore_handleMouseInputHook->oFunc<decltype(&GameCore_handleMouseInput)>()(a1, a2, a3);
 
-	if (clickType > 0) {
-		Vec2& mousePos = SDK::ClientInstance::get()->cursorPos;
+	static auto mouseInputVector = reinterpret_cast<std::vector<MouseInputPacket>*>(Signatures::MouseInputVector.result);
 
-		std::vector<PluginManager::Event::Value> values;
+	for (size_t i = 0; i < mouseInputVector->size(); i++) { // This method sucks so fucking bad, but gets the job done
+		auto& start = mouseInputVector->at(i);
+		auto it = std::next(mouseInputVector->begin(), i);
 
-		PluginManager::Event::Value val{L"mouseX"};
-		val.val = static_cast<double>(mousePos.x);
+		const auto button = start.type;
+		const auto state = start.state;
 
-		PluginManager::Event::Value val2{L"mouseY"};
-		val2.val = static_cast<double>(mousePos.y);
+		if (button > 0) {
+			Vec2& mousePos = SDK::ClientInstance::get()->cursorPos;
 
-		PluginManager::Event::Value val3{L"isDown"};
-		val3.val = static_cast<bool>(isDownWheelDelta);
+			std::vector<PluginManager::Event::Value> values;
 
-		PluginManager::Event::Value val4{L"button"};
-		val4.val = static_cast<double>(clickType);
+			PluginManager::Event::Value val{L"mouseX"};
+			val.val = static_cast<double>(mousePos.x);
 
-		values.push_back(val);
-		values.push_back(val2);
-		values.push_back(val3);
-		values.push_back(val4);
+			PluginManager::Event::Value val2{L"mouseY"};
+			val2.val = static_cast<double>(mousePos.y);
 
-		if (clickType == 4) {
-			PluginManager::Event::Value wheel{ L"wheelDelta" };
-			wheel.val = static_cast<double>(clickType);
-			values.push_back(wheel);
+			PluginManager::Event::Value val3{L"isDown"};
+			val3.val = static_cast<bool>(state);
+
+			PluginManager::Event::Value val4{L"button"};
+			val4.val = static_cast<double>(button);
+
+			values.push_back(val);
+			values.push_back(val2);
+			values.push_back(val3);
+			values.push_back(val4);
+
+			if (button == 4) {
+				PluginManager::Event::Value wheel{ L"wheelDelta" };
+				wheel.val = static_cast<double>(state);
+				values.push_back(wheel);
+			}
+
+			PluginManager::Event ev{L"click", values, true};
+			if (Latite::getPluginManager().dispatchEvent(ev)) {
+				mouseInputVector->erase(it);
+				continue;
+			}
 		}
 
-		PluginManager::Event ev{L"click", values, true};
-		if (Latite::getPluginManager().dispatchEvent(ev)) return;
+		ClickEvent ev{ button, static_cast<char>(state) };
+		if (Eventing::get().dispatch(ev))
+			mouseInputVector->erase(it);
 	}
 
-	ClickEvent ev{ clickType, isDownWheelDelta };
-	if (Eventing::get().dispatch(ev)) return;
-
-	return OnClickHook->oFunc<decltype(&onClick)>()(map, clickType, isDownWheelDelta, a4, a5, a6, a7, a8);
+	return res;
 }
 
 BOOL __stdcall GenericHooks::hkLoadLibraryW(LPCWSTR lib) {
@@ -218,14 +238,9 @@ void __fastcall GenericHooks::MoveInputHandler_tick(void* obj, void* proxy) {
 }
 
 void GenericHooks::ClientInputUpdateSystem_tickBaseInput(uintptr_t** a1, void* a2, uintptr_t* a3, uintptr_t a4, uintptr_t a5, uintptr_t a6, uintptr_t a7, uintptr_t a8, uintptr_t a9, uintptr_t a10, uintptr_t a11,
-	void* a12,
-	uintptr_t a13,
-	uintptr_t a14,
-	char a15,
-	char a16,
-	char a17,
-	char a18,
-	char a19) {
+	char a12,
+	char a13,
+	char a14) {
 
 	SDK::MoveInputComponent* hand = SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent();
 	{
@@ -241,7 +256,7 @@ void GenericHooks::ClientInputUpdateSystem_tickBaseInput(uintptr_t** a1, void* a
 		if (Eventing::get().dispatch(ev)) return;
 	}
 
-	ClientInputUpdateSystem_tickBaseInputHook->oFunc<decltype(&ClientInputUpdateSystem_tickBaseInput)>()(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a15, a15, a16, a17, a18, a19);
+	ClientInputUpdateSystem_tickBaseInputHook->oFunc<decltype(&ClientInputUpdateSystem_tickBaseInput)>()(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14);
 	{
 		AfterMoveEvent ev{ hand };
 		Eventing::get().dispatch(ev);
@@ -418,9 +433,9 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	//GameRenderer_renderCurrentFrameHook = addHook(Signatures::GameRenderer__renderCurrentFrame.result,
 	//	GameRenderer_renderCurrentFrame, "GameRenderer::_renderCurrentFrame");
 
-	Keyboard_feedHook = addHook(Signatures::Keyboard_feed.result, Keyboard_feed, "Keyboard::feed");
+	MainWindow__windowProcCallbackHook = addHook(Signatures::MainWindow__windowProcCallback.result, MainWindow__windowProcCallback, "MainWindow::_windowProcCallback");
 
-	OnClickHook = addHook(Signatures::onClick.result, onClick, "onClick");
+	GameCore_handleMouseInputHook = addHook(Signatures::GameCore_handleMouseInput.result, GameCore_handleMouseInput, "GameCore::handleMouseInput");
 
 	AveragePingHook = addHook(Signatures::RakPeer_GetAveragePing.result, RakPeer_getAveragePing, "RakPeer::GetAveragePing");
 	

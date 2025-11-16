@@ -1,24 +1,29 @@
 #pragma once
-#include "mc/util.h"
+
+#include "MoveInputState.h"
 
 namespace SDK {
-	// or MoveInputHandler in older versions
 	struct MoveInputComponent {
-	private:
-		char pad[0x88];
-		
-	public:
-		MVCLASS_FIELD(bool, sneak, 0x00, 0x4C, 0x4C);
-		MVCLASS_FIELD(bool, jump, 0x07, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06, 0x4B, 0x4B);
-		MVCLASS_FIELD(bool, sprintKey, 0x08, 0x07, 0x07, 0x07, 0x07, 0x07, 0x07, 0x4C, 0x4C);
-		MVCLASS_FIELD(bool, front, 0x0D, 0x2C, 0x2C, 0x2C, 0x2C, 0x2C, 0x0A, 0x5F, 0x5F);
-		MVCLASS_FIELD(bool, back, 0x0E, 0x2D, 0x2D, 0x2D, 0x2D, 0x2D, 0x0B, 0x60, 0x60);
-		MVCLASS_FIELD(bool, left, 0x0F, 0x2E, 0x2E, 0x2E, 0x2E, 0x2E, 0x0C, 0x61, 0x61);
-		MVCLASS_FIELD(bool, right, 0x10, 0x2F, 0x2F, 0x2F, 0x2F, 0x2F, 0x0D, 0x62, 0x62);
-		MVCLASS_FIELD(bool, sprinting, 0x30, 0x27, 0x27, 0x27, 0x27, 0x27, 0x27, 0x6C, 0x6C);
-		
-		// Touch / gamepad joystick input
-		MVCLASS_FIELD(float, joystickX, 0x14);
-		MVCLASS_FIELD(float, joystickY, 0x18);
+		MoveInputState inputState;
+		MoveInputState rawInputState;
+		int8_t holdAutoJumpInWaterTicks;
+		Vec2 move;
+		Vec2 lookDelta;
+		Vec2 interactDir;
+		Vec3 displacement;
+		Vec3 displacementDelta;
+		Vec3 cameraOrientation;
+		bool sneaking : 1;
+		bool sprinting : 1;
+		bool wantUp : 1;
+		bool wantDown : 1;
+		bool jumping : 1;
+		bool autoJumpingInWater : 1;
+		bool moveInputStateLocked : 1;
+		bool persistSneak : 1;
+		bool autoJumpEnabled : 1;
+		bool isCameraRelativeMovementEnabled : 1;
+		bool isRotControlledByMoveDirection : 1;
+		std::array<bool, 2> isPaddling;
 	};
 }

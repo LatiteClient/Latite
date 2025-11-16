@@ -51,7 +51,7 @@ void ToggleSprintSneak::onTick(Event& evGeneric) {
 				input->sprinting = true;
 			}
 		}*/
-		input->sprinting = true;
+		input->rawInputState.sprintDown = true;
 		if (toggleSprinting) {
 			right = L"Toggled";
 			if (std::get<BoolValue>(alwaysSprint)) right = L"Always";
@@ -85,10 +85,10 @@ void ToggleSprintSneak::beforeMove(Event& evGeneric) {
 
 void ToggleSprintSneak::afterMove(Event& evGeneric) {
 	auto& ev = reinterpret_cast<AfterMoveEvent&>(evGeneric);
-	realSneaking = ev.getMoveInputHandler()->sneak;
+	realSneaking = ev.getMoveInputHandler()->rawInputState.sneakDown;
 	//realSprint = ev.getMoveInputHandler()->sprintKey;
 	if (std::get<BoolValue>(sneak) && toggleSneaking) {
-		ev.getMoveInputHandler()->sneak = true;
+		ev.getMoveInputHandler()->rawInputState.sneakDown = true;
 	}
 
 	/*if (std::get<BoolValue>(sprint) && toggleSprinting) {

@@ -6,7 +6,7 @@ namespace SDK {
 	class ScreenContext {
 	public:
 		CLASS_FIELD(Color*, shaderColor, 0x30);
-		CLASS_FIELD(class Tessellator*, tess, 0xC8);
+		CLASS_FIELD(class Tessellator*, tess, 0xB8);
 
 		// this is mce::Camera
 		struct MatrixPtr {

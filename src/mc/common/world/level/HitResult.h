@@ -18,7 +18,7 @@ namespace SDK {
 		BlockPos hitBlock;
 		Vec3 hitPos;
 		// ...
-		CLASS_FIELD(BlockPos, liquidBlock, 0x54);
-		CLASS_FIELD(Vec3, liquidPos, 0x54);
+		CLASS_FIELD(BlockPos, liquidBlock, 0x6C);
+		CLASS_FIELD(Vec3, liquidPos, 0x6C);
 	};
 }
