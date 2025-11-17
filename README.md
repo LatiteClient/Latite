@@ -14,12 +14,23 @@
 - **Customization**: Accent colors, module positions, keybinds, and font settings
 - **Injector (Launcher)**: Easy injection with the dedicated Latite Injector
 
-## Download
+## Building
+1. Clone the repository.
+2. [Install Visual Studio or Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/).
+3. Install [MinGW-w64](https://www.mingw-w64.org/). The installation must be in your system's PATH. To test this, run the `ld` command in a terminal. If MinGW is successfully installed, it should output `ld: no input files`.
+4. Use CMake to build the project.
+
+## Contributing
+We welcome people to contribute code via making a PR (Pull Request) to the Client or [Injector](https://github.com/Plextora/LatiteInjector). Just make sure to ping us in our [Discord Server](https://discord.gg/GpV3w5tyBs) if we don't get to reviewing your PR in a timely manner :)
+
+
+## Installation
 ### Recommended Method
 1. Download the [Latite Installer](https://github.com/Imrglop/Latite-Releases/raw/main/injector/Installer.exe)
 2. Run the installer
 3. Run the Injector from the desktop shortcut, Windows Start menu, or from `%programfiles%\Latite Injector\Latite Injector.exe`
 4. Press "Launch" when in the Injector.
+
 
 ### Alternative Options
 - [Latite Minimal](https://latite-client.is-from.space/r/Latite_Minimal.exe) (for antivirus issues/India users)
@@ -44,11 +55,6 @@ Enhance your experience with community-made plugins:
 
 ## FAQ
 <details>
-<summary>What versions are supported?</summary>
-Currently supports:
-- 1.21.92
-- 1.21.90
-</details>
 
 <details>
 <summary>Why is it flagged as a virus?</summary>
@@ -59,11 +65,9 @@ This is a false positive due to DLL injection techniques. Latite is completely s
 <summary>Can I use this on mobile?</summary>
 No — check out our Android project <a href="https://atlasclient.net">Atlas Client</a> instead.
 </details>
+</details>
 
 [View Full FAQ](https://latiteclient.com/#faq)
-
-## Contributing
-We welcome people to contribute code via making a PR (Pull Request) to the Client or [Injector](https://github.com/Plextora/LatiteInjector). Just make sure to ping us in our [Discord Server](https://discord.gg/GpV3w5tyBs) if we don't get to reviewing your PR in a timely manner :)
 
 ## Community
 - [Discord Server](https://discord.gg/GpV3w5tyBs)
