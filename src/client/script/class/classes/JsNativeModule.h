@@ -54,6 +54,12 @@ public:
 	static JsValueRef CALLBACK getCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 
+#ifndef LATITE_DEBUG
+		Chakra::ThrowError(L"For security, NativeModule is disabled in release builds");
+		return JS_INVALID_REFERENCE;
+#endif
+
+
 		if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
 		if (!Chakra::VerifyParameters({ {arguments[1], JsString} })) return JS_INVALID_REFERENCE;
 
@@ -82,6 +88,11 @@ public:
 
 	static JsValueRef CALLBACK callCallback(JsValueRef callee, bool isConstructor,
 		JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+
+#ifndef LATITE_DEBUG
+		Chakra::ThrowError(L"For security, NativeModule is disabled in release builds");
+		return JS_INVALID_REFERENCE;
+#endif
 
 		if (!Chakra::VerifyArgCount(argCount, 3, true, true)) return JS_INVALID_REFERENCE;
 		if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsString} })) return JS_INVALID_REFERENCE;
