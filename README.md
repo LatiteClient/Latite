@@ -17,7 +17,7 @@
 ## Building
 1. Clone the repository.
 2. [Install Visual Studio or Visual Studio Build Tools](https://visualstudio.microsoft.com/downloads/).
-3. Install [MinGW-w64](https://www.mingw-w64.org/). The installation must be in your system's PATH. To test this, run the `ld` command in a terminal. If MinGW is successfully installed, it should output `ld: no input files`.
+3. Install [MinGW-w64](https://www.mingw-w64.org/). The installation directory must be in your system's PATH. To test this, run the `ld` command in a terminal. If MinGW is successfully installed, it should output `ld: no input files`.
 4. Use CMake to build the project.
 
 ## Contributing
