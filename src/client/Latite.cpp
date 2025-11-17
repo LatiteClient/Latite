@@ -812,7 +812,8 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("centerCursor", LocalizeString::get("client.settings.centerCursor.name"),
+        auto set = std::make_shared<Setting>(""
+                                             "centerCursor", LocalizeString::get("client.settings.centerCursor.name"),
                                              LocalizeString::get("client.settings.centerCursor.desc"));
         set->value = &this->centerCursorMenus;
         this->getSettings().addSetting(set);
@@ -964,13 +965,9 @@ void Latite::onUpdate(Event& evGeneric) {
     bool grabbed = SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed();
     static bool lastGrabbed = grabbed;
 
-    if (!minecraftWindow) {
-        minecraftWindow = FindWindowA(NULL, XOR_STRING("Minecraft"));
-    }
-
-    if (std::get<BoolValue>(centerCursorMenus) && grabbed && !lastGrabbed) {
+    if (std::get<BoolValue>(centerCursorMenus) && grabbed) {
         RECT r = { 0, 0, 0, 0 };
-        GetClientRect(minecraftWindow, &r);
+        GetClientRect(SDK::GameCore::get()->hwnd, &r);
         SetCursorPos(r.left + r.right / 2, r.top + r.bottom / 2);
     }
     lastGrabbed = grabbed;

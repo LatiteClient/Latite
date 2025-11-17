@@ -143,7 +143,6 @@ private:
 
 	Timings timings{};
 	inline static std::optional<std::thread::id> gameThreadId;
-	inline static HWND minecraftWindow = 0;
 
 	ValueType commandPrefix = TextValue(L".");
 	ValueType menuKey = KeyValue('M');
