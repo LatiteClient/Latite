@@ -44,10 +44,10 @@ jobs:
       # Configure using Ninja + clang-cl
       - name: Configure CMake (clang-cl + Ninja)
         run: |
-          cmake -B ${{ env.BUILD_DIR }} ^
-            -G Ninja ^
-            -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIGURATION }} ^
-            -DCMAKE_C_COMPILER=clang-cl ^
+          cmake -B ${{ env.BUILD_DIR }}  
+            -G Ninja   
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIGURATION }}  
+            -DCMAKE_C_COMPILER=clang-cl  
             -DCMAKE_CXX_COMPILER=clang-cl
 
       # Build using Ninja
