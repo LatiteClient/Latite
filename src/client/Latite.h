@@ -158,7 +158,6 @@ private:
 	ValueType minimalViewBob = BoolValue(false);
 	ValueType minecraftRenderer = BoolValue(false);
 	ValueType textShadow = BoolValue(true);
-	ValueType broadcastUsage = BoolValue(true);
 	ValueType centerCursorMenus = BoolValue(false);
 	ValueType snapLines = BoolValue(true);
 	ValueType detectLanguageSetting = BoolValue(true);

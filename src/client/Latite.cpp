@@ -84,10 +84,6 @@ namespace {
     bool hasInjected = false;
 }
 
-namespace shared {
-    std::array<char, 100> serverStatus = {};
-}
-
 #define MVSIG(...) ([]() -> std::pair<SigImpl*, SigImpl*> {\
 /*if (SDK::internalVers == SDK::VLATEST) */return {&Signatures::__VA_ARGS__, &Signatures::__VA_ARGS__}; }\
 /*if (SDK::internalVers == SDK::V1_20_40) { return {&Signatures_1_20_40::__VA_ARGS__, &Signatures::__VA_ARGS__}; }*/ \
@@ -463,7 +459,6 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getEventing().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Latite::onKey, 2);
     Latite::getEventing().listen<RendererInitEvent>(this, (EventListenerFunc)&Latite::onRendererInit, 2);
     Latite::getEventing().listen<RendererCleanupEvent>(this, (EventListenerFunc)&Latite::onRendererCleanup, 2);
-    Latite::getEventing().listen<FocusLostEvent>(this, (EventListenerFunc)&Latite::onFocusLost, 2);
     Latite::getEventing().listen<AppSuspendedEvent>(this, (EventListenerFunc)&Latite::onSuspended, 2);
     Latite::getEventing().listen<CharEvent>(this, (EventListenerFunc)&Latite::onChar, 2);
     Latite::getEventing().listen<ClickEvent>(this, (EventListenerFunc)&Latite::onClick, 2);
@@ -521,10 +516,6 @@ void Latite::threadsafeInit() {
     Latite::getNotifications().push(util::FormatWString(LocalizeString::get("client.intro.menubutton"), { util::StrToWStr(util::KeyToString(Latite::get().getMenuKey().value)) }));
 }
 
-void Latite::patchKey() {
-}
-
-
 static void blockModules(std::string_view moduleName, std::string_view serverName) {
     auto inst = SDK::RakNetConnector::get();
 
@@ -579,50 +570,8 @@ namespace {
     HttpClient client{};
 }
 
-void Latite::fetchLatiteUsers() {
-    auto lp = SDK::ClientInstance::get()->getLocalPlayer();
-    if (!lp) {
-        latiteUsers = {};
-        return;
-    }
 
-    std::string str = XOR_STRING("https://lafa-1-f2031735.deta.app/users");
-
-    winrt::Windows::Foundation::Uri requestUri(util::StrToWStr(str));
-
-    auto name = util::StrToWStr(lp->playerName);
-
-    auto content = HttpStringContent(util::StrToWStr(XOR_STRING("{\"name\":\"")) + name + util::StrToWStr(XOR_STRING("\"}")));
-    std::string medType = XOR_STRING("application/json");
-    content.Headers().ContentType().MediaType(util::StrToWStr(medType));
-    auto usersDirty = &this->latiteUsersDirty;
-    client.PostAsync(requestUri, content).Completed([usersDirty](winrt::Windows::Foundation::IAsyncOperationWithProgress<HttpResponseMessage, HttpProgress> task, winrt::Windows::Foundation::AsyncStatus status) {
-        if (status == winrt::Windows::Foundation::AsyncStatus::Completed) {
-            try {
-                auto res = task.GetResults();
-                if (res.IsSuccessStatusCode()) {
-                    auto cont = res.Content();
-                    auto str = cont.ReadAsStringAsync().get();
-
-                    nlohmann::json json;
-                    try {
-
-                        json = nlohmann::json::parse(util::WStrToStr(str.c_str()));
-                    }
-                    catch (nlohmann::json::parse_error&) {
-                        usersDirty->clear();
-                        for (auto& item : json) {
-                            usersDirty->push_back(item.get<std::string>());
-                        }
-                    }
-                }
-            }
-            catch (winrt::hresult_error&) {
-            }
-        }
-        });
-}
-
+// TODO: Remove this, there's no point of it being here
 std::string Latite::fetchLatestGitHash() {
     std::string url = "https://api.github.com/repos/LatiteClient/Latite/commits/master";
     HttpClient client;
@@ -642,6 +591,7 @@ std::string Latite::fetchLatestGitHash() {
     return json["sha"];
 }
 
+// Also remove this
 std::string Latite::calcCurrentDLLHash() {
     std::wstring dllPath = Latite::get().GetCurrentModuleFilePath(dllInst);
 
@@ -962,21 +912,10 @@ void Latite::onUpdate(Event& evGeneric) {
             });
     }
 
-    bool grabbed = SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed();
-    static bool lastGrabbed = grabbed;
-
-    if (std::get<BoolValue>(centerCursorMenus) && grabbed) {
+    if (std::get<BoolValue>(centerCursorMenus)) {
         RECT r = { 0, 0, 0, 0 };
         GetClientRect(SDK::GameCore::get()->hwnd, &r);
         SetCursorPos(r.left + r.right / 2, r.top + r.bottom / 2);
-    }
-    lastGrabbed = grabbed;
-
-    if (std::get<BoolValue>(broadcastUsage)) {
-        //if (std::chrono::duration_cast<std::chrono::milliseconds>(now - lastSend) > 10s) {
-        //    this->fetchLatiteUsers();
-        //    lastSend = now;
-        //}
     }
 
     latiteUsers = latiteUsersDirty;
@@ -1005,36 +944,6 @@ void Latite::onUpdate(Event& evGeneric) {
     if (rgbHue > 1.f) {
         rgbHue = 0.f;
     }
-#if 0
-    {
-        static auto time = std::chrono::steady_clock::now();
-        auto now = std::chrono::steady_clock::now();
-        if (std::chrono::duration_cast<std::chrono::seconds>(now - time) > 5s) {
-
-            std::string newServerStatus = "menus";
-            auto lp = SDK::ClientInstance::get()->getLocalPlayer();
-            auto rak = SDK::RakNetConnector::get();
-
-            if (lp) {
-                if (rak && !rak->ipAddress.empty()) {
-                    newServerStatus = "server";
-                    if (!rak->featuredServer.empty()) newServerStatus = "server: " + rak->featuredServer;
-                    else if (!rak->dns.empty()) newServerStatus = "server: " + rak->dns + (rak->port == 19132 ? "" : ":" + std::to_string(rak->port));
-                    // Don't show non-dns ips (1.1.1.1) for privacy
-                }
-                else {
-                    newServerStatus = "world: " + SDK::ClientInstance::get()->minecraft->getLevel()->name;
-                }
-            }
-
-            if (newServerStatus.size() > shared::serverStatus.max_size()) { // make sure there are no buffer overflows
-                newServerStatus = newServerStatus.substr(0, shared::serverStatus.max_size() - 2);
-            }
-            strcpy_s(shared::serverStatus.data(), shared::serverStatus.max_size(), newServerStatus.c_str());
-            time = now;
-        }
-    }
-#endif
 }
 
 void Latite::onKey(Event& evGeneric) {
@@ -1110,10 +1019,6 @@ void Latite::onRendererCleanup(Event& ev) {
     this->hudBlurBrush = nullptr;
 }
 
-void Latite::onFocusLost(Event& evGeneric) {
-    auto& ev = reinterpret_cast<FocusLostEvent&>(evGeneric);
-    if (Latite::getScreenManager().getActiveScreen()) ev.setCancelled(true);
-}
 
 void Latite::onSuspended(Event& ev) {
     Latite::getConfigManager().saveCurrentConfig();

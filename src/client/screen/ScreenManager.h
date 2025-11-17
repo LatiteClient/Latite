@@ -66,7 +66,8 @@ public:
 
 	[[nodiscard]] std::optional<std::reference_wrapper<Screen>> getActiveScreen() { return activeScreen; };
 
-	void onKey(Event& ev);
+	void onKey(KeyUpdateEvent& ev);
+	void onFocusLost(FocusLostEvent& ev);
 private:
 	std::optional<std::reference_wrapper<Screen>> activeScreen;
 };

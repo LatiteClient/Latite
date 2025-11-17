@@ -73,7 +73,7 @@ public:
 			thr->detach();
 		}
 
-		~AsyncOperation() {
+		virtual ~AsyncOperation() {
 			JS::JsRelease(callback, nullptr);
 		}
 	};

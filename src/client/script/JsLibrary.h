@@ -4,6 +4,7 @@
 
 class JsLibrary {
 public:
+	virtual ~JsLibrary() = default;
 	JsLibrary(class JsScript* owner, std::wstring const& inclName) : includeName(inclName), owner(owner) {}
 
 	virtual JsValueRef initialize(JsValueRef parentObj) = 0;

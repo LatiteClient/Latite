@@ -144,14 +144,12 @@ JsValueRef Filesystem::writeSync(JsValueRef callee, bool isConstructor, JsValueR
 		throwFsError();
 		return undef;
 	}
-	else {
-		BYTE* buf;
-		unsigned int bufSize;
-		JS::JsGetTypedArrayStorage(arguments[2], &buf, &bufSize, nullptr, nullptr);
+	BYTE* buf;
+	unsigned int bufSize;
+	JS::JsGetTypedArrayStorage(arguments[2], &buf, &bufSize, nullptr, nullptr);
 
-		for (size_t i = 0; i < bufSize; i++) {
-			ofs << (char)buf[i];
-		}
+	for (size_t i = 0; i < bufSize; i++) {
+		ofs << (char)buf[i];
 	}
 	ofs.close();
 	ofs.flush();

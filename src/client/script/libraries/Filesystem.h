@@ -24,7 +24,7 @@ private:
 		virtual void getArgs() override;
 
 		FSAsyncOperation(JsValueRef callback, decltype(initFunc) initFunc, void* param)
-			: JsScript::AsyncOperation(true, callback, initFunc, param), err(0), data(std::nullopt)
+			: JsScript::AsyncOperation(true, callback, initFunc, param)
 		{
 		}
 	};

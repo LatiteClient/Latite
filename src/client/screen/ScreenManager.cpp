@@ -6,7 +6,8 @@
 #include "client/event/events/KeyUpdateEvent.h"
 
 ScreenManager::ScreenManager() {
-	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc)&ScreenManager::onKey);
+	Eventing::get().listen<KeyUpdateEvent, &ScreenManager::onKey>(this);
+	Eventing::get().listen<FocusLostEvent, &ScreenManager::onFocusLost>(this);
 }
 
 void ScreenManager::exitCurrentScreen() {
@@ -18,9 +19,7 @@ void ScreenManager::exitCurrentScreen() {
 	}
 }
 
-void ScreenManager::onKey(Event& evGeneric) {
-	static auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
-
+void ScreenManager::onKey(KeyUpdateEvent& ev) {
 	if (ev.isDown() && ev.getKey() == VK_ESCAPE && getActiveScreen()) {
 		exitCurrentScreen();
 		ev.setCancelled(true);
@@ -43,5 +42,11 @@ void ScreenManager::onKey(Event& evGeneric) {
 		}
 		ev.setCancelled(true);
 		return;
+	}
+}
+
+void ScreenManager::onFocusLost(FocusLostEvent& ev) {
+	if (getActiveScreen()) {
+		ev.setCancelled(true);
 	}
 }
