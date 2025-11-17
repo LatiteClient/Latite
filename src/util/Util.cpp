@@ -517,7 +517,7 @@ void util::KeepInBounds(d2d::Rect& targ, d2d::Rect const& bounds) {
 
 std::string util::GetProcessorInfo() {
     constexpr std::array<int, 3> cpuIds = { static_cast<int>(0x80000002), static_cast<int>(0x80000003), static_cast<int>(0x80000004) };
-    std::array<int, 4> data{};
+    std::array<int, 4 + 1> data{}; // the extra int is to accommodate for the null terminator
     std::string model;
 
 #ifdef __clang__
@@ -527,12 +527,12 @@ std::string util::GetProcessorInfo() {
                 : "=a" (data[0]), "=b" (data[1]), "=c" (data[2]), "=d" (data[3])
                 : "a" (id)
                 );
-        model += std::string(reinterpret_cast<const char*>(data.data()), data.size() * sizeof(int));
+        model += std::string(reinterpret_cast<const char*>(data.data()));
     }
 #else
     for (auto& id : cpuIds) {
         __cpuid(data.data(), id);
-        model += std::string(reinterpret_cast<const char*>(data.data()), data.size() * sizeof(int));
+        model += std::string(reinterpret_cast<const char*>(data.data()));
     }
 #endif
 
