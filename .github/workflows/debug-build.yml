@@ -33,17 +33,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Provides environment variables for MSVC-compatible linking
       - name: Set up MSVC Developer Environment
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Configure CMake
-        run: |
-          cmake -B ${{ env.BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIGURATION }} -A x64
+      # Install Ninja (GitHub Windows runner already has it, but we ensure fresh install)
+      - name: Install Ninja
+        uses: seanmiddleditch/gha-setup-ninja@v3
 
-      - name: Build with CMake
+      # Configure using Ninja + clang-cl
+      - name: Configure CMake (clang-cl + Ninja)
+        run: |
+          cmake -B ${{ env.BUILD_DIR }} ^
+            -G Ninja ^
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIGURATION }} ^
+            -DCMAKE_C_COMPILER=clang-cl ^
+            -DCMAKE_CXX_COMPILER=clang-cl
+
+      # Build using Ninja
+      - name: Build with Ninja
         run: |
           cmake --build ${{ env.BUILD_DIR }} --config ${{ env.BUILD_CONFIGURATION }}
 
+      # Rename DLL + PDB
       - name: Rename DLL + PDB
         shell: pwsh
         run: |
@@ -100,9 +112,9 @@ jobs:
           tag_name: debug
           name: Latite Debug
           body: |
-            ### Automated Debug Build (Latest)
+            ### Latest Automated Debug Build
 
-            **This debug release may contain bugs or slow performance.**
+            ⚠ Debug builds may contain bugs or be slow.
 
             Includes:
             - LatiteDebug.dll
