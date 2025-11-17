@@ -10,7 +10,7 @@ Assets::Assets() :
 	searchIcon(GET_RESOURCE(searchicon_png)),
 	arrowIcon(GET_RESOURCE(arrow_png)),
 	xIcon(GET_RESOURCE(x_png)),
-	hudEditIcon(GET_RESOURCE(cog_png)),
+	hudEditIcon(GET_RESOURCE(hudedit_png)),
 	arrowBackIcon(GET_RESOURCE(arrow_back_png)),
 	cogIcon(GET_RESOURCE(cog_png)),
 	checkmarkIcon(GET_RESOURCE(checkmark_png)),

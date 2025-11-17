@@ -6,6 +6,12 @@ if (NOT MSVC)
     message(FATAL_ERROR "Compiler unsupported, must use MSVC")
 endif ()
 
+# Setup build type macros
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DLATITE_DEBUG)
+endif()
+
 # Add all sources in src/* and deps/*
 file(GLOB_RECURSE Latite_SRC CONFIGURE_DEPENDS
         "src/*.h"

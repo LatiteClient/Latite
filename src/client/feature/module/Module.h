@@ -18,7 +18,7 @@ public:
 	inline static constexpr int nokeybind = 1;
 
 	explicit Module(std::string const& name, std::wstring const& displayName, std::wstring const& description, Category category,
-		int keybind = 0, bool hud = false, bool visible = true) : settings(std::make_shared<SettingGroup>(name)) {
+		int keybind = 0, bool hud = false, bool visible = true) : settings(std::make_shared<SettingGroup>(name)), modName(name), displayName(displayName), description(description), category(category), visible(visible), hud(hud) {
         settings = std::make_shared<SettingGroup>(name);
 		this->hud = hud;
 
@@ -73,6 +73,7 @@ public:
     virtual void afterLoadConfig() {}
     virtual void loadConfig(SettingGroup& resolvedGroup);
     virtual bool shouldHoldToToggle() { return false; }
+	bool shouldListen() override { return this->isEnabled(); };
 
     void setEnabled(bool b, bool blockedOverride = false) { if (!blockedOverride && isBlocked()) return; b ? onEnable() : onDisable(); std::get<BoolValue>(enabled) = b; }
     void setBlocked(bool b) {

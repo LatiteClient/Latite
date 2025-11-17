@@ -12,7 +12,7 @@ LocalizeData::LocalizeData() {
     languages = {
         fallbackLanguage,
 #ifdef LATITE_DEBUG
-        std::make_shared<Language>(LANG_AR_AR, "ar"),
+        std::make_shared<Language>(GET_RESOURCE(lang_ar_AR_json), "ar"),
 #endif
         std::make_shared<Language>(GET_RESOURCE(lang_cs_CZ_json), "cs"),
         std::make_shared<Language>(GET_RESOURCE(lang_nl_NL_json), "nl"),
