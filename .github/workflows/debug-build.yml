@@ -7,21 +7,21 @@ on:
       - "**.cpp"
       - "**.h"
       - "**.hpp"
-      - "**.vcxproj"
-      - "**.sln"
+      - "**CMakeLists.txt"
+      - "**.cmake"
   pull_request:
     branches: ["master"]
     paths:
       - "**.cpp"
       - "**.h"
       - "**.hpp"
-      - "**.vcxproj"
-      - "**.sln"
+      - "**CMakeLists.txt"
+      - "**.cmake"
   workflow_dispatch:
 
 env:
-  SOLUTION_FILE_PATH: LatiteRewrite.vcxproj
   BUILD_CONFIGURATION: Debug
+  BUILD_DIR: cmake-build-debug
 
 permissions:
   contents: write
@@ -33,21 +33,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v1.0.2
+      - name: Set up MSVC Developer Environment
+        uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Build Latite Debug
-        working-directory: ${{env.GITHUB_WORKSPACE}}
+      - name: Configure CMake
         run: |
-          msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} /p:Platform=x64 /p:OutDir="${{ github.workspace }}\\x64\\${{env.BUILD_CONFIGURATION}}\\" ${{env.SOLUTION_FILE_PATH}}
-          if (Test-Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.dll") {
-            Rename-Item -Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.dll" -NewName "LatiteDebug.dll"
+          cmake -B ${{ env.BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIGURATION }} -A x64
+
+      - name: Build with CMake
+        run: |
+          cmake --build ${{ env.BUILD_DIR }} --config ${{ env.BUILD_CONFIGURATION }}
+
+      - name: Rename DLL + PDB
+        shell: pwsh
+        run: |
+          $dll = "${{ github.workspace }}\${{ env.BUILD_DIR }}\Latite.dll"
+          $pdb = "${{ github.workspace }}\${{ env.BUILD_DIR }}\Latite.pdb"
+
+          if (Test-Path $dll) {
+            Rename-Item -Path $dll -NewName "LatiteDebug.dll" -Force
           } else {
-            Write-Error "LatiteRewrite.dll not found in Debug build output"
+            Write-Error "Latite.dll not found"
             exit 1
           }
-          if (Test-Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.pdb") {
-            Rename-Item -Path "${{ github.workspace }}\x64\Debug\LatiteRewrite.pdb" -NewName "LatiteDebug.pdb"
+
+          if (Test-Path $pdb) {
+            Rename-Item -Path $pdb -NewName "LatiteDebug.pdb" -Force
           }
 
       - name: Compute build timestamp
@@ -62,18 +73,18 @@ jobs:
           tag_name: debug-${{ env.TIMESTAMP }}
           name: Latite Debug ${{ env.TIMESTAMP }}
           body: |
-            ### This is an automated, archived experimental DLL build of Latite Client.
+            ### Automated timestamped debug build
 
             Built at: ${{ env.TIMESTAMP }} UTC
 
             Includes:
-            - Debug build (LatiteDebug.dll)
-            - PDB symbols (LatiteDebug.pdb)
+            - LatiteDebug.dll
+            - LatiteDebug.pdb
           prerelease: true
           generate_release_notes: false
           files: |
-            ${{ github.workspace }}/x64/Debug/LatiteDebug.dll
-            ${{ github.workspace }}/x64/Debug/LatiteDebug.pdb
+            ${{ github.workspace }}/cmake-build-debug/LatiteDebug.dll
+            ${{ github.workspace }}/cmake-build-debug/LatiteDebug.pdb
 
       - name: Recreate debug release to refresh date
         shell: bash
@@ -89,17 +100,15 @@ jobs:
           tag_name: debug
           name: Latite Debug
           body: |
-            ### This is an automated, experimental DLL build of Latite Client.
+            ### Automated Debug Build (Latest)
 
-            **This debug release has a high chance of containing bugs or crashes.**
+            **This debug release may contain bugs or slow performance.**
 
             Includes:
-            - Debug build (LatiteDebug.dll)
-            - PDB symbols (LatiteDebug.pdb)
-
-            Warning: This version may run slower than production builds.
+            - LatiteDebug.dll
+            - LatiteDebug.pdb
           prerelease: true
           make_latest: true
           files: |
-            ${{ github.workspace }}/x64/Debug/LatiteDebug.dll
-            ${{ github.workspace }}/x64/Debug/LatiteDebug.pdb
+            ${{ github.workspace }}/cmake-build-debug/LatiteDebug.dll
+            ${{ github.workspace }}/cmake-build-debug/LatiteDebug.pdb
