@@ -148,7 +148,7 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 			}
 
 			PluginManager::Event::Value val{ L"message" };
-			val.val = util::StrToWStr(pkt->str);
+			val.val = util::StrToWStr(pkt->str.has_value() ? *pkt->str : pkt->source);
 
 			PluginManager::Event::Value val2{ L"sender" };
 			val2.val = util::StrToWStr(pkt->source);

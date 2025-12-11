@@ -27,7 +27,8 @@ void Nickname::onClientTextPacket(Event& evG) {
 
     std::string newName = util::WStrToStr(std::get<TextValue>(this->nickname).str);
     auto& currentPlayerName = SDK::ClientInstance::get()->getLocalPlayer()->playerName;
-    replaceAll(message, currentPlayerName, newName);
+    if (message.has_value())
+        replaceAll(*message, currentPlayerName, newName);
     replaceAll(source, currentPlayerName, newName);
 
     textPacket->str = message;

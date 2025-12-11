@@ -18,14 +18,13 @@ namespace SDK {
 
 	class TextPacket : public Packet {
 	public:
-		TextPacketType type;
-		std::string source;
-		std::string str;
-		std::optional<std::string> filteredMessage;
-		std::vector<std::string> params;
 		bool translationNeeded = false;
 		std::string xboxUserId;
 		std::string platformChatId;
+		std::optional<std::string> filteredMessage;
+		TextPacketType type;
+		std::string source;
+		std::optional<std::string> str;
 
 		TextPacket() = default;
 		

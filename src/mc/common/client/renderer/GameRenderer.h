@@ -3,7 +3,7 @@
 
 namespace SDK {
     class GameRenderer {
-        char pad[0x350];
+        char pad[0x358];
 
     public:
         Matrix lastViewMatrix;

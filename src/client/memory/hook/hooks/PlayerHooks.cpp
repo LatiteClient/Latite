@@ -6,7 +6,7 @@
 static std::shared_ptr<Hook> ActorAttackHook;
 static std::shared_ptr<Hook> ActorGetFormattedNameTag;
 
-void PlayerHooks::hkActorAttack(SDK::Actor* obj, SDK::Actor* target, void* cause, bool a4) {
+void PlayerHooks::hkActorAttack(SDK::Actor* obj, SDK::Actor* target, void* cause, void* a4) {
     if (obj == SDK::ClientInstance::get()->getLocalPlayer()) {
         AttackEvent ev{ target };
         Eventing::get().dispatch(ev);

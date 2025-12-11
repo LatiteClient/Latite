@@ -78,6 +78,9 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
         {
             return hat::member_at<GuiData*>(this, 0x558);
         }
+        if (internalVers >= V1_21_130) {
+            return hat::member_at<GuiData*>(this, 0x648);
+        }
         if (internalVers >= V1_21_110) {
             return hat::member_at<GuiData*>(this, 0x578);
         }
