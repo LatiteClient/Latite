@@ -46,16 +46,23 @@ public:
 
     template <typename T, auto listener>
     void listen(Listener* ptr, int priority = 0, bool callWhileInactive = false) requires std::derived_from<T, Event> {
-        static_assert(sizeof(listener) == 16, "Unsupported listener function type");
+        std::shared_lock lock{ mutex };
+
         struct MFPtr {
-            EventListenerFunc ptr;
-            ptrdiff_t adj;
+            const EventListenerFunc ptr;
+            const ptrdiff_t adj;
         };
 
-        MFPtr mfp = std::bit_cast<MFPtr>(listener);
+        if constexpr (sizeof(listener) == sizeof(EventListenerFunc)) {
+            listeners.push_back({ T::hash, EventListener{ static_cast<EventListenerFunc>(listener), ptr, callWhileInactive, priority } });
+        } else if constexpr (sizeof(listener) == sizeof(MFPtr)) {
+            const MFPtr mfp = std::bit_cast<MFPtr>(listener);
+            assert(mfp.adj == 0 && "Unsupported listener function type");
 
-        std::shared_lock lock{ mutex };
-        listeners.push_back({ T::hash, EventListener{ mfp.ptr, ptr, callWhileInactive, priority } });
+            listeners.push_back({ T::hash, EventListener{ mfp.ptr, ptr, callWhileInactive, priority } });
+        } else {
+            static_assert(false, "Unsupported listener function type");
+        }
         std::sort(listeners.begin(), listeners.end(), [](std::pair<uint32_t, EventListener> const& left,
                                                          std::pair<uint32_t, EventListener> const& right) {
             return left.second.priority > right.second.priority;

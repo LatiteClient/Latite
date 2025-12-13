@@ -455,19 +455,18 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getPluginManager().init();
     Logger::Info(XOR_STRING("Script manager initialized."));
 
-    Latite::getEventing().listen<UpdateEvent>(this, (EventListenerFunc)&Latite::onUpdate, 2);
-    Latite::getEventing().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Latite::onKey, 2);
-    Latite::getEventing().listen<RendererInitEvent>(this, (EventListenerFunc)&Latite::onRendererInit, 2);
-    Latite::getEventing().listen<RendererCleanupEvent>(this, (EventListenerFunc)&Latite::onRendererCleanup, 2);
-    Latite::getEventing().listen<AppSuspendedEvent>(this, (EventListenerFunc)&Latite::onSuspended, 2);
-    Latite::getEventing().listen<CharEvent>(this, (EventListenerFunc)&Latite::onChar, 2);
-    Latite::getEventing().listen<ClickEvent>(this, (EventListenerFunc)&Latite::onClick, 2);
-    Latite::getEventing().listen<BobMovementEvent>(this, (EventListenerFunc)&Latite::onBobView, 2);
-    Latite::getEventing().listen<LeaveGameEvent>(this, (EventListenerFunc)&Latite::onLeaveGame, 2);
-    Latite::getEventing().listen<RenderLayerEvent>(this, (EventListenerFunc)&Latite::onRenderLayer, 2);
-    Latite::getEventing().listen<RenderOverlayEvent>(this, (EventListenerFunc)&Latite::onRenderOverlay, 2);
-    //Latite::getEventing().listen<PacketReceiveEvent>(this, (EventListenerFunc)&Latite::onPacketReceive, 2);
-    Latite::getEventing().listen<TickEvent>(this, (EventListenerFunc)&Latite::onTick, 2);
+    Latite::getEventing().listen<UpdateEvent, &Latite::onUpdate>(this, 2);
+    Latite::getEventing().listen<KeyUpdateEvent, &Latite::onKey>(this, 2);
+    Latite::getEventing().listen<RendererInitEvent, &Latite::onRendererInit>(this, 2);
+    Latite::getEventing().listen<RendererCleanupEvent, &Latite::onRendererCleanup>(this, 2);
+    Latite::getEventing().listen<AppSuspendedEvent, &Latite::onSuspended>(this, 2);
+    Latite::getEventing().listen<CharEvent, &Latite::onChar>(this, 2);
+    Latite::getEventing().listen<ClickEvent, &Latite::onClick>(this, 2);
+    Latite::getEventing().listen<BobMovementEvent, &Latite::onBobView>(this, 2);
+    Latite::getEventing().listen<LeaveGameEvent, &Latite::onLeaveGame>(this, 2);
+    Latite::getEventing().listen<RenderLayerEvent, &Latite::onRenderLayer>(this, 2);
+    Latite::getEventing().listen<RenderOverlayEvent, &Latite::onRenderOverlay>(this, 2);
+    Latite::getEventing().listen<TickEvent, &Latite::onTick>(this, 2);
 
     Logger::Info(XOR_STRING("Initialized Hooks"));
     getHooks().enable();
