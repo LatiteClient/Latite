@@ -156,12 +156,8 @@ JsErrorCode JsScript::runScript() {
 #endif
 
 	JsErrorCode code = JsNoError;
-	try {
-		 code = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(this->path.wstring())), this->path.wstring().c_str(), nullptr);
-	}
-	catch (...) {
-		//Latite::getClientMessageQueue().push("Exception while loading script " + path.string() + ": " + e.what());
-	}
+	Logger::Info("Script is {}", util::WStrToStr(loadedScript));
+	code = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(this->path.wstring())), this->path.wstring().c_str(), nullptr);
 	return code;
 }
 
@@ -195,6 +191,7 @@ void JsScript::loadJSApi() {
 	// null-terminate the data because Chakra accepts a null-terminated string only
 	auto ptr = new char[resource.size() + 1];
 	ptr[resource.size()] = 0;
+	memcpy(ptr, resource.data(), resource.size());
 
 	auto err = JS::JsRunScript(util::StrToWStr(ptr).c_str(), sCtx, L"latiteapi.js", &res);
 	delete[] ptr;
