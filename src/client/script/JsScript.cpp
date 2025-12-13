@@ -156,7 +156,6 @@ JsErrorCode JsScript::runScript() {
 #endif
 
 	JsErrorCode code = JsNoError;
-	Logger::Info("Script is {}", util::WStrToStr(loadedScript));
 	code = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(this->path.wstring())), this->path.wstring().c_str(), nullptr);
 	return code;
 }
