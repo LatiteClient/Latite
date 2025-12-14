@@ -18,6 +18,7 @@ public:
 	Asset cogIcon;
 	Asset checkmarkIcon;
 	Asset logoWhite;
+	Asset document;
 
 	void loadAll();
 	void unloadAll();

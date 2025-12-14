@@ -78,25 +78,31 @@ private:
 		SCRIPT
 	} modTab = ALL;
 
-	struct ModContainer {
+	struct ModuleLike {
 		std::wstring name;
 		std::wstring description;
-		std::wstring pluginName = L"";
-		std::shared_ptr<class Module> mod;
+		std::string pluginId;
+		std::wstring pluginAuthor;
+		std::shared_ptr<Module> mod;
 		bool shouldRender = true;
 		bool isExtended = false;
 		bool isMarketScript = false;
+		bool pluginInstalled = false;
 		Vec2 previewSize = {};
 		float arrowRot = 180.f;
 		float lerpArrowRot = 1.f;
 		float lerpToggle = 0.f;
 		float lerpHover = 0.f;
 		Color toggleColorOn = {};
-		Color toggleColorOff = {};
+		Color toggleColorOff = d2d::Color::RGB(0x63, 0x63, 0x63);
 		std::optional<d2d::Rect> modRect = std::nullopt;
 
-		static bool compare(ModContainer const& a, ModContainer const& b) {
-			return (a.name < b.name) || (!a.isMarketScript && b.isMarketScript);
+		static bool isLess(ModuleLike const& a, ModuleLike const& b) {
+			if (a.isMarketScript && !b.isMarketScript) {
+				return true;
+			}
+
+			return a.name < b.name;
 		}
 	};
 
@@ -112,6 +118,7 @@ private:
 	float scrollMax = 0.f;
 	float scroll = 0.f;
 	float lerpScroll = 0.f;
+	bool shouldRebuildModLikes = false;
 
 	std::optional<std::string> jumpModule;
 	ComPtr<ID2D1Effect> compositeEffect;

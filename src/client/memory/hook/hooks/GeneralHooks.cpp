@@ -250,7 +250,7 @@ void GenericHooks::ClientInputUpdateSystem_tickBaseInput(uintptr_t** a1, void* a
 			return;
 		}
 	}
-	
+
 	{
 		BeforeMoveEvent ev{ hand };
 		if (Eventing::get().dispatch(ev)) return;
@@ -350,7 +350,7 @@ void GenericHooks::hkDimensionTick(SDK::Dimension* obj) {
 
 Color* GenericHooks::hkGetFogColor(SDK::Dimension* obj, Color* out, SDK::Actor* ent, float f) {
 	FogColorHook->oFunc<decltype(&hkGetFogColor)>()(obj, out, ent, f);
-	
+
 	FogColorEvent ev{ out };
 	Eventing::get().dispatch(ev);
 
@@ -393,13 +393,16 @@ void GenericHooks::hkOnUri(void* obj, void* pUri) {
 	};
 
 	ActivationUri* uri = reinterpret_cast<ActivationUri*>(pUri);
-	
+
 	if (uri->verb == "addlatiteplugin") {
 		auto pluginName = uri->arguments.find("id");
 
 		if (pluginName != uri->arguments.end()) {
 			Latite::getNotifications().push(L"Installing plugin " + util::StrToWStr(pluginName->second));
-			Latite::getPluginManager().installScript(pluginName->second);
+			auto result = Latite::getPluginManager().installScript(pluginName->second);
+			if (!result.has_value()) {
+				Latite::getNotifications().push(util::StrToWStr(result.error()));
+			}
 		}
 		return;
 	}
@@ -438,7 +441,7 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	GameCore_handleMouseInputHook = addHook(Signatures::GameCore_handleMouseInput.result, GameCore_handleMouseInput, "GameCore::handleMouseInput");
 
 	AveragePingHook = addHook(Signatures::RakPeer_GetAveragePing.result, RakPeer_getAveragePing, "RakPeer::GetAveragePing");
-	
+
 	TurnDeltaHook = addHook(Signatures::LocalPlayer_applyTurnDelta.result, LocalPlayer_applyTurnDelta, "LocalPlayer::applyTurnDelta");
 
 	if (Signatures::ClientInputUpdateSystem_tickBaseInput.result) {

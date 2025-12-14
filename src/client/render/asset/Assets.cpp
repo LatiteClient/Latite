@@ -14,7 +14,8 @@ Assets::Assets() :
 	arrowBackIcon(GET_RESOURCE(arrow_back_png)),
 	cogIcon(GET_RESOURCE(cog_png)),
 	checkmarkIcon(GET_RESOURCE(checkmark_png)),
-	logoWhite(GET_RESOURCE(latitewhite_png))
+	logoWhite(GET_RESOURCE(latitewhite_png)),
+	document(GET_RESOURCE(document_png))
 
 {
 
@@ -27,6 +28,7 @@ Assets::Assets() :
 	allAssets.push_back(&this->cogIcon);
 	allAssets.push_back(&this->checkmarkIcon);
 	allAssets.push_back(&this->logoWhite);
+	allAssets.push_back(&this->document);
 }
 
 void Assets::loadAll() {

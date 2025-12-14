@@ -12,6 +12,7 @@ LOAD_RESOURCE(latitewhite_png);
 LOAD_RESOURCE(logo_png);
 LOAD_RESOURCE(searchicon_png);
 LOAD_RESOURCE(x_png);
+LOAD_RESOURCE(document_png);
 
 // JavaScript
 LOAD_RESOURCE(latiteapi_js)

@@ -60,7 +60,7 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 		if (!std::filesystem::exists(path))
 			path = (util::GetLatitePath() / ("Plugins") / scr).string();
 		if (std::filesystem::exists(path)) {
-			std::filesystem::rename(path, PluginManager::getUserPrerunDir() / (std::filesystem::path(path).filename().string()));
+			std::filesystem::rename(path, PluginManager::getPrerunPluginsDir() / (std::filesystem::path(path).filename().string()));
 			message(util::FormatWString(LocalizeString::get("client.commands.plugin.startup.name"),
                                         { util::StrToWStr(scr) }));
 			return true;
@@ -73,7 +73,8 @@ bool ScriptCommand::execute(std::string const label, std::vector<std::string> ar
 	else if (args[0] == "install") {
 		if (args.size() != 2) return false;
 		auto err = Latite::getPluginManager().installScript(args[1]);
-		if (err.has_value()) {
+		if (!err.has_value()) {
+			message(err.error());
 			return true;
 		}
 		message(util::WFormat(util::FormatWString(LocalizeString::get("client.commands.plugin.install.name"), {

@@ -48,36 +48,45 @@ ClickGUI::ClickGUI() {
 }
 
 void ClickGUI::onRender(Event&) {
-	static std::vector<ModContainer> mods = {};
+	static std::vector<ModuleLike> mods = {};
 
 	static size_t lastCount = 0;
 	static size_t marketScriptCount = 0;
+
+	if (shouldRebuildModLikes) {
+		shouldRebuildModLikes = false;
+		mods.clear();
+	}
 
 	if (mods.empty() || (Latite::getModuleManager().size() != lastCount)) {
 		lastCount = Latite::getModuleManager().size();
 		mods.clear();
 		// TODO: fetch all market scripts
 
-		//auto plugins = Latite::getPluginManager().fetchPluginsFromMarket();
-		//marketScriptCount = plugins.size();
-		//
-		//for (auto& plug : plugins) {
-		//	ModContainer container{ util::WStrToStr(plug.name), "", plug.name, nullptr};
-		//	container.isMarketScript = true;
-		//
-		//	mods.emplace_back(container);
-		//}
+		auto plugins = Latite::getPluginManager().fetchPluginsFromMarket();
+		marketScriptCount = plugins.size();
+
+		for (auto& plug : plugins) {
+			ModuleLike container{ plug.name, plug.desc, plug.id, plug.author, nullptr};
+			container.isMarketScript = true;
+			container.pluginAuthor = plug.author;
+
+			if (PluginManager::isPluginInstalled(plug.id)) {
+				Logger::Info("Plugin is installed: {}", plug.id);
+				container.pluginInstalled = true;
+			}
+
+			mods.emplace_back(container);
+		}
 
 		Latite::getModuleManager().forEach([&](std::shared_ptr<Module> mod) {
 			if (mod->isVisible()) {
-				ModContainer container{ mod->getDisplayName(), mod->desc(), L"", mod };
+				ModuleLike container{ mod->getDisplayName(), mod->desc(), {}, {}, mod };
 				mods.emplace_back(container);
 			}
 			return false;
 			});
 	}
-
-	std::sort(mods.begin(), mods.end(), ModContainer::compare); // Sort modules
 
 	{
 		auto scn = Latite::getScreenManager().getActiveScreen();
@@ -106,6 +115,7 @@ void ClickGUI::onRender(Event&) {
 	dc.ctx->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
 	Vec2& cursorPos = SDK::ClientInstance::get()->cursorPos;
+	auto accentColor = d2d::Color(Latite::get().getAccentColor().getMainColor());
 
 	//auto& ev = reinterpret_cast<RenderOverlayEvent&>(evGeneric);
 	auto& rend = Latite::getRenderer();
@@ -270,7 +280,7 @@ void ClickGUI::onRender(Event&) {
 		}
 	}
 
-	// Search Bar + tabs 
+	// Search Bar + tabs
 	RectF searchRect{};
 	{
 		float gaps = guiWidth * 0.02217f;
@@ -461,37 +471,63 @@ void ClickGUI::onRender(Event&) {
 		float x = xStart;
 		float y = searchRect.bottom + padFromSearchBar;
 		float modStartTop = y;
-		// TODO: clipping
+
 		dc.ctx->PushAxisAlignedClip({ rect.left, y, rect.right, rect.bottom }, D2D1_ANTIALIAS_MODE_ALIASED);
 		modClip = { rect.left, y, rect.right, rect.bottom };
 
-		float yStart = y -= this->lerpScroll;
+		y -= this->lerpScroll;
 
 		this->scroll = std::clamp(scroll, 0.f, scrollMax);
 
 		lerpScroll = std::lerp(lerpScroll, scroll, Latite::getRenderer().getDeltaTime() / 5.f);
 
-		//std::array<float, 3> 
+		std::vector<std::reference_wrapper<ModuleLike>> displayedModLikes;
+
+		// filter what mods get actually displayed (search box / selected category tab), put them in displayedModLikes
 
 		for (auto& mod : mods) {
-			mod.shouldRender = true;
-
-			if (mod.isMarketScript) mod.shouldRender = false;
-			if (modTab == GAME && mod.mod->getCategory() == Module::HUD) mod.shouldRender = false; // Game Tab
-			if (modTab == HUD && !mod.mod->isHud()) mod.shouldRender = false; // Hud Tab
-			if (modTab == SCRIPT && mod.mod->getCategory() != Module::SCRIPT) mod.shouldRender = false; // Hud Tab
-			if (modTab == SCRIPT && mod.isMarketScript) mod.shouldRender = true;
-
-			bool should = mod.shouldRender;
-			if (this->searchTextBox.getText().size() > 0) {
-				should = false;
+			if (searchTextBox.getText().empty()) {
+				if (modTab == ALL) {
+					if (!mod.mod)
+						continue;
+				} else if (modTab == GAME) {
+					if (!mod.mod || mod.mod->getCategory() == Module::HUD)
+						continue;
+				} else if (modTab == HUD) {
+					if (!mod.mod || !mod.mod->isHud())
+						continue;
+				} else if (modTab == SCRIPT) {
+					if (!mod.isMarketScript)
+						continue;
+				}
+			} else {
 				std::wstring lower = mod.name;
-				std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+				std::ranges::transform(lower, lower.begin(), tolower);
 				std::wstring lowerSearch = searchTextBox.getText();
-				std::transform(lowerSearch.begin(), lowerSearch.end(), lowerSearch.begin(), ::tolower);
-				if (lower.rfind(lowerSearch) != UINTPTR_MAX) should = true;
+				std::ranges::transform(lowerSearch, lowerSearch.begin(), tolower);
+
+				if (lower.rfind(lowerSearch) == std::string::npos)
+					continue;
 			}
-			mod.shouldRender = should;
+
+			displayedModLikes.emplace_back(mod);
+		}
+
+		std::ranges::sort(displayedModLikes, ModuleLike::isLess);
+
+		for (auto& modLikeRef : displayedModLikes) {
+			auto& mod = modLikeRef.get();
+
+			if (this->searchTextBox.getText().size() > 0) {
+				mod.shouldRender = false;
+				std::wstring lower = mod.name;
+				std::ranges::transform(lower, lower.begin(), tolower);
+				std::wstring lowerSearch = searchTextBox.getText();
+				std::ranges::transform(lowerSearch, lowerSearch.begin(), tolower);
+
+				if (lower.rfind(lowerSearch) != std::string::npos)
+					mod.shouldRender = true;
+			}
 		}
 
 		int i = 0;
@@ -504,12 +540,14 @@ void ClickGUI::onRender(Event&) {
 		// modules
 		scrollMax = 0.f;
 
-		for (auto& mod : mods) {
+		for (auto& modLikeRef : displayedModLikes) {
+			auto& mod = modLikeRef.get();
+
 			if (!mod.shouldRender) continue;
 			Vec2 pos = { x, y + columnOffs[i] };
 			RectF modRect = { pos.x, pos.y, pos.x + modWidth, pos.y + modHeight };
 
-			if (jumpModule.has_value() && mod.mod->name() == *jumpModule) {
+			if (jumpModule.has_value() && mod.mod && mod.mod->name() == *jumpModule) {
 				scroll = pos.y - modStartTop;
 				mod.isExtended = true;
 			}
@@ -539,10 +577,10 @@ void ClickGUI::onRender(Event&) {
 
 				// module settings calculations
 				dc.ctx->SetTarget(auxiliaryBitmap.Get());
-				bool renderExtended = (mod.lerpArrowRot < 0.995f);
+				bool renderExtended = mod.mod && mod.lerpArrowRot < 0.995f;
 				if (renderExtended) {
 
-					// clipping pane
+					// clipped section
 					{
 						dc.ctx->Clear();
 
@@ -577,8 +615,6 @@ void ClickGUI::onRender(Event&) {
 						}
 
 						float padToSetting = 0.014184f * rect.getHeight();
-						float settingPadY = padToSetting * 2.5f;
-						float settingHeight = rect.getHeight() * setting_height_relative;
 
 						modRectActual.bottom += padToSetting;
 						mod.mod->settings->forEach([&](std::shared_ptr<Setting> set) {
@@ -599,11 +635,10 @@ void ClickGUI::onRender(Event&) {
 							modRectActual.right, modRectActual.bottom + mod.previewSize.y };
 
 							Vec2 drawPos = box.center(mod.previewSize);
-							auto real = RectF(drawPos.x, drawPos.y, 0, 0);
 							D2D1::Matrix3x2F oTrans;
+
 							dc.ctx->GetTransform(&oTrans);
 							dc.ctx->SetTransform(D2D1::Matrix3x2F::Scale(1.f, 1.f) * D2D1::Matrix3x2F::Translation(drawPos.x, drawPos.y));
-							float oSize = rMod->getScale();
 							rMod->render(dc, true, false);
 							mod.previewSize = rMod->getRectNonScaled().getSize();
 							dc.ctx->SetTransform(oTrans);
@@ -623,7 +658,7 @@ void ClickGUI::onRender(Event&) {
 
 
 				dc.fillRoundedRectangle(modRectActual, d2d::Color::RGB(0x44, 0x44, 0x44).asAlpha(0.22f), .22f * modHeight);
-				dc.drawRoundedRectangle(modRectActual, d2d::Color(Latite::get().getAccentColor().getMainColor()).asAlpha(1.f * mod.lerpToggle), .22f * modHeight, 1.f, DrawUtil::OutlinePosition::Inside);;
+				dc.drawRoundedRectangle(modRectActual, accentColor.asAlpha(1.f * mod.lerpToggle), .22f * modHeight, 1.f, DrawUtil::OutlinePosition::Inside);;
 				if (renderExtended) {
 
 					dc.ctx->DrawBitmap(auxiliaryBitmap.Get());
@@ -634,9 +669,22 @@ void ClickGUI::onRender(Event&) {
 				auto textRect = modRect;
 				textRect.left += modRect.getWidth() / 6.f;
 
+				if (mod.isMarketScript) {
+					float authorTextSize = modRect.getHeight() * 0.45f;
+					textRect.bottom -= authorTextSize;
+
+					auto authorRect = textRect;
+					authorRect.top = textRect.bottom;
+					authorRect.bottom = modRect.bottom;
+
+					dc.drawText(authorRect, L"by " + mod.pluginAuthor, d2d::Color(1.f, 1.f, 1.f, 0.57f), FontSelection::PrimarySemilight, authorRect.getHeight() * 0.7f,
+						DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+				}
+
+
 				// Make the text end before the toggle rectangle
 				textRect.right = toggleRect.left;
-				dc.drawText(textRect, mod.name, { 1.f, 1.f, 1.f, 1.f }, FontSelection::PrimaryLight, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+				dc.drawText(textRect, mod.name, { 1.f, 1.f, 1.f, 1.f }, FontSelection::PrimaryLight, textHeight, DWRITE_TEXT_ALIGNMENT_LEADING, mod.isMarketScript ? DWRITE_PARAGRAPH_ALIGNMENT_FAR : DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 				// toggle
 
@@ -661,9 +709,9 @@ void ClickGUI::onRender(Event&) {
 								playClickSound();
 							}
 						}
-						static auto offCol = d2d::Color::RGB(0x63, 0x63, 0x63);
+						static auto offCol = d2d::Color(mod.toggleColorOff);
 
-						mod.toggleColorOn = util::LerpColorState(mod.toggleColorOn, d2d::Color(Latite::get().getAccentColor().getMainColor()) + 0.2f, d2d::Color(Latite::get().getAccentColor().getMainColor()), selecToggle);
+						mod.toggleColorOn = util::LerpColorState(mod.toggleColorOn, accentColor + 0.2f, accentColor, selecToggle);
 						mod.toggleColorOff = util::LerpColorState(mod.toggleColorOff, offCol + 0.2f, offCol, selecToggle);
 
 						//float aTogglePadY = toggleRect.getHeight() * 0.15f;
@@ -680,7 +728,7 @@ void ClickGUI::onRender(Event&) {
 
 						center.x += onDist * mod.lerpToggle;
 
-						dc.brush->SetColor((d2d::Color(0xB9, 0xB9, 0xB9)).get());
+						dc.brush->SetColor(d2d::Color(0xB9, 0xB9, 0xB9).get());
 						dc.ctx->FillEllipse(D2D1::Ellipse({ center.x, center.y }, radius, radius), dc.brush);
 					}
 				}
@@ -689,7 +737,7 @@ void ClickGUI::onRender(Event&) {
 						modRect.top + (modRect.getHeight() * 0.4f), modRect.left + modRect.getHeight() * 0.70f, modRect.bottom - modRect.getHeight() * 0.4f };
 				// arrow
 				if (mod.mod) {
-					
+
 
 					if (this->shouldSelect(modRect, cursorPos) && !shouldSelect(toggleRect, cursorPos)) {
 						if (justClicked[0]) {
@@ -709,9 +757,50 @@ void ClickGUI::onRender(Event&) {
 					dc.ctx->SetTransform(oMatr);
 				}
 				else if (mod.isMarketScript) {
-					//dc.ctx->DrawBitmap(Latite::getAssets().document.getBitmap(), arrowRc.get());
+					if (shouldSelect(modRect, cursorPos)) {
+						setTooltip(mod.description);
+					}
 
-					// TODO
+					auto installUpdateRect = toggleRect;
+					// make it twice as wide as the toggle rect
+					installUpdateRect.left = installUpdateRect.right - installUpdateRect.getWidth() * 1.5f;
+
+					auto documentIconBitmap = Latite::getAssets().document.getBitmap();
+					auto bitmapSize = documentIconBitmap->GetPixelSize();
+
+					// we can't directly use the arrow rect because the height to width ratio of the document icon is different
+					// (need it to not look stretched)
+					// height/width * width = height
+					auto documentRect = arrowRc;
+					float newWidth = arrowRc.getWidth() * 1.5f;
+					documentRect.left = documentRect.centerX(newWidth);
+					documentRect.right = documentRect.centerX(newWidth) + newWidth;
+					auto heightByWidth = static_cast<float>(bitmapSize.height) / static_cast<float>(bitmapSize.width);
+					auto height = heightByWidth * arrowRc.getWidth();
+
+					float heightCenter = documentRect.centerY();
+					documentRect.top = heightCenter - height / 2.f;
+					documentRect.bottom = heightCenter + height / 2.f;
+
+					// draw the icon
+					dc.ctx->DrawBitmap(documentIconBitmap, documentRect.get());
+
+					auto selecting = shouldSelect(installUpdateRect, cursorPos);
+					if (selecting && justClicked[0] && !mod.pluginInstalled) {
+						auto result = PluginManager::installScript(mod.pluginId);
+						if (!result.has_value()) {
+							auto& error = result.error();
+							Latite::getNotifications().push(util::StrToWStr(error));
+						} else {
+							shouldRebuildModLikes = true;
+						}
+					}
+
+					mod.toggleColorOn = util::LerpColorState(mod.toggleColorOn, accentColor + 0.2f, accentColor, selecting);
+					// draw install/update box
+					dc.fillRoundedRectangle(installUpdateRect, mod.pluginInstalled ? mod.toggleColorOff : mod.toggleColorOn, installUpdateRect.getHeight() / 4.f);
+					dc.drawText(installUpdateRect, mod.pluginInstalled ? L"Installed" : L"Install", d2d::Colors::WHITE, FontSelection::PrimaryLight, installUpdateRect.getHeight() / 2.f,
+						DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 				}
 
 			}
@@ -873,7 +962,9 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 	const auto cursorPos = SDK::ClientInstance::get()->cursorPos;
 	const float round = 0.1875f * checkboxSize;
 
-	switch ((Setting::Type)((*set->value).index())) {
+	auto accentColor = d2d::Color(Latite::get().getAccentColor().getMainColor());
+
+	switch (static_cast<Setting::Type>(set->value->index())) {
 	case Setting::Type::Text:
 	{
 		RectF rc = { pos.x, pos.y, (pos.x + size) - (fTextWidth * size), pos.y + checkboxSize };
@@ -1258,7 +1349,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 		innerSliderRect.right = std::clamp(newRight, oLeft, oRight);
 
 		dc.fillRoundedRectangle(sliderRect, d2d::Color::RGB(0x8D, 0x8D, 0x8D).asAlpha(0.11f), sliderRect.getHeight() / 2.f);
-		dc.fillRoundedRectangle(innerSliderRect, d2d::Color(Latite::get().getAccentColor().getMainColor()), innerSliderRect.getHeight() / 2.f);
+		dc.fillRoundedRectangle(innerSliderRect, accentColor, innerSliderRect.getHeight() / 2.f);
 
 		dc.brush->SetColor(d2d::Color(0xB9, 0xB9, 0xB9).get());
 		dc.ctx->FillEllipse(D2D1::Ellipse({ innerSliderRect.right, sliderRect.centerY() }, sliderRect.getHeight() * 0.6f, sliderRect.getHeight() * 0.6f), dc.brush);

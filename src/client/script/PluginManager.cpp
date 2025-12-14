@@ -19,6 +19,7 @@
 #include <winrt/windows.foundation.collections.h>
 #include <winrt/Windows.Web.Http.Headers.h>
 #include <winrt/windows.storage.streams.h>
+#include <expected>
 
 #include "util/XorString.h"
 #include "JsPlugin.h"
@@ -30,20 +31,20 @@ using namespace winrt::Windows::Web::Http::Filters;
 PluginManager::PluginManager() {
 }
 
-std::filesystem::path PluginManager::getUserDir() {
+std::filesystem::path PluginManager::getPluginsDir() {
 	return util::GetLatitePath() / "Plugins";
 }
 
-std::filesystem::path PluginManager::getUserPrerunDir() {
-	return getUserDir();
+std::filesystem::path PluginManager::getPrerunPluginsDir() {
+	return getPluginsDir();
 }
 
 std::shared_ptr<JsPlugin> PluginManager::loadPlugin(std::wstring const& folderPath, bool run) {
 	auto& fPathW = folderPath;
-	auto scriptPath = getUserDir() / fPathW;
+	auto scriptPath = getPluginsDir() / fPathW;
 	if (!std::filesystem::exists(scriptPath)) return nullptr;
 
-	for (auto& scr : this->items) {
+	for (auto& scr : this->items | std::views::values) {
 		if (std::filesystem::absolute(scr->getPath()) == std::filesystem::absolute(scriptPath)) {
 			Latite::getClientMessageQueue().push(util::Format(std::format("Plugin {} is already loaded.", util::WStrToStr(scr->getName()))));
 			return nullptr;
@@ -52,7 +53,7 @@ std::shared_ptr<JsPlugin> PluginManager::loadPlugin(std::wstring const& folderPa
 
 	auto myScript = std::make_shared<JsPlugin>(scriptPath);
 	if (!myScript->load()) return nullptr;
-	this->items.push_back(myScript);
+	this->items.insert({util::WStrToStr(myScript->getFolderName()), myScript});
 
 	if (run) {
 		Event::Value val{L"scriptName"};
@@ -68,7 +69,7 @@ std::shared_ptr<JsPlugin> PluginManager::loadPlugin(std::wstring const& folderPa
 }
 
 std::shared_ptr<JsPlugin> PluginManager::getPluginByName(std::wstring const& name) {
-	for (auto& script : items) {
+	for (auto& script : items | std::views::values) {
 		if (script->getName() == name) {
 			return script;
 		}
@@ -76,10 +77,30 @@ std::shared_ptr<JsPlugin> PluginManager::getPluginByName(std::wstring const& nam
 	return nullptr;
 }
 
+bool PluginManager::isPluginInstalled(std::string const& id) {
+	for (auto& dirEntry : std::filesystem::directory_iterator(getPluginsDir())) {
+		if (dirEntry.is_directory()) {
+			Logger::Info("'{}' & '{}'", dirEntry.path().stem().string(), id);
+			if (dirEntry.path().stem().string() == id) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+std::shared_ptr<class JsPlugin> PluginManager::getPluginById(std::string const& id ){
+	auto it = items.find(id);
+
+	if (it == items.end()) return nullptr;
+
+	return it->second;
+}
+
 void PluginManager::popScript(std::shared_ptr<JsPlugin> ptr) {
 	for (auto it = items.begin(); it != items.end(); ++it) {
-		if (*it == ptr) {
-			unloadScript(*it);
+		if (it->second == ptr) {
+			unloadScript(it->second);
 			items.erase(it);
 			return;
 		}
@@ -95,7 +116,7 @@ void PluginManager::reportError(JsValueRef except, std::wstring filePath) {
 
 	Latite::getClientMessageQueue().display(util::Format(ss.str()));
 	Logger::Info("(plugin/{}) ({}) {}", util::WStrToStr(JsScript::getThis()->getPlugin()->getName()), JsScript::getThis()->getRelativePath().string(), util::WStrToStr(stack));
-	
+
 	// not sure if you release the exception or not, will do it anyway
 	Chakra::Release(except);
 }
@@ -111,20 +132,19 @@ void PluginManager::handleErrors(JsErrorCode code) {
 			reportError(except, script->data.name);
 		}
 		else if (code != JsNoError) {
-			Latite::getClientMessageQueue().display(util::Format(std::format("&cA JS error occured in script {}: JsErrorCode 0x{:X}", util::WStrToStr(script->data.name), (int)code)));
+			Latite::getClientMessageQueue().display(util::Format(std::format("&cA JS error occurred in script {}: JsErrorCode 0x{:X}", util::WStrToStr(script->data.name), (int)code)));
 			Logger::Info("(plugin/{}) ({}) Js ErrorCode: 0x{:X}", util::WStrToStr(script->getPlugin()->getName()), script->getRelativePath().string(), (int)code);
 		}
 	}
 }
 
-bool PluginManager::loadPrerunScripts()
-{
+bool PluginManager::loadPrerunScripts() {
 	if (!scriptingSupported()) {
 		Logger::Warn("Scripting is not supported. Please try restarting your game.");
 		return false;
 	}
 
-	auto prerunPath = getUserPrerunDir();
+	auto prerunPath = getPrerunPluginsDir();
 	std::filesystem::create_directory(prerunPath);
 	for (auto& dirEntry : std::filesystem::directory_iterator(prerunPath)) {
 		if (dirEntry.is_directory()) {
@@ -132,7 +152,7 @@ bool PluginManager::loadPrerunScripts()
 			std::ifstream ifs{pluginJsonPath};
 
 			bool res = loadPlugin(dirEntry.path().filename().wstring(), true) == nullptr;
-			
+
 			if (!ifs.fail()) {
 				try {
 					auto json = json::parse(ifs);
@@ -142,7 +162,7 @@ bool PluginManager::loadPrerunScripts()
 					std::ofstream ofs{pluginJsonPath};
 					if (!ofs.fail()) {
 						ofs << std::setw(4) << json;
-					}					
+					}
 				}
 				catch (nlohmann::json::parse_error&) {
 				}
@@ -156,7 +176,7 @@ void PluginManager::runScriptingOperations()
 {
 	if (!scriptingSupported()) return;
 
-	for (auto& plug : this->items) {
+	for (auto& plug : this->items | std::views::values) {
 		plug->handleAsyncOperations();
 
 		for (auto& scr : plug->getScripts()) {
@@ -195,17 +215,10 @@ void PluginManager::runScriptingOperations()
 	dispatchEvent(ev);
 }
 
-std::optional<int> PluginManager::installScript(std::string const& inName) {
+std::expected<void, std::string> PluginManager::installScript(std::string const& inName) {
 	std::wstring registry = XW("https://raw.githubusercontent.com/LatiteScripting/Scripts/master/Plugins");
 	std::wstring jsonPath = registry + XW("/plugins.json");
 	nlohmann::json scriptsJson;
-
-	auto message = [](std::string const& msg, bool err = false) -> void {
-		if (err) {
-			Latite::getClientMessageQueue().push(util::Format("[&5Plugin Manager&r] &c") + msg);
-		}
-		else Latite::getClientMessageQueue().push(util::Format("[&5Plugin Manager&r] ") + msg);
-	};
 
 	auto http = HttpClient();
 	{
@@ -225,18 +238,15 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 					scriptsJson = nlohmann::json::parse(std::wstring(strs.c_str()));
 				}
 				catch (nlohmann::json::parse_error& e) {
-					message("JSON error while installing plugin: " + std::string(e.what()), true);
-					return 0;
+					return std::unexpected("JSON parse error while installing plugin: " + std::string(e.what()));
 				}
 			}
 			else {
-				message("Could not fetch the plugin list. Are you connected to the internet?", true);
-				return 0;
+				return std::unexpected("Could not fetch the plugin list. Are you connected to the internet?");
 			}
 		}
 		catch (winrt::hresult_error const& err) {
-			Latite::getClientMessageQueue().push(util::WStrToStr(err.message().c_str()));
-			return 0;
+			return std::unexpected(util::WStrToStr(err.message().c_str()));
 		}
 	}
 	auto& arr = scriptsJson["plugins"];
@@ -248,7 +258,7 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 		std::transform(in.begin(), in.end(), in.begin(), ::tolower);
 		std::transform(name.begin(), name.end(), name.begin(), ::tolower);
 		if (in == name) {
-			std::filesystem::path path = getUserPrerunDir() / woName;
+			std::filesystem::path path = getPrerunPluginsDir() / woName;
 			std::filesystem::create_directories(path);
 			for (auto& fil : js["files"]) {
 				auto fws = util::StrToWStr(fil.get<std::string>());
@@ -260,7 +270,7 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 				auto buffer = cont.ReadAsBufferAsync().get();
 
 				// convert winrt IBuffer to something we can pass to std::ofstream
-				auto reader = winrt::Windows::Storage::Streams::DataReader::FromBuffer(buffer);
+				auto reader = DataReader::FromBuffer(buffer);
 
 				std::vector<uint8_t> bytes(buffer.Length());
 				reader.ReadBytes(bytes);
@@ -273,25 +283,24 @@ std::optional<int> PluginManager::installScript(std::string const& inName) {
 				std::ofstream ofs;
 				ofs.open(path / fws, std::ios::binary);
 				if (ofs.fail()) {
-					message("Error opening file: " + std::to_string(*_errno()), true);
-					return *_errno();
+					return std::unexpected("Error opening file: " + std::to_string(*_errno()));
 				}
 				ofs.write(reinterpret_cast<char*>(bytes.data()), bytes.size());
 				ofs.close();
 			}
-			return std::nullopt;
+			return {};
 		}
 	}
-	message("Could not find script " + inName, true);
-	return 0;
+	return std::unexpected("Could not find script " + inName);
 }
 
 std::vector<PluginManager::PluginInfo> PluginManager::fetchPluginsFromMarket() {
 	std::vector<PluginInfo> list = {};
 
-	std::wstring registry = XW("https://raw.githubusercontent.com/LatiteScripting/Scripts/master/Plugins");
-	std::wstring jsonPath = registry + XW("/plugins.json");
+	std::wstring registry = L"https://raw.githubusercontent.com/LatiteScripting/Scripts/master/Plugins";
+	std::wstring jsonPath = registry + L"/plugins.json";
 	nlohmann::json scriptsJson;
+
 
 	auto http = HttpClient();
 	{
@@ -326,8 +335,42 @@ std::vector<PluginManager::PluginInfo> PluginManager::fetchPluginsFromMarket() {
 	auto& arr = scriptsJson["plugins"];
 
 	for (auto& plug : arr) {
-		std::wstring name = util::StrToWStr(plug["name"].get<std::string>());
-		list.push_back(PluginInfo{ name, name, L"", L"", L"" });
+		std::string id = plug["name"].get<std::string>();
+		auto pluginFolder = registry + L"/" + util::StrToWStr(id);
+
+		winrt::Windows::Foundation::Uri requestUri(pluginFolder + L"/plugin.json");
+		HttpRequestMessage request(HttpMethod::Get(), requestUri);
+
+		json pluginJson;
+
+		try
+		{
+			auto operation = http.SendRequestAsync(request);
+			auto response = operation.get();
+			auto cont = response.Content();
+			auto strs = cont.ReadAsStringAsync().get();
+			if (response.IsSuccessStatusCode()) {
+				try
+				{
+					pluginJson = nlohmann::json::parse(std::wstring(strs.c_str()));
+				} catch (nlohmann::json::parse_error&)
+				{
+					continue;
+				}
+			}
+		} catch (winrt::hresult_error const& err)
+		{
+			continue;
+		}
+
+		if (pluginJson["name"].is_string() && pluginJson["author"].is_string() && pluginJson["version"].is_string() && pluginJson["description"].is_string()) {
+			list.emplace_back(PluginInfo{id, util::StrToWStr(pluginJson["name"].get<std::string>()),
+				util::StrToWStr(pluginJson["author"].get<std::string>()),
+				util::StrToWStr(pluginJson["version"].get<std::string>()),
+			util::StrToWStr(pluginJson["description"].get<std::string>())});
+		} else {
+			Logger::Info("Plugin '{}' has an invalid plugin.json", id);
+		}
 	}
 
 	return list;
@@ -340,7 +383,7 @@ std::vector<PluginManager::PluginInfo> PluginManager::fetchPlugins() {
 
 void PluginManager::init()
 {
-	auto scriptsPath = getUserDir();
+	auto scriptsPath = getPluginsDir();
 	std::filesystem::create_directory(scriptsPath);
 
 	initListeners();
@@ -408,7 +451,7 @@ void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr) {
 }
 
 void PluginManager::unloadAll() {
-	for (auto& s : this->items) {
+	for (auto& s : this->items | std::views::values) {
 		popScript(s);
 	}
 }
@@ -435,7 +478,7 @@ bool PluginManager::scriptingSupported() {
 }
 
 void PluginManager::uninitialize() {
-	for (auto& script : this->items) {
+	for (auto& script : this->items | std::views::values) {
 		popScript(script);
 	}
 }

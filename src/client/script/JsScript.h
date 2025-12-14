@@ -5,7 +5,7 @@
 
 class JsScript {
 public:
-	JsContextRef ctx;
+	JsContextRef ctx = nullptr;
 
 	template <typename T>
 	[[nodiscard]] T* getClass() {
