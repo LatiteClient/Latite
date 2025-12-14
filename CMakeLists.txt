@@ -57,7 +57,7 @@ add_resources(EMBEDDED_RESOURCES ${RESOURCE_FILES})
 add_library(Latite SHARED ${Latite_SRC} ${EMBEDDED_RESOURCES})
 
 # C++ standard
-set_property(TARGET Latite PROPERTY CXX_STANDARD 20)
+set_property(TARGET Latite PROPERTY CXX_STANDARD 23)
 
 # Disable RTTI and set warning level
 add_definitions(/GR- /D_HAS_STATIC_RTTI=0 /W4 /MT)
