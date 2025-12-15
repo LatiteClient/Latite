@@ -59,7 +59,6 @@ using namespace winrt::Windows::Storage;
 #include "render/asset/Assets.h"
 #include "resource/Resource.h"
 #include "feature/module/modules/game/Freelook.h"
-#include "feature/module/modules/visual/NoHurtCam.h"
 
 int SDK::internalVers = SDK::VLATEST;
 
@@ -161,9 +160,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int deadCount = 0;
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
-        { "1.21.122", SDK::V1_21_120 },
-        { "1.21.121", SDK::V1_21_120 },
-        { "1.21.120", SDK::V1_21_120 },
+        { "1.21.130", SDK::V1_21_130 },
     };
 
     if (versNumMap.contains(Latite::get().gameVersion)) {
@@ -245,7 +242,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(Components::actorEquipmentPersistentComponent),
         MVSIG(_updatePlayer),
         MVSIG(GameArguments__onUri),
-        MVSIG(_bobHurt),
         MVSIG(RenderMaterialGroup__common),
         MVSIG(GuiData_displayClientMessage),
         MVSIG(Misc::gameCorePointer),
@@ -553,12 +549,9 @@ void Latite::updateModuleBlocking() {
         // scuffed but we don't have a proper static management system
 
         static_assert(std::is_base_of_v<Module, Freelook>);
-        static_assert(std::is_base_of_v<Module, NoHurtCam>);
 
         blockModules("Freelook", "hivebedrock");
         blockModules("Freelook", "galaxite");
-        blockModules("NoHurtCam", "hivebedrock");
-        blockModules("NoHurtCam", "galaxite");
     }
     else {
         

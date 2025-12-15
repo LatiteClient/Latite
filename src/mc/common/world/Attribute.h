@@ -5,6 +5,8 @@
 
 namespace SDK {
 	class AttributeInstance {
+		char pad[0x80];
+
 	public:
 		// AttributeInstance::getCurrentValue
 		MVCLASS_FIELD(float, value, 0x7C, 0x84, 0x84, 0x84, 0x84, 0x84, 0x88, 0x84, 0x84, 0x84);

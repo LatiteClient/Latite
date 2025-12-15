@@ -6,24 +6,25 @@
 
 namespace SDK {
 	class BaseAttributeMap {
-	public:
-		std::unordered_map<unsigned int, AttributeInstance> instances;
+		std::vector<uint32_t> ids;
+		std::vector<AttributeInstance> instances;
+		char pad[0x28];
 
-	private:
-		char pad[0x18];
+		struct AttributeResult { // Made up
+			std::vector<uint32_t>::iterator id;
+			std::vector<AttributeInstance>::iterator instance;
+		};
 
 	public:
 
 		AttributeInstance* getInstance(unsigned int id) {
-			using func_t = AttributeInstance&(*)(BaseAttributeMap*, unsigned int);
+			using func_t = void(*)(AttributeResult&, BaseAttributeMap*, const uint32_t&);
 			static auto func = reinterpret_cast<func_t>(Signatures::BaseAttributeMap_getInstance.result);
-			return &func(this, id);
-			/*try {
-				return &instances.at(id);
-			}
-			catch (std::out_of_range& e) {
-				return std::nullopt;
-			}*/
+			AttributeResult res{};
+			func(res, this, id);
+			if (res.id == this->ids.end() || res.instance == this->instances.end())
+				return nullptr;
+			return &*res.instance;
 		}
 	};
 	

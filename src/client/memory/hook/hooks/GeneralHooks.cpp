@@ -35,7 +35,6 @@ namespace {
 	std::shared_ptr<Hook> AddMessageHook;
 	std::shared_ptr<Hook> UpdatePlayerHook;
 	std::shared_ptr<Hook> OnUriHook;
-	std::shared_ptr<Hook> BobHurtHook;
 	std::shared_ptr<Hook> GrabCursorHook;
 }
 
@@ -317,7 +316,7 @@ void GenericHooks::LevelRendererPlayer_renderOutlineSelection(SDK::LevelRenderer
 	}
 }
 
-void* GenericHooks::hkRenderGuiItemNew(void* obj, SDK::BaseActorRenderContext* baseActorRenderContext, SDK::ItemStack* itemStack, int mode, float x, float y, float opacity, float scale, float a9, bool ench) {
+void* GenericHooks::hkRenderGuiItemNew(void* obj, SDK::BaseActorRenderContext* baseActorRenderContext, SDK::ItemStack* itemStack, int mode, float x, float y, float opacity, float scale, float a9, bool ench, int unk) {
 	auto retAddy = (void*)(Signatures::ItemRenderer_renderGuiItemNew.scan_result + 5); // JMP + jump location
 	if (_ReturnAddress() == retAddy) {
 		RenderGuiItemEvent ev{ itemStack };
@@ -326,7 +325,7 @@ void* GenericHooks::hkRenderGuiItemNew(void* obj, SDK::BaseActorRenderContext* b
 			return nullptr;
 		}
 	}
-	return RenderGuiItemNewHook->oFunc<decltype(&hkRenderGuiItemNew)>()(obj, baseActorRenderContext, itemStack, mode, x, y, opacity, scale, a9, ench);
+	return RenderGuiItemNewHook->oFunc<decltype(&hkRenderGuiItemNew)>()(obj, baseActorRenderContext, itemStack, mode, x, y, opacity, scale, a9, ench, unk);
 }
 
 float GenericHooks::hkGetTimeOfDay(SDK::Dimension* obj, int time, float a) {
@@ -410,13 +409,6 @@ void GenericHooks::hkOnUri(void* obj, void* pUri) {
 	OnUriHook->oFunc<decltype(&hkOnUri)>()(obj, pUri);
 }
 
-void GenericHooks::hkBobHurt(void* obj, void* a2, void* a3) {
-	BobHurtEvent ev{};
-	if (Eventing::get().dispatch(ev)) return;
-
-	BobHurtHook->oFunc<decltype(&hkBobHurt)>()(obj, a2, a3);
-}
-
 void GenericHooks::hkGrabCursor(SDK::ClientInstance* obj) {
 	if (Latite::get().getScreenManager().getActiveScreen()) return;
 	GrabCursorHook->oFunc<decltype(&hkGrabCursor)>()(obj);
@@ -468,7 +460,6 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	AddMessageHook = addHook(Signatures::GuiData__addMessage.result, hkAddMessage, "GuiData::_addMessage");
 	UpdatePlayerHook = addHook(Signatures::_updatePlayer.result, hkUpdatePlayer, "`anonymous namespace'::_updatePlayer");
 	OnUriHook = addHook(Signatures::GameArguments__onUri.result, hkOnUri, "GameArguments::_onUri");
-	BobHurtHook = addHook(Signatures::_bobHurt.result, hkBobHurt, "`anonymous namespace`::_bobHurt");
 	GrabCursorHook = addHook(Signatures::ClientInstance_grabCursor.result, hkGrabCursor, "`ClientInstance::grabCursor");
 }
 

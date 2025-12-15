@@ -5,11 +5,11 @@
 namespace SDK {
 	class ClientInputMappingFactory {
 	public:
-		CLASS_FIELD(KeyboardLayout*, defaultKeyboardLayout, 0xE0);
+		CLASS_FIELD(KeyboardLayout*, defaultKeyboardLayout, 0xF0);
 	};
 
 	class ClientInputHandler {
 	public:
-		MVCLASS_FIELD(ClientInputMappingFactory*, mappingFactory, 0x28, 0x20, 0x20, 0x20, 0x20, 0x20, 0x18, 0x18); // ClientInputHandler::getMappingFactory
+		MVCLASS_FIELD(ClientInputMappingFactory*, mappingFactory, 0x30, 0x28, 0x28, 0x28, 0x28, 0x28, 0x28, 0x28, 0x28, 0x28, 0x20, 0x20, 0x20, 0x20, 0x20, 0x18, 0x18); // ClientInputHandler::getMappingFactory
 	};
 }

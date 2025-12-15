@@ -1,8 +1,9 @@
-#include "pch.h"
 #include "DXHooks.h"
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
+#include "mc/common/client/game/GameCore.h"
 #include "mc/common/client/game/Options.h"
+#include "pch.h"
 
 namespace {
     typedef HRESULT(WINAPI* CreateSwapChainForHWND_t)(
@@ -28,11 +29,12 @@ namespace {
             return true;
         }
 
-        std::wstring optionsPath(appdata);
-        optionsPath +=
-            L"\\Minecraft Bedrock\\Users\\" + util::StrToWStr(SDK::ClientInstance::get()->minecraftGame->xuid) + L"\\games\\com.mojang\\minecraftpe\\options.txt";
+        std::wstring optionsPath;
 
-        if (!std::filesystem::exists(optionsPath))
+        if (SDK::GameCore::get() != nullptr)
+            optionsPath = util::StrToWStr(SDK::GameCore::get()->dataPath) + L"\\minecraftpe\\options.txt";
+
+        if (optionsPath.empty() || !std::filesystem::exists(optionsPath))
             optionsPath = std::wstring(appdata) + L"\\Minecraft Bedrock\\Users\\Shared\\games\\com.mojang\\minecraftpe\\options.txt";
 
         std::ifstream file(optionsPath.c_str());

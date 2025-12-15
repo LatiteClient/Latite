@@ -19,7 +19,6 @@
 #include "events/GammaEvent.h"
 #include "events/GetTimeEvent.h"
 #include "events/HideHandEvent.h"
-#include "events/BobHurtEvent.h"
 #include "events/KeyUpdateEvent.h"
 #include "events/LatiteClientMessageEvent.h"
 #include "events/LeaveGameEvent.h"

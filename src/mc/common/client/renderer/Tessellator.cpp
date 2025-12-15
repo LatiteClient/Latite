@@ -6,7 +6,7 @@ void SDK::Tessellator::vertex(float x, float y, float z) {
 }
 
 void SDK::Tessellator::begin(Primitive fmt, int numVertices) {
-	reinterpret_cast<void(*)(Tessellator*, Primitive, int)>(Signatures::Tessellator_begin.result)(this, fmt, numVertices);
+	reinterpret_cast<void(*)(Tessellator*, int, Primitive, int, bool)>(Signatures::Tessellator_begin.result)(this, 0, fmt, numVertices, false); // buildFaceData
 }
 
 void SDK::Tessellator::color(float r, float g, float b, float a) {
