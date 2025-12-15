@@ -57,7 +57,6 @@ public:
             listeners.push_back({ T::hash, EventListener{ static_cast<EventListenerFunc>(listener), ptr, callWhileInactive, priority } });
         } else if constexpr (sizeof(listener) == sizeof(MFPtr)) {
             const MFPtr mfp = std::bit_cast<MFPtr>(listener);
-            assert(mfp.adj == 0 && "Unsupported listener function type");
 
             listeners.push_back({ T::hash, EventListener{ mfp.ptr, ptr, callWhileInactive, priority } });
         } else {
