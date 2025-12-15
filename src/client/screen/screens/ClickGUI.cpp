@@ -72,7 +72,6 @@ void ClickGUI::onRender(Event&) {
 			container.pluginAuthor = plug.author;
 
 			if (PluginManager::isPluginInstalled(plug.id)) {
-				Logger::Info("Plugin is installed: {}", plug.id);
 				container.pluginInstalled = true;
 			}
 

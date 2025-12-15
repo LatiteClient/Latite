@@ -80,7 +80,6 @@ std::shared_ptr<JsPlugin> PluginManager::getPluginByName(std::wstring const& nam
 bool PluginManager::isPluginInstalled(std::string const& id) {
 	for (auto& dirEntry : std::filesystem::directory_iterator(getPluginsDir())) {
 		if (dirEntry.is_directory()) {
-			Logger::Info("'{}' & '{}'", dirEntry.path().stem().string(), id);
 			if (dirEntry.path().stem().string() == id) {
 				return true;
 			}
