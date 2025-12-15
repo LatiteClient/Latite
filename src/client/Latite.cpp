@@ -904,7 +904,8 @@ void Latite::onUpdate(Event& evGeneric) {
             });
     }
 
-    if (std::get<BoolValue>(centerCursorMenus)) {
+    if (std::get<BoolValue>(centerCursorMenus) && 
+        SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
         RECT r = { 0, 0, 0, 0 };
         GetClientRect(SDK::GameCore::get()->hwnd, &r);
         SetCursorPos(r.left + r.right / 2, r.top + r.bottom / 2);
