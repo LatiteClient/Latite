@@ -3,10 +3,9 @@
 
 class Hitboxes : public Module {
 public:
-	void onEntityRender(Event& evG);
+	void onRenderLevel(RenderLevelEvent& event);
 
 	Hitboxes();
-	virtual ~Hitboxes() = default;
 
 private:
 	EnumData mode;

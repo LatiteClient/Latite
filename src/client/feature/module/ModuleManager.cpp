@@ -79,7 +79,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<ChunkBorders>());
 	this->items.push_back(std::make_shared<ArmorHUD>());
 	this->items.push_back(std::make_shared<MovablePaperdoll>());
-	//this->items.push_back(std::make_shared<Hitboxes>());
+	this->items.push_back(std::make_shared<Hitboxes>());
 	this->items.push_back(std::make_shared<BlockOutline>());
 	this->items.push_back(std::make_shared<MovableScoreboard>());
 	this->items.push_back(std::make_shared<Nickname>());
