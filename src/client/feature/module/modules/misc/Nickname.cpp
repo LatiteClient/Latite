@@ -15,8 +15,7 @@ void Nickname::onClientTextPacket(Event& evG) {
 
     if (!SDK::ClientInstance::get()->getLocalPlayer()) return;
 
-    auto message = textPacket->str;
-    auto source = textPacket->source;
+    auto str = textPacket->str;
 
     auto replaceAll = [](std::string& s, std::string from, std::string to) {
         if (!from.empty())
@@ -27,12 +26,15 @@ void Nickname::onClientTextPacket(Event& evG) {
 
     std::string newName = util::WStrToStr(std::get<TextValue>(this->nickname).str);
     auto& currentPlayerName = SDK::ClientInstance::get()->getLocalPlayer()->playerName;
-    if (message.has_value())
-        replaceAll(*message, currentPlayerName, newName);
-    replaceAll(source, currentPlayerName, newName);
+    replaceAll(str, currentPlayerName, newName);
 
-    textPacket->str = message;
-    textPacket->source = source;
+    textPacket->str = str;
+
+    if (std::holds_alternative<std::string>(textPacket->data)) {
+        auto data = std::get<std::string>(textPacket->data);
+        replaceAll(data, currentPlayerName, newName);
+        textPacket->data = data;
+    }
 }
 
 void Nickname::onGetFormattedNameTag(Event& evG) {

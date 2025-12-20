@@ -23,8 +23,8 @@ namespace SDK {
 		std::string platformChatId;
 		std::optional<std::string> filteredMessage;
 		TextPacketType type;
-		std::string source;
-		std::optional<std::string> str;
+		std::string str;
+		std::variant<std::monostate, std::string, std::vector<std::string>> data;
 
 		TextPacket() = default;
 		

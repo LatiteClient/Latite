@@ -148,10 +148,10 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 			}
 
 			PluginManager::Event::Value val{ L"message" };
-			val.val = util::StrToWStr(pkt->str.has_value() ? *pkt->str : pkt->source);
+			val.val = util::StrToWStr(std::holds_alternative<std::string>(pkt->data) ? std::get<std::string>(pkt->data) : pkt->str);
 
 			PluginManager::Event::Value val2{ L"sender" };
-			val2.val = util::StrToWStr(pkt->source);
+			val2.val = util::StrToWStr(std::holds_alternative<std::string>(pkt->data) ? pkt->str : "");
 
 			PluginManager::Event::Value val3{ L"xuid" };
 			val3.val = util::StrToWStr(pkt->xboxUserId);
