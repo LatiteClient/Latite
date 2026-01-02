@@ -57,7 +57,6 @@ add_resources(EMBEDDED_RESOURCES ${RESOURCE_FILES})
 add_library(Latite SHARED ${Latite_SRC} ${EMBEDDED_RESOURCES})
 
 # enable exceptions
-# TODO: exceptions are scary and bad maybe we shouldn't use them?
 target_compile_options(Latite PRIVATE $<$<COMPILE_LANG_AND_ID:CXX,MSVC,Clang,AppleClang>:/EHsc>)
 
 # C++ standard
