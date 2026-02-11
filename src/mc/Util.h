@@ -4,7 +4,51 @@
 #include "Version.h"
 
 
-namespace SDK {
+namespace SDK { // TODO: remove this shit ffs
+	template <int offs_1_26_0, int offs_1_21_130, int offs_1_21_120, int offs_1_21_111, int offs_1_21_100, int offs_1_21_90, int offs_1_21_80, int offs_1_21_70, int offs_1_21_60, int offs_1_21_50, int offs_1_21_40, int offs_1_21_30, int offs_1_21_20, int offs_1_20_50, int offs_1_20_40, int offs_1_20_30, int offs_1_18_12, int offs_1_19_51>
+		extern inline const int mvGetOffset() {
+		switch (SDK::internalVers) {
+		case SDK::V1_26_0:
+		default:
+			return offs_1_26_0;
+		case SDK::V1_21_130:
+			return offs_1_21_130;
+		case SDK::V1_21_120:
+			return offs_1_21_120;
+		case SDK::V1_21_110:
+			return offs_1_21_111;
+		case SDK::V1_21_100:
+			return offs_1_21_100;
+		case SDK::V1_21_90:
+			return offs_1_21_90;
+		case SDK::V1_21_80:
+			return offs_1_21_80;
+		case SDK::V1_21_70:
+			return offs_1_21_70;
+		case SDK::V1_21_60:
+			return offs_1_21_60;
+		case SDK::V1_21_50:
+			return offs_1_21_50;
+		case SDK::V1_21_40:
+			return offs_1_21_40;
+		case SDK::V1_21_30:
+			return offs_1_21_30;
+		case SDK::V1_21_20:
+			return offs_1_21_20;
+		case SDK::V1_20_50:
+			return offs_1_20_50;
+		case SDK::V1_20_40:
+			return offs_1_20_40;
+		case SDK::V1_20_30:
+			return offs_1_20_30;
+		case SDK::V1_19_51:
+			return offs_1_19_51;
+			break;
+		case SDK::V1_18_12:
+			return offs_1_18_12;
+		}
+	}
+
 	template <int offs_1_21_130, int offs_1_21_120, int offs_1_21_111, int offs_1_21_100, int offs_1_21_90, int offs_1_21_80, int offs_1_21_70, int offs_1_21_60, int offs_1_21_50, int offs_1_21_40, int offs_1_21_30, int offs_1_21_20, int offs_1_20_50, int offs_1_20_40, int offs_1_20_30, int offs_1_18_12, int offs_1_19_51>
 		extern inline const int mvGetOffset() {
 		switch (SDK::internalVers) {

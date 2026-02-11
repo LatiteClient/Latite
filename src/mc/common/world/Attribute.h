@@ -25,8 +25,8 @@ namespace SDK {
 
 	class Attributes {
 	public:
-		inline static Attribute Hunger = Attribute(SDK::mvGetOffset<1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1>(), "minecraft:hunger");
-		inline static Attribute Saturation = Attribute(SDK::mvGetOffset<2, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2>(), "minecraft:saturation");
-		inline static Attribute Health = Attribute(SDK::mvGetOffset<6, 7, 7, 6, 1, 1, 1, 7, 7, 7, 7, 7, 6, 6, 6>(), "minecraft:health");
+		inline static Attribute Hunger = Attribute(SDK::mvGetOffset<12, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1>(), "minecraft:hunger");
+		inline static Attribute Saturation = Attribute(SDK::mvGetOffset<13, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2, 2>(), "minecraft:saturation");
+		inline static Attribute Health = Attribute(SDK::mvGetOffset<2, 6, 6, 6, 7, 7, 6, 1, 1, 1, 7, 7, 7, 7, 7, 6, 6, 6>(), "minecraft:health");
 	};
 }

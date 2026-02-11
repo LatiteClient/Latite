@@ -1,7 +1,7 @@
 #pragma once
 namespace SDK {
 	enum class OptionID {
-		Vsync = 54,
+		Vsync = 56,
 	};
 
 	class Option {
@@ -9,7 +9,7 @@ namespace SDK {
 
 		class Impl {
 		private:
-			char pad[0x124];
+			char pad[0x1CC];
 		public:
 			OptionID id;
 		};
