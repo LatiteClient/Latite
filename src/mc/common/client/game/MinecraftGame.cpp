@@ -12,7 +12,7 @@ bool SDK::MinecraftGame::isCursorGrabbed() {
 
 SDK::ClientInstance* SDK::MinecraftGame::getPrimaryClientInstance() {
     if (SDK::internalVers >= V1_21_40) {
-        const auto map = reinterpret_cast<std::map<unsigned char, std::shared_ptr<SDK::ClientInstance>>*>(reinterpret_cast<uintptr_t>(this) + 0x9D0);
+        const auto map = reinterpret_cast<std::map<unsigned char, std::shared_ptr<SDK::ClientInstance>>*>(reinterpret_cast<uintptr_t>(this) + 0xA08);
         return map->at(0).get();
     }
     //19AAAB62768

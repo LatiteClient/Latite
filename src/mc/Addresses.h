@@ -56,18 +56,18 @@ public:
 	struct Components {
 		inline static SigImpl moveInputComponent{[](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"4C 8B 49 ? 4C 8B D1 4C 8B 41 ? 48 8B 41 ? 4D 2B C1 8B 12 49 C1 F8 ? 49 FF C8 41 81 E0 2E CD 8B 46"_sig,
+			"4C 8B 41 48 4C 8B C9 48 8B 41 50 8B 12 49 2B C0 48 C1 F8 03 48 FF C8 25 2E CD 8B 46"_sig,
 			"MoveInputComponent::try_get"};
 
 		inline static SigImpl runtimeIDComponent{[](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"4C 8B 49 ? 4C 8B D1 4C 8B 41 ? 48 8B 41 ? 4D 2B C1 8B 12 49 C1 F8 ? 49 FF C8 41 81 E0 14 14 A1 3C"_sig,
+			"4C 8B 41 48 4C 8B C9 48 8B 41 50 8B 12 49 2B C0 48 C1 F8 03 48 FF C8 25 14 14 A1 3C"_sig,
 			"ActorRuntimeIDComponent"};
 
 
 		inline static SigImpl actorTypeComponent{[](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"4C 8B 49 ? 4C 8B D1 4C 8B 41 ? 48 8B 41 ? 4D 2B C1 8B 12 49 C1 F8 ? 49 FF C8 41 81 E0 14 AD F3 51"_sig,
+			"4C 8B 41 48 4C 8B C9 48 8B 41 50 8B 12 49 2B C0 48 C1 F8 03 48 FF C8 25 14 AD F3 51"_sig,
 			"ActorTypeComponent"}; //51F3AD14
 
 		inline static SigImpl attributesComponent{[](memory::signature_store&, uintptr_t res) { return res; },
@@ -77,13 +77,13 @@ public:
 
 		inline static SigImpl actorEquipmentPersistentComponent{ [](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"4C 8B 49 ? 4C 8B D1 4C 8B 41 ? 48 8B 41 ? 4D 2B C1 8B 12 49 C1 F8 ? 49 FF C8 41 81 E0 36 48 C4 71"_sig,
+			"4C 8B 41 48 4C 8B C9 48 8B 41 50 8B 12 49 2B C0 48 C1 F8 03 48 FF C8 25 36 48 C4 71"_sig,
 			"struct ActorEquipmentComponent" };
 
 		//76 59 47 33
 		inline static SigImpl actorDataFlagsComponent{ [](memory::signature_store&, uintptr_t res) { return res; },
 			// last 4 bytes is the hash of the component
-			"4C 8B 49 ? 4C 8B D1 4C 8B 41 ? 48 8B 41 ? 4D 2B C1 8B 12 49 C1 F8 ? 49 FF C8 41 81 E0 76 59 47 33"_sig,
+			"4C 8B 41 48 4C 8B C9 48 8B 41 50 8B 12 49 2B C0 48 C1 F8 03 48 FF C8 25 76 59 47 33"_sig,
 			"struct ActorDataFlagsComponent"};
 	};
 
@@ -111,12 +111,12 @@ public:
 		//48 8d 05 ? ? ? ? 48 89 07 48 8d 05 ? ? ? ? 48 89 47 ? 48 8d 05 ? ? ? ? 48 89 47 ? 33 c0
 	};
 
-	inline static SigImpl LevelRenderer_renderLevel{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 8B C4 48 89 58 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D A8 ? ? ? ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4D 8B E8 4C 8B E2 4C 8B F9"_sig,
+	inline static SigImpl LevelRenderer_renderLevel{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"E8 ? ? ? ? 45 32 F6 48 8B 8E"_sig,
 		"LevelRenderer::renderLevel"};
 
 	inline static SigImpl MainWindow__windowProcCallback{[](memory::signature_store&, uintptr_t res) { return res; },
-		"40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4D 8B F1 49 8B F8 8B F2"_sig,
+		"40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 4D 8B E9 49 8B F8 44 8B F2"_sig,
 		"MainWindow::_windowProcCallback"};
 
 	// The signature is big but it hasn't died in a while soo
@@ -175,8 +175,8 @@ public:
 		"48 89 5c 24 ? 48 89 74 24 ? 48 89 7c 24 ? 55 41 54 41 55 41 56 41 57 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? ? 8b ? 45 33 f6"_sig,
 		"MinecraftGame::onAppSuspended"}; // "OnAppSuspend" "SuspendAudio" "CancelJoinGameTelemetry"
 
-	inline static SigImpl RenderController_getOverlayColor{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
-		"E8 ? ? ? ? 44 0F 11 45"_sig,
+	inline static SigImpl RenderController_getOverlayColor{[](memory::signature_store&, uintptr_t res) { return res; },
+		"40 53 55 56 57 48 83 EC ? 49 8B 78"_sig,
 		"RenderController::getOverlayColor"};
 
 	inline static SigImpl ScreenView_setupAndRender{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
@@ -202,7 +202,7 @@ public:
 		"RakPeer::GetAveragePing"};
 
 	inline static SigImpl LocalPlayer_applyTurnDelta{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 54 41 55 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 58"_sig,
+		"48 8B C4 48 89 58 ? 48 89 70 ? 48 89 78 ? 55 41 54 41 55 41 56 41 57 48 8D 68 ? 48 81 EC ? ? ? ? 0F 29 70 ? 0F 29 78 ? 44 0F 29 40 ? 44 0F 29 48 ? 44 0F 29 50 ? 44 0F 29 98 ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 4C 8B EA"_sig,
 		"LocalPlayer::applyTurnDelta"};
 
 	// see what accesses things in moveinputhandler
@@ -230,7 +230,7 @@ public:
 		"Tessellator::begin"};
 
 	inline static SigImpl Tessellator_color{[](memory::signature_store&, uintptr_t res) { return res; },
-		"80 b9 ? ? ? ? ? 4c 8b c1 75"_sig,
+		"F3 0F 10 42 ? 41 B8"_sig,
 		"Tessellator::color"};
 
 	inline static SigImpl MeshHelpers_renderMeshImmediately{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
@@ -302,12 +302,12 @@ public:
 		"Actor::setNameTag" };
 
 	inline static SigImpl _updatePlayer{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"40 55 53 57 41 54 41 55 41 57 48 8D 6C 24 ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 ? 49 8B 78"_sig,
+		"40 55 56 41 54 41 55 41 57 48 8D 6C 24"_sig,
 		"UpdatePlayerFromCameraSystemUtil::_updatePlayer" };
 
 	// showHowToPlayScreen
 	inline static SigImpl GameArguments__onUri{ [](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B F2 4C 8B F9 33 FF"_sig,
+		"48 89 5C 24 ? 55 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 48 8B F2 4C 8B F1 33 DB 44 8B FB"_sig,
 		"GameArguments::_onUri" };
 
 	inline static SigImpl RenderMaterialGroup__common{ [](memory::signature_store& store, uintptr_t) { return store.deref(3); },

@@ -10,7 +10,7 @@ void SDK::Tessellator::begin(Primitive fmt, int numVertices) {
 }
 
 void SDK::Tessellator::color(float r, float g, float b, float a) {
-	reinterpret_cast<void(*)(Tessellator*, float, float, float, float)>(Signatures::Tessellator_color.result)(this, r, g, b, a);
+	reinterpret_cast<void(*)(Tessellator*, const Color&)>(Signatures::Tessellator_color.result)(this, Color{r, g, b, a});
 }
 
 void SDK::Tessellator::color(Color const& col) {
