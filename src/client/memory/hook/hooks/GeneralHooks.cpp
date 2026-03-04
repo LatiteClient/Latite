@@ -36,6 +36,7 @@ namespace {
 	std::shared_ptr<Hook> UpdatePlayerHook;
 	std::shared_ptr<Hook> OnUriHook;
 	std::shared_ptr<Hook> GrabCursorHook;
+	std::shared_ptr<Hook> BaseActorRenderer_renderTextHook;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -45,14 +46,6 @@ void GenericHooks::Level_tick(SDK::Level* level) {
 		TickEvent ev(level);
 		Latite::getEventing().dispatch(ev);
 		Latite::getClientMessageQueue().doPrint(100);
-
-		auto lp = SDK::ClientInstance::get()->getLocalPlayer();
-
-		static bool playerInitialized = false;
-		if (!playerInitialized && lp) {
-			Latite::getHooks().get<PlayerHooks>().init(lp);
-			playerInitialized = true;
-		}
 
 		PluginManager::Event sEv{L"world-tick", {}, false};
 		Latite::getPluginManager().dispatchEvent(sEv);
@@ -414,6 +407,18 @@ void GenericHooks::hkGrabCursor(SDK::ClientInstance* obj) {
 	GrabCursorHook->oFunc<decltype(&hkGrabCursor)>()(obj);
 }
 
+void GenericHooks::hkBaseActorRenderer_renderText(void* screenContext, void* viewData, std::string* tagData, void* font, void* mesh) {
+	const auto old = *tagData;
+	std::string buf = *tagData;
+	RenderNameTagEvent ev{&buf};
+	Eventing::get().dispatch(ev);
+	*tagData = buf;
+
+	BaseActorRenderer_renderTextHook->oFunc<decltype(&hkBaseActorRenderer_renderText)>()(screenContext, viewData, tagData, font, mesh);
+
+	*tagData = old;
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
 	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
@@ -461,5 +466,6 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	UpdatePlayerHook = addHook(Signatures::_updatePlayer.result, hkUpdatePlayer, "`anonymous namespace'::_updatePlayer");
 	OnUriHook = addHook(Signatures::GameArguments__onUri.result, hkOnUri, "GameArguments::_onUri");
 	GrabCursorHook = addHook(Signatures::ClientInstance_grabCursor.result, hkGrabCursor, "`ClientInstance::grabCursor");
+	BaseActorRenderer_renderTextHook = addHook(Signatures::BaseActorRenderer_renderText.result, hkBaseActorRenderer_renderText, "BaseActorRenderer::renderText");
 }
 

@@ -317,6 +317,10 @@ public:
 	inline static SigImpl GuiData_displayClientMessage{ [](memory::signature_store&, uintptr_t res) { return res; },
 		"40 55 53 56 57 41 56 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 41 0F B6 ? 49 8B D8"_sig,
 		"GuiData::displayClientMessage" };
+
+	inline static SigImpl BaseActorRenderer_renderText{ [](memory::signature_store& store, uintptr_t) { return store.deref(1); },
+		"E8 ? ? ? ? 48 83 C3 ? 48 3B DE 75 ? 48 8B 5C 24 ? 48 8B 6C 24 ? 48 8B 74 24 ? 48 83 C4 ? 41 5F"_sig,
+		"BaseActorRenderer_renderText" };
 };
 
 // after adding sigs here, add them in latite.cpp

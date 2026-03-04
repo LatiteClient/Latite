@@ -245,7 +245,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(RenderMaterialGroup__common),
         MVSIG(GuiData_displayClientMessage),
         MVSIG(Misc::gameCorePointer),
-        MVSIG(MouseInputVector)
+        MVSIG(MouseInputVector),
+        MVSIG(BaseActorRenderer_renderText)
     };
     
     new (configMgrBuf) ConfigManager();
