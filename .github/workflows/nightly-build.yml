@@ -75,8 +75,8 @@ jobs:
       - name: Create timestamped archival release
         uses: softprops/action-gh-release@v2.3.2
         with:
-          tag_name: debug-${{ env.TIMESTAMP }}
-          name: Latite Debug ${{ env.TIMESTAMP }}
+          tag_name: nightly-${{ env.TIMESTAMP }}
+          name: Latite Nightly ${{ env.TIMESTAMP }}
           body: |
             ### This is an automated, archived experimental DLL build of Latite Client.
 
