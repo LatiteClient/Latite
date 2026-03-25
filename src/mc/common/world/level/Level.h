@@ -25,7 +25,7 @@ namespace SDK {
 		bool isClientSide();
 
 		CLASS_FIELD(std::shared_ptr<LevelData>, levelData, 0x90);
-		MVCLASS_FIELD(std::string, name, 0x290, 0x6C8, 0x698, 0x678, 0x5B8, 0x548);
+		CLASS_FIELD(std::string, name, 0x290);
 
 		const std::string& getLevelName();
 	};

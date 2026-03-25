@@ -26,11 +26,11 @@ namespace SDK {
 		}
 
 		bool isGlint(class ItemStackBase* item) {
-			return memory::callVirtual<bool>(this, mvGetOffset<0x28, 0x27, 0x27, 0x27, 0x27, 0x27, 0x27, 0x27, 0x27, 0x26, 0x26, 0x26, 0x32, 0x32, 0x2B, 0x32>(), item);
+			return memory::callVirtual<bool>(this, 0x28, item);
 		}
 
 		int getMaxDamage() {
-			return memory::callVirtual<int>(this, mvGetOffset<0x24, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x22, 0x22, 0x22, 0x2F, 0x2F, 0x28, 0x2F>());
+			return memory::callVirtual<int>(this, 0x24);
 		}
 
 		short getDamageValue(class CompoundTag* tag) {
@@ -39,7 +39,7 @@ namespace SDK {
 				return reinterpret_cast<short(*)(Item*, CompoundTag*)>(Signatures::ItemStackBase_getDamageValue.result)(this, tag);
 			}
 
-			return memory::callVirtual<short>(this, mvGetOffset<0x6B, 0x65, 0x6B>(), tag);
+			return memory::callVirtual<short>(this, 0x6B, tag);
 		}
 
 		virtual ~Item() = 0;

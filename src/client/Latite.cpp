@@ -160,10 +160,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int deadCount = 0;
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
-        { "1.26.0", SDK::V1_26_0 },
-        { "1.26.1", SDK::V1_26_0 },
-        { "1.26.2", SDK::V1_26_0 },
-        { "1.26.3", SDK::V1_26_0 },
+        { "1.26.10", SDK::V1_26_10 },
     };
 
     if (versNumMap.contains(Latite::get().gameVersion)) {
