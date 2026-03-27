@@ -7,7 +7,9 @@
 #include "client/script/PluginManager.h"
 #include "../Hooks.h"
 #include "PlayerHooks.h"
+#include "client/event/events/MouseReleaseEvent.h"
 #include "client/screen/ScreenManager.h"
+#include "mc/common/client/game/GameCore.h"
 #include "mc/common/client/game/MouseInputPacket.h"
 
 namespace {
@@ -37,6 +39,7 @@ namespace {
 	std::shared_ptr<Hook> OnUriHook;
 	std::shared_ptr<Hook> GrabCursorHook;
 	std::shared_ptr<Hook> BaseActorRenderer_renderTextHook;
+	std::shared_ptr<Hook> AppPlatformGDK_releaseMouseHook;
 }
 
 void GenericHooks::Level_tick(SDK::Level* level) {
@@ -419,6 +422,13 @@ void GenericHooks::hkBaseActorRenderer_renderText(void* screenContext, void* vie
 	*tagData = old;
 }
 
+void GenericHooks::hkAppPlatformGDK_releaseMouse(void* _this) {
+	AppPlatformGDK_releaseMouseHook->oFunc<decltype(&hkAppPlatformGDK_releaseMouse)>()(_this);
+
+	MouseReleaseEvent ev{};
+	Eventing::get().dispatch(ev);
+}
+
 GenericHooks::GenericHooks() : HookGroup("General") {
 	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
 	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
@@ -467,5 +477,6 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	OnUriHook = addHook(Signatures::GameArguments__onUri.result, hkOnUri, "GameArguments::_onUri");
 	GrabCursorHook = addHook(Signatures::ClientInstance_grabCursor.result, hkGrabCursor, "`ClientInstance::grabCursor");
 	BaseActorRenderer_renderTextHook = addHook(Signatures::BaseActorRenderer_renderText.result, hkBaseActorRenderer_renderText, "BaseActorRenderer::renderText");
+	AppPlatformGDK_releaseMouseHook = addHook(Signatures::AppPlatformGDK_releaseMouse.result, hkAppPlatformGDK_releaseMouse, "AppPlatform::releaseMouse");
 }
 

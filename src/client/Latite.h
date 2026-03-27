@@ -193,6 +193,7 @@ private:
 	void onRenderOverlay(class Event& ev);
 	void onPacketReceive(class Event& ev);
 	void onTick(class Event& ev);
+	void onMouseRelease(class Event& ev);
 
 	bool shouldEject = false;
 	bool hasInit = false;

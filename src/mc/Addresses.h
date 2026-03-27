@@ -321,6 +321,10 @@ public:
 	inline static SigImpl BaseActorRenderer_renderText{ [](memory::signature_store& store, uintptr_t) { return store.deref(1); },
 		"E8 ? ? ? ? 48 83 C3 ? 48 3B DE 75 ? 48 8B 5C 24 ? 48 8B 6C 24 ? 48 8B 74 24 ? 48 83 C4 ? 41 5F"_sig,
 		"BaseActorRenderer_renderText" };
+
+	inline static SigImpl AppPlatformGDK_releaseMouse{[](memory::signature_store&, uintptr_t res) { return res; },
+		"40 53 48 83 EC ? 48 8B D9 B9 ? ? ? ? FF 15 ? ? ? ? 85 C0"_sig,
+		"AppPlatformGDK_releaseMouse" };
 };
 
 // after adding sigs here, add them in latite.cpp

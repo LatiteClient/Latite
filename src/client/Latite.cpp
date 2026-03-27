@@ -45,6 +45,7 @@
 #include <mc/common/client/gui/controls/VisualTree.h>
 #include <mc/common/client/gui/controls/UIControl.h>
 
+#include "event/events/MouseReleaseEvent.h"
 #include "mc/common/client/game/GameCore.h"
 
 using namespace winrt;
@@ -161,6 +162,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     std::unordered_map<std::string, SDK::Version> versNumMap = {
         { "1.26.10", SDK::V1_26_10 },
+        { "1.26.11", SDK::V1_26_10 },
     };
 
     if (versNumMap.contains(Latite::get().gameVersion)) {
@@ -246,7 +248,8 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(GuiData_displayClientMessage),
         MVSIG(Misc::gameCorePointer),
         MVSIG(MouseInputVector),
-        MVSIG(BaseActorRenderer_renderText)
+        MVSIG(BaseActorRenderer_renderText),
+        MVSIG(AppPlatformGDK_releaseMouse)
     };
     
     new (configMgrBuf) ConfigManager();
@@ -464,6 +467,7 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getEventing().listen<RenderLayerEvent, &Latite::onRenderLayer>(this, 2);
     Latite::getEventing().listen<RenderOverlayEvent, &Latite::onRenderOverlay>(this, 2);
     Latite::getEventing().listen<TickEvent, &Latite::onTick>(this, 2);
+    Latite::getEventing().listen<MouseReleaseEvent, &Latite::onMouseRelease>(this, 2);
 
     Logger::Info(XOR_STRING("Initialized Hooks"));
     getHooks().enable();
@@ -905,11 +909,11 @@ void Latite::onUpdate(Event& evGeneric) {
             });
     }
 
-    if (std::get<BoolValue>(centerCursorMenus) && 
+    if (std::get<BoolValue>(centerCursorMenus) &&
         SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
         RECT r = { 0, 0, 0, 0 };
         GetClientRect(SDK::GameCore::get()->hwnd, &r);
-        SetCursorPos(r.left + r.right / 2, r.top + r.bottom / 2);
+        SetCursorPos((r.left + r.right) / 2, (r.top + r.bottom) / 2);
     }
 
     latiteUsers = latiteUsersDirty;
@@ -1065,6 +1069,14 @@ void Latite::onPacketReceive(Event& evG) {
 
 void Latite::onTick(Event& ev) {
     updateModuleBlocking();
+}
+
+void Latite::onMouseRelease(Event& ev) {
+    if (std::get<BoolValue>(centerCursorMenus)) {
+        RECT r = { 0, 0, 0, 0 };
+        GetClientRect(SDK::GameCore::get()->hwnd, &r);
+        SetCursorPos((r.left + r.right) / 2, (r.top + r.bottom) / 2);
+    }
 }
 
 void Latite::loadLanguageConfig(std::shared_ptr<Setting> languageSetting) {
