@@ -1,6 +1,5 @@
 #pragma once
 #include "mc/Util.h"
-#include "mc/Version.h"
 #include "util/memory.h"
 #include "RakPeer.h"
 
@@ -20,13 +19,7 @@ namespace SDK {
 		CLASS_FIELD(std::string, featuredServer, 0x4D0);
 
 		class RakPeer* getPeer() {
-			if (internalVers > V1_18_12) {
-				if (internalVers > V1_19_51) {
-					return memory::callVirtual<RakPeer*>(this, 0x19);
-				}
-				return memory::callVirtual<RakPeer*>(this, 0x17);
-			}
-			return hat::member_at<RakPeer*>(this, 0x230);
+			return memory::callVirtual<RakPeer*>(this, 0x19);
 		}
 	};
 }

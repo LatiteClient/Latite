@@ -22,18 +22,12 @@ public:
 			"80 B9 ? ? ? ? ? 74 ? C6 81 ? ? ? ? ? 48 8D 4C 24 ? E8 ? ? ? ? 90"_sig,
 			"MinecraftGame->cursorGrabbed"};
 
-		inline static SigImpl LevelRendererPlayer_fovX{};
-
-		//89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? f3 0f 10 0d
-
 		inline static SigImpl LevelRendererPlayer_origin{[](memory::signature_store& store, uintptr_t) { return store.ref(4); },
 			"F3 0F 58 B3 ? ? ? ? 48 8B 8B"_sig,
 			"LevelRendererPlayer->origin"};
 
 	};
 	struct Misc {
-		inline static SigImpl clientInstance{};
-
 		inline static SigImpl minecraftGamePointer {[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 89 15 ? ? ? ? 49 8B 40"_sig,
 			"MinecraftGame"};
@@ -105,10 +99,6 @@ public:
 		inline static SigImpl SetTitlePacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8D 3D ? ? ? ? 4C 3B F8"_sig,
 			"const SetTitlePacket::`vftable'"};
-
-		//
-
-		//48 8d 05 ? ? ? ? 48 89 07 48 8d 05 ? ? ? ? 48 89 47 ? 48 8d 05 ? ? ? ? 48 89 47 ? 33 c0
 	};
 
 	inline static SigImpl LevelRenderer_renderLevel{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
@@ -131,8 +121,6 @@ public:
 	inline static SigImpl Options_getHideHand{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 83 EC ? 48 8B 01 48 8D 54 ? ? 41 B8 A2 01 00 00"_sig, // Will probably die every update from now on, but a good sig would be thousands of bytes long
 		"Options::getHideHand"};
-
-	inline static SigImpl Options_getSensitivity{};
 
 	inline static SigImpl ClientInstance_grabCursor{[](memory::signature_store&, uintptr_t res) { return res; },
 		"40 53 48 83 EC ? 48 8B 01 48 8B D9 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 74 ? 48 8B 8B ? ? ? ? 48 8B 01 48 8B 80 ? ? ? ? 48 83 C4 ? 5B 48 FF 25 ? ? ? ? 48 83 C4 ? 5B C3 40 53"_sig,
@@ -209,8 +197,6 @@ public:
 	inline static SigImpl ClientInputUpdateSystem_tickBaseInput{[](memory::signature_store&, uintptr_t res) { return res; },
 		"4C 8B DC 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 48 8B 9C 24"_sig,
 		"ClientInputUpdateSystem::tickBaseInput"};
-
-	inline static SigImpl MoveInputHandler_tick{};
 
 	inline static SigImpl CameraViewBob{[](memory::signature_store&, uintptr_t res) { return res; },
 		"40 53 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 44 24 ? 49 8b 00"_sig,

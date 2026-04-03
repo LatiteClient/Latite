@@ -61,8 +61,6 @@ using namespace winrt::Windows::Storage;
 #include "resource/Resource.h"
 #include "feature/module/modules/game/Freelook.h"
 
-int SDK::internalVers = SDK::VLATEST;
-
 using namespace std;
 
 namespace {
@@ -160,13 +158,9 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int sigCount = 0;
     int deadCount = 0;
 
-    std::unordered_map<std::string, SDK::Version> versNumMap = {
-        { "1.26.10", SDK::V1_26_10 },
-        { "1.26.11", SDK::V1_26_10 },
-        { "1.26.12", SDK::V1_26_10 },
-    };
+    std::array versNumMap = {"1.26.10", "1.26.11", "1.26.12"};
 
-    if (versNumMap.contains(Latite::get().gameVersion)) {
+    if (std::ranges::find(versNumMap.begin(), versNumMap.end(), Latite::get().gameVersion) != versNumMap.end()) {
         // not needed as it will always just be latest
         //auto vers =  versNumMap[Latite::get().gameVersion];
         //SDK::internalVers = vers;
@@ -176,27 +170,22 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         ss << XOR_STRING("Latite Client does not support your version: ") << Latite::get().gameVersion << XOR_STRING(". Latite only supports the following versions:\n\n");
 
         for (auto& key : versNumMap) {
-            ss << key.first << "\n";
+            ss << key << "\n";
         }
 
         Logger::Warn(ss.str());
     }
 
-    Logger::Info(XOR_STRING("Minecraft SDK version {}"), SDK::internalVers);
-
     std::vector<std::pair<SigImpl*, SigImpl*>> sigList = {
         MVSIG(Misc::minecraftGamePointer),
-        MVSIG(Misc::clientInstance),
         MVSIG(MainWindow__windowProcCallback),
         MVSIG(LevelRenderer_renderLevel),
-        MVSIG(Offset::LevelRendererPlayer_fovX),
         MVSIG(Offset::LevelRendererPlayer_origin),
         MVSIG(Offset::MinecraftGame_cursorGrabbed),
         MVSIG(Components::moveInputComponent),
         MVSIG(Options_getGamma),
         MVSIG(Options_getPerspective),
         MVSIG(Options_getHideHand),
-        MVSIG(Options_getSensitivity),
         MVSIG(ClientInstance_grabCursor),
         MVSIG(ClientInstance_releaseCursor),
         MVSIG(Level_tick),
@@ -210,7 +199,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(MinecraftGame__update),
         MVSIG(GpuInfo),
         MVSIG(RakPeer_GetAveragePing),
-        MVSIG(MoveInputHandler_tick),
         MVSIG(ClientInputUpdateSystem_tickBaseInput),
         MVSIG(LocalPlayer_applyTurnDelta),
         MVSIG(Vtable::TextPacket),
