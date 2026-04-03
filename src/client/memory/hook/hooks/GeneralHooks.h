@@ -43,6 +43,7 @@ class GenericHooks : public HookGroup {
     static void hkOnUri(void* obj, void* uri);
     static void hkGrabCursor(SDK::ClientInstance* obj);
     static void hkBaseActorRenderer_renderText(void* screenContext, void* viewData, std::string* tagData, void* font, void* mesh);
+    static void hkAppPlatformGDK_releaseMouse(void* _this);
 public:
     GenericHooks();
 };
