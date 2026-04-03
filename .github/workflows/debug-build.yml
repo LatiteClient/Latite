@@ -71,13 +71,27 @@ jobs:
             Rename-Item -Path $pdb -NewName "LatiteDebug.pdb" -Force
           }
 
+      # Upload PR build artifacts so DLL files are easy to download without creating a release
+      # P.S. Artifacts are retained for only 90 days.
+      - name: Upload PR artifacts
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: LatiteDebug-PR-${{ github.event.pull_request.number }}
+          path: |
+            ${{ github.workspace }}/cmake-build-debug/LatiteDebug.dll
+            ${{ github.workspace }}/cmake-build-debug/LatiteDebug.pdb
+          if-no-files-found: error
+
       - name: Compute build timestamp
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         shell: bash
         run: |
           TS=$(date -u +"%Y%m%d-%H%M%S")
           echo "TIMESTAMP=$TS" >> "$GITHUB_ENV"
 
       - name: Create timestamped archival release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: softprops/action-gh-release@v2.3.2
         with:
           tag_name: debug-${{ env.TIMESTAMP }}
@@ -97,6 +111,7 @@ jobs:
             ${{ github.workspace }}/cmake-build-debug/LatiteDebug.pdb
 
       - name: Recreate debug release to refresh date
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -105,6 +120,7 @@ jobs:
           git push origin :refs/tags/debug || true
 
       - name: Create GitHub Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: softprops/action-gh-release@v2.3.2
         with:
           tag_name: debug
