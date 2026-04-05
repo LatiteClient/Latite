@@ -230,7 +230,7 @@ JsValueRef JsEntityClass::entitySetVariable(JsValueRef callee, bool isConstructo
 
 	Chakra::ThrowError(L"Invalid entity");
 #else
-	Chakra::ThrowError("setMolangVariable is reserved");
+	Chakra::ThrowError(L"setMolangVariable is reserved");
 #endif
 	return JS_INVALID_REFERENCE;
 }
