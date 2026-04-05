@@ -286,10 +286,6 @@ void Renderer::releaseAllResources(bool indep) {
 
 	releaseDeviceResources();
 
-	if (d3dCtx) {
-		d3dCtx->Flush();
-	}
-
 	dxgiDevice = nullptr;
 	SafeRelease(&swapChain4);
 
