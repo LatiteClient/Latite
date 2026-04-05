@@ -30,13 +30,13 @@ public:
 				}, &obj);
 		}
 		JS::JsSetPrototype(obj, getPrototype());
-		Chakra::SetPropertyString(obj, XW("name"), util::StrToWStr(item->namespacedId.getString()));
-		Chakra::SetPropertyString(obj, XW("translateName"), util::StrToWStr(item->translateName));
-		Chakra::SetPropertyNumber(obj, XW("maxDamage"), item->getMaxDamage());
+		Chakra::SetPropertyString(obj, L"name", util::StrToWStr(item->namespacedId.getString()));
+		Chakra::SetPropertyString(obj, L"translateName", util::StrToWStr(item->translateName));
+		Chakra::SetPropertyNumber(obj, L"maxDamage", item->getMaxDamage());
 		return obj;
 	}
 
 	void prepareFunctions() override {
-		Chakra::DefineFunc(prototype, toStringCallback, XW("toString"), this);
+		Chakra::DefineFunc(prototype, toStringCallback, L"toString", this);
 	};
 };

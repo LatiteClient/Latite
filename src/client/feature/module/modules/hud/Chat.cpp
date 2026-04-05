@@ -139,11 +139,11 @@ void Chat::onRenderLayer(Event& evG) {
 	
 	auto& ev = reinterpret_cast<RenderLayerEvent&>(evG);
 
-	if (ev.getScreenView()->visualTree->rootControl->name == XOR_STRING("hud_screen")) {
+	if (ev.getScreenView()->visualTree->rootControl->name == "hud_screen") {
 		//static bool lastEnabled = false;
 
 		//if (isEnabled() != lastEnabled) {
-		chatStack = ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName(XOR_STRING("chat_panel"));
+		chatStack = ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName("chat_panel");
 		if (isEnabled()) {
 			if (chatStack->position.x < 20000) {
 				chatStack->position.x += 20000;

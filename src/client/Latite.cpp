@@ -108,7 +108,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     AddVectoredExceptionHandler(1, VectoredExceptionHandler);
 #endif
 
-    Logger::Info(XOR_STRING("Latite Client {}"), Latite::version);
+    Logger::Info("Latite Client {}", Latite::version);
 
     char path[MAX_PATH]{};
     GetModuleFileNameA(nullptr, path, MAX_PATH);
@@ -150,7 +150,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     }*/
     Logger::Info("Minecraft {}", Latite::get().gameVersion);
 
-    Logger::Info(XOR_STRING("Loading assets"));
+    Logger::Info("Loading assets");
     Latite::get().dllInst = dll;
     // ... init assets
     Latite::get().initL10n();
@@ -173,7 +173,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     }
     else {
         std::stringstream ss;
-        ss << XOR_STRING("Latite Client does not support your version: ") << Latite::get().gameVersion << XOR_STRING(". Latite only supports the following versions:\n\n");
+        ss << "Latite Client does not support your version: " << Latite::get().gameVersion << ". Latite only supports the following versions:\n\n";
 
         for (auto& key : versNumMap) {
             ss << key.first << "\n";
@@ -182,7 +182,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         Logger::Warn(ss.str());
     }
 
-    Logger::Info(XOR_STRING("Minecraft SDK version {}"), SDK::internalVers);
+    Logger::Info("Minecraft SDK version {}", SDK::internalVers);
 
     std::vector<std::pair<SigImpl*, SigImpl*>> sigList = {
         MVSIG(Misc::minecraftGamePointer),
@@ -203,7 +203,6 @@ DWORD __stdcall startThread(HINSTANCE dll) {
         MVSIG(ChatScreenController_sendChatMessage),
         MVSIG(GameCore_handleMouseInput),
         MVSIG(MinecraftGame_onDeviceLost),
-        MVSIG(MinecraftGame_onAppSuspended),
         MVSIG(RenderController_getOverlayColor),
         MVSIG(ScreenView_setupAndRender),
         MVSIG(KeyMap),
@@ -255,10 +254,10 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     
     new (configMgrBuf) ConfigManager();
     if (!Latite::getConfigManager().loadMaster()) {
-        Logger::Fatal(XOR_STRING("Could not load master config!"));
+        Logger::Fatal("Could not load master config!");
     }
     else {
-        Logger::Info(XOR_STRING("Loaded master config"));
+        Logger::Info("Loaded master config");
     }
     new (mainSettingGroup) SettingGroup("global");
 
@@ -303,7 +302,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     new (keyboardBuf) Keyboard(reinterpret_cast<int*>(Signatures::KeyMap.result));
 
-    Logger::Info(XOR_STRING("Waiting for game to load.."));
+    Logger::Info("Waiting for game to load..");
 
     while (!SDK::ClientInstance::get()) {
         std::this_thread::sleep_for(10ms);
@@ -311,7 +310,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
 
     Latite::get().initialize(dll);
 
-    Logger::Info(XOR_STRING("Initialized Latite Client"));
+    Logger::Info("Initialized Latite Client");
     return 0ul;
     END_ERROR_HANDLER
 }
@@ -445,8 +444,8 @@ SDK::Font* Latite::getFont() {
     case 1:
         return SDK::ClientInstance::get()->minecraftGame->getFontRepository()->getSmoothFont();
     default:
-        Logger::Fatal(XOR_STRING("Unknown font selected: {}"), this->mcRendFont.getSelectedKey());
-        throw std::runtime_error(XOR_STRING("Unknown font"));
+        Logger::Fatal("Unknown font selected: {}", this->mcRendFont.getSelectedKey());
+        throw std::runtime_error("Unknown font");
     }
 }
 
@@ -454,7 +453,7 @@ void Latite::initialize(HINSTANCE hInst) {
     this->dllInst = hInst;
 
     Latite::getPluginManager().init();
-    Logger::Info(XOR_STRING("Script manager initialized."));
+    Logger::Info("Script manager initialized.");
 
     Latite::getEventing().listen<UpdateEvent, &Latite::onUpdate>(this, 2);
     Latite::getEventing().listen<KeyUpdateEvent, &Latite::onKey>(this, 2);
@@ -470,9 +469,9 @@ void Latite::initialize(HINSTANCE hInst) {
     Latite::getEventing().listen<TickEvent, &Latite::onTick>(this, 2);
     Latite::getEventing().listen<MouseReleaseEvent, &Latite::onMouseRelease>(this, 2);
 
-    Logger::Info(XOR_STRING("Initialized Hooks"));
+    Logger::Info("Initialized Hooks");
     getHooks().enable();
-    Logger::Info(XOR_STRING("Enabled Hooks"));
+    Logger::Info("Enabled Hooks");
 
     // doesn't work, maybe it's stored somewhere else too
     //if (SDK::internalVers < SDK::V1_20) {
@@ -506,7 +505,7 @@ void Latite::threadsafeInit() {
     //app.Title(ws);
     SetWindowTextW(SDK::GameCore::get()->hwnd, ws.c_str());
     Latite::getPluginManager().loadPrerunScripts();
-    Logger::Info(XOR_STRING("Loaded startup scripts"));
+    Logger::Info("Loaded startup scripts");
     
     Latite::getConfigManager().applyModuleConfig();
 
@@ -815,7 +814,7 @@ namespace {
 
         auto folderPath = util::GetLatitePath() / "Assets";
 
-        winrt::Windows::Foundation::Uri requestUri(util::StrToWStr(XOR_STRING("https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll")));
+        winrt::Windows::Foundation::Uri requestUri(util::StrToWStr("https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll"));
 
         auto buffer = co_await http.GetBufferAsync(requestUri);
 
@@ -1022,7 +1021,7 @@ void Latite::onRendererCleanup(Event& ev) {
 
 void Latite::onSuspended(Event& ev) {
     Latite::getConfigManager().saveCurrentConfig();
-    Logger::Info(XOR_STRING("Saved config"));
+    Logger::Info("Saved config");
 }
 
 void Latite::onBobView(Event& ev) {
@@ -1107,7 +1106,7 @@ void Latite::loadConfig(SettingGroup& gr) {
 
 void Latite::writeServerIP() {
     std::string server;
-    std::filesystem::path serverIPTextPath = util::GetLatitePath() / XOR_STRING("serverip.txt");
+    std::filesystem::path serverIPTextPath = util::GetLatitePath() / "serverip.txt";
 
     SDK::RakNetConnector* connector = SDK::RakNetConnector::get();
     if (connector && !connector->dns.empty()) {

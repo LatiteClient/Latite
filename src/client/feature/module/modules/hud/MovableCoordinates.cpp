@@ -28,9 +28,9 @@ void MovableCoordinates::onRenderLayer(Event& evG) {
     }
 
     if (this->isActive() && this->isEnabled()) {
-        if (ev.getScreenView()->visualTree->rootControl->name == XOR_STRING("hud_screen")) {
+        if (ev.getScreenView()->visualTree->rootControl->name == "hud_screen") {
             this->vanillaCoordinates = ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName(
-                XOR_STRING("player_position"));
+                "player_position");
             float guiScale = SDK::ClientInstance::get()->getGuiData()->guiScale;
 
 

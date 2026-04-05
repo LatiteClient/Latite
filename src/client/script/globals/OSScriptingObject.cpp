@@ -39,6 +39,6 @@ JsValueRef OSScriptingObject::playSound(JsValueRef callee, bool isConstructor, J
 }
 
 void OSScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
-	Chakra::DefineFunc(object, openUri, XW("openUri"), this);
-	Chakra::DefineFunc(object, playSound, XW("playSound"), this);
+	Chakra::DefineFunc(object, openUri, L"openUri", this);
+	Chakra::DefineFunc(object, playSound, L"playSound", this);
 }

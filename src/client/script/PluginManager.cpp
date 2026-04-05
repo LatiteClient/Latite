@@ -21,7 +21,6 @@
 #include <winrt/windows.storage.streams.h>
 #include <expected>
 
-#include "util/XorString.h"
 #include "JsPlugin.h"
 
 using namespace winrt::Windows::Storage::Streams;
@@ -215,8 +214,8 @@ void PluginManager::runScriptingOperations()
 }
 
 std::expected<void, std::string> PluginManager::installScript(std::string const& inName) {
-	std::wstring registry = XW("https://raw.githubusercontent.com/LatiteScripting/Scripts/master/Plugins");
-	std::wstring jsonPath = registry + XW("/plugins.json");
+	std::wstring registry = L"https://raw.githubusercontent.com/LatiteScripting/Scripts/master/Plugins";
+	std::wstring jsonPath = registry + L"/plugins.json";
 	nlohmann::json scriptsJson;
 
 	auto http = HttpClient();
