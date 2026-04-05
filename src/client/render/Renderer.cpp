@@ -8,7 +8,7 @@
 
 Renderer::~Renderer() {
     // ...
-	releaseAllResources();
+	releaseAllResources(false);
 }
 
 bool Renderer::init(IDXGISwapChain* chain) {
@@ -179,7 +179,7 @@ bool Renderer::init(IDXGISwapChain* chain) {
 }
 
 HRESULT Renderer::reinit() {
-	releaseAllResources(false);
+	releaseAllResources(true, false);
     hasInit = false;
     return S_OK;
 }
@@ -240,7 +240,7 @@ void Renderer::render() {
 	this->hasCopiedBitmap = false;
 }
 
-void Renderer::releaseAllResources(bool indep) {
+void Renderer::releaseAllResources(bool flush, bool indep) {
 	RendererCleanupEvent ev{};
 	Eventing::get().dispatch(ev);
 
@@ -285,6 +285,10 @@ void Renderer::releaseAllResources(bool indep) {
 	d3d11Targets.clear();
 
 	releaseDeviceResources();
+
+	if (flush && d3dCtx) {
+		d3dCtx->Flush();
+	}
 
 	dxgiDevice = nullptr;
 	SafeRelease(&swapChain4);
