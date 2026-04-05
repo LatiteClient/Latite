@@ -668,12 +668,13 @@ void Latite::initSettings() {
         set->value = &this->menuBlurEnabled;
         this->getSettings().addSetting(set);
     }
+    /* Removed because of instability
     {
         auto set = std::make_shared<Setting>("useDX11", LocalizeString::get("client.settings.useDX11.name"),
                                              LocalizeString::get("client.settings.useDX11.desc"));
         set->value = &this->useDX11;
         this->getSettings().addSetting(set);
-    }
+    }*/
     {
         auto set = std::make_shared<Setting>("forceDisableVSync", L"Force Disable VSync",
                                              L"Forces VSync in fullscreen. May cause freezing, overheating, and screen tearing on some devices.\nRestart your game upon disabling this setting.");
