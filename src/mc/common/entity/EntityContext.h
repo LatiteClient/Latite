@@ -4,13 +4,6 @@
 #include "util/LMath.h"
 
 namespace SDK {
-	struct EntityContext_Old {
-		struct {
-			uintptr_t basicRegistry;
-		}*basicRegistry;
-		uint32_t id;
-	};
-
 	class EntityContext {
 	public:
 		uintptr_t getBasicRegistry() {
