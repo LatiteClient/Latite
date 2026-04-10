@@ -19,6 +19,7 @@ namespace {
     bool isForceDisableVSync = false;
     std::shared_ptr<Hook> PresentHook;
     std::shared_ptr<Hook> ResizeBuffersHook;
+    std::shared_ptr<Hook> ResizeBuffers3Hook;
     std::shared_ptr<Hook> ExecuteCommandListsHook;
 
     // TODO: temporary, remove this
@@ -133,6 +134,23 @@ HRESULT __stdcall DXHooks::SwapChain_ResizeBuffers(
     UINT Width,
     UINT Height,
     DXGI_FORMAT NewFormat,
+    UINT SwapChainFlags) {
+    Latite::getRenderer().reinit();
+    UINT newFlags = SwapChainFlags;
+    if (tearingSupported && isForceDisableVSync) {
+        newFlags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+    }
+
+    return ResizeBuffersHook->oFunc<decltype(&SwapChain_ResizeBuffers)>()(
+        chain, BufferCount, Width, Height, NewFormat, newFlags);
+}
+
+HRESULT __stdcall DXHooks::SwapChain3_ResizeBuffers(
+    IDXGISwapChain* chain,
+    UINT BufferCount,
+    UINT Width,
+    UINT Height,
+    DXGI_FORMAT NewFormat,
     UINT SwapChainFlags,
     const UINT *pCreationNodeMask,
     IUnknown *const *ppPresentQueue) {
@@ -143,7 +161,7 @@ HRESULT __stdcall DXHooks::SwapChain_ResizeBuffers(
         newFlags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
     }
 
-    return ResizeBuffersHook->oFunc<decltype(&SwapChain_ResizeBuffers)>()(
+    return ResizeBuffers3Hook->oFunc<decltype(&SwapChain3_ResizeBuffers)>()(
         chain, BufferCount, Width, Height, NewFormat, newFlags, pCreationNodeMask, ppPresentQueue);
 }
 
@@ -235,11 +253,12 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
     }
 
     PresentHook = addHook(vftable[8], SwapChain_Present, "IDXGISwapChain::Present");
-    ResizeBuffersHook = addHook(vftable[39], SwapChain_ResizeBuffers, "IDXGISwapChain3::ResizeBuffers");
+    ResizeBuffersHook = addHook(vftable[13], SwapChain_ResizeBuffers, "IDXGISwapChain::ResizeBuffers");
+    ResizeBuffers3Hook = addHook(vftable[39], SwapChain3_ResizeBuffers, "IDXGISwapChain3::ResizeBuffers");
 
     // Needed for D3D11On12 for DX12
     if (cqueueVftable) ExecuteCommandListsHook = addHook(cqueueVftable[10], CommandQueue_ExecuteCommandLists, "ID3D12CommandQueue::executeCommandLists");
     PresentHook->enable();
-    ResizeBuffersHook->enable();
+    ResizeBuffers3Hook->enable();
     if (cqueueVftable) ExecuteCommandListsHook->enable();
 }
