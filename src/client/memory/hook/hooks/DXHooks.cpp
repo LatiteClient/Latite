@@ -253,6 +253,8 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
     }
 
     PresentHook = addHook(vftable[8], SwapChain_Present, "IDXGISwapChain::Present");
+
+    // We need both ResizeBuffers hooks as DX11 uses IDXGISwapChain::ResizeBuffers and DX12 uses IDXGISwapChain3::ResizeBuffers
     ResizeBuffersHook = addHook(vftable[13], SwapChain_ResizeBuffers, "IDXGISwapChain::ResizeBuffers");
     ResizeBuffers3Hook = addHook(vftable[39], SwapChain3_ResizeBuffers, "IDXGISwapChain3::ResizeBuffers");
 
