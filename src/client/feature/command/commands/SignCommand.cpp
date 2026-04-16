@@ -19,7 +19,7 @@ bool SignCommand::execute(std::string const label, std::vector<std::string> args
 #if LATITE_DEBUG
 		message(util::StrToWStr(std::format("Generated certificate {}", util::WStrToStr(cert.value()))));
 #endif
-		std::wofstream ofs(path / XOR_STRING("certificate"));
+		std::wofstream ofs(path / "certificate");
 		ofs << cert.value();
 		ofs.flush();
 		return true;

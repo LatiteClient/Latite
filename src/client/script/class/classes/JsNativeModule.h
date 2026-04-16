@@ -44,10 +44,10 @@ public:
 
 	void prepareFunctions() override {
 		// static
-		Chakra::DefineFunc(constructor, getCallback, XW("get"), this);
-		Chakra::DefineFunc(prototype, defaultToString, XW("toString"), this);
-		Chakra::DefineFunc(prototype, callCallback, XW("call"), this);
-		Chakra::SetPropertyNumber(prototype, XW("handle"), 0.0);
+		Chakra::DefineFunc(constructor, getCallback, L"get", this);
+		Chakra::DefineFunc(prototype, defaultToString, L"toString", this);
+		Chakra::DefineFunc(prototype, callCallback, L"call", this);
+		Chakra::SetPropertyNumber(prototype, L"handle", 0.0);
 
 	};
 
@@ -98,7 +98,7 @@ public:
 		if (!Chakra::VerifyParameters({ {arguments[1], JsString}, {arguments[2], JsString} })) return JS_INVALID_REFERENCE;
 
 		if (argCount > 18) {
-			Chakra::ThrowError(XW("NativeModule.call can only accept 15 native arguments."));
+			Chakra::ThrowError(L"NativeModule.call can only accept 15 native arguments.");
 			return JS_INVALID_REFERENCE;
 		}
 
@@ -115,14 +115,14 @@ public:
 		auto proc = GetProcAddress(mod, util::WStrToStr(name).c_str());
 
 		if (!proc) {
-			Chakra::ThrowError(XW("Could not find function ") + name);
+			Chakra::ThrowError(L"Could not find function " + name);
 			return JS_INVALID_REFERENCE;
 		}
 
 		if (!JsScript::getThis()->getPlugin()->isTrusted())
 			for (auto& banned : banList) {
 				if (proc == banned) {
-					Chakra::ThrowError(XW("This function is banned in non-trusted plugins."));
+					Chakra::ThrowError(L"This function is banned in non-trusted plugins.");
 					return JS_INVALID_REFERENCE;
 				}
 			}
@@ -148,25 +148,25 @@ public:
 		}
 
 
-		if (type == XW("int64")) {
+		if (type == L"int64") {
 			// int64_t
 			auto res = ((any_func_int64_t)proc)(args[0], args[1], args[2], args[3], args[4], args[5],
 				args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
 			return Chakra::MakeDouble(res);
 		}
-		else if (type == XW("int32")) {
+		else if (type == L"int32") {
 			// int
 			auto res = ((any_func_int32_t)proc)(args[0], args[1], args[2], args[3], args[4], args[5],
 				args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
 			return Chakra::MakeInt(res);
 		}
-		else if (type == XW("float32")) {
+		else if (type == L"float32") {
 			// float
 			auto res = ((any_func_float32_t)proc)(args[0], args[1], args[2], args[3], args[4], args[5],
 				args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]);
 			return Chakra::MakeDouble(res);
 		}
-		else if (type == XW("float64")) {
+		else if (type == L"float64") {
 			// double
 			auto res = ((any_func_float64_t)proc)(args[0], args[1], args[2], args[3], args[4], args[5],
 				args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14]);

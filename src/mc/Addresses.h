@@ -14,7 +14,6 @@ public:
 	}
 };
 
-// 1.20.71
 class Signatures {
 public:
 	struct Offset {
@@ -109,7 +108,6 @@ public:
 		"40 53 56 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 48 8B F9"_sig,
 		"MainWindow::_windowProcCallback"};
 
-	// The signature is big but it hasn't died in a while soo
 	inline static SigImpl Options_getGamma{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 83 EC ? 48 8B 01 48 8D 54 ? ? 41 B8 36 00 00 00"_sig,
 		"Options::getGamma"};
@@ -134,8 +132,6 @@ public:
 		"e8 ? ? ? ? 48 8b 4b ? 48 85 c9 74 ? 48 8b 41 ? 48 83 c1 ? 48 8b 40"_sig,
 		"Level::tick" };
 
-	// callsites
-
 	inline static SigImpl ChatScreenController_sendChatMessage{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5C 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B FA 4C 8B F1 45 33 E4 48 8B 49"_sig,
 		"ClientInstanceScreenModel::sendChatMessage"};
@@ -151,17 +147,6 @@ public:
 	inline static SigImpl MouseInputVector{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 		"48 2B 05 ? ? ? ? 8B 0D"_sig,
 		"MouseInputVector"};
-
-	//ff 15 ? ? ? ? 48 8d 4c 24 ? e8 ? ? ? ? 48 8b 4c 24 ? 48 3b cb
-	/*
-	"SuspendAudio"
-	"forceSendEvents"
-	"SuspendUserManager"
-	"SuspendGameRenderer
-	"unloadAllTextures""*/
-	inline static SigImpl MinecraftGame_onAppSuspended{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5c 24 ? 48 89 74 24 ? 48 89 7c 24 ? 55 41 54 41 55 41 56 41 57 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? ? 8b ? 45 33 f6"_sig,
-		"MinecraftGame::onAppSuspended"}; // "OnAppSuspend" "SuspendAudio" "CancelJoinGameTelemetry"
 
 	inline static SigImpl RenderController_getOverlayColor{[](memory::signature_store&, uintptr_t res) { return res; },
 		"40 53 55 56 57 48 83 EC ? 49 8B 78"_sig,

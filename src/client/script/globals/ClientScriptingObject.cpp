@@ -110,22 +110,22 @@ void ClientScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 #endif
 
 	Chakra::DefineFunc(object, registerEventCallback, L"on");
-	Chakra::DefineFunc(object, runCommandCallback, XW("runCommand"));
-	Chakra::DefineFunc(object, showNotifCallback, XW("showNotification"));
-	Chakra::DefineFunc(object, getMmgrCallback, XW("getModuleManager"), this);
-	Chakra::DefineFunc(object, getCmgrCallback, XW("getCommandManager"), this);
-	Chakra::DefineFunc(object, getSmgrCallback, XW("getScreenManager"), this);
+	Chakra::DefineFunc(object, runCommandCallback, L"runCommand");
+	Chakra::DefineFunc(object, showNotifCallback, L"showNotification");
+	Chakra::DefineFunc(object, getMmgrCallback, L"getModuleManager", this);
+	Chakra::DefineFunc(object, getCmgrCallback, L"getCommandManager", this);
+	Chakra::DefineFunc(object, getSmgrCallback, L"getScreenManager", this);
 
 	initModuleManager();
 	initCommandManager();
 	initScreenManager();
 
-	Chakra::DefineFunc(moduleManager, mmgrRegisterModuleCallback, XW("registerModule"));
-	Chakra::DefineFunc(moduleManager, mmgrGetModuleByName, XW("getModuleByName"));
-	Chakra::DefineFunc(moduleManager, mmgrForEachModule, XW("forEachModule"));
-	Chakra::DefineFunc(commandManager, cmgrRegisterCommandCallback, XW("registerCommand"));
-	Chakra::DefineFunc(commandManager, cmgrGetPrefixCallback, XW("getPrefix"));
-	Chakra::DefineFunc(commandManager, smgrRegisterScreenCallback, XW("registerScreen"));
+	Chakra::DefineFunc(moduleManager, mmgrRegisterModuleCallback, L"registerModule");
+	Chakra::DefineFunc(moduleManager, mmgrGetModuleByName, L"getModuleByName");
+	Chakra::DefineFunc(moduleManager, mmgrForEachModule, L"forEachModule");
+	Chakra::DefineFunc(commandManager, cmgrRegisterCommandCallback, L"registerCommand");
+	Chakra::DefineFunc(commandManager, cmgrGetPrefixCallback, L"getPrefix");
+	Chakra::DefineFunc(commandManager, smgrRegisterScreenCallback, L"registerScreen");
 
 	Chakra::SetPropertyString(object, L"version", util::StrToWStr(std::string(Latite::version.data(), Latite::version.size())));
 }
@@ -258,7 +258,7 @@ JsValueRef ClientScriptingObject::mmgrForEachModule(JsValueRef callee, bool isCo
 	
 	auto cl = script->getClass<JsModuleClass>();
 	if (!cl) {
-		Chakra::ThrowError(XW("INTERNAL ERROR: could not find Module class"));
+		Chakra::ThrowError(L"INTERNAL ERROR: could not find Module class");
 		return JS_INVALID_REFERENCE;
 	}
 

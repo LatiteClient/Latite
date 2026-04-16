@@ -26,7 +26,7 @@ public:
 
 	void prepareFunctions() override {
 		__super::prepareFunctions();
-		Chakra::DefineFunc(prototype, getLastTextCallback, XW("getLastText"), this);
+		Chakra::DefineFunc(prototype, getLastTextCallback, L"getLastText", this);
 	};
 
 private:

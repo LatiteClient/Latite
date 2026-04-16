@@ -14,11 +14,11 @@ public:
 
 	void prepareFunctions() override {
 		__super::prepareFunctions();
-		Chakra::DefineFunc(prototype, playerGetName, XW("getName"));
-		Chakra::DefineFunc(prototype, playerGetXboxUserID, XW("getXUID"));
-		Chakra::DefineFunc(prototype, playerGetSelectedItem, XW("getHoldingItem"));
-		Chakra::DefineFunc(prototype, playerGetSelectedSlot, XW("getSelectedSlot"));
-		Chakra::DefineFunc(prototype, playerGetInventorySlot, XW("getItem"));
+		Chakra::DefineFunc(prototype, playerGetName, L"getName");
+		Chakra::DefineFunc(prototype, playerGetXboxUserID, L"getXUID");
+		Chakra::DefineFunc(prototype, playerGetSelectedItem, L"getHoldingItem");
+		Chakra::DefineFunc(prototype, playerGetSelectedSlot, L"getSelectedSlot");
+		Chakra::DefineFunc(prototype, playerGetInventorySlot, L"getItem");
 	}
 private:
 	static JsValueRef CALLBACK playerGetName(JsValueRef callee, bool isConstructor,

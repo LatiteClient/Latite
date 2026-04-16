@@ -47,14 +47,14 @@ FARPROC Chakra::pass(const char* name)
 
 void Chakra::SetContext(JsContextRef context) {
 	if (!Latite::isMainThread()) {
-		Logger::Fatal("{}", XOR_STRING("SetContext accessed outside of the main thread!!!"));
+		Logger::Fatal("{}", "SetContext accessed outside of the main thread!!!");
 		__debugbreak();
 	}
 
 	auto error = JS::JsSetCurrentContext(context);
 
 	if (error != JsNoError) {
-		Logger::Warn("{}: {:X}", XOR_STRING("SetContext JsError"), (int)error);
+		Logger::Warn("{}: {:X}", "SetContext JsError", (int)error);
 	}
 }
 

@@ -25,8 +25,8 @@ void MovableScoreboard::onRenderLayer(Event& evG) {
 	}
 
 	if (this->isActive() && this->isEnabled()) {
-		if (ev.getScreenView()->visualTree->rootControl->name == XOR_STRING("hud_screen")) {
-			this->sidebar = ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName(XOR_STRING("sidebar"));
+		if (ev.getScreenView()->visualTree->rootControl->name == "hud_screen") {
+			this->sidebar = ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName("sidebar");
 
 			auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 			if (!lp) return;

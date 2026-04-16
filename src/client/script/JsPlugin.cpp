@@ -4,7 +4,6 @@
 #include "util/Chakrautil.h"
 #include "util/Util.h"
 #include "PluginManager.h"
-#include "util/XorString.h"
 #include "util/Logger.h"
 
 using namespace winrt::Windows::Storage::Streams;
@@ -194,7 +193,7 @@ std::shared_ptr<JsScript> JsPlugin::loadOrFindModule(JsScript* script, std::wstr
 }
 
 std::wstring JsPlugin::getCertificate() {
-	std::wifstream ifs(getPath() / XOR_STRING("certificate"));
+	std::wifstream ifs(getPath() / "certificate");
 	if (ifs.fail()) {
 #if LATITE_DEBUG
 		Logger::Info("Failed to get certificate");
@@ -220,7 +219,7 @@ std::optional<std::wstring> JsPlugin::getHash(std::filesystem::path const& main)
 				iterate(fil);
 				continue;
 			}
-			if (fil.path().string().ends_with(XOR_STRING(".js"))) { // I think I should still be fine with unicode filepaths
+			if (fil.path().string().ends_with(".js")) { // I think I should still be fine with unicode filepaths
 				jsFiles.push_back(fil);
 			}
 		}

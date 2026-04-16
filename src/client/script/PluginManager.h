@@ -65,7 +65,7 @@ public:
 			std::wstring name;
 			std::variant<std::nullptr_t, double, std::wstring, int64_t, bool> val = nullptr;
 
-			Value(std::wstring const& name) : name(name) {
+			explicit Value(std::wstring const& name) : name(name) {
 			}
 
 			Value() {

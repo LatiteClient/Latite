@@ -87,7 +87,6 @@ using nlohmann::json;
 // Utils
 #include "util/Util.h"
 #include "util/Logger.h"
-#include "util/XorString.h"
 #include "util/ChakraUtil.h"
 #include "util/DxUtil.h"
 #include "util/LMath.h"

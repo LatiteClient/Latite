@@ -55,10 +55,10 @@ public:
 	void prepareFunctions() override {
 		// Static functions
 		// Member functions
-		Chakra::DefineFunc(prototype, send, XW("send"), this);
-		Chakra::DefineFunc(prototype, close, XW("close"), this);
-		Chakra::DefineFunc(prototype, on, XW("on"), this);
-		Chakra::DefineFunc(prototype, toStringCallback, XW("toString"), this);
+		Chakra::DefineFunc(prototype, send, L"send", this);
+		Chakra::DefineFunc(prototype, close, L"close", this);
+		Chakra::DefineFunc(prototype, on, L"on", this);
+		Chakra::DefineFunc(prototype, toStringCallback, L"toString", this);
 	};
 private:
 	winrt::Windows::Networking::Sockets::MessageWebSocket webSocket;

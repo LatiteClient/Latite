@@ -57,8 +57,8 @@ public:
 		Chakra::SetPropertyString(prototype, L"displayName", L"", true);
 
 		Chakra::DefineFunc(prototype, toStringCallback, L"toString", this);
-		Chakra::DefineFunc(prototype, getValueCallback, XW("getValue"), this);
-		Chakra::DefineFunc(prototype, setValueCallback, XW("setValue"), this);
-		Chakra::DefineFunc(prototype, setCondition, XW("setCondition"), this);
+		Chakra::DefineFunc(prototype, getValueCallback, L"getValue", this);
+		Chakra::DefineFunc(prototype, setValueCallback, L"setValue", this);
+		Chakra::DefineFunc(prototype, setCondition, L"setCondition", this);
 	};
 };

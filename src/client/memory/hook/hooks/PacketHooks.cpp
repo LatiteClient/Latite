@@ -38,7 +38,7 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 		auto packetId = packet->getID();
 
 		if (packetId == SDK::PacketID::CHANGE_DIMENSION) {
-			PluginManager::Event sEv{ XW("change-dimension"), {}, false };
+			PluginManager::Event sEv{ L"change-dimension", {}, false };
 			Latite::getPluginManager().dispatchEvent(sEv);
 		}
 		else if (packetId == SDK::PacketID::SET_SCORE) {
@@ -47,7 +47,7 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 			auto data = PluginManager::Event::Value(L"data");
 			data.val = pkt->serialize();
 
-			PluginManager::Event sEv{ XW("set-score"), { data }, false };
+			PluginManager::Event sEv{ L"set-score", { data }, false };
 			Latite::getPluginManager().dispatchEvent(sEv);
 		}
 		else if (packetId == SDK::PacketID::MODAL_FORM_REQUEST) {
@@ -59,11 +59,11 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 			auto formJson = PluginManager::Event::Value(L"formJson");
 			formJson.val = util::StrToWStr(pkt->mFormJSON);
 		
-			PluginManager::Event sEv{ XW("modal-form-request"), { formId, formJson }, false };
+			PluginManager::Event sEv{ L"modal-form-request", { formId, formJson }, false };
 			if (Latite::getPluginManager().dispatchEvent(sEv)) return;
 		}
 		else if (packetId == SDK::PacketID::TRANSFER) {
-			PluginManager::Event sEv{ XW("transfer"), {}, false };
+			PluginManager::Event sEv{ L"transfer", {}, false };
 			Latite::getPluginManager().dispatchEvent(sEv);
 		} else if (packetId == SDK::PacketID::SET_TITLE) {
 			auto pkt = std::static_pointer_cast<SDK::SetTitlePacket>(packet);
