@@ -2,7 +2,6 @@
 #include "Player.h"
 #include "util/Util.h"
 #include "util/memory.h"
-#include "mc/Version.h"
 #include "mc/Addresses.h"
 
 void SDK::Player::displayClientMessage(std::string const& message) {

@@ -4,30 +4,14 @@
 #include "util/LMath.h"
 
 namespace SDK {
-	struct EntityContext_Old {
-		struct {
-			uintptr_t basicRegistry;
-		}*basicRegistry;
-		uint32_t id;
-	};
-
 	class EntityContext {
 	public:
 		uintptr_t getBasicRegistry() {
-			if (internalVers >= V1_20_50) {
-				return basicRegistry;
-			}
-
-			return reinterpret_cast<EntityContext_Old*>(this)->basicRegistry->basicRegistry;
+			return basicRegistry;
 		}
 
 		uint32_t& getId() {
-			if (internalVers >= V1_20_50) {
-				return id;
-			}
-
-			return reinterpret_cast<EntityContext_Old*>(this)->id;
-
+			return id;
 		}
 	private:
 		void* entityRegistry;

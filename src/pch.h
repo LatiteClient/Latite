@@ -51,7 +51,6 @@ using nlohmann::json;
 #include <winrt/windows.security.cryptography.core.h>
 
 // SDK
-#include "mc/Version.h"
 #include "mc/common/client/game/ClientInstance.h"
 #include "mc/common/client/game/MinecraftGame.h"
 #include "mc/common/client/player/LocalPlayer.h"

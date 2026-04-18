@@ -1,6 +1,5 @@
 #pragma once
 #include "WorldToScreen.h"
-#include "mc/common/client/game/ClientHMDState.h"
 #include "mc/common/client/game/ClientInstance.h"
 #include "mc/common/client/gui/GuiData.h"
 #include <glm/glm.hpp>

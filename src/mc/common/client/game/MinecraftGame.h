@@ -18,12 +18,6 @@ namespace SDK {
 		CLASS_FIELD(class Font*, minecraftFont, 0xF20);
 
 		class FontRepository* getFontRepository() {
-			if (internalVers >= V1_21_40) {
-				return reinterpret_cast<FontRepository*>(fontRepo);
-			}
-			if (internalVers > V1_19_41) {
-				return *fontRepo;
-			}
 			return reinterpret_cast<FontRepository*>(fontRepo);
 		}
 

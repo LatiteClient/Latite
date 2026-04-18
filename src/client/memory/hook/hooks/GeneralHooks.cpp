@@ -23,7 +23,6 @@ namespace {
 	std::shared_ptr<Hook> LoadLibraryAHook;
 	std::shared_ptr<Hook> AveragePingHook;
 	std::shared_ptr<Hook> TurnDeltaHook;
-	std::shared_ptr<Hook> MoveInputHandler_tickHook;
 	std::shared_ptr<Hook> ClientInputUpdateSystem_tickBaseInputHook;
 	std::shared_ptr<Hook> ViewBobHook;
 	std::shared_ptr<Hook> Level_initializeHook;
@@ -217,19 +216,6 @@ void __fastcall GenericHooks::LocalPlayer_applyTurnDelta(void* obj, Vec2& rot) {
 	}
 	lerpRot = { 0, 0 };
 	TurnDeltaHook->oFunc<decltype(&LocalPlayer_applyTurnDelta)>()(obj, rot);
-}
-
-void __fastcall GenericHooks::MoveInputHandler_tick(void* obj, void* proxy) {
-	SDK::MoveInputComponent* hand = reinterpret_cast<SDK::MoveInputComponent*>(obj);
-	{
-		BeforeMoveEvent ev{ hand };
-		if (Eventing::get().dispatch(ev)) return;
-	}
-	MoveInputHandler_tickHook->oFunc<decltype(&MoveInputHandler_tick)>()(obj, proxy);
-	{
-		AfterMoveEvent ev{ hand };
-		Eventing::get().dispatch(ev);
-	}
 }
 
 void GenericHooks::ClientInputUpdateSystem_tickBaseInput(uintptr_t** a1, void* a2, uintptr_t* a3, uintptr_t a4, uintptr_t a5, uintptr_t a6, uintptr_t a7, uintptr_t a8, uintptr_t a9, uintptr_t a10, uintptr_t a11,
@@ -451,12 +437,7 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 
 	TurnDeltaHook = addHook(Signatures::LocalPlayer_applyTurnDelta.result, LocalPlayer_applyTurnDelta, "LocalPlayer::applyTurnDelta");
 
-	if (Signatures::ClientInputUpdateSystem_tickBaseInput.result) {
-		ClientInputUpdateSystem_tickBaseInputHook = addHook(Signatures::ClientInputUpdateSystem_tickBaseInput.result, ClientInputUpdateSystem_tickBaseInput, "ClientInputUpdateSystem::tickBaseInput");
-	}
-	else {
-		MoveInputHandler_tickHook = addHook(Signatures::MoveInputHandler_tick.result, MoveInputHandler_tick, "MoveInputHandler::tick");
-	}
+	ClientInputUpdateSystem_tickBaseInputHook = addHook(Signatures::ClientInputUpdateSystem_tickBaseInput.result, ClientInputUpdateSystem_tickBaseInput, "ClientInputUpdateSystem::tickBaseInput");
 
 	//ViewBobHook = addHook(Signatures::CameraViewBob.result, CameraViewBob, "`anonymous namespace'::_bobMovement");
 	if (Signatures::Vtable::Level.result) {
