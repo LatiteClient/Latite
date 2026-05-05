@@ -77,6 +77,7 @@ void Keyboard::findTextInput() {
 }
 
 bool Keyboard::isKeyDown(int vKey) {
+	if (!keyMap) return false;
 	return keyMap[vKey];
 }
 

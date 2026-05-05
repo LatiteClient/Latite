@@ -1,8 +1,8 @@
 #pragma once
 #include <cstddef>
 
-#define LOAD_RESOURCE(x) extern "C" char _binary_assets_##x##_start, _binary_assets_##x##_end;
-#define GET_RESOURCE(x) ::Resource{&_binary_assets_##x##_start, &_binary_assets_##x##_end}
+#define LOAD_RESOURCE(x) extern "C" unsigned char _binary_assets_##x##_start[]; extern "C" const unsigned int _binary_assets_##x##_size;
+#define GET_RESOURCE(x) ::Resource{reinterpret_cast<const char*>(&_binary_assets_##x##_start[0]), reinterpret_cast<const char*>(&_binary_assets_##x##_start[0]) + _binary_assets_##x##_size}
 
 struct Resource {
     Resource(const char* begin, const char* end) : _begin(begin), _end(end) {}

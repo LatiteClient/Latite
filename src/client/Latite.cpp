@@ -158,7 +158,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     int sigCount = 0;
     int deadCount = 0;
 
-    std::array versNumMap = {"1.26.10", "1.26.11", "1.26.12"};
+    std::array versNumMap = {"1.26.3", "1.26.4", "1.26.5", "1.26.6", "1.26.7", "1.26.8", "1.26.9", "1.26.10", "1.26.11", "1.26.12", "1.26.13"};
 
     if (std::ranges::find(versNumMap.begin(), versNumMap.end(), Latite::get().gameVersion) != versNumMap.end()) {
         // not needed as it will always just be latest
@@ -288,7 +288,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     MH_Initialize();
     new (hooks) LatiteHooks();
 
-    new (keyboardBuf) Keyboard(reinterpret_cast<int*>(Signatures::KeyMap.result));
+    new (keyboardBuf) Keyboard(reinterpret_cast<int*>(Signatures::KeyMap.result ? Signatures::KeyMap.result : 0));
 
     Logger::Info("Waiting for game to load..");
 
