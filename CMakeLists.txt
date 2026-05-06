@@ -67,6 +67,15 @@ add_library(Latite SHARED
         ${EMBEDDED_RESOURCES}
 )
 
+# Final artifact names. Keep these in CMake so the DLL CodeView record and
+# linker-generated PDB name agree, **do not rename the DLL/PDB after linking!!**
+set_target_properties(Latite PROPERTIES
+        OUTPUT_NAME_DEBUG "LatiteDebug"
+        PDB_NAME_DEBUG "LatiteDebug"
+        OUTPUT_NAME_NIGHTLY "LatiteNightly"
+        PDB_NAME_NIGHTLY "LatiteNightly"
+)
+
 # C++ standard
 set_property(TARGET Latite PROPERTY CXX_STANDARD 23)
 set_property(TARGET Latite PROPERTY CXX_STANDARD_REQUIRED ON)

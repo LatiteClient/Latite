@@ -46,32 +46,17 @@ jobs:
         run: |
           $env:CC = "clang-cl"
           $env:CXX = "clang-cl"
-          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIGURATION }} -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl
+          cmake -B ${{ env.BUILD_DIR }} -G Ninja `
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIGURATION }} `
+            -DCMAKE_C_COMPILER=clang-cl `
+            -DCMAKE_CXX_COMPILER=clang-cl
 
-      # Build using Ninja
+      # Build using Ninja. CMAKE_BUILD_TYPE selected the config at configure time.
       - name: Build with Ninja
         run: |
-          cmake --build ${{ env.BUILD_DIR }} --config ${{ env.BUILD_CONFIGURATION }}
+          cmake --build ${{ env.BUILD_DIR }}
 
-      # Rename DLL + PDB
-      - name: Rename DLL + PDB
-        shell: pwsh
-        run: |
-          $dll = "${{ github.workspace }}\${{ env.BUILD_DIR }}\Latite.dll"
-          $pdb = "${{ github.workspace }}\${{ env.BUILD_DIR }}\Latite.pdb"
-
-          if (Test-Path $dll) {
-            Rename-Item -Path $dll -NewName "LatiteDebug.dll" -Force
-          } else {
-            Write-Error "Latite.dll not found"
-            exit 1
-          }
-
-          if (Test-Path $pdb) {
-            Rename-Item -Path $pdb -NewName "LatiteDebug.pdb" -Force
-          }
-
-      # Upload PR build artifacts so DLL files are easy to download without creating a release
+      # Upload PR build artifacts so DLL/PDB files are easy to download without creating a release
       # P.S. Artifacts are retained for only 90 days.
       - name: Upload PR artifacts
         if: github.event_name == 'pull_request'
@@ -79,8 +64,8 @@ jobs:
         with:
           name: LatiteDebug-PR-${{ github.event.pull_request.number }}
           path: |
-            ${{ github.workspace }}/cmake-build-debug/LatiteDebug.dll
-            ${{ github.workspace }}/cmake-build-debug/LatiteDebug.pdb
+            ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteDebug.dll
+            ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteDebug.pdb
           if-no-files-found: error
 
       - name: Compute build timestamp
@@ -107,8 +92,8 @@ jobs:
           prerelease: true
           generate_release_notes: false
           files: |
-            ${{ github.workspace }}/cmake-build-debug/LatiteDebug.dll
-            ${{ github.workspace }}/cmake-build-debug/LatiteDebug.pdb
+            ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteDebug.dll
+            ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteDebug.pdb
 
       - name: Recreate debug release to refresh date
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -136,5 +121,5 @@ jobs:
           prerelease: true
           make_latest: true
           files: |
-            ${{ github.workspace }}/cmake-build-debug/LatiteDebug.dll
-            ${{ github.workspace }}/cmake-build-debug/LatiteDebug.pdb
+            ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteDebug.dll
+            ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteDebug.pdb
