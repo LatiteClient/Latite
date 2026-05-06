@@ -5,7 +5,6 @@
 #include "util.h"
 #include "DxUtil.h"
 #include "LMath.h"
-#include "mc/version.h"
 
 // this is needed because we can't "link" ChakraCore with this DLL, as the path wouldn't be specified
 #define FUNC(name) using _Type_ ## name = decltype(&name); inline static _Type_ ## name  name = (_Type_ ## name)Chakra::pass(#name)

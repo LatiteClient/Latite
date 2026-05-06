@@ -10,13 +10,13 @@ public:
 	void prepareFunctions() override {
 		__super::prepareFunctions();
 
-		Chakra::DefineFunc(prototype, getBreakProgress, XW("getBreakProgress"), this);
-		Chakra::DefineFunc(prototype, getLastBreakProgress, XW("getLastBreakProgress"), this);
-		Chakra::DefineFunc(prototype, getLookingAt, XW("getLookingAt"), this);
-		Chakra::DefineFunc(prototype, getSelectedBlock, XW("getSelectedBlock"), this);
-		Chakra::DefineFunc(prototype, getMovementState, XW("getMovementState"), this);
-		Chakra::DefineFunc(prototype, setMovementState, XW("setMovementState"), this);
-		Chakra::DefineFunc(prototype, turn, XW("turn"), this);
+		Chakra::DefineFunc(prototype, getBreakProgress, L"getBreakProgress", this);
+		Chakra::DefineFunc(prototype, getLastBreakProgress, L"getLastBreakProgress", this);
+		Chakra::DefineFunc(prototype, getLookingAt, L"getLookingAt", this);
+		Chakra::DefineFunc(prototype, getSelectedBlock, L"getSelectedBlock", this);
+		Chakra::DefineFunc(prototype, getMovementState, L"getMovementState", this);
+		Chakra::DefineFunc(prototype, setMovementState, L"setMovementState", this);
+		Chakra::DefineFunc(prototype, turn, L"turn", this);
 	}
 private:
 	static JsValueRef CALLBACK getBreakProgress(JsValueRef callee, bool isConstructor,

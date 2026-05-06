@@ -47,7 +47,6 @@
 #include "globals/D2DScriptingObject.h"
 #include "globals/Graphics3DScriptingObject.h"
 #include "globals/OSScriptingObject.h"
-#include "util/XorString.h"
 #include "util/Logger.h"
 
 #include "globals/OptionsScriptingObject.h"
@@ -440,8 +439,8 @@ namespace {
 		std::wstring request = Chakra::GetString(arguments[1]);
 		std::wstring reqMessage = L"Unknown permission.";
 
-		static std::wstring permSysAccess = util::StrToWStr(XOR_STRING("permission.system_access"));
-		static std::wstring sysAccessMessage = util::StrToWStr(XOR_STRING("This script is requesting the System Access permission.\n\nPlease make sure you trust this plugin!\nThis permission will give the plugin access to system functions, like playing system sounds, ejecting the CD drive, and many other things."));
+		static std::wstring permSysAccess = util::StrToWStr("permission.system_access");
+		static std::wstring sysAccessMessage = util::StrToWStr("This script is requesting the System Access permission.\n\nPlease make sure you trust this plugin!\nThis permission will give the plugin access to system functions, like playing system sounds, ejecting the CD drive, and many other things.");
 
 		if (request == permSysAccess) {
 			perm = JsPlugin::UserPermission::SYSTEM_ACCESS;
@@ -532,14 +531,14 @@ void JsScript::loadScriptObjects() {
 		JsValueRef plugin;
 		JS::JsCreateObject(&plugin);
 
-		Chakra::SetPropertyString(plugin, XW("name"), data.name, true);
-		Chakra::SetPropertyString(plugin, XW("author"), data.author, true);
-		Chakra::SetPropertyString(plugin, XW("description"), data.description, true);
-		Chakra::SetPropertyString(plugin, XW("version"), data.version, true);
+		Chakra::SetPropertyString(plugin, L"name", data.name, true);
+		Chakra::SetPropertyString(plugin, L"author", data.author, true);
+		Chakra::SetPropertyString(plugin, L"description", data.description, true);
+		Chakra::SetPropertyString(plugin, L"version", data.version, true);
 
-		Chakra::DefineFunc(plugin, requestPermission, XW("requestPermission"), this);
+		Chakra::DefineFunc(plugin, requestPermission, L"requestPermission", this);
 
-		Chakra::SetProperty(globalObj, XW("plugin"), plugin, true);
+		Chakra::SetProperty(globalObj, L"plugin", plugin, true);
 	}
 
 	{ // Log Func

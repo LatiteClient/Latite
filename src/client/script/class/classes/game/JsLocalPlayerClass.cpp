@@ -7,7 +7,7 @@
 JsValueRef JsLocalPlayerClass::getBreakProgress(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!lp) {
-		Chakra::ThrowError(XW("Invalid local player"));
+		Chakra::ThrowError(L"Invalid local player");
 		return JS_INVALID_REFERENCE;
 	}
 	return Chakra::MakeDouble(lp->gameMode->breakProgress);
@@ -16,7 +16,7 @@ JsValueRef JsLocalPlayerClass::getBreakProgress(JsValueRef callee, bool isConstr
 JsValueRef JsLocalPlayerClass::getLastBreakProgress(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!lp) {
-		Chakra::ThrowError(XW("Invalid local player"));
+		Chakra::ThrowError(L"Invalid local player");
 		return JS_INVALID_REFERENCE;
 	}
 	return Chakra::MakeDouble(lp->gameMode->lastBreakProgress);
@@ -25,7 +25,7 @@ JsValueRef JsLocalPlayerClass::getLastBreakProgress(JsValueRef callee, bool isCo
 JsValueRef JsLocalPlayerClass::getLookingAt(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!lp) {
-		Chakra::ThrowError(XW("Invalid local player"));
+		Chakra::ThrowError(L"Invalid local player");
 		return JS_INVALID_REFERENCE;
 	}
 	return Chakra::MakeInt((int)SDK::ClientInstance::get()->minecraft->getLevel()->getHitResult()->hitType);
@@ -34,7 +34,7 @@ JsValueRef JsLocalPlayerClass::getLookingAt(JsValueRef callee, bool isConstructo
 JsValueRef JsLocalPlayerClass::getSelectedBlock(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!lp) {
-		Chakra::ThrowError(XW("Invalid local player"));
+		Chakra::ThrowError(L"Invalid local player");
 		return JS_INVALID_REFERENCE;
 	}
 
@@ -53,7 +53,7 @@ JsValueRef JsLocalPlayerClass::setMovementState(JsValueRef callee, bool isConstr
 	
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!lp) {
-		Chakra::ThrowError(XW("Invalid local player"));
+		Chakra::ThrowError(L"Invalid local player");
 		return JS_INVALID_REFERENCE;
 	}
 	
@@ -113,7 +113,7 @@ JsValueRef JsLocalPlayerClass::setMovementState(JsValueRef callee, bool isConstr
 JsValueRef JsLocalPlayerClass::getMovementState(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!lp) {
-		Chakra::ThrowError(XW("Invalid local player"));
+		Chakra::ThrowError(L"Invalid local player");
 		return JS_INVALID_REFERENCE;
 	}
 
@@ -140,7 +140,7 @@ JsValueRef JsLocalPlayerClass::turn(JsValueRef callee, bool isConstructor, JsVal
 	
 	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!lp) {
-		Chakra::ThrowError(XW("Invalid local player"));
+		Chakra::ThrowError(L"Invalid local player");
 		return JS_INVALID_REFERENCE;
 	}
 

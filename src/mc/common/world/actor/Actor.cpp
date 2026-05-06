@@ -14,9 +14,6 @@ SDK::ActorDataFlagComponent* SDK::Actor::getActorDataFlagsComponent() {
 }
 
 bool SDK::Actor::getStatusFlag(int flag) {
-	if (internalVers < V1_21_20) {
-		return memory::callVirtual<bool>(this, 0, flag);
-	}
 	auto comp = getActorDataFlagsComponent();
 	if (comp == nullptr) {
 		return false;
@@ -25,9 +22,6 @@ bool SDK::Actor::getStatusFlag(int flag) {
 }
 
 void SDK::Actor::setStatusFlag(int flag, bool value) {
-	if (internalVers < V1_21_20) {
-		return memory::callVirtual<void>(this, 1, flag, value);
-	}
 	auto comp = getActorDataFlagsComponent();
 	if (comp == nullptr) {
 		return;
@@ -36,39 +30,22 @@ void SDK::Actor::setStatusFlag(int flag, bool value) {
 }
 
 AABB& SDK::Actor::getBoundingBox() {
-	if (internalVers < V1_19_51) {
-		return hat::member_at<AABB>(this, 0x4B8);
-	}
 	return aabbShape->boundingBox;
 }
 
 Vec2& SDK::Actor::getRot() {
-	if (internalVers < V1_19_51) {
-		return hat::member_at<Vec2>(this, 0x138);
-	}
 	return actorRotation->rotation;
 }
 
 Vec3& SDK::Actor::getVelocity() {
-	if (internalVers < V1_19_51) {
-		return hat::member_at<Vec3>(this, 0x4F0);
-	}
 	return stateVector->velocity;
 }
 
 Vec3& SDK::Actor::getPos() {
-	if (internalVers < V1_19_51) {
-		return memory::callVirtual<Vec3&>(this, 22);
-	}
-
 	return stateVector->pos;
 }
 
 Vec3& SDK::Actor::getPosOld() {
-	if (internalVers < V1_19_51) {
-		return memory::callVirtual<Vec3&>(this, 23);
-	}
-
 	return stateVector->posOld;
 }
 
@@ -82,18 +59,11 @@ void SDK::Actor::setNameTag(std::string* nametag) {
 }
 
 int64_t SDK::Actor::getRuntimeID() {
-	if (internalVers < V1_19_51) {
-		return hat::member_at<int64_t>(this, 0x550);
-	}
 	return *reinterpret_cast<int64_t * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::runtimeIDComponent.result)(entityContext.getBasicRegistry(), &entityContext.getId());
 }
 
 uint8_t SDK::Actor::getEntityTypeID() {
-	if (internalVers >= V1_20_50) {
-		return static_cast<uint32_t>(*reinterpret_cast<uint32_t * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::actorTypeComponent.result)(entityContext.getBasicRegistry(), &entityContext.getId()));
-	}
-
-	return memory::callVirtual<int>(this, 0x64);
+	return *reinterpret_cast<uint32_t * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::actorTypeComponent.result)(entityContext.getBasicRegistry(), &entityContext.getId());
 }
 
 void SDK::Actor::swing() {
@@ -110,11 +80,7 @@ SDK::AttributesComponent* SDK::Actor::getAttributesComponent() {
 }
 
 SDK::AttributeInstance* SDK::Actor::getAttribute(SDK::Attribute& attribute) {
-	if (internalVers >= V1_20_40) {
-		return getAttributesComponent()->baseAttributes.getInstance(attribute.mIDValue);
-	}
-
-	return memory::callVirtual<SDK::AttributeInstance*>(this, 0xB8, attribute);
+	return getAttributesComponent()->baseAttributes.getInstance(attribute.mIDValue);
 }
 
 float SDK::Actor::getHealth() {

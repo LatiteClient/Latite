@@ -7,6 +7,6 @@ JsValueRef JsTextModuleClass::getLastTextCallback(JsValueRef callee, bool isCons
         return Chakra::MakeString(reinterpret_cast<TextModule*>(tm)->getLastText());
     }
 
-    Chakra::ThrowError(XW("Invalid text module"));
+    Chakra::ThrowError(L"Invalid text module");
     return JS_INVALID_REFERENCE;
 }

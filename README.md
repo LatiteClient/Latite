@@ -5,7 +5,7 @@
 
 **Latite Client** is a legitimate DLL modification for Minecraft Windows 10/11 Edition featuring a clean UI, 30+ customizable mods, and a powerful plugin system.
 
-![Demo image](https://github.com/user-attachments/assets/0862d42f-ac15-4bd6-9395-536ce27d7ed4)
+![Image of Latite Client mod menu](https://github.com/user-attachments/assets/86ce2fea-af96-4264-93e1-040545912636)
 
 ## Features
 - **Clean Interface**: Intuitive UI with search and filtering

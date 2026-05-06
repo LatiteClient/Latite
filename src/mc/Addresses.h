@@ -14,7 +14,6 @@ public:
 	}
 };
 
-// 1.20.71
 class Signatures {
 public:
 	struct Offset {
@@ -22,18 +21,12 @@ public:
 			"80 B9 ? ? ? ? ? 74 ? C6 81 ? ? ? ? ? 48 8D 4C 24 ? E8 ? ? ? ? 90"_sig,
 			"MinecraftGame->cursorGrabbed"};
 
-		inline static SigImpl LevelRendererPlayer_fovX{};
-
-		//89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? 89 86 ? ? ? ? 8b 43 ? f3 0f 10 0d
-
 		inline static SigImpl LevelRendererPlayer_origin{[](memory::signature_store& store, uintptr_t) { return store.ref(4); },
 			"F3 0F 58 B3 ? ? ? ? 48 8B 8B"_sig,
 			"LevelRendererPlayer->origin"};
 
 	};
 	struct Misc {
-		inline static SigImpl clientInstance{};
-
 		inline static SigImpl minecraftGamePointer {[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 89 15 ? ? ? ? 49 8B 40"_sig,
 			"MinecraftGame"};
@@ -105,10 +98,6 @@ public:
 		inline static SigImpl SetTitlePacket{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 			"48 8D 3D ? ? ? ? 4C 3B F8"_sig,
 			"const SetTitlePacket::`vftable'"};
-
-		//
-
-		//48 8d 05 ? ? ? ? 48 89 07 48 8d 05 ? ? ? ? 48 89 47 ? 48 8d 05 ? ? ? ? 48 89 47 ? 33 c0
 	};
 
 	inline static SigImpl LevelRenderer_renderLevel{[](memory::signature_store& store, uintptr_t) { return store.deref(1); },
@@ -119,7 +108,6 @@ public:
 		"40 53 56 57 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 48 8B F9"_sig,
 		"MainWindow::_windowProcCallback"};
 
-	// The signature is big but it hasn't died in a while soo
 	inline static SigImpl Options_getGamma{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 83 EC ? 48 8B 01 48 8D 54 ? ? 41 B8 36 00 00 00"_sig,
 		"Options::getGamma"};
@@ -132,8 +120,6 @@ public:
 		"48 83 EC ? 48 8B 01 48 8D 54 ? ? 41 B8 A2 01 00 00"_sig, // Will probably die every update from now on, but a good sig would be thousands of bytes long
 		"Options::getHideHand"};
 
-	inline static SigImpl Options_getSensitivity{};
-
 	inline static SigImpl ClientInstance_grabCursor{[](memory::signature_store&, uintptr_t res) { return res; },
 		"40 53 48 83 EC ? 48 8B 01 48 8B D9 48 8B 80 ? ? ? ? FF 15 ? ? ? ? 84 C0 74 ? 48 8B 8B ? ? ? ? 48 8B 01 48 8B 80 ? ? ? ? 48 83 C4 ? 5B 48 FF 25 ? ? ? ? 48 83 C4 ? 5B C3 40 53"_sig,
 		"ClientInstance::grabCursor"};
@@ -145,8 +131,6 @@ public:
 	inline static SigImpl Level_tick{ [](memory::signature_store& stor, uintptr_t res) { return stor.deref(1); },
 		"e8 ? ? ? ? 48 8b 4b ? 48 85 c9 74 ? 48 8b 41 ? 48 83 c1 ? 48 8b 40"_sig,
 		"Level::tick" };
-
-	// callsites
 
 	inline static SigImpl ChatScreenController_sendChatMessage{[](memory::signature_store&, uintptr_t res) { return res; },
 		"48 89 5C 24 ? 48 89 74 24 ? 55 57 41 54 41 56 41 57 48 8D AC 24 ? ? ? ? 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 85 ? ? ? ? 4C 8B FA 4C 8B F1 45 33 E4 48 8B 49"_sig,
@@ -163,17 +147,6 @@ public:
 	inline static SigImpl MouseInputVector{[](memory::signature_store& store, uintptr_t) { return store.deref(3); },
 		"48 2B 05 ? ? ? ? 8B 0D"_sig,
 		"MouseInputVector"};
-
-	//ff 15 ? ? ? ? 48 8d 4c 24 ? e8 ? ? ? ? 48 8b 4c 24 ? 48 3b cb
-	/*
-	"SuspendAudio"
-	"forceSendEvents"
-	"SuspendUserManager"
-	"SuspendGameRenderer
-	"unloadAllTextures""*/
-	inline static SigImpl MinecraftGame_onAppSuspended{[](memory::signature_store&, uintptr_t res) { return res; },
-		"48 89 5c 24 ? 48 89 74 24 ? 48 89 7c 24 ? 55 41 54 41 55 41 56 41 57 48 8d ac 24 ? ? ? ? 48 81 ec ? ? ? ? ? 8b ? 45 33 f6"_sig,
-		"MinecraftGame::onAppSuspended"}; // "OnAppSuspend" "SuspendAudio" "CancelJoinGameTelemetry"
 
 	inline static SigImpl RenderController_getOverlayColor{[](memory::signature_store&, uintptr_t res) { return res; },
 		"40 53 55 56 57 48 83 EC ? 49 8B 78"_sig,
@@ -209,8 +182,6 @@ public:
 	inline static SigImpl ClientInputUpdateSystem_tickBaseInput{[](memory::signature_store&, uintptr_t res) { return res; },
 		"4C 8B DC 53 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 44 24 ? 48 8B 9C 24"_sig,
 		"ClientInputUpdateSystem::tickBaseInput"};
-
-	inline static SigImpl MoveInputHandler_tick{};
 
 	inline static SigImpl CameraViewBob{[](memory::signature_store&, uintptr_t res) { return res; },
 		"40 53 48 81 ec ? ? ? ? 48 8b 05 ? ? ? ? 48 33 c4 48 89 44 24 ? 49 8b 00"_sig,

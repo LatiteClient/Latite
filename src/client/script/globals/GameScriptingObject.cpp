@@ -14,7 +14,6 @@
 #include "client/script/PluginManager.h"
 #include "util/Logger.h"
 #include "mc/common/network/packet/TextPacket.h"
-#include "util/XorString.h"
 #include "../class/classes/game/JsEntityClass.h"
 #include "../class/classes/game/JsPlayerClass.h"
 #include "../class/classes/game/JsLocalPlayerClass.h"
@@ -25,25 +24,25 @@
 
 void GameScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
 	this->createWorldObject();
-	Chakra::SetPropertyString(object, XW("version"), util::StrToWStr(Latite::get().gameVersion));
-	Chakra::DefineFunc(object, getLocalPlayerCallback, XW("getLocalPlayer"));
-	Chakra::DefineFunc(object, getMousePosCallback, XW("getMousePos"));
-	Chakra::DefineFunc(object, getScreenSizeCallback, XW("getScreenSize"));
-	Chakra::DefineFunc(object, isInUICallback, XW("isInUI"));
-	Chakra::DefineFunc(object, playSoundUI, XW("playSoundUI"));
-	Chakra::DefineFunc(object, sendChatCallback, XW("sendChatMessage"));
-	Chakra::DefineFunc(object, executeCommand, XW("executeCommand"));
-	Chakra::DefineFunc(object, getWorldCallback, XW("getWorld"), this);
-	Chakra::DefineFunc(object, getDimensionCallback, XW("getDimension"), this);
-	Chakra::DefineFunc(object, getConnectedServerCallback, XW("getServer"));
-	Chakra::DefineFunc(object, getPortCallback, XW("getPort"));
-	Chakra::DefineFunc(object, getConnectedFeaturedServerCallback, XW("getFeaturedServer"));
-	Chakra::DefineFunc(object, getInputBinding, XW("getInputBinding"));
-	Chakra::DefineFunc(object, getFOV, XW("getFOV"));
-	Chakra::DefineFunc(object, getCameraPosition, XW("getCameraPosition"));
-	Chakra::DefineFunc(object, captureCursor, XW("captureCursor"));
-	Chakra::DefineFunc(object, releaseCursor, XW("releaseCursor"));
-	Chakra::DefineFunc(object, isKeyDown, XW("isKeyDown"));
+	Chakra::SetPropertyString(object, L"version", util::StrToWStr(Latite::get().gameVersion));
+	Chakra::DefineFunc(object, getLocalPlayerCallback, L"getLocalPlayer");
+	Chakra::DefineFunc(object, getMousePosCallback, L"getMousePos");
+	Chakra::DefineFunc(object, getScreenSizeCallback, L"getScreenSize");
+	Chakra::DefineFunc(object, isInUICallback, L"isInUI");
+	Chakra::DefineFunc(object, playSoundUI, L"playSoundUI");
+	Chakra::DefineFunc(object, sendChatCallback, L"sendChatMessage");
+	Chakra::DefineFunc(object, executeCommand, L"executeCommand");
+	Chakra::DefineFunc(object, getWorldCallback, L"getWorld", this);
+	Chakra::DefineFunc(object, getDimensionCallback, L"getDimension", this);
+	Chakra::DefineFunc(object, getConnectedServerCallback, L"getServer");
+	Chakra::DefineFunc(object, getPortCallback, L"getPort");
+	Chakra::DefineFunc(object, getConnectedFeaturedServerCallback, L"getFeaturedServer");
+	Chakra::DefineFunc(object, getInputBinding, L"getInputBinding");
+	Chakra::DefineFunc(object, getFOV, L"getFOV");
+	Chakra::DefineFunc(object, getCameraPosition, L"getCameraPosition");
+	Chakra::DefineFunc(object, captureCursor, L"captureCursor");
+	Chakra::DefineFunc(object, releaseCursor, L"releaseCursor");
+	Chakra::DefineFunc(object, isKeyDown, L"isKeyDown");
 }
 
 void GameScriptingObject::createWorldObject() {
@@ -53,16 +52,16 @@ void GameScriptingObject::createWorldObject() {
 	JS::JsCreateObject(&dimensionObj);
 	//JS::JsAddRef(dimensionObj, nullptr);
 
-	Chakra::DefineFunc(worldObj, worldExists, XW("exists"), this);
-	Chakra::DefineFunc(worldObj, worldGetEntList, XW("getEntities"), this);
-	Chakra::DefineFunc(worldObj, worldGetEntCount, XW("getEntityCount"), this);
-	Chakra::DefineFunc(worldObj, worldGetPlayers, XW("getPlayers"), this);
-	Chakra::DefineFunc(worldObj, worldGetName, XW("getName"), this);
-	Chakra::DefineFunc(dimensionObj, worldExists, XW("exists"), this);
-	Chakra::DefineFunc(dimensionObj, dimensionGetBlock, XW("getBlock"), this);
-	Chakra::DefineFunc(dimensionObj, dimensionGetName, XW("getName"), this);
-	Chakra::SetProperty(Chakra::GetGlobalObject(), XW("world"), worldObj);
-	Chakra::SetProperty(Chakra::GetGlobalObject(), XW("dimension"), dimensionObj);
+	Chakra::DefineFunc(worldObj, worldExists, L"exists", this);
+	Chakra::DefineFunc(worldObj, worldGetEntList, L"getEntities", this);
+	Chakra::DefineFunc(worldObj, worldGetEntCount, L"getEntityCount", this);
+	Chakra::DefineFunc(worldObj, worldGetPlayers, L"getPlayers", this);
+	Chakra::DefineFunc(worldObj, worldGetName, L"getName", this);
+	Chakra::DefineFunc(dimensionObj, worldExists, L"exists", this);
+	Chakra::DefineFunc(dimensionObj, dimensionGetBlock, L"getBlock", this);
+	Chakra::DefineFunc(dimensionObj, dimensionGetName, L"getName", this);
+	Chakra::SetProperty(Chakra::GetGlobalObject(), L"world", worldObj);
+	Chakra::SetProperty(Chakra::GetGlobalObject(), L"dimension", dimensionObj);
 }
 
 JsValueRef GameScriptingObject::worldExists(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
@@ -72,7 +71,7 @@ JsValueRef GameScriptingObject::worldExists(JsValueRef callee, bool isConstructo
 JsValueRef GameScriptingObject::worldGetName(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState)
 {
 	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
-		Chakra::ThrowError(XW("World is not allowed to be used here"));
+		Chakra::ThrowError(L"World is not allowed to be used here");
 		return Chakra::GetUndefined();
 	}
 
@@ -81,7 +80,7 @@ JsValueRef GameScriptingObject::worldGetName(JsValueRef callee, bool isConstruct
 
 JsValueRef GameScriptingObject::worldGetPlayers(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
-		Chakra::ThrowError(XW("World is not allowed to be used here"));
+		Chakra::ThrowError(L"World is not allowed to be used here");
 		return Chakra::GetUndefined();
 	}
 
@@ -108,7 +107,7 @@ JsValueRef GameScriptingObject::worldGetEntList(JsValueRef callee, bool isConstr
 	JsPlugin* scr = JsScript::getThis()->getPlugin();
 
 	if (!Latite::getPluginManager().hasPermission(scr, PluginManager::Permission::Operator)) {
-		Chakra::ThrowError(util::StrToWStr(XOR_STRING("No permission to use getEntityList here")));
+		Chakra::ThrowError(L"No permission to use getEntityList here");
 		return JS_INVALID_REFERENCE;
 	}
 
@@ -140,7 +139,7 @@ JsValueRef GameScriptingObject::worldGetEntList(JsValueRef callee, bool isConstr
 
 JsValueRef GameScriptingObject::worldGetEntCount(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
-		Chakra::ThrowError(XW("World is not available"));
+		Chakra::ThrowError(L"World is not available");
 		return Chakra::GetUndefined();
 	}
 
@@ -153,7 +152,7 @@ JsValueRef GameScriptingObject::worldGetEntCount(JsValueRef callee, bool isConst
 
 JsValueRef GameScriptingObject::dimensionGetName(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
 	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
-		Chakra::ThrowError(XW("Dimension is not available"));
+		Chakra::ThrowError(L"Dimension is not available");
 		return Chakra::GetUndefined();
 	}
 
@@ -170,13 +169,13 @@ JsValueRef GameScriptingObject::dimensionGetBlock(JsValueRef callee, bool isCons
 	int z = Chakra::GetInt(arguments[3]);
 
 	if (!SDK::ClientInstance::get()->getLocalPlayer()) {
-		Chakra::ThrowError(XW("Dimension is not available"));
+		Chakra::ThrowError(L"Dimension is not available");
 		return Chakra::GetUndefined();
 	}
 
 	JsScript* scr = JsScript::getThis();
 	if (!Latite::getPluginManager().hasPermission(scr->getPlugin(), PluginManager::Permission::Operator)) {
-		Chakra::ThrowError(util::StrToWStr(XOR_STRING("No permission to use getBlock here")));
+		Chakra::ThrowError(L"No permission to use getBlock here");
 		return JS_INVALID_REFERENCE;
 	}
 
@@ -273,7 +272,7 @@ JsValueRef GameScriptingObject::isKeyDown(JsValueRef callee, bool isConstructor,
 
 	int vKey = Chakra::GetInt(arguments[1]);
 	if (vKey > 255 || vKey < 0) {
-		Chakra::ThrowError(XW("Virtual key code out of bounds [0-255]"));
+		Chakra::ThrowError(L"Virtual key code out of bounds [0-255]");
 		return JS_INVALID_REFERENCE;
 	}
 
@@ -298,7 +297,7 @@ JsValueRef GameScriptingObject::sendChatCallback(JsValueRef callee, bool isConst
 
 		return Chakra::GetUndefined();
 	}
-	Chakra::ThrowError(util::StrToWStr(XOR_STRING("Permission denied to use sendChatMessage")));
+	Chakra::ThrowError(L"Permission denied to use sendChatMessage");
 	return Chakra::GetUndefined();
 }
 

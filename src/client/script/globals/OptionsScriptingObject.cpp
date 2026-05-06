@@ -17,11 +17,11 @@ JsValueRef OptionsScriptingObject::setPlayerViewPerspective(JsValueRef callee, b
         return Chakra::GetUndefined();
     }
 
-    Chakra::ThrowError(XW("Perspective out of bounds [0-2]"));
+    Chakra::ThrowError(L"Perspective out of bounds [0-2]");
     return Chakra::GetUndefined();
 }
 
 void OptionsScriptingObject::initialize(JsContextRef ctx, JsValueRef parentObj) {
-    Chakra::DefineFunc(object, getPlayerViewPerspective, XW("getPlayerViewPerspective"));
-    Chakra::DefineFunc(object, setPlayerViewPerspective, XW("setPlayerViewPerspective"));
+    Chakra::DefineFunc(object, getPlayerViewPerspective, L"getPlayerViewPerspective");
+    Chakra::DefineFunc(object, setPlayerViewPerspective, L"setPlayerViewPerspective");
 }
