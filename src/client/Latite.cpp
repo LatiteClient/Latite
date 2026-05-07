@@ -841,6 +841,8 @@ void Latite::initLanguageSetting() {
 
 void Latite::detectLanguage() {
     if (!this->getDetectLanguageSetting()) return;
+    // run func if language is on english (default)
+    if (this->clientLanguage.getValue() != 0) return;
 
     winrt::hstring topUserLanguage = winrt::Windows::System::UserProfile::GlobalizationPreferences::Languages().GetAt(0);
     winrt::Windows::Globalization::Language language{topUserLanguage};
