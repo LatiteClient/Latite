@@ -7,7 +7,7 @@
 #include <windows.h>
 #include <eh.h>
 
-#ifdef LATITE_DEBUG
+#ifdef LATITE_CRASH_REPORTING
 
 // A custom exception class to wrap SEH exceptions
 class StructuredException {

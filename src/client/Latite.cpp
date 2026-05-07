@@ -102,7 +102,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     std::filesystem::create_directory(util::GetLatitePath() / "Assets");
     Logger::Setup();
 
-#ifdef LATITE_DEBUG
+#ifdef LATITE_CRASH_REPORTING
     DebugExceptionHandler::Install();
 #endif
 
@@ -346,7 +346,7 @@ BOOL WINAPI DllMain(
         hasInjected = false;
         Logger::Info("Latite Client detached.");
 
-#ifdef LATITE_DEBUG
+#ifdef LATITE_CRASH_REPORTING
         DebugExceptionHandler::Uninstall();
 #endif
     }
@@ -477,7 +477,7 @@ void Latite::threadsafeInit() {
     //if (SDK::ClientInstance::get()->minecraftGame->xuid.size() > 0) wnd->postXUID();
 
 
-#ifdef LATITE_DEBUG
+#ifdef LATITE_CRASH_REPORTING
     // Set SEH translator for game thread
     _set_se_translator(translate_seh_to_cpp_exception);
 #endif
@@ -505,8 +505,8 @@ void Latite::threadsafeInit() {
 
     Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
     Latite::getNotifications().push(LocalizeString::get("client.intro.welcome"));
-    // intentional crashing code
-    //*reinterpret_cast<volatile int*>(0) = 1;
+    //intentional crashing code
+    *reinterpret_cast<volatile int*>(0) = 1;
     Latite::getNotifications().push(util::FormatWString(LocalizeString::get("client.intro.menubutton"), { util::StrToWStr(util::KeyToString(Latite::get().getMenuKey().value)) }));
 }
 

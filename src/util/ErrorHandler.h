@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef LATITE_DEBUG
+#ifdef LATITE_CRASH_REPORTING
 #include "util/ExceptionHandler.h"
 #include <stdexcept>
 

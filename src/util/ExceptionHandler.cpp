@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ExceptionHandler.h"
 
-#ifdef LATITE_DEBUG
+#ifdef LATITE_CRASH_REPORTING
 #include "util/Util.h"
 
 #include <atomic>
