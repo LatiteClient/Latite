@@ -103,7 +103,7 @@ DWORD __stdcall startThread(HINSTANCE dll) {
     Logger::Setup();
 
 #ifdef LATITE_DEBUG
-    AddVectoredExceptionHandler(1, VectoredExceptionHandler);
+    DebugExceptionHandler::Install();
 #endif
 
     Logger::Info("Latite Client {}", Latite::version);
@@ -345,6 +345,10 @@ BOOL WINAPI DllMain(
 
         hasInjected = false;
         Logger::Info("Latite Client detached.");
+
+#ifdef LATITE_DEBUG
+        DebugExceptionHandler::Uninstall();
+#endif
     }
     return TRUE;  // Successful DLL_PROCESS_ATTACH.
     END_ERROR_HANDLER
@@ -501,6 +505,8 @@ void Latite::threadsafeInit() {
 
     Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
     Latite::getNotifications().push(LocalizeString::get("client.intro.welcome"));
+    // intentional crashing code
+    //*reinterpret_cast<volatile int*>(0) = 1;
     Latite::getNotifications().push(util::FormatWString(LocalizeString::get("client.intro.menubutton"), { util::StrToWStr(util::KeyToString(Latite::get().getMenuKey().value)) }));
 }
 

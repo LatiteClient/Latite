@@ -1,12 +1,8 @@
 #pragma once
 
 #ifdef LATITE_DEBUG
-#include "pch.h"
-#include "util/Logger.h"
+#include "util/ExceptionHandler.h"
 #include <stdexcept>
-
-void LogExceptionDetails(StructuredException& ex);
-void LogExceptionDetails(const std::exception& e);
 
 #define BEGIN_ERROR_HANDLER try {
 
