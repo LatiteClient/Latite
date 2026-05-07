@@ -45,7 +45,7 @@ std::string GenerateStackTrace(CONTEXT* contextArg = nullptr) {
         dllSize = moduleInfo.SizeOfImage;
     }
 
-    std::string regularPdbPath = (std::filesystem::path(searchPath) / "LatiteRewrite.pdb").string();
+    std::string regularPdbPath = (std::filesystem::path(searchPath) / "LatiteDebug.pdb").string();
     if (!SymLoadModule64(process, NULL, regularPdbPath.c_str(), NULL, baseAddress, dllSize)) {
         Logger::Warn(
             "Could not find or load PDB at {}. Stack trace will not have symbols. System error code: {}",
