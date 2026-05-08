@@ -662,13 +662,8 @@ void Latite::initSettings() {
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("forceDisableVSync", L"Force Disable VSync",
-                                             L"Forces VSync in fullscreen. May cause freezing, overheating, and screen tearing on some devices.\nRestart your game upon disabling this setting.");
-        // Add in LocalizeString calls when this setting has been translated to other languages.
-        /*
         auto set = std::make_shared<Setting>("forceDisableVSync", LocalizeString::get("client.settings.forceDisableVSync.name"),
             LocalizeString::get("client.settings.forceDisableVSync.desc"));
-            */
         set->value = &this->forceDisableVSync;
         this->getSettings().addSetting(set);
     }
@@ -846,6 +841,8 @@ void Latite::initLanguageSetting() {
 
 void Latite::detectLanguage() {
     if (!this->getDetectLanguageSetting()) return;
+    // run func if language is on english (default)
+    if (this->clientLanguage.getValue() != 0) return;
 
     winrt::hstring topUserLanguage = winrt::Windows::System::UserProfile::GlobalizationPreferences::Languages().GetAt(0);
     winrt::Windows::Globalization::Language language{topUserLanguage};

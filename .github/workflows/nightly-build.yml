@@ -46,25 +46,15 @@ jobs:
         run: |
           $env:CC = "clang-cl"
           $env:CXX = "clang-cl"
-          cmake -B ${{ env.BUILD_DIR }} -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIGURATION }} -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl
+          cmake -B ${{ env.BUILD_DIR }} -G Ninja `
+            -DCMAKE_BUILD_TYPE=${{ env.BUILD_CONFIGURATION }} `
+            -DCMAKE_C_COMPILER=clang-cl `
+            -DCMAKE_CXX_COMPILER=clang-cl
 
-      # Build using Ninja
+      # Build using Ninja. CMAKE_BUILD_TYPE selected the config at configure time.
       - name: Build with Ninja
         run: |
-          cmake --build ${{ env.BUILD_DIR }} --config ${{ env.BUILD_CONFIGURATION }}
-
-      # Rename DLL
-      - name: Rename DLL
-        shell: pwsh
-        run: |
-          $dll = "${{ github.workspace }}\${{ env.BUILD_DIR }}\Latite.dll"
-
-          if (Test-Path $dll) {
-            Rename-Item -Path $dll -NewName "LatiteNightly.dll" -Force
-          } else {
-            Write-Error "Latite.dll not found"
-            exit 1
-          }
+          cmake --build ${{ env.BUILD_DIR }}
 
       # Upload PR build artifacts so DLL files are easy to download without creating a release
       # P.S. Artifacts are retained for only 90 days.
@@ -74,7 +64,7 @@ jobs:
         with:
           name: LatiteNightly-PR-${{ github.event.pull_request.number }}
           path: |
-            ${{ github.workspace }}/cmake-build-nightly/LatiteNightly.dll
+            ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteNightly.dll
           if-no-files-found: error
 
       - name: Compute build timestamp
@@ -100,7 +90,7 @@ jobs:
           prerelease: true
           generate_release_notes: false
           files: |
-            ${{ github.workspace }}/cmake-build-nightly/LatiteNightly.dll
+            ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteNightly.dll
 
       - name: Recreate nightly release to refresh date
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -127,4 +117,4 @@ jobs:
           prerelease: true
           make_latest: true
           files: |
-            ${{ github.workspace }}/cmake-build-nightly/LatiteNightly.dll
+            ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteNightly.dll
