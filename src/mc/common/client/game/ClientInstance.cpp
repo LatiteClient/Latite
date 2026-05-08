@@ -7,7 +7,7 @@ SDK::ClientInstance* SDK::ClientInstance::instance = nullptr;
 
 SDK::ClientInstance* SDK::ClientInstance::get() {
     if (!instance) {
-        // IMinecraftGame
+        if (!Signatures::Misc::minecraftGamePointer.result) return nullptr;
         MinecraftGame** mcgame = reinterpret_cast<MinecraftGame**>(Signatures::Misc::minecraftGamePointer.result);
         if (!*mcgame) {
             return nullptr;
@@ -40,11 +40,13 @@ SDK::Options* SDK::ClientInstance::getOptions() {
 }*/
 
 void SDK::ClientInstance::grabCursor() {
+    if (!Signatures::ClientInstance_grabCursor.result) return;
     reinterpret_cast<void(__fastcall*)(void*)>(Signatures::ClientInstance_grabCursor.result)(this);
 }
 
 //vtable call:
 //48 8b 80 ? ? ? ? 48 8b ce ff 15 ? ? ? ? 84 db
 void SDK::ClientInstance::releaseCursor() {
+    if (!Signatures::ClientInstance_releaseCursor.result) return;
     reinterpret_cast<void(__fastcall*)(void*)>(Signatures::ClientInstance_releaseCursor.result)(this);
 }

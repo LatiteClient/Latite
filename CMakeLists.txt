@@ -2,6 +2,8 @@
 
 project(Latite)
 
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
 # Allow Nightly as a valid configuration
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;MinSizeRel;Nightly" CACHE STRING "" FORCE)
 
@@ -36,14 +38,21 @@ function(ADD_RESOURCES out_var)
     set(result)
     foreach(in_f ${ARGN})
         file(RELATIVE_PATH src_f ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${in_f})
-        set(out_f "${PROJECT_BINARY_DIR}/${in_f}.o")
+        string(REPLACE "/" "_" symbol_name ${src_f})
+        string(REPLACE "." "_" symbol_name ${symbol_name})
+        string(REPLACE "-" "_" symbol_name ${symbol_name})
+        string(REPLACE " " "_" symbol_name ${symbol_name})
+        set(out_f "${PROJECT_BINARY_DIR}/${in_f}.cpp")
+
+        get_filename_component(out_dir ${out_f} DIRECTORY)
+        file(MAKE_DIRECTORY ${out_dir})
 
         add_custom_command(
                 OUTPUT ${out_f}
-                COMMAND ld.exe -r -b binary -o ${out_f} ${src_f}
-                DEPENDS ${in_f}
+                COMMAND ${Python3_EXECUTABLE} ARGS ${CMAKE_SOURCE_DIR}/tools/embed_resource.py ${src_f} ${out_f} ${symbol_name}
+                DEPENDS ${in_f} ${CMAKE_SOURCE_DIR}/tools/embed_resource.py
                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                COMMENT "Building object ${out_f}"
+                COMMENT "Embedding resource ${src_f}"
                 VERBATIM
         )
 

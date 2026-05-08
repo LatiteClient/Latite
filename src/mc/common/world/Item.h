@@ -27,7 +27,7 @@ namespace SDK {
 		}
 
 		short getDamageValue(class CompoundTag* tag) {
-			// TODO: fix this
+			if (!Signatures::ItemStackBase_getDamageValue.result) return 0;
 			return reinterpret_cast<short(*)(Item*, CompoundTag*)>(Signatures::ItemStackBase_getDamageValue.result)(this, tag);
 		}
 

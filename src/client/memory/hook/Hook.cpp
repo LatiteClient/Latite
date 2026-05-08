@@ -9,6 +9,7 @@ Hook::Hook(uintptr_t target, void* detour, std::string const& hookName, bool tab
 	: funcName(hookName)
 #endif
 {
+	if (target == 0) return;
 
 	if (tableSwap) {
 		auto res = vh::hook(reinterpret_cast<LPVOID*>(target), detour, &this->funcPtr);

@@ -10,6 +10,7 @@
 #include "mc/common/entity/component/RuntimeIDComponent.h"
 
 SDK::ActorDataFlagComponent* SDK::Actor::getActorDataFlagsComponent() {
+	if (!Signatures::Components::actorDataFlagsComponent.result) return nullptr;
 	return reinterpret_cast<SDK::ActorDataFlagComponent * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::actorDataFlagsComponent.result)(entityContext.getBasicRegistry(), &entityContext.getId());
 }
 
@@ -55,14 +56,17 @@ int SDK::Actor::getCommandPermissionLevel() {
 }
 
 void SDK::Actor::setNameTag(std::string* nametag) {
+	if (!Signatures::Actor_setNameTag.result) return;
 	return reinterpret_cast<void(__fastcall*)(Actor*, std::string*)>(Signatures::Actor_setNameTag.result)(this, nametag);
 }
 
 int64_t SDK::Actor::getRuntimeID() {
+	if (!Signatures::Components::runtimeIDComponent.result) return 0;
 	return *reinterpret_cast<int64_t * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::runtimeIDComponent.result)(entityContext.getBasicRegistry(), &entityContext.getId());
 }
 
 uint8_t SDK::Actor::getEntityTypeID() {
+	if (!Signatures::Components::actorTypeComponent.result) return 0;
 	return *reinterpret_cast<uint32_t * (__fastcall*)(uintptr_t a1, uint32_t * a2)>(Signatures::Components::actorTypeComponent.result)(entityContext.getBasicRegistry(), &entityContext.getId());
 }
 
@@ -76,11 +80,14 @@ bool SDK::Actor::isPlayer() {
 }
 
 SDK::AttributesComponent* SDK::Actor::getAttributesComponent() {
+	if (!Signatures::Components::attributesComponent.result) return nullptr;
 	return reinterpret_cast<SDK::AttributesComponent * (__fastcall*)(const EntityContext&)>(Signatures::Components::attributesComponent.result)(entityContext);
 }
 
 SDK::AttributeInstance* SDK::Actor::getAttribute(SDK::Attribute& attribute) {
-	return getAttributesComponent()->baseAttributes.getInstance(attribute.mIDValue);
+	auto comp = getAttributesComponent();
+	if (!comp) return nullptr;
+	return comp->baseAttributes.getInstance(attribute.mIDValue);
 }
 
 float SDK::Actor::getHealth() {
@@ -110,10 +117,11 @@ bool SDK::Actor::isInvisible() {
 }
 
 SDK::ItemStack* SDK::Actor::getArmor(int armorSlot) {
-	// TODO: this is EXTREMELY scuffed
+	if (!Signatures::Components::actorEquipmentPersistentComponent.result) return nullptr;
 	int& componentId = hat::member_at<int>(this, 0x18);
 	auto obj = reinterpret_cast<void* (*)(void* obj, int& id)>(Signatures::Components::actorEquipmentPersistentComponent.result)
 		(hat::member_at<void*>(this, 0x10), componentId);
+	if (!obj) return nullptr;
 
 	return (*(SDK::ItemStack*(**)(LPVOID, int))(**(uintptr_t**)((uintptr_t)obj + 8) + 56i64))(*(LPVOID*)((uintptr_t)obj + 8), armorSlot);
 }

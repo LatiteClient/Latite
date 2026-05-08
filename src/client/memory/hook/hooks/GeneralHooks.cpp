@@ -119,6 +119,7 @@ bool GenericHooks::GameCore_handleMouseInput(void* a1, void* a2, void* a3) { // 
 	const auto res = GameCore_handleMouseInputHook->oFunc<decltype(&GameCore_handleMouseInput)>()(a1, a2, a3);
 
 	static auto mouseInputVector = reinterpret_cast<std::vector<MouseInputPacket>*>(Signatures::MouseInputVector.result);
+	if (!mouseInputVector) return res;
 
 	for (size_t i = 0; i < mouseInputVector->size(); i++) { // This method sucks so fucking bad, but gets the job done
 		auto& start = mouseInputVector->at(i);
