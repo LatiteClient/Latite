@@ -78,22 +78,6 @@ jobs:
             ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteDebug.pdb
           if-no-files-found: error
 
-      - name: Stage timestamped PDB artifact
-        if: github.event_name != 'pull_request'
-        run: |
-          New-Item -ItemType Directory -Force -Path "${{ runner.temp }}/pdb-artifacts" | Out-Null
-          Copy-Item `
-            "${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteDebug.pdb" `
-            "${{ runner.temp }}/pdb-artifacts/LatiteDebug-${{ steps.build_timestamp.outputs.timestamp }}.pdb"
-
-      - name: Upload timestamped PDB artifact
-        if: github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v4
-        with:
-          name: LatiteDebug-${{ steps.build_timestamp.outputs.timestamp }}.pdb
-          path: ${{ runner.temp }}/pdb-artifacts/LatiteDebug-${{ steps.build_timestamp.outputs.timestamp }}.pdb
-          if-no-files-found: error
-
       - name: Create timestamped archival release
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: softprops/action-gh-release@v2.3.2
