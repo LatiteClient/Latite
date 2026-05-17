@@ -9,10 +9,12 @@ endif ()
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;MinSizeRel;Nightly" CACHE STRING "" FORCE)
 
+# Nightly keeps RelWithDebInfo-style compilation so we get usable symbols, but
+# links like a shipped binary so the DLL doesn't become a My 600-Lb. Life contestant
 set(CMAKE_C_FLAGS_NIGHTLY "${CMAKE_C_FLAGS_RELWITHDEBINFO}" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_NIGHTLY "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}" CACHE STRING "" FORCE)
-set(CMAKE_EXE_LINKER_FLAGS_NIGHTLY "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO}" CACHE STRING "" FORCE)
-set(CMAKE_SHARED_LINKER_FLAGS_NIGHTLY "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO}" CACHE STRING "" FORCE)
+set(CMAKE_EXE_LINKER_FLAGS_NIGHTLY "${CMAKE_EXE_LINKER_FLAGS_RELEASE}" CACHE STRING "" FORCE)
+set(CMAKE_SHARED_LINKER_FLAGS_NIGHTLY "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}" CACHE STRING "" FORCE)
 
 if (NOT MSVC)
     message(FATAL_ERROR "Compiler unsupported, must use MSVC")
@@ -21,7 +23,7 @@ endif()
 # Enable Hot Reload / debug info format for supported MSVC generators
 if (POLICY CMP0141)
     cmake_policy(SET CMP0141 NEW)
-    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug>:EditAndContinue>$<$<CONFIG:Release,RelWithDebInfo,Nightly>:ProgramDatabase>")
+    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug>:EditAndContinue>$<$<CONFIG:RelWithDebInfo,Nightly>:ProgramDatabase>")
 endif ()
 
 # MSVC runtime
@@ -115,7 +117,14 @@ target_compile_options(Latite PRIVATE
 )
 
 target_link_options(Latite PRIVATE
-        $<$<CONFIG:Release>:/DEBUG:FULL>
+        $<$<CONFIG:Release>:/INCREMENTAL:NO>
+        $<$<CONFIG:Release>:/OPT:REF>
+        $<$<CONFIG:Release>:/OPT:ICF>
+
+        $<$<CONFIG:Nightly>:/DEBUG:FULL>
+        $<$<CONFIG:Nightly>:/INCREMENTAL:NO>
+        $<$<CONFIG:Nightly>:/OPT:REF>
+        $<$<CONFIG:Nightly>:/OPT:NOICF>
 )
 
 target_include_directories(Latite PRIVATE
