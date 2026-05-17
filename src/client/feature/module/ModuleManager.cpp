@@ -18,6 +18,7 @@
 #include "modules/game/TextHotkey.h"
 #include "modules/game/Freelook.h"
 #include "modules/game/AutoGG.h"
+#include "modules/game/HiveTranslate.h"
 
 #include "modules/visual/Fullbright.h"
 #include "modules/visual/MotionBlur.h"
@@ -98,6 +99,7 @@ ModuleManager::ModuleManager() {
 	this->items.push_back(std::make_shared<CustomCoordinates>());
 	this->items.push_back(std::make_shared<MovableCoordinates>());
 	this->items.push_back(std::make_shared<AutoGG>());
+	this->items.push_back(std::make_shared<HiveTranslate>());
 	this->items.push_back(std::make_shared<FrameTimeDisplay>());
 	this->items.push_back(std::make_shared<BlockGame>());
 
