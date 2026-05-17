@@ -13,6 +13,8 @@ void Logger::Setup() {
 }
 
 void Logger::LogInternal(Level level, std::string str) {
+    str = util::RedactPrivatePaths(std::move(str));
+
     std::time_t t = std::time(0); // get time now
     std::tm now;
     std::ostringstream oss;

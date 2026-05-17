@@ -182,20 +182,21 @@ namespace {
     }
 
     void AppendRawLog(std::string const& text) {
-        OutputDebugStringA(text.c_str());
+        std::string redactedText = util::RedactPrivatePaths(text);
+        OutputDebugStringA(redactedText.c_str());
 
         try {
             std::filesystem::create_directories(LogsPath());
 
             std::ofstream latest(LogsPath() / "latest.log", std::ios::app);
             if (!latest.fail()) {
-                latest << text;
+                latest << redactedText;
                 latest.flush();
             }
 
             std::ofstream archive(DailyLogPath(), std::ios::app);
             if (!archive.fail()) {
-                archive << text;
+                archive << redactedText;
                 archive.flush();
             }
         }

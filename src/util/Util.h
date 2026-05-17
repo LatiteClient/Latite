@@ -15,6 +15,7 @@ namespace util {
 	extern std::filesystem::path GetLatitePath();
 	extern std::wstring StrToWStr(std::string const& s);
 	extern std::string WStrToStr(std::wstring const& ws);
+	extern std::string RedactPrivatePaths(std::string text);
 	extern std::wstring FormatWString(std::wstring const& formatString, std::vector<std::wstring> const& formatArgs);
 	extern std::string Format(std::string const& s);
 	extern std::wstring WFormat(std::wstring const& s);

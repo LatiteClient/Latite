@@ -7,10 +7,83 @@
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
 
+#include <cctype>
+
 #ifdef min
 #undef min
 #undef max
 #endif
+
+namespace {
+    std::string GetEnvironmentVariableUtf8(wchar_t const* name) {
+        wchar_t buffer[32767] = {};
+        auto length = GetEnvironmentVariableW(name, buffer, static_cast<DWORD>(std::size(buffer)));
+        if (length == 0 || length >= std::size(buffer)) {
+            return {};
+        }
+
+        return util::WStrToStr(std::wstring(buffer, length));
+    }
+
+    void ReplaceAllCaseInsensitive(std::string& text, std::string_view search, std::string_view replacement) {
+        if (search.empty()) {
+            return;
+        }
+
+        size_t offset = 0;
+        while (offset < text.size()) {
+            auto found = std::search(
+                text.begin() + static_cast<std::ptrdiff_t>(offset),
+                text.end(),
+                search.begin(),
+                search.end(),
+                [](char lhs, char rhs) {
+                    return std::tolower(static_cast<unsigned char>(lhs)) ==
+                        std::tolower(static_cast<unsigned char>(rhs));
+                }
+            );
+
+            if (found == text.end()) {
+                break;
+            }
+
+            auto position = static_cast<size_t>(std::distance(text.begin(), found));
+            text.replace(position, search.size(), replacement);
+            offset = position + replacement.size();
+        }
+    }
+
+    void AddPathRedaction(
+        std::vector<std::pair<std::string, std::string>>& redactions,
+        std::string const& path,
+        std::string token
+    ) {
+        if (path.empty()) {
+            return;
+        }
+
+        // extended length paths appear in crash reports as \\?\C:\...
+        redactions.emplace_back("\\\\?\\" + path, token);
+        redactions.emplace_back(path, token);
+
+        std::string forwardSlashPath = path;
+        std::replace(forwardSlashPath.begin(), forwardSlashPath.end(), '\\', '/');
+        redactions.emplace_back("//?/" + forwardSlashPath, token);
+        redactions.emplace_back(std::move(forwardSlashPath), std::move(token));
+    }
+
+    std::vector<std::pair<std::string, std::string>> BuildPrivatePathRedactions() {
+        std::vector<std::pair<std::string, std::string>> redactions;
+
+        // replaces the most specific roots first so appdata paths don't become
+        // the stupid %USERPROFILE%\AppData\... form.
+        AddPathRedaction(redactions, GetEnvironmentVariableUtf8(L"LOCALAPPDATA"), "%LOCALAPPDATA%");
+        AddPathRedaction(redactions, GetEnvironmentVariableUtf8(L"APPDATA"), "%APPDATA%");
+        AddPathRedaction(redactions, GetEnvironmentVariableUtf8(L"USERPROFILE"), "%USERPROFILE%");
+
+        return redactions;
+    }
+}
 
 namespace util {
     namespace detail {
@@ -172,6 +245,15 @@ std::string util::WStrToStr(std::wstring const& ws) {
         WideCharToMultiByte(CP_UTF8, 0, ws.c_str(), static_cast<int>(ws.size()), &ret[0], len, NULL, NULL);
     }
     return ret;
+}
+
+std::string util::RedactPrivatePaths(std::string text) {
+    static auto const redactions = BuildPrivatePathRedactions();
+    for (auto const& [path, token] : redactions) {
+        ReplaceAllCaseInsensitive(text, path, token);
+    }
+
+    return text;
 }
 
 std::string util::Format(std::string const& s) {
