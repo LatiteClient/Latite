@@ -21,24 +21,23 @@
 4. Use CMake to build the project.
 
 ## Contributing
-We welcome people to contribute code via making a PR (Pull Request) to the Client or [Injector](https://github.com/Plextora/LatiteInjector). Just make sure to ping us in our [Discord Server](https://discord.gg/GpV3w5tyBs) if we don't get to reviewing your PR in a timely manner :)
+We welcome people to contribute code via making a PR (Pull Request) to the Client or [Launcher](https://github.com/LatiteClient/Launcher). Just make sure to ping us in our [Discord Server](https://discord.gg/GpV3w5tyBs) if we don't get to reviewing your PR in a timely manner :)
 
 
 ## Installation
 ### Recommended Method
-1. Download the [Latite Installer](https://github.com/Imrglop/Latite-Releases/raw/main/injector/Installer.exe)
-2. Run the installer
-3. Run the Injector from the desktop shortcut, Windows Start menu, or from `%programfiles%\Latite Injector\Latite Injector.exe`
-4. Press "Launch" when in the Injector.
+1. Download the [Latite Client Launcher](https://github.com/LatiteClient/Launcher/releases/latest/download/Latite.Client.Launcher_x64-setup.exe)
+2. Run the installer.
+3. Open **Latite Client Launcher**.
+4. Press **Launch** to start Minecraft and inject Latite.
 
 
 ### Alternative Options
-- [Latite Minimal](https://latite-client.is-from.space/r/Latite_Minimal.exe) (for antivirus issues/India users)
-- [DLL Download](https://github.com/Imrglop/Latite-Releases/releases/latest/download/Latite.dll) (for using Latite with other Injector's)
+- [DLL Download](https://github.com/LatiteClient/Latite/releases/latest/download/Latite.dll) (for using Latite with other Injector's)
 - **Jiayi Launcher Import**:  
   Use this command (Win + R) to import Latite in Jiayi Launcher:
   ```bash
-  jiayi://addmod/https://github.com/Imrglop/Latite-Releases/releases/latest/download/Latite.dll
+  jiayi://addmod/https://github.com/LatiteClient/Latite/releases/latest/download/Latite.dll
   ```
 
 [Watch Installation Tutorial](https://youtu.be/h3v849ayuZY)
