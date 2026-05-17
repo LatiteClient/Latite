@@ -139,6 +139,30 @@ namespace {
         return oss.str();
     }
 
+    constexpr std::string_view crashReportTitle = "Latite Client Crash Report";
+    constexpr size_t crashReportWidth = 75;
+
+    std::string MakeCenteredDivider(std::string_view title, char fill, size_t width) {
+        if (title.empty()) {
+            return std::string(width, fill);
+        }
+
+        std::string decoratedTitle = std::format(" {} ", title);
+        if (decoratedTitle.size() >= width) {
+            return decoratedTitle;
+        }
+
+        size_t totalFill = width - decoratedTitle.size();
+        size_t leftFill = totalFill / 2;
+        size_t rightFill = totalFill - leftFill;
+        return std::string(leftFill, fill) + decoratedTitle + std::string(rightFill, fill);
+    }
+
+    void AppendSectionHeading(std::ostringstream& stream, std::string_view title) {
+        stream << title << "\n";
+        stream << std::string(title.size(), '-') << "\n";
+    }
+
     std::filesystem::path LogsPath() {
         return util::GetLatitePath() / "Logs";
     }
@@ -706,7 +730,7 @@ std::string DebugExceptionHandler::GenerateStackTrace(CONTEXT* contextArg) {
     InitializeStackFrame(context, stackFrame, machineType);
 
     std::ostringstream stackTrace;
-    stackTrace << "\n--- Stack Trace ---\n";
+    AppendSectionHeading(stackTrace, "Stack Trace");
 
     CriticalSectionGuard symbolGuard(EnterSymbolLock, LeaveSymbolLock);
     bool haveSymbols = EnsureSymbolsLocked();
@@ -794,7 +818,8 @@ std::filesystem::path DebugExceptionHandler::WriteCrashReport(EXCEPTION_POINTERS
 
     std::ostringstream report;
     report << "\n";
-    report << "========== Latite Client Crash Report ==========\n";
+    report << MakeCenteredDivider(crashReportTitle, '=', crashReportWidth) << "\n\n";
+    AppendSectionHeading(report, "Crash Summary");
     report << "Time: " << MakeTimestamp(false) << "\n";
     report << "Reason: " << reason << "\n";
     report << "Process ID: " << GetCurrentProcessId() << "\n";
@@ -818,7 +843,7 @@ std::filesystem::path DebugExceptionHandler::WriteCrashReport(EXCEPTION_POINTERS
     else {
         report << "Minidump Result: unavailable\n";
     }
-    report << "==============================================\n";
+    report << "\n";
     AppendRawLog(report.str());
 
     std::ostringstream stackReport;
@@ -826,14 +851,14 @@ std::filesystem::path DebugExceptionHandler::WriteCrashReport(EXCEPTION_POINTERS
         stackReport << GenerateStackTrace(&context);
     }
     catch (std::exception const& e) {
-        stackReport << "\n--- Stack Trace ---\n";
+        AppendSectionHeading(stackReport, "Stack Trace");
         stackReport << "Stack trace unavailable: " << e.what() << "\n";
     }
     catch (...) {
-        stackReport << "\n--- Stack Trace ---\n";
+        AppendSectionHeading(stackReport, "Stack Trace");
         stackReport << "Stack trace unavailable due to an unknown error.\n";
     }
-    stackReport << "==============================================\n";
+    stackReport << "\n" << std::string(crashReportWidth, '=') << "\n";
     AppendRawLog(stackReport.str());
 
     return dumpPath;
