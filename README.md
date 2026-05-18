@@ -1,6 +1,6 @@
 # Latite Client
 [![Discord](https://img.shields.io/discord/885656043521179680)](https://discord.gg/GpV3w5tyBs)
-[![GitHub release](https://img.shields.io/github/v/release/Imrglop/Latite-Releases)](https://github.com/Imrglop/Latite-Releases/releases/latest)
+[![GitHub release](https://img.shields.io/github/v/release/LatiteClient/Latite)](https://github.com/LatiteClient/Latite/releases/latest)
 [![Latite Nightly](https://github.com/LatiteClient/Latite/actions/workflows/nightly-build.yml/badge.svg)](https://github.com/LatiteClient/Latite/actions/workflows/nightly-build.yml)
 
 **Latite Client** is a legitimate DLL modification for Minecraft Windows 10/11 Edition featuring a clean UI, 30+ customizable mods, and a powerful plugin system.
