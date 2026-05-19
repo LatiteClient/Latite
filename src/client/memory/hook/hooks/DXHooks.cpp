@@ -90,6 +90,13 @@ HRESULT WINAPI DXHooks::CreateSwapChainForHWNDHook(
     IDXGIOutput* output,
     IDXGISwapChain1** swapChain) {
 
+    if (device) {
+        ComPtr<ID3D12CommandQueue> queue;
+        if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&queue))) && queue) {
+            Latite::getRenderer().setCommandQueue(queue.Get());
+        }
+    }
+
     DXGI_SWAP_CHAIN_DESC1 modifiedDesc = *desc;
     if (tearingSupported && isForceDisableVSync) {
         modifiedDesc.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
@@ -167,8 +174,14 @@ HRESULT __stdcall DXHooks::SwapChain3_ResizeBuffers(
 
 HRESULT __stdcall DXHooks::CommandQueue_ExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists,
     ID3D12CommandList* const* ppCommandLists) {
-    auto lock = Latite::getRenderer().lock();
-    Latite::getRenderer().setCommandQueue(queue);
+    if (queue) {
+        auto desc = queue->GetDesc();
+        if (desc.Type == D3D12_COMMAND_LIST_TYPE_DIRECT) {
+            auto lock = Latite::getRenderer().lock();
+            Latite::getRenderer().setCommandQueue(queue);
+        }
+    }
+
     return ExecuteCommandListsHook->oFunc<decltype(&CommandQueue_ExecuteCommandLists)>()(
         queue, NumCommandLists, ppCommandLists);
 }

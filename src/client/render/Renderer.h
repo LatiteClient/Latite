@@ -41,15 +41,16 @@ private:
 	bool dx12Removed = false;
 	bool hasCopiedBitmap = false;
 
-	IDXGISwapChain* gameSwapChain;
-	IDXGISwapChain4* swapChain4;
+	IDXGISwapChain* gameSwapChain = nullptr;
+	IDXGISwapChain4* swapChain4 = nullptr;
 
 	ComPtr<IDXGIDevice> dxgiDevice;
 
 	ComPtr<ID3D12Device> gameDevice12;
 	ComPtr<ID3D11Device> gameDevice11;
-	ID3D11Device* d3dDevice;
-	ID3D12CommandQueue* commandQueue;
+	ComPtr<ID3D11Device> d3dDevice;
+	ComPtr<ID3D12CommandQueue> commandQueue;
+	ComPtr<ID3D12CommandQueue> lastFailedCommandQueue;
 
 	ComPtr<ID3D11DeviceContext> d3dCtx;
 	ComPtr<ID3D11On12Device> d3d11On12Device;
@@ -118,9 +119,7 @@ public:
 		gameDevice12 = dev;
 	}
 
-	void setCommandQueue(ID3D12CommandQueue* queue) noexcept {
-		commandQueue = queue;
-	}
+	void setCommandQueue(ID3D12CommandQueue* queue);
 
 	void setSwapChain(IDXGISwapChain* chain) noexcept {
 		gameSwapChain = chain;

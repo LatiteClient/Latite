@@ -6,70 +6,182 @@
 #include "client/event/events/RendererInitEvent.h"
 #include "client/Latite.h"
 
+namespace {
+	const char* commandQueueTypeName(D3D12_COMMAND_LIST_TYPE type) noexcept {
+		switch (type) {
+		case D3D12_COMMAND_LIST_TYPE_DIRECT:
+			return "DIRECT";
+		case D3D12_COMMAND_LIST_TYPE_BUNDLE:
+			return "BUNDLE";
+		case D3D12_COMMAND_LIST_TYPE_COMPUTE:
+			return "COMPUTE";
+		case D3D12_COMMAND_LIST_TYPE_COPY:
+			return "COPY";
+		default:
+			return "UNKNOWN";
+		}
+	}
+
+	bool sameComObject(IUnknown* left, IUnknown* right) {
+		if (!left || !right) return left == right;
+
+		ComPtr<IUnknown> leftUnknown;
+		ComPtr<IUnknown> rightUnknown;
+		if (FAILED(left->QueryInterface(IID_PPV_ARGS(&leftUnknown))) ||
+			FAILED(right->QueryInterface(IID_PPV_ARGS(&rightUnknown)))) {
+			return left == right;
+		}
+
+		return leftUnknown.Get() == rightUnknown.Get();
+	}
+
+	const char* dxgiErrorName(HRESULT hr) noexcept {
+		switch (hr) {
+		case DXGI_ERROR_SDK_COMPONENT_MISSING:
+			return "DXGI_ERROR_SDK_COMPONENT_MISSING";
+		default:
+			return "unknown";
+		}
+	}
+}
+
 Renderer::~Renderer() {
     // ...
 	releaseAllResources(false);
 }
 
+void Renderer::setCommandQueue(ID3D12CommandQueue* queue) {
+	if (!queue) {
+		commandQueue = nullptr;
+		return;
+	}
+
+	if (queue == commandQueue.Get()) return;
+	if (queue == lastFailedCommandQueue.Get()) return;
+
+	auto desc = queue->GetDesc();
+	if (desc.Type != D3D12_COMMAND_LIST_TYPE_DIRECT) {
+		return;
+	}
+
+	ComPtr<ID3D12Device> queueDevice;
+	HRESULT deviceHr = queue->GetDevice(IID_PPV_ARGS(&queueDevice));
+	if (FAILED(deviceHr) || !queueDevice) {
+		return;
+	}
+
+	if (gameDevice12 && !sameComObject(gameDevice12.Get(), queueDevice.Get())) {
+		return;
+	}
+
+	commandQueue = queue;
+	lastFailedCommandQueue = nullptr;
+}
+
 bool Renderer::init(IDXGISwapChain* chain) {
 	if (!shouldInit) return false;
 
-	bool isDX12 = true;
-	if (!dx12Removed && SUCCEEDED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12))) && Latite::get().shouldForceDX11()) {
-		static_cast<ID3D12Device5*>(gameDevice12.Get())->RemoveDevice();
-		bufferCount = 1;
-		Logger::Info("Force DX11 active");
-		isDX12 = false;
-		dx12Removed = true;
+	if (!chain) {
+		Logger::Warn("Renderer init called with a null swap chain");
 		return false;
 	}
+
     this->gameSwapChain = chain;
 
-
-	if (!swapChain4)
-		ThrowIfFailed(chain->QueryInterface(&swapChain4));
-
-	if (Latite::get().shouldForceDX11()) {
-		isDX12 = false;
-	}
-	
-	if (SUCCEEDED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12))) && !dx12Removed && Latite::get().shouldForceDX11()) {
-		static_cast<ID3D12Device5*>(gameDevice12.Get())->RemoveDevice();
-		bufferCount = 1;
-		Logger::Info("Force DX11 active");
-		isDX12 = false;
-		dx12Removed = true;
-		return init(chain);
-	}
-
-	else gameDevice11 = nullptr;
-
-	if (!gameDevice11.Get() || !gameDevice12.Get()) {
-		if (Latite::get().shouldForceDX11() || FAILED(chain->GetDevice(IID_PPV_ARGS(&gameDevice12)))) {
-			ThrowIfFailed(chain->GetDevice(IID_PPV_ARGS(&gameDevice11)));
-			Logger::Info("Using DX11");
-			d3dDevice = gameDevice11.Get();
-			d3dDevice->GetImmediateContext(d3dCtx.GetAddressOf());
-			bufferCount = 1;
-			isDX11 = true;
-			isDX12 = false;
-		}
-		else {
-			Logger::Info("Using DX12");
-			bufferCount = 3;
-		}
-	}
-
-	if (gameDevice12.Get()) {
-		if (!this->commandQueue) {
+	if (!swapChain4) {
+		HRESULT swapChainHr = chain->QueryInterface(&swapChain4);
+		if (FAILED(swapChainHr) || !swapChain4) {
+			Logger::Fatal("IDXGISwapChain4 QueryInterface failed: hr=0x{:08X}, chain=0x{:X}",
+				static_cast<unsigned>(swapChainHr),
+				reinterpret_cast<uintptr_t>(chain));
 			return false;
 		}
 	}
 
-	createDeviceIndependentResources();
+	const bool forceDX11 = Latite::get().shouldForceDX11();
+	ComPtr<ID3D12Device> detectedDevice12;
+	HRESULT device12Hr = chain->GetDevice(IID_PPV_ARGS(&detectedDevice12));
+	if (SUCCEEDED(device12Hr) && detectedDevice12) {
+		gameDevice12 = detectedDevice12;
+		gameDevice11 = nullptr;
+	}
+	else {
+		gameDevice12 = nullptr;
+	}
+	
+	if (gameDevice12 && forceDX11 && !dx12Removed) {
+		ComPtr<ID3D12Device5> device5;
+		if (SUCCEEDED(gameDevice12.As(&device5))) {
+			device5->RemoveDevice();
+		}
+		else {
+			Logger::Warn("Force DX11 active, but ID3D12Device5 QueryInterface failed for device 0x{:X}",
+				reinterpret_cast<uintptr_t>(gameDevice12.Get()));
+		}
+
+		bufferCount = 1;
+		Logger::Info("Force DX11 active");
+		dx12Removed = true;
+		return false;
+	}
+
+	if (forceDX11 || !gameDevice12) {
+		ComPtr<ID3D11Device> detectedDevice11;
+		HRESULT device11Hr = chain->GetDevice(IID_PPV_ARGS(&detectedDevice11));
+		if (FAILED(device11Hr) || !detectedDevice11) {
+			Logger::Fatal("Failed to get D3D device from swap chain: D3D11 hr=0x{:08X}, D3D12 hr=0x{:08X}, forceDX11={}",
+				static_cast<unsigned>(device11Hr),
+				static_cast<unsigned>(device12Hr),
+				forceDX11);
+			return false;
+		}
+
+		Logger::Info("Using DX11");
+		gameDevice11 = detectedDevice11;
+		gameDevice12 = nullptr;
+		commandQueue = nullptr;
+		d3dDevice = gameDevice11;
+		d3dDevice->GetImmediateContext(d3dCtx.ReleaseAndGetAddressOf());
+		bufferCount = 1;
+		isDX11 = true;
+	}
+	else {
+		if (!commandQueue) {
+			reqCommandQueue = true;
+			return false;
+		}
+
+		auto queueDesc = commandQueue->GetDesc();
+		ComPtr<ID3D12Device> queueDevice;
+		HRESULT queueDeviceHr = commandQueue->GetDevice(IID_PPV_ARGS(&queueDevice));
+		if (FAILED(queueDeviceHr) || !queueDevice) {
+			Logger::Warn("Stored D3D12 command queue 0x{:X} GetDevice failed before D3D11On12 init: hr=0x{:08X}",
+				reinterpret_cast<uintptr_t>(commandQueue.Get()),
+				static_cast<unsigned>(queueDeviceHr));
+			commandQueue = nullptr;
+			reqCommandQueue = true;
+			return false;
+		}
+
+		if (queueDesc.Type != D3D12_COMMAND_LIST_TYPE_DIRECT ||
+			!sameComObject(gameDevice12.Get(), queueDevice.Get())) {
+			Logger::Warn("Stored D3D12 command queue is not usable for D3D11On12: queue=0x{:X}, queueDevice=0x{:X}, swapChainDevice=0x{:X}, type={} ({})",
+				reinterpret_cast<uintptr_t>(commandQueue.Get()),
+				reinterpret_cast<uintptr_t>(queueDevice.Get()),
+				reinterpret_cast<uintptr_t>(gameDevice12.Get()),
+				commandQueueTypeName(queueDesc.Type),
+				static_cast<int>(queueDesc.Type));
+			commandQueue = nullptr;
+			reqCommandQueue = true;
+			return false;
+		}
+
+		reqCommandQueue = false;
+		bufferCount = 3;
+		isDX11 = false;
+		Logger::Info("Using DX12");
 
 #if LATITE_DEBUG
-	if (gameDevice12) {
 		ComPtr<ID3D12InfoQueue> infoQueue;
 		if (SUCCEEDED(gameDevice12->QueryInterface(IID_PPV_ARGS(&infoQueue))))
 		{
@@ -91,26 +203,88 @@ bool Renderer::init(IDXGISwapChain* chain) {
 
 			infoQueue->PushStorageFilter(&filter);
 		}
-    }
 #endif
-	if (gameDevice12) {
-		D3D11On12CreateDevice(gameDevice12.Get(),
+
+		IUnknown* queues[] = { commandQueue.Get() };
+		d3dDevice = nullptr;
+		d3dCtx = nullptr;
+		d3d11On12Device = nullptr;
+
+		auto createD3D11On12Device = [&](UINT flags) {
+			d3dDevice = nullptr;
+			d3dCtx = nullptr;
+			d3d11On12Device = nullptr;
+
+			return D3D11On12CreateDevice(gameDevice12.Get(),
+				flags,
+				nullptr, 0,
+				queues,
+				_countof(queues), 0, d3dDevice.ReleaseAndGetAddressOf(), d3dCtx.ReleaseAndGetAddressOf(),
+				nullptr
+			);
+		};
+
+		UINT on12Flags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #ifdef LATITE_DEBUG
-			D3D11_CREATE_DEVICE_BGRA_SUPPORT | D3D11_CREATE_DEVICE_DEBUG
-#else
-			D3D11_CREATE_DEVICE_BGRA_SUPPORT
+		on12Flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-			, nullptr, 0,
-			reinterpret_cast<IUnknown**>(&commandQueue),
-			1, 0, &d3dDevice, d3dCtx.GetAddressOf(),
-			nullptr
-		);
-		d3dDevice->QueryInterface(d3d11On12Device.GetAddressOf());
-		// TODO: is this necessary, we already reference the d3ddevice in 11on12createdevice
-		d3dDevice->GetImmediateContext(&d3dCtx);
+
+		HRESULT on12Hr = createD3D11On12Device(on12Flags);
+
+#ifdef LATITE_DEBUG
+		if (on12Hr == DXGI_ERROR_SDK_COMPONENT_MISSING) {
+			on12Flags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+			on12Hr = createD3D11On12Device(on12Flags);
+		}
+#endif
+
+		if (FAILED(on12Hr) || !d3dDevice) {
+			Logger::Fatal("D3D11On12CreateDevice failed: hr=0x{:08X} ({}), createFlags=0x{:X}, d3dDevice=0x{:X}, d3dCtx=0x{:X}, gameDevice12=0x{:X}, commandQueue=0x{:X}, queueDevice=0x{:X}, queueType={}, queueFlags=0x{:X}, queueNodeMask={}",
+				static_cast<unsigned>(on12Hr),
+				dxgiErrorName(on12Hr),
+				on12Flags,
+				reinterpret_cast<uintptr_t>(d3dDevice.Get()),
+				reinterpret_cast<uintptr_t>(d3dCtx.Get()),
+				reinterpret_cast<uintptr_t>(gameDevice12.Get()),
+				reinterpret_cast<uintptr_t>(commandQueue.Get()),
+				reinterpret_cast<uintptr_t>(queueDevice.Get()),
+				commandQueueTypeName(queueDesc.Type),
+				static_cast<unsigned>(queueDesc.Flags),
+				queueDesc.NodeMask);
+			lastFailedCommandQueue = commandQueue;
+			commandQueue = nullptr;
+			reqCommandQueue = true;
+			return false;
+		}
+
+		HRESULT on12InterfaceHr = d3dDevice->QueryInterface(d3d11On12Device.ReleaseAndGetAddressOf());
+		if (FAILED(on12InterfaceHr) || !d3d11On12Device) {
+			Logger::Fatal("ID3D11On12Device QueryInterface failed: hr=0x{:08X}, d3dDevice=0x{:X}, commandQueue=0x{:X}",
+				static_cast<unsigned>(on12InterfaceHr),
+				reinterpret_cast<uintptr_t>(d3dDevice.Get()),
+				reinterpret_cast<uintptr_t>(commandQueue.Get()));
+			lastFailedCommandQueue = commandQueue;
+			commandQueue = nullptr;
+			reqCommandQueue = true;
+			return false;
+		}
 	}
 
-	ThrowIfFailed(d3dDevice->QueryInterface(dxgiDevice.GetAddressOf()));
+	if (!d3dDevice) {
+		Logger::Fatal("Renderer init failed: no D3D11 device was created");
+		return false;
+	}
+
+	createDeviceIndependentResources();
+
+	HRESULT dxgiHr = d3dDevice->QueryInterface(dxgiDevice.ReleaseAndGetAddressOf());
+	if (FAILED(dxgiHr) || !dxgiDevice) {
+		Logger::Fatal("IDXGIDevice QueryInterface failed: hr=0x{:08X}, d3dDevice=0x{:X}",
+			static_cast<unsigned>(dxgiHr),
+			reinterpret_cast<uintptr_t>(d3dDevice.Get()));
+		return false;
+	}
+
 	ThrowIfFailed(d2dFactory->CreateDevice(dxgiDevice.Get(), d2dDevice.GetAddressOf()));
 	ThrowIfFailed(d2dDevice->CreateDeviceContext(D2D1_DEVICE_CONTEXT_OPTIONS_ENABLE_MULTITHREADED_OPTIMIZATIONS, d2dCtx.GetAddressOf()));
 	d2dCtx->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
@@ -275,7 +449,7 @@ void Renderer::releaseAllResources(bool flush, bool indep) {
 
 	if (isDX12) gameDevice12 = nullptr;
 	SafeRelease(&swapChain4);
-	SafeRelease(&d3dDevice);
+	d3dDevice = nullptr;
 	d2dDevice = nullptr;
 	d2dCtx = nullptr;
 
