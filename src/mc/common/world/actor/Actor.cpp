@@ -72,7 +72,7 @@ void SDK::Actor::swing() {
 }
 
 bool SDK::Actor::isPlayer() {
-	return getEntityTypeID() == 63;
+	return getEntityTypeID() == 319;
 }
 
 SDK::AttributesComponent* SDK::Actor::getAttributesComponent() {
