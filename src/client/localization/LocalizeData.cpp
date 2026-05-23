@@ -19,6 +19,7 @@ LocalizeData::LocalizeData() {
         std::make_shared<Language>(GET_RESOURCE(lang_fr_FR_json), "fr"),
         std::make_shared<Language>(GET_RESOURCE(lang_es_ES_json), "es"),
         std::make_shared<Language>(GET_RESOURCE(lang_ja_JP_json), "ja"),
+        std::make_shared<Language>(GET_RESOURCE(lang_ru_RU_json), "ru"),
         std::make_shared<Language>(GET_RESOURCE(lang_pt_PT_json), "pt-PT"),
         std::make_shared<Language>(GET_RESOURCE(lang_pt_BR_json), "pt-BR"),
         std::make_shared<Language>(GET_RESOURCE(lang_zh_CN_json), "zh-CN"),

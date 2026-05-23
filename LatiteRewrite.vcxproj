@@ -947,6 +947,7 @@
     <None Include="assets\lang\ja_JP.json" />
     <None Include="assets\lang\nl_NL.json" />
     <None Include="assets\lang\pt_BR.json" />
+    <None Include="assets\lang\ru_RU.json" />
     <None Include="CMakePresets.json" />
     <None Include="CppProperties.json" />
     <None Include="src\client\script\js\latiteapi.js" />

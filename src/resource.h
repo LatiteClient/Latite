@@ -39,3 +39,4 @@
 #define LANG_JA_JP 109
 #define LANG_PT_BR 110
 #define LANG_NL_NL 111
+#define LANG_RU_RU 112
