@@ -122,6 +122,12 @@ public:
 		return std::get<BoolValue>(textShadow);
 	}
 
+#ifdef LATITE_DEBUG
+	[[nodiscard]] bool shouldRenderDebugTextRects() {
+		return std::get<BoolValue>(debugTextRects);
+	}
+#endif
+
 	[[nodiscard]] bool getDoSnapLines() {
 		return std::get<BoolValue>(snapLines);
 	}
@@ -173,6 +179,9 @@ private:
 	ValueType minimalViewBob = BoolValue(false);
 	ValueType minecraftRenderer = BoolValue(false);
 	ValueType textShadow = BoolValue(true);
+#ifdef LATITE_DEBUG
+	ValueType debugTextRects = BoolValue(false);
+#endif
 	ValueType centerCursorMenus = BoolValue(false);
 	ValueType snapLines = BoolValue(true);
 	ValueType detectLanguageSetting = BoolValue(true);

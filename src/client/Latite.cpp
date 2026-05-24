@@ -775,6 +775,15 @@ void Latite::initSettings() {
         this->getSettings().addSetting(set);
     }
 
+#ifdef LATITE_DEBUG
+    {
+        auto set = std::make_shared<Setting>("debugTextRects", L"Debug Text Rects",
+                                             L"Draw text bounds and highlight likely text overflow.");
+        set->value = &this->debugTextRects;
+        this->getSettings().addSetting(set);
+    }
+#endif
+
     {
         auto set = std::make_shared<Setting>("secondaryFont", LocalizeString::get("client.settings.secondaryFont.name"),
                                              LocalizeString::get("client.settings.secondaryFont.desc"));

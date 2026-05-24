@@ -17,6 +17,19 @@ static size_t countof(auto str, auto ch) {
 	return c;
 }
 
+#ifdef LATITE_DEBUG
+static d2d::Color getDebugTextRectColor(bool overflow) {
+	return overflow
+		? d2d::Color::RGB(0xFF, 0x35, 0x35).asAlpha(0.95f)
+		: d2d::Color::RGB(0x22, 0xD7, 0xFF).asAlpha(0.75f);
+}
+
+static bool isDebugTextOverflow(Vec2 const& textSize, d2d::Rect const& rect) {
+	constexpr float epsilon = 0.5f;
+	return textSize.x > rect.getWidth() + epsilon || textSize.y > rect.getHeight() + epsilon;
+}
+#endif
+
 D2D1_RECT_F D2DUtil::getRect(RectF const& rc)  {
 	return D2D1::RectF(rc.left, rc.top, rc.right, rc.bottom);
 }
@@ -161,6 +174,14 @@ void D2DUtil::drawText(RectF const& rc, std::wstring const& ws, d2d::Color const
 		layout->SetTextAlignment(alignment);
 		layout->SetParagraphAlignment(verticalAlignment);
 		this->ctx->DrawTextLayout({ rc.getPos().x, rc.getPos().y }, layout, brush);
+#ifdef LATITE_DEBUG
+		if (Latite::get().shouldRenderDebugTextRects()) {
+			DWRITE_TEXT_METRICS metrics{};
+			layout->GetMetrics(&metrics);
+			bool overflow = isDebugTextOverflow({ metrics.widthIncludingTrailingWhitespace, metrics.height }, rc);
+			drawRectangle(rc, getDebugTextRectColor(overflow), overflow ? 1.5f : 1.f);
+		}
+#endif
 	}
 }
 
@@ -456,6 +477,13 @@ void MCDrawUtil::drawText(RectF const& rc, std::wstring const& text, d2d::Color 
 	RectF rMod = rc;
 	rMod.top = newTop;
 	renderCtx->drawText(this->font, getRect(rMod), util::WStrToStr(text), color, color.a, (SDK::ui::TextAlignment)alignment, SDK::TextMeasureData((size * guiScale) / this->font->getLineHeight(), Latite::get().shouldRenderTextShadows(), false), caretMeasure);
+#ifdef LATITE_DEBUG
+	if (Latite::get().shouldRenderDebugTextRects()) {
+		Vec2 measured = getTextSize(text, font, size, true, false);
+		bool overflow = isDebugTextOverflow(measured, rc);
+		drawRectangle(rc, getDebugTextRectColor(overflow), overflow ? 1.5f : 1.f);
+	}
+#endif
 }
 
 Vec2 MCDrawUtil::getTextSize(std::wstring const& text, Renderer::FontSelection font, float size, bool trailingWhitespace, bool cache, std::optional<Vec2> bounds) {
