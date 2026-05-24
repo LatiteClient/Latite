@@ -106,7 +106,13 @@ public:
 	void updateSecondaryFont(std::wstring family) {
 		fontFamily2 = std::move(family);
 
+		refreshTextFormats();
+	}
+
+	void refreshTextFormats() {
+		if (!dWriteFactory) return;
 		auto mutex = lock();
+		clearTextCache();
 		releaseTextFormats();
 		createTextFormats();
 	}

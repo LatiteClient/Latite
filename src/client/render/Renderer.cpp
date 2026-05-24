@@ -35,6 +35,20 @@ namespace {
 		return leftUnknown.Get() == rightUnknown.Get();
 	}
 
+	std::wstring selectedTextLocale() {
+		try {
+			auto const& languages = Latite::get().getL10nData().getLanguages();
+			int selectedLanguage = Latite::get().getSelectedLanguage();
+			if (selectedLanguage >= 0 && selectedLanguage < static_cast<int>(languages.size())) {
+				return util::StrToWStr(languages[selectedLanguage]->langCode);
+			}
+		}
+		catch (...) {
+		}
+
+		return L"en-us";
+	}
+
 	const char* dxgiErrorName(HRESULT hr) noexcept {
 		switch (hr) {
 		case DXGI_ERROR_SDK_COMPONENT_MISSING:
@@ -481,6 +495,7 @@ void Renderer::releaseAllResources(bool flush, bool indep) {
 
 void Renderer::createTextFormats() {
 	float fontSize = 10.f;
+	std::wstring locale = selectedTextLocale();
 
 	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily.c_str(),
 		nullptr,
@@ -488,7 +503,7 @@ void Renderer::createTextFormats() {
 		DWRITE_FONT_STYLE_NORMAL,
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
-		L"en-us",
+		locale.c_str(),
 		this->primaryFont.GetAddressOf()));
 
 	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily.c_str(),
@@ -497,7 +512,7 @@ void Renderer::createTextFormats() {
 		DWRITE_FONT_STYLE_NORMAL,
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
-		L"en-us",
+		locale.c_str(),
 		this->primarySemilight.GetAddressOf()));
 
 	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily.c_str(),
@@ -506,7 +521,7 @@ void Renderer::createTextFormats() {
 		DWRITE_FONT_STYLE_NORMAL,
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
-		L"en-us",
+		locale.c_str(),
 		this->primaryLight.GetAddressOf()));
 
 	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
@@ -515,7 +530,7 @@ void Renderer::createTextFormats() {
 		DWRITE_FONT_STYLE_NORMAL,
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
-		L"en-us",
+		locale.c_str(),
 		this->secondaryFont.GetAddressOf()));
 
 	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
@@ -524,7 +539,7 @@ void Renderer::createTextFormats() {
 		DWRITE_FONT_STYLE_NORMAL,
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
-		L"en-us",
+		locale.c_str(),
 		this->secondarySemilight.GetAddressOf()));
 
 	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily2.c_str(),
@@ -533,7 +548,7 @@ void Renderer::createTextFormats() {
 		DWRITE_FONT_STYLE_NORMAL,
 		DWRITE_FONT_STRETCH_NORMAL,
 		fontSize,
-		L"en-us",
+		locale.c_str(),
 		this->secondaryLight.GetAddressOf()));
 
 }
