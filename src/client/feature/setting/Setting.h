@@ -1,6 +1,8 @@
 #pragma once
 #include "client/feature/Feature.h"
+#include "client/localization/LocalizeString.h"
 #include <nlohmann/json.hpp>
+#include <optional>
 #include <variant>
 
 struct NullValue {
@@ -301,11 +303,21 @@ using ValueType = std::variant<
 class EnumEntry /*: Feature*/ {
 	std::wstring entryName;
 	std::wstring entryDesc;
+	std::optional<std::string> entryNameKey;
+	std::optional<std::string> entryDescKey;
 public:
 	std::wstring name() { return entryName; }
 	std::wstring desc() { return entryDesc; }
 
-	EnumEntry(int key, std::wstring const& name, std::wstring const& desc = L"") : entryName(name), entryDesc(desc) {}
+	EnumEntry(int, std::wstring const& name, std::wstring const& desc = L"") : entryName(name), entryDesc(desc) {}
+	EnumEntry(int, LocalizedString const& name, std::wstring const& desc = L"") : entryName(name.value()), entryDesc(desc), entryNameKey(name.key()) {}
+	EnumEntry(int, std::wstring const& name, LocalizedString const& desc) : entryName(name), entryDesc(desc.value()), entryDescKey(desc.key()) {}
+	EnumEntry(int, LocalizedString const& name, LocalizedString const& desc) : entryName(name.value()), entryDesc(desc.value()), entryNameKey(name.key()), entryDescKey(desc.key()) {}
+
+	void refreshLocalization() {
+		if (entryNameKey) entryName = LocalizeString::get(*entryNameKey).value();
+		if (entryDescKey) entryDesc = LocalizeString::get(*entryDescKey).value();
+	}
 };
 
 class EnumData {
@@ -334,6 +346,12 @@ public:
 
 	[[nodiscard]] std::wstring getSelectedDesc() {
 		return entries[std::get<EnumValue>(selectedIdx)].desc();
+	}
+
+	void refreshLocalization() {
+		for (auto& entry : entries) {
+			entry.refreshLocalization();
+		}
 	}
 
 	void next() {
@@ -373,12 +391,28 @@ public:
 	};
 
 	Setting(std::string const& internalName, std::wstring const& displayName, std::wstring const& description, Condition condition = Condition()) : settingName(internalName), displayName(displayName), description(description), condition(std::move(condition)) {}
+	Setting(std::string const& internalName, LocalizedString const& displayName, std::wstring const& description, Condition condition = Condition()) : settingName(internalName), description(description), condition(std::move(condition)) {
+		setDisplayName(displayName);
+	}
+	Setting(std::string const& internalName, std::wstring const& displayName, LocalizedString const& description, Condition condition = Condition()) : settingName(internalName), displayName(displayName), condition(std::move(condition)) {
+		setDescription(description);
+	}
+	Setting(std::string const& internalName, LocalizedString const& displayName, LocalizedString const& description, Condition condition = Condition()) : settingName(internalName), condition(std::move(condition)) {
+		setDisplayName(displayName);
+		setDescription(description);
+	}
 
 	[[nodiscard]] bool shouldRender(class SettingGroup& group);
 
 	std::wstring desc() override { return description; }
 	std::wstring getDisplayName() { return displayName; }
 	std::string name() override { return settingName; }
+
+	void refreshLocalization() {
+		if (displayNameKey) displayName = LocalizeString::get(*displayNameKey).value();
+		if (descriptionKey) description = LocalizeString::get(*descriptionKey).value();
+		if (enumData) enumData->refreshLocalization();
+	}
 	
 
 	std::optional<std::function<void(Setting&)>> callback;
@@ -410,8 +444,20 @@ public:
 		float col[4] = { 0.f, 0.f, 0.f, 1.f };
 	} rendererInfo;
 protected:
+	void setDisplayName(LocalizedString const& text) {
+		displayName = text.value();
+		displayNameKey = text.key();
+	}
+
+	void setDescription(LocalizedString const& text) {
+		description = text.value();
+		descriptionKey = text.key();
+	}
+
 	std::string settingName;
 	std::wstring displayName, description;
+	std::optional<std::string> displayNameKey;
+	std::optional<std::string> descriptionKey;
 
 };
 

@@ -31,6 +31,12 @@ CommandManager::CommandManager() {
 #endif
 }
 
+void CommandManager::refreshLocalization() {
+	for (auto& item : items) {
+		item->refreshLocalization();
+	}
+}
+
 bool CommandManager::runCommand(std::string const& line) {
 	if (line.substr(0, prefix.size()) != prefix) {
 		return false;

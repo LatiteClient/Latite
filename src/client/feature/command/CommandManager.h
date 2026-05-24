@@ -10,6 +10,7 @@ public:
 	virtual ~CommandManager() = default;
 
 	bool runCommand(std::string const& line);
+	void refreshLocalization();
 	bool registerScriptCommand(JsCommand* cmd) {
 		for (auto& mod_ : items) {
 			if (mod_->name() == cmd->name()) {

@@ -28,6 +28,10 @@ public:
 		jumpModule = name;
 		modTab = ALL;
 	}
+
+	void requestModuleListRebuild() {
+		shouldRebuildModLikes = true;
+	}
 protected:
 	void onEnable(bool ignoreAnims) override;
 	void onDisable() override;

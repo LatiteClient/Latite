@@ -46,6 +46,7 @@ public:
 	void initLanguageSetting();
 	void initSettings();
 	void detectLanguage();
+	void onLanguageChanged();
 
 	void queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback);
 	void queueForClientThread(std::function<void()> callback);

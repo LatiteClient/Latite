@@ -21,6 +21,22 @@ public:
         addSetting("forceMinecraftRend", LocalizeString::get("client.hudmodule.props.forceMcRend.name"),
                    LocalizeString::get("client.hudmodule.props.forceMcRend.desc"), forceMCRend);
 	}
+	HUDModule(std::string const& name, LocalizedString const& displayName, LocalizedString const& description, Category category, int keybind = 0,
+		bool resizable = true)
+		: HUDModule(name, displayName.value(), description.value(), category, keybind, resizable) {
+		setDisplayName(displayName);
+		setDescription(description);
+	}
+	HUDModule(std::string const& name, LocalizedString const& displayName, std::wstring const& description, Category category, int keybind = 0,
+		bool resizable = true)
+		: HUDModule(name, displayName.value(), description, category, keybind, resizable) {
+		setDisplayName(displayName);
+	}
+	HUDModule(std::string const& name, std::wstring const& displayName, LocalizedString const& description, Category category, int keybind = 0,
+		bool resizable = true)
+		: HUDModule(name, displayName, description.value(), category, keybind, resizable) {
+		setDescription(description);
+	}
 
 	virtual ~HUDModule() = default;
 

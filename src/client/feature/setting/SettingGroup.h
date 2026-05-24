@@ -25,6 +25,12 @@ public:
 		settings.push_back(set);
 	}
 
+	void refreshLocalization() {
+		for (auto& setting : settings) {
+			setting->refreshLocalization();
+		}
+	}
+
 	[[nodiscard]] std::string name() { return groupName; }
 
 	// TODO: Is this needed?

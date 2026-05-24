@@ -886,12 +886,12 @@ void Latite::downloadChakraCore() {
 }
 
 void Latite::initLanguageSetting() {
-    auto set = std::make_shared<Setting>("language", L"Language",
-        L"The client's language.");
+    auto set = std::make_shared<Setting>("language", LocalizeString::get("client.settings.language.name"),
+        LocalizeString::get("client.settings.language.desc"));
     set->enumData = &this->clientLanguage;
     set->value = set->enumData->getValue();
     set->userUpdateCallback = [](Setting&) {
-        Latite::getNotifications().push(LocalizeString::get("client.message.languageSwitchHelper.name"));
+        Latite::get().onLanguageChanged();
         };
 
     for (int i = 0; auto & lang : l10nData->getLanguages()) {
@@ -901,6 +901,17 @@ void Latite::initLanguageSetting() {
         i++;
     }
     this->getSettings().addSetting(set);
+}
+
+void Latite::onLanguageChanged() {
+    getSettings().refreshLocalization();
+
+    getModuleManager().forEach([](std::shared_ptr<Module> mod) {
+        mod->refreshLocalization();
+        });
+
+    getCommandManager().refreshLocalization();
+    getScreenManager().get<ClickGUI>().requestModuleListRebuild();
 }
 
 void Latite::detectLanguage() {

@@ -1,7 +1,9 @@
 #pragma once
+#include <optional>
 #include <string>
 #include <vector>
 #include "client/feature/Feature.h"
+#include "client/localization/LocalizeString.h"
 
 class ICommand : public Listener, public Feature {
 public:
@@ -12,6 +14,11 @@ public:
         for (auto& a : aliases) {
             this->aliases.push_back(a);
         }
+    }
+    ICommand(std::string const& name, LocalizedString const& description, std::string const& usage, std::vector<std::string> aliases = {})
+            : ICommand(name, description.value(), usage, aliases)
+    {
+        descriptionKey = description.key();
     }
     ~ICommand() = default;
 
@@ -29,10 +36,15 @@ public:
     [[nodiscard]] std::wstring desc() override { return description; };
     [[nodiscard]] std::string name() override { return cmdName; };
 
+    virtual void refreshLocalization() {
+        if (descriptionKey) description = LocalizeString::get(*descriptionKey).value();
+    }
+
 
 protected:
     std::string cmdName, usage;
     std::wstring description;
+    std::optional<std::string> descriptionKey;
     std::vector<std::string> aliases;
     bool script = false;
 
@@ -45,6 +57,8 @@ class Command : public ICommand {
 public:
 	~Command() = default;
 	Command(std::string const& name, std::wstring const& description, std::string const& usage, std::vector<std::string> aliases = {})
+		: ICommand(name, description, usage, aliases) {}
+	Command(std::string const& name, LocalizedString const& description, std::string const& usage, std::vector<std::string> aliases = {})
 		: ICommand(name, description, usage, aliases) {}
 
 	virtual void message(std::wstring const& str, bool error = false) override;

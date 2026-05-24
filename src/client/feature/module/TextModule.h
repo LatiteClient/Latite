@@ -39,6 +39,22 @@ public:
 	maxBGX(maxBgX), cacheText(cacheText) {
 		this->textual = true;
 	}
+	TextModule(std::string const& name, LocalizedString const& displayName,
+		LocalizedString const& description, Category category, float maxBgX = 400.f, int keybind = 0, bool cacheText = false)
+		: TextModule(name, displayName.value(), description.value(), category, maxBgX, keybind, cacheText) {
+		setDisplayName(displayName);
+		setDescription(description);
+	}
+	TextModule(std::string const& name, LocalizedString const& displayName,
+		std::wstring const& description, Category category, float maxBgX = 400.f, int keybind = 0, bool cacheText = false)
+		: TextModule(name, displayName.value(), description, category, maxBgX, keybind, cacheText) {
+		setDisplayName(displayName);
+	}
+	TextModule(std::string const& name, std::wstring const& displayName,
+		LocalizedString const& description, Category category, float maxBgX = 400.f, int keybind = 0, bool cacheText = false)
+		: TextModule(name, displayName, description.value(), category, maxBgX, keybind, cacheText) {
+		setDescription(description);
+	}
 
 	virtual ~TextModule() = default;
 
