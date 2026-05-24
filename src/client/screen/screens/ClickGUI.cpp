@@ -250,7 +250,7 @@ void ClickGUI::onRender(Event&) {
 				dc.ctx->DrawBitmap(Latite::getAssets().hudEditIcon.getBitmap(), hudEditRect);
 
 				if (shouldSelect(hudEditRect, cursorPos)) {
-					setTooltip(L"Open the HUD editor");
+					setTooltip(LocalizeString::get("client.ui.clickGui.openHudEditor.desc"));
 					if (justClicked[0]) {
 						playClickSound();
 						close();
@@ -267,7 +267,7 @@ void ClickGUI::onRender(Event&) {
 				settingsRect = { right - setSize, hudEditRect.bottom - setSize, right, hudEditRect.bottom };
 
 				if (shouldSelect(settingsRect, cursorPos)) {
-					setTooltip(L"Open general client settings");
+					setTooltip(LocalizeString::get("client.ui.clickGui.openSettings.desc"));
 					if (justClicked[0]) {
 						playClickSound();
 						this->tab = SETTINGS;
@@ -334,10 +334,10 @@ void ClickGUI::onRender(Event&) {
 				std::wstring searchStr = L"";
 				if (searchTextBox.getText().empty() && !searchTextBox.isSelected()) {
 					if (this->tab == SETTINGS) {
-						searchStr += L"Search Settings";
+						searchStr += LocalizeString::get("client.ui.clickGui.searchSettings.name").value();
 					}
 					else if (this->tab == MODULES) {
-						searchStr += L"Search";
+						searchStr += LocalizeString::get("client.ui.clickGui.search.name").value();
 					}
 				}
 				else {
@@ -403,7 +403,12 @@ void ClickGUI::onRender(Event&) {
 		else if (tab == MODULES) {
 
 			// all, game, hud, etc buttons
-			static std::vector<std::tuple<std::wstring, ClickGUI::ModTab, d2d::Color, float>> modTabs = { {L"All", ALL, searchCol, 0.f }, {L"Game", GAME, searchCol, 0.f }, {L"HUD", HUD, searchCol, 0.f }, { L"Plugins", SCRIPT, searchCol, 0.f } };
+			static std::vector<std::tuple<std::string, ClickGUI::ModTab, d2d::Color, float>> modTabs = {
+				{"client.ui.clickGui.tab.all.name", ALL, searchCol, 0.f},
+				{"client.ui.clickGui.tab.game.name", GAME, searchCol, 0.f},
+				{"client.ui.clickGui.tab.hud.name", HUD, searchCol, 0.f},
+				{"client.ui.clickGui.tab.plugins.name", SCRIPT, searchCol, 0.f}
+			};
 
 			float nodeWidth = guiWidth * 0.083f;
 
@@ -445,7 +450,7 @@ void ClickGUI::onRender(Event&) {
 				dc.ctx->FillRoundedRectangle(rr, rend.getSolidBrush());
 
 				float baseColor = 1.f - (0.1f * std::get<3>(pair));
-				dc.drawText(renderTabRect, std::get<0>(pair), { baseColor, baseColor, baseColor, 0.8f }, FontSelection::PrimaryRegular, nodeRect.getHeight() / 2.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+				dc.drawText(renderTabRect, LocalizeString::get(std::get<0>(pair)), { baseColor, baseColor, baseColor, 0.8f }, FontSelection::PrimaryRegular, nodeRect.getHeight() / 2.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 				dc.ctx->SetTarget(myBitmap);
 
 				auto oWidth = nodeRect.getWidth() + gaps;
@@ -597,7 +602,7 @@ void ClickGUI::onRender(Event&) {
 
 							dc.drawRoundedRectangle(resetRect, d2d::Color::RGB(0xFB, 0x36, 0x36), resetRect.getHeight() * (0.223f), 0.5f, DrawUtil::OutlinePosition::Inside);
 
-							dc.drawText(resetRect, L"Reset", d2d::Color::RGB(0xFB, 0x36, 0x36), Renderer::FontSelection::PrimaryRegular, resetRect.getHeight() * 0.6f,
+							dc.drawText(resetRect, LocalizeString::get("client.ui.clickGui.reset.name"), d2d::Color::RGB(0xFB, 0x36, 0x36), Renderer::FontSelection::PrimaryRegular, resetRect.getHeight() * 0.6f,
 								DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 
@@ -676,7 +681,7 @@ void ClickGUI::onRender(Event&) {
 					authorRect.top = textRect.bottom;
 					authorRect.bottom = modRect.bottom;
 
-					dc.drawText(authorRect, L"by " + mod.pluginAuthor, d2d::Color(1.f, 1.f, 1.f, 0.57f), FontSelection::PrimarySemilight, authorRect.getHeight() * 0.7f,
+					dc.drawText(authorRect, util::FormatWString(LocalizeString::get("client.ui.clickGui.pluginAuthor.name"), { mod.pluginAuthor }), d2d::Color(1.f, 1.f, 1.f, 0.57f), FontSelection::PrimarySemilight, authorRect.getHeight() * 0.7f,
 						DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 				}
 
@@ -696,7 +701,7 @@ void ClickGUI::onRender(Event&) {
 							toggleRect.getHeight() / 2.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 						if (this->shouldSelect(toggleRect, cursorPos)) {
-							setTooltip(L"Enable this module using the keybind.");
+							setTooltip(LocalizeString::get("client.ui.clickGui.enableWithKeybind.desc"));
 						}
 
 					}
@@ -798,7 +803,7 @@ void ClickGUI::onRender(Event&) {
 					mod.toggleColorOn = util::LerpColorState(mod.toggleColorOn, accentColor + 0.2f, accentColor, selecting);
 					// draw install/update box
 					dc.fillRoundedRectangle(installUpdateRect, mod.pluginInstalled ? mod.toggleColorOff : mod.toggleColorOn, installUpdateRect.getHeight() / 4.f);
-					dc.drawText(installUpdateRect, mod.pluginInstalled ? L"Installed" : L"Install", d2d::Colors::WHITE, FontSelection::PrimaryLight, installUpdateRect.getHeight() / 2.f,
+					dc.drawText(installUpdateRect, mod.pluginInstalled ? LocalizeString::get("client.ui.clickGui.installed.name") : LocalizeString::get("client.ui.clickGui.install.name"), d2d::Colors::WHITE, FontSelection::PrimaryLight, installUpdateRect.getHeight() / 2.f,
 						DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 				}
 
@@ -1123,7 +1128,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 		if (!set->desc().empty())
 			if (shouldSelect(textRect, cursorPos)) setTooltip(set->desc());
 		if (shouldSelect(keyRect, cursorPos)) {
-			setTooltip(L"Right click to reset");
+			setTooltip(LocalizeString::get("client.ui.clickGui.rightClickReset.desc"));
 			if (justClicked[0]) {
 				if (!this->activeSetting) activeSetting = set;
 				playClickSound();
@@ -1386,7 +1391,7 @@ void ClickGUI::drawColorPicker() {
 	RectF titleRect = { cPickerRect.left + remPad, cPickerRect.top + remPad, cPickerRect.right - remPad, cPickerRect.top + remPad + textSize };
 
 	{
-		dc.drawText(titleRect, L"Color Picker", { 1.f, 1.f, 1.f, 1.f }, Renderer::FontSelection::PrimaryLight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(titleRect, LocalizeString::get("client.ui.clickGui.colorPicker.name"), { 1.f, 1.f, 1.f, 1.f }, Renderer::FontSelection::PrimaryLight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	}
 
 	float boxTop = titleRect.bottom + remPad;

@@ -8,6 +8,7 @@
 #include "client/event/events/DrawHUDModulesEvent.h"
 #include "client/Latite.h"
 #include "client/config/ConfigManager.h"
+#include "client/localization/LocalizeString.h"
 #include "client/feature/module/ModuleManager.h"
 #include "client/feature/module/HUDModule.h"
 #include "client/feature/module/script/JsHudModule.h"
@@ -89,7 +90,7 @@ void HUDEditor::onRender(Event& ev) {
 			dc.fillRoundedRectangle(btnRect, col, 20.f);
 			dc.drawRoundedRectangle(btnRect, outlineCol, 20.f, 2.f, DrawUtil::OutlinePosition::Outside);
 
-			dc.drawText(btnRect, L"Mod Settings", d2d::Color(0.9f, 0.9f, 0.9f, 1.f), Renderer::FontSelection::PrimaryRegular, 20.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+			dc.drawText(btnRect, LocalizeString::get("client.ui.hudEditor.modSettings.name"), d2d::Color(0.9f, 0.9f, 0.9f, 1.f), Renderer::FontSelection::PrimaryRegular, 20.f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		}
 
 		clearLayers();

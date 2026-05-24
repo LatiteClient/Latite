@@ -2,6 +2,7 @@
 #include "../Screen.h"
 #include "../../render/asset/Asset.h"
 #include "client/screen/TextBox.h"
+#include "client/localization/LocalizeString.h"
 #include <memory>
 #include <array>
 #include <map>
@@ -32,6 +33,10 @@ public:
 	void requestModuleListRebuild() {
 		shouldRebuildModLikes = true;
 	}
+
+	void refreshLocalization() {
+		colorPicker.rgbSetting.refreshLocalization();
+	}
 protected:
 	void onEnable(bool ignoreAnims) override;
 	void onDisable() override;
@@ -54,9 +59,10 @@ private:
 		Vec2 dragOffs = {};
 		ValueType rgbSelector = BoolValue(false);
 
-		Setting rgbSetting = Setting{ "colorpickerrgb", L"RGB", L"Cycle through a rainbow of colors for this setting" };
+		Setting rgbSetting;
 
-		ColorPicker() {
+		ColorPicker()
+			: rgbSetting("colorpickerrgb", LocalizeString::get("client.ui.clickGui.rgb.name"), LocalizeString::get("client.ui.clickGui.rgb.desc")) {
 			rgbSetting.value = &rgbSelector;
 		}
 	} colorPicker{};

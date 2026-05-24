@@ -904,14 +904,15 @@ void Latite::initLanguageSetting() {
 }
 
 void Latite::onLanguageChanged() {
-    getSettings().refreshLocalization();
+    Latite::getSettings().refreshLocalization();
 
-    getModuleManager().forEach([](std::shared_ptr<Module> mod) {
+    Latite::getModuleManager().forEach([](std::shared_ptr<Module> mod) {
         mod->refreshLocalization();
         });
 
-    getCommandManager().refreshLocalization();
-    getScreenManager().get<ClickGUI>().requestModuleListRebuild();
+    Latite::getCommandManager().refreshLocalization();
+    Latite::getScreenManager().get<ClickGUI>().requestModuleListRebuild();
+    Latite::getScreenManager().get<ClickGUI>().refreshLocalization();
 }
 
 void Latite::detectLanguage() {
