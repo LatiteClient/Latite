@@ -117,6 +117,7 @@ private:
 	};
 
 	std::map<Setting*, std::shared_ptr<TextBox>> settingBoxes = {};
+	std::map<Setting*, float> dropdownAnimations = {};
 
 	d2d::Rect rect = {};
 	d2d::Rect cPickerRect = {};

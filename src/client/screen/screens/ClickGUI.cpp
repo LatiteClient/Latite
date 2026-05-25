@@ -1329,6 +1329,11 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 			enumRect.right = enumRect.left + dropdownWidth;
 		contains = this->shouldSelect(enumRect, cursorPos);
 		bool dropdownOpen = dropdownSetting == set;
+		float& dropdownAnim = dropdownAnimations[set];
+		dropdownAnim = std::lerp(dropdownAnim, dropdownOpen ? 1.f : 0.f, Latite::getRenderer().getDeltaTime() * 0.3f);
+		if (dropdownOpen && dropdownAnim > 0.995f) dropdownAnim = 1.f;
+		else if (!dropdownOpen && dropdownAnim < 0.005f) dropdownAnim = 0.f;
+		bool renderDropdown = dropdownAnim > 0.f;
 
 		auto lerpedColor = util::LerpColorState(set->rendererInfo.col, colOff + 0.1f, colOff, contains);
 		set->rendererInfo.col[0] = lerpedColor.r;
@@ -1346,9 +1351,9 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 			: RectF{ enumRect.left + entryPadX, enumRect.top, enumRect.right - arrowPad - arrowSize - entryPadX, enumRect.bottom };
 		drawTextClipped(dc, selectedTextRect, selectedTextRect, text, d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::PrimaryRegular, textSize * 0.9f,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-		drawBitmapRotated(dc, Latite::getAssets().arrowIcon.getBitmap(), arrowRect, dropdownOpen ? 180.f : 0.f, 0.92f);
+		drawBitmapRotated(dc, Latite::getAssets().arrowIcon.getBitmap(), arrowRect, dropdownAnim * 180.f, 0.92f);
 
-		if (dropdownOpen) {
+		if (renderDropdown) {
 			dc.drawRoundedRectangle(enumRect, d2d::Color(1.f, 1.f, 1.f, 1.f), round);
 		}
 
@@ -1371,7 +1376,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 		}
 
 		float dropdownBottom = enumRect.bottom;
-		if (dropdownOpen) {
+		if (renderDropdown) {
 			float entryHeight = checkboxSize * 1.16f;
 			float dropdownPad = checkboxSize * 0.22f;
 			RectF dropdownRect = {
@@ -1380,7 +1385,10 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 				enumRect.right,
 				enumRect.bottom + dropdownPad + entryHeight * static_cast<float>(entries->size())
 			};
+			RectF animatedDropdownRect = dropdownRect;
+			animatedDropdownRect.bottom = dropdownRect.top + dropdownRect.getHeight() * dropdownAnim;
 
+			dc.ctx->PushAxisAlignedClip(animatedDropdownRect.get(), D2D1_ANTIALIAS_MODE_ALIASED);
 			dc.fillRoundedRectangle(dropdownRect, d2d::Color::RGB(0x2E, 0x2E, 0x2E).asAlpha(0.96f), round);
 			dc.drawRoundedRectangle(dropdownRect, d2d::Color(1.f, 1.f, 1.f, 0.18f), round, 0.75f, DrawUtil::OutlinePosition::Inside);
 
@@ -1392,7 +1400,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 					dropdownRect.right,
 					dropdownRect.top + entryHeight * static_cast<float>(i + 1)
 				};
-				bool entryHovered = this->shouldSelect(entryRect, cursorPos);
+				bool entryHovered = dropdownOpen && animatedDropdownRect.contains(cursorPos) && this->shouldSelect(entryRect, cursorPos);
 				bool entrySelected = i == val.val;
 				if (entryHovered || entrySelected) {
 					dc.fillRoundedRectangle(entryRect, (entrySelected ? accentColor : d2d::Color::RGB(0xD9, 0xD9, 0xD9)).asAlpha(entrySelected ? 0.34f : 0.12f), round);
@@ -1423,12 +1431,13 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 					}
 				}
 			}
+			dc.ctx->PopAxisAlignedClip();
 
-			if (justClicked[0] && !contains && !this->shouldSelect(dropdownRect, cursorPos) && !clickedEntry) {
+			if (dropdownOpen && justClicked[0] && !contains && !this->shouldSelect(dropdownRect, cursorPos) && !clickedEntry) {
 				dropdownSetting = nullptr;
 			}
 
-			dropdownBottom = dropdownRect.bottom;
+			dropdownBottom = animatedDropdownRect.bottom;
 		}
 
 		if (contains && justClicked[0]) {
@@ -1437,7 +1446,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 			playClickSound();
 		}
 
-		return dropdownOpen ? std::max(dropdownBottom, settingBottom) : settingBottom;
+		return renderDropdown ? std::max(dropdownBottom, settingBottom) : settingBottom;
 	}
 	case Setting::Type::Color:
 	{
@@ -1976,6 +1985,7 @@ void ClickGUI::onEnable(bool ignoreAnims) {
 	mouseButtons = {};
 	justClicked = {};
 	dropdownSetting = nullptr;
+	dropdownAnimations.clear();
 	this->tab = MODULES;
 }
 
@@ -1983,6 +1993,7 @@ void ClickGUI::onDisable() {
 	capturedKey = 0;
 	activeSetting = nullptr;
 	dropdownSetting = nullptr;
+	dropdownAnimations.clear();
 	searchTextBox.reset();
 	searchTextBox.setSelected(false);
 
