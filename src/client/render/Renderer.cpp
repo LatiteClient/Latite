@@ -49,6 +49,17 @@ namespace {
 		return L"en-us";
 	}
 
+	DWRITE_READING_DIRECTION selectedTextReadingDirection() {
+		try {
+			return Latite::get().getL10nData().isSelectedLanguageRightToLeft()
+				? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT
+				: DWRITE_READING_DIRECTION_LEFT_TO_RIGHT;
+		}
+		catch (...) {
+			return DWRITE_READING_DIRECTION_LEFT_TO_RIGHT;
+		}
+	}
+
 	const char* dxgiErrorName(HRESULT hr) noexcept {
 		switch (hr) {
 		case DXGI_ERROR_SDK_COMPONENT_MISSING:
@@ -496,6 +507,12 @@ void Renderer::releaseAllResources(bool flush, bool indep) {
 void Renderer::createTextFormats() {
 	float fontSize = 10.f;
 	std::wstring locale = selectedTextLocale();
+	DWRITE_READING_DIRECTION readingDirection = selectedTextReadingDirection();
+	auto configureTextFormat = [readingDirection](ComPtr<IDWriteTextFormat>& format) {
+		if (!format.Get()) return;
+		format->SetReadingDirection(readingDirection);
+		format->SetFlowDirection(DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
+	};
 
 	ThrowIfFailed(dWriteFactory->CreateTextFormat(fontFamily.c_str(),
 		nullptr,
@@ -551,6 +568,12 @@ void Renderer::createTextFormats() {
 		locale.c_str(),
 		this->secondaryLight.GetAddressOf()));
 
+	configureTextFormat(primaryFont);
+	configureTextFormat(primarySemilight);
+	configureTextFormat(primaryLight);
+	configureTextFormat(secondaryFont);
+	configureTextFormat(secondarySemilight);
+	configureTextFormat(secondaryLight);
 }
 
 void Renderer::releaseTextFormats() {
@@ -596,18 +619,27 @@ void Renderer::releaseDeviceResources() {
 	blurEffect = nullptr;
 }
 
-IDWriteTextLayout* Renderer::getLayout(IDWriteTextFormat* fmt, std::wstring const& str, bool cache) {
+ComPtr<IDWriteTextLayout> Renderer::getLayout(IDWriteTextFormat* fmt, std::wstring const& str, bool cache) {
 	auto hash = util::fnv1a_64w(str);
-	auto it = this->cachedLayouts.find(hash);
-	if (it != cachedLayouts.end()) {
-		if (it->second.first == fmt) {
-			return it->second.second.Get();
+	if (cache) {
+		auto it = this->cachedLayouts.find(hash);
+		if (it != cachedLayouts.end()) {
+			if (it->second.first == fmt) {
+				return it->second.second;
+			}
 		}
 	}
 
 	auto [width, height] = getScreenSize();
 	ComPtr<IDWriteTextLayout> layout;
-	dWriteFactory->CreateTextLayout(str.c_str(), static_cast<uint32_t>(str.size()), fmt, width, height, layout.GetAddressOf());
+	if (FAILED(dWriteFactory->CreateTextLayout(str.c_str(), static_cast<uint32_t>(str.size()), fmt, width, height, layout.GetAddressOf()))) {
+		return {};
+	}
+
+	if (!cache) {
+		return layout;
+	}
+
 	this->cachedLayouts[hash] = { fmt, layout };
-	return layout.Get(); // Im pretty sure it implicitly adds a ref when I add it to cachedLayouts
+	return layout;
 }

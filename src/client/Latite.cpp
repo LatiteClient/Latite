@@ -913,6 +913,7 @@ void Latite::initLanguageSetting() {
 }
 
 void Latite::onLanguageChanged() {
+    Latite::getRenderer().refreshTextFormats();
     Latite::getSettings().refreshLocalization();
 
     Latite::getModuleManager().forEach([](std::shared_ptr<Module> mod) {

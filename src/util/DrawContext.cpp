@@ -30,6 +30,24 @@ static bool isDebugTextOverflow(Vec2 const& textSize, d2d::Rect const& rect) {
 }
 #endif
 
+static DWRITE_READING_DIRECTION getSelectedTextReadingDirection() {
+	try {
+		return Latite::get().getL10nData().isSelectedLanguageRightToLeft()
+			? DWRITE_READING_DIRECTION_RIGHT_TO_LEFT
+			: DWRITE_READING_DIRECTION_LEFT_TO_RIGHT;
+	}
+	catch (...) {
+		return DWRITE_READING_DIRECTION_LEFT_TO_RIGHT;
+	}
+}
+
+static void applySelectedTextDirection(IDWriteTextLayout* layout) {
+	if (!layout) return;
+
+	layout->SetReadingDirection(getSelectedTextReadingDirection());
+	layout->SetFlowDirection(DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
+}
+
 D2D1_RECT_F D2DUtil::getRect(RectF const& rc)  {
 	return D2D1::RectF(rc.left, rc.top, rc.right, rc.bottom);
 }
@@ -164,16 +182,18 @@ void D2DUtil::drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity) {
 void D2DUtil::drawText(RectF const& rc, std::wstring const& ws, d2d::Color const& color, Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment, bool cache, bool hyphen)  {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	brush->SetColor(color.get());
-	if (auto layout = Latite::getRenderer().getLayout(fmt.Get(), ws, cache)) {
+	auto layout = Latite::getRenderer().getLayout(fmt.Get(), ws, cache);
+	if (layout.Get()) {
 		layout->SetMaxWidth(rc.getWidth());
 		layout->SetMaxHeight(rc.getHeight());
 		DWRITE_TEXT_RANGE range{};
 		range.startPosition = 0;
 		range.length = static_cast<UINT32>(ws.size());
 		layout->SetFontSize(size, range);
+		applySelectedTextDirection(layout.Get());
 		layout->SetTextAlignment(alignment);
 		layout->SetParagraphAlignment(verticalAlignment);
-		this->ctx->DrawTextLayout({ rc.getPos().x, rc.getPos().y }, layout, brush);
+		this->ctx->DrawTextLayout({ rc.getPos().x, rc.getPos().y }, layout.Get(), brush);
 #ifdef LATITE_DEBUG
 		if (Latite::get().shouldRenderDebugTextRects()) {
 			DWRITE_TEXT_METRICS metrics{};
@@ -188,7 +208,8 @@ void D2DUtil::drawText(RectF const& rc, std::wstring const& ws, d2d::Color const
 Vec2 D2DUtil::getTextSize(std::wstring const& ws, Renderer::FontSelection font, float size, bool tw, bool cache, std::optional<Vec2> bounds) {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	auto ss = ctx->GetPixelSize();
-	if (auto layout = Latite::getRenderer().getLayout(fmt.Get(), ws, cache)) {
+	auto layout = Latite::getRenderer().getLayout(fmt.Get(), ws, cache);
+	if (layout.Get()) {
 		if (!bounds.has_value()) {
 			layout->SetMaxWidth(static_cast<float>(ss.width));
 			layout->SetMaxHeight(static_cast<float>(ss.height));
@@ -201,6 +222,7 @@ Vec2 D2DUtil::getTextSize(std::wstring const& ws, Renderer::FontSelection font, 
 		range.startPosition = 0;
 		range.length = static_cast<UINT32>(ws.size());
 		layout->SetFontSize(size, range);
+		applySelectedTextDirection(layout.Get());
 		layout->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 		layout->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 		DWRITE_TEXT_METRICS textMetrics;
@@ -219,13 +241,15 @@ Vec2 D2DUtil::getTextSize(std::wstring const& ws, Renderer::FontSelection font, 
 d2d::Rect D2DUtil::getTextRect(std::wstring const& ws, Renderer::FontSelection font, float size, float pad, bool cache) {
 	ComPtr<IDWriteTextFormat> fmt = Latite::getRenderer().getTextFormat(font);
 	auto ss = ctx->GetPixelSize();
-	if (auto layout = Latite::getRenderer().getLayout(fmt.Get(), ws, cache)) {
+	auto layout = Latite::getRenderer().getLayout(fmt.Get(), ws, cache);
+	if (layout.Get()) {
 		layout->SetMaxWidth(static_cast<float>(ss.width));
 		layout->SetMaxHeight(static_cast<float>(ss.height));
 		DWRITE_TEXT_RANGE range;
 		range.startPosition = 0;
 		range.length = static_cast<UINT32>(ws.size());
 		layout->SetFontSize(size, range);
+		applySelectedTextDirection(layout.Get());
 		layout->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 		layout->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 		DWRITE_TEXT_METRICS metrics;
@@ -233,9 +257,11 @@ d2d::Rect D2DUtil::getTextRect(std::wstring const& ws, Renderer::FontSelection f
 		layout->GetMetrics(&metrics);
 		layout->GetOverhangMetrics(&overhangs);
 
+		float width = metrics.widthIncludingTrailingWhitespace + std::max(0.f, overhangs.left) + std::max(0.f, overhangs.right);
+		float height = metrics.height + std::max(0.f, overhangs.top) + std::max(0.f, overhangs.bottom);
 		return {
-			metrics.left - overhangs.left - pad, metrics.top - overhangs.top - pad,
-			metrics.layoutWidth + overhangs.right + pad, metrics.layoutHeight + overhangs.bottom + pad
+			-pad, -pad,
+			width + pad, height + pad
 		};
 	}
 	return {};

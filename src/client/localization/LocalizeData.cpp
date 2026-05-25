@@ -11,9 +11,6 @@ LocalizeData::LocalizeData() {
 
     languages = {
         fallbackLanguage,
-#ifdef LATITE_DEBUG
-        std::make_shared<Language>(GET_RESOURCE(lang_ar_AR_json), "ar"),
-#endif
         std::make_shared<Language>(GET_RESOURCE(lang_cs_CZ_json), "cs"),
         std::make_shared<Language>(GET_RESOURCE(lang_nl_NL_json), "nl"),
         std::make_shared<Language>(GET_RESOURCE(lang_fr_FR_json), "fr"),
@@ -24,6 +21,7 @@ LocalizeData::LocalizeData() {
         std::make_shared<Language>(GET_RESOURCE(lang_pt_BR_json), "pt-BR"),
         std::make_shared<Language>(GET_RESOURCE(lang_zh_CN_json), "zh-CN"),
         std::make_shared<Language>(GET_RESOURCE(lang_zh_TW_json), "zh-TW"),
+        std::make_shared<Language>(GET_RESOURCE(lang_ar_AR_json), "ar"),
     };
 
     for (auto& lang : languages) {
@@ -46,6 +44,7 @@ bool LocalizeData::parseLangFile(Language& lang, const std::string& content, boo
     if (!obj["translations"].is_object()) return false;
 
     lang.name = obj["name"].get<std::string>();
+    lang.rightToLeft = obj.value("rtl", false);
 
     if (cache) {
         for (auto it = obj["translations"].begin(); it != obj["translations"].end(); ++it) {
@@ -54,6 +53,15 @@ bool LocalizeData::parseLangFile(Language& lang, const std::string& content, boo
     }
 
     return true;
+}
+
+bool LocalizeData::isSelectedLanguageRightToLeft() const {
+    const int selectedLanguage = Latite::get().getSelectedLanguage();
+    if (selectedLanguage < 0 || selectedLanguage >= static_cast<int>(languages.size())) {
+        return false;
+    }
+
+    return languages[selectedLanguage]->rightToLeft;
 }
 
 std::wstring LocalizeData::get(const std::string& id) {

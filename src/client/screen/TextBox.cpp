@@ -1,5 +1,17 @@
 #include "pch.h"
 #include "TextBox.h"
+#include "client/Latite.h"
+
+namespace {
+	bool isRightToLeftText() {
+		try {
+			return Latite::get().getL10nData().isSelectedLanguageRightToLeft();
+		}
+		catch (...) {
+			return false;
+		}
+	}
+}
 
 bool TextBox::isSelected() {
 	return isSelectedBool;
@@ -31,12 +43,17 @@ void TextBox::onChar(wchar_t character) {
 }
 
 void TextBox::onKeyDown(int key) {
+	const bool rtl = isRightToLeftText();
 	if (key == VK_LEFT) {
-		place = std::max(place - 1, 0);
+		place = rtl
+			? std::min(place + 1, static_cast<int>(text.size()))
+			: std::max(place - 1, 0);
 		startTime = std::chrono::high_resolution_clock::now();
 	}
 	else if (key == VK_RIGHT) {
-		place = std::min(place + 1, maxChars);
+		place = rtl
+			? std::max(place - 1, 0)
+			: std::min(place + 1, static_cast<int>(text.size()));
 		startTime = std::chrono::high_resolution_clock::now();
 	}
 }
@@ -70,6 +87,8 @@ void TextBox::render(DrawUtil& dc, float rounding, d2d::Color backgroundColor, d
 
 	// draw blinker
 	Vec2 ts = dc.getTextSize(text.substr(0, this->place), Renderer::FontSelection::PrimaryRegular, textSize);
-	d2d::Rect blinkerRect = { rect.left + ts.x, rect.top + 2.f, rect.left + ts.x + 2.f, rect.bottom - 2.f };
+	const bool rtl = isRightToLeftText();
+	float blinkerX = rtl ? rect.right - ts.x - 2.f : rect.left + ts.x;
+	d2d::Rect blinkerRect = { blinkerX, rect.top + 2.f, blinkerX + 2.f, rect.bottom - 2.f };
 	if (isSelected() && shouldBlink()) dc.fillRectangle(blinkerRect, textColor);
 }

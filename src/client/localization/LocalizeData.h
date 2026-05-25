@@ -10,6 +10,7 @@ public:
 	struct Language {
 		std::string name;
 		std::string langCode;
+		bool rightToLeft = false;
 		Resource resource;
 
 		std::unordered_map<std::string, std::wstring> localizeCache;
@@ -27,6 +28,7 @@ public:
 		return languages;
 	}
 
+	[[nodiscard]] bool isSelectedLanguageRightToLeft() const;
 	std::wstring get(const std::string& key);
 private:
 	std::optional<std::wstring> tryGetKey(Language& lang, const std::string& key);

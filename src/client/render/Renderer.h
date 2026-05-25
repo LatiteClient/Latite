@@ -287,5 +287,5 @@ public:
 		return this->wicFactory.Get();
 	}
 
-	[[nodiscard]] IDWriteTextLayout* getLayout(IDWriteTextFormat* fmt, std::wstring const& str, bool cache = false);
+	[[nodiscard]] ComPtr<IDWriteTextLayout> getLayout(IDWriteTextFormat* fmt, std::wstring const& str, bool cache = false);
 };
