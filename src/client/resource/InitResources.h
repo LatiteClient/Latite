@@ -18,7 +18,7 @@ LOAD_RESOURCE(document_png);
 LOAD_RESOURCE(latiteapi_js)
 
 // Translations
-LOAD_RESOURCE(lang_ar_AR_json);
+LOAD_RESOURCE(lang_ar_SA_json);
 LOAD_RESOURCE(lang_en_US_json)
 LOAD_RESOURCE(lang_cs_CZ_json)
 LOAD_RESOURCE(lang_nl_NL_json)
