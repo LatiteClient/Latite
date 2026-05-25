@@ -105,6 +105,20 @@ namespace {
 		dc.ctx->DrawBitmap(bitmap, rect.get(), opacity);
 		dc.ctx->SetTransform(oldTransform);
 	}
+
+	void drawTextClipped(D2DUtil& dc, RectF const& clipRect, RectF const& textRect, std::wstring const& text, d2d::Color const& color,
+		Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment, bool cache = false) {
+		dc.ctx->PushAxisAlignedClip(clipRect.get(), D2D1_ANTIALIAS_MODE_ALIASED);
+		dc.drawText(textRect, text, color, font, size, alignment, verticalAlignment, cache);
+		dc.ctx->PopAxisAlignedClip();
+	}
+
+	float measuredLabelHeight(D2DUtil& dc, RectF const& textRect, std::wstring const& text, FontSelection font, float size) {
+		if (textRect.getWidth() <= 0.f) return textRect.getHeight();
+
+		float measured = dc.getTextSize(text, font, size, true, false, Vec2{ textRect.getWidth(), 10000.f }).y;
+		return std::max(textRect.getHeight(), measured);
+	}
 }
 
 ClickGUI::ClickGUI() {
@@ -444,13 +458,18 @@ void ClickGUI::onRender(Event&) {
 
 			float settingWidth = rect.getWidth() / 3.f;
 			float padToSettings = 0.04787f * rect.getHeight();
+			float settingRowHeight = rect.getWidth() * setting_height_relative;
+			float settingsBottom = rect.bottom - settingRowHeight * 1.3f;
+			auto hasSettingRoom = [settingsBottom, settingRowHeight](Vec2 const& settingPos) {
+				return settingPos.y + settingRowHeight <= settingsBottom;
+			};
 			float startColumnX = logicalColumnX(rect, offX, settingWidth, rtl);
 			// float settings
 			Vec2 setPos = { startColumnX, searchRect.bottom + padToSettings };
 			{
 				// go through all float settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
-					if (setPos.y <= rect.bottom) {
+					if (hasSettingRoom(setPos)) {
 						if (set->visible && set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Float /* || set->value->index() == Setting::Type::Int*/) {
 							setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth, 0.35f) + (setting_height_relative * rect.getHeight());
 						}
@@ -463,7 +482,7 @@ void ClickGUI::onRender(Event&) {
 			{
 				// go through all enum settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
-					if (setPos.y <= rect.bottom) {
+					if (hasSettingRoom(setPos)) {
 						if (set->visible && set->shouldRender(settings) && (set->value->index() == (size_t)Setting::Type::Key || set->value->index() == (size_t)Setting::Type::Enum || set->value->index() == (size_t)Setting::Type::Color || set->value->index() == (size_t)Setting::Type::Text)) {
 							setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth) + (setting_height_relative * rect.getHeight());
 						}
@@ -476,7 +495,7 @@ void ClickGUI::onRender(Event&) {
 			{
 				// go through all bool settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
-					if (setPos.y <= rect.bottom) {
+					if (hasSettingRoom(setPos)) {
 						if (set->visible && set->shouldRender(settings) && set->value->index() == (size_t)Setting::Type::Bool /* || set->value->index() == Setting::Type::Enum*/) {
 							setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth) + (setting_height_relative * rect.getHeight());
 						}
@@ -1130,8 +1149,10 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 		}
 
 		textVal.str = tb->getText();
-		dc.drawText(rightRc, set->getDisplayName(), { 1.f, 1.f, 1.f, 1.f }, Renderer::FontSelection::PrimarySemilight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-		return rightRc.bottom;
+		auto label = set->getDisplayName();
+		rightRc.bottom = rightRc.top + measuredLabelHeight(dc, rightRc, label, Renderer::FontSelection::PrimarySemilight, textSize);
+		dc.drawText(rightRc, label, { 1.f, 1.f, 1.f, 1.f }, Renderer::FontSelection::PrimarySemilight, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+		return std::max(txtRc.bottom, rightRc.bottom);
 	}
 	break;
 	case Setting::Type::Bool:
@@ -1323,7 +1344,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 		RectF selectedTextRect = rtl
 			? RectF{ enumRect.left + arrowPad + arrowSize + entryPadX, enumRect.top, enumRect.right - entryPadX, enumRect.bottom }
 			: RectF{ enumRect.left + entryPadX, enumRect.top, enumRect.right - arrowPad - arrowSize - entryPadX, enumRect.bottom };
-		dc.drawText(selectedTextRect, text, d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::PrimaryRegular, textSize * 0.9f,
+		drawTextClipped(dc, selectedTextRect, selectedTextRect, text, d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::PrimaryRegular, textSize * 0.9f,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		drawBitmapRotated(dc, Latite::getAssets().arrowIcon.getBitmap(), arrowRect, dropdownOpen ? 180.f : 0.f, 0.92f);
 
@@ -1334,8 +1355,11 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 
 		float padToName = 0.006335f * rect.getWidth();
 		RectF textRect = labelAfterStartControl(enumRect, pos, size, padToName, rtl);
+		auto label = set->getDisplayName();
+		textRect.bottom = textRect.top + measuredLabelHeight(dc, textRect, label, FontSelection::PrimaryRegular, textSize);
+		float settingBottom = std::max(enumRect.bottom, textRect.bottom);
 
-		dc.drawText(textRect, set->getDisplayName(), { 1.f, 1.f, 1.f, 1.f }, FontSelection::PrimaryRegular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		dc.drawText(textRect, label, { 1.f, 1.f, 1.f, 1.f }, FontSelection::PrimaryRegular, textSize, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		if (!set->desc().empty())
 			if (shouldSelect(textRect, cursorPos)) setTooltip(set->desc());
 
@@ -1380,7 +1404,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 					entryRect.right - entryPadX,
 					entryRect.bottom
 				};
-				dc.drawText(entryTextRect, entries->at(i).name(), d2d::Colors::WHITE, FontSelection::PrimaryRegular, textSize * 0.9f,
+				drawTextClipped(dc, entryTextRect, entryTextRect, entries->at(i).name(), d2d::Colors::WHITE, FontSelection::PrimaryRegular, textSize * 0.9f,
 					DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
 				if (entryHovered) {
@@ -1413,7 +1437,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 			playClickSound();
 		}
 
-		return dropdownOpen ? dropdownBottom : enumRect.bottom;
+		return dropdownOpen ? std::max(dropdownBottom, settingBottom) : settingBottom;
 	}
 	case Setting::Type::Color:
 	{
