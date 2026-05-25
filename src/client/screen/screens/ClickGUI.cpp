@@ -97,6 +97,14 @@ namespace {
 		dc.ctx->DrawBitmap(bitmap, rect.get(), opacity);
 		dc.ctx->SetTransform(oldTransform);
 	}
+
+	void drawBitmapRotated(D2DUtil& dc, ID2D1Bitmap* bitmap, RectF const& rect, float degrees, float opacity = 1.f) {
+		D2D1::Matrix3x2F oldTransform;
+		dc.ctx->GetTransform(&oldTransform);
+		dc.ctx->SetTransform(D2D1::Matrix3x2F::Rotation(degrees, { rect.centerX(), rect.centerY() }) * oldTransform);
+		dc.ctx->DrawBitmap(bitmap, rect.get(), opacity);
+		dc.ctx->SetTransform(oldTransform);
+	}
 }
 
 ClickGUI::ClickGUI() {
@@ -993,6 +1001,11 @@ void ClickGUI::onKey(Event& evGeneric) {
 		ev.setCancelled(true);
 		return;
 	}
+	if (this->dropdownSetting && ev.isDown() && ev.getKey() == VK_ESCAPE) {
+		dropdownSetting = nullptr;
+		ev.setCancelled(true);
+		return;
+	}
 	if (this->activeSetting) {
 		if (ev.isDown()) {
 			if (ev.getKey() == VK_ESCAPE) {
@@ -1255,6 +1268,12 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 		bool contains = this->shouldSelect(enumRect, cursorPos);
 
 		EnumValue& val = std::get<EnumValue>(*set->value);
+		auto* entries = set->enumData->getEntries();
+		if (!entries || entries->empty()) {
+			return enumRect.bottom;
+		}
+
+		val.val = std::clamp(val.val, 0, static_cast<int>(entries->size()) - 1);
 
 		auto colOff = d2d::Color::RGB(0xD9, 0xD9, 0xD9).asAlpha(0.11f);
 		if (!set->rendererInfo.init) {
@@ -1264,12 +1283,6 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 			set->rendererInfo.col[2] = colOff.b;
 			set->rendererInfo.col[3] = colOff.a;
 		}
-		auto lerpedColor = util::LerpColorState(set->rendererInfo.col, colOff + 0.1f, colOff, contains);
-		set->rendererInfo.col[0] = lerpedColor.r;
-		set->rendererInfo.col[1] = lerpedColor.g;
-		set->rendererInfo.col[2] = lerpedColor.b;
-		set->rendererInfo.col[3] = lerpedColor.a;
-
 		auto text = set->enumData->getSelectedName();
 
 		auto ts = dc.getTextSize(text, FontSelection::PrimarySemilight, textSize * 0.9f) + Vec2(8.f, 0.f);
@@ -1279,12 +1292,42 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 			else enumRect.right = enumRect.left + newWidth;
 		}
 
+		float entryPadX = checkboxSize * 0.42f;
+		float arrowSize = checkboxSize * 0.35f;
+		float arrowPad = checkboxSize * 0.45f;
+		float maxEntryTextWidth = ts.x;
+		for (auto& entry : *entries) {
+			maxEntryTextWidth = std::max(maxEntryTextWidth, dc.getTextSize(entry.name(), FontSelection::PrimaryRegular, textSize * 0.9f).x);
+		}
+
+		float maxDropdownWidth = std::max(checkboxSize * 2.f, size * (1.f - fTextWidth));
+		float dropdownWidth = std::min(maxDropdownWidth, std::max(enumRect.getWidth(), maxEntryTextWidth + entryPadX * 2.f + arrowSize + arrowPad));
+		if (rtl)
+			enumRect.left = enumRect.right - dropdownWidth;
+		else
+			enumRect.right = enumRect.left + dropdownWidth;
+		contains = this->shouldSelect(enumRect, cursorPos);
+		bool dropdownOpen = dropdownSetting == set;
+
+		auto lerpedColor = util::LerpColorState(set->rendererInfo.col, colOff + 0.1f, colOff, contains);
+		set->rendererInfo.col[0] = lerpedColor.r;
+		set->rendererInfo.col[1] = lerpedColor.g;
+		set->rendererInfo.col[2] = lerpedColor.b;
+		set->rendererInfo.col[3] = lerpedColor.a;
+
 		dc.fillRoundedRectangle(enumRect, Color(set->rendererInfo.col), round);
 
-		dc.drawText(enumRect, text, d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::PrimaryRegular, textSize * 0.9f,
-			DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		RectF arrowRect = rtl
+			? RectF{ enumRect.left + arrowPad, enumRect.centerY(arrowSize), enumRect.left + arrowPad + arrowSize, enumRect.centerY(arrowSize) + arrowSize }
+			: RectF{ enumRect.right - arrowPad - arrowSize, enumRect.centerY(arrowSize), enumRect.right - arrowPad, enumRect.centerY(arrowSize) + arrowSize };
+		RectF selectedTextRect = rtl
+			? RectF{ enumRect.left + arrowPad + arrowSize + entryPadX, enumRect.top, enumRect.right - entryPadX, enumRect.bottom }
+			: RectF{ enumRect.left + entryPadX, enumRect.top, enumRect.right - arrowPad - arrowSize - entryPadX, enumRect.bottom };
+		dc.drawText(selectedTextRect, text, d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::PrimaryRegular, textSize * 0.9f,
+			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+		drawBitmapRotated(dc, Latite::getAssets().arrowIcon.getBitmap(), arrowRect, dropdownOpen ? 180.f : 0.f, 0.92f);
 
-		if (activeSetting == set) {
+		if (dropdownOpen) {
 			dc.drawRoundedRectangle(enumRect, d2d::Color(1.f, 1.f, 1.f, 1.f), round);
 		}
 
@@ -1296,23 +1339,81 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 		if (!set->desc().empty())
 			if (shouldSelect(textRect, cursorPos)) setTooltip(set->desc());
 
-		if (shouldSelect(enumRect, cursorPos)) {
+		if (contains) {
 			if (set->enumData->getSelectedDesc().size() > 0) {
 				setTooltip(set->enumData->getSelectedDesc());
 			}
 			else setTooltip(set->enumData->getSelectedName());
 		}
 
-		if (shouldSelect(enumRect, cursorPos)) {
-			if (justClicked[0]) {
-				// cycle
-				set->enumData->next();
-				set->update();
-				set->userUpdate();
-				playClickSound();
+		float dropdownBottom = enumRect.bottom;
+		if (dropdownOpen) {
+			float entryHeight = checkboxSize * 1.16f;
+			float dropdownPad = checkboxSize * 0.22f;
+			RectF dropdownRect = {
+				enumRect.left,
+				enumRect.bottom + dropdownPad,
+				enumRect.right,
+				enumRect.bottom + dropdownPad + entryHeight * static_cast<float>(entries->size())
+			};
+
+			dc.fillRoundedRectangle(dropdownRect, d2d::Color::RGB(0x2E, 0x2E, 0x2E).asAlpha(0.96f), round);
+			dc.drawRoundedRectangle(dropdownRect, d2d::Color(1.f, 1.f, 1.f, 0.18f), round, 0.75f, DrawUtil::OutlinePosition::Inside);
+
+			bool clickedEntry = false;
+			for (int i = 0; i < static_cast<int>(entries->size()); ++i) {
+				RectF entryRect = {
+					dropdownRect.left,
+					dropdownRect.top + entryHeight * static_cast<float>(i),
+					dropdownRect.right,
+					dropdownRect.top + entryHeight * static_cast<float>(i + 1)
+				};
+				bool entryHovered = this->shouldSelect(entryRect, cursorPos);
+				bool entrySelected = i == val.val;
+				if (entryHovered || entrySelected) {
+					dc.fillRoundedRectangle(entryRect, (entrySelected ? accentColor : d2d::Color::RGB(0xD9, 0xD9, 0xD9)).asAlpha(entrySelected ? 0.34f : 0.12f), round);
+				}
+
+				RectF entryTextRect = {
+					entryRect.left + entryPadX,
+					entryRect.top,
+					entryRect.right - entryPadX,
+					entryRect.bottom
+				};
+				dc.drawText(entryTextRect, entries->at(i).name(), d2d::Colors::WHITE, FontSelection::PrimaryRegular, textSize * 0.9f,
+					DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+
+				if (entryHovered) {
+					auto desc = entries->at(i).desc();
+					setTooltip(desc.empty() ? entries->at(i).name() : desc);
+					if (justClicked[0]) {
+						if (val.val != i) {
+							val.val = i;
+							set->update();
+							set->userUpdate();
+						}
+
+						dropdownSetting = nullptr;
+						clickedEntry = true;
+						playClickSound();
+					}
+				}
 			}
+
+			if (justClicked[0] && !contains && !this->shouldSelect(dropdownRect, cursorPos) && !clickedEntry) {
+				dropdownSetting = nullptr;
+			}
+
+			dropdownBottom = dropdownRect.bottom;
 		}
-		return enumRect.bottom;
+
+		if (contains && justClicked[0]) {
+			dropdownSetting = dropdownOpen ? nullptr : set;
+			activeSetting = nullptr;
+			playClickSound();
+		}
+
+		return dropdownOpen ? dropdownBottom : enumRect.bottom;
 	}
 	case Setting::Type::Color:
 	{
@@ -1850,12 +1951,14 @@ void ClickGUI::onEnable(bool ignoreAnims) {
 	lerpScroll = 0.f;
 	mouseButtons = {};
 	justClicked = {};
+	dropdownSetting = nullptr;
 	this->tab = MODULES;
 }
 
 void ClickGUI::onDisable() {
 	capturedKey = 0;
 	activeSetting = nullptr;
+	dropdownSetting = nullptr;
 	searchTextBox.reset();
 	searchTextBox.setSelected(false);
 

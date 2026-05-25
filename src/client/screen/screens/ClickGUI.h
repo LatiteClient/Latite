@@ -122,6 +122,7 @@ private:
 	d2d::Rect cPickerRect = {};
 
 	Setting* activeSetting = nullptr;
+	Setting* dropdownSetting = nullptr;
 	int capturedKey = 0;
 	float adaptedScale = 0.f;
 
