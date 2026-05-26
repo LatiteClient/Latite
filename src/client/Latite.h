@@ -37,7 +37,7 @@ public:
 	[[nodiscard]] LocalizeData& getL10nData() noexcept { return *l10nData; }
 	[[nodiscard]] Timings& getTimings() noexcept { return timings; }
 	[[nodiscard]] std::string getCommandPrefix() { return util::WStrToStr(std::get<TextValue>(commandPrefix).str); }
-	[[nodiscard]] int getSelectedLanguage() { return clientLanguage.getSelectedKey(); }
+	[[nodiscard]] int getSelectedLanguage();
 
 	void queueEject() noexcept;
 	void initialize(HINSTANCE hInst);
@@ -45,7 +45,6 @@ public:
 	void downloadChakraCore();
 	void initLanguageSetting();
 	void initSettings();
-	void detectLanguage();
 	void onLanguageChanged();
 
 	void queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback);
@@ -132,10 +131,6 @@ public:
 		return std::get<BoolValue>(snapLines);
 	}
 
-	[[nodiscard]] bool getDetectLanguageSetting() {
-		return std::get<BoolValue>(detectLanguageSetting);
-	}
-
 	[[nodiscard]] SDK::Font* getFont();
 
 	void fetchLatiteUsers();
@@ -184,7 +179,6 @@ private:
 #endif
 	ValueType centerCursorMenus = BoolValue(false);
 	ValueType snapLines = BoolValue(true);
-	ValueType detectLanguageSetting = BoolValue(true);
 	ValueType secondaryFont = TextValue(L"Segoe UI");
 	ValueType rgbSpeed = FloatValue(1.f);
 

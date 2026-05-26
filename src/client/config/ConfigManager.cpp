@@ -1,7 +1,35 @@
 #include "pch.h"
+#include <algorithm>
 #include "ConfigManager.h"
 #include "client/Latite.h"
 #include "client/feature/module/ModuleManager.h"
+
+namespace {
+	std::optional<bool> getLegacyDetectLanguageValue(SettingGroup& group) {
+		std::optional<bool> legacyDetectLanguage;
+		group.forEach([&](std::shared_ptr<Setting> set) {
+			if (set->name() != "detectLanguage") return;
+
+			if (auto* value = std::get_if<BoolValue>(&set->resolvedValue)) {
+				legacyDetectLanguage = value->value;
+			}
+			});
+
+		return legacyDetectLanguage;
+	}
+
+	void migrateLegacyLanguageValue(Setting& languageSetting, std::optional<bool> legacyDetectLanguage) {
+		if (!legacyDetectLanguage) return;
+
+		auto* languageValue = std::get_if<EnumValue>(&languageSetting.resolvedValue);
+		if (!languageValue) return;
+
+		const int legacyLanguageValue = std::max(languageValue->val, 0);
+		languageValue->val = (*legacyDetectLanguage && legacyLanguageValue == 0)
+			? 0
+			: legacyLanguageValue + 1;
+	}
+}
 
 ConfigManager::ConfigManager() {
 	auto folder = util::GetLatitePath() / "Configs";
@@ -19,11 +47,20 @@ void ConfigManager::applyLanguageConfig(std::string_view languageSettingName) {
 
 		// Might be a bit hacky
 		if (Latite::getSettings().name() == item->name()) {
+			std::shared_ptr<Setting> languageSetting;
+			const auto legacyDetectLanguage = getLegacyDetectLanguageValue(*item);
+
 			item->forEach([&](std::shared_ptr<Setting> set) {
 				if (set->name() == languageSettingName) {
-					Latite::get().loadLanguageConfig(set);
+					languageSetting = set;
 				}
 				});
+
+			if (languageSetting) {
+				migrateLegacyLanguageValue(*languageSetting, legacyDetectLanguage);
+				Latite::get().loadLanguageConfig(languageSetting);
+			}
+
 			Latite::get().loadConfig(*item.get());
 		}
 	}

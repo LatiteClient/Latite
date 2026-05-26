@@ -3,10 +3,10 @@
 
 #include "client/resource/Resource.h"
 
-#pragma once
-
 class LocalizeData {
 public:
+	static constexpr int systemDefaultLanguageSettingValue = 0;
+
 	struct Language {
 		std::string name;
 		std::string langCode;
@@ -29,8 +29,10 @@ public:
 	}
 
 	[[nodiscard]] bool isSelectedLanguageRightToLeft() const;
+	[[nodiscard]] int resolveLanguageSetting(int selectedLanguageSetting) const;
 	std::wstring get(const std::string& key);
 private:
+	[[nodiscard]] int getSystemDefaultLanguageIndex() const;
 	std::optional<std::wstring> tryGetKey(Language& lang, const std::string& key);
 	std::shared_ptr<Language> fallbackLanguage;
 	std::vector<std::shared_ptr<Language>> languages;

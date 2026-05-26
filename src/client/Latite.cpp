@@ -3,7 +3,6 @@
 //
 #include <array>
 #include <cstdint>
-#include <regex>
 
 #include "Latite.h"
 #include "localization/LocalizeString.h"
@@ -37,9 +36,6 @@
 #include "mc/common/client/game/FontRepository.h"
 #include <winrt/windows.ui.viewmanagement.h>
 #include <winrt/windows.storage.streams.h>
-#include <winrt/windows.system.userprofile.h>
-// this looks like its unused, but this provides types for language.DisplayName(). compilation will fail without it.
-#include <winrt/windows.globalization.h>
 
 #include <mc/common/client/gui/ScreenView.h>
 #include <mc/common/client/gui/controls/VisualTree.h>
@@ -160,6 +156,7 @@ namespace {
             compileTime.substr(6, 2)
         );
     }
+
 }
 
 #define MVSIG(...) ([]() -> std::pair<SigImpl*, SigImpl*> {\
@@ -341,8 +338,6 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
 
     Latite::get().initSettings();
     Latite::getConfigManager().applyGlobalConfig();
-
-    Latite::get().detectLanguage();
 
     new (mmgrBuf) ModuleManager;
     new (commandMgrBuf) CommandManager;
@@ -539,6 +534,11 @@ std::optional<float> Latite::getMenuBlur() {
 
 std::vector<std::string> Latite::getLatiteUsers() {
     return latiteUsers;
+}
+
+int Latite::getSelectedLanguage() {
+    if (!l10nData) return 0;
+    return l10nData->resolveLanguageSetting(clientLanguage.getSelectedKey());
 }
 
 void Latite::queueEject() noexcept {
@@ -830,14 +830,6 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("detectLanguage",
-                                             LocalizeString::get("client.settings.detectLanguage.name"),
-                                             LocalizeString::get("client.settings.detectLanguage.desc"));
-        set->value = &this->detectLanguageSetting;
-        this->getSettings().addSetting(set);
-    }
-
-    {
         auto set = std::make_shared<Setting>("rgbSpeed", L"RGB Speed", L"How fast the RGB color cycles");
         set->value = &this->rgbSpeed;
         set->min = FloatValue(0.f);
@@ -903,9 +895,13 @@ void Latite::initLanguageSetting() {
         Latite::get().onLanguageChanged();
         };
 
+    set->enumData->addEntry({
+        LocalizeData::systemDefaultLanguageSettingValue, LocalizeString::get("client.settings.language.systemDefault.name")
+        });
+
     for (int i = 0; auto & lang : l10nData->getLanguages()) {
         set->enumData->addEntry({
-            i, util::StrToWStr(lang->name)
+            i + 1, util::StrToWStr(lang->name)
             });
         i++;
     }
@@ -923,40 +919,6 @@ void Latite::onLanguageChanged() {
     Latite::getCommandManager().refreshLocalization();
     Latite::getScreenManager().get<ClickGUI>().requestModuleListRebuild();
     Latite::getScreenManager().get<ClickGUI>().refreshLocalization();
-}
-
-void Latite::detectLanguage() {
-    if (!this->getDetectLanguageSetting()) return;
-    // run func if language is on english (default)
-    if (this->clientLanguage.getValue() != 0) return;
-
-    winrt::hstring topUserLanguage = winrt::Windows::System::UserProfile::GlobalizationPreferences::Languages().GetAt(0);
-    winrt::Windows::Globalization::Language language{topUserLanguage};
-    std::string systemLanguage = winrt::to_string(language.LanguageTag());
-
-    // Get the language code by itself EXCEPT for portuguese and chinese variants
-    // en-US -> en
-    std::regex pattern(R"(^([a-z]{2})-[A-Z]{2}$)");
-    std::smatch match;
-    if (std::regex_match(systemLanguage, match, pattern) && systemLanguage.find("pt") == std::string::npos &&
-        systemLanguage.find("zh") == std::string::npos) {
-        systemLanguage = match[1].str();
-    }
-
-    Latite::getSettings().forEach([&](std::shared_ptr<Setting> set) {
-        if (set->name() == "language") {
-            for (int i = 0; i < l10nData->getLanguages().size(); ++i) {
-                const std::shared_ptr<LocalizeData::Language>& lang = l10nData->getLanguages()[i];
-                if (systemLanguage == lang->langCode) {
-                    ValueType* value = set->enumData->getValue();
-                    if (value) {
-                        *value = EnumValue(i);
-                        return;
-                    }
-                }
-            }
-        }
-    });
 }
 
 void Latite::onUpdate(Event& evGeneric) {
