@@ -63,6 +63,27 @@ D2D1_RECT_F D2DUtil::getRect(RectF const& rc)  {
 	return D2D1::RectF(rc.left, rc.top, rc.right, rc.bottom);
 }
 
+void D2DUtil::drawBitmapMirroredX(ID2D1Bitmap* bitmap, RectF const& rect, bool mirror, float opacity) {
+	if (!mirror) {
+		ctx->DrawBitmap(bitmap, rect.get(), opacity);
+		return;
+	}
+
+	D2D1::Matrix3x2F oldTransform;
+	ctx->GetTransform(&oldTransform);
+	ctx->SetTransform(D2D1::Matrix3x2F::Scale(-1.f, 1.f, { rect.centerX(), rect.centerY() }) * oldTransform);
+	ctx->DrawBitmap(bitmap, rect.get(), opacity);
+	ctx->SetTransform(oldTransform);
+}
+
+void D2DUtil::drawBitmapRotated(ID2D1Bitmap* bitmap, RectF const& rect, float degrees, float opacity) {
+	D2D1::Matrix3x2F oldTransform;
+	ctx->GetTransform(&oldTransform);
+	ctx->SetTransform(D2D1::Matrix3x2F::Rotation(degrees, { rect.centerX(), rect.centerY() }) * oldTransform);
+	ctx->DrawBitmap(bitmap, rect.get(), opacity);
+	ctx->SetTransform(oldTransform);
+}
+
 void D2DUtil::fillRectangle(RectF const& rect, d2d::Color const& color)  {
 	this->brush->SetColor(color.get());
 	ctx->FillRectangle(getRect(rect), brush);

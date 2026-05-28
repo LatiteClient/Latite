@@ -35,76 +35,6 @@ float calcAnim = 0.f;
 
 namespace {
 	static constexpr float setting_height_relative = 0.0168f; // 0.0168
-
-	bool isRightToLeftUI() {
-		try {
-			return Latite::get().getL10nData().isSelectedLanguageRightToLeft();
-		}
-		catch (...) {
-			return false;
-		}
-	}
-
-	RectF rectFromStart(RectF const& bounds, float startOffset, float top, float width, float height, bool rtl) {
-		if (rtl) {
-			float right = bounds.right - startOffset;
-			return { right - width, top, right, top + height };
-		}
-
-		float left = bounds.left + startOffset;
-		return { left, top, left + width, top + height };
-	}
-
-	RectF rectFromEnd(RectF const& bounds, float endOffset, float top, float width, float height, bool rtl) {
-		if (rtl) {
-			float left = bounds.left + endOffset;
-			return { left, top, left + width, top + height };
-		}
-
-		float right = bounds.right - endOffset;
-		return { right - width, top, right, top + height };
-	}
-
-	RectF controlAtStart(Vec2 const& pos, float areaWidth, float controlWidth, float height, bool rtl) {
-		if (rtl) {
-			return { pos.x + areaWidth - controlWidth, pos.y, pos.x + areaWidth, pos.y + height };
-		}
-
-		return { pos.x, pos.y, pos.x + controlWidth, pos.y + height };
-	}
-
-	RectF labelAfterStartControl(RectF const& controlRect, Vec2 const& pos, float areaWidth, float gap, bool rtl) {
-		if (rtl) {
-			return { pos.x, controlRect.top, controlRect.left - gap, controlRect.bottom };
-		}
-
-		return { controlRect.right + gap, controlRect.top, pos.x + areaWidth, controlRect.bottom };
-	}
-
-	float logicalColumnX(RectF const& bounds, float logicalOffset, float width, bool rtl) {
-		return rtl ? bounds.right - logicalOffset - width : bounds.left + logicalOffset;
-	}
-
-	void drawBitmapMirroredX(D2DUtil& dc, ID2D1Bitmap* bitmap, RectF const& rect, bool mirror, float opacity = 1.f) {
-		if (!mirror) {
-			dc.ctx->DrawBitmap(bitmap, rect.get(), opacity);
-			return;
-		}
-
-		D2D1::Matrix3x2F oldTransform;
-		dc.ctx->GetTransform(&oldTransform);
-		dc.ctx->SetTransform(D2D1::Matrix3x2F::Scale(-1.f, 1.f, { rect.centerX(), rect.centerY() }) * oldTransform);
-		dc.ctx->DrawBitmap(bitmap, rect.get(), opacity);
-		dc.ctx->SetTransform(oldTransform);
-	}
-
-	void drawBitmapRotated(D2DUtil& dc, ID2D1Bitmap* bitmap, RectF const& rect, float degrees, float opacity = 1.f) {
-		D2D1::Matrix3x2F oldTransform;
-		dc.ctx->GetTransform(&oldTransform);
-		dc.ctx->SetTransform(D2D1::Matrix3x2F::Rotation(degrees, { rect.centerX(), rect.centerY() }) * oldTransform);
-		dc.ctx->DrawBitmap(bitmap, rect.get(), opacity);
-		dc.ctx->SetTransform(oldTransform);
-	}
 }
 
 ClickGUI::ClickGUI() {
@@ -205,7 +135,7 @@ void ClickGUI::onRender(Event&) {
 
 	rect = { guiX, guiY, ss.width - guiX, ss.height - guiY };
 	float guiWidth = rect.getWidth();
-	const bool rtl = isRightToLeftUI();
+	const bool rtl = Latite::get().getL10nData().isSelectedLanguageRightToLeft();
 
 	if (Latite::get().getMenuBlur()) dc.drawGaussianBlur(Latite::get().getMenuBlur().value() * (isActive() ? 1.f : calcAnim));
 
@@ -247,7 +177,7 @@ void ClickGUI::onRender(Event&) {
 	float offY = 0.03191f * rect.getHeight();
 	float imgSize = 0.05338f * rect.getWidth();
 
-	RectF logoRect = rectFromStart(rect, offX, rect.top + offY, imgSize, imgSize, rtl);
+	RectF logoRect = d2d::rectFromStart(rect, offX, rect.top + offY, imgSize, imgSize, rtl);
 
 	// Latite Logo + text
 	{
@@ -288,7 +218,7 @@ void ClickGUI::onRender(Event&) {
 		float xWidth = rect.getWidth() * 0.02323f;
 		float xHeight = xWidth;//rect.getHeight() * 0.04078f;
 
-		RectF xRect = rectFromEnd(rect, xOffs, rect.top + yOffs, xWidth, xHeight, rtl);
+		RectF xRect = d2d::rectFromEnd(rect, xOffs, rect.top + yOffs, xWidth, xHeight, rtl);
 
 		auto bmp = Latite::getAssets().xIcon.getBitmap();
 		dc.ctx->DrawBitmap(bmp, xRect, 1.f);
@@ -306,7 +236,7 @@ void ClickGUI::onRender(Event&) {
 				? RectF{ xRect.right + betw, xRect.top, xRect.right + betw + xWidth, xRect.bottom }
 				: RectF{ xRect.left - betw - xWidth, xRect.top, xRect.left - betw, xRect.bottom };
 			{
-				drawBitmapMirroredX(dc, Latite::getAssets().arrowBackIcon.getBitmap(), backArrowRect, rtl);
+				dc.drawBitmapMirroredX(Latite::getAssets().arrowBackIcon.getBitmap(), backArrowRect, rtl);
 			}
 			if (shouldSelect(backArrowRect, cursorPos)) {
 				if (justClicked[0]) {
@@ -369,7 +299,7 @@ void ClickGUI::onRender(Event&) {
 		float searchHeight = 0.0425f * rect.getHeight();
 		float searchRound = searchHeight * 0.416f;
 
-		searchRect = rectFromStart(rect, offX, logoRect.bottom + gapY, searchWidth, searchHeight, rtl);
+		searchRect = d2d::rectFromStart(rect, offX, logoRect.bottom + gapY, searchWidth, searchHeight, rtl);
 		auto searchCol = d2d::Color::RGB(0x70, 0x70, 0x70).asAlpha(0.28f);
 
 		if (shouldSelect(searchRect, cursorPos)) {
@@ -450,7 +380,7 @@ void ClickGUI::onRender(Event&) {
 			auto hasSettingRoom = [settingsBottom, settingRowHeight](Vec2 const& settingPos) {
 				return settingPos.y + settingRowHeight <= settingsBottom;
 			};
-			float startColumnX = logicalColumnX(rect, offX, settingWidth, rtl);
+			float startColumnX = d2d::logicalColumnX(rect, offX, settingWidth, rtl);
 			// float settings
 			Vec2 setPos = { startColumnX, searchRect.bottom + padToSettings };
 			{
@@ -478,7 +408,7 @@ void ClickGUI::onRender(Event&) {
 			}
 
 			// bool settings
-			setPos = { logicalColumnX(rect, rect.getWidth() * (1.3f / 3.f), settingWidth, rtl), searchRect.bottom + padToSettings };
+			setPos = { d2d::logicalColumnX(rect, rect.getWidth() * (1.3f / 3.f), settingWidth, rtl), searchRect.bottom + padToSettings };
 			{
 				// go through all bool settings
 				settings.forEach([&](std::shared_ptr<Setting> set) {
@@ -1093,7 +1023,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 	const float textSize = checkboxSize * 0.8f;
 	const auto cursorPos = SDK::ClientInstance::get()->cursorPos;
 	const float round = 0.1875f * checkboxSize;
-	const bool rtl = isRightToLeftUI();
+	const bool rtl = Latite::get().getL10nData().isSelectedLanguageRightToLeft();
 
 	auto accentColor = d2d::Color(Latite::get().getAccentColor().getMainColor());
 
@@ -1153,14 +1083,14 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 	break;
 	case Setting::Type::Bool:
 	{
-		RectF checkboxRect = controlAtStart(pos, size, checkboxSize, checkboxSize, rtl);
+		RectF checkboxRect = d2d::controlAtStart(pos, size, checkboxSize, checkboxSize, rtl);
 		float offs = checkboxSize * 0.66f;
-		RectF textRect = labelAfterStartControl(checkboxRect, pos, size, offs, rtl);
+		RectF textRect = d2d::labelAfterStartControl(checkboxRect, pos, size, offs, rtl);
 		auto disp = set->getDisplayName();
 		float labelHeight = dc.getMeasuredTextHeight(textRect, disp, FontSelection::PrimarySemilight, textSize, 3.f);
 		float rowHeight = std::max(checkboxSize, labelHeight);
 		checkboxRect = checkboxRect.translate(0.f, (rowHeight - checkboxSize) * 0.5f);
-		textRect = labelAfterStartControl(checkboxRect, pos, size, offs, rtl);
+		textRect = d2d::labelAfterStartControl(checkboxRect, pos, size, offs, rtl);
 		textRect.top = pos.y;
 		textRect.bottom = pos.y + rowHeight;
 
@@ -1207,7 +1137,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 	break;
 	case Setting::Type::Key:
 	{
-		RectF keyRect = controlAtStart(pos, size, checkboxSize * 2.f, checkboxSize, rtl);
+		RectF keyRect = d2d::controlAtStart(pos, size, checkboxSize * 2.f, checkboxSize, rtl);
 		std::wstring text = util::StrToWStr(util::KeyToString(std::get<KeyValue>(*set->value)));
 		float keyTextSize = textSize * 0.9f;
 		auto ts = dc.getTextSize(text, FontSelection::PrimaryRegular, keyTextSize, false, false, Vec2{ 10000.f, 10000.f }) + Vec2(8.f, 0.f);
@@ -1217,12 +1147,12 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 		else keyRect.right = keyRect.left + keyWidth;
 
 		float padToName = 0.006335f * rect.getWidth();
-		RectF textRect = labelAfterStartControl(keyRect, pos, size, padToName, rtl);
+		RectF textRect = d2d::labelAfterStartControl(keyRect, pos, size, padToName, rtl);
 		auto disp = set->getDisplayName();
 		float labelHeight = dc.getMeasuredTextHeight(textRect, disp, FontSelection::PrimarySemilight, textSize, 3.f);
 		float rowHeight = std::max(checkboxSize, labelHeight);
 		keyRect = keyRect.translate(0.f, (rowHeight - checkboxSize) * 0.5f);
-		textRect = labelAfterStartControl(keyRect, pos, size, padToName, rtl);
+		textRect = d2d::labelAfterStartControl(keyRect, pos, size, padToName, rtl);
 		textRect.top = pos.y;
 		textRect.bottom = pos.y + rowHeight;
 
@@ -1291,7 +1221,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 	}
 	case Setting::Type::Enum:
 	{
-		RectF enumRect = controlAtStart(pos, size, checkboxSize * 2.f, checkboxSize, rtl);
+		RectF enumRect = d2d::controlAtStart(pos, size, checkboxSize * 2.f, checkboxSize, rtl);
 
 		EnumValue& val = std::get<EnumValue>(*set->value);
 		auto* entries = set->enumData->getEntries();
@@ -1329,12 +1259,12 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 			enumRect.right = enumRect.left + dropdownWidth;
 
 		float padToName = 0.006335f * rect.getWidth();
-		RectF textRect = labelAfterStartControl(enumRect, pos, size, padToName, rtl);
+		RectF textRect = d2d::labelAfterStartControl(enumRect, pos, size, padToName, rtl);
 		auto label = set->getDisplayName();
 		float labelHeight = dc.getMeasuredTextHeight(textRect, label, FontSelection::PrimaryRegular, textSize, 3.f);
 		float rowHeight = std::max(checkboxSize, labelHeight);
 		enumRect = enumRect.translate(0.f, (rowHeight - checkboxSize) * 0.5f);
-		textRect = labelAfterStartControl(enumRect, pos, size, padToName, rtl);
+		textRect = d2d::labelAfterStartControl(enumRect, pos, size, padToName, rtl);
 		textRect.top = pos.y;
 		textRect.bottom = pos.y + rowHeight;
 		float settingBottom = pos.y + rowHeight;
@@ -1363,7 +1293,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 			: RectF{ enumRect.left + entryPadX, enumRect.top, enumRect.right - arrowPad - arrowSize - entryPadX, enumRect.bottom };
 		dc.drawSingleLineFitted(selectedTextRect, text, d2d::Color(1.f, 1.f, 1.f, 1.f), FontSelection::PrimaryRegular, enumTextSize,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
-		drawBitmapRotated(dc, Latite::getAssets().arrowIcon.getBitmap(), arrowRect, dropdownAnim * 180.f, 0.92f);
+		dc.drawBitmapRotated(Latite::getAssets().arrowIcon.getBitmap(), arrowRect, dropdownAnim * 180.f, 0.92f);
 
 		if (renderDropdown) {
 			dc.drawRoundedRectangle(enumRect, d2d::Color(1.f, 1.f, 1.f, 1.f), round);
@@ -1458,17 +1388,17 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
 	{
 		float padToName = 0.006335f * rect.getWidth();
 
-		RectF colRect = controlAtStart(pos, size, checkboxSize * 2.f, checkboxSize, rtl);
+		RectF colRect = d2d::controlAtStart(pos, size, checkboxSize * 2.f, checkboxSize, rtl);
 		bool contains = this->shouldSelect(colRect, cursorPos);
 		std::wstring name = set->getDisplayName();
 
 		auto& colVal = std::get<ColorValue>(*set->value);
 
-		RectF textRect = labelAfterStartControl(colRect, pos, size, padToName, rtl);
+		RectF textRect = d2d::labelAfterStartControl(colRect, pos, size, padToName, rtl);
 		float labelHeight = dc.getMeasuredTextHeight(textRect, name, FontSelection::PrimarySemilight, textSize, 3.f);
 		float rowHeight = std::max(checkboxSize, labelHeight);
 		colRect = colRect.translate(0.f, (rowHeight - checkboxSize) * 0.5f);
-		textRect = labelAfterStartControl(colRect, pos, size, padToName, rtl);
+		textRect = d2d::labelAfterStartControl(colRect, pos, size, padToName, rtl);
 		textRect.top = pos.y;
 		textRect.bottom = pos.y + rowHeight;
 		contains = this->shouldSelect(colRect, cursorPos);
@@ -1653,7 +1583,7 @@ bool ClickGUI::shouldSelect(d2d::Rect rc, Vec2 const& pt) {
 
 void ClickGUI::drawColorPicker() {
 	auto& cursorPos = SDK::ClientInstance::get()->cursorPos;
-	const bool rtl = isRightToLeftUI();
+	const bool rtl = Latite::get().getL10nData().isSelectedLanguageRightToLeft();
 	D2DUtil dc;
 	dc.ctx->SetTarget(auxiliaryBitmap.Get());
 	dc.ctx->Clear();

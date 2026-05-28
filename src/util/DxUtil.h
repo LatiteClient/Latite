@@ -237,6 +237,46 @@ namespace d2d {
 			return { left, top, right, bottom };
 		}
 	};
+
+	[[nodiscard]] inline Rect rectFromStart(Rect const& bounds, float startOffset, float top, float width, float height, bool rtl) {
+		if (rtl) {
+			float right = bounds.right - startOffset;
+			return { right - width, top, right, top + height };
+		}
+
+		float left = bounds.left + startOffset;
+		return { left, top, left + width, top + height };
+	}
+
+	[[nodiscard]] inline Rect rectFromEnd(Rect const& bounds, float endOffset, float top, float width, float height, bool rtl) {
+		if (rtl) {
+			float left = bounds.left + endOffset;
+			return { left, top, left + width, top + height };
+		}
+
+		float right = bounds.right - endOffset;
+		return { right - width, top, right, top + height };
+	}
+
+	[[nodiscard]] inline Rect controlAtStart(Vec2 const& pos, float areaWidth, float controlWidth, float height, bool rtl) {
+		if (rtl) {
+			return { pos.x + areaWidth - controlWidth, pos.y, pos.x + areaWidth, pos.y + height };
+		}
+
+		return { pos.x, pos.y, pos.x + controlWidth, pos.y + height };
+	}
+
+	[[nodiscard]] inline Rect labelAfterStartControl(Rect const& controlRect, Vec2 const& pos, float areaWidth, float gap, bool rtl) {
+		if (rtl) {
+			return { pos.x, controlRect.top, controlRect.left - gap, controlRect.bottom };
+		}
+
+		return { controlRect.right + gap, controlRect.top, pos.x + areaWidth, controlRect.bottom };
+	}
+
+	[[nodiscard]] inline float logicalColumnX(Rect const& bounds, float logicalOffset, float width, bool rtl) {
+		return rtl ? bounds.right - logicalOffset - width : bounds.left + logicalOffset;
+	}
 }
 
 namespace util {

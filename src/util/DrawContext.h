@@ -66,6 +66,8 @@ public:
 
 	virtual void drawGaussianBlur(float intensity = 5.f);
 	virtual void drawGaussianBlur(ID2D1Bitmap1* bmp, float intensity = 5.f);
+	void drawBitmapMirroredX(ID2D1Bitmap* bitmap, RectF const& rect, bool mirror, float opacity = 1.f);
+	void drawBitmapRotated(ID2D1Bitmap* bitmap, RectF const& rect, float degrees, float opacity = 1.f);
 
 	virtual void fillRectangle(RectF const& rect, ID2D1Brush* cbrush);
 	virtual void drawRectangle(RectF const& rect, ID2D1Brush* cbrush, float lineThickness = 1.f);
