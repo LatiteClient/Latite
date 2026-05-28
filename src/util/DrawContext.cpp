@@ -8,6 +8,7 @@
 #include <mc/common/client/renderer/game/BaseActorRenderContext.h>
 #include <mc/common/client/renderer/ItemRenderer.h>
 #include <ranges>
+#include <utility>
 
 static size_t countof(auto str, auto ch) {
 	size_t c = 0;
@@ -46,6 +47,16 @@ static void applySelectedTextDirection(IDWriteTextLayout* layout) {
 
 	layout->SetReadingDirection(getSelectedTextReadingDirection());
 	layout->SetFlowDirection(DWRITE_FLOW_DIRECTION_TOP_TO_BOTTOM);
+}
+
+static std::wstring singleLineText(std::wstring text) {
+	for (auto& ch : text) {
+		if (ch == L'\r' || ch == L'\n' || ch == L'\t') {
+			ch = L' ';
+		}
+	}
+
+	return text;
 }
 
 D2D1_RECT_F D2DUtil::getRect(RectF const& rc)  {
@@ -236,6 +247,68 @@ Vec2 D2DUtil::getTextSize(std::wstring const& ws, Renderer::FontSelection font, 
 		return Vec2(width, height);
 	}
 	return {};
+}
+
+void D2DUtil::drawTextClipped(RectF const& clipRect, RectF const& textRect, std::wstring const& text, d2d::Color const& color,
+	Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment, bool cache) {
+	ctx->PushAxisAlignedClip(clipRect.get(), D2D1_ANTIALIAS_MODE_ALIASED);
+	drawText(textRect, text, color, font, size, alignment, verticalAlignment, cache);
+	ctx->PopAxisAlignedClip();
+}
+
+void D2DUtil::drawWrappedTextClipped(RectF const& textRect, std::wstring const& text, d2d::Color const& color,
+	Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment, bool cache) {
+	drawTextClipped(textRect, textRect, text, color, font, size, alignment, verticalAlignment, cache);
+}
+
+void D2DUtil::drawSingleLineFitted(RectF const& textRect, std::wstring const& text, d2d::Color const& color,
+	Renderer::FontSelection font, float size, DWRITE_TEXT_ALIGNMENT alignment, DWRITE_PARAGRAPH_ALIGNMENT verticalAlignment, bool cache) {
+	std::wstring fitted = ellipsizeToWidth(text, font, size, textRect.getWidth());
+	drawTextClipped(textRect, textRect, fitted, color, font, size, alignment, verticalAlignment, cache);
+}
+
+float D2DUtil::getTextLineHeight(Renderer::FontSelection font, float size) {
+	float measured = getTextSize(L"Ay", font, size, true, false, Vec2{ 10000.f, 10000.f }).y;
+	return measured > 0.f ? measured : size * 1.25f;
+}
+
+float D2DUtil::getMeasuredTextHeight(RectF const& textRect, std::wstring const& text, Renderer::FontSelection font, float size, float maxLines) {
+	if (textRect.getWidth() <= 0.f) return textRect.getHeight();
+
+	float measured = getTextSize(text, font, size, true, false, Vec2{ textRect.getWidth(), 10000.f }).y;
+	if (maxLines > 0.f) {
+		measured = std::min(measured, getTextLineHeight(font, size) * maxLines);
+	}
+
+	return std::max(textRect.getHeight(), measured);
+}
+
+std::wstring D2DUtil::ellipsizeToWidth(std::wstring text, Renderer::FontSelection font, float size, float maxWidth) {
+	text = singleLineText(std::move(text));
+	if (text.empty() || maxWidth <= 1.f) return L"";
+
+	auto textWidth = [&](std::wstring const& value) {
+		return getTextSize(value, font, size, false, false, Vec2{ 10000.f, 10000.f }).x;
+	};
+
+	if (textWidth(text) <= maxWidth) return text;
+
+	const std::wstring suffix = L"...";
+	if (textWidth(suffix) > maxWidth) return L"";
+
+	size_t lo = 0;
+	size_t hi = text.size();
+	while (lo < hi) {
+		size_t mid = (lo + hi + 1) / 2;
+		if (textWidth(text.substr(0, mid) + suffix) <= maxWidth) {
+			lo = mid;
+		}
+		else {
+			hi = mid - 1;
+		}
+	}
+
+	return text.substr(0, lo) + suffix;
 }
 
 d2d::Rect D2DUtil::getTextRect(std::wstring const& ws, Renderer::FontSelection font, float size, float pad, bool cache) {
