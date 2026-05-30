@@ -1,9 +1,11 @@
 #pragma once
 #include <string>
 #include <filesystem>
+#include <vector>
 
 namespace d2d {
 	class Rect;
+	struct Color;
 }
 
 struct Color;
@@ -19,6 +21,17 @@ namespace util {
 	extern std::wstring FormatWString(std::wstring const& formatString, std::vector<std::wstring> const& formatArgs);
 	extern std::string Format(std::string const& s);
 	extern std::wstring WFormat(std::wstring const& s);
+
+	struct MinecraftFormatRun {
+		std::wstring text;
+		wchar_t colorCode = L'\0';
+	};
+
+	extern bool IsMinecraftFormattingCode(wchar_t code);
+	extern wchar_t NormalizeMinecraftFormattingCode(wchar_t code);
+	extern std::vector<MinecraftFormatRun> ParseMinecraftFormatting(std::wstring const& text);
+	extern std::wstring StripMinecraftFormatting(std::wstring const& text);
+	extern d2d::Color MinecraftFormattingColor(wchar_t code, d2d::Color const& fallback);
 	extern std::wstring GetClipboardText();
 	extern void SetClipboardText(std::wstring const& text);
 

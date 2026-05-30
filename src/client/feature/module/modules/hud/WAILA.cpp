@@ -109,6 +109,40 @@ namespace {
 		return base + L"  " + suffix;
 	}
 
+	float getMinecraftFormattedTextWidth(DrawUtil& dc, std::wstring const& text,
+	Renderer::FontSelection font, float size, bool cache) {
+		float width = 0.f;
+
+		for (auto const& run : util::ParseMinecraftFormatting(text)) {
+			if (run.text.empty()) continue;
+			width += dc.getTextSize(run.text, font, size, true, cache).x;
+		}
+
+		return width;
+	}
+
+	void drawMinecraftFormattedText(DrawUtil& dc, d2d::Rect const& rect, std::wstring const& text, d2d::Color const& defaultColor,
+		Renderer::FontSelection font, float size, bool cache) {
+		float x = rect.left;
+
+		for (auto const& run : util::ParseMinecraftFormatting(text)) {
+			if (run.text.empty()) continue;
+
+			float runWidth = dc.getTextSize(run.text, font, size, true, cache).x;
+
+			d2d::Rect runRect = rect;
+			runRect.left = x;
+			runRect.right = x + runWidth + 4.f;
+
+			auto color = util::MinecraftFormattingColor(run.colorCode, defaultColor);
+
+			dc.drawText(runRect, run.text, color, font, size, DWRITE_TEXT_ALIGNMENT_LEADING,
+				DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cache);
+
+			x += runWidth;
+		}
+	}
+
 	d2d::Color colorForBlockId(std::string const& id) {
 		std::string clean = stripIdentifier(id);
 
@@ -414,10 +448,16 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 		? 9.f
 		: 0.f;
 
-	auto titleTextSize = dc.getTextSize(target->title, Renderer::FontSelection::SecondaryLight, titleSize, false);
-	auto detailTextSize = dc.getTextSize(target->detail, Renderer::FontSelection::SecondaryLight, detailSize, false);
+	auto plainTitle = util::StripMinecraftFormatting(target->title);
+	auto plainDetail = util::StripMinecraftFormatting(target->detail);
+	bool cacheText = !isDefault && !inEditor;
 
-	float textWidth = std::max(titleTextSize.x, detailTextSize.x);
+	auto titleTextSize = dc.getTextSize(plainTitle, Renderer::FontSelection::SecondaryLight, titleSize, true, cacheText);
+	auto detailTextSize = dc.getTextSize(plainDetail, Renderer::FontSelection::SecondaryLight, detailSize, true, cacheText);
+
+	float titleWidth = getMinecraftFormattedTextWidth(dc, target->title, Renderer::FontSelection::SecondaryLight, titleSize, cacheText);
+	float detailWidth = getMinecraftFormattedTextWidth(dc, target->detail, Renderer::FontSelection::SecondaryLight, detailSize, cacheText);
+	float textWidth = std::max(titleWidth, detailWidth);
 	float contentWidth = iconSize + textGap + textWidth;
 	float width = std::max(defaultWidth, contentWidth + (paddingX * 2.f));
 	float textHeight = titleTextSize.y + detailTextSize.y + healthHeight;
@@ -444,9 +484,8 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 
 	float textLeft = paddingX + iconSize + textGap;
 	float y = paddingY;
-	dc.drawText({ textLeft, y, width - paddingX, y + titleTextSize.y + 2.f }, target->title, title,
-		Renderer::FontSelection::SecondaryLight, titleSize, DWRITE_TEXT_ALIGNMENT_LEADING,
-		DWRITE_PARAGRAPH_ALIGNMENT_NEAR, !isDefault && !inEditor);
+	drawMinecraftFormattedText(dc, {textLeft, y, width - paddingX, y + titleTextSize.y + 2.f}, target->title, title,
+	                           Renderer::FontSelection::SecondaryLight, titleSize, cacheText);
 	y += titleTextSize.y;
 
 	if (healthHeight > 0.f) {
@@ -455,9 +494,8 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	}
 
 	if (!target->detail.empty()) {
-		dc.drawText({ textLeft, y, width - paddingX, height - paddingY }, target->detail, detail,
-			Renderer::FontSelection::SecondaryLight, detailSize, DWRITE_TEXT_ALIGNMENT_LEADING,
-			DWRITE_PARAGRAPH_ALIGNMENT_NEAR, !isDefault && !inEditor);
+		drawMinecraftFormattedText(dc, {textLeft, y, width - paddingX, height - paddingY}, target->detail, detail,
+		                           Renderer::FontSelection::SecondaryLight, detailSize, cacheText);
 	}
 
 	dc.flush();
