@@ -513,14 +513,14 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult* hit) {
 	if (!block || !block->legacyBlock) return std::nullopt;
 
 	auto legacy = block->legacyBlock;
-	std::string nameSource = legacy->translateName;
+	std::string nameSource = legacy->name.getString();
 	if (nameSource.empty()) {
 		nameSource = "block";
 	}
 
 	std::wstring detail;
 	if (std::get<BoolValue>(showNamespace).value) {
-		detail = widen(namespaceFrom(nameSource));
+		detail = util::StrToWStr(legacy->namespacedId.getString());
 	}
 	if (std::get<BoolValue>(showCoordinates).value) {
 		detail = appendDetail(std::move(detail), formatBlockPos(hit->hitBlock));
