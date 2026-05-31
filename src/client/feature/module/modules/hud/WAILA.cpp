@@ -8,13 +8,13 @@
 #include "mc/common/world/level/block/Block.h"
 
 namespace {
-	constexpr float defaultWidth = 146.f;
-	constexpr float defaultHeight = 48.f;
-	constexpr float iconSize = 32.f;
+	constexpr float defaultWidth = 296.f;
+	constexpr float defaultHeight = 96.f;
+	constexpr float iconSize = 64.f;
 	constexpr float paddingX = 8.f;
 	constexpr float paddingY = 6.f;
 	constexpr float textGap = 8.f;
-	constexpr float borderThickness = 2.f;
+	constexpr float borderThickness = 3.f;
 
 	std::wstring titleCaseIdentifier(std::string id) {
 		if (auto colon = id.find(':'); colon != std::string::npos) {
@@ -226,7 +226,7 @@ WAILA::WAILA() : HUDModule("WAILA", L"WAILA", L"Shows the block or entity you ar
 	addSliderSetting("entityDistance", L"Entity Distance", L"Maximum entity inspection distance.", entityDistance,
 		FloatValue(2.f), FloatValue(12.f), FloatValue(0.5f), "showEntities"_istrue);
 	addSliderSetting("textSize", L"Text Size", L"Text size for the inspector.", textSize,
-		FloatValue(10.f), FloatValue(22.f), FloatValue(1.f));
+		FloatValue(20.f), FloatValue(44.f), FloatValue(1.f));
 	addSetting("background", L"Background", L"Inspector background color.", backgroundColor);
 	addSetting("border", L"Border", L"Inspector border color.", borderColor);
 	addSetting("titleColor", L"Title", L"Inspector title color.", titleColor);
