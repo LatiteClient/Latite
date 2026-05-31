@@ -1,5 +1,6 @@
 #pragma once
 #include "../../HUDModule.h"
+#include "../src/mc/common/client/renderer/texture/TextureUVCoordinateSet.h"
 
 class WAILA final : public HUDModule {
 public:
@@ -35,9 +36,9 @@ private:
 	ValueType entityDistance = FloatValue(6.f);
 	ValueType textSize = FloatValue(32.f);
 	ValueType backgroundColor = ColorValue(0.055f, 0.065f, 0.075f, 0.82f);
-	ValueType borderColor = ColorValue(0.54f, 0.47f, 1.00f, 1.f);
+	ValueType borderColor = ColorValue(0.44f, 0.35f, 0.96f, 1.f);
 	ValueType titleColor = ColorValue(1.f, 1.f, 1.f, 1.f);
-	ValueType detailColor = ColorValue(0.50f, 0.43f, 1.f, 1.f);
+	ValueType detailColor = ColorValue(0.33f, 0.33f, 1.00f, 1.f);
 	ValueType radius = FloatValue(0.f);
 
 	std::optional<TargetInfo> getTargetInfo(bool preview);
