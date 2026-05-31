@@ -33,12 +33,6 @@ namespace SDK {
 			return *item;
 		}
 
-		void finishPickupAnimation() {
-			showPickUp = false;
-			wasPickedUp = false;
-			pickupTime = {};
-		}
-
 		virtual ~ItemStackBase() = 0;
 	};
 

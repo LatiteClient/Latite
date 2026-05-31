@@ -1,6 +1,5 @@
 #pragma once
 #include "../../HUDModule.h"
-#include "mc/common/client/renderer/texture/TextureUVCoordinateSet.h"
 
 class WAILA final : public HUDModule {
 public:
@@ -22,14 +21,9 @@ private:
 		TargetType type = TargetType::Block;
 		std::wstring title;
 		std::wstring detail;
-		d2d::Color swatch = d2d::Colors::WHITE;
-		std::string texturePath;
-		std::string blockId;
 		SDK::Block const* block = nullptr;
-		SDK::TextureUVCoordinateSet const* textureUv = nullptr;
 		SDK::ItemStack* itemStack = nullptr;
 		float health = -1.f;
-		float distance = 0.f;
 	};
 
 	ValueType showBlocks = BoolValue(true);
