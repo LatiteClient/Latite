@@ -12,6 +12,8 @@ namespace SDK {
 		short aux; // 0x0020
 		uint8_t itemCount;
 		bool valid;
+		bool showPickUp;
+		bool wasPickedUp;
 		std::chrono::steady_clock::time_point pickupTime;
 		std::vector<class BlockLegacy*> canPlaceOn;
 		uintptr_t canPlaceOnHash;
@@ -29,6 +31,12 @@ namespace SDK {
 		Item* getItem() {
 			if (!item) return nullptr;
 			return *item;
+		}
+
+		void finishPickupAnimation() {
+			showPickUp = false;
+			wasPickedUp = false;
+			pickupTime = {};
 		}
 
 		virtual ~ItemStackBase() = 0;

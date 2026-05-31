@@ -125,6 +125,14 @@ public:
 		"55 41 56 56 57 53 48 83 EC ? 48 8D 6C 24 ? 48 C7 45 ? ? ? ? ? 48 89 D6 48 8D 7D ? 48 89 FA E8 ? ? ? ? 48 89 F9"_sig,
 		"ItemStackBase::getHoverName"};
 
+	inline static SigImpl ItemStack_ItemStackBlock{[](memory::signature_store&, uintptr_t res) { return res; },
+		"55 56 48 83 EC 38 48 8D 6C 24 30 48 C7 45 00 FE FF FF FF 48 89 CE E8 35 C3 FF FF 48 8D 05 ? ? ? ? 48 89 06 48 89 75 F8 48 8D 8E 80 00 00 00 E8 ? ? ? ? 48 8B 45 F8 48 83 C4 38 5E 5D C3"_sig,
+		"ItemStack::ItemStack(Block const&, int, CompoundTag const*)"};
+
+	inline static SigImpl ItemStackBase_destructor{[](memory::signature_store&, uintptr_t res) { return res; },
+		"56 57 48 83 EC 28 48 89 CE 48 8D 05 ? ? ? ? 48 89 01 48 8B 49 78 48 85 C9 74 11 48 8B 01 48 8B 00 BA 01 00 00 00 FF 15"_sig,
+		"ItemStackBase::~ItemStackBase"};
+
 
 	inline static SigImpl Tessellator_vertex{[](memory::signature_store&, uintptr_t res) { return res; },
 		"56 57 48 83 EC ? 0F 29 7C 24 ? 0F 29 74 24 ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 8B 81"_sig,
