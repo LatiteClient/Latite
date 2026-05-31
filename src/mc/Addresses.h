@@ -150,6 +150,18 @@ public:
 		"E8 ? ? ? ? 4C 8D 45 ? 4C 8D 8D ? ? ? ? 48 89 F2 E8 ? ? ? ? 80 BF"_sig,
 		"ItemRenderer::renderGuiItemNew"};
 
+	inline static SigImpl BlockGraphics_getForBlock{[](memory::signature_store&, uintptr_t res) { return res; },
+		"56 48 83 EC ? 48 89 CE E8 ? ? ? ? 48 85 C0 74 ? 48 83 C4 ? 5E C3 48 89 F1"_sig,
+		"BlockGraphics::getForBlock"};
+
+	inline static SigImpl BlockGraphics_getTexture{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 48 8B 41 ? 4C 8B 49 ? 49 29 C1 74 ? 49 C1 F9 ? 49 BA ? ? ? ? ? ? ? ? 4D 0F AF D1 49 FF CA 49 39 D2 4C 0F 43 D2 4F 8D 0C 52 49 C1 E1 ? 4A 8B 54 08 ? 4A 8B 44 08 ? 48 29 D0 48 C1 E8 ? 69 C0 ? ? ? ? 85 C0 7E ? 31 C9 41 39 C0 41 0F 42 C8 48 8D 04 49 48 8D 04 C2 EB"_sig,
+		"BlockGraphics::getTexture"};
+
+	inline static SigImpl BlockGraphics_getTextureAtPos{[](memory::signature_store&, uintptr_t res) { return res; },
+		"56 57 48 83 EC ? 48 89 D6 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 48 8B 41 ? 48 8B 51"_sig,
+		"BlockGraphics::getTexture(BlockPos)"};
+
 	inline static SigImpl UIControl_updateCachedPosition{[](memory::signature_store&, uintptr_t res) { return res; },
 		"55 56 57 48 83 EC ? 48 8D 6C 24 ? 0F 29 75 ? 48 C7 45 ? ? ? ? ? 48 89 CE 0F 57 F6 0F 29 75"_sig,
 		"UIControl::updateCachedPosition"};

@@ -2,6 +2,7 @@
 #include "ClientInstance.h"
 
 #include "Platform_GameCore.h"
+#include "mc/common/resources/ResourcePackManager.h"
 
 SDK::ClientInstance* SDK::ClientInstance::instance = nullptr;
 
@@ -33,6 +34,10 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
 
 SDK::Options* SDK::ClientInstance::getOptions() {
     return hat::member_at<Options*>(this, 0xC38);
+}
+
+SDK::ResourcePackManager& SDK::ClientInstance::getResourcePackManager() {
+    return *memory::callVirtual<ResourcePackManager*>(this, 0x60);
 }
 
 void SDK::ClientInstance::grabCursor() {

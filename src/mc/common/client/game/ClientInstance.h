@@ -3,6 +3,8 @@
 #include "util/LMath.h"
 
 namespace SDK {
+	class ResourcePackManager;
+
 	class ClientInstance {
 	public:
 		CLASS_FIELD(class MinecraftGame*, minecraftGame, 0x1A0);
@@ -17,6 +19,7 @@ namespace SDK {
 		class LocalPlayer* getLocalPlayer();
 		class GuiData* getGuiData();
 		class Options* getOptions();
+		class ResourcePackManager& getResourcePackManager();
 		//class ClientHMDState* getClientHMDState(); Removed in 1.21.111
 
 		void grabCursor();
