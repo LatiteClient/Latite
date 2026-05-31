@@ -509,7 +509,9 @@ void WAILA::drawHealthPips(DrawUtil& dc, float x, float y, float health) {
 }
 
 void WAILA::drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::Rect const& icon) {
-	ctxGeneric.fillRoundedRectangle(icon, d2d::Color::RGB(20, 20, 24, 150), 2.f);
+	// if i dont draw a super small rectangle before drawing items everything gets fucked for some reason
+	ctxGeneric.fillRoundedRectangle(d2d::Rect(icon.left / 48.f, icon.top / 48.f, icon.right / 48.f, icon.bottom / 48.f),
+	                                d2d::Color::RGB(20, 20, 24, 150), 2.f);
 
 	auto& dc = static_cast<MCDrawUtil&>(ctxGeneric);
 
