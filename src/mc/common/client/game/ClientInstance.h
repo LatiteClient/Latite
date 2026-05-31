@@ -3,8 +3,6 @@
 #include "util/LMath.h"
 
 namespace SDK {
-	class ResourcePackManager;
-
 	class ClientInstance {
 	public:
 		CLASS_FIELD(class MinecraftGame*, minecraftGame, 0x1A0);

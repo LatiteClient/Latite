@@ -2,7 +2,6 @@
 #include "ClientInstance.h"
 
 #include "Platform_GameCore.h"
-#include "mc/common/resources/ResourcePackManager.h"
 
 SDK::ClientInstance* SDK::ClientInstance::instance = nullptr;
 

@@ -4,6 +4,8 @@
 namespace SDK {
 	class Actor;
 	class HitResult;
+	class ItemStack;
+	struct TextureUVCoordinateSet;
 }
 
 class WAILA final : public HUDModule {
@@ -11,8 +13,10 @@ public:
 	WAILA();
 	~WAILA() override = default;
 
-	void render(DrawUtil& dc, bool isDefault, bool inEditor) override;
+	void render(DrawUtil& ctx, bool isDefault, bool inEditor) override;
 	void afterLoadConfig() override;
+
+	virtual bool forceMinecraftRenderer() override { return true; }
 
 private:
 	enum class TargetType {
@@ -25,6 +29,9 @@ private:
 		std::wstring title;
 		std::wstring detail;
 		d2d::Color swatch = d2d::Colors::WHITE;
+		std::string texturePath;
+		SDK::TextureUVCoordinateSet const* textureUv = nullptr;
+		SDK::ItemStack* itemStack = nullptr;
 		float health = -1.f;
 		float distance = 0.f;
 	};
@@ -49,4 +56,5 @@ private:
 	std::optional<TargetInfo> getEntityInfo(SDK::Actor* actor, float distance);
 
 	void drawHealthPips(DrawUtil& dc, float x, float y, float health);
+	void drawTargetIcon(DrawUtil& dc, TargetInfo const& target, d2d::Rect const& icon);
 };

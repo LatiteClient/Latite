@@ -2,17 +2,29 @@
 #include "WAILA.h"
 
 #include <algorithm>
+#include <array>
 #include <cctype>
+#include <cstdint>
 #include <cmath>
+#include <format>
 #include <iomanip>
+#include <limits>
+#include <string_view>
 #include <unordered_map>
+#include <unordered_set>
+
+#include <Shlwapi.h>
 
 #include "mc/common/entity/component/ActorTypeComponent.h"
+#include "mc/common/client/renderer/block/BlockGraphics.h"
+#include "mc/common/world/ItemStack.h"
+#include "mc/common/world/actor/item/ItemActor.h"
 #include "mc/common/world/actor/player/Player.h"
 #include "mc/common/world/level/BlockSource.h"
 #include "mc/common/world/level/HitResult.h"
 #include "mc/common/world/level/block/Block.h"
 #include "mc/common/world/level/block/BlockLegacy.h"
+#include "util/Logger.h"
 
 namespace {
 	constexpr float defaultWidth = 196.f;
@@ -107,6 +119,265 @@ namespace {
 		if (suffix.empty()) return base;
 		if (base.empty()) return suffix;
 		return base + L"  " + suffix;
+	}
+
+	bool endsWith(std::string_view value, std::string_view suffix) {
+		return value.size() >= suffix.size() && value.substr(value.size() - suffix.size()) == suffix;
+	}
+
+	std::string normalizeTexturePath(std::string path) {
+		std::replace(path.begin(), path.end(), '\\', '/');
+		if (endsWith(path, ".png")) {
+			path.resize(path.size() - 4);
+		}
+		if (path.starts_with("blocks/") || path.starts_with("items/")) {
+			path = "textures/" + path;
+		}
+		return path;
+	}
+
+	template <typename... Args>
+	void logWailaOnce(std::string key, std::string_view fmt, Args&&... args) {
+		static std::unordered_set<std::string> logged;
+		if (!logged.emplace(std::move(key)).second) return;
+
+		Logger::Info("[WAILA] {}", std::vformat(fmt, std::make_format_args(args...)));
+	}
+
+	bool hasPngSignature(std::string const& buffer) {
+		constexpr std::array<unsigned char, 8> pngSignature{ 0x89, 'P', 'N', 'G', 0x0D, 0x0A, 0x1A, 0x0A };
+		if (buffer.size() < pngSignature.size()) return false;
+
+		for (std::size_t i = 0; i < pngSignature.size(); ++i) {
+			if (static_cast<unsigned char>(buffer[i]) != pngSignature[i]) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	bool loadPngTextureResource(std::string const& normalizedPath, std::string* outBuffer = nullptr) {
+		if (normalizedPath.empty()) return false;
+
+		for (auto const& candidate : std::array<std::string, 2>{ normalizedPath + ".png", normalizedPath }) {
+			std::string buffer;
+			if (!util::TryGetGameTextureBuffer(candidate, buffer)) {
+				continue;
+			}
+
+			if (!hasPngSignature(buffer)) {
+				logWailaOnce("texture-resource-not-png:" + candidate,
+					"ResourcePackManager loaded '{}', but the buffer is not a PNG", candidate);
+				continue;
+			}
+
+			if (outBuffer) {
+				*outBuffer = std::move(buffer);
+			}
+			logWailaOnce("texture-resource:" + normalizedPath,
+				"ResourcePackManager proved PNG '{}' via '{}'", normalizedPath, candidate);
+			return true;
+		}
+
+		logWailaOnce("texture-resource:" + normalizedPath,
+			"ResourcePackManager missed PNG '{}'", normalizedPath);
+		return false;
+	}
+
+	bool textureResourceExists(std::string path) {
+		path = normalizeTexturePath(std::move(path));
+		if (path.empty()) return false;
+
+		static std::unordered_map<std::string, bool> cache;
+		if (auto found = cache.find(path); found != cache.end()) {
+			return found->second;
+		}
+
+		auto exists = loadPngTextureResource(path);
+
+		cache[path] = exists;
+		return exists;
+	}
+
+	bool isMissingUv(SDK::TextureUVCoordinateSet const* uv) {
+		if (!uv) return true;
+		if (uv->sourceFileLocation.mPath->value.empty()) return true;
+		if (uv->u1 <= uv->u0 || uv->v1 <= uv->v0) return true;
+
+		auto path = uv->sourceFileLocation.mPath->value;
+		std::transform(path.begin(), path.end(), path.begin(),
+			[](unsigned char ch) { return static_cast<char>(std::tolower(ch)); });
+		return path.find("missing") != std::string::npos;
+	}
+
+	SDK::TextureUVCoordinateSet const* previewOakLogUv() {
+		static SDK::TextureUVCoordinateSet uv = [] {
+			SDK::TextureUVCoordinateSet value{};
+			value.weight = 1.f;
+			value.u1 = 1.f;
+			value.v1 = 1.f;
+			value.sourceFileLocation = SDK::ResourceLocation("textures/blocks/log_oak", SDK::ResourceFileSystem::UserPackage);
+			return value;
+		}();
+		return &uv;
+	}
+
+	SDK::TextureUVCoordinateSet const* resolveBlockTextureUv(SDK::Block const& block, BlockPos const& pos,
+		std::string const& blockId) {
+		constexpr std::uint64_t primaryTextureSlot = 0;
+
+		auto graphics = SDK::BlockGraphics::getForBlock(block);
+		if (!graphics) {
+			logWailaOnce("block-graphics-null:" + blockId,
+				"BlockGraphics::getForBlock returned null for '{}'", blockId);
+			return nullptr;
+		}
+
+		auto uv = graphics->getTextureAt(pos, primaryTextureSlot, 0);
+		if (isMissingUv(uv)) {
+			auto path = uv ? uv->sourceFileLocation.mPath->value : std::string{};
+			logWailaOnce("block-uv-missing:" + blockId,
+				"BlockGraphics primary UV missing for '{}' slot {} path='{}' uv=({}, {}, {}, {})",
+				blockId, primaryTextureSlot, path,
+				uv ? uv->u0 : 0.f, uv ? uv->v0 : 0.f, uv ? uv->u1 : 0.f, uv ? uv->v1 : 0.f);
+			return nullptr;
+		}
+
+		logWailaOnce("block-uv:" + blockId,
+			"BlockGraphics primary UV for '{}' slot {} path='{}' fs={} uv=({}, {}, {}, {})",
+			blockId, primaryTextureSlot, uv->sourceFileLocation.mPath->value,
+			static_cast<int>(uv->sourceFileLocation.mFileSystem), uv->u0, uv->v0, uv->u1, uv->v1);
+		return uv;
+	}
+
+	bool drawTextureUvIcon(MCDrawUtil& dc, SDK::TextureUVCoordinateSet const* uv, d2d::Rect const& icon) {
+		if (isMissingUv(uv)) return false;
+
+		SDK::TexturePtr texture{};
+		dc.renderCtx->getTexture(&texture, uv->sourceFileLocation, false);
+		if (!texture.textureData) {
+			logWailaOnce("block-uv-texture-null:" + uv->sourceFileLocation.mPath->value,
+				"getTexture returned null for BlockGraphics path '{}' fs={}",
+				uv->sourceFileLocation.mPath->value, static_cast<int>(uv->sourceFileLocation.mFileSystem));
+			return false;
+		}
+
+		dc.drawImage(texture, icon.getPos(), { icon.getWidth(), icon.getHeight() }, d2d::Colors::WHITE);
+		logWailaOnce("block-uv-draw:" + uv->sourceFileLocation.mPath->value,
+			"Drawing source texture '{}' fs={} at full UVs; metadata uv=({}, {}, {}, {})",
+			uv->sourceFileLocation.mPath->value, static_cast<int>(uv->sourceFileLocation.mFileSystem),
+			uv->u0, uv->v0, uv->u1, uv->v1);
+		return true;
+	}
+
+	bool drawTextureIcon(MCDrawUtil& dc, std::string const& texturePath, d2d::Rect const& icon) {
+		auto path = normalizeTexturePath(texturePath);
+		if (path.empty()) return false;
+		if (!textureResourceExists(path)) {
+			logWailaOnce("texture-icon-missing:" + path,
+				"Texture icon '{}' did not pass PNG proof", path);
+			return false;
+		}
+
+		for (auto fileSystem : { SDK::ResourceFileSystem::UserPackage, SDK::ResourceFileSystem::AppPackage }) {
+			SDK::TexturePtr texture{};
+			SDK::ResourceLocation location(path, fileSystem);
+			dc.renderCtx->getTexture(&texture, location, false);
+
+			if (texture.textureData) {
+				dc.drawImage(texture, icon.getPos(), { icon.getWidth(), icon.getHeight() }, d2d::Colors::WHITE);
+				logWailaOnce("texture-icon-draw:" + path,
+					"Drawing explicit texture '{}' fs={}", path, static_cast<int>(fileSystem));
+				return true;
+			}
+		}
+
+		logWailaOnce("texture-icon-null:" + path,
+			"Texture icon '{}' passed PNG proof, but getTexture returned null", path);
+		return false;
+	}
+
+	ID2D1Bitmap* getD2DTextureBitmap(std::string texturePath, ID2D1DeviceContext* dc) {
+		auto path = normalizeTexturePath(std::move(texturePath));
+		if (path.empty() || !dc) return nullptr;
+
+		static std::unordered_map<std::string, ComPtr<ID2D1Bitmap>> cache;
+		static std::unordered_set<std::string> failed;
+
+		if (auto found = cache.find(path); found != cache.end()) {
+			return found->second.Get();
+		}
+		if (failed.contains(path)) {
+			return nullptr;
+		}
+
+		std::string buffer;
+		if (!loadPngTextureResource(path, &buffer)) {
+			failed.emplace(path);
+			return nullptr;
+		}
+
+		if (buffer.size() > std::numeric_limits<UINT>::max()) {
+			logWailaOnce("d2d-texture-too-large:" + path, "PNG '{}' is too large for SHCreateMemStream", path);
+			failed.emplace(path);
+			return nullptr;
+		}
+
+		auto stream = ComPtr<IStream>(SHCreateMemStream(reinterpret_cast<BYTE const*>(buffer.data()),
+			static_cast<UINT>(buffer.size())));
+		if (!stream) {
+			logWailaOnce("d2d-texture-stream:" + path, "Could not create memory stream for PNG '{}'", path);
+			failed.emplace(path);
+			return nullptr;
+		}
+
+		ComPtr<IWICBitmapDecoder> decoder;
+		auto* factory = Latite::getRenderer().getImagingFactory();
+		if (!factory || FAILED(factory->CreateDecoderFromStream(stream.Get(), nullptr,
+			WICDecodeMetadataCacheOnDemand, decoder.GetAddressOf()))) {
+			logWailaOnce("d2d-texture-decoder:" + path, "Could not create WIC decoder for PNG '{}'", path);
+			failed.emplace(path);
+			return nullptr;
+		}
+
+		ComPtr<IWICBitmapFrameDecode> frame;
+		if (FAILED(decoder->GetFrame(0, frame.GetAddressOf()))) {
+			logWailaOnce("d2d-texture-frame:" + path, "Could not decode first frame for PNG '{}'", path);
+			failed.emplace(path);
+			return nullptr;
+		}
+
+		ComPtr<IWICFormatConverter> converter;
+		if (FAILED(factory->CreateFormatConverter(converter.GetAddressOf())) ||
+			FAILED(converter->Initialize(frame.Get(), GUID_WICPixelFormat32bppPBGRA, WICBitmapDitherTypeNone,
+				nullptr, 0.0, WICBitmapPaletteTypeCustom))) {
+			logWailaOnce("d2d-texture-converter:" + path, "Could not convert PNG '{}' for D2D", path);
+			failed.emplace(path);
+			return nullptr;
+		}
+
+		ComPtr<ID2D1Bitmap> bitmap;
+		if (FAILED(dc->CreateBitmapFromWicBitmap(converter.Get(), nullptr, bitmap.GetAddressOf()))) {
+			logWailaOnce("d2d-texture-bitmap:" + path, "Could not create D2D bitmap for PNG '{}'", path);
+			failed.emplace(path);
+			return nullptr;
+		}
+
+		auto [it, _] = cache.emplace(path, std::move(bitmap));
+		logWailaOnce("d2d-texture-draw:" + path, "Decoded D2D preview texture '{}'", path);
+		return it->second.Get();
+	}
+
+	bool drawD2DTextureIcon(DrawUtil& dc, std::string const& texturePath, d2d::Rect const& icon) {
+		if (dc.isMinecraft()) return false;
+
+		auto& d2dDc = static_cast<D2DUtil&>(dc);
+		auto* bitmap = getD2DTextureBitmap(texturePath, d2dDc.ctx);
+		if (!bitmap) return false;
+
+		d2dDc.ctx->DrawBitmap(bitmap, D2D1::RectF(icon.left, icon.top, icon.right, icon.bottom),
+			1.f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+		return true;
 	}
 
 	float getMinecraftFormattedTextWidth(DrawUtil& dc, std::wstring const& text,
@@ -479,8 +750,7 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 
 	d2d::Rect icon{ paddingX, paddingY + ((height - (paddingY * 2.f) - iconSize) * 0.5f),
 		paddingX + iconSize, paddingY + ((height - (paddingY * 2.f) - iconSize) * 0.5f) + iconSize };
-	dc.fillRoundedRectangle(icon, target->swatch, 2.f);
-	dc.drawRoundedRectangle(icon, d2d::Colors::BLACK.asAlpha(0.45f), 2.f, 1.f, DrawUtil::OutlinePosition::Inside);
+	drawTargetIcon(dc, *target, icon);
 
 	float textLeft = paddingX + iconSize + textGap;
 	float y = paddingY;
@@ -508,6 +778,8 @@ std::optional<WAILA::TargetInfo> WAILA::getTargetInfo(bool preview) {
 			.title = L"Oak Log",
 			.detail = std::get<BoolValue>(showNamespace).value ? L"minecraft" : L"",
 			.swatch = d2d::Color::RGB(131, 88, 45),
+			.texturePath = "textures/blocks/log_oak",
+			.textureUv = previewOakLogUv(),
 			.health = -1.f,
 			.distance = 0.f,
 		};
@@ -551,6 +823,7 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult* hit) {
 	if (!block || !block->legacyBlock) return std::nullopt;
 
 	auto legacy = block->legacyBlock;
+	auto namespacedId = legacy->namespacedId.getString();
 	std::string nameSource = legacy->name.getString();
 	if (nameSource.empty()) {
 		nameSource = "block";
@@ -558,7 +831,7 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult* hit) {
 
 	std::wstring detail;
 	if (std::get<BoolValue>(showNamespace).value) {
-		detail = util::StrToWStr(legacy->namespacedId.getString());
+		detail = util::StrToWStr(namespacedId);
 	}
 	if (std::get<BoolValue>(showCoordinates).value) {
 		detail = appendDetail(std::move(detail), formatBlockPos(hit->hitBlock));
@@ -574,6 +847,7 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult* hit) {
 		.title = titleCaseIdentifier(nameSource),
 		.detail = detail,
 		.swatch = colorForBlockId(nameSource),
+		.textureUv = resolveBlockTextureUv(*block, hit->hitBlock, namespacedId.empty() ? nameSource : namespacedId),
 		.health = -1.f,
 		.distance = distance(hit->start, hit->hitPos),
 	};
@@ -629,10 +903,22 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float d
 
 	uint32_t type = typeComponent->type;
 	std::wstring title = entityNameFromType(type);
+	SDK::ItemStack* itemStack = nullptr;
+
 	if (type == 319) {
 		auto player = static_cast<SDK::Player*>(actor);
 		if (!player->playerName.empty()) {
 			title = widen(player->playerName);
+		}
+	}
+	else if (type == 64) {
+		auto itemActor = static_cast<SDK::ItemActor*>(actor);
+		itemStack = itemActor->getItemStack();
+		if (itemStack && itemStack->getItem()) {
+			auto hoverName = itemStack->getHoverName();
+			if (!hoverName.empty()) {
+				title = widen(hoverName);
+			}
 		}
 	}
 
@@ -656,6 +942,7 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float d
 		.title = title,
 		.detail = detail,
 		.swatch = colorForEntityId(type),
+		.itemStack = itemStack,
 		.health = health,
 		.distance = distanceToActor,
 	};
@@ -678,4 +965,40 @@ void WAILA::drawHealthPips(DrawUtil& dc, float x, float y, float health) {
 			? d2d::Color::RGB(226, 55, 65)
 			: d2d::Color::RGB(74, 40, 45, 150), 1.5f);
 	}
+}
+
+void WAILA::drawTargetIcon(DrawUtil& dc, TargetInfo const& target, d2d::Rect const& icon) {
+	bool drewIcon = false;
+
+	dc.fillRoundedRectangle(icon, d2d::Color::RGB(20, 20, 24, 150), 2.f);
+
+	if (dc.isMinecraft()) {
+		auto& mcDc = static_cast<MCDrawUtil&>(dc);
+
+		if (target.itemStack && target.itemStack->item) {
+			mcDc.drawItem(target.itemStack, icon.getPos(), icon.getWidth() / 48.f, 1.f);
+			drewIcon = true;
+
+			if (target.itemStack->itemCount > 1) {
+				mcDc.drawText(icon, std::to_wstring(target.itemStack->itemCount), d2d::Colors::WHITE,
+					Renderer::FontSelection::PrimaryRegular, 11.f, DWRITE_TEXT_ALIGNMENT_TRAILING,
+					DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+			}
+		}
+		else {
+			drewIcon = drawTextureUvIcon(mcDc, target.textureUv, icon);
+			if (!drewIcon) {
+				drewIcon = drawTextureIcon(mcDc, target.texturePath, icon);
+			}
+		}
+	}
+	else {
+		drewIcon = drawD2DTextureIcon(dc, target.texturePath, icon);
+	}
+
+	if (!drewIcon) {
+		dc.fillRoundedRectangle(icon, target.swatch, 2.f);
+	}
+
+	dc.drawRoundedRectangle(icon, d2d::Colors::BLACK.asAlpha(0.45f), 2.f, 1.f, DrawUtil::OutlinePosition::Inside);
 }
