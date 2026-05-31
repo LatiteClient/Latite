@@ -318,7 +318,7 @@ std::optional<WAILA::TargetInfo> WAILA::getTargetInfo(bool preview) {
 	if (preview) {
 		return TargetInfo{
 			.type = TargetType::Block,
-			.title = L"Oak Log",
+			.title = L"WAILA",
 			.detail = std::get<BoolValue>(showNamespace).value ? L"Minecraft" : L"",
 			.health = -1.f,
 		};
