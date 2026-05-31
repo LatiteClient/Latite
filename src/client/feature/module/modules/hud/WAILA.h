@@ -33,12 +33,12 @@ private:
 	ValueType showDistance = BoolValue(false);
 	ValueType showHealth = BoolValue(true);
 	ValueType entityDistance = FloatValue(6.f);
-	ValueType textSize = FloatValue(18.f);
-	ValueType backgroundColor = ColorValue(0.f, 0.f, 0.f, 0.68f);
-	ValueType borderColor = ColorValue(0.31f, 0.24f, 0.72f, 1.f);
+	ValueType textSize = FloatValue(16.f);
+	ValueType backgroundColor = ColorValue(0.055f, 0.065f, 0.075f, 0.82f);
+	ValueType borderColor = ColorValue(0.54f, 0.47f, 1.00f, 1.f);
 	ValueType titleColor = ColorValue(1.f, 1.f, 1.f, 1.f);
-	ValueType detailColor = ColorValue(0.45f, 0.39f, 1.f, 1.f);
-	ValueType radius = FloatValue(2.f);
+	ValueType detailColor = ColorValue(0.50f, 0.43f, 1.f, 1.f);
+	ValueType radius = FloatValue(0.f);
 
 	std::optional<TargetInfo> getTargetInfo(bool preview);
 	std::optional<TargetInfo> getBlockTarget(SDK::HitResult* hit);

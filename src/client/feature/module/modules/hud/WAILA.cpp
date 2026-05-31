@@ -8,12 +8,13 @@
 #include "mc/common/world/level/block/Block.h"
 
 namespace {
-	constexpr float defaultWidth = 196.f;
-	constexpr float defaultHeight = 52.f;
+	constexpr float defaultWidth = 146.f;
+	constexpr float defaultHeight = 48.f;
 	constexpr float iconSize = 32.f;
-	constexpr float paddingX = 9.f;
-	constexpr float paddingY = 7.f;
+	constexpr float paddingX = 8.f;
+	constexpr float paddingY = 6.f;
 	constexpr float textGap = 8.f;
+	constexpr float borderThickness = 2.f;
 
 	std::wstring titleCaseIdentifier(std::string id) {
 		if (auto colon = id.find(':'); colon != std::string::npos) {
@@ -225,7 +226,7 @@ WAILA::WAILA() : HUDModule("WAILA", L"WAILA", L"Shows the block or entity you ar
 	addSliderSetting("entityDistance", L"Entity Distance", L"Maximum entity inspection distance.", entityDistance,
 		FloatValue(2.f), FloatValue(12.f), FloatValue(0.5f), "showEntities"_istrue);
 	addSliderSetting("textSize", L"Text Size", L"Text size for the inspector.", textSize,
-		FloatValue(12.f), FloatValue(30.f), FloatValue(1.f));
+		FloatValue(10.f), FloatValue(22.f), FloatValue(1.f));
 	addSetting("background", L"Background", L"Inspector background color.", backgroundColor);
 	addSetting("border", L"Border", L"Inspector border color.", borderColor);
 	addSetting("titleColor", L"Title", L"Inspector title color.", titleColor);
@@ -267,8 +268,8 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	std::wstring plainDetail = util::StripMinecraftFormatting(target->detail);
 	bool cacheText = !isDefault && !inEditor;
 
-	Vec2 titleTextSize = dc.getTextSize(plainTitle, Renderer::FontSelection::SecondaryLight, titleSize, true, cacheText);
-	Vec2 detailTextSize = dc.getTextSize(plainDetail, Renderer::FontSelection::SecondaryLight, detailSize, true, cacheText);
+	Vec2 titleTextSize = dc.getTextSize(plainTitle, Renderer::FontSelection::PrimaryRegular, titleSize, true, cacheText);
+	Vec2 detailTextSize = dc.getTextSize(plainDetail, Renderer::FontSelection::PrimaryRegular, detailSize, true, cacheText);
 	float textWidth = std::max(titleTextSize.x, detailTextSize.x);
 	float contentWidth = iconSize + textGap + textWidth;
 	float width = std::max(defaultWidth, contentWidth + (paddingX * 2.f));
@@ -285,9 +286,8 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	auto title = d2d::Color(std::get<ColorValue>(titleColor).getMainColor());
 	auto detail = d2d::Color(std::get<ColorValue>(detailColor).getMainColor());
 
-	dc.fillRoundedRectangle(bounds, background, cornerRadius);
-	dc.drawRoundedRectangle(bounds, border, cornerRadius, 1.25f, DrawUtil::OutlinePosition::Inside);
-	dc.fillRectangle({ 0.f, 0.f, width, 2.f }, border);
+	dc.fillRectangle(bounds, background);
+	dc.drawRectangle(bounds, border, borderThickness);
 
 	d2d::Rect icon{ paddingX, paddingY + ((height - (paddingY * 2.f) - iconSize) * 0.5f),
 		paddingX + iconSize, paddingY + ((height - (paddingY * 2.f) - iconSize) * 0.5f) + iconSize };
@@ -295,7 +295,7 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 
 	float textLeft = paddingX + iconSize + textGap;
 	float y = paddingY;
-	dc.drawText({textLeft, y, width - paddingX, y + titleTextSize.y + 2.f}, target->title, title,
+	dc.drawText({textLeft, y - 1.f, width - paddingX, y + titleTextSize.y + 2.f}, target->title, title,
 		Renderer::FontSelection::SecondaryLight, titleSize, DWRITE_TEXT_ALIGNMENT_LEADING,
 		DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
 	y += titleTextSize.y;
@@ -306,7 +306,7 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	}
 
 	if (!target->detail.empty()) {
-		dc.drawText({textLeft, y, width - paddingX, height - paddingY}, target->detail, detail,
+		dc.drawText({textLeft, y + 1.f, width - paddingX, height - paddingY}, target->detail, detail,
 			Renderer::FontSelection::SecondaryLight, detailSize, DWRITE_TEXT_ALIGNMENT_LEADING,
 			DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
 	}
@@ -319,7 +319,7 @@ std::optional<WAILA::TargetInfo> WAILA::getTargetInfo(bool preview) {
 		return TargetInfo{
 			.type = TargetType::Block,
 			.title = L"Oak Log",
-			.detail = std::get<BoolValue>(showNamespace).value ? L"minecraft" : L"",
+			.detail = std::get<BoolValue>(showNamespace).value ? L"Minecraft" : L"",
 			.health = -1.f,
 		};
 	}
@@ -375,13 +375,13 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult* hit) {
 	if (std::get<BoolValue>(showCoordinates).value) {
 		if (!detail.empty()) detail += L"  ";
 		std::wstringstream ss;
-		ss << hit->hitBlock.x << L", " << hit->hitBlock.y << L", " << hit->hitBlock.z;
+		ss << "\n" << hit->hitBlock.x << L", " << hit->hitBlock.y << L", " << hit->hitBlock.z;
 		detail += ss.str();
 	}
 	if (std::get<BoolValue>(showDistance).value) {
 		if (!detail.empty()) detail += L"  ";
 		std::wstringstream ss;
-		ss << std::fixed << std::setprecision(1) << hit->start.distance(hit->hitPos) << L"m";
+		ss << "\n" << std::fixed << std::setprecision(1) << hit->start.distance(hit->hitPos) << L"m";
 		detail += ss.str();
 	}
 
@@ -465,7 +465,7 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float d
 
 	std::wstring detail;
 	if (std::get<BoolValue>(showNamespace).value) {
-		detail = L"minecraft";
+		detail = L"Minecraft";
 	}
 	if (std::get<BoolValue>(showDistance).value) {
 		if (!detail.empty()) detail += L"  ";
@@ -502,9 +502,9 @@ void WAILA::drawHealthPips(DrawUtil& dc, float x, float y, float health) {
 			y + pipSize,
 		};
 
-		dc.fillRoundedRectangle(pip, i < filledPips
+		dc.fillRectangle(pip, i < filledPips
 			? d2d::Color::RGB(226, 55, 65)
-			: d2d::Color::RGB(74, 40, 45, 150), 1.5f);
+			: d2d::Color::RGB(74, 40, 45, 150));
 	}
 }
 
