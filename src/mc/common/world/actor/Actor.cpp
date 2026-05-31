@@ -75,6 +75,10 @@ bool SDK::Actor::isPlayer() {
 	return getEntityTypeID() == 319;
 }
 
+bool SDK::Actor::isItem() {
+	return getEntityTypeID() == 64;
+}
+
 SDK::AttributesComponent* SDK::Actor::getAttributesComponent() {
 	return this->tryGetComponent<AttributesComponent>();
 }

@@ -46,5 +46,5 @@ private:
 	std::optional<TargetInfo> getEntityInfo(SDK::Actor* actor, float distance);
 
 	void drawHealthPips(DrawUtil& dc, float x, float y, float health);
-	void drawTargetIcon(DrawUtil& dc, TargetInfo const& target, d2d::Rect const& icon);
+	void drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::Rect const& icon);
 };

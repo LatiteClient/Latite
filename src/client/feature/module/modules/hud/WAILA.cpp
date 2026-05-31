@@ -1,21 +1,11 @@
 #include "pch.h"
 #include "WAILA.h"
 
-#include <algorithm>
-#include <cctype>
-#include <cstdint>
-#include <cmath>
-#include <iomanip>
-#include <unordered_map>
-
 #include "mc/common/entity/component/ActorTypeComponent.h"
-#include "mc/common/world/ItemStack.h"
 #include "mc/common/world/actor/item/ItemActor.h"
-#include "mc/common/world/actor/player/Player.h"
 #include "mc/common/world/level/BlockSource.h"
 #include "mc/common/world/level/HitResult.h"
 #include "mc/common/world/level/block/Block.h"
-#include "mc/common/world/level/block/BlockLegacy.h"
 
 namespace {
 	constexpr float defaultWidth = 196.f;
@@ -255,16 +245,16 @@ void WAILA::afterLoadConfig() {
 
 	if (hasStoredPosition) return;
 
-	auto ci = SDK::ClientInstance::get();
-	if (!ci || !ci->getGuiData()) return;
+	auto clientInstance = SDK::ClientInstance::get();
+	if (!clientInstance || !clientInstance->getGuiData()) return;
 
-	auto screenSize = ci->getGuiData()->screenSize;
+	Vec2 screenSize = clientInstance->getGuiData()->screenSize;
 	setPos({ std::max(0.f, (screenSize.x - defaultWidth) * 0.5f), 8.f });
 	storePos(screenSize);
 }
 
 void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
-	auto target = getTargetInfo(isDefault || inEditor);
+	std::optional<TargetInfo> target = getTargetInfo(isDefault || inEditor);
 	if (!target.has_value()) return;
 
 	float titleSize = std::get<FloatValue>(textSize).value;
@@ -273,12 +263,12 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 		? 9.f
 		: 0.f;
 
-	auto plainTitle = util::StripMinecraftFormatting(target->title);
-	auto plainDetail = util::StripMinecraftFormatting(target->detail);
+	std::wstring plainTitle = util::StripMinecraftFormatting(target->title);
+	std::wstring plainDetail = util::StripMinecraftFormatting(target->detail);
 	bool cacheText = !isDefault && !inEditor;
 
-	auto titleTextSize = dc.getTextSize(plainTitle, Renderer::FontSelection::SecondaryLight, titleSize, true, cacheText);
-	auto detailTextSize = dc.getTextSize(plainDetail, Renderer::FontSelection::SecondaryLight, detailSize, true, cacheText);
+	Vec2 titleTextSize = dc.getTextSize(plainTitle, Renderer::FontSelection::SecondaryLight, titleSize, true, cacheText);
+	Vec2 detailTextSize = dc.getTextSize(plainDetail, Renderer::FontSelection::SecondaryLight, detailSize, true, cacheText);
 	float textWidth = std::max(titleTextSize.x, detailTextSize.x);
 	float contentWidth = iconSize + textGap + textWidth;
 	float width = std::max(defaultWidth, contentWidth + (paddingX * 2.f));
@@ -334,10 +324,10 @@ std::optional<WAILA::TargetInfo> WAILA::getTargetInfo(bool preview) {
 		};
 	}
 
-	auto ci = SDK::ClientInstance::get();
-	if (!ci || !ci->minecraft) return std::nullopt;
+	auto clientInstance = SDK::ClientInstance::get();
+	if (!clientInstance || !clientInstance->minecraft) return std::nullopt;
 
-	auto level = ci->minecraft->getLevel();
+	auto level = clientInstance->minecraft->getLevel();
 	if (!level) return std::nullopt;
 
 	auto hit = level->getHitResult();
@@ -346,7 +336,7 @@ std::optional<WAILA::TargetInfo> WAILA::getTargetInfo(bool preview) {
 	if (std::get<BoolValue>(showEntities).value) {
 		float entityTargetDistance = 0.f;
 		if (auto actor = getEntityTarget(hit, entityTargetDistance)) {
-			if (auto info = getEntityInfo(actor, entityTargetDistance)) {
+			if (std::optional<TargetInfo> info = getEntityInfo(actor, entityTargetDistance)) {
 				return info;
 			}
 		}
@@ -362,10 +352,10 @@ std::optional<WAILA::TargetInfo> WAILA::getTargetInfo(bool preview) {
 std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult* hit) {
 	if (!hit || hit->hitType != SDK::HitType::BLOCK) return std::nullopt;
 
-	auto ci = SDK::ClientInstance::get();
-	if (!ci) return std::nullopt;
+	auto clientInstance = SDK::ClientInstance::get();
+	if (!clientInstance) return std::nullopt;
 
-	auto region = ci->getRegion();
+	auto region = clientInstance->getRegion();
 	if (!region) return std::nullopt;
 
 	auto block = region->getBlock(hit->hitBlock);
@@ -405,11 +395,11 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult* hit) {
 }
 
 SDK::Actor* WAILA::getEntityTarget(SDK::HitResult* hit, float& distanceOut) {
-	auto ci = SDK::ClientInstance::get();
-	if (!ci || !ci->minecraft || !hit) return nullptr;
+	auto clientInstance = SDK::ClientInstance::get();
+	if (!clientInstance || !clientInstance->minecraft || !hit) return nullptr;
 
-	auto level = ci->minecraft->getLevel();
-	auto localPlayer = ci->getLocalPlayer();
+	auto level = clientInstance->minecraft->getLevel();
+	auto localPlayer = clientInstance->getLocalPlayer();
 	if (!level || !localPlayer) return nullptr;
 
 	float maxDistance = std::max(0.f, std::get<FloatValue>(entityDistance).value);
@@ -432,7 +422,7 @@ SDK::Actor* WAILA::getEntityTarget(SDK::HitResult* hit, float& distanceOut) {
 		auto typeComponent = actor->tryGetComponent<SDK::ActorTypeComponent>();
 		if (!typeComponent) continue;
 
-		auto hitDistance = actor->getBoundingBox().intersectsRay(hit->start, direction, nearestDistance, 0.08f);
+		std::optional<float> hitDistance = actor->getBoundingBox().intersectsRay(hit->start, direction, nearestDistance, 0.08f);
 		if (!hitDistance.has_value()) continue;
 		if (*hitDistance < nearestDistance) {
 			nearestDistance = *hitDistance;
@@ -456,13 +446,13 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float d
 	std::wstring title = entityNameFromType(type);
 	SDK::ItemStack* itemStack = nullptr;
 
-	if (type == 319) {
+	if (actor->isPlayer()) {
 		auto player = static_cast<SDK::Player*>(actor);
 		if (!player->playerName.empty()) {
 			title = util::StrToWStr(player->playerName);
 		}
 	}
-	else if (type == 64) {
+	else if (actor->isItem()) {
 		auto itemActor = static_cast<SDK::ItemActor*>(actor);
 		itemStack = itemActor->getItemStack();
 		if (itemStack && itemStack->getItem()) {
@@ -485,7 +475,7 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float d
 	}
 
 	float health = -1.f;
-	if (std::get<BoolValue>(showHealth).value && actor->getAttributesComponent()) {
+	if (std::get<BoolValue>(showHealth).value && actor->getAttributesComponent() && !actor->isItem()) {
 		health = std::clamp(actor->getHealth(), 0.f, 20.f);
 	}
 
@@ -498,6 +488,7 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float d
 	};
 }
 
+// TODO: draw real minecraft hearts?
 void WAILA::drawHealthPips(DrawUtil& dc, float x, float y, float health) {
 	int filledPips = std::clamp(static_cast<int>(std::ceil(health / 2.f)), 0, 10);
 	constexpr float pipSize = 6.f;
@@ -517,16 +508,16 @@ void WAILA::drawHealthPips(DrawUtil& dc, float x, float y, float health) {
 	}
 }
 
-void WAILA::drawTargetIcon(DrawUtil& dc, TargetInfo const& target, d2d::Rect const& icon) {
-	dc.fillRoundedRectangle(icon, d2d::Color::RGB(20, 20, 24, 150), 2.f);
+void WAILA::drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::Rect const& icon) {
+	ctxGeneric.fillRoundedRectangle(icon, d2d::Color::RGB(20, 20, 24, 150), 2.f);
 
-	auto& mcDc = static_cast<MCDrawUtil&>(dc);
+	auto& dc = static_cast<MCDrawUtil&>(ctxGeneric);
 
 	if (target.itemStack && target.itemStack->getItem()) {
-		mcDc.drawItem(target.itemStack, icon.getPos(), icon.getWidth() / 48.f, 1.f);
+		dc.drawItem(target.itemStack, icon.getPos(), icon.getWidth() / 48.f, 1.f);
 
 		if (target.itemStack->itemCount > 1) {
-			mcDc.drawText(icon, std::to_wstring(target.itemStack->itemCount), d2d::Colors::WHITE,
+			dc.drawText(icon, std::to_wstring(target.itemStack->itemCount), d2d::Colors::WHITE,
 				Renderer::FontSelection::PrimaryRegular, 11.f, DWRITE_TEXT_ALIGNMENT_TRAILING,
 				DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 		}
@@ -541,7 +532,7 @@ void WAILA::drawTargetIcon(DrawUtil& dc, TargetInfo const& target, d2d::Rect con
 			itemStack->pickupTime = {};
 
 			if (itemStack->getItem()) {
-				mcDc.drawItem(itemStack, icon.getPos(), icon.getWidth() / 48.f, 1.f);
+				dc.drawItem(itemStack, icon.getPos(), icon.getWidth() / 48.f, 1.f);
 			}
 
 			itemStack->destruct();

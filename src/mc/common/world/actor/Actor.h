@@ -42,6 +42,7 @@ namespace SDK {
 		uint32_t getEntityTypeID();
 		void swing();
 		bool isPlayer();
+		bool isItem();
 
 		struct AttributesComponent* getAttributesComponent();
 		class AttributeInstance* getAttribute(class Attribute& attribute);
