@@ -1,12 +1,6 @@
 #pragma once
 #include "../../HUDModule.h"
-
-namespace SDK {
-	class Actor;
-	class HitResult;
-	class ItemStack;
-	struct TextureUVCoordinateSet;
-}
+#include "mc/common/client/renderer/texture/TextureUVCoordinateSet.h"
 
 class WAILA final : public HUDModule {
 public:
@@ -30,6 +24,8 @@ private:
 		std::wstring detail;
 		d2d::Color swatch = d2d::Colors::WHITE;
 		std::string texturePath;
+		std::string blockId;
+		SDK::Block const* block = nullptr;
 		SDK::TextureUVCoordinateSet const* textureUv = nullptr;
 		SDK::ItemStack* itemStack = nullptr;
 		float health = -1.f;

@@ -295,6 +295,8 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         MVSIG(ClientInputUpdateSystem_tickBaseInput),
         MVSIG(LocalPlayer_applyTurnDelta),
         MVSIG(ItemStackBase_getHoverName),
+        MVSIG(ItemStack_ItemStackBlock),
+        MVSIG(ItemStackBase_destructor),
         MVSIG(Vtable::Level),
         MVSIG(Tessellator_begin),
         MVSIG(Tessellator_vertex),

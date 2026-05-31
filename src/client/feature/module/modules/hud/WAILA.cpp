@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <cstddef>
 #include <cstdint>
 #include <cmath>
 #include <format>
@@ -378,6 +379,41 @@ namespace {
 		d2dDc.ctx->DrawBitmap(bitmap, D2D1::RectF(icon.left, icon.top, icon.right, icon.bottom),
 			1.f, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
 		return true;
+	}
+
+	bool drawBlockItemIcon(MCDrawUtil& dc, SDK::Block const* block, std::string const& blockId,
+		d2d::Rect const& icon) {
+		if (!block) return false;
+
+		if (!Signatures::ItemStack_ItemStackBlock.result || !Signatures::ItemStackBase_destructor.result) {
+			logWailaOnce("block-item-signature-missing",
+				"Native block item preview unavailable because ItemStack construction signatures are unresolved");
+			return false;
+		}
+
+		alignas(SDK::ItemStack) std::byte storage[sizeof(SDK::ItemStack)]{};
+		SDK::ItemStack* itemStack = SDK::ItemStack::constructFromBlock(storage, *block, 1, nullptr);
+		if (!itemStack) {
+			logWailaOnce("block-item-ctor-null:" + blockId,
+				"ItemStack block constructor returned null for '{}'", blockId);
+			return false;
+		}
+		itemStack->finishPickupAnimation();
+
+		bool drewIcon = false;
+		if (itemStack->getItem()) {
+			dc.drawItem(itemStack, icon.getPos(), icon.getWidth() / 48.f, 1.f);
+			drewIcon = true;
+			logWailaOnce("block-item-draw:" + blockId,
+				"Drawing native block item preview for '{}'", blockId);
+		}
+		else {
+			logWailaOnce("block-item-empty:" + blockId,
+				"Native block item stack for '{}' did not resolve an item", blockId);
+		}
+
+		itemStack->destruct();
+		return drewIcon;
 	}
 
 	float getMinecraftFormattedTextWidth(DrawUtil& dc, std::wstring const& text,
@@ -779,6 +815,7 @@ std::optional<WAILA::TargetInfo> WAILA::getTargetInfo(bool preview) {
 			.detail = std::get<BoolValue>(showNamespace).value ? L"minecraft" : L"",
 			.swatch = d2d::Color::RGB(131, 88, 45),
 			.texturePath = "textures/blocks/log_oak",
+			.blockId = "minecraft:oak_log",
 			.textureUv = previewOakLogUv(),
 			.health = -1.f,
 			.distance = 0.f,
@@ -847,6 +884,8 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult* hit) {
 		.title = titleCaseIdentifier(nameSource),
 		.detail = detail,
 		.swatch = colorForBlockId(nameSource),
+		.blockId = namespacedId.empty() ? nameSource : namespacedId,
+		.block = block,
 		.textureUv = resolveBlockTextureUv(*block, hit->hitBlock, namespacedId.empty() ? nameSource : namespacedId),
 		.health = -1.f,
 		.distance = distance(hit->start, hit->hitPos),
@@ -986,7 +1025,12 @@ void WAILA::drawTargetIcon(DrawUtil& dc, TargetInfo const& target, d2d::Rect con
 			}
 		}
 		else {
-			drewIcon = drawTextureUvIcon(mcDc, target.textureUv, icon);
+			if (target.type == TargetType::Block) {
+				drewIcon = drawBlockItemIcon(mcDc, target.block, target.blockId, icon);
+			}
+			if (!drewIcon) {
+				drewIcon = drawTextureUvIcon(mcDc, target.textureUv, icon);
+			}
 			if (!drewIcon) {
 				drewIcon = drawTextureIcon(mcDc, target.texturePath, icon);
 			}
