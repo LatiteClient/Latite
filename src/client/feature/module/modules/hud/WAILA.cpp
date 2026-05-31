@@ -286,8 +286,8 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	auto title = d2d::Color(std::get<ColorValue>(titleColor).getMainColor());
 	auto detail = d2d::Color(std::get<ColorValue>(detailColor).getMainColor());
 
-	dc.fillRectangle(bounds, background);
-	dc.drawRectangle(bounds, border, borderThickness);
+	dc.fillRoundedRectangle(bounds, background, cornerRadius);
+	dc.drawRoundedRectangle(bounds, border, cornerRadius, borderThickness);
 
 	d2d::Rect icon{ paddingX, paddingY + ((height - (paddingY * 2.f) - iconSize) * 0.5f),
 		paddingX + iconSize, paddingY + ((height - (paddingY * 2.f) - iconSize) * 0.5f) + iconSize };
