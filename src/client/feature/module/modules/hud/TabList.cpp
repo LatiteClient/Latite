@@ -1,12 +1,14 @@
 #include "pch.h"
 #include "TabList.h"
 #include "client/Latite.h"
-#include "client/event/events/RenderNameTagEvent.h"
+#include "client/event/events/RenderLayerEvent.h"
 #include "client/event/events/TickEvent.h"
 #include "client/misc/NameTagCache.h"
-#include "../../../../render/asset/Assets.h"
+#include "mc/common/client/gui/controls/UIControl.h"
+#include "mc/common/client/gui/controls/VisualTree.h"
 #include "mc/common/world/actor/player/Player.h"
 #include "util/Logger.h"
+#include "util/DrawContext.h"
 #include <algorithm>
 #include <cctype>
 #include <unordered_set>
@@ -161,7 +163,7 @@ namespace {
 		return formattedName.empty() ? playerName : formattedName;
 	}
 
-	void drawFormattedText(D2DUtil& dc, d2d::Rect const& rc, std::string const& text, d2d::Color const& fallbackColor,
+	void drawFormattedText(DrawUtil& dc, d2d::Rect const& rc, std::string const& text, d2d::Color const& fallbackColor,
 		Renderer::FontSelection font, float textSize) {
 		float x = rc.left;
 		d2d::Color color = fallbackColor;
@@ -180,7 +182,9 @@ namespace {
 			size_t codeSize = 0;
 			if (readFormatCode(text, i, code, codeSize)) {
 				flush();
-				color = minecraftColor(code, fallbackColor).asAlpha(fallbackColor.a);
+				if (isColorCode(code) || std::tolower(static_cast<unsigned char>(code)) == 'r') {
+					color = minecraftColor(code, fallbackColor).asAlpha(fallbackColor.a);
+				}
 				i += codeSize;
 				continue;
 			}
@@ -208,28 +212,8 @@ TabList::TabList() : Module("PlayerList", LocalizeString::get("client.module.tab
                LocalizeString::get("client.module.tabList.bgColor.desc"), bgCol);
 	addSliderSetting("textSize", LocalizeString::get("client.textmodule.props.textSize.name"), L"", textSizeS,
 		FloatValue(2.f), FloatValue(100.f), FloatValue(2.f));
-    listen<RenderOverlayEvent>(static_cast<EventListenerFunc>(&TabList::onRenderOverlay));
-	listen<RenderNameTagEvent>(static_cast<EventListenerFunc>(&TabList::onRenderNameTag), true);
-	listen<TickEvent>(static_cast<EventListenerFunc>(&TabList::onTick), true);
-}
-
-void TabList::onRenderNameTag(Event& evG) {
-	auto& ev = static_cast<RenderNameTagEvent&>(evG);
-	auto* tag = ev.getNametag();
-	if (!tag || !hasFormatCode(*tag)) return;
-
-	auto* client = SDK::ClientInstance::get();
-	if (!client || !client->minecraft) return;
-
-	auto* level = client->minecraft->getLevel();
-	if (!level || !level->getPlayerList()) return;
-
-	for (auto& ent : *level->getPlayerList()) {
-		std::string rowName = colorizedPlayerName(ent.second.name, *tag);
-		if (hasFormatCode(rowName)) {
-			coloredNameCache[ent.second.name] = rowName;
-		}
-	}
+    listen<RenderLayerEvent>(static_cast<EventListenerFunc>(&TabList::onRenderLayer));
+	listen<TickEvent>(static_cast<EventListenerFunc>(&TabList::onTick));
 }
 
 void TabList::onTick(Event& evG) {
@@ -257,11 +241,16 @@ void TabList::onTick(Event& evG) {
 		if (!activePlayers.contains(player->playerName)) continue;
 
 		auto nameTag = NameTagCache::getNetworkNameTag(runtimeId);
-		if (!nameTag) continue;
+		if (!nameTag) {
+			coloredNameCache.erase(player->playerName);
+			continue;
+		}
 
 		std::string rowName = colorizedPlayerName(player->playerName, *nameTag);
 		if (hasFormatCode(rowName)) {
 			coloredNameCache[player->playerName] = rowName;
+		} else {
+			coloredNameCache.erase(player->playerName);
 		}
 	}
 	NameTagCache::retainNetworkNameTags(activeRuntimeIds);
@@ -290,13 +279,17 @@ void TabList::afterLoadConfig() {
 	}
 }
 
-void TabList::onRenderOverlay(Event& evG) {
-	(void)evG;
+void TabList::onRenderLayer(Event& evG) {
+	auto& ev = static_cast<RenderLayerEvent&>(evG);
+	auto* screenView = ev.getScreenView();
+	if (!screenView || !screenView->visualTree || !screenView->visualTree->rootControl
+		|| screenView->visualTree->rootControl->name != "hud_screen") return;
 
 	auto plr = SDK::ClientInstance::get()->getLocalPlayer();
 	if (!plr) return;
 
-	D2DUtil dc;
+	MCDrawUtil dc{ ev.getUIRenderContext(), Latite::get().getFont() };
+	dc.setImmediate(false);
 	auto lvl = SDK::ClientInstance::get()->minecraft->getLevel();
 	if (!lvl || !lvl->getPlayerList()) return;
 
@@ -317,26 +310,17 @@ void TabList::onRenderOverlay(Event& evG) {
 	const ColorValue backgroundColor = colorOrDefault(bgCol, ColorValue(0.f, 0.f, 0.f, 0.5f));
 	float sectionHeight = textP * 1.3f;
 
-	float logoSize = sectionHeight;
-	float logoPad = 4.f;
-
 	float longestText = dc.getTextSize(txt, font, textP).x;
 	auto sortedRows = sortedPlayerListRows(lvl, coloredNameCache);
 	for (auto* row : sortedRows) {
 		std::string rowName = tabRowName(*row, coloredNameCache);
 		auto w = dc.getTextSize(util::StrToWStr(stripFormatCodes(rowName)), font, textP).x + 3.f;
-		for (auto& user : Latite::get().getLatiteUsers()) {
-			if (user == row->name) {
-				w += logoPad + logoSize;
-			}
-		}
-
 		if (w > longestText) longestText = w;
 	}
 
 	float sectionSize = longestText;
 
-	size_t maxPerTab = 15;
+	size_t maxPerTab = 16;
 	int numTabs = static_cast<int>(std::ceil(static_cast<float>(size) / static_cast<float>(maxPerTab)));
 
 	float oY = sectionHeight;
@@ -346,36 +330,20 @@ void TabList::onRenderOverlay(Event& evG) {
 
 	size_t idx = 0;
 
-
 	float calcWidth = sectionSize * static_cast<float>(numTabs);
 	float calcHeight = sectionHeight * ((static_cast<float>(size) > maxPerTab) ? maxPerTab : static_cast<float>(size));
 
-
 	auto& ss = SDK::ClientInstance::get()->getGuiData()->screenSize;
-	D2D1::Matrix3x2F mat;
-	dc.ctx->GetTransform(&mat);
-	dc.ctx->SetTransform(mat * D2D1::Matrix3x2F::Translation(ss.x / 2.f - calcWidth / 2.f, 20.f));
+	const Vec2 offset = { ss.x / 2.f - calcWidth / 2.f, 20.f };
 
+	dc.fillRectangle({ offset.x, offset.y, offset.x + calcWidth, offset.y + calcHeight + oY }, backgroundColor.getMainColor());
+	dc.drawRectangle({ offset.x, offset.y, offset.x + calcWidth, offset.y + calcHeight + oY }, d2d::Color(backgroundColor.getMainColor()).asAlpha(1.f), 2.f);
 
-	dc.fillRectangle({ 0.f, 0.f, calcWidth, calcHeight + oY }, backgroundColor.getMainColor());
-	dc.drawRectangle({ 0.f, 0.f, calcWidth, calcHeight + oY }, d2d::Color(backgroundColor.getMainColor()).asAlpha(1.f), 2.f);
-
-	dc.drawText({ 0.f, 0.f, calcWidth, oY }, txt, textColor.getMainColor(), font, textP, DWRITE_TEXT_ALIGNMENT_CENTER);
-
+	dc.drawText({ offset.x, offset.y, offset.x + calcWidth, offset.y + oY }, txt, textColor.getMainColor(), font, textP, DWRITE_TEXT_ALIGNMENT_CENTER);
 
 	for (auto* row : sortedRows) {
 		std::string rowName = tabRowName(*row, coloredNameCache);
-		d2d::Rect rc = { x, y, x + longestText, y + sectionHeight };
-		for (auto& user : Latite::get().getLatiteUsers()) {
-			if (user == row->name) {
-				rc.left += logoSize + logoPad;
-				d2d::Rect logoRc = { x, y, x + logoSize, y + logoSize };
-				dc.ctx->DrawBitmap(Latite::getAssets().logoWhite.getBitmap(), logoRc);
-			}
-		}
-
-		// render
-		//dc.drawRectangle(rc, d2d::Colors::BLACK, 0.5f);
+		d2d::Rect rc = { offset.x + x, offset.y + y, offset.x + x + longestText, offset.y + y + sectionHeight };
 
 		drawFormattedText(dc, rc, rowName, textColor.getMainColor(), font, textP);
 
@@ -388,5 +356,5 @@ void TabList::onRenderOverlay(Event& evG) {
 		y = oY;
 		idx = 0;
 	}
-	dc.ctx->SetTransform(mat);
+	dc.flush();
 }

@@ -6,8 +6,7 @@ class TabList : public Module {
 public:
 	TabList();
 
-	void onRenderOverlay(Event&);
-	void onRenderNameTag(Event&);
+	void onRenderLayer(Event&);
 	void onTick(Event&);
 	void afterLoadConfig() override;
 	bool shouldHoldToToggle() override { return true; }
