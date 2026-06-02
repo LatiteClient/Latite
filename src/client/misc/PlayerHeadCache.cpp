@@ -4,6 +4,8 @@
 #include "TempStorage.h"
 #include "mc/common/world/actor/player/SerializedSkinRef.h"
 
+#include <limits>
+
 namespace {
 	constexpr uint32_t playerHeadTextureSize = 64;
 
@@ -73,6 +75,46 @@ namespace {
 		}
 
 		return head;
+	}
+
+	bool validateSkinImageForPlayerHead(SDK::SkinImage const* image) {
+		if (image && image->hasRgbaBytes()) {
+			return true;
+		}
+
+		if (!image || image->width == 0 || image->height == 0) {
+			return false;
+		}
+
+		auto width = static_cast<size_t>(image->width);
+		auto height = static_cast<size_t>(image->height);
+		auto maxPixelCount = std::numeric_limits<size_t>::max() / 4u;
+		auto pixelCount = width * height;
+		bool pixelCountOverflow = height != 0 && pixelCount / height != width;
+		bool suspiciousLayout =
+			image->width > 4096 ||
+			image->height > 4096 ||
+			pixelCountOverflow ||
+			pixelCount > maxPixelCount ||
+			image->bytes.data() == nullptr ||
+			image->bytes.size() < pixelCount * 4u;
+
+		static bool warned = false;
+		if (suspiciousLayout && !warned) {
+			warned = true;
+			Logger::Warn(
+				"Player head skin layout validation failed. image=0x{:X}, format={}, width={}, height={}, bytes=0x{:X}, byteCount={}, expectedByteCount={}. Minecraft player skin layout may have changed.",
+				reinterpret_cast<uintptr_t>(image),
+				image->imageFormat,
+				image->width,
+				image->height,
+				reinterpret_cast<uintptr_t>(image->bytes.data()),
+				image->bytes.size(),
+				pixelCountOverflow || pixelCount > maxPixelCount ? 0 : pixelCount * 4u
+			);
+		}
+
+		return false;
 	}
 
 	bool writeRgbaPng(std::filesystem::path const& path, std::vector<uint8_t> const& rgba, uint32_t width, uint32_t height) {
@@ -145,7 +187,7 @@ std::string PlayerHeadCache::getTexturePath(SDK::SerializedSkinRef const& skin) 
 	static std::unordered_map<uint64_t, std::string> cachedPaths;
 
 	auto image = skin.getSkinImage();
-	if (!image || !image->hasRgbaBytes()) return {};
+	if (!validateSkinImageForPlayerHead(image)) return {};
 
 	auto id = skin.getId();
 	std::string key = id && !id->empty() ? *id : std::format("{}x{}:{}", image->width, image->height, image->bytes.size());

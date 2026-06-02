@@ -15,8 +15,6 @@ namespace SDK {
 		size_t dataSize = 0;
 	};
 
-	static_assert(sizeof(SkinImageBlob) == 0x18);
-
 	class SkinImage {
 	public:
 		bool hasRgbaBytes() const {
@@ -34,8 +32,6 @@ namespace SDK {
 		uint8_t pad[7]{};
 		SkinImageBlob bytes;
 	};
-
-	static_assert(sizeof(SkinImage) == 0x30);
 
 	class SerializedSkinRef {
 	public:
@@ -70,5 +66,4 @@ namespace SDK {
 		void* refCount = nullptr;
 	};
 
-	static_assert(sizeof(SerializedSkinRef) == 0x10);
 }

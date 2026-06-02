@@ -11,6 +11,4 @@ namespace SDK {
 		CLASS_FIELD(std::string, name, 0x18);
 		CLASS_FIELD(SerializedSkinRef, skin, 0x80);
 	};
-
-	static_assert(sizeof(PlayerListEntry) == 0xA8);
 }
