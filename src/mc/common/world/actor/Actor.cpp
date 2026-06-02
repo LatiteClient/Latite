@@ -66,6 +66,16 @@ uint32_t SDK::Actor::getEntityTypeID() {
 	return this->tryGetComponent<ActorTypeComponent>()->type;
 }
 
+void const* SDK::Actor::getActorRendererId() {
+	// render gets the usual renderer id from vfunc 69 right now
+	return memory::callVirtual<void const*>(this, 0x45);
+}
+
+void const* SDK::Actor::getActorRendererIdOverride() {
+	// some actors use this one instead of the query renderer id
+	return memory::callVirtual<void const*>(this, 0x52);
+}
+
 void SDK::Actor::swing() {
 	// @dump-wbds vtable Actor, swing
 	return memory::callVirtual<void>(this, 0x6E);

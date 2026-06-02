@@ -40,6 +40,8 @@ namespace SDK {
 		void setNameTag(std::string* nametag);
 		uint64_t getRuntimeID();
 		uint32_t getEntityTypeID();
+		void const* getActorRendererId();
+		void const* getActorRendererIdOverride();
 		void swing();
 		bool isPlayer();
 		bool isItem();
