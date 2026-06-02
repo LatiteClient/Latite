@@ -15,6 +15,7 @@
 
 #include "config/ConfigManager.h"
 #include "misc/ClientMessageQueue.h"
+#include "misc/TempStorage.h"
 #include "input/Keyboard.h"
 #include "memory/hook/Hooks.h"
 #include "event/Eventing.h"
@@ -195,6 +196,7 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
 
     std::filesystem::create_directory(util::GetLatitePath());
     std::filesystem::create_directory(util::GetLatitePath() / "Assets");
+    LatiteTemp::cleanup();
     Logger::Setup();
 
 #ifdef LATITE_CRASH_REPORTING
@@ -440,6 +442,7 @@ BOOL WINAPI DllMainImpl(
         Latite::getPluginManager().~PluginManager();
         Latite::getNotifications().~Notifications();
         Latite::get().~Latite();
+        LatiteTemp::cleanup();
 
         MH_Uninitialize();
 
