@@ -426,6 +426,11 @@ void MCDrawUtil::drawImage(SDK::TexturePtr& texture, Vec2 const& pos, Vec2 const
 	this->renderCtx->flushImages(flushCol, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
 }
 
+void MCDrawUtil::drawImage(SDK::TexturePtr& texture, Vec2 const& pos, Vec2 const& size, Vec2 const& uvPos, Vec2 const& uvSize, d2d::Color const& flushCol) {
+	this->renderCtx->drawImage(texture, { pos.x * this->guiScale, pos.y * guiScale }, { size.x * guiScale, size.y * guiScale }, uvPos, uvSize);
+	this->renderCtx->flushImages(flushCol, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
+}
+
 d2d::Rect MCDrawUtil::drawItem(SDK::ItemStack* item, Vec2 const& pos, float sizeModifier, float opacity) {
 	SDK::BaseActorRenderContext ctx = SDK::BaseActorRenderContext{this->renderCtx->screenContext, this->renderCtx->cinst, this->renderCtx->cinst->minecraftGame};
 	

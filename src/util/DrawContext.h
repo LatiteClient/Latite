@@ -115,6 +115,7 @@ public:
 
 	void drawVignette(d2d::Color const& innerCol, float fade = 0.f);
 	void drawImage(SDK::TexturePtr& texture, Vec2 const& pos, Vec2 const& size, d2d::Color const& flushCol);
+	void drawImage(SDK::TexturePtr& texture, Vec2 const& pos, Vec2 const& size, Vec2 const& uvPos, Vec2 const& uvSize, d2d::Color const& flushCol);
 	d2d::Rect drawItem(SDK::ItemStack* item, Vec2 const& pos, float sizeModifier = 1.f, float opacity = 1.f);
 
 	void fillPolygon(Vec2 const& center, float radius, int numSides, d2d::Color const& col);

@@ -24,6 +24,10 @@ private:
 		std::wstring detail;
 		SDK::Block const* block = nullptr;
 		SDK::ItemStack* itemStack = nullptr;
+		std::string faceTexturePath;
+		Vec2 faceUvPos{};
+		Vec2 faceUvSize{ 1.f, 1.f };
+		bool faceTextureOverlay = false;
 		float health = -1.f;
 	};
 
@@ -45,6 +49,7 @@ private:
 	std::optional<TargetInfo> getBlockTarget(SDK::HitResult* hit);
 	SDK::Actor* getEntityTarget(SDK::HitResult* hit, float& distance);
 	std::optional<TargetInfo> getEntityInfo(SDK::Actor* actor, float distance);
+	std::string getPlayerFaceTexturePath(SDK::Player* player);
 
 	void drawHealthPips(DrawUtil& dc, float x, float y, float health);
 	void drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::Rect const& icon);

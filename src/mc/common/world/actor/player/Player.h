@@ -4,6 +4,7 @@
 #include "PlayerInventory.h"
 #include "mc/common/network/PacketSender.h"
 #include "GameMode.h"
+#include "SerializedSkinRef.h"
 #include <string>
 
 namespace SDK {
@@ -13,6 +14,10 @@ namespace SDK {
 
 		MoveInputComponent* getMoveInputComponent();
 		std::string getXUID();
+
+		SerializedSkinRef* getSkin() const {
+			return *reinterpret_cast<SerializedSkinRef* const*>(reinterpret_cast<uintptr_t>(this) + 0xAB0);
+		}
 
 		// @dump-wbds Player::getSupplies, 3
 		CLASS_FIELD(PlayerInventory*, supplies, 0x5B8); // xref: getSupplies
