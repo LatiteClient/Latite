@@ -27,7 +27,6 @@ private:
 		std::string faceTexturePath;
 		Vec2 faceUvPos{};
 		Vec2 faceUvSize{ 1.f, 1.f };
-		bool faceTextureOverlay = false;
 		float health = -1.f;
 	};
 

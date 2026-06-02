@@ -17,7 +17,6 @@ namespace {
 	constexpr float borderThickness = 3.f;
 	constexpr Vec2 skinFaceUvPos{ 0.125f, 0.125f };
 	constexpr Vec2 skinFaceUvSize{ 0.125f, 0.125f };
-	constexpr Vec2 skinHatUvPos{ 0.625f, 0.125f };
 	constexpr uint32_t playerHeadTextureSize = 64;
 
 	uint64_t hashSkinBytes(SDK::SkinImage const& image, std::string const& id) {
@@ -177,7 +176,7 @@ namespace {
 		auto head = makePlayerHeadRgba(*image);
 		if (head.empty()) return {};
 
-		auto path = util::GetLatitePath() / "WAILAHeads" / std::format("head-v3-{:016x}.png", hash);
+		auto path = util::GetLatitePath() / "WAILAHeads" / std::format("head-{:016x}.png", hash);
 		if (!fileHasContent(path)) {
 			std::error_code ec;
 			std::filesystem::remove(path, ec);
@@ -624,7 +623,6 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float d
 	std::string faceTexturePath;
 	Vec2 faceUvPos = skinFaceUvPos;
 	Vec2 faceUvSize = skinFaceUvSize;
-	bool faceTextureOverlay = false;
 
 	if (actor->isPlayer()) {
 		auto player = static_cast<SDK::Player*>(actor);
@@ -673,7 +671,6 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float d
 		.faceTexturePath = faceTexturePath,
 		.faceUvPos = faceUvPos,
 		.faceUvSize = faceUvSize,
-		.faceTextureOverlay = faceTextureOverlay,
 		.health = health,
 	};
 }
@@ -731,8 +728,8 @@ void WAILA::drawHealthPips(DrawUtil& dc, float x, float y, float health) {
 
 void WAILA::drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::Rect const& icon) {
 	// if i dont draw a super small rectangle before drawing items everything gets fucked for some reason
-	ctxGeneric.fillRoundedRectangle(d2d::Rect(icon.left / 48.f, icon.top / 48.f, icon.right / 48.f, icon.bottom / 48.f),
-	                                d2d::Color::RGB(20, 20, 24, 150), 2.f);
+	//ctxGeneric.fillRoundedRectangle(d2d::Rect(icon.left / 48.f, icon.top / 48.f, icon.right / 48.f, icon.bottom / 48.f),
+	                                //d2d::Color::RGB(20, 20, 24, 150), 2.f);
 
 	auto& dc = static_cast<MCDrawUtil&>(ctxGeneric);
 
@@ -743,9 +740,6 @@ void WAILA::drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::
 		dc.renderCtx->getTexture(&texture, SDK::ResourceLocation(target.faceTexturePath, textureFileSystem), externalTexture);
 		if (texture.textureData) {
 			dc.drawImage(texture, icon.getPos(), icon.getSize(), target.faceUvPos, target.faceUvSize, d2d::Colors::WHITE);
-			if (target.faceTextureOverlay) {
-				dc.drawImage(texture, icon.getPos(), icon.getSize(), skinHatUvPos, skinFaceUvSize, d2d::Colors::WHITE);
-			}
 			return;
 		}
 	}
