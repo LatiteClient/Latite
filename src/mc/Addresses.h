@@ -178,6 +178,14 @@ public:
 		"55 41 57 41 56 41 55 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 0F 29 75 ? 48 C7 45 ? ? ? ? ? 4D 89 CE 4C 89 C6 48 89 D7"_sig,
 		"ActorRenderDispatcher::render"}; // "No renderer found - have you set the entity's description:identifier correctly?"
 
+	inline static SigImpl ActorRenderDispatcher_renderUI{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 83 EC ? 48 8B 44 24 ? 44 0F B6 54 24"_sig,
+		"ActorRenderDispatcher::render(BaseActorRenderContext&, Actor&, Vec3 const&, Vec2 const&, bool)"};
+
+	inline static SigImpl ActorRenderDispatcher_getRendererById{[](memory::signature_store&, uintptr_t res) { return res; },
+		"41 57 41 56 41 54 56 57 53 48 83 EC ? 4C 89 C3 48 89 D6 48 89 CF 4C 89 C1"_sig,
+		"ActorRenderDispatcher::getRenderer(HashedString const&)"};
+
 	inline static SigImpl LevelRendererPlayer_renderOutlineSelection{[](memory::signature_store&, uintptr_t res) { return res; },
 		"55 41 57 41 56 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 48 C7 45 ? ? ? ? ? 4D 89 CE 4D 89 C7"_sig,
 		"LevelRendererPlayer::renderOutlineSelection"};

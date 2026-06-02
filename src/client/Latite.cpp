@@ -311,6 +311,8 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         MVSIG(BlockGraphics_getTextureAtPos),
         MVSIG(UIControl_updateCachedPosition),
         MVSIG(ActorRenderDispatcher_render),
+        MVSIG(ActorRenderDispatcher_renderUI),
+        MVSIG(ActorRenderDispatcher_getRendererById),
         MVSIG(LevelRendererPlayer_renderOutlineSelection),
         MVSIG(Dimension_getSkyColor),
         MVSIG(Dimension_getTimeOfDay),
