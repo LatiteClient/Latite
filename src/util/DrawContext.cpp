@@ -528,6 +528,17 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 
 	float projectedWidth = std::max(0.01f, projectedMax.x - projectedMin.x);
 	float projectedHeight = std::max(0.01f, projectedMax.y - projectedMin.y);
+	// aabb is gameplay size, so leave some room for hats, held items, and model layers
+	float horizontalRenderPadding = projectedWidth * 0.08f;
+	float topRenderPadding = projectedHeight * 0.12f;
+	float bottomRenderPadding = projectedHeight * 0.04f;
+	projectedMin.x -= horizontalRenderPadding;
+	projectedMax.x += horizontalRenderPadding;
+	projectedMin.y -= topRenderPadding;
+	projectedMax.y += bottomRenderPadding;
+	projectedWidth = std::max(0.01f, projectedMax.x - projectedMin.x);
+	projectedHeight = std::max(0.01f, projectedMax.y - projectedMin.y);
+
 	float scale = std::min((ownerWidth * 0.82f) / projectedWidth, (ownerHeight * 0.88f) / projectedHeight);
 	scale = std::min(scale, 96.f * guiScale);
 
