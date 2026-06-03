@@ -495,6 +495,7 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float d
 		.type = TargetType::Entity,
 		.title = title,
 		.detail = detail,
+		.actor = actor,
 		.itemStack = itemStack,
 		.faceTexturePath = faceTexturePath,
 		.faceUvPos = faceUvPos,
@@ -596,6 +597,9 @@ void WAILA::drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::
 
 			itemStack->destruct();
 		}
+	}
+	else if (target.type == TargetType::Entity && target.actor && !target.actor->isItem()) {
+		dc.drawActor(target.actor, icon, 1.f);
 	}
 
 }

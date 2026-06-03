@@ -23,6 +23,7 @@ private:
 		std::wstring title;
 		std::wstring detail;
 		SDK::Block const* block = nullptr;
+		SDK::Actor* actor = nullptr;
 		SDK::ItemStack* itemStack = nullptr;
 		std::string faceTexturePath;
 		Vec2 faceUvPos{};
