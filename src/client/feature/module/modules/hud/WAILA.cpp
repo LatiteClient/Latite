@@ -562,6 +562,12 @@ void WAILA::drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::
 
 	auto& dc = static_cast<MCDrawUtil&>(ctxGeneric);
 
+	if (target.type == TargetType::Entity && target.actor && !target.actor->isItem()) {
+		if (dc.drawActor(target.actor, icon, 1.f)) {
+			return;
+		}
+	}
+
 	if (!target.faceTexturePath.empty()) {
 		SDK::TexturePtr texture{};
 		auto externalTexture = std::filesystem::path(target.faceTexturePath).is_absolute();
@@ -597,9 +603,6 @@ void WAILA::drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::
 
 			itemStack->destruct();
 		}
-	}
-	else if (target.type == TargetType::Entity && target.actor && !target.actor->isItem()) {
-		dc.drawActor(target.actor, icon, 1.f);
 	}
 
 }

@@ -458,7 +458,7 @@ d2d::Rect MCDrawUtil::drawItem(SDK::ItemStack* item, Vec2 const& pos, float size
 }
 
 bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opacity) {
-	if (!actor || !actor->aabbShape || !renderCtx || !renderCtx->screenContext || !renderCtx->cinst ||
+	if (!actor || !actor->aabbShape || !actor->stateVector || !renderCtx || !renderCtx->screenContext || !renderCtx->cinst ||
 		!renderCtx->cinst->minecraftGame || !scn || !scn->matrix || !Signatures::ActorRenderDispatcher_renderUI.result) {
 		return false;
 	}
@@ -468,14 +468,8 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 	if (!dispatcher) return false;
 
 	auto const& box = actor->getBoundingBox();
-	float height = std::max(0.25f, box.higher.y - box.lower.y);
-	float widthX = std::max(0.01f, box.higher.x - box.lower.x);
-	float widthZ = std::max(0.01f, box.higher.z - box.lower.z);
 	float ownerWidth = bounds.getWidth() * guiScale;
 	float ownerHeight = bounds.getHeight() * guiScale;
-	float horizontalExtent = std::max(widthX, widthZ);
-	float scale = std::min((ownerWidth * 0.78f) / horizontalExtent, (ownerHeight * 0.88f) / height);
-	scale = std::min(scale, 96.f * guiScale);
 	float bodyYaw = actor->actorRotation ? actor->actorRotation->rotation.y : 0.f;
 	if (auto renderRotation = actor->tryGetComponent<SDK::RenderRotationComponent>()) {
 		bodyYaw = renderRotation->rotation.y;
@@ -496,14 +490,62 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 		};
 	};
 
-	float centerX = (bounds.left * guiScale) + (ownerWidth * 0.5f);
-	float actorPixelHeight = height * scale;
-	float anchorY = (bounds.top * guiScale) + ((ownerHeight + actorPixelHeight) * 0.5f);
+	D2D1::Matrix4x4F actorOrientation =
+		D2D1::Matrix4x4F::Scale(1.f, 1.f, -1.f) *
+		D2D1::Matrix4x4F::RotationZ(180.f) *
+		D2D1::Matrix4x4F::RotationY(-180.f - bodyYaw);
+
+	auto transformActorPoint = [](D2D1::Matrix4x4F const& matrix, Vec3 const& point) {
+		return Vec2{
+			(point.x * matrix._11) + (point.y * matrix._21) + (point.z * matrix._31),
+			(point.x * matrix._12) + (point.y * matrix._22) + (point.z * matrix._32),
+		};
+	};
+
+	Vec3 actorPos = actor->getPos();
+	Vec3 localLower = box.lower - actorPos;
+	Vec3 localHigher = box.higher - actorPos;
+	std::array<Vec3, 8> corners{
+		Vec3{ localLower.x, localLower.y, localLower.z },
+		Vec3{ localLower.x, localLower.y, localHigher.z },
+		Vec3{ localLower.x, localHigher.y, localLower.z },
+		Vec3{ localLower.x, localHigher.y, localHigher.z },
+		Vec3{ localHigher.x, localLower.y, localLower.z },
+		Vec3{ localHigher.x, localLower.y, localHigher.z },
+		Vec3{ localHigher.x, localHigher.y, localLower.z },
+		Vec3{ localHigher.x, localHigher.y, localHigher.z },
+	};
+
+	Vec2 projectedMin = transformActorPoint(actorOrientation, corners.front());
+	Vec2 projectedMax = projectedMin;
+	for (Vec3 const& corner : corners) {
+		Vec2 projected = transformActorPoint(actorOrientation, corner);
+		projectedMin.x = std::min(projectedMin.x, projected.x);
+		projectedMin.y = std::min(projectedMin.y, projected.y);
+		projectedMax.x = std::max(projectedMax.x, projected.x);
+		projectedMax.y = std::max(projectedMax.y, projected.y);
+	}
+
+	float projectedWidth = std::max(0.01f, projectedMax.x - projectedMin.x);
+	float projectedHeight = std::max(0.01f, projectedMax.y - projectedMin.y);
+	float scale = std::min((ownerWidth * 0.82f) / projectedWidth, (ownerHeight * 0.88f) / projectedHeight);
+	scale = std::min(scale, 96.f * guiScale);
+
+	Vec2 projectedCenter{
+		(projectedMin.x + projectedMax.x) * 0.5f,
+		(projectedMin.y + projectedMax.y) * 0.5f,
+	};
+	Vec2 frameCenter{
+		(bounds.left * guiScale) + (ownerWidth * 0.5f),
+		(bounds.top * guiScale) + (ownerHeight * 0.5f),
+	};
+	float anchorX = frameCenter.x - (projectedCenter.x * scale);
+	float anchorY = frameCenter.y - (projectedCenter.y * scale);
 	D2D1::Matrix4x4F localTransform =
 		D2D1::Matrix4x4F::Scale(scale, scale, -scale) *
 		D2D1::Matrix4x4F::RotationZ(180.f) *
 		D2D1::Matrix4x4F::RotationY(-180.f - bodyYaw) *
-		D2D1::Matrix4x4F::Translation(centerX, anchorY, -500.f);
+		D2D1::Matrix4x4F::Translation(anchorX, anchorY, -500.f);
 	D2D1::Matrix4x4F transform = localTransform * parentTransform;
 
 	Vec2 clipTopLeft = transformPoint(parentTransform, { bounds.left * guiScale, bounds.top * guiScale });
