@@ -7,6 +7,8 @@
 #include "mc/common/world/level/HitResult.h"
 #include "mc/common/world/level/block/Block.h"
 #include "client/misc/PlayerHeadCache.h"
+#include "client/misc/TempStorage.h"
+#include "client/resource/InitResources.h"
 
 namespace {
 	constexpr float defaultWidth = 296.f;
@@ -15,7 +17,9 @@ namespace {
 	constexpr float paddingX = 8.f;
 	constexpr float paddingY = 6.f;
 	constexpr float textGap = 8.f;
-	constexpr float borderThickness = 3.f;
+	constexpr float borderTextureBaseWidth = 16.f;
+	constexpr float borderTextureBaseHeight = 16.f;
+	constexpr float borderTextureSliceSize = 4.f;
 	constexpr Vec2 skinFaceUvPos{ 0.125f, 0.125f };
 	constexpr Vec2 skinFaceUvSize{ 0.125f, 0.125f };
 
@@ -230,11 +234,8 @@ WAILA::WAILA() : HUDModule("WAILA", L"WAILA", L"Shows the block or entity you ar
 		FloatValue(2.f), FloatValue(12.f), FloatValue(0.5f), "showEntities"_istrue);
 	addSliderSetting("textSize", L"Text Size", L"Text size for the inspector.", textSize,
 		FloatValue(20.f), FloatValue(44.f), FloatValue(1.f));
-	addSetting("background", L"Background", L"Inspector background color.", backgroundColor);
-	addSetting("border", L"Border", L"Inspector border color.", borderColor);
 	addSetting("titleColor", L"Title", L"Inspector title color.", titleColor);
 	addSetting("detailColor", L"Detail", L"Inspector detail color.", detailColor);
-	addSliderSetting("radius", L"Radius", L"Corner radius.", radius, FloatValue(0.f), FloatValue(8.f), FloatValue(1.f));
 
 	rect = { 0.f, 0.f, defaultWidth, defaultHeight };
 }
@@ -283,14 +284,75 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	rect.bottom = rect.top + height;
 
 	d2d::Rect bounds{ 0.f, 0.f, width, height };
-	float cornerRadius = std::get<FloatValue>(radius).value;
-	auto background = d2d::Color(std::get<ColorValue>(backgroundColor).getMainColor());
-	auto border = d2d::Color(std::get<ColorValue>(borderColor).getMainColor());
 	auto title = d2d::Color(std::get<ColorValue>(titleColor).getMainColor());
 	auto detail = d2d::Color(std::get<ColorValue>(detailColor).getMainColor());
 
-	dc.fillRoundedRectangle(bounds, background, cornerRadius);
-	dc.drawRoundedRectangle(bounds, border, cornerRadius, borderThickness);
+	bool drewBackground = [&]() -> bool {
+		if (!dc.isMinecraft()) return false;
+
+		auto& mc = static_cast<MCDrawUtil&>(dc);
+		if (!mc.renderCtx) return false;
+
+		static std::string borderTexturePath;
+
+		if (borderTexturePath.empty()) {
+			auto resource = GET_RESOURCE(purpleborder_png);
+			auto path = LatiteTemp::resolvePath("Assets/purpleborder.png");
+			if (path.empty()) return false;
+
+			std::error_code ec;
+			std::filesystem::create_directories(path.parent_path(), ec);
+			if (ec) return false;
+
+			std::filesystem::remove(path, ec);
+
+			std::ofstream out(path, std::ios::binary | std::ios::trunc);
+			if (!out.good()) return false;
+
+			out.write(resource.data(), static_cast<std::streamsize>(resource.size()));
+			out.close();
+			if (!out.good()) {
+				std::filesystem::remove(path, ec);
+				return false;
+			}
+
+			borderTexturePath = util::WStrToStr(path.wstring());
+		}
+
+		SDK::TexturePtr texture{};
+		mc.renderCtx->getTexture(&texture, SDK::ResourceLocation(borderTexturePath, SDK::ResourceFileSystem::Raw), true);
+		if (!texture.textureData) return false;
+
+		auto sliceX = std::min(borderTextureSliceSize, bounds.getWidth() * 0.5f);
+		auto sliceY = std::min(borderTextureSliceSize, bounds.getHeight() * 0.5f);
+		auto uvSliceX = borderTextureSliceSize / borderTextureBaseWidth;
+		auto uvSliceY = borderTextureSliceSize / borderTextureBaseHeight;
+
+		float destX[] = { bounds.left, bounds.left + sliceX, bounds.right - sliceX, bounds.right };
+		float destY[] = { bounds.top, bounds.top + sliceY, bounds.bottom - sliceY, bounds.bottom };
+		float uvX[] = { 0.f, uvSliceX, 1.f - uvSliceX, 1.f };
+		float uvY[] = { 0.f, uvSliceY, 1.f - uvSliceY, 1.f };
+
+		for (int yIdx = 0; yIdx < 3; ++yIdx) {
+			for (int xIdx = 0; xIdx < 3; ++xIdx) {
+				d2d::Rect dest{ destX[xIdx], destY[yIdx], destX[xIdx + 1], destY[yIdx + 1] };
+				if (dest.getWidth() <= 0.f || dest.getHeight() <= 0.f) continue;
+
+				mc.renderCtx->drawImage(texture,
+					{ dest.left * mc.guiScale, dest.top * mc.guiScale },
+					{ dest.getWidth() * mc.guiScale, dest.getHeight() * mc.guiScale },
+					{ uvX[xIdx], uvY[yIdx] },
+					{ uvX[xIdx + 1] - uvX[xIdx], uvY[yIdx + 1] - uvY[yIdx] });
+			}
+		}
+
+		mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
+		return true;
+	}();
+
+	if (!drewBackground) {
+		dc.fillRectangle(bounds, d2d::Color(0.055f, 0.065f, 0.075f, 0.82f));
+	}
 
 	d2d::Rect icon{ paddingX, paddingY + ((height - (paddingY * 2.f) - iconSize) * 0.5f),
 		paddingX + iconSize, paddingY + ((height - (paddingY * 2.f) - iconSize) * 0.5f) + iconSize };
