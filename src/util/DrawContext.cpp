@@ -5,6 +5,12 @@
 #include "mc/common/client/renderer/Tessellator.h"
 #include "mc/common/client/renderer/MeshUtils.h"
 #include "mc/common/client/renderer/MaterialPtr.h"
+#include "mc/common/client/renderer/ActorRenderer.h"
+#include "mc/common/client/renderer/ActorRenderDispatcher.h"
+#include "mc/common/entity/component/ActorHeadRotationComponent.h"
+#include "mc/common/entity/component/MobBodyRotationComponent.h"
+#include "mc/common/entity/component/RenderRotationComponent.h"
+#include "mc/common/world/actor/Actor.h"
 #include <mc/common/client/renderer/game/BaseActorRenderContext.h>
 #include <mc/common/client/renderer/ItemRenderer.h>
 #include <ranges>
@@ -449,6 +455,155 @@ d2d::Rect MCDrawUtil::drawItem(SDK::ItemStack* item, Vec2 const& pos, float size
 		pos.x + ((itemSize) * sizeModifier) / guiScale,
 		pos.y + ((itemSize) * sizeModifier) / guiScale
 	};
+}
+
+bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opacity) {
+	if (!actor || !actor->aabbShape || !renderCtx || !renderCtx->screenContext || !renderCtx->cinst ||
+		!renderCtx->cinst->minecraftGame || !scn || !scn->matrix || !Signatures::ActorRenderDispatcher_renderUI.result) {
+		return false;
+	}
+
+	SDK::BaseActorRenderContext ctx{ renderCtx->screenContext, renderCtx->cinst, renderCtx->cinst->minecraftGame };
+	auto& dispatcher = ctx.entityRenderDispatcher;
+	if (!dispatcher) return false;
+
+	auto const& box = actor->getBoundingBox();
+	float height = std::max(0.25f, box.higher.y - box.lower.y);
+	float widthX = std::max(0.01f, box.higher.x - box.lower.x);
+	float widthZ = std::max(0.01f, box.higher.z - box.lower.z);
+	float ownerWidth = bounds.getWidth() * guiScale;
+	float ownerHeight = bounds.getHeight() * guiScale;
+	float horizontalExtent = std::max(widthX, widthZ);
+	float scale = std::min((ownerWidth * 0.78f) / horizontalExtent, (ownerHeight * 0.88f) / height);
+	scale = std::min(scale, 96.f * guiScale);
+	float bodyYaw = actor->actorRotation ? actor->actorRotation->rotation.y : 0.f;
+	if (auto renderRotation = actor->tryGetComponent<SDK::RenderRotationComponent>()) {
+		bodyYaw = renderRotation->rotation.y;
+	}
+	if (auto bodyRotation = actor->tryGetComponent<SDK::MobBodyRotationComponent>()) {
+		bodyYaw = bodyRotation->yBodyRot;
+	}
+
+	auto& matrixStack = scn->matrix->matrixStack;
+	D2D1::Matrix4x4F parentTransform = matrixStack.empty()
+		? D2D1::Matrix4x4F::Translation(0.f, 0.f, 0.f)
+		: matrixStack.top();
+
+	auto transformPoint = [](D2D1::Matrix4x4F const& matrix, Vec2 const& point) {
+		return Vec2{
+			(point.x * matrix._11) + (point.y * matrix._21) + matrix._41,
+			(point.x * matrix._12) + (point.y * matrix._22) + matrix._42,
+		};
+	};
+
+	float centerX = (bounds.left * guiScale) + (ownerWidth * 0.5f);
+	float actorPixelHeight = height * scale;
+	float anchorY = (bounds.top * guiScale) + ((ownerHeight + actorPixelHeight) * 0.5f);
+	D2D1::Matrix4x4F localTransform =
+		D2D1::Matrix4x4F::Scale(scale, scale, -scale) *
+		D2D1::Matrix4x4F::RotationZ(180.f) *
+		D2D1::Matrix4x4F::RotationY(-180.f - bodyYaw) *
+		D2D1::Matrix4x4F::Translation(centerX, anchorY, -500.f);
+	D2D1::Matrix4x4F transform = localTransform * parentTransform;
+
+	Vec2 clipTopLeft = transformPoint(parentTransform, { bounds.left * guiScale, bounds.top * guiScale });
+	Vec2 clipBottomRight = transformPoint(parentTransform, { bounds.right * guiScale, bounds.bottom * guiScale });
+	SDK::RectangleArea clip{
+		std::min(clipTopLeft.x, clipBottomRight.x),
+		std::min(clipTopLeft.y, clipBottomRight.y),
+		std::max(clipTopLeft.x, clipBottomRight.x),
+		std::max(clipTopLeft.y, clipBottomRight.y),
+	};
+
+	flush();
+	renderCtx->saveCurrentClippingRectangle();
+	renderCtx->setClippingRectangle(clip);
+	matrixStack.push(transform);
+
+	Vec3 cameraTarget{};
+	Vec2 rotation{ 0.f, bodyYaw };
+	Vec2 hudActorRotation{ 0.f, bodyYaw };
+	struct ScopedActorHudPose {
+		SDK::Actor* actor = nullptr;
+		SDK::ActorHeadRotationComponent* headRotation = nullptr;
+		SDK::MobBodyRotationComponent* bodyRotation = nullptr;
+		SDK::RenderRotationComponent* renderRotation = nullptr;
+		Vec2 savedRotation{};
+		Vec2 savedRotationOld{};
+		SDK::ActorHeadRotationComponent savedHeadRotation{};
+		SDK::MobBodyRotationComponent savedBodyRotation{};
+		SDK::RenderRotationComponent savedRenderRotation{};
+
+		ScopedActorHudPose(SDK::Actor* actor, Vec2 forcedRotation) : actor(actor) {
+			if (!actor || !actor->actorRotation) return;
+
+			savedRotation = actor->actorRotation->rotation;
+			savedRotationOld = actor->actorRotation->rotationOld;
+			actor->actorRotation->rotation = forcedRotation;
+			actor->actorRotation->rotationOld = forcedRotation;
+
+			headRotation = actor->tryGetComponent<SDK::ActorHeadRotationComponent>();
+			if (headRotation) {
+				savedHeadRotation = *headRotation;
+				headRotation->yHeadRot = forcedRotation.y;
+				headRotation->yHeadRotOld = forcedRotation.y;
+			}
+
+			bodyRotation = actor->tryGetComponent<SDK::MobBodyRotationComponent>();
+			if (bodyRotation) {
+				savedBodyRotation = *bodyRotation;
+				bodyRotation->yBodyRot = forcedRotation.y;
+				bodyRotation->yBodyRotOld = forcedRotation.y;
+			}
+
+			renderRotation = actor->tryGetComponent<SDK::RenderRotationComponent>();
+			if (renderRotation) {
+				savedRenderRotation = *renderRotation;
+				renderRotation->rotation = forcedRotation;
+			}
+		}
+
+		~ScopedActorHudPose() {
+			if (!actor || !actor->actorRotation) return;
+
+			actor->actorRotation->rotation = savedRotation;
+			actor->actorRotation->rotationOld = savedRotationOld;
+			if (headRotation) *headRotation = savedHeadRotation;
+			if (bodyRotation) *bodyRotation = savedBodyRotation;
+			if (renderRotation) *renderRotation = savedRenderRotation;
+		}
+	} poseOverride{ actor, hudActorRotation };
+
+	struct ScopedRendererInventoryFlag {
+		std::shared_ptr<SDK::ActorRenderer> renderer{};
+		bool savedValue = false;
+		bool changed = false;
+
+		ScopedRendererInventoryFlag(std::shared_ptr<SDK::ActorRenderer> renderer) : renderer(std::move(renderer)) {
+			if (!this->renderer) return;
+
+			savedValue = this->renderer->renderingInventory;
+			this->renderer->renderingInventory = true;
+			changed = true;
+		}
+
+		~ScopedRendererInventoryFlag() {
+			if (changed && renderer) {
+				renderer->renderingInventory = savedValue;
+			}
+		}
+	};
+	auto actorRenderer = dispatcher->getRendererById(actor->getActorRendererId());
+	if (!actorRenderer) {
+		actorRenderer = dispatcher->getRendererById(actor->getActorRendererIdOverride());
+	}
+	ScopedRendererInventoryFlag inventoryFlag{ actorRenderer };
+
+	dispatcher->renderUI(&ctx, actor, cameraTarget, rotation, opacity > 0.f);
+
+	matrixStack.pop();
+	renderCtx->restoreSavedClippingRectangle();
+	return true;
 }
 
 void MCDrawUtil::fillPolygon(Vec2 const& center, float radius, int numSides, d2d::Color const& col) {

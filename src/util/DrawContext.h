@@ -117,6 +117,7 @@ public:
 	void drawImage(SDK::TexturePtr& texture, Vec2 const& pos, Vec2 const& size, d2d::Color const& flushCol);
 	void drawImage(SDK::TexturePtr& texture, Vec2 const& pos, Vec2 const& size, Vec2 const& uvPos, Vec2 const& uvSize, d2d::Color const& flushCol);
 	d2d::Rect drawItem(SDK::ItemStack* item, Vec2 const& pos, float sizeModifier = 1.f, float opacity = 1.f);
+	bool drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opacity = 1.f);
 
 	void fillPolygon(Vec2 const& center, float radius, int numSides, d2d::Color const& col);
 	void drawPolygon(Vec2 const& center, float radius, int numSides, d2d::Color const& col, float lineThickness = 1.f);
