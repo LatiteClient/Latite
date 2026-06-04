@@ -19,6 +19,11 @@ namespace {
 	constexpr float textGap = 7.f;
 	constexpr float titleTextScale = 0.72f;
 	constexpr float detailTextScale = 0.74f;
+	constexpr int maxHearts = 10;
+	constexpr float heartSize = 9.f;
+	constexpr float heartGap = 0.f;
+	constexpr float heartStride = heartSize + heartGap;
+	constexpr float heartRowWidth = heartSize + (heartStride * (maxHearts - 1));
 	constexpr float borderTextureBaseWidth = 16.f;
 	constexpr float borderTextureBaseHeight = 16.f;
 	constexpr float borderTextureSliceSize = 4.f;
@@ -267,7 +272,7 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	float titleSize = std::get<FloatValue>(textSize).value * titleTextScale;
 	float detailSize = titleSize * detailTextScale;
 	float healthHeight = target->type == TargetType::Entity && target->health >= 0.f && std::get<BoolValue>(showHealth).value
-		? 7.f
+		? heartSize
 		: 0.f;
 
 	std::wstring plainTitle = util::StripMinecraftFormatting(target->title);
@@ -281,6 +286,9 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	}
 
 	float textWidth = std::max(titleTextSize.x, detailTextSize.x);
+	if (healthHeight > 0.f) {
+		textWidth = std::max(textWidth, heartRowWidth);
+	}
 	float contentWidth = iconSize + textGap + textWidth;
 	float width = std::max(defaultWidth, contentWidth + (paddingX * 2.f));
 	float textHeight = titleTextSize.y + detailTextSize.y + healthHeight;
@@ -416,7 +424,7 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	y += titleTextSize.y;
 
 	if (healthHeight > 0.f) {
-		drawHealthPips(dc, textLeft, y + 0.5f, target->health);
+		drawHealthHearts(dc, textLeft, y, target->health);
 		y += healthHeight;
 	}
 
@@ -649,21 +657,49 @@ std::string WAILA::getPlayerFaceTexturePath(SDK::Player* player) {
 	return {};
 }
 
-// TODO: draw real minecraft hearts?
-void WAILA::drawHealthPips(DrawUtil& dc, float x, float y, float health) {
-	int filledPips = std::clamp(static_cast<int>(std::ceil(health / 2.f)), 0, 10);
-	constexpr float pipSize = 5.f;
-	constexpr float gap = 1.5f;
+void WAILA::drawHealthHearts(DrawUtil& dc, float x, float y, float health) {
+	int filledHearts = std::clamp(static_cast<int>(std::ceil(health / 2.f)), 0, maxHearts);
 
-	for (int i = 0; i < 10; ++i) {
-		d2d::Rect pip{
-			x + (i * (pipSize + gap)),
+	if (dc.isMinecraft()) {
+		auto& mc = static_cast<MCDrawUtil&>(dc);
+		if (mc.renderCtx) {
+			SDK::TexturePtr texture{};
+			mc.renderCtx->getTexture(&texture, SDK::ResourceLocation("textures/ui/heart", SDK::ResourceFileSystem::UserPackage), false);
+			if (texture.textureData) {
+				for (int i = 0; i < maxHearts; ++i) {
+					mc.renderCtx->drawImage(texture,
+						{ (x + (i * heartStride)) * mc.guiScale, y * mc.guiScale },
+						{ heartSize * mc.guiScale, heartSize * mc.guiScale },
+						{ 0.f, 0.f },
+						{ 1.f, 1.f });
+				}
+				mc.renderCtx->flushImages(d2d::Color::RGB(74, 40, 45, 110), 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
+
+				if (filledHearts > 0) {
+					for (int i = 0; i < filledHearts; ++i) {
+						mc.renderCtx->drawImage(texture,
+							{ (x + (i * heartStride)) * mc.guiScale, y * mc.guiScale },
+							{ heartSize * mc.guiScale, heartSize * mc.guiScale },
+							{ 0.f, 0.f },
+							{ 1.f, 1.f });
+					}
+					mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
+				}
+
+				return;
+			}
+		}
+	}
+
+	for (int i = 0; i < maxHearts; ++i) {
+		d2d::Rect heart{
+			x + (i * heartStride),
 			y,
-			x + (i * (pipSize + gap)) + pipSize,
-			y + pipSize,
+			x + (i * heartStride) + heartSize,
+			y + heartSize,
 		};
 
-		dc.fillRectangle(pip, i < filledPips
+		dc.fillRectangle(heart, i < filledHearts
 			? d2d::Color::RGB(226, 55, 65)
 			: d2d::Color::RGB(74, 40, 45, 150));
 	}

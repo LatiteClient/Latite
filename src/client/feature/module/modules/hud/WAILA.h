@@ -48,6 +48,6 @@ private:
 	std::optional<TargetInfo> getEntityInfo(SDK::Actor* actor, float distance);
 	std::string getPlayerFaceTexturePath(SDK::Player* player);
 
-	void drawHealthPips(DrawUtil& dc, float x, float y, float health);
+	void drawHealthHearts(DrawUtil& dc, float x, float y, float health);
 	void drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::Rect const& icon);
 };
