@@ -476,7 +476,7 @@ std::optional<WAILA::TargetInfo> WAILA::getTargetInfo(bool preview) {
 		return TargetInfo{
 			.type = TargetType::Block,
 			.title = L"WAILA",
-			.detail = std::get<BoolValue>(showNamespace).value ? /* italicize namespace */ L"\u00A7oMinecraft\u00A7r" : L"",
+			.detail = L"Minecraft"
 			.health = -1.f,
 		};
 	}
