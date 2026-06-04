@@ -38,7 +38,7 @@ private:
 	ValueType showDistance = BoolValue(false);
 	ValueType showHealth = BoolValue(true);
 	ValueType entityDistance = FloatValue(6.f);
-	ValueType textSize = FloatValue(32.f);
+	ValueType textSize = FloatValue(36.f);
 	ValueType titleColor = ColorValue(1.f, 1.f, 1.f, 1.f);
 	ValueType detailColor = ColorValue(0.33f, 0.33f, 1.00f, 1.f);
 
