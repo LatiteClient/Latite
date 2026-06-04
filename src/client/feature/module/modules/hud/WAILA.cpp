@@ -384,7 +384,7 @@ std::optional<WAILA::TargetInfo> WAILA::getTargetInfo(bool preview) {
 		return TargetInfo{
 			.type = TargetType::Block,
 			.title = L"WAILA",
-			.detail = std::get<BoolValue>(showNamespace).value ? L"Minecraft" : L"",
+			.detail = std::get<BoolValue>(showNamespace).value ? /* italicize namespace */ L"\u00A7oMinecraft\u00A7r" : L"",
 			.health = -1.f,
 		};
 	}
@@ -435,7 +435,8 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult* hit) {
 
 	std::wstring detail;
 	if (std::get<BoolValue>(showNamespace).value) {
-		detail = util::StrToWStr(namespacedId);
+		// // italicize namespace
+		detail = L"\u00A7o" + util::StrToWStr(namespacedId) + L"\u00A7r";
 	}
 	if (std::get<BoolValue>(showCoordinates).value) {
 		if (!detail.empty()) detail += L"  ";
@@ -539,7 +540,8 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float d
 
 	std::wstring detail;
 	if (std::get<BoolValue>(showNamespace).value) {
-		detail = L"Minecraft";
+		// italicize namespace
+		detail = L"\u00A7oMinecraft\u00A7r";
 	}
 	if (std::get<BoolValue>(showDistance).value) {
 		if (!detail.empty()) detail += L"  ";
