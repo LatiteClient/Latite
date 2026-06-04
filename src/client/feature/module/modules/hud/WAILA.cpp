@@ -7,8 +7,6 @@
 #include "mc/common/world/level/HitResult.h"
 #include "mc/common/world/level/block/Block.h"
 #include "client/misc/PlayerHeadCache.h"
-#include "client/misc/TempStorage.h"
-#include "client/resource/InitResources.h"
 
 namespace {
 	constexpr float defaultWidth = 204.f;
@@ -307,34 +305,8 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 		auto& mc = static_cast<MCDrawUtil&>(dc);
 		if (!mc.renderCtx) return false;
 
-		static std::string borderTexturePath;
-
-		if (borderTexturePath.empty()) {
-			auto resource = GET_RESOURCE(purpleborder_png);
-			auto path = LatiteTemp::resolvePath("Assets/purpleborder.png");
-			if (path.empty()) return false;
-
-			std::error_code ec;
-			std::filesystem::create_directories(path.parent_path(), ec);
-			if (ec) return false;
-
-			std::filesystem::remove(path, ec);
-
-			std::ofstream out(path, std::ios::binary | std::ios::trunc);
-			if (!out.good()) return false;
-
-			out.write(resource.data(), static_cast<std::streamsize>(resource.size()));
-			out.close();
-			if (!out.good()) {
-				std::filesystem::remove(path, ec);
-				return false;
-			}
-
-			borderTexturePath = util::WStrToStr(path.wstring());
-		}
-
 		SDK::TexturePtr texture{};
-		mc.renderCtx->getTexture(&texture, SDK::ResourceLocation(borderTexturePath, SDK::ResourceFileSystem::Raw), true);
+		mc.renderCtx->getTexture(&texture, SDK::ResourceLocation("textures/ui/purpleBorder", SDK::ResourceFileSystem::UserPackage), false);
 		if (!texture.textureData) return false;
 
 		auto transform = mc.scn->matrix->matrixStack.empty()
