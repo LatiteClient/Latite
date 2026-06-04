@@ -349,28 +349,52 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 		float bottom = snapYToGuiPixel(bounds.bottom);
 		if (right <= left || bottom <= top) return false;
 
+		auto drawSlice = [&](float x, float y, float w, float h, float u, float v, float uw, float vh) {
+			if (w <= 0.f || h <= 0.f || uw <= 0.f || vh <= 0.f) return;
+
+			mc.renderCtx->drawImage(texture,
+				{ x, y },
+				{ w, h },
+				{ u / borderTextureBaseWidth, v / borderTextureBaseHeight },
+				{ uw / borderTextureBaseWidth, vh / borderTextureBaseHeight });
+		};
+
+		auto drawTiledSlice = [&](float x, float y, float w, float h, float u, float v, float uw, float vh) {
+			float tileW = uw * mc.guiScale;
+			float tileH = vh * mc.guiScale;
+			if (w <= 0.f || h <= 0.f || tileW <= 0.f || tileH <= 0.f) return;
+
+			for (float yOffset = 0.f; yOffset < h - 0.001f; yOffset += tileH) {
+				float pieceH = std::min(tileH, h - yOffset);
+
+				for (float xOffset = 0.f; xOffset < w - 0.001f; xOffset += tileW) {
+					float pieceW = std::min(tileW, w - xOffset);
+					drawSlice(x + xOffset, y + yOffset, pieceW, pieceH, u, v,
+						pieceW / mc.guiScale, pieceH / mc.guiScale);
+				}
+			}
+		};
+
 		auto sliceX = std::min(borderTextureSliceSize * mc.guiScale, (right - left) * 0.5f);
 		auto sliceY = std::min(borderTextureSliceSize * mc.guiScale, (bottom - top) * 0.5f);
-		auto uvSliceX = borderTextureSliceSize / borderTextureBaseWidth;
-		auto uvSliceY = borderTextureSliceSize / borderTextureBaseHeight;
+		float centerX = left + sliceX;
+		float centerY = top + sliceY;
+		float centerWidth = std::max(0.f, (right - left) - (sliceX * 2.f));
+		float centerHeight = std::max(0.f, (bottom - top) - (sliceY * 2.f));
+		float rightX = right - sliceX;
+		float bottomY = bottom - sliceY;
+		float sourceCenterSize = borderTextureBaseWidth - (borderTextureSliceSize * 2.f);
 
-		float destX[] = { left, left + sliceX, right - sliceX, right };
-		float destY[] = { top, top + sliceY, bottom - sliceY, bottom };
-		float uvX[] = { 0.f, uvSliceX, 1.f - uvSliceX, 1.f };
-		float uvY[] = { 0.f, uvSliceY, 1.f - uvSliceY, 1.f };
-
-		for (int yIdx = 0; yIdx < 3; ++yIdx) {
-			for (int xIdx = 0; xIdx < 3; ++xIdx) {
-				d2d::Rect dest{ destX[xIdx], destY[yIdx], destX[xIdx + 1], destY[yIdx + 1] };
-				if (dest.getWidth() <= 0.f || dest.getHeight() <= 0.f) continue;
-
-				mc.renderCtx->drawImage(texture,
-					dest.getPos(),
-					dest.getSize(),
-					{ uvX[xIdx], uvY[yIdx] },
-					{ uvX[xIdx + 1] - uvX[xIdx], uvY[yIdx + 1] - uvY[yIdx] });
-			}
-		}
+		drawSlice(left, top, sliceX, sliceY, 0.f, 0.f, borderTextureSliceSize, borderTextureSliceSize);
+		drawTiledSlice(centerX, top, centerWidth, sliceY, borderTextureSliceSize, 0.f, sourceCenterSize, borderTextureSliceSize);
+		drawTiledSlice(left, centerY, sliceX, centerHeight, 0.f, borderTextureSliceSize, borderTextureSliceSize, sourceCenterSize);
+		drawTiledSlice(centerX, centerY, centerWidth, centerHeight, borderTextureSliceSize, borderTextureSliceSize, sourceCenterSize, sourceCenterSize);
+		drawSlice(rightX, top, sliceX, sliceY, borderTextureBaseWidth - borderTextureSliceSize, 0.f, borderTextureSliceSize, borderTextureSliceSize);
+		drawSlice(left, bottomY, sliceX, sliceY, 0.f, borderTextureBaseHeight - borderTextureSliceSize, borderTextureSliceSize, borderTextureSliceSize);
+		drawTiledSlice(rightX, centerY, sliceX, centerHeight, borderTextureBaseWidth - borderTextureSliceSize, borderTextureSliceSize, borderTextureSliceSize, sourceCenterSize);
+		drawTiledSlice(centerX, bottomY, centerWidth, sliceY, borderTextureSliceSize, borderTextureBaseHeight - borderTextureSliceSize, sourceCenterSize, borderTextureSliceSize);
+		drawSlice(rightX, bottomY, sliceX, sliceY, borderTextureBaseWidth - borderTextureSliceSize, borderTextureBaseHeight - borderTextureSliceSize,
+			borderTextureSliceSize, borderTextureSliceSize);
 
 		mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
 		return true;
