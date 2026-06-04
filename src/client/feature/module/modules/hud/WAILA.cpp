@@ -476,7 +476,7 @@ std::optional<WAILA::TargetInfo> WAILA::getTargetInfo(bool preview) {
 		return TargetInfo{
 			.type = TargetType::Block,
 			.title = L"WAILA",
-			.detail = L"Minecraft"
+			.detail = L"Minecraft",
 			.health = -1.f,
 		};
 	}
