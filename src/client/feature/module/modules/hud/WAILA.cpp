@@ -11,12 +11,14 @@
 #include "client/resource/InitResources.h"
 
 namespace {
-	constexpr float defaultWidth = 296.f;
-	constexpr float defaultHeight = 96.f;
-	constexpr float iconSize = 64.f;
-	constexpr float paddingX = 8.f;
+	constexpr float defaultWidth = 204.f;
+	constexpr float defaultHeight = 64.f;
+	constexpr float iconSize = 48.f;
+	constexpr float paddingX = 7.f;
 	constexpr float paddingY = 6.f;
-	constexpr float textGap = 8.f;
+	constexpr float textGap = 7.f;
+	constexpr float titleTextScale = 0.72f;
+	constexpr float detailTextScale = 0.74f;
 	constexpr float borderTextureBaseWidth = 16.f;
 	constexpr float borderTextureBaseHeight = 16.f;
 	constexpr float borderTextureSliceSize = 4.f;
@@ -262,10 +264,10 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	std::optional<TargetInfo> target = getTargetInfo(isDefault || inEditor);
 	if (!target.has_value()) return;
 
-	float titleSize = std::get<FloatValue>(textSize).value;
-	float detailSize = titleSize * 0.78f;
+	float titleSize = std::get<FloatValue>(textSize).value * titleTextScale;
+	float detailSize = titleSize * detailTextScale;
 	float healthHeight = target->type == TargetType::Entity && target->health >= 0.f && std::get<BoolValue>(showHealth).value
-		? 9.f
+		? 7.f
 		: 0.f;
 
 	std::wstring plainTitle = util::StripMinecraftFormatting(target->title);
@@ -274,6 +276,10 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 
 	Vec2 titleTextSize = dc.getTextSize(plainTitle, Renderer::FontSelection::PrimaryRegular, titleSize, true, cacheText);
 	Vec2 detailTextSize = dc.getTextSize(plainDetail, Renderer::FontSelection::PrimaryRegular, detailSize, true, cacheText);
+	if (target->detail.empty()) {
+		detailTextSize = {};
+	}
+
 	float textWidth = std::max(titleTextSize.x, detailTextSize.x);
 	float contentWidth = iconSize + textGap + textWidth;
 	float width = std::max(defaultWidth, contentWidth + (paddingX * 2.f));
@@ -323,13 +329,33 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 		mc.renderCtx->getTexture(&texture, SDK::ResourceLocation(borderTexturePath, SDK::ResourceFileSystem::Raw), true);
 		if (!texture.textureData) return false;
 
-		auto sliceX = std::min(borderTextureSliceSize, bounds.getWidth() * 0.5f);
-		auto sliceY = std::min(borderTextureSliceSize, bounds.getHeight() * 0.5f);
+		auto transform = mc.scn->matrix->matrixStack.empty()
+			? D2D1::Matrix4x4F::Translation(0.f, 0.f, 0.f)
+			: mc.scn->matrix->matrixStack.top();
+		float matrixScaleX = std::abs(transform._11) > 0.001f ? transform._11 : 1.f;
+		float matrixScaleY = std::abs(transform._22) > 0.001f ? transform._22 : 1.f;
+		auto snapXToGuiPixel = [&](float localX) {
+			float screenX = transform._41 + (localX * mc.guiScale * matrixScaleX);
+			return (std::round(screenX / mc.guiScale) * mc.guiScale - transform._41) / matrixScaleX;
+		};
+		auto snapYToGuiPixel = [&](float localY) {
+			float screenY = transform._42 + (localY * mc.guiScale * matrixScaleY);
+			return (std::round(screenY / mc.guiScale) * mc.guiScale - transform._42) / matrixScaleY;
+		};
+
+		float left = snapXToGuiPixel(bounds.left);
+		float top = snapYToGuiPixel(bounds.top);
+		float right = snapXToGuiPixel(bounds.right);
+		float bottom = snapYToGuiPixel(bounds.bottom);
+		if (right <= left || bottom <= top) return false;
+
+		auto sliceX = std::min(borderTextureSliceSize * mc.guiScale, (right - left) * 0.5f);
+		auto sliceY = std::min(borderTextureSliceSize * mc.guiScale, (bottom - top) * 0.5f);
 		auto uvSliceX = borderTextureSliceSize / borderTextureBaseWidth;
 		auto uvSliceY = borderTextureSliceSize / borderTextureBaseHeight;
 
-		float destX[] = { bounds.left, bounds.left + sliceX, bounds.right - sliceX, bounds.right };
-		float destY[] = { bounds.top, bounds.top + sliceY, bounds.bottom - sliceY, bounds.bottom };
+		float destX[] = { left, left + sliceX, right - sliceX, right };
+		float destY[] = { top, top + sliceY, bottom - sliceY, bottom };
 		float uvX[] = { 0.f, uvSliceX, 1.f - uvSliceX, 1.f };
 		float uvY[] = { 0.f, uvSliceY, 1.f - uvSliceY, 1.f };
 
@@ -339,8 +365,8 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 				if (dest.getWidth() <= 0.f || dest.getHeight() <= 0.f) continue;
 
 				mc.renderCtx->drawImage(texture,
-					{ dest.left * mc.guiScale, dest.top * mc.guiScale },
-					{ dest.getWidth() * mc.guiScale, dest.getHeight() * mc.guiScale },
+					dest.getPos(),
+					dest.getSize(),
 					{ uvX[xIdx], uvY[yIdx] },
 					{ uvX[xIdx + 1] - uvX[xIdx], uvY[yIdx + 1] - uvY[yIdx] });
 			}
@@ -359,14 +385,14 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	drawTargetIcon(dc, *target, icon);
 
 	float textLeft = paddingX + iconSize + textGap;
-	float y = paddingY;
+	float y = paddingY + std::max(0.f, (height - (paddingY * 2.f) - textHeight) * 0.5f);
 	dc.drawText({textLeft, y - 1.f, width - paddingX, y + titleTextSize.y + 2.f}, target->title, title,
 		Renderer::FontSelection::SecondaryLight, titleSize, DWRITE_TEXT_ALIGNMENT_LEADING,
 		DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
 	y += titleTextSize.y;
 
 	if (healthHeight > 0.f) {
-		drawHealthPips(dc, textLeft, y + 1.f, target->health);
+		drawHealthPips(dc, textLeft, y + 0.5f, target->health);
 		y += healthHeight;
 	}
 
@@ -435,7 +461,7 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult* hit) {
 
 	std::wstring detail;
 	if (std::get<BoolValue>(showNamespace).value) {
-		// // italicize namespace
+		// italicize namespace
 		detail = L"\u00A7o" + util::StrToWStr(namespacedId) + L"\u00A7r";
 	}
 	if (std::get<BoolValue>(showCoordinates).value) {
@@ -602,8 +628,8 @@ std::string WAILA::getPlayerFaceTexturePath(SDK::Player* player) {
 // TODO: draw real minecraft hearts?
 void WAILA::drawHealthPips(DrawUtil& dc, float x, float y, float health) {
 	int filledPips = std::clamp(static_cast<int>(std::ceil(health / 2.f)), 0, 10);
-	constexpr float pipSize = 6.f;
-	constexpr float gap = 2.f;
+	constexpr float pipSize = 5.f;
+	constexpr float gap = 1.5f;
 
 	for (int i = 0; i < 10; ++i) {
 		d2d::Rect pip{
@@ -648,7 +674,7 @@ void WAILA::drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::
 
 		if (target.itemStack->itemCount > 1) {
 			dc.drawText(icon, std::to_wstring(target.itemStack->itemCount), d2d::Colors::WHITE,
-				Renderer::FontSelection::PrimaryRegular, 11.f, DWRITE_TEXT_ALIGNMENT_TRAILING,
+				Renderer::FontSelection::PrimaryRegular, 18.f, DWRITE_TEXT_ALIGNMENT_TRAILING,
 				DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 		}
 	}
