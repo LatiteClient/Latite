@@ -9,17 +9,17 @@
 #include "client/misc/PlayerHeadCache.h"
 
 namespace {
-	constexpr float defaultWidth = 204.f;
-	constexpr float defaultHeight = 64.f;
-	constexpr float iconSize = 48.f;
+	constexpr float defaultWidth = 347.f;
+	constexpr float defaultHeight = 109.f;
+	constexpr float iconSize = 72.f;
 	constexpr float paddingX = 7.f;
 	constexpr float paddingY = 6.f;
-	constexpr float textGap = 7.f;
-	constexpr float titleTextScale = 0.72f;
-	constexpr float detailTextScale = 0.74f;
+	constexpr float textGap = 11.f;
+	constexpr float titleTextScale = 0.88f;
+	constexpr float detailTextScale = 0.86f;
 	constexpr int maxHearts = 10;
-	constexpr float heartSize = 9.f;
-	constexpr float heartStride = 8.f;
+	constexpr float heartSize = 18.f;
+	constexpr float heartStride = 16.f;
 	constexpr float heartRowWidth = heartSize + (heartStride * (maxHearts - 1));
 	constexpr float borderTextureBaseWidth = 16.f;
 	constexpr float borderTextureBaseHeight = 16.f;
@@ -705,7 +705,7 @@ void WAILA::drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::
 
 		if (target.itemStack->itemCount > 1) {
 			dc.drawText(icon, std::to_wstring(target.itemStack->itemCount), d2d::Colors::WHITE,
-				Renderer::FontSelection::PrimaryRegular, 18.f, DWRITE_TEXT_ALIGNMENT_TRAILING,
+				Renderer::FontSelection::PrimaryRegular, 24.f, DWRITE_TEXT_ALIGNMENT_TRAILING,
 				DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 		}
 	}
