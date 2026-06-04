@@ -27,6 +27,148 @@ namespace {
 	constexpr Vec2 skinFaceUvPos{ 0.125f, 0.125f };
 	constexpr Vec2 skinFaceUvSize{ 0.125f, 0.125f };
 
+	SDK::ImageInfo makeBorderSlice(float x, float y, float w, float h, float u, float v, float uw, float vh) {
+		return SDK::ImageInfo{
+			.position = { x, y },
+			.size = { w, h },
+			.uv = { u, v },
+			.uvSize = { uw, vh },
+		};
+	}
+
+	template <typename SnapXToGuiPixel, typename SnapYToGuiPixel>
+	void addTiledBorderSlices(std::vector<SDK::ImageInfo>& slices, float x, float y, float w, float h, float u, float v,
+		float uw, float vh, float guiScale, SnapXToGuiPixel const& snapGuiXToGuiPixel, SnapYToGuiPixel const& snapGuiYToGuiPixel) {
+		float tileW = uw * guiScale;
+		float tileH = vh * guiScale;
+		if (w <= 0.f || h <= 0.f || tileW <= 0.f || tileH <= 0.f) return;
+
+		float y0 = y;
+		for (float yOffset = 0.f; yOffset < h - 0.001f;) {
+			float nextYOffset = std::min(yOffset + tileH, h);
+			float y1 = nextYOffset >= h - 0.001f ? y + h : snapGuiYToGuiPixel(y + nextYOffset);
+			y1 = std::clamp(y1, y0, y + h);
+			if (y1 <= y0 + 0.001f) y1 = std::min(y + h, std::max(y0, y + nextYOffset));
+			if (y1 <= y0 + 0.001f) {
+				yOffset = nextYOffset;
+				continue;
+			}
+
+			float pieceH = y1 - y0;
+			float sourceH = std::min(vh, pieceH / guiScale);
+
+			float x0 = x;
+			for (float xOffset = 0.f; xOffset < w - 0.001f;) {
+				float nextXOffset = std::min(xOffset + tileW, w);
+				float x1 = nextXOffset >= w - 0.001f ? x + w : snapGuiXToGuiPixel(x + nextXOffset);
+				x1 = std::clamp(x1, x0, x + w);
+				if (x1 <= x0 + 0.001f) x1 = std::min(x + w, std::max(x0, x + nextXOffset));
+				if (x1 <= x0 + 0.001f) {
+					xOffset = nextXOffset;
+					continue;
+				}
+
+				float pieceW = x1 - x0;
+				float sourceW = std::min(uw, pieceW / guiScale);
+				if (pieceW > 0.f && pieceH > 0.f && sourceW > 0.f && sourceH > 0.f) {
+					slices.push_back(makeBorderSlice(x0, y0, pieceW, pieceH, u, v, sourceW, sourceH));
+				}
+
+				x0 = x1;
+				xOffset = nextXOffset;
+			}
+
+			y0 = y1;
+			yOffset = nextYOffset;
+		}
+	}
+
+	bool drawPurpleBorderBackground(DrawUtil& dc, d2d::Rect const& bounds) {
+		if (!dc.isMinecraft()) return false;
+
+		auto& mc = static_cast<MCDrawUtil&>(dc);
+		if (!mc.renderCtx) return false;
+
+		SDK::TexturePtr texture{};
+		mc.renderCtx->getTexture(&texture, SDK::ResourceLocation("textures/ui/purpleBorder", SDK::ResourceFileSystem::UserPackage), false);
+		if (!texture.textureData) return false;
+
+		auto transform = mc.scn->matrix->matrixStack.empty()
+			? D2D1::Matrix4x4F::Translation(0.f, 0.f, 0.f)
+			: mc.scn->matrix->matrixStack.top();
+		float matrixScaleX = std::abs(transform._11) > 0.001f ? transform._11 : 1.f;
+		float matrixScaleY = std::abs(transform._22) > 0.001f ? transform._22 : 1.f;
+		auto snapXToGuiPixel = [&](float localX) {
+			float screenX = transform._41 + (localX * mc.guiScale * matrixScaleX);
+			return (std::round(screenX / mc.guiScale) * mc.guiScale - transform._41) / matrixScaleX;
+		};
+		auto snapYToGuiPixel = [&](float localY) {
+			float screenY = transform._42 + (localY * mc.guiScale * matrixScaleY);
+			return (std::round(screenY / mc.guiScale) * mc.guiScale - transform._42) / matrixScaleY;
+		};
+		auto snapGuiXToGuiPixel = [&](float localX) {
+			float screenX = transform._41 + (localX * matrixScaleX);
+			return (std::round(screenX / mc.guiScale) * mc.guiScale - transform._41) / matrixScaleX;
+		};
+		auto snapGuiYToGuiPixel = [&](float localY) {
+			float screenY = transform._42 + (localY * matrixScaleY);
+			return (std::round(screenY / mc.guiScale) * mc.guiScale - transform._42) / matrixScaleY;
+		};
+
+		float left = snapXToGuiPixel(bounds.left);
+		float top = snapYToGuiPixel(bounds.top);
+		float right = snapXToGuiPixel(bounds.right);
+		float bottom = snapYToGuiPixel(bounds.bottom);
+		if (right <= left || bottom <= top) return false;
+
+		auto sliceX = std::min(borderTextureSliceSize * mc.guiScale, (right - left) * 0.5f);
+		auto sliceY = std::min(borderTextureSliceSize * mc.guiScale, (bottom - top) * 0.5f);
+		float centerX = left + sliceX;
+		float centerY = top + sliceY;
+		float centerWidth = std::max(0.f, (right - left) - (sliceX * 2.f));
+		float centerHeight = std::max(0.f, (bottom - top) - (sliceY * 2.f));
+		float rightX = right - sliceX;
+		float bottomY = bottom - sliceY;
+		float sourceCenterSize = borderTextureBaseWidth - (borderTextureSliceSize * 2.f);
+
+		std::vector<SDK::ImageInfo> topSlices;
+		std::vector<SDK::ImageInfo> leftSlices;
+		std::vector<SDK::ImageInfo> middleSlices;
+		std::vector<SDK::ImageInfo> rightSlices;
+		std::vector<SDK::ImageInfo> bottomSlices;
+
+		addTiledBorderSlices(topSlices, centerX, top, centerWidth, sliceY, borderTextureSliceSize, 0.f, sourceCenterSize,
+			borderTextureSliceSize, mc.guiScale, snapGuiXToGuiPixel, snapGuiYToGuiPixel);
+		addTiledBorderSlices(leftSlices, left, centerY, sliceX, centerHeight, 0.f, borderTextureSliceSize, borderTextureSliceSize,
+			sourceCenterSize, mc.guiScale, snapGuiXToGuiPixel, snapGuiYToGuiPixel);
+		addTiledBorderSlices(middleSlices, centerX, centerY, centerWidth, centerHeight, borderTextureSliceSize,
+			borderTextureSliceSize, sourceCenterSize, sourceCenterSize, mc.guiScale, snapGuiXToGuiPixel, snapGuiYToGuiPixel);
+		addTiledBorderSlices(rightSlices, rightX, centerY, sliceX, centerHeight, borderTextureBaseWidth - borderTextureSliceSize,
+			borderTextureSliceSize, borderTextureSliceSize, sourceCenterSize, mc.guiScale, snapGuiXToGuiPixel, snapGuiYToGuiPixel);
+		addTiledBorderSlices(bottomSlices, centerX, bottomY, centerWidth, sliceY, borderTextureSliceSize,
+			borderTextureBaseHeight - borderTextureSliceSize, sourceCenterSize, borderTextureSliceSize, mc.guiScale,
+			snapGuiXToGuiPixel, snapGuiYToGuiPixel);
+
+		SDK::NinesliceInfo info{};
+		info.topLeft = makeBorderSlice(left, top, sliceX, sliceY, 0.f, 0.f, borderTextureSliceSize, borderTextureSliceSize);
+		info.topRight = makeBorderSlice(rightX, top, sliceX, sliceY, borderTextureBaseWidth - borderTextureSliceSize, 0.f,
+			borderTextureSliceSize, borderTextureSliceSize);
+		info.bottomLeft = makeBorderSlice(left, bottomY, sliceX, sliceY, 0.f, borderTextureBaseHeight - borderTextureSliceSize,
+			borderTextureSliceSize, borderTextureSliceSize);
+		info.bottomRight = makeBorderSlice(rightX, bottomY, sliceX, sliceY, borderTextureBaseWidth - borderTextureSliceSize,
+			borderTextureBaseHeight - borderTextureSliceSize, borderTextureSliceSize, borderTextureSliceSize);
+		info.uvScale = { 1.f / borderTextureBaseWidth, 1.f / borderTextureBaseHeight };
+		info.top.set(topSlices.data(), topSlices.size());
+		info.left.set(leftSlices.data(), leftSlices.size());
+		info.middle.set(middleSlices.data(), middleSlices.size());
+		info.right.set(rightSlices.data(), rightSlices.size());
+		info.bottom.set(bottomSlices.data(), bottomSlices.size());
+
+		mc.renderCtx->drawNineslice(texture, info);
+		mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
+		return true;
+	}
+
 	std::wstring titleCaseIdentifier(std::string id) {
 		if (auto colon = id.find(':'); colon != std::string::npos) {
 			id = id.substr(colon + 1);
@@ -298,86 +440,7 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	auto title = d2d::Color(std::get<ColorValue>(titleColor).getMainColor());
 	auto detail = d2d::Color(std::get<ColorValue>(detailColor).getMainColor());
 
-	bool drewBackground = [&]() -> bool {
-		if (!dc.isMinecraft()) return false;
-
-		auto& mc = static_cast<MCDrawUtil&>(dc);
-		if (!mc.renderCtx) return false;
-
-		SDK::TexturePtr texture{};
-		mc.renderCtx->getTexture(&texture, SDK::ResourceLocation("textures/ui/purpleBorder", SDK::ResourceFileSystem::UserPackage), false);
-		if (!texture.textureData) return false;
-
-		auto transform = mc.scn->matrix->matrixStack.empty()
-			? D2D1::Matrix4x4F::Translation(0.f, 0.f, 0.f)
-			: mc.scn->matrix->matrixStack.top();
-		float matrixScaleX = std::abs(transform._11) > 0.001f ? transform._11 : 1.f;
-		float matrixScaleY = std::abs(transform._22) > 0.001f ? transform._22 : 1.f;
-		auto snapXToGuiPixel = [&](float localX) {
-			float screenX = transform._41 + (localX * mc.guiScale * matrixScaleX);
-			return (std::round(screenX / mc.guiScale) * mc.guiScale - transform._41) / matrixScaleX;
-		};
-		auto snapYToGuiPixel = [&](float localY) {
-			float screenY = transform._42 + (localY * mc.guiScale * matrixScaleY);
-			return (std::round(screenY / mc.guiScale) * mc.guiScale - transform._42) / matrixScaleY;
-		};
-
-		float left = snapXToGuiPixel(bounds.left);
-		float top = snapYToGuiPixel(bounds.top);
-		float right = snapXToGuiPixel(bounds.right);
-		float bottom = snapYToGuiPixel(bounds.bottom);
-		if (right <= left || bottom <= top) return false;
-
-		auto drawSlice = [&](float x, float y, float w, float h, float u, float v, float uw, float vh) {
-			if (w <= 0.f || h <= 0.f || uw <= 0.f || vh <= 0.f) return;
-
-			mc.renderCtx->drawImage(texture,
-				{ x, y },
-				{ w, h },
-				{ u / borderTextureBaseWidth, v / borderTextureBaseHeight },
-				{ uw / borderTextureBaseWidth, vh / borderTextureBaseHeight });
-		};
-
-		auto drawTiledSlice = [&](float x, float y, float w, float h, float u, float v, float uw, float vh) {
-			float tileW = uw * mc.guiScale;
-			float tileH = vh * mc.guiScale;
-			if (w <= 0.f || h <= 0.f || tileW <= 0.f || tileH <= 0.f) return;
-
-			for (float yOffset = 0.f; yOffset < h - 0.001f; yOffset += tileH) {
-				float pieceH = std::min(tileH, h - yOffset);
-
-				for (float xOffset = 0.f; xOffset < w - 0.001f; xOffset += tileW) {
-					float pieceW = std::min(tileW, w - xOffset);
-					drawSlice(x + xOffset, y + yOffset, pieceW, pieceH, u, v,
-						pieceW / mc.guiScale, pieceH / mc.guiScale);
-				}
-			}
-		};
-
-		auto sliceX = std::min(borderTextureSliceSize * mc.guiScale, (right - left) * 0.5f);
-		auto sliceY = std::min(borderTextureSliceSize * mc.guiScale, (bottom - top) * 0.5f);
-		float centerX = left + sliceX;
-		float centerY = top + sliceY;
-		float centerWidth = std::max(0.f, (right - left) - (sliceX * 2.f));
-		float centerHeight = std::max(0.f, (bottom - top) - (sliceY * 2.f));
-		float rightX = right - sliceX;
-		float bottomY = bottom - sliceY;
-		float sourceCenterSize = borderTextureBaseWidth - (borderTextureSliceSize * 2.f);
-
-		drawSlice(left, top, sliceX, sliceY, 0.f, 0.f, borderTextureSliceSize, borderTextureSliceSize);
-		drawTiledSlice(centerX, top, centerWidth, sliceY, borderTextureSliceSize, 0.f, sourceCenterSize, borderTextureSliceSize);
-		drawTiledSlice(left, centerY, sliceX, centerHeight, 0.f, borderTextureSliceSize, borderTextureSliceSize, sourceCenterSize);
-		drawTiledSlice(centerX, centerY, centerWidth, centerHeight, borderTextureSliceSize, borderTextureSliceSize, sourceCenterSize, sourceCenterSize);
-		drawSlice(rightX, top, sliceX, sliceY, borderTextureBaseWidth - borderTextureSliceSize, 0.f, borderTextureSliceSize, borderTextureSliceSize);
-		drawSlice(left, bottomY, sliceX, sliceY, 0.f, borderTextureBaseHeight - borderTextureSliceSize, borderTextureSliceSize, borderTextureSliceSize);
-		drawTiledSlice(rightX, centerY, sliceX, centerHeight, borderTextureBaseWidth - borderTextureSliceSize, borderTextureSliceSize, borderTextureSliceSize, sourceCenterSize);
-		drawTiledSlice(centerX, bottomY, centerWidth, sliceY, borderTextureSliceSize, borderTextureBaseHeight - borderTextureSliceSize, sourceCenterSize, borderTextureSliceSize);
-		drawSlice(rightX, bottomY, sliceX, sliceY, borderTextureBaseWidth - borderTextureSliceSize, borderTextureBaseHeight - borderTextureSliceSize,
-			borderTextureSliceSize, borderTextureSliceSize);
-
-		mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
-		return true;
-	}();
+	bool drewBackground = drawPurpleBorderBackground(dc, bounds);
 
 	if (!drewBackground) {
 		dc.fillRectangle(bounds, d2d::Color(0.055f, 0.065f, 0.075f, 0.82f));
