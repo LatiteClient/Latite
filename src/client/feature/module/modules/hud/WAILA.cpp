@@ -19,8 +19,7 @@ namespace {
 	constexpr float detailTextScale = 0.74f;
 	constexpr int maxHearts = 10;
 	constexpr float heartSize = 9.f;
-	constexpr float heartGap = 0.f;
-	constexpr float heartStride = heartSize + heartGap;
+	constexpr float heartStride = 8.f;
 	constexpr float heartRowWidth = heartSize + (heartStride * (maxHearts - 1));
 	constexpr float borderTextureBaseWidth = 16.f;
 	constexpr float borderTextureBaseHeight = 16.f;
@@ -636,7 +635,7 @@ void WAILA::drawHealthHearts(DrawUtil& dc, float x, float y, float health) {
 		auto& mc = static_cast<MCDrawUtil&>(dc);
 		if (mc.renderCtx) {
 			SDK::TexturePtr texture{};
-			mc.renderCtx->getTexture(&texture, SDK::ResourceLocation("textures/ui/heart", SDK::ResourceFileSystem::UserPackage), false);
+			mc.renderCtx->getTexture(&texture, SDK::ResourceLocation("textures/ui/heart_new", SDK::ResourceFileSystem::UserPackage), false);
 			if (texture.textureData) {
 				for (int i = 0; i < maxHearts; ++i) {
 					mc.renderCtx->drawImage(texture,
