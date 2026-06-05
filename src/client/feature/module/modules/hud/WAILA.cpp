@@ -692,31 +692,47 @@ std::string WAILA::getPlayerFaceTexturePath(SDK::Player* player) {
 }
 
 void WAILA::drawHealthHearts(DrawUtil& dc, float x, float y, float health) {
-	int filledHearts = std::clamp(static_cast<int>(std::ceil(health / 2.f)), 0, maxHearts);
+	int halfHearts = std::clamp(static_cast<int>(std::ceil(health)), 0, maxHearts * 2);
+	int filledHearts = halfHearts / 2;
+	bool hasHalfHeart = (halfHearts % 2) != 0;
 
 	if (dc.isMinecraft()) {
 		auto& mc = static_cast<MCDrawUtil&>(dc);
 		if (mc.renderCtx) {
-			SDK::TexturePtr texture{};
-			mc.renderCtx->getTexture(&texture, SDK::ResourceLocation("textures/ui/heart_new", SDK::ResourceFileSystem::UserPackage), false);
-			if (texture.textureData) {
+			SDK::TexturePtr backgroundTexture{};
+			SDK::TexturePtr heartTexture{};
+			SDK::TexturePtr halfHeartTexture{};
+			mc.renderCtx->getTexture(&backgroundTexture, SDK::ResourceLocation("textures/ui/heart_background", SDK::ResourceFileSystem::UserPackage), false);
+			mc.renderCtx->getTexture(&heartTexture, SDK::ResourceLocation("textures/ui/heart", SDK::ResourceFileSystem::UserPackage), false);
+			mc.renderCtx->getTexture(&halfHeartTexture, SDK::ResourceLocation("textures/ui/heart_half", SDK::ResourceFileSystem::UserPackage), false);
+
+			if (backgroundTexture.textureData && heartTexture.textureData && halfHeartTexture.textureData) {
 				for (int i = 0; i < maxHearts; ++i) {
-					mc.renderCtx->drawImage(texture,
+					mc.renderCtx->drawImage(backgroundTexture,
 						{ (x + (i * heartStride)) * mc.guiScale, y * mc.guiScale },
 						{ heartSize * mc.guiScale, heartSize * mc.guiScale },
 						{ 0.f, 0.f },
 						{ 1.f, 1.f });
 				}
-				mc.renderCtx->flushImages(d2d::Color::RGB(74, 40, 45, 110), 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
+				mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
 
 				if (filledHearts > 0) {
 					for (int i = 0; i < filledHearts; ++i) {
-						mc.renderCtx->drawImage(texture,
+						mc.renderCtx->drawImage(heartTexture,
 							{ (x + (i * heartStride)) * mc.guiScale, y * mc.guiScale },
 							{ heartSize * mc.guiScale, heartSize * mc.guiScale },
 							{ 0.f, 0.f },
 							{ 1.f, 1.f });
 					}
+					mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
+				}
+
+				if (hasHalfHeart && filledHearts < maxHearts) {
+					mc.renderCtx->drawImage(halfHeartTexture,
+						{ (x + (filledHearts * heartStride)) * mc.guiScale, y * mc.guiScale },
+						{ heartSize * mc.guiScale, heartSize * mc.guiScale },
+						{ 0.f, 0.f },
+						{ 1.f, 1.f });
 					mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
 				}
 
@@ -733,9 +749,16 @@ void WAILA::drawHealthHearts(DrawUtil& dc, float x, float y, float health) {
 			y + heartSize,
 		};
 
-		dc.fillRectangle(heart, i < filledHearts
-			? d2d::Color::RGB(226, 55, 65)
-			: d2d::Color::RGB(74, 40, 45, 150));
+		dc.fillRectangle(heart, d2d::Color::RGB(74, 40, 45, 150));
+
+		if (i < filledHearts) {
+			dc.fillRectangle(heart, d2d::Color::RGB(226, 55, 65));
+		}
+		else if (i == filledHearts && hasHalfHeart) {
+			d2d::Rect halfHeart = heart;
+			halfHeart.right = halfHeart.left + (heart.getWidth() * 0.5f);
+			dc.fillRectangle(halfHeart, d2d::Color::RGB(226, 55, 65));
+		}
 	}
 }
 
