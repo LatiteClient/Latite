@@ -7,6 +7,7 @@
 #include "mc/common/entity/component/ActorDataFlagComponent.h"
 #include "mc/common/entity/component/ActorEquipmentComponent.h"
 #include "mc/common/entity/component/ActorTypeComponent.h"
+#include "mc/common/entity/component/MobBodyRotationComponent.h"
 #include "mc/common/entity/component/RuntimeIDComponent.h"
 
 SDK::ActorDataFlagComponent* SDK::Actor::getActorDataFlagsComponent() {
@@ -56,6 +57,22 @@ int SDK::Actor::getCommandPermissionLevel() {
 
 void SDK::Actor::setNameTag(std::string* nametag) {
 	return reinterpret_cast<void(__fastcall*)(Actor*, std::string*)>(Signatures::Actor_setNameTag.result)(this, nametag);
+}
+
+void SDK::Actor::setUIRendering(bool value) {
+	return reinterpret_cast<void(__fastcall*)(Actor*, bool)>(Signatures::Actor_setUIRendering.result)(this, value);
+}
+
+void SDK::Actor::setYHeadRotations(float current, float old) {
+	return reinterpret_cast<void(__fastcall*)(Actor*, float, float)>(Signatures::Actor_setYHeadRotations.result)(this, current, old);
+}
+
+void SDK::Actor::setYBodyRotations(float current, float old) {
+	return reinterpret_cast<void(__fastcall*)(Actor*, float, float)>(Signatures::Mob_setYBodyRotations.result)(this, current, old);
+}
+
+void SDK::Actor::setRotationY(float value) {
+	return reinterpret_cast<void(__fastcall*)(Actor*, float)>(Signatures::Actor_setRotationY.result)(this, value);
 }
 
 uint64_t SDK::Actor::getRuntimeID() {

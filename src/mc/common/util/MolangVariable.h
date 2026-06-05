@@ -1,5 +1,6 @@
 #pragma once
 #include "mc/deps/core/StringUtils.h"
+#include <cstddef>
 
 namespace SDK {
 	using MolangScriptArgType = int32_t;
@@ -21,7 +22,7 @@ namespace SDK {
 	struct MolangScriptArg {
 		MolangScriptArgType mType;
 		MolangScriptArgPOD mPOD;
-		//std::variant<MolangMatrix, MaterialVariants, MolangActorArrayPtr, MolangActorIdArrayPtr, MolangArrayVariable, MolangClientTexture, MolangContextVariable, MolangDataDrivenGeometry, MolangEntityVariable, MolangGeometryVariable, MolangMaterialVariable, MolangMemberAccessor, MolangMemberArray, MolangQueryFunctionPtr, MolangTempVariable, MolangTextureVariable> mData;
+		std::byte mData[0x50];
 	};
 
 	struct MolangVariableSettings {

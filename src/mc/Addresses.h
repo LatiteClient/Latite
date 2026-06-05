@@ -186,6 +186,34 @@ public:
 		"41 57 41 56 41 54 56 57 53 48 83 EC ? 4C 89 C3 48 89 D6 48 89 CF 4C 89 C1"_sig,
 		"ActorRenderDispatcher::getRenderer(HashedString const&)"};
 
+	inline static SigImpl Actor_setUIRendering{[](memory::signature_store&, uintptr_t res) { return res; },
+		"41 89 D0 88 91"_sig,
+		"Actor::setUIRendering"};
+
+	inline static SigImpl Actor_setYHeadRotations{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 8B 51 ? 8B 41 ? 48 8B 4A ? 4C 8B 42 ? 49 29 C8 49 C1 E8 ? 41 FF C8 41 81 E0 ? ? ? ? 4E 8D 0C C1 48 8B 4A ? 0F 1F 84 00 ? ? ? ? 4D 8B 01 49 83 F8 ? 0F 84 ? ? ? ? 49 C1 E0 ? 4E 8D 0C 01 42 81 7C 01 ? ? ? ? ? 75 ? 4C 01 C1 48 39 4A ? 74 ? 48 8B 49 ? 48 85 C9 74 ? 89 C2 81 E2 ? ? ? ? 41 89 D0 41 C1 E8 ? 4C 8B 49 ? 4C 8B 51 ? 4D 29 CA 49 C1 FA ? 4D 39 D0 73 ? 4F 8B 04 C1 4D 85 C0 74 ? 81 E2 ? ? ? ? 25 ? ? ? ? 41 8B 14 90 31 D0 3D ? ? ? ? 77 ? 48 8B 41 ? 89 D1 C1 E9 ? 81 E1 ? ? ? ? 48 8B 04 08 48 85 C0 74 ? 81 E2 ? ? ? ? 83 E2 ? F3 0F 11 0C D0 F3 0F 11 54 D0"_sig,
+		"Actor::setYHeadRotations"};
+
+	inline static SigImpl Actor_setRotationY{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 8B 81 ? ? ? ? F3 0F 11 48 ? C3 CC CC CC 48 8B 81 ? ? ? ? F3 0F 11 48 ? C3 CC CC CC 48 8B 81"_sig,
+		"Actor::setRotationY"};
+
+	inline static SigImpl Mob_setYBodyRotations{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 83 EC ? 48 8B 51 ? 8B 41 ? 48 8B 4A ? 4C 8B 42 ? 49 29 C8 49 C1 E8 ? 41 FF C8 41 81 E0 ? ? ? ? 4E 8D 0C C1 48 8B 4A ? 0F 1F 40 ? 4D 8B 01 49 83 F8 ? 0F 84 ? ? ? ? 49 C1 E0 ? 4E 8D 0C 01 42 81 7C 01 ? ? ? ? ? 75 ? 4C 01 C1 48 39 4A ? 74 ? 48 8B 49 ? 48 85 C9 74 ? 89 C2 81 E2 ? ? ? ? 41 89 D0 41 C1 E8 ? 4C 8B 49 ? 4C 8B 51 ? 4D 29 CA 49 C1 FA ? 4D 39 D0 73 ? 4F 8B 04 C1 4D 85 C0 74 ? 81 E2 ? ? ? ? 25 ? ? ? ? 41 8B 14 90 31 D0 3D ? ? ? ? 77 ? 48 8B 41 ? 89 D1 C1 E9 ? 81 E1 ? ? ? ? 48 8B 04 08 48 85 C0 74 ? 81 E2 ? ? ? ? 83 E2 ? F3 0F 11 0C D0 F3 0F 11 54 D0"_sig,
+		"Mob::setYBodyRotations"};
+
+	inline static SigImpl MolangScriptArg_MolangScriptArg{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 C8 C6 41 ? ? C7 01"_sig,
+		"MolangScriptArg::MolangScriptArg(float)"};
+
+	inline static SigImpl MolangScriptArg_destructor{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 48 0F BE 41 ? 4C 8D 41 ? 48 FF C0 48 8D 54 24 ? 48 89 C1 E8 ? ? ? ? 48 8B 4C 24 ? 48 31 E1 48 3B 0D ? ? ? ? 75 ? 48 83 C4 ? C3 E8 ? ? ? ? CC CC CC CC CC CC CC CC CC 56 57"_sig,
+		"MolangScriptArg::~MolangScriptArg"};
+
+	inline static SigImpl MolangVariableMap_setMolangVariable{[](memory::signature_store&, uintptr_t res) { return res; },
+		"56 57 48 83 EC ? 4C 89 CE 48 89 CF 48 89 D1"_sig,
+		"MolangVariableMap::setMolangVariable"};
+
 	inline static SigImpl LevelRendererPlayer_renderOutlineSelection{[](memory::signature_store&, uintptr_t res) { return res; },
 		"55 41 57 41 56 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 48 C7 45 ? ? ? ? ? 4D 89 CE 4D 89 C7"_sig,
 		"LevelRendererPlayer::renderOutlineSelection"};

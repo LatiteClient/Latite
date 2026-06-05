@@ -5,7 +5,6 @@
 #include "mc/common/client/renderer/Tessellator.h"
 #include "mc/common/client/renderer/MeshUtils.h"
 #include "mc/common/client/renderer/MaterialPtr.h"
-#include "mc/common/client/renderer/ActorRenderer.h"
 #include "mc/common/client/renderer/ActorRenderDispatcher.h"
 #include "mc/common/entity/component/ActorHeadRotationComponent.h"
 #include "mc/common/entity/component/MobBodyRotationComponent.h"
@@ -467,10 +466,11 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 	auto& dispatcher = ctx.entityRenderDispatcher;
 	if (!dispatcher) return false;
 
-	auto const& box = actor->getBoundingBox();
 	float ownerWidth = bounds.getWidth() * guiScale;
 	float ownerHeight = bounds.getHeight() * guiScale;
-	constexpr float hudBodyYaw = -22.5f;
+	constexpr float hudBodyYaw = 0.f;
+	constexpr float hudHeadYaw = 0.f;
+	constexpr float portraitYawCorrection = -90.f;
 	constexpr float actorRenderDepth = -50.f;
 
 	auto& matrixStack = scn->matrix->matrixStack;
@@ -485,6 +485,7 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 		};
 	};
 
+	auto const& box = actor->getBoundingBox();
 	Vec3 actorPos = actor->getPos();
 	Vec3 localLower = box.lower - actorPos;
 	Vec3 localHigher = box.higher - actorPos;
@@ -507,7 +508,11 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 	D2D1::Matrix4x4F localTransform =
 		D2D1::Matrix4x4F::Scale(-scale, scale, scale) *
 		D2D1::Matrix4x4F::RotationZ(180.f) *
+		D2D1::Matrix4x4F::RotationY(portraitYawCorrection) *
 		D2D1::Matrix4x4F::Translation(anchorX, anchorY, actorRenderDepth - (modelCenter.z * scale));
+	if (actor->getStatusFlag(57)) {
+		localTransform = D2D1::Matrix4x4F::Translation(0.f, 0.8f, 0.f) * localTransform;
+	}
 	D2D1::Matrix4x4F transform = localTransform * parentTransform;
 
 	Vec2 clipTopLeft = transformPoint(parentTransform, { bounds.left * guiScale, bounds.top * guiScale });
@@ -534,28 +539,19 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 		SDK::RenderRotationComponent* renderRotation = nullptr;
 		Vec2 savedRotation{};
 		Vec2 savedRotationOld{};
-		SDK::ActorHeadRotationComponent savedHeadRotation{};
-		SDK::MobBodyRotationComponent savedBodyRotation{};
 		SDK::RenderRotationComponent savedRenderRotation{};
+		float savedHeadYaw = 0.f;
+		float savedHeadYawOld = 0.f;
+		float savedBodyYaw = 0.f;
+		float savedBodyYawOld = 0.f;
 
-		ScopedActorHudPose(SDK::Actor* actor, float forcedBodyYaw) : actor(actor) {
+		ScopedActorHudPose(SDK::Actor* actor, float forcedBodyYaw, float forcedHeadYaw) : actor(actor) {
 			if (!actor) return;
 
 			actorRotation = actor->actorRotation;
 			bodyRotation = actor->tryGetComponent<SDK::MobBodyRotationComponent>();
 			headRotation = actor->tryGetComponent<SDK::ActorHeadRotationComponent>();
 			renderRotation = actor->tryGetComponent<SDK::RenderRotationComponent>();
-
-			float savedBodyYaw = 0.f;
-			if (bodyRotation) {
-				savedBodyYaw = bodyRotation->yBodyRot;
-			}
-			else if (renderRotation) {
-				savedBodyYaw = renderRotation->rotation.y;
-			}
-			else if (actorRotation) {
-				savedBodyYaw = actorRotation->rotation.y;
-			}
 
 			if (actorRotation) {
 				savedRotation = actorRotation->rotation;
@@ -564,61 +560,69 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 				actorRotation->rotationOld = { 0.f, forcedBodyYaw };
 			}
 
-			if (bodyRotation) {
-				savedBodyRotation = *bodyRotation;
-				bodyRotation->yBodyRot = forcedBodyYaw;
-				bodyRotation->yBodyRotOld = forcedBodyYaw;
-			}
-
-			if (headRotation) {
-				savedHeadRotation = *headRotation;
-				headRotation->yHeadRot = savedHeadRotation.yHeadRot + (forcedBodyYaw - savedBodyYaw);
-				headRotation->yHeadRotOld = headRotation->yHeadRot;
-			}
-
 			if (renderRotation) {
 				savedRenderRotation = *renderRotation;
 				renderRotation->rotation = { 0.f, forcedBodyYaw };
 			}
+
+			if (bodyRotation) {
+				savedBodyYaw = bodyRotation->yBodyRot;
+				savedBodyYawOld = bodyRotation->yBodyRotOld;
+			}
+
+			if (headRotation) {
+				savedHeadYaw = headRotation->yHeadRot;
+				savedHeadYawOld = headRotation->yHeadRotOld;
+			}
+
+			if (bodyRotation) {
+				actor->setYBodyRotations(forcedBodyYaw, forcedBodyYaw);
+			}
+			actor->setYHeadRotations(forcedHeadYaw, forcedHeadYaw);
 		}
 
 		~ScopedActorHudPose() {
 			if (!actor) return;
 
+			if (bodyRotation) {
+				actor->setYBodyRotations(savedBodyYaw, savedBodyYawOld);
+			}
+			actor->setYHeadRotations(savedHeadYaw, savedHeadYawOld);
 			if (actorRotation) {
 				actorRotation->rotation = savedRotation;
 				actorRotation->rotationOld = savedRotationOld;
 			}
-			if (headRotation) *headRotation = savedHeadRotation;
-			if (bodyRotation) *bodyRotation = savedBodyRotation;
 			if (renderRotation) *renderRotation = savedRenderRotation;
 		}
-	} poseOverride{ actor, hudBodyYaw };
+	} poseOverride{ actor, hudBodyYaw, hudHeadYaw };
 
-	struct ScopedRendererInventoryFlag {
-		std::shared_ptr<SDK::ActorRenderer> renderer{};
-		bool savedValue = false;
+	struct ScopedActorHudMolang {
+		explicit ScopedActorHudMolang(SDK::Actor* actor) {
+			if (!actor) return;
+
+			actor->molangVariableMap.setMolangVariable(0x61917791E3C297E0ull, "variable.player_x_rotation", 0.f);
+			actor->molangVariableMap.setMolangVariable(0xD921ED03129A7263ull, "variable.is_using_vr", 0.f);
+			actor->molangVariableMap.setMolangVariable(0x2739F381184DE4AEull, "variable.is_first_person", 0.f);
+		}
+	} hudMolang{ actor };
+
+	struct ScopedActorUIRendering {
+		SDK::Actor* actor = nullptr;
 		bool changed = false;
 
-		ScopedRendererInventoryFlag(std::shared_ptr<SDK::ActorRenderer> renderer) : renderer(std::move(renderer)) {
-			if (!this->renderer) return;
+		explicit ScopedActorUIRendering(SDK::Actor* actor) : actor(actor) {
+			if (!actor) return;
 
-			savedValue = this->renderer->renderingInventory;
-			this->renderer->renderingInventory = true;
+			actor->setUIRendering(true);
 			changed = true;
 		}
 
-		~ScopedRendererInventoryFlag() {
-			if (changed && renderer) {
-				renderer->renderingInventory = savedValue;
+		~ScopedActorUIRendering() {
+			if (changed && actor) {
+				actor->setUIRendering(false);
 			}
 		}
-	};
-	auto actorRenderer = dispatcher->getRendererById(actor->getActorRendererId());
-	if (!actorRenderer) {
-		actorRenderer = dispatcher->getRendererById(actor->getActorRendererIdOverride());
-	}
-	ScopedRendererInventoryFlag inventoryFlag{ actorRenderer };
+	} uiRendering{ actor };
 
 	dispatcher->renderUI(&ctx, actor, cameraTarget, rotation, opacity > 0.f);
 
