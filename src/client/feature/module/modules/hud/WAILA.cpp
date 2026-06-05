@@ -457,8 +457,10 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 		DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
 	y += titleTextSize.y;
 
+	float heartRowOffsetX = -1.5.f;
+	float heartRowOffsetY = 2.f;
 	if (healthHeight > 0.f) {
-		drawHealthHearts(dc, textLeft, y, target->health);
+		drawHealthHearts(dc, textLeft + heartRowOffsetX, y + heartRowOffsetY, target->health);
 		y += healthHeight;
 	}
 
