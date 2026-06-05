@@ -18,6 +18,7 @@
 #include "mc/common/client/gui/controls/UIControl.h"
 #include <client/script/globals/D2DScriptingObject.h>
 #include <client/feature/module/script/JsTextModule.h>
+#include <glm/gtc/matrix_transform.hpp>
 
 
 HUDEditor::HUDEditor() : dragMod(nullptr) {
@@ -320,7 +321,10 @@ void HUDEditor::renderModule(HUDModule* mod, SDK::MinecraftUIRenderContext* ctx)
 		if (isActive()) mod->renderFrame(dc);
 		dc.setImmediate(false);
 		dc.flush();
-		dc.scn->matrix->matrixStack.push(D2D1::Matrix4x4F::Scale(mod->getScale(), mod->getScale(), 0.f) * D2D1::Matrix4x4F::Translation(mod->getRect().left * dc.guiScale, mod->getRect().top * dc.guiScale, 0.f));
+		glm::mat4 transform{ 1.f };
+		transform = glm::translate(transform, glm::vec3(mod->getRect().left * dc.guiScale, mod->getRect().top * dc.guiScale, 0.f));
+		transform = glm::scale(transform, glm::vec3(mod->getScale(), mod->getScale(), 1.f));
+		dc.scn->matrix->matrixStack.push(transform);
 		mod->render(dc, false, isActive());
 		dc.flush();
 		dc.scn->matrix->matrixStack.pop();

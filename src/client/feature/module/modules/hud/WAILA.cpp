@@ -94,25 +94,25 @@ namespace {
 		if (!texture.textureData) return false;
 
 		auto transform = mc.scn->matrix->matrixStack.empty()
-			? D2D1::Matrix4x4F::Translation(0.f, 0.f, 0.f)
+			? glm::mat4{ 1.f }
 			: mc.scn->matrix->matrixStack.top();
-		float matrixScaleX = std::abs(transform._11) > 0.001f ? transform._11 : 1.f;
-		float matrixScaleY = std::abs(transform._22) > 0.001f ? transform._22 : 1.f;
+		float matrixScaleX = std::abs(transform[0][0]) > 0.001f ? transform[0][0] : 1.f;
+		float matrixScaleY = std::abs(transform[1][1]) > 0.001f ? transform[1][1] : 1.f;
 		auto snapXToGuiPixel = [&](float localX) {
-			float screenX = transform._41 + (localX * mc.guiScale * matrixScaleX);
-			return (std::round(screenX / mc.guiScale) * mc.guiScale - transform._41) / matrixScaleX;
+			float screenX = transform[3][0] + (localX * mc.guiScale * matrixScaleX);
+			return (std::round(screenX / mc.guiScale) * mc.guiScale - transform[3][0]) / matrixScaleX;
 		};
 		auto snapYToGuiPixel = [&](float localY) {
-			float screenY = transform._42 + (localY * mc.guiScale * matrixScaleY);
-			return (std::round(screenY / mc.guiScale) * mc.guiScale - transform._42) / matrixScaleY;
+			float screenY = transform[3][1] + (localY * mc.guiScale * matrixScaleY);
+			return (std::round(screenY / mc.guiScale) * mc.guiScale - transform[3][1]) / matrixScaleY;
 		};
 		auto snapGuiXToGuiPixel = [&](float localX) {
-			float screenX = transform._41 + (localX * matrixScaleX);
-			return (std::round(screenX / mc.guiScale) * mc.guiScale - transform._41) / matrixScaleX;
+			float screenX = transform[3][0] + (localX * matrixScaleX);
+			return (std::round(screenX / mc.guiScale) * mc.guiScale - transform[3][0]) / matrixScaleX;
 		};
 		auto snapGuiYToGuiPixel = [&](float localY) {
-			float screenY = transform._42 + (localY * matrixScaleY);
-			return (std::round(screenY / mc.guiScale) * mc.guiScale - transform._42) / matrixScaleY;
+			float screenY = transform[3][1] + (localY * matrixScaleY);
+			return (std::round(screenY / mc.guiScale) * mc.guiScale - transform[3][1]) / matrixScaleY;
 		};
 
 		float left = snapXToGuiPixel(bounds.left);

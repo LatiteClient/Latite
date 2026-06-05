@@ -12,6 +12,7 @@
 #include "mc/common/world/actor/Actor.h"
 #include <mc/common/client/renderer/game/BaseActorRenderContext.h>
 #include <mc/common/client/renderer/ItemRenderer.h>
+#include <glm/gtc/matrix_transform.hpp>
 #include <ranges>
 #include <utility>
 
@@ -468,20 +469,20 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 
 	float ownerWidth = bounds.getWidth() * guiScale;
 	float ownerHeight = bounds.getHeight() * guiScale;
-	constexpr float hudBodyYaw = 0.f;
-	constexpr float hudHeadYaw = 0.f;
-	constexpr float portraitYawCorrection = -90.f;
+	constexpr float hudBodyYaw = -22.5f;
+	constexpr float hudHeadYaw = -22.5f;
 	constexpr float actorRenderDepth = -50.f;
 
 	auto& matrixStack = scn->matrix->matrixStack;
-	D2D1::Matrix4x4F parentTransform = matrixStack.empty()
-		? D2D1::Matrix4x4F::Translation(0.f, 0.f, 0.f)
+	glm::mat4 parentTransform = matrixStack.empty()
+		? glm::mat4{ 1.f }
 		: matrixStack.top();
 
-	auto transformPoint = [](D2D1::Matrix4x4F const& matrix, Vec2 const& point) {
+	auto transformPoint = [](glm::mat4 const& matrix, Vec2 const& point) {
+		glm::vec4 transformed = matrix * glm::vec4(point.x, point.y, 0.f, 1.f);
 		return Vec2{
-			(point.x * matrix._11) + (point.y * matrix._21) + matrix._41,
-			(point.x * matrix._12) + (point.y * matrix._22) + matrix._42,
+			transformed.x,
+			transformed.y,
 		};
 	};
 
@@ -505,15 +506,14 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 	};
 	float anchorX = frameCenter.x - (modelCenter.x * scale);
 	float anchorY = frameCenter.y + (modelCenter.y * scale);
-	D2D1::Matrix4x4F localTransform =
-		D2D1::Matrix4x4F::Scale(-scale, scale, scale) *
-		D2D1::Matrix4x4F::RotationZ(180.f) *
-		D2D1::Matrix4x4F::RotationY(portraitYawCorrection) *
-		D2D1::Matrix4x4F::Translation(anchorX, anchorY, actorRenderDepth - (modelCenter.z * scale));
+	glm::mat4 localTransform{ 1.f };
+	localTransform = glm::translate(localTransform, glm::vec3(anchorX, anchorY, actorRenderDepth - (modelCenter.z * scale)));
+	localTransform = glm::scale(localTransform, glm::vec3(-scale, scale, scale));
+	localTransform = glm::rotate(localTransform, glm::radians(180.f), glm::vec3(0.f, 0.f, 1.f));
 	if (actor->getStatusFlag(57)) {
-		localTransform = D2D1::Matrix4x4F::Translation(0.f, 0.8f, 0.f) * localTransform;
+		localTransform = glm::translate(localTransform, glm::vec3(0.f, 0.8f, 0.f));
 	}
-	D2D1::Matrix4x4F transform = localTransform * parentTransform;
+	glm::mat4 transform = parentTransform * localTransform;
 
 	Vec2 clipTopLeft = transformPoint(parentTransform, { bounds.left * guiScale, bounds.top * guiScale });
 	Vec2 clipBottomRight = transformPoint(parentTransform, { bounds.right * guiScale, bounds.bottom * guiScale });

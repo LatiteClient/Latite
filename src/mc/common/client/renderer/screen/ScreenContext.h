@@ -1,5 +1,6 @@
 #pragma once
 #include "mc/Util.h"
+#include <glm/mat4x4.hpp>
 #include <stack>
 
 namespace SDK {
@@ -10,10 +11,10 @@ namespace SDK {
 
 		// this is mce::Camera
 		struct MatrixPtr {
-			CLASS_FIELD(std::stack<D2D1::Matrix4x4F>, viewMatrixStack, 0x0);
+			CLASS_FIELD(std::stack<glm::mat4>, viewMatrixStack, 0x0);
 			// worldMatrixStack
-			CLASS_FIELD(std::stack<D2D1::Matrix4x4F>, matrixStack, 0x40);
-			CLASS_FIELD(std::stack<D2D1::Matrix4x4F>, projectionMatrixStack, 0x80);
+			CLASS_FIELD(std::stack<glm::mat4>, matrixStack, 0x40);
+			CLASS_FIELD(std::stack<glm::mat4>, projectionMatrixStack, 0x80);
 		};
 		CLASS_FIELD(MatrixPtr*, matrix, 0x18);
 
