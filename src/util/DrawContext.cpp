@@ -470,13 +470,8 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 	auto const& box = actor->getBoundingBox();
 	float ownerWidth = bounds.getWidth() * guiScale;
 	float ownerHeight = bounds.getHeight() * guiScale;
-	float bodyYaw = actor->actorRotation ? actor->actorRotation->rotation.y : 0.f;
-	if (auto renderRotation = actor->tryGetComponent<SDK::RenderRotationComponent>()) {
-		bodyYaw = renderRotation->rotation.y;
-	}
-	if (auto bodyRotation = actor->tryGetComponent<SDK::MobBodyRotationComponent>()) {
-		bodyYaw = bodyRotation->yBodyRot;
-	}
+	constexpr float hudBodyYaw = -22.5f;
+	constexpr float actorRenderDepth = -50.f;
 
 	auto& matrixStack = scn->matrix->matrixStack;
 	D2D1::Matrix4x4F parentTransform = matrixStack.empty()
@@ -490,73 +485,29 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 		};
 	};
 
-	D2D1::Matrix4x4F actorOrientation =
-		D2D1::Matrix4x4F::Scale(1.f, 1.f, -1.f) *
-		D2D1::Matrix4x4F::RotationZ(180.f) *
-		D2D1::Matrix4x4F::RotationY(-180.f - bodyYaw);
-
-	auto transformActorPoint = [](D2D1::Matrix4x4F const& matrix, Vec3 const& point) {
-		return Vec2{
-			(point.x * matrix._11) + (point.y * matrix._21) + (point.z * matrix._31),
-			(point.x * matrix._12) + (point.y * matrix._22) + (point.z * matrix._32),
-		};
-	};
-
 	Vec3 actorPos = actor->getPos();
 	Vec3 localLower = box.lower - actorPos;
 	Vec3 localHigher = box.higher - actorPos;
-	std::array<Vec3, 8> corners{
-		Vec3{ localLower.x, localLower.y, localLower.z },
-		Vec3{ localLower.x, localLower.y, localHigher.z },
-		Vec3{ localLower.x, localHigher.y, localLower.z },
-		Vec3{ localLower.x, localHigher.y, localHigher.z },
-		Vec3{ localHigher.x, localLower.y, localLower.z },
-		Vec3{ localHigher.x, localLower.y, localHigher.z },
-		Vec3{ localHigher.x, localHigher.y, localLower.z },
-		Vec3{ localHigher.x, localHigher.y, localHigher.z },
-	};
-
-	Vec2 projectedMin = transformActorPoint(actorOrientation, corners.front());
-	Vec2 projectedMax = projectedMin;
-	for (Vec3 const& corner : corners) {
-		Vec2 projected = transformActorPoint(actorOrientation, corner);
-		projectedMin.x = std::min(projectedMin.x, projected.x);
-		projectedMin.y = std::min(projectedMin.y, projected.y);
-		projectedMax.x = std::max(projectedMax.x, projected.x);
-		projectedMax.y = std::max(projectedMax.y, projected.y);
-	}
-
-	float projectedWidth = std::max(0.01f, projectedMax.x - projectedMin.x);
-	float projectedHeight = std::max(0.01f, projectedMax.y - projectedMin.y);
+	Vec3 modelCenter = (localLower + localHigher) * 0.5f;
+	float modelWidth = std::max(0.01f, std::max(localHigher.x - localLower.x, localHigher.z - localLower.z));
+	float modelHeight = std::max(0.01f, localHigher.y - localLower.y);
 	// aabb is gameplay size, so leave some room for hats, held items, and model layers
-	float horizontalRenderPadding = projectedWidth * 0.08f;
-	float topRenderPadding = projectedHeight * 0.12f;
-	float bottomRenderPadding = projectedHeight * 0.04f;
-	projectedMin.x -= horizontalRenderPadding;
-	projectedMax.x += horizontalRenderPadding;
-	projectedMin.y -= topRenderPadding;
-	projectedMax.y += bottomRenderPadding;
-	projectedWidth = std::max(0.01f, projectedMax.x - projectedMin.x);
-	projectedHeight = std::max(0.01f, projectedMax.y - projectedMin.y);
+	modelWidth *= 1.16f;
+	modelHeight *= 1.16f;
 
-	float scale = std::min((ownerWidth * 0.82f) / projectedWidth, (ownerHeight * 0.88f) / projectedHeight);
+	float scale = std::min((ownerWidth * 0.82f) / modelWidth, (ownerHeight * 0.88f) / modelHeight);
 	scale = std::min(scale, 96.f * guiScale);
 
-	Vec2 projectedCenter{
-		(projectedMin.x + projectedMax.x) * 0.5f,
-		(projectedMin.y + projectedMax.y) * 0.5f,
-	};
 	Vec2 frameCenter{
 		(bounds.left * guiScale) + (ownerWidth * 0.5f),
 		(bounds.top * guiScale) + (ownerHeight * 0.5f),
 	};
-	float anchorX = frameCenter.x - (projectedCenter.x * scale);
-	float anchorY = frameCenter.y - (projectedCenter.y * scale);
+	float anchorX = frameCenter.x - (modelCenter.x * scale);
+	float anchorY = frameCenter.y + (modelCenter.y * scale);
 	D2D1::Matrix4x4F localTransform =
-		D2D1::Matrix4x4F::Scale(scale, scale, -scale) *
+		D2D1::Matrix4x4F::Scale(-scale, scale, scale) *
 		D2D1::Matrix4x4F::RotationZ(180.f) *
-		D2D1::Matrix4x4F::RotationY(-180.f - bodyYaw) *
-		D2D1::Matrix4x4F::Translation(anchorX, anchorY, -500.f);
+		D2D1::Matrix4x4F::Translation(anchorX, anchorY, actorRenderDepth - (modelCenter.z * scale));
 	D2D1::Matrix4x4F transform = localTransform * parentTransform;
 
 	Vec2 clipTopLeft = transformPoint(parentTransform, { bounds.left * guiScale, bounds.top * guiScale });
@@ -574,10 +525,10 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 	matrixStack.push(transform);
 
 	Vec3 cameraTarget{};
-	Vec2 rotation{ 0.f, bodyYaw };
-	Vec2 hudActorRotation{ 0.f, bodyYaw };
+	Vec2 rotation{};
 	struct ScopedActorHudPose {
 		SDK::Actor* actor = nullptr;
+		SDK::ActorRotationComponent* actorRotation = nullptr;
 		SDK::ActorHeadRotationComponent* headRotation = nullptr;
 		SDK::MobBodyRotationComponent* bodyRotation = nullptr;
 		SDK::RenderRotationComponent* renderRotation = nullptr;
@@ -587,45 +538,62 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 		SDK::MobBodyRotationComponent savedBodyRotation{};
 		SDK::RenderRotationComponent savedRenderRotation{};
 
-		ScopedActorHudPose(SDK::Actor* actor, Vec2 forcedRotation) : actor(actor) {
-			if (!actor || !actor->actorRotation) return;
+		ScopedActorHudPose(SDK::Actor* actor, float forcedBodyYaw) : actor(actor) {
+			if (!actor) return;
 
-			savedRotation = actor->actorRotation->rotation;
-			savedRotationOld = actor->actorRotation->rotationOld;
-			actor->actorRotation->rotation = forcedRotation;
-			actor->actorRotation->rotationOld = forcedRotation;
-
+			actorRotation = actor->actorRotation;
+			bodyRotation = actor->tryGetComponent<SDK::MobBodyRotationComponent>();
 			headRotation = actor->tryGetComponent<SDK::ActorHeadRotationComponent>();
-			if (headRotation) {
-				savedHeadRotation = *headRotation;
-				headRotation->yHeadRot = forcedRotation.y;
-				headRotation->yHeadRotOld = forcedRotation.y;
+			renderRotation = actor->tryGetComponent<SDK::RenderRotationComponent>();
+
+			float savedBodyYaw = 0.f;
+			if (bodyRotation) {
+				savedBodyYaw = bodyRotation->yBodyRot;
+			}
+			else if (renderRotation) {
+				savedBodyYaw = renderRotation->rotation.y;
+			}
+			else if (actorRotation) {
+				savedBodyYaw = actorRotation->rotation.y;
 			}
 
-			bodyRotation = actor->tryGetComponent<SDK::MobBodyRotationComponent>();
+			if (actorRotation) {
+				savedRotation = actorRotation->rotation;
+				savedRotationOld = actorRotation->rotationOld;
+				actorRotation->rotation = { 0.f, forcedBodyYaw };
+				actorRotation->rotationOld = { 0.f, forcedBodyYaw };
+			}
+
 			if (bodyRotation) {
 				savedBodyRotation = *bodyRotation;
-				bodyRotation->yBodyRot = forcedRotation.y;
-				bodyRotation->yBodyRotOld = forcedRotation.y;
+				bodyRotation->yBodyRot = forcedBodyYaw;
+				bodyRotation->yBodyRotOld = forcedBodyYaw;
 			}
 
-			renderRotation = actor->tryGetComponent<SDK::RenderRotationComponent>();
+			if (headRotation) {
+				savedHeadRotation = *headRotation;
+				headRotation->yHeadRot = savedHeadRotation.yHeadRot + (forcedBodyYaw - savedBodyYaw);
+				headRotation->yHeadRotOld = headRotation->yHeadRot;
+			}
+
 			if (renderRotation) {
 				savedRenderRotation = *renderRotation;
-				renderRotation->rotation = forcedRotation;
+				renderRotation->rotation = { 0.f, forcedBodyYaw };
 			}
 		}
 
 		~ScopedActorHudPose() {
-			if (!actor || !actor->actorRotation) return;
+			if (!actor) return;
 
-			actor->actorRotation->rotation = savedRotation;
-			actor->actorRotation->rotationOld = savedRotationOld;
+			if (actorRotation) {
+				actorRotation->rotation = savedRotation;
+				actorRotation->rotationOld = savedRotationOld;
+			}
 			if (headRotation) *headRotation = savedHeadRotation;
 			if (bodyRotation) *bodyRotation = savedBodyRotation;
 			if (renderRotation) *renderRotation = savedRenderRotation;
 		}
-	} poseOverride{ actor, hudActorRotation };
+	} poseOverride{ actor, hudBodyYaw };
 
 	struct ScopedRendererInventoryFlag {
 		std::shared_ptr<SDK::ActorRenderer> renderer{};
