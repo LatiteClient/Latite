@@ -24,11 +24,11 @@ namespace {
 	constexpr float borderTextureBaseWidth = 16.f;
 	constexpr float borderTextureBaseHeight = 16.f;
 	constexpr float borderTextureSliceSize = 4.f;
-	constexpr Vec2 skinFaceUvPos{ 0.125f, 0.125f };
-	constexpr Vec2 skinFaceUvSize{ 0.125f, 0.125f };
+	constexpr Vec2 skinFaceUvPos { 0.125f, 0.125f };
+	constexpr Vec2 skinFaceUvSize { 0.125f, 0.125f };
 
 	SDK::ImageInfo makeBorderSlice(float x, float y, float w, float h, float u, float v, float uw, float vh) {
-		return SDK::ImageInfo{
+		return SDK::ImageInfo {
 			.position = { x, y },
 			.size = { w, h },
 			.uv = { u, v },
@@ -36,9 +36,10 @@ namespace {
 		};
 	}
 
-	template <typename SnapXToGuiPixel, typename SnapYToGuiPixel>
-	void addTiledBorderSlices(std::vector<SDK::ImageInfo>& slices, float x, float y, float w, float h, float u, float v,
-		float uw, float vh, float guiScale, SnapXToGuiPixel const& snapGuiXToGuiPixel, SnapYToGuiPixel const& snapGuiYToGuiPixel) {
+	template<typename SnapXToGuiPixel, typename SnapYToGuiPixel>
+	void addTiledBorderSlices(std::vector<SDK::ImageInfo> &slices, float x, float y, float w, float h, float u, float v,
+	                          float uw, float vh, float guiScale, SnapXToGuiPixel const &snapGuiXToGuiPixel,
+	                          SnapYToGuiPixel const &snapGuiYToGuiPixel) {
 		float tileW = uw * guiScale;
 		float tileH = vh * guiScale;
 		if (w <= 0.f || h <= 0.f || tileW <= 0.f || tileH <= 0.f) return;
@@ -83,19 +84,20 @@ namespace {
 		}
 	}
 
-	bool drawPurpleBorderBackground(DrawUtil& dc, d2d::Rect const& bounds) {
+	bool drawPurpleBorderBackground(DrawUtil &dc, d2d::Rect const &bounds) {
 		if (!dc.isMinecraft()) return false;
 
-		auto& mc = static_cast<MCDrawUtil&>(dc);
+		auto &mc = static_cast<MCDrawUtil &>(dc);
 		if (!mc.renderCtx) return false;
 
-		SDK::TexturePtr texture{};
-		mc.renderCtx->getTexture(&texture, SDK::ResourceLocation("textures/ui/purpleBorder", SDK::ResourceFileSystem::UserPackage), false);
+		SDK::TexturePtr texture {};
+		mc.renderCtx->getTexture(
+			&texture, SDK::ResourceLocation("textures/ui/purpleBorder", SDK::ResourceFileSystem::UserPackage), false);
 		if (!texture.textureData) return false;
 
 		auto transform = mc.scn->matrix->matrixStack.empty()
-			? glm::mat4{ 1.f }
-			: mc.scn->matrix->matrixStack.top();
+			                 ? glm::mat4 { 1.f }
+			                 : mc.scn->matrix->matrixStack.top();
 		float matrixScaleX = std::abs(transform[0][0]) > 0.001f ? transform[0][0] : 1.f;
 		float matrixScaleY = std::abs(transform[1][1]) > 0.001f ? transform[1][1] : 1.f;
 		auto snapXToGuiPixel = [&](float localX) {
@@ -137,26 +139,37 @@ namespace {
 		std::vector<SDK::ImageInfo> rightSlices;
 		std::vector<SDK::ImageInfo> bottomSlices;
 
-		addTiledBorderSlices(topSlices, centerX, top, centerWidth, sliceY, borderTextureSliceSize, 0.f, sourceCenterSize,
-			borderTextureSliceSize, mc.guiScale, snapGuiXToGuiPixel, snapGuiYToGuiPixel);
-		addTiledBorderSlices(leftSlices, left, centerY, sliceX, centerHeight, 0.f, borderTextureSliceSize, borderTextureSliceSize,
-			sourceCenterSize, mc.guiScale, snapGuiXToGuiPixel, snapGuiYToGuiPixel);
+		addTiledBorderSlices(topSlices, centerX, top, centerWidth, sliceY, borderTextureSliceSize, 0.f,
+		                     sourceCenterSize,
+		                     borderTextureSliceSize, mc.guiScale, snapGuiXToGuiPixel, snapGuiYToGuiPixel);
+		addTiledBorderSlices(leftSlices, left, centerY, sliceX, centerHeight, 0.f, borderTextureSliceSize,
+		                     borderTextureSliceSize,
+		                     sourceCenterSize, mc.guiScale, snapGuiXToGuiPixel, snapGuiYToGuiPixel);
 		addTiledBorderSlices(middleSlices, centerX, centerY, centerWidth, centerHeight, borderTextureSliceSize,
-			borderTextureSliceSize, sourceCenterSize, sourceCenterSize, mc.guiScale, snapGuiXToGuiPixel, snapGuiYToGuiPixel);
-		addTiledBorderSlices(rightSlices, rightX, centerY, sliceX, centerHeight, borderTextureBaseWidth - borderTextureSliceSize,
-			borderTextureSliceSize, borderTextureSliceSize, sourceCenterSize, mc.guiScale, snapGuiXToGuiPixel, snapGuiYToGuiPixel);
+		                     borderTextureSliceSize, sourceCenterSize, sourceCenterSize, mc.guiScale,
+		                     snapGuiXToGuiPixel, snapGuiYToGuiPixel);
+		addTiledBorderSlices(rightSlices, rightX, centerY, sliceX, centerHeight,
+		                     borderTextureBaseWidth - borderTextureSliceSize,
+		                     borderTextureSliceSize, borderTextureSliceSize, sourceCenterSize, mc.guiScale,
+		                     snapGuiXToGuiPixel, snapGuiYToGuiPixel);
 		addTiledBorderSlices(bottomSlices, centerX, bottomY, centerWidth, sliceY, borderTextureSliceSize,
-			borderTextureBaseHeight - borderTextureSliceSize, sourceCenterSize, borderTextureSliceSize, mc.guiScale,
-			snapGuiXToGuiPixel, snapGuiYToGuiPixel);
+		                     borderTextureBaseHeight - borderTextureSliceSize, sourceCenterSize, borderTextureSliceSize,
+		                     mc.guiScale,
+		                     snapGuiXToGuiPixel, snapGuiYToGuiPixel);
 
-		SDK::NinesliceInfo info{};
-		info.topLeft = makeBorderSlice(left, top, sliceX, sliceY, 0.f, 0.f, borderTextureSliceSize, borderTextureSliceSize);
-		info.topRight = makeBorderSlice(rightX, top, sliceX, sliceY, borderTextureBaseWidth - borderTextureSliceSize, 0.f,
-			borderTextureSliceSize, borderTextureSliceSize);
-		info.bottomLeft = makeBorderSlice(left, bottomY, sliceX, sliceY, 0.f, borderTextureBaseHeight - borderTextureSliceSize,
-			borderTextureSliceSize, borderTextureSliceSize);
-		info.bottomRight = makeBorderSlice(rightX, bottomY, sliceX, sliceY, borderTextureBaseWidth - borderTextureSliceSize,
-			borderTextureBaseHeight - borderTextureSliceSize, borderTextureSliceSize, borderTextureSliceSize);
+		SDK::NinesliceInfo info {};
+		info.topLeft = makeBorderSlice(left, top, sliceX, sliceY, 0.f, 0.f, borderTextureSliceSize,
+		                               borderTextureSliceSize);
+		info.topRight = makeBorderSlice(rightX, top, sliceX, sliceY, borderTextureBaseWidth - borderTextureSliceSize,
+		                                0.f,
+		                                borderTextureSliceSize, borderTextureSliceSize);
+		info.bottomLeft = makeBorderSlice(left, bottomY, sliceX, sliceY, 0.f,
+		                                  borderTextureBaseHeight - borderTextureSliceSize,
+		                                  borderTextureSliceSize, borderTextureSliceSize);
+		info.bottomRight = makeBorderSlice(rightX, bottomY, sliceX, sliceY,
+		                                   borderTextureBaseWidth - borderTextureSliceSize,
+		                                   borderTextureBaseHeight - borderTextureSliceSize, borderTextureSliceSize,
+		                                   borderTextureSliceSize);
 		info.uvScale = { 1.f / borderTextureBaseWidth, 1.f / borderTextureBaseHeight };
 		info.top.set(topSlices.data(), topSlices.size());
 		info.left.set(leftSlices.data(), leftSlices.size());
@@ -186,7 +199,7 @@ namespace {
 		std::wstring out;
 		out.reserve(id.size());
 		bool newWord = true;
-		for (char ch : id) {
+		for (char ch: id) {
 			if (ch == '_' || ch == '-' || ch == '.') {
 				out.push_back(L' ');
 				newWord = true;
@@ -196,8 +209,7 @@ namespace {
 			unsigned char uch = static_cast<unsigned char>(ch);
 			if (newWord) {
 				out.push_back(static_cast<wchar_t>(std::toupper(uch)));
-			}
-			else {
+			} else {
 				out.push_back(static_cast<wchar_t>(std::tolower(uch)));
 			}
 			newWord = false;
@@ -357,7 +369,7 @@ namespace {
 		return ss.str();
 	}
 
-	Vec3 rayDirectionFromHit(SDK::HitResult* hit) {
+	Vec3 rayDirectionFromHit(SDK::HitResult *hit) {
 		if (!hit) return {};
 
 		Vec3 toHit = hit->hitPos - hit->start;
@@ -373,13 +385,14 @@ WAILA::WAILA() : HUDModule("WAILA", L"WAILA", L"Shows the block or entity you ar
 	addSetting("showBlocks", L"Blocks", L"Show block information.", showBlocks);
 	addSetting("showEntities", L"Entities", L"Show entity information.", showEntities);
 	addSetting("showNamespace", L"Namespace", L"Show the source namespace or mod id.", showNamespace);
-	addSetting("showCoordinates", L"Coordinates", L"Show target block coordinates.", showCoordinates, "showBlocks"_istrue);
+	addSetting("showCoordinates", L"Coordinates", L"Show target block coordinates.", showCoordinates,
+	           "showBlocks"_istrue);
 	addSetting("showDistance", L"Distance", L"Show distance to the target.", showDistance);
 	addSetting("showHealth", L"Health", L"Show health pips for living entities.", showHealth, "showEntities"_istrue);
 	addSliderSetting("entityDistance", L"Entity Distance", L"Maximum entity inspection distance.", entityDistance,
-		FloatValue(2.f), FloatValue(12.f), FloatValue(0.5f), "showEntities"_istrue);
+	                 FloatValue(2.f), FloatValue(12.f), FloatValue(0.5f), "showEntities"_istrue);
 	addSliderSetting("textSize", L"Text Size", L"Text size for the inspector.", textSize,
-		FloatValue(20.f), FloatValue(44.f), FloatValue(1.f));
+	                 FloatValue(20.f), FloatValue(44.f), FloatValue(1.f));
 	addSetting("titleColor", L"Title", L"Inspector title color.", titleColor);
 	addSetting("detailColor", L"Detail", L"Inspector detail color.", detailColor);
 
@@ -404,22 +417,25 @@ void WAILA::afterLoadConfig() {
 	storePos(screenSize);
 }
 
-void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
+void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 	std::optional<TargetInfo> target = getTargetInfo(isDefault || inEditor);
 	if (!target.has_value()) return;
 
 	float titleSize = std::get<FloatValue>(textSize).value * titleTextScale;
 	float detailSize = titleSize * detailTextScale;
-	float healthHeight = target->type == TargetType::Entity && target->health >= 0.f && std::get<BoolValue>(showHealth).value
-		? heartSize
-		: 0.f;
+	float healthHeight = target->type == TargetType::Entity && target->health >= 0.f && std::get<BoolValue>(showHealth).
+	                     value
+		                     ? heartSize
+		                     : 0.f;
 
 	std::wstring plainTitle = util::StripMinecraftFormatting(target->title);
 	std::wstring plainDetail = util::StripMinecraftFormatting(target->detail);
 	bool cacheText = !isDefault && !inEditor;
 
-	Vec2 titleTextSize = dc.getTextSize(plainTitle, Renderer::FontSelection::PrimaryRegular, titleSize, true, cacheText);
-	Vec2 detailTextSize = dc.getTextSize(plainDetail, Renderer::FontSelection::PrimaryRegular, detailSize, true, cacheText);
+	Vec2 titleTextSize = dc.getTextSize(plainTitle, Renderer::FontSelection::PrimaryRegular, titleSize, true,
+	                                    cacheText);
+	Vec2 detailTextSize = dc.getTextSize(plainDetail, Renderer::FontSelection::PrimaryRegular, detailSize, true,
+	                                     cacheText);
 	if (target->detail.empty()) {
 		detailTextSize = {};
 	}
@@ -436,7 +452,7 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	rect.right = rect.left + width;
 	rect.bottom = rect.top + height;
 
-	d2d::Rect bounds{ 0.f, 0.f, width, height };
+	d2d::Rect bounds { 0.f, 0.f, width, height };
 	auto title = d2d::Color(std::get<ColorValue>(titleColor).getMainColor());
 	auto detail = d2d::Color(std::get<ColorValue>(detailColor).getMainColor());
 
@@ -446,18 +462,20 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 		dc.fillRectangle(bounds, d2d::Color(0.055f, 0.065f, 0.075f, 0.82f));
 	}
 
-	d2d::Rect icon{ paddingX, paddingY + ((height - (paddingY * 2.f) - iconSize) * 0.5f),
-		paddingX + iconSize, paddingY + ((height - (paddingY * 2.f) - iconSize) * 0.5f) + iconSize };
+	d2d::Rect icon {
+		paddingX, paddingY + ((height - (paddingY * 2.f) - iconSize) * 0.5f),
+		paddingX + iconSize, paddingY + ((height - (paddingY * 2.f) - iconSize) * 0.5f) + iconSize
+	};
 	drawTargetIcon(dc, *target, icon);
 
 	float textLeft = paddingX + iconSize + textGap;
 	float y = paddingY + std::max(0.f, (height - (paddingY * 2.f) - textHeight) * 0.5f);
-	dc.drawText({textLeft, y - 1.f, width - paddingX, y + titleTextSize.y + 2.f}, target->title, title,
-		Renderer::FontSelection::SecondaryLight, titleSize, DWRITE_TEXT_ALIGNMENT_LEADING,
-		DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
+	dc.drawText({ textLeft, y - 1.f, width - paddingX, y + titleTextSize.y + 2.f }, target->title, title,
+	            Renderer::FontSelection::SecondaryLight, titleSize, DWRITE_TEXT_ALIGNMENT_LEADING,
+	            DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
 	y += titleTextSize.y;
 
-	float heartRowOffsetX = -1.5.f;
+	float heartRowOffsetX = -1.5f;
 	float heartRowOffsetY = 2.f;
 	if (healthHeight > 0.f) {
 		drawHealthHearts(dc, textLeft + heartRowOffsetX, y + heartRowOffsetY, target->health);
@@ -465,9 +483,9 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 	}
 
 	if (!target->detail.empty()) {
-		dc.drawText({textLeft, y + 1.f, width - paddingX, height - paddingY}, target->detail, detail,
-			Renderer::FontSelection::SecondaryLight, detailSize, DWRITE_TEXT_ALIGNMENT_LEADING,
-			DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
+		dc.drawText({ textLeft, y + 1.f, width - paddingX, height - paddingY }, target->detail, detail,
+		            Renderer::FontSelection::SecondaryLight, detailSize, DWRITE_TEXT_ALIGNMENT_LEADING,
+		            DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
 	}
 
 	dc.flush();
@@ -475,7 +493,7 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 
 std::optional<WAILA::TargetInfo> WAILA::getTargetInfo(bool preview) {
 	if (preview) {
-		return TargetInfo{
+		return TargetInfo {
 			.type = TargetType::Block,
 			.title = L"WAILA",
 			.detail = L"Minecraft",
@@ -508,7 +526,7 @@ std::optional<WAILA::TargetInfo> WAILA::getTargetInfo(bool preview) {
 	return std::nullopt;
 }
 
-std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult* hit) {
+std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult *hit) {
 	if (!hit || hit->hitType != SDK::HitType::BLOCK) return std::nullopt;
 
 	auto clientInstance = SDK::ClientInstance::get();
@@ -545,7 +563,7 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult* hit) {
 		detail += ss.str();
 	}
 
-	return TargetInfo{
+	return TargetInfo {
 		.type = TargetType::Block,
 		.title = titleCaseIdentifier(nameSource),
 		.detail = detail,
@@ -554,7 +572,7 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult* hit) {
 	};
 }
 
-SDK::Actor* WAILA::getEntityTarget(SDK::HitResult* hit, float& distanceOut) {
+SDK::Actor *WAILA::getEntityTarget(SDK::HitResult *hit, float &distanceOut) {
 	auto clientInstance = SDK::ClientInstance::get();
 	if (!clientInstance || !clientInstance->minecraft || !hit) return nullptr;
 
@@ -574,15 +592,16 @@ SDK::Actor* WAILA::getEntityTarget(SDK::HitResult* hit, float& distanceOut) {
 	Vec3 direction = rayDirectionFromHit(hit);
 	if (direction.magnitude() <= 0.0001f) return nullptr;
 
-	SDK::Actor* nearestActor = nullptr;
-	for (auto actor : level->getRuntimeActorList()) {
+	SDK::Actor *nearestActor = nullptr;
+	for (auto actor: level->getRuntimeActorList()) {
 		if (!actor || actor == localPlayer || !actor->aabbShape) continue;
 		if (actor->isInvisible()) continue;
 
 		auto typeComponent = actor->tryGetComponent<SDK::ActorTypeComponent>();
 		if (!typeComponent) continue;
 
-		std::optional<float> hitDistance = actor->getBoundingBox().intersectsRay(hit->start, direction, nearestDistance, 0.08f);
+		std::optional<float> hitDistance = actor->getBoundingBox().intersectsRay(
+			hit->start, direction, nearestDistance, 0.08f);
 		if (!hitDistance.has_value()) continue;
 		if (*hitDistance < nearestDistance) {
 			nearestDistance = *hitDistance;
@@ -596,7 +615,7 @@ SDK::Actor* WAILA::getEntityTarget(SDK::HitResult* hit, float& distanceOut) {
 	return nearestActor;
 }
 
-std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float distanceToActor) {
+std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor *actor, float distanceToActor) {
 	if (!actor) return std::nullopt;
 
 	auto typeComponent = actor->tryGetComponent<SDK::ActorTypeComponent>();
@@ -604,13 +623,13 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float d
 
 	uint32_t type = typeComponent->type;
 	std::wstring title = entityNameFromType(type);
-	SDK::ItemStack* itemStack = nullptr;
+	SDK::ItemStack *itemStack = nullptr;
 	std::string faceTexturePath;
 	Vec2 faceUvPos = skinFaceUvPos;
 	Vec2 faceUvSize = skinFaceUvSize;
 
 	if (actor->isPlayer()) {
-		auto player = static_cast<SDK::Player*>(actor);
+		auto player = static_cast<SDK::Player *>(actor);
 		if (!player->playerName.empty()) {
 			title = util::StrToWStr(player->playerName);
 		}
@@ -620,9 +639,8 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float d
 			faceUvPos = { 0.f, 0.f };
 			faceUvSize = { 1.f, 1.f };
 		}
-	}
-	else if (actor->isItem()) {
-		auto itemActor = static_cast<SDK::ItemActor*>(actor);
+	} else if (actor->isItem()) {
+		auto itemActor = static_cast<SDK::ItemActor *>(actor);
 		itemStack = itemActor->getItemStack();
 		if (itemStack && itemStack->getItem()) {
 			auto hoverName = itemStack->getHoverName();
@@ -649,7 +667,7 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float d
 		health = std::clamp(actor->getHealth(), 0.f, 20.f);
 	}
 
-	return TargetInfo{
+	return TargetInfo {
 		.type = TargetType::Entity,
 		.title = title,
 		.detail = detail,
@@ -662,7 +680,7 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor* actor, float d
 	};
 }
 
-std::string WAILA::getPlayerFaceTexturePath(SDK::Player* player) {
+std::string WAILA::getPlayerFaceTexturePath(SDK::Player *player) {
 	if (!player) return {};
 
 	auto clientInstance = SDK::ClientInstance::get();
@@ -683,8 +701,8 @@ std::string WAILA::getPlayerFaceTexturePath(SDK::Player* player) {
 	auto playerList = level->getPlayerList();
 	if (!playerList) return {};
 
-	for (auto& entryPair : *playerList) {
-		auto& entry = entryPair.second;
+	for (auto &entryPair: *playerList) {
+		auto &entry = entryPair.second;
 		if (entry.name != player->playerName) continue;
 
 		return PlayerHeadCache::getTexturePath(entry.skin);
@@ -693,58 +711,62 @@ std::string WAILA::getPlayerFaceTexturePath(SDK::Player* player) {
 	return {};
 }
 
-void WAILA::drawHealthHearts(DrawUtil& dc, float x, float y, float health) {
+void WAILA::drawHealthHearts(DrawUtil &dc, float x, float y, float health) {
 	int halfHearts = std::clamp(static_cast<int>(std::ceil(health)), 0, maxHearts * 2);
 	int filledHearts = halfHearts / 2;
 	bool hasHalfHeart = (halfHearts % 2) != 0;
 
-	if (dc.isMinecraft()) {
-		auto& mc = static_cast<MCDrawUtil&>(dc);
-		if (mc.renderCtx) {
-			SDK::TexturePtr backgroundTexture{};
-			SDK::TexturePtr heartTexture{};
-			SDK::TexturePtr halfHeartTexture{};
-			mc.renderCtx->getTexture(&backgroundTexture, SDK::ResourceLocation("textures/ui/heart_background", SDK::ResourceFileSystem::UserPackage), false);
-			mc.renderCtx->getTexture(&heartTexture, SDK::ResourceLocation("textures/ui/heart", SDK::ResourceFileSystem::UserPackage), false);
-			mc.renderCtx->getTexture(&halfHeartTexture, SDK::ResourceLocation("textures/ui/heart_half", SDK::ResourceFileSystem::UserPackage), false);
+	auto &mc = static_cast<MCDrawUtil &>(dc);
+	if (mc.renderCtx) {
+		SDK::TexturePtr backgroundTexture {};
+		SDK::TexturePtr heartTexture {};
+		SDK::TexturePtr halfHeartTexture {};
+		mc.renderCtx->getTexture(&backgroundTexture,
+		                         SDK::ResourceLocation("textures/ui/heart_background",
+		                                               SDK::ResourceFileSystem::UserPackage), false);
+		mc.renderCtx->getTexture(&heartTexture,
+		                         SDK::ResourceLocation("textures/ui/heart", SDK::ResourceFileSystem::UserPackage),
+		                         false);
+		mc.renderCtx->getTexture(&halfHeartTexture,
+		                         SDK::ResourceLocation("textures/ui/heart_half", SDK::ResourceFileSystem::UserPackage),
+		                         false);
 
-			if (backgroundTexture.textureData && heartTexture.textureData && halfHeartTexture.textureData) {
-				for (int i = 0; i < maxHearts; ++i) {
-					mc.renderCtx->drawImage(backgroundTexture,
-						{ (x + (i * heartStride)) * mc.guiScale, y * mc.guiScale },
-						{ heartSize * mc.guiScale, heartSize * mc.guiScale },
-						{ 0.f, 0.f },
-						{ 1.f, 1.f });
+		if (backgroundTexture.textureData && heartTexture.textureData && halfHeartTexture.textureData) {
+			for (int i = 0; i < maxHearts; ++i) {
+				mc.renderCtx->drawImage(backgroundTexture,
+				                        { (x + (i * heartStride)) * mc.guiScale, y * mc.guiScale },
+				                        { heartSize * mc.guiScale, heartSize * mc.guiScale },
+				                        { 0.f, 0.f },
+				                        { 1.f, 1.f });
+			}
+			mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
+
+			if (filledHearts > 0) {
+				for (int i = 0; i < filledHearts; ++i) {
+					mc.renderCtx->drawImage(heartTexture,
+					                        { (x + (i * heartStride)) * mc.guiScale, y * mc.guiScale },
+					                        { heartSize * mc.guiScale, heartSize * mc.guiScale },
+					                        { 0.f, 0.f },
+					                        { 1.f, 1.f });
 				}
 				mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
-
-				if (filledHearts > 0) {
-					for (int i = 0; i < filledHearts; ++i) {
-						mc.renderCtx->drawImage(heartTexture,
-							{ (x + (i * heartStride)) * mc.guiScale, y * mc.guiScale },
-							{ heartSize * mc.guiScale, heartSize * mc.guiScale },
-							{ 0.f, 0.f },
-							{ 1.f, 1.f });
-					}
-					mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
-				}
-
-				if (hasHalfHeart && filledHearts < maxHearts) {
-					mc.renderCtx->drawImage(halfHeartTexture,
-						{ (x + (filledHearts * heartStride)) * mc.guiScale, y * mc.guiScale },
-						{ heartSize * mc.guiScale, heartSize * mc.guiScale },
-						{ 0.f, 0.f },
-						{ 1.f, 1.f });
-					mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
-				}
-
-				return;
 			}
+
+			if (hasHalfHeart && filledHearts < maxHearts) {
+				mc.renderCtx->drawImage(halfHeartTexture,
+				                        { (x + (filledHearts * heartStride)) * mc.guiScale, y * mc.guiScale },
+				                        { heartSize * mc.guiScale, heartSize * mc.guiScale },
+				                        { 0.f, 0.f },
+				                        { 1.f, 1.f });
+				mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
+			}
+
+			return;
 		}
 	}
 
 	for (int i = 0; i < maxHearts; ++i) {
-		d2d::Rect heart{
+		d2d::Rect heart {
 			x + (i * heartStride),
 			y,
 			x + (i * heartStride) + heartSize,
@@ -755,8 +777,7 @@ void WAILA::drawHealthHearts(DrawUtil& dc, float x, float y, float health) {
 
 		if (i < filledHearts) {
 			dc.fillRectangle(heart, d2d::Color::RGB(226, 55, 65));
-		}
-		else if (i == filledHearts && hasHalfHeart) {
+		} else if (i == filledHearts && hasHalfHeart) {
 			d2d::Rect halfHeart = heart;
 			halfHeart.right = halfHeart.left + (heart.getWidth() * 0.5f);
 			dc.fillRectangle(halfHeart, d2d::Color::RGB(226, 55, 65));
@@ -764,12 +785,12 @@ void WAILA::drawHealthHearts(DrawUtil& dc, float x, float y, float health) {
 	}
 }
 
-void WAILA::drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::Rect const& icon) {
+void WAILA::drawTargetIcon(DrawUtil &ctxGeneric, TargetInfo const &target, d2d::Rect const &icon) {
 	// if i dont draw a super small rectangle before drawing items everything gets fucked for some reason
 	//ctxGeneric.fillRoundedRectangle(d2d::Rect(icon.left / 48.f, icon.top / 48.f, icon.right / 48.f, icon.bottom / 48.f),
-	                                //d2d::Color::RGB(20, 20, 24, 150), 2.f);
+	//d2d::Color::RGB(20, 20, 24, 150), 2.f);
 
-	auto& dc = static_cast<MCDrawUtil&>(ctxGeneric);
+	auto &dc = static_cast<MCDrawUtil &>(ctxGeneric);
 
 	if (target.type == TargetType::Entity && target.actor && !target.actor->isItem()) {
 		if (dc.drawActor(target.actor, icon, 1.f)) {
@@ -778,12 +799,14 @@ void WAILA::drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::
 	}
 
 	if (!target.faceTexturePath.empty()) {
-		SDK::TexturePtr texture{};
+		SDK::TexturePtr texture {};
 		auto externalTexture = std::filesystem::path(target.faceTexturePath).is_absolute();
 		auto textureFileSystem = externalTexture ? SDK::ResourceFileSystem::Raw : SDK::ResourceFileSystem::UserPackage;
-		dc.renderCtx->getTexture(&texture, SDK::ResourceLocation(target.faceTexturePath, textureFileSystem), externalTexture);
+		dc.renderCtx->getTexture(&texture, SDK::ResourceLocation(target.faceTexturePath, textureFileSystem),
+		                         externalTexture);
 		if (texture.textureData) {
-			dc.drawImage(texture, icon.getPos(), icon.getSize(), target.faceUvPos, target.faceUvSize, d2d::Colors::WHITE);
+			dc.drawImage(texture, icon.getPos(), icon.getSize(), target.faceUvPos, target.faceUvSize,
+			             d2d::Colors::WHITE);
 			return;
 		}
 	}
@@ -793,14 +816,13 @@ void WAILA::drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::
 
 		if (target.itemStack->itemCount > 1) {
 			dc.drawText(icon, std::to_wstring(target.itemStack->itemCount), d2d::Colors::WHITE,
-				Renderer::FontSelection::PrimaryRegular, 24.f, DWRITE_TEXT_ALIGNMENT_TRAILING,
-				DWRITE_PARAGRAPH_ALIGNMENT_FAR);
+			            Renderer::FontSelection::PrimaryRegular, 24.f, DWRITE_TEXT_ALIGNMENT_TRAILING,
+			            DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 		}
-	}
-	else if (target.type == TargetType::Block && target.block &&
-		Signatures::ItemStack_ItemStackBlock.result && Signatures::ItemStackBase_destructor.result) {
+	} else if (target.type == TargetType::Block && target.block &&
+	           Signatures::ItemStack_ItemStackBlock.result && Signatures::ItemStackBase_destructor.result) {
 		alignas(SDK::ItemStack) char storage[sizeof(SDK::ItemStack)] = {};
-		SDK::ItemStack* itemStack = SDK::ItemStack::constructFromBlock(storage, *target.block, 1, nullptr);
+		SDK::ItemStack *itemStack = SDK::ItemStack::constructFromBlock(storage, *target.block, 1, nullptr);
 		if (itemStack) {
 			itemStack->showPickUp = false;
 			itemStack->wasPickedUp = false;
@@ -813,5 +835,4 @@ void WAILA::drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::
 			itemStack->destruct();
 		}
 	}
-
 }
