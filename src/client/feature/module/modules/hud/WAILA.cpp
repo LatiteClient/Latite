@@ -663,8 +663,8 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor *actor, float d
 	}
 
 	float health = -1.f;
-	if (std::get<BoolValue>(showHealth).value && actor->getAttributesComponent() && !actor->isItem()) {
-		health = std::clamp(actor->getHealth(), 0.f, 20.f);
+	if (std::get<BoolValue>(showHealth).value && actor->getHealth() != std::nullopt && !actor->isItem()) {
+		health = actor->getHealth().value();
 	}
 
 	return TargetInfo {

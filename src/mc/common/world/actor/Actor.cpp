@@ -114,24 +114,24 @@ SDK::AttributeInstance* SDK::Actor::getAttribute(SDK::Attribute& attribute) {
 	return getAttributesComponent()->baseAttributes.getInstance(attribute.mIDValue);
 }
 
-float SDK::Actor::getHealth() {
+std::optional<float> SDK::Actor::getHealth() {
 	auto attrib = getAttribute(SDK::Attributes::Health);
 	if (!attrib)
-		return 20.f;
+		return std::nullopt;
 	return attrib->value;
 }
 
-float SDK::Actor::getHunger() {
+std::optional<float> SDK::Actor::getHunger() {
 	auto attrib = getAttribute(SDK::Attributes::Hunger);
 	if (!attrib)
-		return 20.f;
+		return std::nullopt;
 	return attrib->value;
 }
 
-float SDK::Actor::getSaturation() {
+std::optional<float> SDK::Actor::getSaturation() {
 	auto attrib = getAttribute(SDK::Attributes::Saturation);
 	if (!attrib)
-		return 20.f;
+		return std::nullopt;
 	return attrib->value;
 }
 
