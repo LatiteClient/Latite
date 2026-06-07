@@ -66,37 +66,15 @@ jobs:
         run: |
           cmake --build ${{ env.BUILD_DIR }}
 
-      # Upload PR build artifacts so DLL/PDB files are easy to download without creating a release
       # P.S. Artifacts are retained for only 90 days.
-      - name: Upload PR artifacts
-        if: github.event_name == 'pull_request'
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: LatiteDebug-PR-${{ github.event.pull_request.number }}
+          name: LatiteDebug-${{ steps.build_timestamp.outputs.timestamp }}
           path: |
             ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteDebug.dll
             ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteDebug.pdb
           if-no-files-found: error
-
-      - name: Create timestamped archival release
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: softprops/action-gh-release@v2.3.2
-        with:
-          tag_name: debug-${{ env.TIMESTAMP }}
-          name: Latite Debug ${{ env.TIMESTAMP }}
-          body: |
-            ### Automated timestamped debug build
-
-            Built at: ${{ env.TIMESTAMP }} UTC
-
-            Includes:
-            - LatiteDebug.dll
-            - LatiteDebug.pdb
-          prerelease: true
-          generate_release_notes: false
-          files: |
-            ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteDebug.dll
-            ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteDebug.pdb
 
       - name: Recreate debug release to refresh date
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
