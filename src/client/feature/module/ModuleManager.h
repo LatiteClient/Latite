@@ -26,6 +26,7 @@ public:
 	bool deregisterScriptModule(JsModule* mod) {
 		for (auto it = items.begin(); it != items.end(); it++) {
 			if (it->get() == mod) {
+				Eventing::get().unlisten(mod);
 				items.erase(it);
 				return true;
 			}

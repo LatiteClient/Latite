@@ -93,6 +93,7 @@ HRESULT WINAPI DXHooks::CreateSwapChainForHWNDHook(
     if (device) {
         ComPtr<ID3D12CommandQueue> queue;
         if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&queue))) && queue) {
+            auto lock = Latite::getRenderer().lock();
             Latite::getRenderer().setCommandQueue(queue.Get());
         }
     }
@@ -107,14 +108,17 @@ HRESULT WINAPI DXHooks::CreateSwapChainForHWNDHook(
 }
 
 HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInterval, UINT Flags) {
-    if (Latite::getRenderer().hasInitialized()) {
-        auto lock = Latite::getRenderer().lock();
-        Latite::getRenderer().render();
-    }
-
-    if (!Latite::getRenderer().hasInitialized()) {
-        auto lock = Latite::getRenderer().lock();
-        Latite::getRenderer().init(chain);
+    auto& renderer = Latite::getRenderer();
+    if (!renderer.isResizeInProgress()) {
+        auto lock = renderer.lock();
+        if (!renderer.isResizeInProgress()) {
+            if (renderer.hasInitialized()) {
+                renderer.render();
+            }
+            else {
+                renderer.init(chain);
+            }
+        }
     }
 
     //static bool hasKilled = false;
@@ -142,14 +146,16 @@ HRESULT __stdcall DXHooks::SwapChain_ResizeBuffers(
     UINT Height,
     DXGI_FORMAT NewFormat,
     UINT SwapChainFlags) {
-    Latite::getRenderer().reinit();
+    Latite::getRenderer().beginResize();
     UINT newFlags = SwapChainFlags;
     if (tearingSupported && isForceDisableVSync) {
         newFlags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
     }
 
-    return ResizeBuffersHook->oFunc<decltype(&SwapChain_ResizeBuffers)>()(
+    const HRESULT result = ResizeBuffersHook->oFunc<decltype(&SwapChain_ResizeBuffers)>()(
         chain, BufferCount, Width, Height, NewFormat, newFlags);
+    Latite::getRenderer().endResize();
+    return result;
 }
 
 HRESULT __stdcall DXHooks::SwapChain3_ResizeBuffers(
@@ -162,14 +168,16 @@ HRESULT __stdcall DXHooks::SwapChain3_ResizeBuffers(
     const UINT *pCreationNodeMask,
     IUnknown *const *ppPresentQueue) {
 
-    Latite::getRenderer().reinit();
+    Latite::getRenderer().beginResize();
     UINT newFlags = SwapChainFlags;
     if (tearingSupported && isForceDisableVSync) {
         newFlags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
     }
 
-    return ResizeBuffers3Hook->oFunc<decltype(&SwapChain3_ResizeBuffers)>()(
+    const HRESULT result = ResizeBuffers3Hook->oFunc<decltype(&SwapChain3_ResizeBuffers)>()(
         chain, BufferCount, Width, Height, NewFormat, newFlags, pCreationNodeMask, ppPresentQueue);
+    Latite::getRenderer().endResize();
+    return result;
 }
 
 HRESULT __stdcall DXHooks::CommandQueue_ExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists,
@@ -177,8 +185,10 @@ HRESULT __stdcall DXHooks::CommandQueue_ExecuteCommandLists(ID3D12CommandQueue* 
     if (queue) {
         auto desc = queue->GetDesc();
         if (desc.Type == D3D12_COMMAND_LIST_TYPE_DIRECT) {
-            auto lock = Latite::getRenderer().lock();
-            Latite::getRenderer().setCommandQueue(queue);
+            {
+                auto lock = Latite::getRenderer().lock();
+                Latite::getRenderer().setCommandQueue(queue);
+            }
         }
     }
 
@@ -274,6 +284,7 @@ DXHooks::DXHooks() : HookGroup("DirectX") {
     // Needed for D3D11On12 for DX12
     if (cqueueVftable) ExecuteCommandListsHook = addHook(cqueueVftable[10], CommandQueue_ExecuteCommandLists, "ID3D12CommandQueue::executeCommandLists");
     PresentHook->enable();
+    ResizeBuffersHook->enable();
     ResizeBuffers3Hook->enable();
     if (cqueueVftable) ExecuteCommandListsHook->enable();
 }

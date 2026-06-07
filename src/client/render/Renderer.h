@@ -1,7 +1,8 @@
 #pragma once
 #include "util/DXUtil.h"
+#include <atomic>
+#include <mutex>
 #include <vector>
-#include <shared_mutex>
 
 class Renderer final {
 public:
@@ -11,11 +12,16 @@ public:
 	~Renderer();
 
 	bool init(IDXGISwapChain* chain);
-	bool hasInitialized() { return hasInit; };
+	bool hasInitialized() const noexcept { return hasInit.load(std::memory_order_acquire); };
 	HRESULT reinit();
 	void setShouldReinit();
 	void setShouldInit();
-	std::shared_lock<std::shared_mutex> lock();
+	void beginResize();
+	void endResize() noexcept;
+	[[nodiscard]] bool isResizeInProgress() const noexcept {
+		return activeResizes.load(std::memory_order_acquire) != 0;
+	}
+	std::unique_lock<std::recursive_mutex> lock();
 	void render();
 	bool isDX11ByDefault() { return isDX11; }
 
@@ -33,10 +39,11 @@ private:
 	void createTextFormats();
 	void releaseTextFormats();
 
-	bool hasInit = false;
-	bool shouldReinit = false;
+	std::atomic_bool hasInit = false;
+	std::atomic_bool shouldReinit = false;
 	bool firstInit = false;
-	bool shouldInit = false;
+	std::atomic_bool shouldInit = false;
+	std::atomic<std::uint32_t> activeResizes = 0;
 	bool reqCommandQueue = false;
 	bool dx12Removed = false;
 	bool hasCopiedBitmap = false;
@@ -81,7 +88,7 @@ private:
 
 	std::unordered_map<int64_t, std::pair<IDWriteTextFormat*, ComPtr<IDWriteTextLayout>>> cachedLayouts;
 
-	std::shared_mutex mutex;
+	std::recursive_mutex mutex;
 	int bufferCount = 3;
 	float deltaTime = 1.f;
 	std::chrono::system_clock::time_point lastTime;

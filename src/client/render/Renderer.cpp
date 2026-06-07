@@ -104,7 +104,7 @@ void Renderer::setCommandQueue(ID3D12CommandQueue* queue) {
 }
 
 bool Renderer::init(IDXGISwapChain* chain) {
-	if (!shouldInit) return false;
+	if (!shouldInit.load(std::memory_order_acquire)) return false;
 
 	if (!chain) {
 		Logger::Warn("Renderer init called with a null swap chain");
@@ -368,7 +368,7 @@ bool Renderer::init(IDXGISwapChain* chain) {
 	this->blurBuffers[0] = bmp;
 	this->hasCopiedBitmap = true;
 
-	hasInit = true;
+	hasInit.store(true, std::memory_order_release);
 	firstInit = true;
 
 	RendererInitEvent ev{};
@@ -379,20 +379,31 @@ bool Renderer::init(IDXGISwapChain* chain) {
 
 HRESULT Renderer::reinit() {
 	releaseAllResources(true, false);
-    hasInit = false;
+    hasInit.store(false, std::memory_order_release);
     return S_OK;
 }
 
 void Renderer::setShouldReinit() {
-	shouldReinit = true;
+	shouldReinit.store(true, std::memory_order_release);
 }
 
 void Renderer::setShouldInit() {
-	shouldInit = true;
+	shouldInit.store(true, std::memory_order_release);
 }
 
-std::shared_lock<std::shared_mutex> Renderer::lock() {
-	return std::shared_lock<std::shared_mutex>(mutex);
+void Renderer::beginResize() {
+	if (activeResizes.fetch_add(1, std::memory_order_acq_rel) == 0) {
+		auto rendererLock = lock();
+		reinit();
+	}
+}
+
+void Renderer::endResize() noexcept {
+	activeResizes.fetch_sub(1, std::memory_order_acq_rel);
+}
+
+std::unique_lock<std::recursive_mutex> Renderer::lock() {
+	return std::unique_lock<std::recursive_mutex>(mutex);
 }
 
 void Renderer::render() {
@@ -403,8 +414,7 @@ void Renderer::render() {
 		ThrowIfFailed(gameDevice11->GetDeviceRemovedReason());
 	}
 
-	if (shouldReinit) {
-		shouldReinit = false;
+	if (shouldReinit.exchange(false, std::memory_order_acq_rel)) {
 		reinit();
 		return;
 	}
@@ -415,7 +425,7 @@ void Renderer::render() {
 
 	lastTime = now;
 
-	if (!hasInit) return;
+	if (!hasInit.load(std::memory_order_acquire)) return;
 
 	auto idx = swapChain4->GetCurrentBackBufferIndex();
 	if (gameDevice12) {
