@@ -5,6 +5,7 @@ namespace SDK {
 		LOGIN = 0x1,
 		TEXT = 0x9,
 		ACTOR_EVENT = 0x1B,
+		SET_ENTITY_DATA = 0x27,
 		CHANGE_DIMENSION = 0x3D,
 		TRANSFER = 0x55,
 		SET_TITLE = 0x58,

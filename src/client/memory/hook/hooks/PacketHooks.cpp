@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "PacketHooks.h"
+#include "client/misc/NameTagCache.h"
 #include "client/script/PluginManager.h"
 #include <mc/common/network/MinecraftPackets.h>
+#include <mc/common/network/packet/SetActorDataPacket.h>
 
 namespace {
 	std::shared_ptr<Hook> SetTitlePacketRead;
@@ -38,8 +40,17 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 		auto packetId = packet->getID();
 
 		if (packetId == SDK::PacketID::CHANGE_DIMENSION) {
+			NameTagCache::clearNetworkNameTags();
 			PluginManager::Event sEv{ L"change-dimension", {}, false };
 			Latite::getPluginManager().dispatchEvent(sEv);
+		}
+		else if (packetId == SDK::PacketID::SET_ENTITY_DATA) {
+			auto* setActorData = static_cast<SDK::SetActorDataPacket*>(packet.get());
+			uint64_t runtimeId = 0;
+			std::string nameTag;
+			if (setActorData->tryGetNameTag(&runtimeId, &nameTag)) {
+				NameTagCache::recordNetworkNameTag(runtimeId, nameTag);
+			}
 		}
 		else if (packetId == SDK::PacketID::SET_SCORE) {
 			auto pkt = std::static_pointer_cast<SDK::SetScorePacket>(packet);
