@@ -181,22 +181,22 @@ namespace {
         return LogsPath() / oss.str();
     }
 
-    void AppendRawLog(std::string const& text) {
-        std::string redactedText = util::RedactPrivatePaths(text);
-        OutputDebugStringA(redactedText.c_str());
+    void AppendRawLog(std::string const& text, bool redactPrivatePaths = true) {
+        std::string outputText = redactPrivatePaths ? util::RedactPrivatePaths(text) : text;
+        OutputDebugStringA(outputText.c_str());
 
         try {
             std::filesystem::create_directories(LogsPath());
 
             std::ofstream latest(LogsPath() / "latest.log", std::ios::app);
             if (!latest.fail()) {
-                latest << redactedText;
+                latest << outputText;
                 latest.flush();
             }
 
             std::ofstream archive(DailyLogPath(), std::ios::app);
             if (!archive.fail()) {
-                archive << redactedText;
+                archive << outputText;
                 archive.flush();
             }
         }
@@ -853,14 +853,14 @@ std::filesystem::path DebugExceptionHandler::WriteCrashReport(EXCEPTION_POINTERS
     }
     catch (std::exception const& e) {
         AppendSectionHeading(stackReport, "Stack Trace");
-        stackReport << "Stack trace unavailable: " << e.what() << "\n";
+        stackReport << "Stack trace unavailable: " << util::RedactPrivatePaths(e.what()) << "\n";
     }
     catch (...) {
         AppendSectionHeading(stackReport, "Stack Trace");
         stackReport << "Stack trace unavailable due to an unknown error.\n";
     }
     stackReport << "\n" << std::string(crashReportWidth, '=') << "\n";
-    AppendRawLog(stackReport.str());
+    AppendRawLog(stackReport.str(), false);
 
     return dumpPath;
 }
