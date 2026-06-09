@@ -2,9 +2,15 @@
 
 project(Latite)
 
-set(LATITE_BUILD_TIMESTAMP "" CACHE STRING "Latite build timestamp in YYYYMMDD-HHMMSS UTC format")
+set(LATITE_BUILD_TIMESTAMP "" CACHE STRING "Latite build timestamp in YYYY-MM-DD_HH-mm-ssZ UTC format")
 if (NOT LATITE_BUILD_TIMESTAMP)
-    string(TIMESTAMP LATITE_BUILD_TIMESTAMP "%Y%m%d-%H%M%S" UTC)
+    string(TIMESTAMP LATITE_BUILD_TIMESTAMP "%Y-%m-%d_%H-%M-%SZ" UTC)
+endif ()
+
+if (NOT LATITE_BUILD_TIMESTAMP MATCHES
+        "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9]-[0-9][0-9]-[0-9][0-9]Z$")
+    message(FATAL_ERROR
+            "LATITE_BUILD_TIMESTAMP must use YYYY-MM-DD_HH-mm-ssZ UTC format; got '${LATITE_BUILD_TIMESTAMP}'")
 endif ()
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;MinSizeRel;Nightly" CACHE STRING "" FORCE)
@@ -95,10 +101,10 @@ target_compile_definitions(Latite PRIVATE
         _UNICODE
         UNICODE
         _HAS_STATIC_RTTI=0
+        LATITE_BUILD_TIMESTAMP=\"${LATITE_BUILD_TIMESTAMP}\"
 
         $<$<CONFIG:Debug>:LATITE_DEBUG>
         $<$<CONFIG:Debug>:LATITE_CRASH_REPORTING>
-        $<$<CONFIG:Debug>:LATITE_BUILD_TIMESTAMP=\"${LATITE_BUILD_TIMESTAMP}\">
         $<$<CONFIG:Release>:LATITE_RELEASE>
         $<$<CONFIG:Release>:LATITE_CRASH_REPORTING>
         $<$<CONFIG:RelWithDebInfo>:LATITE_RELEASE>
@@ -106,7 +112,6 @@ target_compile_definitions(Latite PRIVATE
         $<$<CONFIG:MinSizeRel>:LATITE_RELEASE>
         $<$<CONFIG:Nightly>:LATITE_NIGHTLY>
         $<$<CONFIG:Nightly>:LATITE_CRASH_REPORTING>
-        $<$<CONFIG:Nightly>:LATITE_BUILD_TIMESTAMP=\"${LATITE_BUILD_TIMESTAMP}\">
 )
 
 # Compile options

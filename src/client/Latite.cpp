@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 // LatiteRecode.cpp : Defines the entry point for the application.
 //
-#include <array>
 #include <cstdint>
 
 #include "Latite.h"
@@ -82,80 +81,6 @@ namespace {
         DWORD fdwReason;
         LPVOID reserved;
     };
-
-    constexpr bool isDigit(char ch) {
-        return ch >= '0' && ch <= '9';
-    }
-
-    constexpr int parseFixedNumber(std::string_view text, bool allowSpaces = false) {
-        int value = 0;
-        bool foundDigit = false;
-
-        for (char ch : text) {
-            if (allowSpaces && ch == ' ') {
-                continue;
-            }
-
-            if (!isDigit(ch)) {
-                return 0;
-            }
-
-            value = (value * 10) + (ch - '0');
-            foundDigit = true;
-        }
-
-        return foundDigit ? value : 0;
-    }
-
-    constexpr int parseCompileMonth(std::string_view month) {
-        constexpr std::array<std::string_view, 12> months{
-            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-        };
-
-        for (std::size_t index = 0; index < months.size(); ++index) {
-            if (month == months[index]) {
-                return static_cast<int>(index + 1);
-            }
-        }
-
-        return 0;
-    }
-
-    constexpr bool isCompileTime(std::string_view time) {
-        return time.size() == 8 &&
-            isDigit(time[0]) &&
-            isDigit(time[1]) &&
-            time[2] == ':' &&
-            isDigit(time[3]) &&
-            isDigit(time[4]) &&
-            time[5] == ':' &&
-            isDigit(time[6]) &&
-            isDigit(time[7]);
-    }
-
-    std::string getCompilerTimestamp() {
-        constexpr std::string_view compileDate = __DATE__;
-        constexpr std::string_view compileTime = __TIME__;
-
-        constexpr int month = parseCompileMonth(compileDate.substr(0, 3));
-        constexpr int day = parseFixedNumber(compileDate.substr(4, 2), true);
-        constexpr int year = parseFixedNumber(compileDate.substr(7, 4));
-
-        if constexpr (month == 0 || day == 0 || year == 0 || !isCompileTime(compileTime)) {
-            return "unknown";
-        }
-
-        return std::format(
-            "{:04}{:02}{:02}-{}{}{}",
-            year,
-            month,
-            day,
-            compileTime.substr(0, 2),
-            compileTime.substr(3, 2),
-            compileTime.substr(6, 2)
-        );
-    }
 
 }
 
@@ -673,7 +598,7 @@ std::string Latite::getBuildTimestamp() {
 #if defined(LATITE_BUILD_TIMESTAMP)
     return LATITE_BUILD_TIMESTAMP;
 #else
-    return getCompilerTimestamp();
+    return "unknown";
 #endif
 }
 

@@ -47,7 +47,7 @@ jobs:
         id: build_timestamp
         shell: bash
         run: |
-          TS=$(date -u +"%Y%m%d-%H%M%S")
+          TS=$(date -u +"%Y-%m-%d_%H-%M-%SZ")
           echo "TIMESTAMP=$TS" >> "$GITHUB_ENV"
           echo "timestamp=$TS" >> "$GITHUB_OUTPUT"
 
@@ -65,6 +65,16 @@ jobs:
       - name: Build with Ninja
         run: |
           cmake --build ${{ env.BUILD_DIR }}
+
+      - name: Verify UTC build timestamp in DLL
+        shell: pwsh
+        run: |
+          $dllPath = "${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteDebug.dll"
+          $expected = "${{ steps.build_timestamp.outputs.timestamp }}"
+          $contents = [Text.Encoding]::ASCII.GetString([IO.File]::ReadAllBytes($dllPath))
+          if (-not $contents.Contains($expected)) {
+            throw "Expected UTC build timestamp '$expected' was not embedded in $dllPath"
+          }
 
       # P.S. Artifacts are retained for only 90 days.
       - name: Upload build artifacts
