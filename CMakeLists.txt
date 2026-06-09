@@ -2,15 +2,12 @@
 
 project(Latite)
 
-set(LATITE_BUILD_TIMESTAMP "" CACHE STRING "Latite build timestamp in YYYY-MM-DD_HH-mm-ssZ UTC format")
-if (NOT LATITE_BUILD_TIMESTAMP)
-    string(TIMESTAMP LATITE_BUILD_TIMESTAMP "%Y-%m-%d_%H-%M-%SZ" UTC)
-endif ()
-
-if (NOT LATITE_BUILD_TIMESTAMP MATCHES
+set(LATITE_BUILD_TIMESTAMP "" CACHE STRING
+        "Optional fixed Latite build timestamp in YYYY-MM-DD_HH-mm-ssZ UTC format")
+if (LATITE_BUILD_TIMESTAMP AND NOT LATITE_BUILD_TIMESTAMP MATCHES
         "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9]-[0-9][0-9]-[0-9][0-9]Z$")
     message(FATAL_ERROR
-            "LATITE_BUILD_TIMESTAMP must use YYYY-MM-DD_HH-mm-ssZ UTC format; got '${LATITE_BUILD_TIMESTAMP}'")
+            "LATITE_BUILD_TIMESTAMP must use YYYY-MM-DD_HH-mm-ssZ UTC+0 format; got '${LATITE_BUILD_TIMESTAMP}'")
 endif ()
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo;MinSizeRel;Nightly" CACHE STRING "" FORCE)
@@ -74,10 +71,26 @@ file(GLOB_RECURSE RESOURCE_FILES
 
 add_resources(EMBEDDED_RESOURCES ${RESOURCE_FILES})
 
+set(LATITE_BUILD_TIMESTAMP_SOURCE
+        "${PROJECT_BINARY_DIR}/generated/LatiteBuildTimestamp.cpp")
+set_source_files_properties("${LATITE_BUILD_TIMESTAMP_SOURCE}" PROPERTIES GENERATED TRUE)
+
+add_custom_target(LatiteBuildTimestampGenerator
+        COMMAND ${CMAKE_COMMAND}
+        "-DLATITE_BUILD_TIMESTAMP=${LATITE_BUILD_TIMESTAMP}"
+        "-DOUTPUT_FILE=${LATITE_BUILD_TIMESTAMP_SOURCE}"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateBuildTimestamp.cmake"
+        BYPRODUCTS "${LATITE_BUILD_TIMESTAMP_SOURCE}"
+        COMMENT "Refreshing Latite UTC build timestamp"
+        VERBATIM
+)
+
 add_library(Latite SHARED
         ${Latite_SRC}
         ${EMBEDDED_RESOURCES}
+        "${LATITE_BUILD_TIMESTAMP_SOURCE}"
 )
+add_dependencies(Latite LatiteBuildTimestampGenerator)
 
 # Final artifact names. Keep these in CMake so the DLL CodeView record and
 # linker-generated PDB name agree, **do not rename the DLL/PDB after linking!!**
@@ -101,7 +114,6 @@ target_compile_definitions(Latite PRIVATE
         _UNICODE
         UNICODE
         _HAS_STATIC_RTTI=0
-        LATITE_BUILD_TIMESTAMP=\"${LATITE_BUILD_TIMESTAMP}\"
 
         $<$<CONFIG:Debug>:LATITE_DEBUG>
         $<$<CONFIG:Debug>:LATITE_CRASH_REPORTING>

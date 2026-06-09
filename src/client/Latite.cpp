@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "Latite.h"
+#include "BuildTimestamp.h"
 #include "localization/LocalizeString.h"
 
 #include "client/screen/TextBox.h"
@@ -598,7 +599,7 @@ std::string Latite::getBuildTimestamp() {
 #if defined(LATITE_BUILD_TIMESTAMP)
     return LATITE_BUILD_TIMESTAMP;
 #else
-    return "unknown";
+    return LatiteBuild::getTimestamp();
 #endif
 }
 
