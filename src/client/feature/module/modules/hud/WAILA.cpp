@@ -17,10 +17,10 @@ namespace {
 	constexpr float textGap = 11.f;
 	constexpr float titleTextScale = 0.88f;
 	constexpr float detailTextScale = 0.86f;
-	constexpr int maxHearts = 10;
+	constexpr int heartsPerRow = 10;
 	constexpr float heartSize = 18.f;
-	constexpr float heartStride = 16.f;
-	constexpr float heartRowWidth = heartSize + (heartStride * (maxHearts - 1));
+	constexpr float heartStride = heartSize;
+	constexpr float heartRowStride = heartSize;
 	constexpr float borderTextureBaseWidth = 16.f;
 	constexpr float borderTextureBaseHeight = 16.f;
 	constexpr float borderTextureSliceSize = 4.f;
@@ -423,10 +423,11 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 
 	float titleSize = std::get<FloatValue>(textSize).value * titleTextScale;
 	float detailSize = titleSize * detailTextScale;
-	float healthHeight = target->type == TargetType::Entity && target->health >= 0.f && std::get<BoolValue>(showHealth).
-	                     value
-		                     ? heartSize
-		                     : 0.f;
+	bool showTargetHealth = target->type == TargetType::Entity && target->health >= 0.f &&
+	                        std::get<BoolValue>(showHealth).value;
+	int targetMaxHearts = target->maxHealth > 0.f ? static_cast<int>(std::ceil(target->maxHealth / 2.f)) : heartsPerRow;
+	int heartRows = showTargetHealth ? (targetMaxHearts + heartsPerRow - 1) / heartsPerRow : 0;
+	float healthHeight = heartRows > 0 ? heartSize + (heartRowStride * (heartRows - 1)) : 0.f;
 
 	std::wstring plainTitle = util::StripMinecraftFormatting(target->title);
 	std::wstring plainDetail = util::StripMinecraftFormatting(target->detail);
@@ -442,7 +443,9 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 
 	float textWidth = std::max(titleTextSize.x, detailTextSize.x);
 	if (healthHeight > 0.f) {
-		textWidth = std::max(textWidth, heartRowWidth);
+		int heartsInWidestRow = std::min(targetMaxHearts, heartsPerRow);
+		float healthWidth = heartSize + (heartStride * (heartsInWidestRow - 1));
+		textWidth = std::max(textWidth, healthWidth);
 	}
 	float contentWidth = iconSize + textGap + textWidth;
 	float width = std::max(defaultWidth, contentWidth + (paddingX * 2.f));
@@ -478,7 +481,7 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 	float heartRowOffsetX = -1.5f;
 	float heartRowOffsetY = 2.f;
 	if (healthHeight > 0.f) {
-		drawHealthHearts(dc, textLeft + heartRowOffsetX, y + heartRowOffsetY, target->health);
+		drawHealthHearts(dc, textLeft + heartRowOffsetX, y + heartRowOffsetY, target->health, target->maxHealth);
 		y += healthHeight;
 	}
 
@@ -663,8 +666,14 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor *actor, float d
 	}
 
 	float health = -1.f;
+	float maxHealth = -1.f;
 	if (std::get<BoolValue>(showHealth).value && actor->getHealth() != std::nullopt && !actor->isItem()) {
 		health = actor->getHealth().value();
+		if (actor->getMaxHealth() != std::nullopt) {
+			maxHealth = actor->getMaxHealth().value();
+		} else {
+			maxHealth = 20.0f;
+		}
 	}
 
 	return TargetInfo {
@@ -677,6 +686,7 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor *actor, float d
 		.faceUvPos = faceUvPos,
 		.faceUvSize = faceUvSize,
 		.health = health,
+		.maxHealth = maxHealth,
 	};
 }
 
@@ -711,10 +721,17 @@ std::string WAILA::getPlayerFaceTexturePath(SDK::Player *player) {
 	return {};
 }
 
-void WAILA::drawHealthHearts(DrawUtil &dc, float x, float y, float health) {
+void WAILA::drawHealthHearts(DrawUtil &dc, float x, float y, float health, float maxHealth) {
+	int maxHearts = maxHealth > 0 ? static_cast<int>(std::ceil(maxHealth / 2.f)) : heartsPerRow;
 	int halfHearts = std::clamp(static_cast<int>(std::ceil(health)), 0, maxHearts * 2);
 	int filledHearts = halfHearts / 2;
 	bool hasHalfHeart = (halfHearts % 2) != 0;
+	auto getHeartPosition = [x, y](int index) {
+		return Vec2 {
+			x + ((index % heartsPerRow) * heartStride),
+			y + ((index / heartsPerRow) * heartRowStride),
+		};
+	};
 
 	auto &mc = static_cast<MCDrawUtil &>(dc);
 	if (mc.renderCtx) {
@@ -733,8 +750,9 @@ void WAILA::drawHealthHearts(DrawUtil &dc, float x, float y, float health) {
 
 		if (backgroundTexture.textureData && heartTexture.textureData && halfHeartTexture.textureData) {
 			for (int i = 0; i < maxHearts; ++i) {
+				Vec2 position = getHeartPosition(i);
 				mc.renderCtx->drawImage(backgroundTexture,
-				                        { (x + (i * heartStride)) * mc.guiScale, y * mc.guiScale },
+				                        { position.x * mc.guiScale, position.y * mc.guiScale },
 				                        { heartSize * mc.guiScale, heartSize * mc.guiScale },
 				                        { 0.f, 0.f },
 				                        { 1.f, 1.f });
@@ -743,8 +761,9 @@ void WAILA::drawHealthHearts(DrawUtil &dc, float x, float y, float health) {
 
 			if (filledHearts > 0) {
 				for (int i = 0; i < filledHearts; ++i) {
+					Vec2 position = getHeartPosition(i);
 					mc.renderCtx->drawImage(heartTexture,
-					                        { (x + (i * heartStride)) * mc.guiScale, y * mc.guiScale },
+					                        { position.x * mc.guiScale, position.y * mc.guiScale },
 					                        { heartSize * mc.guiScale, heartSize * mc.guiScale },
 					                        { 0.f, 0.f },
 					                        { 1.f, 1.f });
@@ -753,8 +772,9 @@ void WAILA::drawHealthHearts(DrawUtil &dc, float x, float y, float health) {
 			}
 
 			if (hasHalfHeart && filledHearts < maxHearts) {
+				Vec2 position = getHeartPosition(filledHearts);
 				mc.renderCtx->drawImage(halfHeartTexture,
-				                        { (x + (filledHearts * heartStride)) * mc.guiScale, y * mc.guiScale },
+				                        { position.x * mc.guiScale, position.y * mc.guiScale },
 				                        { heartSize * mc.guiScale, heartSize * mc.guiScale },
 				                        { 0.f, 0.f },
 				                        { 1.f, 1.f });
@@ -766,11 +786,12 @@ void WAILA::drawHealthHearts(DrawUtil &dc, float x, float y, float health) {
 	}
 
 	for (int i = 0; i < maxHearts; ++i) {
+		Vec2 position = getHeartPosition(i);
 		d2d::Rect heart {
-			x + (i * heartStride),
-			y,
-			x + (i * heartStride) + heartSize,
-			y + heartSize,
+			position.x,
+			position.y,
+			position.x + heartSize,
+			position.y + heartSize,
 		};
 
 		dc.fillRectangle(heart, d2d::Color::RGB(74, 40, 45, 150));

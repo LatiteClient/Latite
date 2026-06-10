@@ -121,6 +121,13 @@ std::optional<float> SDK::Actor::getHealth() {
 	return attrib->value;
 }
 
+std::optional<float> SDK::Actor::getMaxHealth() {
+	auto attrib = getAttribute(SDK::Attributes::Health);
+	if (!attrib)
+		return std::nullopt;
+	return attrib->maxValue;
+}
+
 std::optional<float> SDK::Actor::getHunger() {
 	auto attrib = getAttribute(SDK::Attributes::Hunger);
 	if (!attrib)

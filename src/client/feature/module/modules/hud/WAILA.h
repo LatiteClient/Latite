@@ -29,6 +29,7 @@ private:
 		Vec2 faceUvPos{};
 		Vec2 faceUvSize{ 1.f, 1.f };
 		float health = -1.f;
+		float maxHealth = -1.f;
 	};
 
 	ValueType showBlocks = BoolValue(true);
@@ -48,6 +49,6 @@ private:
 	std::optional<TargetInfo> getEntityInfo(SDK::Actor* actor, float distance);
 	std::string getPlayerFaceTexturePath(SDK::Player* player);
 
-	void drawHealthHearts(DrawUtil& dc, float x, float y, float health);
+	void drawHealthHearts(DrawUtil& dc, float x, float y, float health, float maxHealth);
 	void drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::Rect const& icon);
 };

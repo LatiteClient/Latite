@@ -53,6 +53,7 @@ namespace SDK {
 		struct AttributesComponent* getAttributesComponent();
 		class AttributeInstance* getAttribute(class Attribute& attribute);
 		std::optional<float> getHealth();
+		std::optional<float> getMaxHealth();
 		std::optional<float> getHunger();
 		std::optional<float> getSaturation();
 		bool isInvisible();
