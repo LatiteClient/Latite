@@ -12,6 +12,8 @@ namespace {
 	constexpr float defaultWidth = 347.f;
 	constexpr float defaultHeight = 109.f;
 	constexpr float iconSize = 72.f;
+	constexpr float toolIconSize = 36.f;
+	constexpr float toolIconGap = 6.f;
 	constexpr float paddingX = 7.f;
 	constexpr float paddingY = 6.f;
 	constexpr float textGap = 11.f;
@@ -388,6 +390,8 @@ WAILA::WAILA() : HUDModule("WAILA", L"WAILA", L"Shows the block or entity you ar
 	addSetting("showCoordinates", L"Coordinates", L"Show target block coordinates.", showCoordinates,
 	           "showBlocks"_istrue);
 	addSetting("showDistance", L"Distance", L"Show distance to the target.", showDistance);
+	addSetting("showHarvest", L"Tool Info", L"Show the preferred tool for the targeted block.",
+	           showHarvest, "showBlocks"_istrue);
 	addSetting("showHealth", L"Health", L"Show health pips for living entities.", showHealth, "showEntities"_istrue);
 	addSliderSetting("entityDistance", L"Entity Distance", L"Maximum entity inspection distance.", entityDistance,
 	                 FloatValue(2.f), FloatValue(12.f), FloatValue(0.5f), "showEntities"_istrue);
@@ -442,12 +446,14 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 	}
 
 	float textWidth = std::max(titleTextSize.x, detailTextSize.x);
+	bool showToolIcon = target->type == TargetType::Block && !target->toolItemId.empty();
 	if (healthHeight > 0.f) {
 		int heartsInWidestRow = std::min(targetMaxHearts, heartsPerRow);
 		float healthWidth = heartSize + (heartStride * (heartsInWidestRow - 1));
 		textWidth = std::max(textWidth, healthWidth);
 	}
-	float contentWidth = iconSize + textGap + textWidth;
+	float contentWidth = iconSize + textGap + textWidth +
+	                     (showToolIcon ? toolIconGap + toolIconSize : 0.f);
 	float width = std::max(defaultWidth, contentWidth + (paddingX * 2.f));
 	float textHeight = titleTextSize.y + detailTextSize.y + healthHeight;
 	float height = std::max(defaultHeight, std::max(iconSize, textHeight) + (paddingY * 2.f));
@@ -472,8 +478,9 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 	drawTargetIcon(dc, *target, icon);
 
 	float textLeft = paddingX + iconSize + textGap;
+	float textRight = width - paddingX - (showToolIcon ? toolIconGap + toolIconSize : 0.f);
 	float y = paddingY + std::max(0.f, (height - (paddingY * 2.f) - textHeight) * 0.5f);
-	dc.drawText({ textLeft, y - 1.f, width - paddingX, y + titleTextSize.y + 2.f }, target->title, title,
+	dc.drawText({ textLeft, y - 1.f, textRight, y + titleTextSize.y + 2.f }, target->title, title,
 	            Renderer::FontSelection::SecondaryLight, titleSize, DWRITE_TEXT_ALIGNMENT_LEADING,
 	            DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
 	y += titleTextSize.y;
@@ -486,9 +493,55 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 	}
 
 	if (!target->detail.empty()) {
-		dc.drawText({ textLeft, y + 1.f, width - paddingX, height - paddingY }, target->detail, detail,
+		dc.drawText({ textLeft, y + 1.f, textRight, height - paddingY }, target->detail, detail,
 		            Renderer::FontSelection::SecondaryLight, detailSize, DWRITE_TEXT_ALIGNMENT_LEADING,
 		            DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
+	}
+
+	if (showToolIcon && dc.isMinecraft() && Signatures::ItemStack_ItemStackBlock.result &&
+	    Signatures::ItemStackBase_destructor.result) {
+		auto clientInstance = SDK::ClientInstance::get();
+		auto level = clientInstance && clientInstance->minecraft ? clientInstance->minecraft->getLevel() : nullptr;
+		auto registry = level
+			                ? *reinterpret_cast<void **>(reinterpret_cast<uintptr_t>(level) + 0x198)
+			                : nullptr;
+		void *toolCounter = nullptr;
+		if (registry) {
+			auto itemCounters = reinterpret_cast<void ***>(reinterpret_cast<uintptr_t>(registry) + 0x30);
+			for (auto current = itemCounters[0]; current && current < itemCounters[1]; ++current) {
+				auto counter = *current;
+				auto item = counter ? *reinterpret_cast<SDK::Item **>(counter) : nullptr;
+				if (item && item->namespacedId.getString() == target->toolItemId) {
+					toolCounter = counter;
+					break;
+				}
+			}
+		}
+
+		if (toolCounter && target->block) {
+			alignas(SDK::ItemStack) char storage[sizeof(SDK::ItemStack)] = {};
+			auto toolStack = SDK::ItemStack::constructFromBlock(storage, *target->block, 1, nullptr);
+			if (toolStack) {
+				auto originalItem = toolStack->item;
+				auto originalBlock = toolStack->block;
+				auto originalAux = toolStack->aux;
+				toolStack->item = reinterpret_cast<SDK::Item **>(toolCounter);
+				toolStack->block = nullptr;
+				toolStack->aux = 0;
+				toolStack->itemCount = 1;
+
+				auto &mc = static_cast<MCDrawUtil &>(dc);
+				mc.drawItem(toolStack, {
+					            width - paddingX - toolIconSize,
+					            height - paddingY - toolIconSize,
+				            }, toolIconSize / 48.f, 1.f);
+
+				toolStack->item = originalItem;
+				toolStack->block = originalBlock;
+				toolStack->aux = originalAux;
+				toolStack->destruct();
+			}
+		}
 	}
 
 	dc.flush();
@@ -564,6 +617,51 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult *hit) {
 		std::wstringstream ss;
 		ss << "\n" << std::fixed << std::setprecision(1) << hit->start.distance(hit->hitPos) << L"m";
 		detail += ss.str();
+	}
+	if (std::get<BoolValue>(showHarvest).value) {
+		auto containsAny = [&](std::initializer_list<std::string_view> needles) {
+			return std::ranges::any_of(needles, [&](std::string_view needle) {
+				return namespacedId.find(needle) != std::string::npos;
+			});
+		};
+		std::string toolItemId;
+		if (containsAny({ "leaves", "leaf_litter" })) {
+			toolItemId = "minecraft:shears";
+		} else if (containsAny({ "cobweb" })) {
+			toolItemId = "minecraft:shears";
+		} else if (containsAny({ "wool", "vine", "lichen", "web", "tripwire" })) {
+			toolItemId = "minecraft:shears";
+		} else if (containsAny({
+			           "_log", "_wood", "stem", "hyphae", "planks", "bookshelf", "chest", "barrel",
+			           "crafting_table", "fence", "wooden_", "bamboo", "pumpkin", "melon",
+		           })) {
+			toolItemId = "minecraft:wooden_axe";
+		} else if (containsAny({
+			           "dirt", "grass_block", "sand", "gravel", "clay", "snow", "soul_sand", "soul_soil", "mud",
+			           "mycelium", "podzol", "path",
+		           })) {
+			toolItemId = "minecraft:wooden_shovel";
+		} else if (containsAny({
+			           "hay_block", "wart_block", "sponge", "sculk", "moss", "shroomlight", "target",
+		           })) {
+			toolItemId = "minecraft:wooden_hoe";
+		} else if (containsAny({
+			           "stone", "ore", "deepslate", "cobble", "brick", "concrete", "terracotta", "obsidian", "anvil",
+			           "furnace", "rail", "copper", "iron", "gold", "diamond", "emerald", "lapis", "redstone",
+			           "quartz", "prismarine", "basalt", "blackstone", "netherrack", "end_stone", "dripstone",
+			           "tuff", "calcite", "amethyst",
+		           })) {
+			toolItemId = "minecraft:wooden_pickaxe";
+		}
+
+		return TargetInfo {
+			.type = TargetType::Block,
+			.title = titleCaseIdentifier(nameSource),
+			.detail = detail,
+			.block = block,
+			.toolItemId = std::move(toolItemId),
+			.health = -1.f,
+		};
 	}
 
 	return TargetInfo {
