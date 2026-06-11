@@ -11,25 +11,27 @@
 #include "client/misc/PlayerHeadCache.h"
 
 namespace {
-	constexpr float defaultWidth = 347.f;
-	constexpr float defaultHeight = 109.f;
-	constexpr float iconSize = 72.f;
-	constexpr float toolIconSize = 36.f;
+	constexpr float defaultWidth = 252.f;
+	constexpr float defaultHeight = 81.f;
+	constexpr float iconSlotSize = 54.f;
+	constexpr float iconSize = 48.f;
+	constexpr float iconInset = (iconSlotSize - iconSize) * 0.5f;
+	constexpr float actorIconScale = iconSlotSize / iconSize;
+	constexpr float toolIconSize = 30.f;
 	constexpr float toolIconGap = 6.f;
-	constexpr float toolIconSpacing = 2.f;
+	constexpr float toolIconSpacing = 3.f;
 	constexpr float toolSpeedEpsilon = 0.0001f;
-	constexpr float paddingX = 7.f;
-	constexpr float paddingY = 6.f;
-	constexpr float textGap = 11.f;
-	constexpr float titleTextScale = 0.88f;
-	constexpr float detailTextScale = 0.86f;
+	constexpr float paddingX = 12.f;
+	constexpr float paddingY = 12.f;
+	constexpr float textGap = 9.f;
+	constexpr float lineGap = 3.f;
+	constexpr float titleTextScale = 0.78f;
+	constexpr float detailTextScale = 0.92f;
 	constexpr int heartsPerRow = 10;
 	constexpr float heartSize = 18.f;
 	constexpr float heartStride = heartSize;
 	constexpr float heartRowStride = heartSize;
-	constexpr float borderTextureBaseWidth = 16.f;
-	constexpr float borderTextureBaseHeight = 16.f;
-	constexpr float borderTextureSliceSize = 4.f;
+	constexpr float frameUnit = 3.f;
 	constexpr Vec2 skinFaceUvPos { 0.125f, 0.125f };
 	constexpr Vec2 skinFaceUvSize { 0.125f, 0.125f };
 
@@ -148,159 +150,58 @@ namespace {
 		return bestItemIds;
 	}
 
-	SDK::ImageInfo makeBorderSlice(float x, float y, float w, float h, float u, float v, float uw, float vh) {
-		return SDK::ImageInfo {
-			.position = { x, y },
-			.size = { w, h },
-			.uv = { u, v },
-			.uvSize = { uw, vh },
-		};
-	}
-
-	template<typename SnapXToGuiPixel, typename SnapYToGuiPixel>
-	void addTiledBorderSlices(std::vector<SDK::ImageInfo> &slices, float x, float y, float w, float h, float u, float v,
-	                          float uw, float vh, float guiScale, SnapXToGuiPixel const &snapGuiXToGuiPixel,
-	                          SnapYToGuiPixel const &snapGuiYToGuiPixel) {
-		float tileW = uw * guiScale;
-		float tileH = vh * guiScale;
-		if (w <= 0.f || h <= 0.f || tileW <= 0.f || tileH <= 0.f) return;
-
-		float y0 = y;
-		for (float yOffset = 0.f; yOffset < h - 0.001f;) {
-			float nextYOffset = std::min(yOffset + tileH, h);
-			float y1 = nextYOffset >= h - 0.001f ? y + h : snapGuiYToGuiPixel(y + nextYOffset);
-			y1 = std::clamp(y1, y0, y + h);
-			if (y1 <= y0 + 0.001f) y1 = std::min(y + h, std::max(y0, y + nextYOffset));
-			if (y1 <= y0 + 0.001f) {
-				yOffset = nextYOffset;
-				continue;
-			}
-
-			float pieceH = y1 - y0;
-			float sourceH = std::min(vh, pieceH / guiScale);
-
-			float x0 = x;
-			for (float xOffset = 0.f; xOffset < w - 0.001f;) {
-				float nextXOffset = std::min(xOffset + tileW, w);
-				float x1 = nextXOffset >= w - 0.001f ? x + w : snapGuiXToGuiPixel(x + nextXOffset);
-				x1 = std::clamp(x1, x0, x + w);
-				if (x1 <= x0 + 0.001f) x1 = std::min(x + w, std::max(x0, x + nextXOffset));
-				if (x1 <= x0 + 0.001f) {
-					xOffset = nextXOffset;
-					continue;
-				}
-
-				float pieceW = x1 - x0;
-				float sourceW = std::min(uw, pieceW / guiScale);
-				if (pieceW > 0.f && pieceH > 0.f && sourceW > 0.f && sourceH > 0.f) {
-					slices.push_back(makeBorderSlice(x0, y0, pieceW, pieceH, u, v, sourceW, sourceH));
-				}
-
-				x0 = x1;
-				xOffset = nextXOffset;
-			}
-
-			y0 = y1;
-			yOffset = nextYOffset;
-		}
-	}
-
-	bool drawPurpleBorderBackground(DrawUtil &dc, d2d::Rect const &bounds) {
-		if (!dc.isMinecraft()) return false;
-
+	void drawInspectorPanel(DrawUtil &dc, d2d::Rect const &bounds) {
 		auto &mc = static_cast<MCDrawUtil &>(dc);
-		if (!mc.renderCtx) return false;
+		if (!mc.renderCtx) return;
 
-		SDK::TexturePtr texture {};
-		mc.renderCtx->getTexture(
-			&texture, SDK::ResourceLocation("textures/ui/purpleBorder", SDK::ResourceFileSystem::UserPackage), false);
-		if (!texture.textureData) return false;
-
-		auto transform = mc.scn->matrix->matrixStack.empty()
-			                 ? glm::mat4 { 1.f }
-			                 : mc.scn->matrix->matrixStack.top();
-		float matrixScaleX = std::abs(transform[0][0]) > 0.001f ? transform[0][0] : 1.f;
-		float matrixScaleY = std::abs(transform[1][1]) > 0.001f ? transform[1][1] : 1.f;
-		auto snapXToGuiPixel = [&](float localX) {
-			float screenX = transform[3][0] + (localX * mc.guiScale * matrixScaleX);
-			return (std::round(screenX / mc.guiScale) * mc.guiScale - transform[3][0]) / matrixScaleX;
-		};
-		auto snapYToGuiPixel = [&](float localY) {
-			float screenY = transform[3][1] + (localY * mc.guiScale * matrixScaleY);
-			return (std::round(screenY / mc.guiScale) * mc.guiScale - transform[3][1]) / matrixScaleY;
-		};
-		auto snapGuiXToGuiPixel = [&](float localX) {
-			float screenX = transform[3][0] + (localX * matrixScaleX);
-			return (std::round(screenX / mc.guiScale) * mc.guiScale - transform[3][0]) / matrixScaleX;
-		};
-		auto snapGuiYToGuiPixel = [&](float localY) {
-			float screenY = transform[3][1] + (localY * matrixScaleY);
-			return (std::round(screenY / mc.guiScale) * mc.guiScale - transform[3][1]) / matrixScaleY;
+		const auto background = d2d::Color::RGB(0x12, 0x0B, 0x16, 218);
+		const d2d::Color borderTones[] = {
+			d2d::Color::RGB(0x59, 0x20, 0x83, 238),
+			d2d::Color::RGB(0x56, 0x23, 0x7F, 238),
+			d2d::Color::RGB(0x52, 0x25, 0x7B, 238),
+			d2d::Color::RGB(0x4E, 0x26, 0x76, 238),
+			d2d::Color::RGB(0x4A, 0x25, 0x71, 238),
+			d2d::Color::RGB(0x46, 0x23, 0x6C, 238),
+			d2d::Color::RGB(0x42, 0x20, 0x67, 238),
+			d2d::Color::RGB(0x3E, 0x1D, 0x62, 238),
 		};
 
-		float left = snapXToGuiPixel(bounds.left);
-		float top = snapYToGuiPixel(bounds.top);
-		float right = snapXToGuiPixel(bounds.right);
-		float bottom = snapYToGuiPixel(bounds.bottom);
-		if (right <= left || bottom <= top) return false;
+		float left = bounds.left;
+		float top = bounds.top;
+		float right = bounds.right;
+		float bottom = bounds.bottom;
+		if (right - left <= frameUnit * 4.f || bottom - top <= frameUnit * 4.f) return;
 
-		auto sliceX = std::min(borderTextureSliceSize * mc.guiScale, (right - left) * 0.5f);
-		auto sliceY = std::min(borderTextureSliceSize * mc.guiScale, (bottom - top) * 0.5f);
-		float centerX = left + sliceX;
-		float centerY = top + sliceY;
-		float centerWidth = std::max(0.f, (right - left) - (sliceX * 2.f));
-		float centerHeight = std::max(0.f, (bottom - top) - (sliceY * 2.f));
-		float rightX = right - sliceX;
-		float bottomY = bottom - sliceY;
-		float sourceCenterSize = borderTextureBaseWidth - (borderTextureSliceSize * 2.f);
+		// Deferred UI meshes must be resolved before the item renderer changes render state.
+		mc.flush(false);
+		mc.setImmediate(true);
 
-		std::vector<SDK::ImageInfo> topSlices;
-		std::vector<SDK::ImageInfo> leftSlices;
-		std::vector<SDK::ImageInfo> middleSlices;
-		std::vector<SDK::ImageInfo> rightSlices;
-		std::vector<SDK::ImageInfo> bottomSlices;
+		// Leave a single frame unit open at each outer corner.
+		mc.fillRectangle({ left + frameUnit, top, right - frameUnit, bottom }, background);
+		mc.fillRectangle({ left, top + frameUnit, left + frameUnit, bottom - frameUnit }, background);
+		mc.fillRectangle({ right - frameUnit, top + frameUnit, right, bottom - frameUnit }, background);
 
-		addTiledBorderSlices(topSlices, centerX, top, centerWidth, sliceY, borderTextureSliceSize, 0.f,
-		                     sourceCenterSize,
-		                     borderTextureSliceSize, mc.guiScale, snapGuiXToGuiPixel, snapGuiYToGuiPixel);
-		addTiledBorderSlices(leftSlices, left, centerY, sliceX, centerHeight, 0.f, borderTextureSliceSize,
-		                     borderTextureSliceSize,
-		                     sourceCenterSize, mc.guiScale, snapGuiXToGuiPixel, snapGuiYToGuiPixel);
-		addTiledBorderSlices(middleSlices, centerX, centerY, centerWidth, centerHeight, borderTextureSliceSize,
-		                     borderTextureSliceSize, sourceCenterSize, sourceCenterSize, mc.guiScale,
-		                     snapGuiXToGuiPixel, snapGuiYToGuiPixel);
-		addTiledBorderSlices(rightSlices, rightX, centerY, sliceX, centerHeight,
-		                     borderTextureBaseWidth - borderTextureSliceSize,
-		                     borderTextureSliceSize, borderTextureSliceSize, sourceCenterSize, mc.guiScale,
-		                     snapGuiXToGuiPixel, snapGuiYToGuiPixel);
-		addTiledBorderSlices(bottomSlices, centerX, bottomY, centerWidth, sliceY, borderTextureSliceSize,
-		                     borderTextureBaseHeight - borderTextureSliceSize, sourceCenterSize, borderTextureSliceSize,
-		                     mc.guiScale,
-		                     snapGuiXToGuiPixel, snapGuiYToGuiPixel);
+		float borderLeft = left + frameUnit;
+		float borderTopY = top + frameUnit;
+		float borderRight = right - frameUnit;
+		float borderBottomY = bottom - frameUnit;
+		float sideTop = borderTopY + frameUnit;
+		float sideBottom = borderBottomY - frameUnit;
+		float toneHeight = (sideBottom - sideTop) / static_cast<float>(std::size(borderTones));
 
-		SDK::NinesliceInfo info {};
-		info.topLeft = makeBorderSlice(left, top, sliceX, sliceY, 0.f, 0.f, borderTextureSliceSize,
-		                               borderTextureSliceSize);
-		info.topRight = makeBorderSlice(rightX, top, sliceX, sliceY, borderTextureBaseWidth - borderTextureSliceSize,
-		                                0.f,
-		                                borderTextureSliceSize, borderTextureSliceSize);
-		info.bottomLeft = makeBorderSlice(left, bottomY, sliceX, sliceY, 0.f,
-		                                  borderTextureBaseHeight - borderTextureSliceSize,
-		                                  borderTextureSliceSize, borderTextureSliceSize);
-		info.bottomRight = makeBorderSlice(rightX, bottomY, sliceX, sliceY,
-		                                   borderTextureBaseWidth - borderTextureSliceSize,
-		                                   borderTextureBaseHeight - borderTextureSliceSize, borderTextureSliceSize,
-		                                   borderTextureSliceSize);
-		info.uvScale = { 1.f / borderTextureBaseWidth, 1.f / borderTextureBaseHeight };
-		info.top.set(topSlices.data(), topSlices.size());
-		info.left.set(leftSlices.data(), leftSlices.size());
-		info.middle.set(middleSlices.data(), middleSlices.size());
-		info.right.set(rightSlices.data(), rightSlices.size());
-		info.bottom.set(bottomSlices.data(), bottomSlices.size());
+		mc.fillRectangle({ borderLeft, borderTopY, borderRight, borderTopY + frameUnit }, borderTones[0]);
+		for (size_t i = 0; i < std::size(borderTones); ++i) {
+			float toneTop = sideTop + (toneHeight * static_cast<float>(i));
+			float toneBottom = i + 1 == std::size(borderTones)
+				                   ? sideBottom
+				                   : sideTop + (toneHeight * static_cast<float>(i + 1));
+			mc.fillRectangle({ borderLeft, toneTop, borderLeft + frameUnit, toneBottom }, borderTones[i]);
+			mc.fillRectangle({ borderRight - frameUnit, toneTop, borderRight, toneBottom }, borderTones[i]);
+		}
+		mc.fillRectangle({ borderLeft, borderBottomY - frameUnit, borderRight, borderBottomY },
+		                 borderTones[std::size(borderTones) - 1]);
 
-		mc.renderCtx->drawNineslice(texture, info);
-		mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
-		return true;
+		mc.setImmediate(false);
 	}
 
 	std::wstring titleCaseIdentifier(std::string id) {
@@ -503,9 +404,13 @@ namespace {
 }
 
 WAILA::WAILA() : HUDModule("WAILA", L"WAILA", L"Shows the block or entity you are looking at.", HUD) {
+	showPreview = false;
+
 	addSetting("showBlocks", L"Blocks", L"Show block information.", showBlocks);
 	addSetting("showEntities", L"Entities", L"Show entity information.", showEntities);
 	addSetting("showNamespace", L"Namespace", L"Show the source namespace or mod id.", showNamespace);
+	addSetting("showItemId", L"Item ID", L"Show the full namespaced block or item id.", showItemId,
+	           "showNamespace"_istrue);
 	addSetting("showCoordinates", L"Coordinates", L"Show target block coordinates.", showCoordinates,
 	           "showBlocks"_istrue);
 	addSetting("showDistance", L"Distance", L"Show distance to the target.", showDistance);
@@ -547,11 +452,14 @@ void WAILA::afterLoadConfig() {
 }
 
 void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
+	if (!dc.isMinecraft()) return;
+
 	std::optional<TargetInfo> target = getTargetInfo(isDefault || inEditor);
 	if (!target.has_value()) return;
 
 	float titleSize = std::get<FloatValue>(textSize).value * titleTextScale;
 	float detailSize = titleSize * detailTextScale;
+	bool hasDetail = !target->detail.empty();
 	bool showTargetHealth = target->type == TargetType::Entity && target->health >= 0.f &&
 	                        std::get<BoolValue>(showHealth).value;
 	int targetMaxHearts = target->maxHealth > 0.f ? static_cast<int>(std::ceil(target->maxHealth / 2.f)) : heartsPerRow;
@@ -566,7 +474,7 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 	                                    cacheText);
 	Vec2 detailTextSize = dc.getTextSize(plainDetail, Renderer::FontSelection::PrimaryRegular, detailSize, true,
 	                                     cacheText);
-	if (target->detail.empty()) {
+	if (!hasDetail) {
 		detailTextSize = {};
 	}
 
@@ -581,11 +489,13 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 		float healthWidth = heartSize + (heartStride * (heartsInWidestRow - 1));
 		textWidth = std::max(textWidth, healthWidth);
 	}
-	float contentWidth = iconSize + textGap + textWidth +
+	float contentWidth = iconSlotSize + textGap + textWidth +
 	                     (showToolIcons ? toolIconGap + toolIconsWidth : 0.f);
 	float width = std::max(defaultWidth, contentWidth + (paddingX * 2.f));
-	float textHeight = titleTextSize.y + detailTextSize.y + healthHeight;
-	float height = std::max(defaultHeight, std::max(iconSize, textHeight) + (paddingY * 2.f));
+	float textHeight = titleTextSize.y;
+	if (healthHeight > 0.f) textHeight += lineGap + healthHeight;
+	if (hasDetail) textHeight += lineGap + detailTextSize.y;
+	float height = std::max(defaultHeight, std::max(iconSlotSize, textHeight) + (paddingY * 2.f));
 
 	rect.right = rect.left + width;
 	rect.bottom = rect.top + height;
@@ -594,35 +504,32 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 	auto title = d2d::Color(std::get<ColorValue>(titleColor).getMainColor());
 	auto detail = d2d::Color(std::get<ColorValue>(detailColor).getMainColor());
 
-	bool drewBackground = drawPurpleBorderBackground(dc, bounds);
+	drawInspectorPanel(dc, bounds);
 
-	if (!drewBackground) {
-		dc.fillRectangle(bounds, d2d::Color(0.055f, 0.065f, 0.075f, 0.82f));
-	}
-
+	float iconSlotTop = paddingY + ((height - (paddingY * 2.f) - iconSlotSize) * 0.5f);
 	d2d::Rect icon {
-		paddingX, paddingY + ((height - (paddingY * 2.f) - iconSize) * 0.5f),
-		paddingX + iconSize, paddingY + ((height - (paddingY * 2.f) - iconSize) * 0.5f) + iconSize
+		paddingX + iconInset, iconSlotTop + iconInset,
+		paddingX + iconInset + iconSize, iconSlotTop + iconInset + iconSize
 	};
 	drawTargetIcon(dc, *target, icon);
 
-	float textLeft = paddingX + iconSize + textGap;
+	float textLeft = paddingX + iconSlotSize + textGap;
 	float textRight = width - paddingX - (showToolIcons ? toolIconGap + toolIconsWidth : 0.f);
 	float y = paddingY + std::max(0.f, (height - (paddingY * 2.f) - textHeight) * 0.5f);
-	dc.drawText({ textLeft, y - 1.f, textRight, y + titleTextSize.y + 2.f }, target->title, title,
+	dc.drawText({ textLeft, y, textRight, y + titleTextSize.y + 1.f }, target->title, title,
 	            Renderer::FontSelection::SecondaryLight, titleSize, DWRITE_TEXT_ALIGNMENT_LEADING,
 	            DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
 	y += titleTextSize.y;
 
-	float heartRowOffsetX = -1.5f;
-	float heartRowOffsetY = 2.f;
 	if (healthHeight > 0.f) {
-		drawHealthHearts(dc, textLeft + heartRowOffsetX, y + heartRowOffsetY, target->health, target->maxHealth);
+		y += lineGap;
+		drawHealthHearts(dc, textLeft - 1.5f, y, target->health, target->maxHealth);
 		y += healthHeight;
 	}
 
-	if (!target->detail.empty()) {
-		dc.drawText({ textLeft, y + 1.f, textRight, height - paddingY }, target->detail, detail,
+	if (hasDetail) {
+		y += lineGap;
+		dc.drawText({ textLeft, y, textRight, height - paddingY }, target->detail, detail,
 		            Renderer::FontSelection::SecondaryLight, detailSize, DWRITE_TEXT_ALIGNMENT_LEADING,
 		            DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
 	}
@@ -659,6 +566,7 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 				auto originalAux = toolStack->aux;
 
 				auto &mc = static_cast<MCDrawUtil &>(dc);
+				mc.flush(false);
 				float toolX = width - paddingX - toolIconsWidth;
 				for (auto toolCounter : toolCounters) {
 					if (toolCounter) {
@@ -685,10 +593,14 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 
 std::optional<WAILA::TargetInfo> WAILA::getTargetInfo(bool preview) {
 	if (preview) {
+		bool namespaceEnabled = std::get<BoolValue>(showNamespace).value;
+		bool itemIdEnabled = std::get<BoolValue>(showItemId).value;
 		return TargetInfo {
 			.type = TargetType::Block,
-			.title = L"WAILA",
-			.detail = L"Minecraft",
+			.title = L"Stone",
+			.detail = namespaceEnabled
+				          ? (itemIdEnabled ? L"\u00A7ominecraft:stone\u00A7r" : L"\u00A7oMinecraft\u00A7r") // italicize namespace
+				          : L"",
 			.health = -1.f,
 		};
 	}
@@ -739,8 +651,15 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult *hit) {
 
 	std::wstring detail;
 	if (std::get<BoolValue>(showNamespace).value) {
-		// italicize namespace
-		detail = L"\u00A7o" + util::StrToWStr(namespacedId) + L"\u00A7r";
+		if (std::get<BoolValue>(showItemId).value) {
+			// italicize namespace
+			detail = L"\u00A7o" + util::StrToWStr(namespacedId) + L"\u00A7r";
+		} else {
+			auto separator = namespacedId.find(':');
+			auto namespaceId = separator == std::string::npos ? namespacedId : namespacedId.substr(0, separator);
+			// italicize namespace
+			detail = L"\u00A7o" + titleCaseIdentifier(namespaceId) + L"\u00A7r";
+		}
 	}
 	if (std::get<BoolValue>(showCoordinates).value) {
 		if (!detail.empty()) detail += L"  ";
@@ -1013,7 +932,14 @@ void WAILA::drawTargetIcon(DrawUtil &ctxGeneric, TargetInfo const &target, d2d::
 	auto &dc = static_cast<MCDrawUtil &>(ctxGeneric);
 
 	if (target.type == TargetType::Entity && target.actor && !target.actor->isItem()) {
-		if (dc.drawActor(target.actor, icon, 1.f)) {
+		float actorIconExpansion = (icon.getWidth() * (actorIconScale - 1.f)) * 0.5f;
+		d2d::Rect actorIcon {
+			icon.left - actorIconExpansion,
+			icon.top - actorIconExpansion,
+			icon.right + actorIconExpansion,
+			icon.bottom + actorIconExpansion,
+		};
+		if (dc.drawActor(target.actor, actorIcon, 1.f)) {
 			return;
 		}
 	}
@@ -1032,6 +958,7 @@ void WAILA::drawTargetIcon(DrawUtil &ctxGeneric, TargetInfo const &target, d2d::
 	}
 
 	if (target.itemStack && target.itemStack->getItem()) {
+		dc.flush(false);
 		dc.drawItem(target.itemStack, icon.getPos(), icon.getWidth() / 48.f, 1.f);
 
 		if (target.itemStack->itemCount > 1) {
@@ -1049,6 +976,7 @@ void WAILA::drawTargetIcon(DrawUtil &ctxGeneric, TargetInfo const &target, d2d::
 			itemStack->pickupTime = {};
 
 			if (itemStack->getItem()) {
+				dc.flush(false);
 				dc.drawItem(itemStack, icon.getPos(), icon.getWidth() / 48.f, 1.f);
 			}
 

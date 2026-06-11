@@ -36,6 +36,7 @@ private:
 	ValueType showBlocks = BoolValue(true);
 	ValueType showEntities = BoolValue(true);
 	ValueType showNamespace = BoolValue(true);
+	ValueType showItemId = BoolValue(false);
 	ValueType showCoordinates = BoolValue(false);
 	ValueType showDistance = BoolValue(false);
 	ValueType showHarvest = BoolValue(true);
