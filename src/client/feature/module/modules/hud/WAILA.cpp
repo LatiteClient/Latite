@@ -10,399 +10,6 @@
 #include "mc/common/world/level/block/Block.h"
 #include "client/misc/PlayerHeadCache.h"
 
-namespace {
-	constexpr float defaultWidth = 252.f;
-	constexpr float defaultHeight = 81.f;
-	constexpr float iconSlotSize = 54.f;
-	constexpr float iconSize = 48.f;
-	constexpr float iconInset = (iconSlotSize - iconSize) * 0.5f;
-	constexpr float actorIconScale = iconSlotSize / iconSize;
-	constexpr float toolIconSize = 30.f;
-	constexpr float toolIconGap = 6.f;
-	constexpr float toolIconSpacing = 3.f;
-	constexpr float toolSpeedEpsilon = 0.0001f;
-	constexpr float paddingX = 12.f;
-	constexpr float paddingY = 12.f;
-	constexpr float textGap = 9.f;
-	constexpr float lineGap = 3.f;
-	constexpr float titleTextScale = 0.78f;
-	constexpr float detailTextScale = 0.92f;
-	constexpr int heartsPerRow = 10;
-	constexpr float heartSize = 18.f;
-	constexpr float heartStride = heartSize;
-	constexpr float heartRowStride = heartSize;
-	constexpr float frameUnit = 3.f;
-	constexpr Vec2 skinFaceUvPos { 0.125f, 0.125f };
-	constexpr Vec2 skinFaceUvSize { 0.125f, 0.125f };
-
-	SDK::ItemTier const *getToolTier(SDK::Item *item, std::string_view itemId) {
-		if (itemId.ends_with("_sword") || itemId == "minecraft:mace") {
-			return static_cast<SDK::WeaponItem *>(item)->tier;
-		}
-		if (itemId.ends_with("_pickaxe") || itemId.ends_with("_axe") ||
-		    itemId.ends_with("_shovel") || itemId.ends_with("_hoe")) {
-			return static_cast<SDK::DiggerItem *>(item)->tier;
-		}
-		return nullptr;
-	}
-
-	std::vector<std::string> findPreferredToolItemIds(SDK::Block const &block, bool minimumTier) {
-		static std::unordered_map<SDK::Block const *, std::vector<std::string>> minimumTierCache;
-		static std::unordered_map<SDK::Block const *, std::vector<std::string>> fastestCache;
-		auto &cache = minimumTier ? minimumTierCache : fastestCache;
-		if (auto cached = cache.find(&block); cached != cache.end()) return cached->second;
-
-		if (!Signatures::ItemStack_ItemStackBlock.result || !Signatures::ItemStackBase_destructor.result) return {};
-
-		auto clientInstance = SDK::ClientInstance::get();
-		auto level = clientInstance && clientInstance->minecraft ? clientInstance->minecraft->getLevel() : nullptr;
-		auto registry = level
-			                ? *reinterpret_cast<void **>(reinterpret_cast<uintptr_t>(level) + 0x198)
-			                : nullptr;
-		if (!registry) return {};
-
-		auto itemCounters = reinterpret_cast<void ***>(reinterpret_cast<uintptr_t>(registry) + 0x30);
-		if (!itemCounters[0] || !itemCounters[1]) return {};
-
-		alignas(SDK::ItemStack) char storage[sizeof(SDK::ItemStack)] = {};
-		auto candidateStack = SDK::ItemStack::constructFromBlock(storage, block, 1, nullptr);
-		if (!candidateStack) return {};
-
-		auto originalItem = candidateStack->item;
-		auto originalBlock = candidateStack->block;
-		auto originalAux = candidateStack->aux;
-		float bestDestroySpeed = 1.f;
-		std::vector<std::string> bestItemIds;
-		struct ToolFamilyCandidate {
-			void **vtable;
-			SDK::ItemTier const *tier;
-			float destroySpeed;
-			std::string itemId;
-		};
-		std::vector<ToolFamilyCandidate> minimumTierCandidates;
-
-		for (auto current = itemCounters[0]; current < itemCounters[1]; ++current) {
-			auto counter = *current;
-			auto item = counter ? *reinterpret_cast<SDK::Item **>(counter) : nullptr;
-			if (!item) continue;
-
-			candidateStack->item = reinterpret_cast<SDK::Item **>(counter);
-			candidateStack->block = nullptr;
-			candidateStack->aux = 0;
-			candidateStack->itemCount = 1;
-
-			float destroySpeed = item->getDestroySpeed(candidateStack, &block);
-			if (destroySpeed <= 1.f) continue;
-
-			std::string itemId = item->namespacedId.getString();
-			if (itemId.empty()) continue;
-
-			if (minimumTier) {
-				if (!item->canDestroySpecial(&block)) continue;
-
-				auto vtable = *reinterpret_cast<void ***>(item);
-				auto tier = getToolTier(item, itemId);
-				auto family = std::ranges::find_if(minimumTierCandidates, [&](ToolFamilyCandidate const &candidate) {
-					return candidate.vtable == vtable;
-				});
-				if (family == minimumTierCandidates.end()) {
-					minimumTierCandidates.push_back({ vtable, tier, destroySpeed, std::move(itemId) });
-				} else {
-					bool lowerTier = tier && (!family->tier ||
-					                         tier->level < family->tier->level ||
-					                         (tier->level == family->tier->level &&
-					                          tier->speed < family->tier->speed - toolSpeedEpsilon));
-					bool sameTier = (!tier && !family->tier) ||
-					                (tier && family->tier && tier->level == family->tier->level &&
-					                 std::abs(tier->speed - family->tier->speed) <= toolSpeedEpsilon);
-					if (lowerTier ||
-					    (sameTier && destroySpeed < family->destroySpeed - toolSpeedEpsilon)) {
-						family->tier = tier;
-						family->destroySpeed = destroySpeed;
-						family->itemId = std::move(itemId);
-					}
-				}
-				continue;
-			}
-
-			if (destroySpeed > bestDestroySpeed + toolSpeedEpsilon) {
-				bestDestroySpeed = destroySpeed;
-				bestItemIds.clear();
-				bestItemIds.push_back(std::move(itemId));
-			} else if (std::abs(destroySpeed - bestDestroySpeed) <= toolSpeedEpsilon &&
-			           std::ranges::find(bestItemIds, itemId) == bestItemIds.end()) {
-				bestItemIds.push_back(std::move(itemId));
-			}
-		}
-
-		if (minimumTier) {
-			bestItemIds.reserve(minimumTierCandidates.size());
-			for (auto &candidate : minimumTierCandidates) {
-				bestItemIds.push_back(std::move(candidate.itemId));
-			}
-		}
-
-		candidateStack->item = originalItem;
-		candidateStack->block = originalBlock;
-		candidateStack->aux = originalAux;
-		candidateStack->destruct();
-		cache.insert_or_assign(&block, bestItemIds);
-		return bestItemIds;
-	}
-
-	void drawInspectorPanel(DrawUtil &dc, d2d::Rect const &bounds) {
-		auto &mc = static_cast<MCDrawUtil &>(dc);
-		if (!mc.renderCtx) return;
-
-		const auto background = d2d::Color::RGB(0x12, 0x0B, 0x16, 218);
-		const d2d::Color borderTones[] = {
-			d2d::Color::RGB(0x59, 0x20, 0x83, 238),
-			d2d::Color::RGB(0x56, 0x23, 0x7F, 238),
-			d2d::Color::RGB(0x52, 0x25, 0x7B, 238),
-			d2d::Color::RGB(0x4E, 0x26, 0x76, 238),
-			d2d::Color::RGB(0x4A, 0x25, 0x71, 238),
-			d2d::Color::RGB(0x46, 0x23, 0x6C, 238),
-			d2d::Color::RGB(0x42, 0x20, 0x67, 238),
-			d2d::Color::RGB(0x3E, 0x1D, 0x62, 238),
-		};
-
-		float left = bounds.left;
-		float top = bounds.top;
-		float right = bounds.right;
-		float bottom = bounds.bottom;
-		if (right - left <= frameUnit * 4.f || bottom - top <= frameUnit * 4.f) return;
-
-		// Deferred UI meshes must be resolved before the item renderer changes render state.
-		mc.flush(false);
-		mc.setImmediate(true);
-
-		// Leave a single frame unit open at each outer corner.
-		mc.fillRectangle({ left + frameUnit, top, right - frameUnit, bottom }, background);
-		mc.fillRectangle({ left, top + frameUnit, left + frameUnit, bottom - frameUnit }, background);
-		mc.fillRectangle({ right - frameUnit, top + frameUnit, right, bottom - frameUnit }, background);
-
-		float borderLeft = left + frameUnit;
-		float borderTopY = top + frameUnit;
-		float borderRight = right - frameUnit;
-		float borderBottomY = bottom - frameUnit;
-		float sideTop = borderTopY + frameUnit;
-		float sideBottom = borderBottomY - frameUnit;
-		float toneHeight = (sideBottom - sideTop) / static_cast<float>(std::size(borderTones));
-
-		mc.fillRectangle({ borderLeft, borderTopY, borderRight, borderTopY + frameUnit }, borderTones[0]);
-		for (size_t i = 0; i < std::size(borderTones); ++i) {
-			float toneTop = sideTop + (toneHeight * static_cast<float>(i));
-			float toneBottom = i + 1 == std::size(borderTones)
-				                   ? sideBottom
-				                   : sideTop + (toneHeight * static_cast<float>(i + 1));
-			mc.fillRectangle({ borderLeft, toneTop, borderLeft + frameUnit, toneBottom }, borderTones[i]);
-			mc.fillRectangle({ borderRight - frameUnit, toneTop, borderRight, toneBottom }, borderTones[i]);
-		}
-		mc.fillRectangle({ borderLeft, borderBottomY - frameUnit, borderRight, borderBottomY },
-		                 borderTones[std::size(borderTones) - 1]);
-
-		mc.setImmediate(false);
-	}
-
-	std::wstring titleCaseIdentifier(std::string id) {
-		if (auto colon = id.find(':'); colon != std::string::npos) {
-			id = id.substr(colon + 1);
-		}
-		if (id.starts_with("tile.")) {
-			id = id.substr(5);
-		}
-		if (id.starts_with("item.")) {
-			id = id.substr(5);
-		}
-		if (id.ends_with(".name")) {
-			id.resize(id.size() - 5);
-		}
-
-		std::wstring out;
-		out.reserve(id.size());
-		bool newWord = true;
-		for (char ch: id) {
-			if (ch == '_' || ch == '-' || ch == '.') {
-				out.push_back(L' ');
-				newWord = true;
-				continue;
-			}
-
-			unsigned char uch = static_cast<unsigned char>(ch);
-			if (newWord) {
-				out.push_back(static_cast<wchar_t>(std::toupper(uch)));
-			} else {
-				out.push_back(static_cast<wchar_t>(std::tolower(uch)));
-			}
-			newWord = false;
-		}
-
-		if (out == L"Tnt") return L"TNT";
-		if (out.empty()) return L"Unknown";
-		return out;
-	}
-
-	std::wstring entityNameFromType(uint32_t id) {
-		static const std::unordered_map<uint32_t, std::wstring> names = {
-			{ 64, L"Item" },
-			{ 65, L"Primed TNT" },
-			{ 66, L"Falling Block" },
-			{ 69, L"Experience Orb" },
-			{ 70, L"Eye of Ender" },
-			{ 71, L"End Crystal" },
-			{ 72, L"Firework Rocket" },
-			{ 77, L"Fishing Hook" },
-			{ 83, L"Painting" },
-			{ 90, L"Boat" },
-			{ 93, L"Lightning Bolt" },
-			{ 95, L"Area Effect Cloud" },
-			{ 117, L"Shield" },
-			{ 119, L"Lectern" },
-			{ 145, L"Ominous Item Spawner" },
-			{ 218, L"Chest Boat" },
-			{ 307, L"NPC" },
-			{ 312, L"Agent" },
-			{ 317, L"Armor Stand" },
-			{ 318, L"Tripod Camera" },
-			{ 319, L"Player" },
-			{ 378, L"Bee" },
-			{ 379, L"Piglin" },
-			{ 383, L"Piglin Brute" },
-			{ 390, L"Allay" },
-			{ 788, L"Iron Golem" },
-			{ 789, L"Snow Golem" },
-			{ 886, L"Wandering Trader" },
-			{ 916, L"Copper Golem" },
-			{ 2849, L"Creeper" },
-			{ 2853, L"Slime" },
-			{ 2854, L"Enderman" },
-			{ 2857, L"Ghast" },
-			{ 2858, L"Magma Cube" },
-			{ 2859, L"Blaze" },
-			{ 2861, L"Witch" },
-			{ 2865, L"Guardian" },
-			{ 2866, L"Elder Guardian" },
-			{ 2869, L"Ender Dragon" },
-			{ 2870, L"Shulker" },
-			{ 2873, L"Vindicator" },
-			{ 2875, L"Ravager" },
-			{ 2920, L"Evoker" },
-			{ 2921, L"Vex" },
-			{ 2930, L"Pillager" },
-			{ 2936, L"Elder Guardian Ghost" },
-			{ 2947, L"Warden" },
-			{ 2956, L"Breeze" },
-			{ 2962, L"Creaking" },
-			{ 4874, L"Chicken" },
-			{ 4875, L"Cow" },
-			{ 4876, L"Pig" },
-			{ 4877, L"Sheep" },
-			{ 4880, L"Mooshroom" },
-			{ 4882, L"Rabbit" },
-			{ 4892, L"Polar Bear" },
-			{ 4893, L"Llama" },
-			{ 4938, L"Turtle" },
-			{ 4977, L"Panda" },
-			{ 4985, L"Fox" },
-			{ 4988, L"Hoglin" },
-			{ 4989, L"Strider" },
-			{ 4992, L"Goat" },
-			{ 4994, L"Axolotl" },
-			{ 4996, L"Frog" },
-			{ 5002, L"Camel" },
-			{ 5003, L"Sniffer" },
-			{ 5006, L"Armadillo" },
-			{ 5011, L"Happy Ghast" },
-			{ 5021, L"Trader Llama" },
-			{ 8977, L"Squid" },
-			{ 8991, L"Dolphin" },
-			{ 9068, L"Pufferfish" },
-			{ 9069, L"Salmon" },
-			{ 9071, L"Tropical Fish" },
-			{ 9072, L"Fish" },
-			{ 9089, L"Glow Squid" },
-			{ 9093, L"Tadpole" },
-			{ 9109, L"Nautilus" },
-			{ 21262, L"Wolf" },
-			{ 21270, L"Ocelot" },
-			{ 21278, L"Parrot" },
-			{ 21323, L"Cat" },
-			{ 33043, L"Bat" },
-			{ 68388, L"Zombified Piglin" },
-			{ 68404, L"Wither" },
-			{ 68410, L"Phantom" },
-			{ 68478, L"Zoglin" },
-			{ 68504, L"Camel Husk" },
-			{ 76694, L"Zombie Nautilus" },
-			{ 199456, L"Zombie" },
-			{ 199468, L"Zombie Villager" },
-			{ 199471, L"Husk" },
-			{ 199534, L"Drowned" },
-			{ 199540, L"Zombie Villager" },
-			{ 264995, L"Spider" },
-			{ 264999, L"Silverfish" },
-			{ 265000, L"Cave Spider" },
-			{ 265015, L"Endermite" },
-			{ 524372, L"Minecart" },
-			{ 524384, L"Hopper Minecart" },
-			{ 524385, L"TNT Minecart" },
-			{ 524386, L"Chest Minecart" },
-			{ 524387, L"Furnace Minecart" },
-			{ 524388, L"Command Block Minecart" },
-			{ 1116962, L"Skeleton" },
-			{ 1116974, L"Stray" },
-			{ 1116976, L"Wither Skeleton" },
-			{ 1117072, L"Bogged" },
-			{ 1117079, L"Parched" },
-			{ 16777999, L"Villager" },
-			{ 16778099, L"Villager" },
-			{ 2118423, L"Horse" },
-			{ 2118424, L"Donkey" },
-			{ 2118425, L"Mule" },
-			{ 2186010, L"Skeleton Horse" },
-			{ 2186011, L"Zombie Horse" },
-			{ 4194372, L"Experience Bottle" },
-			{ 4194380, L"Shulker Bullet" },
-			{ 4194383, L"Dragon Fireball" },
-			{ 4194385, L"Snowball" },
-			{ 4194386, L"Egg" },
-			{ 4194389, L"Fireball" },
-			{ 4194390, L"Potion" },
-			{ 4194391, L"Ender Pearl" },
-			{ 4194393, L"Wither Skull" },
-			{ 4194395, L"Wither Skull" },
-			{ 4194398, L"Small Fireball" },
-			{ 4194405, L"Lingering Potion" },
-			{ 4194406, L"Llama Spit" },
-			{ 4194407, L"Evocation Fang" },
-			{ 4194410, L"Ice Bomb" },
-			{ 4194445, L"Breeze Wind Charge" },
-			{ 4194447, L"Wind Charge" },
-			{ 12582985, L"Trident" },
-			{ 12582992, L"Arrow" },
-		};
-
-		if (auto found = names.find(id); found != names.end()) {
-			return found->second;
-		}
-
-		std::wstringstream ss;
-		ss << L"Entity " << id;
-		return ss.str();
-	}
-
-	Vec3 rayDirectionFromHit(SDK::HitResult *hit) {
-		if (!hit) return {};
-
-		Vec3 toHit = hit->hitPos - hit->start;
-		if (hit->hitType != SDK::HitType::AIR && toHit.magnitude() > 0.001f) {
-			return toHit.normalized();
-		}
-
-		return hit->end.normalized();
-	}
-}
-
 WAILA::WAILA() : HUDModule("WAILA", L"WAILA", L"Shows the block or entity you are looking at.", HUD) {
 	showPreview = false;
 
@@ -416,10 +23,14 @@ WAILA::WAILA() : HUDModule("WAILA", L"WAILA", L"Shows the block or entity you ar
 	addSetting("showDistance", L"Distance", L"Show distance to the target.", showDistance);
 	addSetting("showHarvest", L"Tool Info", L"Show the preferred tool for the targeted block.",
 	           showHarvest, "showBlocks"_istrue);
-	toolMode.addEntry(EnumEntry { toolModeMinimumTier, L"Minimum Tier",
-	                             L"Show the lowest-tier effective tool that can correctly harvest the block." });
-	toolMode.addEntry(EnumEntry { toolModeFastest, L"Fastest",
-	                             L"Show the tool with the highest native destroy speed." });
+	toolMode.addEntry(EnumEntry {
+		static_cast<int>(ToolMode::MinimumTier), L"Minimum Tier",
+		L"Show the lowest-tier effective tool that can correctly harvest the block."
+	});
+	toolMode.addEntry(EnumEntry {
+		static_cast<int>(ToolMode::Fastest), L"Fastest",
+		L"Show the tool with the highest native destroy speed."
+	});
 	addEnumSetting("toolMode", L"Tool Mode", L"How the preferred mining tool is selected.", toolMode,
 	               "showHarvest"_istrue);
 	addSetting("showHealth", L"Health", L"Show health pips for living entities.", showHealth, "showEntities"_istrue);
@@ -430,7 +41,379 @@ WAILA::WAILA() : HUDModule("WAILA", L"WAILA", L"Shows the block or entity you ar
 	addSetting("titleColor", L"Title", L"Inspector title color.", titleColor);
 	addSetting("detailColor", L"Detail", L"Inspector detail color.", detailColor);
 
-	rect = { 0.f, 0.f, defaultWidth, defaultHeight };
+	rect = { 0.f, 0.f, panelLayout.defaultWidth, panelLayout.defaultHeight };
+}
+
+SDK::ItemTier const *WAILA::getToolTier(SDK::Item *item, std::string_view itemId) const {
+	if (itemId.ends_with("_sword") || itemId == "minecraft:mace") {
+		return static_cast<SDK::WeaponItem *>(item)->tier;
+	}
+	if (itemId.ends_with("_pickaxe") || itemId.ends_with("_axe") ||
+	    itemId.ends_with("_shovel") || itemId.ends_with("_hoe")) {
+		return static_cast<SDK::DiggerItem *>(item)->tier;
+	}
+	return nullptr;
+}
+
+std::vector<std::string> WAILA::findPreferredToolItemIds(SDK::Block const &block, bool minimumTier) {
+	auto &cache = minimumTier ? minimumTierToolCache : fastestToolCache;
+	if (auto cached = cache.find(&block); cached != cache.end()) return cached->second;
+
+	if (!Signatures::ItemStack_ItemStackBlock.result || !Signatures::ItemStackBase_destructor.result) return {};
+
+	auto clientInstance = SDK::ClientInstance::get();
+	auto level = clientInstance && clientInstance->minecraft ? clientInstance->minecraft->getLevel() : nullptr;
+	auto registry = level
+		                ? *reinterpret_cast<void **>(reinterpret_cast<uintptr_t>(level) + 0x198)
+		                : nullptr;
+	if (!registry) return {};
+
+	auto itemCounters = reinterpret_cast<void ***>(reinterpret_cast<uintptr_t>(registry) + 0x30);
+	if (!itemCounters[0] || !itemCounters[1]) return {};
+
+	alignas(SDK::ItemStack) char storage[sizeof(SDK::ItemStack)] = {};
+	auto candidateStack = SDK::ItemStack::constructFromBlock(storage, block, 1, nullptr);
+	if (!candidateStack) return {};
+
+	auto originalItem = candidateStack->item;
+	auto originalBlock = candidateStack->block;
+	auto originalAux = candidateStack->aux;
+	float bestDestroySpeed = 1.f;
+	std::vector<std::string> bestItemIds;
+	struct ToolFamilyCandidate {
+		void **vtable;
+		SDK::ItemTier const *tier;
+		float destroySpeed;
+		std::string itemId;
+	};
+	std::vector<ToolFamilyCandidate> minimumTierCandidates;
+
+	for (auto current = itemCounters[0]; current < itemCounters[1]; ++current) {
+		auto counter = *current;
+		auto item = counter ? *reinterpret_cast<SDK::Item **>(counter) : nullptr;
+		if (!item) continue;
+
+		candidateStack->item = reinterpret_cast<SDK::Item **>(counter);
+		candidateStack->block = nullptr;
+		candidateStack->aux = 0;
+		candidateStack->itemCount = 1;
+
+		float destroySpeed = item->getDestroySpeed(candidateStack, &block);
+		if (destroySpeed <= 1.f) continue;
+
+		std::string itemId = item->namespacedId.getString();
+		if (itemId.empty()) continue;
+
+		if (minimumTier) {
+			if (!item->canDestroySpecial(&block)) continue;
+
+			auto vtable = *reinterpret_cast<void ***>(item);
+			auto tier = getToolTier(item, itemId);
+			auto family = std::ranges::find(minimumTierCandidates, vtable, &ToolFamilyCandidate::vtable);
+			if (family == minimumTierCandidates.end()) {
+				minimumTierCandidates.push_back({ vtable, tier, destroySpeed, std::move(itemId) });
+			} else {
+				bool lowerTier = tier && (!family->tier ||
+				                          tier->level < family->tier->level ||
+				                          (tier->level == family->tier->level &&
+				                           tier->speed < family->tier->speed - toolLayout.speedEpsilon));
+				bool sameTier = (!tier && !family->tier) ||
+				                (tier && family->tier && tier->level == family->tier->level &&
+				                 std::abs(tier->speed - family->tier->speed) <= toolLayout.speedEpsilon);
+				if (lowerTier ||
+				    (sameTier && destroySpeed < family->destroySpeed - toolLayout.speedEpsilon)) {
+					family->tier = tier;
+					family->destroySpeed = destroySpeed;
+					family->itemId = std::move(itemId);
+				}
+			}
+			continue;
+		}
+
+		if (destroySpeed > bestDestroySpeed + toolLayout.speedEpsilon) {
+			bestDestroySpeed = destroySpeed;
+			bestItemIds.clear();
+			bestItemIds.push_back(std::move(itemId));
+		} else if (std::abs(destroySpeed - bestDestroySpeed) <= toolLayout.speedEpsilon &&
+		           std::ranges::find(bestItemIds, itemId) == bestItemIds.end()) {
+			bestItemIds.push_back(std::move(itemId));
+		}
+	}
+
+	if (minimumTier) {
+		bestItemIds.reserve(minimumTierCandidates.size());
+		for (auto &candidate: minimumTierCandidates) {
+			bestItemIds.push_back(std::move(candidate.itemId));
+		}
+	}
+
+	candidateStack->item = originalItem;
+	candidateStack->block = originalBlock;
+	candidateStack->aux = originalAux;
+	candidateStack->destruct();
+	cache.insert_or_assign(&block, bestItemIds);
+	return bestItemIds;
+}
+
+void WAILA::drawInspectorPanel(DrawUtil &dc, d2d::Rect const &bounds) const {
+	auto &mc = static_cast<MCDrawUtil &>(dc);
+	if (!mc.renderCtx) return;
+
+	const auto background = d2d::Color::RGB(0x12, 0x0B, 0x16, 218);
+	const d2d::Color borderTones[] = {
+		d2d::Color::RGB(0x59, 0x20, 0x83, 238),
+		d2d::Color::RGB(0x56, 0x23, 0x7F, 238),
+		d2d::Color::RGB(0x52, 0x25, 0x7B, 238),
+		d2d::Color::RGB(0x4E, 0x26, 0x76, 238),
+		d2d::Color::RGB(0x4A, 0x25, 0x71, 238),
+		d2d::Color::RGB(0x46, 0x23, 0x6C, 238),
+		d2d::Color::RGB(0x42, 0x20, 0x67, 238),
+		d2d::Color::RGB(0x3E, 0x1D, 0x62, 238),
+	};
+
+	float left = bounds.left;
+	float top = bounds.top;
+	float right = bounds.right;
+	float bottom = bounds.bottom;
+	if (right - left <= panelLayout.frameThickness * 4.f ||
+	    bottom - top <= panelLayout.frameThickness * 4.f)
+		return;
+
+	// Deferred UI meshes must be resolved before the item renderer changes render state.
+	mc.flush(false);
+	mc.setImmediate(true);
+
+	// Leave a single frame unit open at each outer corner.
+	mc.fillRectangle({ left + panelLayout.frameThickness, top, right - panelLayout.frameThickness, bottom },
+	                 background);
+	mc.fillRectangle({
+		                 left, top + panelLayout.frameThickness, left + panelLayout.frameThickness,
+		                 bottom - panelLayout.frameThickness
+	                 }, background);
+	mc.fillRectangle({
+		                 right - panelLayout.frameThickness, top + panelLayout.frameThickness, right,
+		                 bottom - panelLayout.frameThickness
+	                 }, background);
+
+	float borderLeft = left + panelLayout.frameThickness;
+	float borderTopY = top + panelLayout.frameThickness;
+	float borderRight = right - panelLayout.frameThickness;
+	float borderBottomY = bottom - panelLayout.frameThickness;
+	float sideTop = borderTopY + panelLayout.frameThickness;
+	float sideBottom = borderBottomY - panelLayout.frameThickness;
+	float toneHeight = (sideBottom - sideTop) / static_cast<float>(std::size(borderTones));
+
+	mc.fillRectangle({ borderLeft, borderTopY, borderRight, borderTopY + panelLayout.frameThickness },
+	                 borderTones[0]);
+	for (size_t i = 0; i < std::size(borderTones); ++i) {
+		float toneTop = sideTop + (toneHeight * static_cast<float>(i));
+		float toneBottom = i + 1 == std::size(borderTones)
+			                   ? sideBottom
+			                   : sideTop + (toneHeight * static_cast<float>(i + 1));
+		mc.fillRectangle({ borderLeft, toneTop, borderLeft + panelLayout.frameThickness, toneBottom },
+		                 borderTones[i]);
+		mc.fillRectangle({ borderRight - panelLayout.frameThickness, toneTop, borderRight, toneBottom },
+		                 borderTones[i]);
+	}
+	mc.fillRectangle({ borderLeft, borderBottomY - panelLayout.frameThickness, borderRight, borderBottomY },
+	                 borderTones[std::size(borderTones) - 1]);
+
+	mc.setImmediate(false);
+}
+
+std::wstring WAILA::titleCaseIdentifier(std::string id) const {
+	if (auto colon = id.find(':'); colon != std::string::npos) {
+		id = id.substr(colon + 1);
+	}
+	if (id.starts_with("tile.")) {
+		id = id.substr(5);
+	}
+	if (id.starts_with("item.")) {
+		id = id.substr(5);
+	}
+	if (id.ends_with(".name")) {
+		id.resize(id.size() - 5);
+	}
+
+	std::wstring out;
+	out.reserve(id.size());
+	bool newWord = true;
+	for (char ch: id) {
+		if (ch == '_' || ch == '-' || ch == '.') {
+			out.push_back(L' ');
+			newWord = true;
+			continue;
+		}
+
+		unsigned char uch = static_cast<unsigned char>(ch);
+		if (newWord) {
+			out.push_back(static_cast<wchar_t>(std::toupper(uch)));
+		} else {
+			out.push_back(static_cast<wchar_t>(std::tolower(uch)));
+		}
+		newWord = false;
+	}
+
+	if (out == L"Tnt") return L"TNT";
+	if (out.empty()) return L"Unknown";
+	return out;
+}
+
+// TODO: PLEASE PLEASE PLEASE REPLACE THIS THIS IS THE DUMBEST SHIT EVER
+std::wstring WAILA::entityNameFromType(uint32_t id) const {
+	switch (id) {
+		case 64: return L"Item";
+		case 65: return L"Primed TNT";
+		case 66: return L"Falling Block";
+		case 69: return L"Experience Orb";
+		case 70: return L"Eye of Ender";
+		case 71: return L"End Crystal";
+		case 72: return L"Firework Rocket";
+		case 77: return L"Fishing Hook";
+		case 83: return L"Painting";
+		case 90: return L"Boat";
+		case 93: return L"Lightning Bolt";
+		case 95: return L"Area Effect Cloud";
+		case 117: return L"Shield";
+		case 119: return L"Lectern";
+		case 145: return L"Ominous Item Spawner";
+		case 218: return L"Chest Boat";
+		case 307: return L"NPC";
+		case 312: return L"Agent";
+		case 317: return L"Armor Stand";
+		case 318: return L"Tripod Camera";
+		case 319: return L"Player";
+		case 378: return L"Bee";
+		case 379: return L"Piglin";
+		case 383: return L"Piglin Brute";
+		case 390: return L"Allay";
+		case 788: return L"Iron Golem";
+		case 789: return L"Snow Golem";
+		case 886: return L"Wandering Trader";
+		case 916: return L"Copper Golem";
+		case 2849: return L"Creeper";
+		case 2853: return L"Slime";
+		case 2854: return L"Enderman";
+		case 2857: return L"Ghast";
+		case 2858: return L"Magma Cube";
+		case 2859: return L"Blaze";
+		case 2861: return L"Witch";
+		case 2865: return L"Guardian";
+		case 2866: return L"Elder Guardian";
+		case 2869: return L"Ender Dragon";
+		case 2870: return L"Shulker";
+		case 2873: return L"Vindicator";
+		case 2875: return L"Ravager";
+		case 2920: return L"Evoker";
+		case 2921: return L"Vex";
+		case 2930: return L"Pillager";
+		case 2936: return L"Elder Guardian Ghost";
+		case 2947: return L"Warden";
+		case 2956: return L"Breeze";
+		case 2962: return L"Creaking";
+		case 4874: return L"Chicken";
+		case 4875: return L"Cow";
+		case 4876: return L"Pig";
+		case 4877: return L"Sheep";
+		case 4880: return L"Mooshroom";
+		case 4882: return L"Rabbit";
+		case 4892: return L"Polar Bear";
+		case 4893: return L"Llama";
+		case 4938: return L"Turtle";
+		case 4977: return L"Panda";
+		case 4985: return L"Fox";
+		case 4988: return L"Hoglin";
+		case 4989: return L"Strider";
+		case 4992: return L"Goat";
+		case 4994: return L"Axolotl";
+		case 4996: return L"Frog";
+		case 5002: return L"Camel";
+		case 5003: return L"Sniffer";
+		case 5006: return L"Armadillo";
+		case 5011: return L"Happy Ghast";
+		case 5021: return L"Trader Llama";
+		case 8977: return L"Squid";
+		case 8991: return L"Dolphin";
+		case 9068: return L"Pufferfish";
+		case 9069: return L"Salmon";
+		case 9071: return L"Tropical Fish";
+		case 9072: return L"Fish";
+		case 9089: return L"Glow Squid";
+		case 9093: return L"Tadpole";
+		case 9109: return L"Nautilus";
+		case 21262: return L"Wolf";
+		case 21270: return L"Ocelot";
+		case 21278: return L"Parrot";
+		case 21323: return L"Cat";
+		case 33043: return L"Bat";
+		case 68388: return L"Zombified Piglin";
+		case 68404: return L"Wither";
+		case 68410: return L"Phantom";
+		case 68478: return L"Zoglin";
+		case 68504: return L"Camel Husk";
+		case 76694: return L"Zombie Nautilus";
+		case 199456: return L"Zombie";
+		case 199468: return L"Zombie Villager";
+		case 199471: return L"Husk";
+		case 199534: return L"Drowned";
+		case 199540: return L"Zombie Villager";
+		case 264995: return L"Spider";
+		case 264999: return L"Silverfish";
+		case 265000: return L"Cave Spider";
+		case 265015: return L"Endermite";
+		case 524372: return L"Minecart";
+		case 524384: return L"Hopper Minecart";
+		case 524385: return L"TNT Minecart";
+		case 524386: return L"Chest Minecart";
+		case 524387: return L"Furnace Minecart";
+		case 524388: return L"Command Block Minecart";
+		case 1116962: return L"Skeleton";
+		case 1116974: return L"Stray";
+		case 1116976: return L"Wither Skeleton";
+		case 1117072: return L"Bogged";
+		case 1117079: return L"Parched";
+		case 16777999: return L"Villager";
+		case 16778099: return L"Villager";
+		case 2118423: return L"Horse";
+		case 2118424: return L"Donkey";
+		case 2118425: return L"Mule";
+		case 2186010: return L"Skeleton Horse";
+		case 2186011: return L"Zombie Horse";
+		case 4194372: return L"Experience Bottle";
+		case 4194380: return L"Shulker Bullet";
+		case 4194383: return L"Dragon Fireball";
+		case 4194385: return L"Snowball";
+		case 4194386: return L"Egg";
+		case 4194389: return L"Fireball";
+		case 4194390: return L"Potion";
+		case 4194391: return L"Ender Pearl";
+		case 4194393: return L"Wither Skull";
+		case 4194395: return L"Wither Skull";
+		case 4194398: return L"Small Fireball";
+		case 4194405: return L"Lingering Potion";
+		case 4194406: return L"Llama Spit";
+		case 4194407: return L"Evocation Fang";
+		case 4194410: return L"Ice Bomb";
+		case 4194445: return L"Breeze Wind Charge";
+		case 4194447: return L"Wind Charge";
+		case 12582985: return L"Trident";
+		case 12582992: return L"Arrow";
+		default:
+			std::wstringstream ss;
+			ss << L"Entity " << id;
+			return ss.str();
+	}
+}
+
+Vec3 WAILA::rayDirectionFromHit(SDK::HitResult *hit) const {
+	if (!hit) return {};
+
+	Vec3 toHit = hit->hitPos - hit->start;
+	if (hit->hitType != SDK::HitType::AIR && toHit.magnitude() > 0.001f) {
+		return toHit.normalized();
+	}
+
+	return hit->end.normalized();
 }
 
 void WAILA::afterLoadConfig() {
@@ -447,7 +430,7 @@ void WAILA::afterLoadConfig() {
 	if (!clientInstance || !clientInstance->getGuiData()) return;
 
 	Vec2 screenSize = clientInstance->getGuiData()->screenSize;
-	setPos({ std::max(0.f, (screenSize.x - defaultWidth) * 0.5f), 8.f });
+	setPos({ std::max(0.f, (screenSize.x - panelLayout.defaultWidth) * 0.5f), 8.f });
 	storePos(screenSize);
 }
 
@@ -457,14 +440,18 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 	std::optional<TargetInfo> target = getTargetInfo(isDefault || inEditor);
 	if (!target.has_value()) return;
 
-	float titleSize = std::get<FloatValue>(textSize).value * titleTextScale;
-	float detailSize = titleSize * detailTextScale;
+	float titleSize = std::get<FloatValue>(textSize).value * panelLayout.titleTextScale;
+	float detailSize = titleSize * panelLayout.detailTextScale;
 	bool hasDetail = !target->detail.empty();
 	bool showTargetHealth = target->type == TargetType::Entity && target->health >= 0.f &&
 	                        std::get<BoolValue>(showHealth).value;
-	int targetMaxHearts = target->maxHealth > 0.f ? static_cast<int>(std::ceil(target->maxHealth / 2.f)) : heartsPerRow;
-	int heartRows = showTargetHealth ? (targetMaxHearts + heartsPerRow - 1) / heartsPerRow : 0;
-	float healthHeight = heartRows > 0 ? heartSize + (heartRowStride * (heartRows - 1)) : 0.f;
+	int targetMaxHearts = target->maxHealth > 0.f
+		                      ? static_cast<int>(std::ceil(target->maxHealth / 2.f))
+		                      : healthLayout.heartsPerRow;
+	int heartRows = showTargetHealth
+		                ? (targetMaxHearts + healthLayout.heartsPerRow - 1) / healthLayout.heartsPerRow
+		                : 0;
+	float healthHeight = heartRows > 0 ? healthLayout.heartSize * heartRows : 0.f;
 
 	std::wstring plainTitle = util::StripMinecraftFormatting(target->title);
 	std::wstring plainDetail = util::StripMinecraftFormatting(target->detail);
@@ -481,21 +468,22 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 	float textWidth = std::max(titleTextSize.x, detailTextSize.x);
 	bool showToolIcons = target->type == TargetType::Block && !target->toolItemIds.empty();
 	float toolIconsWidth = showToolIcons
-		                       ? (toolIconSize * static_cast<float>(target->toolItemIds.size())) +
-		                         (toolIconSpacing * static_cast<float>(target->toolItemIds.size() - 1))
+		                       ? (toolLayout.iconSize * static_cast<float>(target->toolItemIds.size())) +
+		                         (toolLayout.spacing * static_cast<float>(target->toolItemIds.size() - 1))
 		                       : 0.f;
 	if (healthHeight > 0.f) {
-		int heartsInWidestRow = std::min(targetMaxHearts, heartsPerRow);
-		float healthWidth = heartSize + (heartStride * (heartsInWidestRow - 1));
+		int heartsInWidestRow = std::min(targetMaxHearts, healthLayout.heartsPerRow);
+		float healthWidth = healthLayout.heartSize * heartsInWidestRow;
 		textWidth = std::max(textWidth, healthWidth);
 	}
-	float contentWidth = iconSlotSize + textGap + textWidth +
-	                     (showToolIcons ? toolIconGap + toolIconsWidth : 0.f);
-	float width = std::max(defaultWidth, contentWidth + (paddingX * 2.f));
+	float contentWidth = panelLayout.iconSlotSize + panelLayout.textGap + textWidth +
+	                     (showToolIcons ? toolLayout.gap + toolIconsWidth : 0.f);
+	float width = std::max(panelLayout.defaultWidth, contentWidth + (panelLayout.paddingX * 2.f));
 	float textHeight = titleTextSize.y;
-	if (healthHeight > 0.f) textHeight += lineGap + healthHeight;
-	if (hasDetail) textHeight += lineGap + detailTextSize.y;
-	float height = std::max(defaultHeight, std::max(iconSlotSize, textHeight) + (paddingY * 2.f));
+	if (healthHeight > 0.f) textHeight += panelLayout.lineGap + healthHeight;
+	if (hasDetail) textHeight += panelLayout.lineGap + detailTextSize.y;
+	float height = std::max(panelLayout.defaultHeight,
+	                        std::max(panelLayout.iconSlotSize, textHeight) + (panelLayout.paddingY * 2.f));
 
 	rect.right = rect.left + width;
 	rect.bottom = rect.top + height;
@@ -506,30 +494,33 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 
 	drawInspectorPanel(dc, bounds);
 
-	float iconSlotTop = paddingY + ((height - (paddingY * 2.f) - iconSlotSize) * 0.5f);
+	float iconSlotTop = panelLayout.paddingY +
+	                    ((height - (panelLayout.paddingY * 2.f) - panelLayout.iconSlotSize) * 0.5f);
 	d2d::Rect icon {
-		paddingX + iconInset, iconSlotTop + iconInset,
-		paddingX + iconInset + iconSize, iconSlotTop + iconInset + iconSize
+		panelLayout.paddingX + panelLayout.iconInset, iconSlotTop + panelLayout.iconInset,
+		panelLayout.paddingX + panelLayout.iconInset + panelLayout.iconSize,
+		iconSlotTop + panelLayout.iconInset + panelLayout.iconSize
 	};
 	drawTargetIcon(dc, *target, icon);
 
-	float textLeft = paddingX + iconSlotSize + textGap;
-	float textRight = width - paddingX - (showToolIcons ? toolIconGap + toolIconsWidth : 0.f);
-	float y = paddingY + std::max(0.f, (height - (paddingY * 2.f) - textHeight) * 0.5f);
+	float textLeft = panelLayout.paddingX + panelLayout.iconSlotSize + panelLayout.textGap;
+	float textRight = width - panelLayout.paddingX - (showToolIcons ? toolLayout.gap + toolIconsWidth : 0.f);
+	float y = panelLayout.paddingY +
+	          std::max(0.f, (height - (panelLayout.paddingY * 2.f) - textHeight) * 0.5f);
 	dc.drawText({ textLeft, y, textRight, y + titleTextSize.y + 1.f }, target->title, title,
 	            Renderer::FontSelection::SecondaryLight, titleSize, DWRITE_TEXT_ALIGNMENT_LEADING,
 	            DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
 	y += titleTextSize.y;
 
 	if (healthHeight > 0.f) {
-		y += lineGap;
+		y += panelLayout.lineGap;
 		drawHealthHearts(dc, textLeft - 1.5f, y, target->health, target->maxHealth);
 		y += healthHeight;
 	}
 
 	if (hasDetail) {
-		y += lineGap;
-		dc.drawText({ textLeft, y, textRight, height - paddingY }, target->detail, detail,
+		y += panelLayout.lineGap;
+		dc.drawText({ textLeft, y, textRight, height - panelLayout.paddingY }, target->detail, detail,
 		            Renderer::FontSelection::SecondaryLight, detailSize, DWRITE_TEXT_ALIGNMENT_LEADING,
 		            DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
 	}
@@ -542,6 +533,7 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 			                ? *reinterpret_cast<void **>(reinterpret_cast<uintptr_t>(level) + 0x198)
 			                : nullptr;
 		std::vector<void *> toolCounters(target->toolItemIds.size());
+		bool hasToolCounter = false;
 		if (registry) {
 			auto itemCounters = reinterpret_cast<void ***>(reinterpret_cast<uintptr_t>(registry) + 0x30);
 			for (auto current = itemCounters[0]; current && current < itemCounters[1]; ++current) {
@@ -553,11 +545,12 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 				auto targetItem = std::ranges::find(target->toolItemIds, itemId);
 				if (targetItem != target->toolItemIds.end()) {
 					toolCounters[std::distance(target->toolItemIds.begin(), targetItem)] = counter;
+					hasToolCounter = true;
 				}
 			}
 		}
 
-		if (target->block && std::ranges::any_of(toolCounters, [](void *counter) { return counter != nullptr; })) {
+		if (target->block && hasToolCounter) {
 			alignas(SDK::ItemStack) char storage[sizeof(SDK::ItemStack)] = {};
 			auto toolStack = SDK::ItemStack::constructFromBlock(storage, *target->block, 1, nullptr);
 			if (toolStack) {
@@ -567,17 +560,17 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 
 				auto &mc = static_cast<MCDrawUtil &>(dc);
 				mc.flush(false);
-				float toolX = width - paddingX - toolIconsWidth;
-				for (auto toolCounter : toolCounters) {
+				float toolX = width - panelLayout.paddingX - toolIconsWidth;
+				for (auto toolCounter: toolCounters) {
 					if (toolCounter) {
 						toolStack->item = reinterpret_cast<SDK::Item **>(toolCounter);
 						toolStack->block = nullptr;
 						toolStack->aux = 0;
 						toolStack->itemCount = 1;
-						mc.drawItem(toolStack, { toolX, height - paddingY - toolIconSize },
-						            toolIconSize / 48.f, 1.f);
+						mc.drawItem(toolStack, { toolX, height - panelLayout.paddingY - toolLayout.iconSize },
+						            toolLayout.iconSize / 48.f, 1.f);
 					}
-					toolX += toolIconSize + toolIconSpacing;
+					toolX += toolLayout.iconSize + toolLayout.spacing;
 				}
 
 				toolStack->item = originalItem;
@@ -679,7 +672,8 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult *hit) {
 			.title = titleCaseIdentifier(nameSource),
 			.detail = detail,
 			.block = block,
-			.toolItemIds = findPreferredToolItemIds(*block, toolMode.getSelectedKey() == toolModeMinimumTier),
+			.toolItemIds = findPreferredToolItemIds(
+				*block, toolMode.getSelectedKey() == static_cast<int>(ToolMode::MinimumTier)),
 			.health = -1.f,
 		};
 	}
@@ -742,73 +736,58 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor *actor, float d
 	auto typeComponent = actor->tryGetComponent<SDK::ActorTypeComponent>();
 	if (!typeComponent) return std::nullopt;
 
-	uint32_t type = typeComponent->type;
-	std::wstring title = entityNameFromType(type);
-	SDK::ItemStack *itemStack = nullptr;
-	std::string faceTexturePath;
-	Vec2 faceUvPos = skinFaceUvPos;
-	Vec2 faceUvSize = skinFaceUvSize;
+	TargetInfo info {
+		.type = TargetType::Entity,
+		.title = entityNameFromType(typeComponent->type),
+		.actor = actor,
+	};
 
 	if (actor->isPlayer()) {
 		auto player = static_cast<SDK::Player *>(actor);
 		if (!player->playerName.empty()) {
-			title = util::StrToWStr(player->playerName);
+			info.title = util::StrToWStr(player->playerName);
 		}
 
-		faceTexturePath = getPlayerFaceTexturePath(player);
-		if (!faceTexturePath.empty()) {
-			faceUvPos = { 0.f, 0.f };
-			faceUvSize = { 1.f, 1.f };
+		info.faceTexturePath = getPlayerFaceTexturePath(player);
+		if (!info.faceTexturePath.empty()) {
+			info.faceUvPos = { 0.f, 0.f };
+			info.faceUvSize = { 1.f, 1.f };
 		}
 	} else if (actor->isItem()) {
 		auto itemActor = static_cast<SDK::ItemActor *>(actor);
-		itemStack = itemActor->getItemStack();
-		if (itemStack && itemStack->getItem()) {
-			auto hoverName = itemStack->getHoverName();
+		info.itemStack = itemActor->getItemStack();
+		if (info.itemStack && info.itemStack->getItem()) {
+			auto hoverName = info.itemStack->getHoverName();
 			if (!hoverName.empty()) {
-				title = util::StrToWStr(hoverName);
+				info.title = util::StrToWStr(hoverName);
 			}
 		}
 	}
 
-	std::wstring detail;
 	if (std::get<BoolValue>(showNamespace).value) {
 		// italicize namespace
-		detail = L"\u00A7oMinecraft\u00A7r";
+		info.detail = L"\u00A7oMinecraft\u00A7r";
 	}
 	if (std::get<BoolValue>(showDistance).value) {
-		if (!detail.empty()) detail += L"  ";
+		if (!info.detail.empty()) info.detail += L"  ";
 		std::wstringstream ss;
 		ss << std::fixed << std::setprecision(1) << distanceToActor << L"m";
-		detail += ss.str();
+		info.detail += ss.str();
 	}
 
-	float health = -1.f;
-	float maxHealth = -1.f;
 	if (std::get<BoolValue>(showHealth).value && actor->getHealth() != std::nullopt && !actor->isItem()) {
-		health = actor->getHealth().value();
+		info.health = actor->getHealth().value();
 		if (actor->getMaxHealth() != std::nullopt) {
-			maxHealth = actor->getMaxHealth().value();
+			info.maxHealth = actor->getMaxHealth().value();
 		} else {
-			maxHealth = 20.0f;
+			info.maxHealth = 20.0f;
 		}
 	}
 
-	return TargetInfo {
-		.type = TargetType::Entity,
-		.title = title,
-		.detail = detail,
-		.actor = actor,
-		.itemStack = itemStack,
-		.faceTexturePath = faceTexturePath,
-		.faceUvPos = faceUvPos,
-		.faceUvSize = faceUvSize,
-		.health = health,
-		.maxHealth = maxHealth,
-	};
+	return info;
 }
 
-std::string WAILA::getPlayerFaceTexturePath(SDK::Player *player) {
+std::string WAILA::getPlayerFaceTexturePath(SDK::Player *player) const {
 	if (!player) return {};
 
 	auto clientInstance = SDK::ClientInstance::get();
@@ -839,17 +818,20 @@ std::string WAILA::getPlayerFaceTexturePath(SDK::Player *player) {
 	return {};
 }
 
-void WAILA::drawHealthHearts(DrawUtil &dc, float x, float y, float health, float maxHealth) {
-	int maxHearts = maxHealth > 0 ? static_cast<int>(std::ceil(maxHealth / 2.f)) : heartsPerRow;
+Vec2 WAILA::getHeartPosition(float x, float y, int index) const {
+	return {
+		x + ((index % healthLayout.heartsPerRow) * healthLayout.heartSize),
+		y + ((index / healthLayout.heartsPerRow) * healthLayout.heartSize),
+	};
+}
+
+void WAILA::drawHealthHearts(DrawUtil &dc, float x, float y, float health, float maxHealth) const {
+	int maxHearts = maxHealth > 0
+		                ? static_cast<int>(std::ceil(maxHealth / 2.f))
+		                : healthLayout.heartsPerRow;
 	int halfHearts = std::clamp(static_cast<int>(std::ceil(health)), 0, maxHearts * 2);
 	int filledHearts = halfHearts / 2;
 	bool hasHalfHeart = (halfHearts % 2) != 0;
-	auto getHeartPosition = [x, y](int index) {
-		return Vec2 {
-			x + ((index % heartsPerRow) * heartStride),
-			y + ((index / heartsPerRow) * heartRowStride),
-		};
-	};
 
 	auto &mc = static_cast<MCDrawUtil &>(dc);
 	if (mc.renderCtx) {
@@ -860,18 +842,20 @@ void WAILA::drawHealthHearts(DrawUtil &dc, float x, float y, float health, float
 		                         SDK::ResourceLocation("/resource_packs/vanilla/textures/ui/heart_background",
 		                                               SDK::ResourceFileSystem::AppPackage), false);
 		mc.renderCtx->getTexture(&heartTexture,
-		                         SDK::ResourceLocation("/resource_packs/vanilla/textures/ui/heart", SDK::ResourceFileSystem::AppPackage),
+		                         SDK::ResourceLocation("/resource_packs/vanilla/textures/ui/heart",
+		                                               SDK::ResourceFileSystem::AppPackage),
 		                         false);
 		mc.renderCtx->getTexture(&halfHeartTexture,
-		                         SDK::ResourceLocation("/resource_packs/vanilla/textures/ui/heart_half", SDK::ResourceFileSystem::AppPackage),
+		                         SDK::ResourceLocation("/resource_packs/vanilla/textures/ui/heart_half",
+		                                               SDK::ResourceFileSystem::AppPackage),
 		                         false);
 
 		if (backgroundTexture.textureData && heartTexture.textureData && halfHeartTexture.textureData) {
 			for (int i = 0; i < maxHearts; ++i) {
-				Vec2 position = getHeartPosition(i);
+				Vec2 position = getHeartPosition(x, y, i);
 				mc.renderCtx->drawImage(backgroundTexture,
 				                        { position.x * mc.guiScale, position.y * mc.guiScale },
-				                        { heartSize * mc.guiScale, heartSize * mc.guiScale },
+				                        { healthLayout.heartSize * mc.guiScale, healthLayout.heartSize * mc.guiScale },
 				                        { 0.f, 0.f },
 				                        { 1.f, 1.f });
 			}
@@ -879,10 +863,13 @@ void WAILA::drawHealthHearts(DrawUtil &dc, float x, float y, float health, float
 
 			if (filledHearts > 0) {
 				for (int i = 0; i < filledHearts; ++i) {
-					Vec2 position = getHeartPosition(i);
+					Vec2 position = getHeartPosition(x, y, i);
 					mc.renderCtx->drawImage(heartTexture,
 					                        { position.x * mc.guiScale, position.y * mc.guiScale },
-					                        { heartSize * mc.guiScale, heartSize * mc.guiScale },
+					                        {
+						                        healthLayout.heartSize * mc.guiScale,
+						                        healthLayout.heartSize * mc.guiScale
+					                        },
 					                        { 0.f, 0.f },
 					                        { 1.f, 1.f });
 				}
@@ -890,10 +877,10 @@ void WAILA::drawHealthHearts(DrawUtil &dc, float x, float y, float health, float
 			}
 
 			if (hasHalfHeart && filledHearts < maxHearts) {
-				Vec2 position = getHeartPosition(filledHearts);
+				Vec2 position = getHeartPosition(x, y, filledHearts);
 				mc.renderCtx->drawImage(halfHeartTexture,
 				                        { position.x * mc.guiScale, position.y * mc.guiScale },
-				                        { heartSize * mc.guiScale, heartSize * mc.guiScale },
+				                        { healthLayout.heartSize * mc.guiScale, healthLayout.heartSize * mc.guiScale },
 				                        { 0.f, 0.f },
 				                        { 1.f, 1.f });
 				mc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
@@ -904,12 +891,12 @@ void WAILA::drawHealthHearts(DrawUtil &dc, float x, float y, float health, float
 	}
 
 	for (int i = 0; i < maxHearts; ++i) {
-		Vec2 position = getHeartPosition(i);
+		Vec2 position = getHeartPosition(x, y, i);
 		d2d::Rect heart {
 			position.x,
 			position.y,
-			position.x + heartSize,
-			position.y + heartSize,
+			position.x + healthLayout.heartSize,
+			position.y + healthLayout.heartSize,
 		};
 
 		dc.fillRectangle(heart, d2d::Color::RGB(74, 40, 45, 150));
@@ -924,15 +911,11 @@ void WAILA::drawHealthHearts(DrawUtil &dc, float x, float y, float health, float
 	}
 }
 
-void WAILA::drawTargetIcon(DrawUtil &ctxGeneric, TargetInfo const &target, d2d::Rect const &icon) {
-	// if i dont draw a super small rectangle before drawing items everything gets fucked for some reason
-	//ctxGeneric.fillRoundedRectangle(d2d::Rect(icon.left / 48.f, icon.top / 48.f, icon.right / 48.f, icon.bottom / 48.f),
-	//d2d::Color::RGB(20, 20, 24, 150), 2.f);
-
+void WAILA::drawTargetIcon(DrawUtil &ctxGeneric, TargetInfo const &target, d2d::Rect const &icon) const {
 	auto &dc = static_cast<MCDrawUtil &>(ctxGeneric);
 
 	if (target.type == TargetType::Entity && target.actor && !target.actor->isItem()) {
-		float actorIconExpansion = (icon.getWidth() * (actorIconScale - 1.f)) * 0.5f;
+		float actorIconExpansion = (icon.getWidth() * (panelLayout.actorIconScale - 1.f)) * 0.5f;
 		d2d::Rect actorIcon {
 			icon.left - actorIconExpansion,
 			icon.top - actorIconExpansion,
