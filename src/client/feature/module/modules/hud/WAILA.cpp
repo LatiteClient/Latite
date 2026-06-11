@@ -2,6 +2,8 @@
 #include "WAILA.h"
 
 #include "mc/common/entity/component/ActorTypeComponent.h"
+#include "mc/common/world/DiggerItem.h"
+#include "mc/common/world/WeaponItem.h"
 #include "mc/common/world/actor/item/ItemActor.h"
 #include "mc/common/world/level/BlockSource.h"
 #include "mc/common/world/level/HitResult.h"
@@ -14,6 +16,8 @@ namespace {
 	constexpr float iconSize = 72.f;
 	constexpr float toolIconSize = 36.f;
 	constexpr float toolIconGap = 6.f;
+	constexpr float toolIconSpacing = 2.f;
+	constexpr float toolSpeedEpsilon = 0.0001f;
 	constexpr float paddingX = 7.f;
 	constexpr float paddingY = 6.f;
 	constexpr float textGap = 11.f;
@@ -28,6 +32,121 @@ namespace {
 	constexpr float borderTextureSliceSize = 4.f;
 	constexpr Vec2 skinFaceUvPos { 0.125f, 0.125f };
 	constexpr Vec2 skinFaceUvSize { 0.125f, 0.125f };
+
+	SDK::ItemTier const *getToolTier(SDK::Item *item, std::string_view itemId) {
+		if (itemId.ends_with("_sword") || itemId == "minecraft:mace") {
+			return static_cast<SDK::WeaponItem *>(item)->tier;
+		}
+		if (itemId.ends_with("_pickaxe") || itemId.ends_with("_axe") ||
+		    itemId.ends_with("_shovel") || itemId.ends_with("_hoe")) {
+			return static_cast<SDK::DiggerItem *>(item)->tier;
+		}
+		return nullptr;
+	}
+
+	std::vector<std::string> findPreferredToolItemIds(SDK::Block const &block, bool minimumTier) {
+		static std::unordered_map<SDK::Block const *, std::vector<std::string>> minimumTierCache;
+		static std::unordered_map<SDK::Block const *, std::vector<std::string>> fastestCache;
+		auto &cache = minimumTier ? minimumTierCache : fastestCache;
+		if (auto cached = cache.find(&block); cached != cache.end()) return cached->second;
+
+		if (!Signatures::ItemStack_ItemStackBlock.result || !Signatures::ItemStackBase_destructor.result) return {};
+
+		auto clientInstance = SDK::ClientInstance::get();
+		auto level = clientInstance && clientInstance->minecraft ? clientInstance->minecraft->getLevel() : nullptr;
+		auto registry = level
+			                ? *reinterpret_cast<void **>(reinterpret_cast<uintptr_t>(level) + 0x198)
+			                : nullptr;
+		if (!registry) return {};
+
+		auto itemCounters = reinterpret_cast<void ***>(reinterpret_cast<uintptr_t>(registry) + 0x30);
+		if (!itemCounters[0] || !itemCounters[1]) return {};
+
+		alignas(SDK::ItemStack) char storage[sizeof(SDK::ItemStack)] = {};
+		auto candidateStack = SDK::ItemStack::constructFromBlock(storage, block, 1, nullptr);
+		if (!candidateStack) return {};
+
+		auto originalItem = candidateStack->item;
+		auto originalBlock = candidateStack->block;
+		auto originalAux = candidateStack->aux;
+		float bestDestroySpeed = 1.f;
+		std::vector<std::string> bestItemIds;
+		struct ToolFamilyCandidate {
+			void **vtable;
+			SDK::ItemTier const *tier;
+			float destroySpeed;
+			std::string itemId;
+		};
+		std::vector<ToolFamilyCandidate> minimumTierCandidates;
+
+		for (auto current = itemCounters[0]; current < itemCounters[1]; ++current) {
+			auto counter = *current;
+			auto item = counter ? *reinterpret_cast<SDK::Item **>(counter) : nullptr;
+			if (!item) continue;
+
+			candidateStack->item = reinterpret_cast<SDK::Item **>(counter);
+			candidateStack->block = nullptr;
+			candidateStack->aux = 0;
+			candidateStack->itemCount = 1;
+
+			float destroySpeed = item->getDestroySpeed(candidateStack, &block);
+			if (destroySpeed <= 1.f) continue;
+
+			std::string itemId = item->namespacedId.getString();
+			if (itemId.empty()) continue;
+
+			if (minimumTier) {
+				if (!item->canDestroySpecial(&block)) continue;
+
+				auto vtable = *reinterpret_cast<void ***>(item);
+				auto tier = getToolTier(item, itemId);
+				auto family = std::ranges::find_if(minimumTierCandidates, [&](ToolFamilyCandidate const &candidate) {
+					return candidate.vtable == vtable;
+				});
+				if (family == minimumTierCandidates.end()) {
+					minimumTierCandidates.push_back({ vtable, tier, destroySpeed, std::move(itemId) });
+				} else {
+					bool lowerTier = tier && (!family->tier ||
+					                         tier->level < family->tier->level ||
+					                         (tier->level == family->tier->level &&
+					                          tier->speed < family->tier->speed - toolSpeedEpsilon));
+					bool sameTier = (!tier && !family->tier) ||
+					                (tier && family->tier && tier->level == family->tier->level &&
+					                 std::abs(tier->speed - family->tier->speed) <= toolSpeedEpsilon);
+					if (lowerTier ||
+					    (sameTier && destroySpeed < family->destroySpeed - toolSpeedEpsilon)) {
+						family->tier = tier;
+						family->destroySpeed = destroySpeed;
+						family->itemId = std::move(itemId);
+					}
+				}
+				continue;
+			}
+
+			if (destroySpeed > bestDestroySpeed + toolSpeedEpsilon) {
+				bestDestroySpeed = destroySpeed;
+				bestItemIds.clear();
+				bestItemIds.push_back(std::move(itemId));
+			} else if (std::abs(destroySpeed - bestDestroySpeed) <= toolSpeedEpsilon &&
+			           std::ranges::find(bestItemIds, itemId) == bestItemIds.end()) {
+				bestItemIds.push_back(std::move(itemId));
+			}
+		}
+
+		if (minimumTier) {
+			bestItemIds.reserve(minimumTierCandidates.size());
+			for (auto &candidate : minimumTierCandidates) {
+				bestItemIds.push_back(std::move(candidate.itemId));
+			}
+		}
+
+		candidateStack->item = originalItem;
+		candidateStack->block = originalBlock;
+		candidateStack->aux = originalAux;
+		candidateStack->destruct();
+		cache.insert_or_assign(&block, bestItemIds);
+		return bestItemIds;
+	}
 
 	SDK::ImageInfo makeBorderSlice(float x, float y, float w, float h, float u, float v, float uw, float vh) {
 		return SDK::ImageInfo {
@@ -392,6 +511,12 @@ WAILA::WAILA() : HUDModule("WAILA", L"WAILA", L"Shows the block or entity you ar
 	addSetting("showDistance", L"Distance", L"Show distance to the target.", showDistance);
 	addSetting("showHarvest", L"Tool Info", L"Show the preferred tool for the targeted block.",
 	           showHarvest, "showBlocks"_istrue);
+	toolMode.addEntry(EnumEntry { toolModeMinimumTier, L"Minimum Tier",
+	                             L"Show the lowest-tier effective tool that can correctly harvest the block." });
+	toolMode.addEntry(EnumEntry { toolModeFastest, L"Fastest",
+	                             L"Show the tool with the highest native destroy speed." });
+	addEnumSetting("toolMode", L"Tool Mode", L"How the preferred mining tool is selected.", toolMode,
+	               "showHarvest"_istrue);
 	addSetting("showHealth", L"Health", L"Show health pips for living entities.", showHealth, "showEntities"_istrue);
 	addSliderSetting("entityDistance", L"Entity Distance", L"Maximum entity inspection distance.", entityDistance,
 	                 FloatValue(2.f), FloatValue(12.f), FloatValue(0.5f), "showEntities"_istrue);
@@ -446,14 +571,18 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 	}
 
 	float textWidth = std::max(titleTextSize.x, detailTextSize.x);
-	bool showToolIcon = target->type == TargetType::Block && !target->toolItemId.empty();
+	bool showToolIcons = target->type == TargetType::Block && !target->toolItemIds.empty();
+	float toolIconsWidth = showToolIcons
+		                       ? (toolIconSize * static_cast<float>(target->toolItemIds.size())) +
+		                         (toolIconSpacing * static_cast<float>(target->toolItemIds.size() - 1))
+		                       : 0.f;
 	if (healthHeight > 0.f) {
 		int heartsInWidestRow = std::min(targetMaxHearts, heartsPerRow);
 		float healthWidth = heartSize + (heartStride * (heartsInWidestRow - 1));
 		textWidth = std::max(textWidth, healthWidth);
 	}
 	float contentWidth = iconSize + textGap + textWidth +
-	                     (showToolIcon ? toolIconGap + toolIconSize : 0.f);
+	                     (showToolIcons ? toolIconGap + toolIconsWidth : 0.f);
 	float width = std::max(defaultWidth, contentWidth + (paddingX * 2.f));
 	float textHeight = titleTextSize.y + detailTextSize.y + healthHeight;
 	float height = std::max(defaultHeight, std::max(iconSize, textHeight) + (paddingY * 2.f));
@@ -478,7 +607,7 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 	drawTargetIcon(dc, *target, icon);
 
 	float textLeft = paddingX + iconSize + textGap;
-	float textRight = width - paddingX - (showToolIcon ? toolIconGap + toolIconSize : 0.f);
+	float textRight = width - paddingX - (showToolIcons ? toolIconGap + toolIconsWidth : 0.f);
 	float y = paddingY + std::max(0.f, (height - (paddingY * 2.f) - textHeight) * 0.5f);
 	dc.drawText({ textLeft, y - 1.f, textRight, y + titleTextSize.y + 2.f }, target->title, title,
 	            Renderer::FontSelection::SecondaryLight, titleSize, DWRITE_TEXT_ALIGNMENT_LEADING,
@@ -498,43 +627,50 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 		            DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
 	}
 
-	if (showToolIcon && dc.isMinecraft() && Signatures::ItemStack_ItemStackBlock.result &&
+	if (showToolIcons && dc.isMinecraft() && Signatures::ItemStack_ItemStackBlock.result &&
 	    Signatures::ItemStackBase_destructor.result) {
 		auto clientInstance = SDK::ClientInstance::get();
 		auto level = clientInstance && clientInstance->minecraft ? clientInstance->minecraft->getLevel() : nullptr;
 		auto registry = level
 			                ? *reinterpret_cast<void **>(reinterpret_cast<uintptr_t>(level) + 0x198)
 			                : nullptr;
-		void *toolCounter = nullptr;
+		std::vector<void *> toolCounters(target->toolItemIds.size());
 		if (registry) {
 			auto itemCounters = reinterpret_cast<void ***>(reinterpret_cast<uintptr_t>(registry) + 0x30);
 			for (auto current = itemCounters[0]; current && current < itemCounters[1]; ++current) {
 				auto counter = *current;
 				auto item = counter ? *reinterpret_cast<SDK::Item **>(counter) : nullptr;
-				if (item && item->namespacedId.getString() == target->toolItemId) {
-					toolCounter = counter;
-					break;
+				if (!item) continue;
+
+				auto itemId = item->namespacedId.getString();
+				auto targetItem = std::ranges::find(target->toolItemIds, itemId);
+				if (targetItem != target->toolItemIds.end()) {
+					toolCounters[std::distance(target->toolItemIds.begin(), targetItem)] = counter;
 				}
 			}
 		}
 
-		if (toolCounter && target->block) {
+		if (target->block && std::ranges::any_of(toolCounters, [](void *counter) { return counter != nullptr; })) {
 			alignas(SDK::ItemStack) char storage[sizeof(SDK::ItemStack)] = {};
 			auto toolStack = SDK::ItemStack::constructFromBlock(storage, *target->block, 1, nullptr);
 			if (toolStack) {
 				auto originalItem = toolStack->item;
 				auto originalBlock = toolStack->block;
 				auto originalAux = toolStack->aux;
-				toolStack->item = reinterpret_cast<SDK::Item **>(toolCounter);
-				toolStack->block = nullptr;
-				toolStack->aux = 0;
-				toolStack->itemCount = 1;
 
 				auto &mc = static_cast<MCDrawUtil &>(dc);
-				mc.drawItem(toolStack, {
-					            width - paddingX - toolIconSize,
-					            height - paddingY - toolIconSize,
-				            }, toolIconSize / 48.f, 1.f);
+				float toolX = width - paddingX - toolIconsWidth;
+				for (auto toolCounter : toolCounters) {
+					if (toolCounter) {
+						toolStack->item = reinterpret_cast<SDK::Item **>(toolCounter);
+						toolStack->block = nullptr;
+						toolStack->aux = 0;
+						toolStack->itemCount = 1;
+						mc.drawItem(toolStack, { toolX, height - paddingY - toolIconSize },
+						            toolIconSize / 48.f, 1.f);
+					}
+					toolX += toolIconSize + toolIconSpacing;
+				}
 
 				toolStack->item = originalItem;
 				toolStack->block = originalBlock;
@@ -619,47 +755,12 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult *hit) {
 		detail += ss.str();
 	}
 	if (std::get<BoolValue>(showHarvest).value) {
-		auto containsAny = [&](std::initializer_list<std::string_view> needles) {
-			return std::ranges::any_of(needles, [&](std::string_view needle) {
-				return namespacedId.find(needle) != std::string::npos;
-			});
-		};
-		std::string toolItemId;
-		if (containsAny({ "leaves", "leaf_litter" })) {
-			toolItemId = "minecraft:shears";
-		} else if (containsAny({ "cobweb" })) {
-			toolItemId = "minecraft:shears";
-		} else if (containsAny({ "wool", "vine", "lichen", "web", "tripwire" })) {
-			toolItemId = "minecraft:shears";
-		} else if (containsAny({
-			           "_log", "_wood", "stem", "hyphae", "planks", "bookshelf", "chest", "barrel",
-			           "crafting_table", "fence", "wooden_", "bamboo", "pumpkin", "melon",
-		           })) {
-			toolItemId = "minecraft:wooden_axe";
-		} else if (containsAny({
-			           "dirt", "grass_block", "sand", "gravel", "clay", "snow", "soul_sand", "soul_soil", "mud",
-			           "mycelium", "podzol", "path",
-		           })) {
-			toolItemId = "minecraft:wooden_shovel";
-		} else if (containsAny({
-			           "hay_block", "wart_block", "sponge", "sculk", "moss", "shroomlight", "target",
-		           })) {
-			toolItemId = "minecraft:wooden_hoe";
-		} else if (containsAny({
-			           "stone", "ore", "deepslate", "cobble", "brick", "concrete", "terracotta", "obsidian", "anvil",
-			           "furnace", "rail", "copper", "iron", "gold", "diamond", "emerald", "lapis", "redstone",
-			           "quartz", "prismarine", "basalt", "blackstone", "netherrack", "end_stone", "dripstone",
-			           "tuff", "calcite", "amethyst",
-		           })) {
-			toolItemId = "minecraft:wooden_pickaxe";
-		}
-
 		return TargetInfo {
 			.type = TargetType::Block,
 			.title = titleCaseIdentifier(nameSource),
 			.detail = detail,
 			.block = block,
-			.toolItemId = std::move(toolItemId),
+			.toolItemIds = findPreferredToolItemIds(*block, toolMode.getSelectedKey() == toolModeMinimumTier),
 			.health = -1.f,
 		};
 	}

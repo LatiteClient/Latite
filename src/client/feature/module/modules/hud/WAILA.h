@@ -25,7 +25,7 @@ private:
 		SDK::Block const* block = nullptr;
 		SDK::Actor* actor = nullptr;
 		SDK::ItemStack* itemStack = nullptr;
-		std::string toolItemId;
+		std::vector<std::string> toolItemIds;
 		std::string faceTexturePath;
 		Vec2 faceUvPos{};
 		Vec2 faceUvSize{ 1.f, 1.f };
@@ -39,6 +39,9 @@ private:
 	ValueType showCoordinates = BoolValue(false);
 	ValueType showDistance = BoolValue(false);
 	ValueType showHarvest = BoolValue(true);
+	static constexpr int toolModeMinimumTier = 0;
+	static constexpr int toolModeFastest = 1;
+	EnumData toolMode;
 	ValueType showHealth = BoolValue(true);
 	ValueType entityDistance = FloatValue(6.f);
 	ValueType textSize = FloatValue(36.f);
