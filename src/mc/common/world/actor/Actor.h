@@ -44,6 +44,9 @@ namespace SDK {
 		void setRotationY(float value);
 		uint64_t getRuntimeID();
 		uint32_t getEntityTypeID();
+		std::string getEntityLocalizationKey();
+		std::string getEntityTypeName();
+		std::string getEntityNamespace();
 		void const* getActorRendererId();
 		void const* getActorRendererIdOverride();
 		void swing();

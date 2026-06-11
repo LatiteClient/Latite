@@ -95,8 +95,10 @@ private:
 
 	SDK::ItemTier const* getToolTier(SDK::Item* item, std::string_view itemId) const;
 	std::vector<std::string> findPreferredToolItemIds(SDK::Block const& block, bool minimumTier);
+	std::optional<std::wstring> getLocalizedMinecraftName(std::string const& key) const;
+	std::wstring getBlockDisplayName(
+		SDK::Block const& block, std::string const& localizationKey, std::string const& fallbackName) const;
 	std::wstring titleCaseIdentifier(std::string id) const;
-	std::wstring entityNameFromType(uint32_t id) const;
 	Vec3 rayDirectionFromHit(SDK::HitResult* hit) const;
 	std::string getPlayerFaceTexturePath(SDK::Player* player) const;
 	Vec2 getHeartPosition(float x, float y, int index) const;

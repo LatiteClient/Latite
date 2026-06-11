@@ -5,6 +5,7 @@
 #include <mc/common/entity/component/AttributesComponent.h>
 
 #include "mc/common/entity/component/ActorDataFlagComponent.h"
+#include "mc/common/entity/component/ActorDefinitionIdentifierComponent.h"
 #include "mc/common/entity/component/ActorEquipmentComponent.h"
 #include "mc/common/entity/component/ActorTypeComponent.h"
 #include "mc/common/entity/component/MobBodyRotationComponent.h"
@@ -81,6 +82,33 @@ uint64_t SDK::Actor::getRuntimeID() {
 
 uint32_t SDK::Actor::getEntityTypeID() {
 	return this->tryGetComponent<ActorTypeComponent>()->type;
+}
+
+std::string SDK::Actor::getEntityLocalizationKey() {
+	auto component = this->tryGetComponent<ActorDefinitionIdentifierComponent>();
+	if (!component) return {};
+
+	auto const& identifier = component->identifier;
+	if (identifier.identifier.empty()) return {};
+
+	std::string key = "entity.";
+	if (!identifier.nameSpace.empty() && identifier.nameSpace != "minecraft") {
+		key += identifier.nameSpace;
+		key += ':';
+	}
+	key += identifier.identifier;
+	key += ".name";
+	return key;
+}
+
+std::string SDK::Actor::getEntityTypeName() {
+	auto component = this->tryGetComponent<ActorDefinitionIdentifierComponent>();
+	return component ? component->identifier.canonicalName.getString() : std::string {};
+}
+
+std::string SDK::Actor::getEntityNamespace() {
+	auto component = this->tryGetComponent<ActorDefinitionIdentifierComponent>();
+	return component ? component->identifier.nameSpace : std::string {};
 }
 
 void const* SDK::Actor::getActorRendererId() {

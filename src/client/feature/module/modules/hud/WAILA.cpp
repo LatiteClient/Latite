@@ -2,6 +2,7 @@
 #include "WAILA.h"
 
 #include "mc/common/entity/component/ActorTypeComponent.h"
+#include "mc/common/locale/I18n.h"
 #include "mc/common/world/DiggerItem.h"
 #include "mc/common/world/WeaponItem.h"
 #include "mc/common/world/actor/item/ItemActor.h"
@@ -155,6 +156,45 @@ std::vector<std::string> WAILA::findPreferredToolItemIds(SDK::Block const &block
 	return bestItemIds;
 }
 
+std::optional<std::wstring> WAILA::getLocalizedMinecraftName(std::string const &key) const {
+	if (key.empty()) return std::nullopt;
+
+	auto i18n = SDK::I18n::get();
+	if (!i18n) return std::nullopt;
+
+	auto localizedName = i18n->get(key);
+	if (localizedName.empty() || localizedName == key || localizedName == "%" + key) {
+		return std::nullopt;
+	}
+	return util::StrToWStr(localizedName);
+}
+
+std::wstring WAILA::getBlockDisplayName(
+	SDK::Block const &block, std::string const &localizationKey, std::string const &fallbackName) const {
+	if (Signatures::ItemStackBase_getHoverName.result &&
+	    Signatures::ItemStack_ItemStackBlock.result &&
+	    Signatures::ItemStackBase_destructor.result) {
+		alignas(SDK::ItemStack) char storage[sizeof(SDK::ItemStack)] = {};
+		auto itemStack = SDK::ItemStack::constructFromBlock(storage, block, 1, nullptr);
+		if (itemStack) {
+			auto hoverName = itemStack->getHoverName();
+			itemStack->destruct();
+			if (!hoverName.empty()) {
+				return util::StrToWStr(hoverName);
+			}
+		}
+	}
+
+	if (!localizationKey.empty()) {
+		auto key = localizationKey.ends_with(".name") ? localizationKey : localizationKey + ".name";
+		if (auto localizedName = getLocalizedMinecraftName(key)) {
+			return *localizedName;
+		}
+	}
+
+	return titleCaseIdentifier(fallbackName);
+}
+
 void WAILA::drawInspectorPanel(DrawUtil &dc, d2d::Rect const &bounds) const {
 	auto &mc = static_cast<MCDrawUtil &>(dc);
 	if (!mc.renderCtx) return;
@@ -257,152 +297,6 @@ std::wstring WAILA::titleCaseIdentifier(std::string id) const {
 	if (out == L"Tnt") return L"TNT";
 	if (out.empty()) return L"Unknown";
 	return out;
-}
-
-// TODO: PLEASE PLEASE PLEASE REPLACE THIS THIS IS THE DUMBEST SHIT EVER
-std::wstring WAILA::entityNameFromType(uint32_t id) const {
-	switch (id) {
-		case 64: return L"Item";
-		case 65: return L"Primed TNT";
-		case 66: return L"Falling Block";
-		case 69: return L"Experience Orb";
-		case 70: return L"Eye of Ender";
-		case 71: return L"End Crystal";
-		case 72: return L"Firework Rocket";
-		case 77: return L"Fishing Hook";
-		case 83: return L"Painting";
-		case 90: return L"Boat";
-		case 93: return L"Lightning Bolt";
-		case 95: return L"Area Effect Cloud";
-		case 117: return L"Shield";
-		case 119: return L"Lectern";
-		case 145: return L"Ominous Item Spawner";
-		case 218: return L"Chest Boat";
-		case 307: return L"NPC";
-		case 312: return L"Agent";
-		case 317: return L"Armor Stand";
-		case 318: return L"Tripod Camera";
-		case 319: return L"Player";
-		case 378: return L"Bee";
-		case 379: return L"Piglin";
-		case 383: return L"Piglin Brute";
-		case 390: return L"Allay";
-		case 788: return L"Iron Golem";
-		case 789: return L"Snow Golem";
-		case 886: return L"Wandering Trader";
-		case 916: return L"Copper Golem";
-		case 2849: return L"Creeper";
-		case 2853: return L"Slime";
-		case 2854: return L"Enderman";
-		case 2857: return L"Ghast";
-		case 2858: return L"Magma Cube";
-		case 2859: return L"Blaze";
-		case 2861: return L"Witch";
-		case 2865: return L"Guardian";
-		case 2866: return L"Elder Guardian";
-		case 2869: return L"Ender Dragon";
-		case 2870: return L"Shulker";
-		case 2873: return L"Vindicator";
-		case 2875: return L"Ravager";
-		case 2920: return L"Evoker";
-		case 2921: return L"Vex";
-		case 2930: return L"Pillager";
-		case 2936: return L"Elder Guardian Ghost";
-		case 2947: return L"Warden";
-		case 2956: return L"Breeze";
-		case 2962: return L"Creaking";
-		case 4874: return L"Chicken";
-		case 4875: return L"Cow";
-		case 4876: return L"Pig";
-		case 4877: return L"Sheep";
-		case 4880: return L"Mooshroom";
-		case 4882: return L"Rabbit";
-		case 4892: return L"Polar Bear";
-		case 4893: return L"Llama";
-		case 4938: return L"Turtle";
-		case 4977: return L"Panda";
-		case 4985: return L"Fox";
-		case 4988: return L"Hoglin";
-		case 4989: return L"Strider";
-		case 4992: return L"Goat";
-		case 4994: return L"Axolotl";
-		case 4996: return L"Frog";
-		case 5002: return L"Camel";
-		case 5003: return L"Sniffer";
-		case 5006: return L"Armadillo";
-		case 5011: return L"Happy Ghast";
-		case 5021: return L"Trader Llama";
-		case 8977: return L"Squid";
-		case 8991: return L"Dolphin";
-		case 9068: return L"Pufferfish";
-		case 9069: return L"Salmon";
-		case 9071: return L"Tropical Fish";
-		case 9072: return L"Fish";
-		case 9089: return L"Glow Squid";
-		case 9093: return L"Tadpole";
-		case 9109: return L"Nautilus";
-		case 21262: return L"Wolf";
-		case 21270: return L"Ocelot";
-		case 21278: return L"Parrot";
-		case 21323: return L"Cat";
-		case 33043: return L"Bat";
-		case 68388: return L"Zombified Piglin";
-		case 68404: return L"Wither";
-		case 68410: return L"Phantom";
-		case 68478: return L"Zoglin";
-		case 68504: return L"Camel Husk";
-		case 76694: return L"Zombie Nautilus";
-		case 199456: return L"Zombie";
-		case 199468: return L"Zombie Villager";
-		case 199471: return L"Husk";
-		case 199534: return L"Drowned";
-		case 199540: return L"Zombie Villager";
-		case 264995: return L"Spider";
-		case 264999: return L"Silverfish";
-		case 265000: return L"Cave Spider";
-		case 265015: return L"Endermite";
-		case 524372: return L"Minecart";
-		case 524384: return L"Hopper Minecart";
-		case 524385: return L"TNT Minecart";
-		case 524386: return L"Chest Minecart";
-		case 524387: return L"Furnace Minecart";
-		case 524388: return L"Command Block Minecart";
-		case 1116962: return L"Skeleton";
-		case 1116974: return L"Stray";
-		case 1116976: return L"Wither Skeleton";
-		case 1117072: return L"Bogged";
-		case 1117079: return L"Parched";
-		case 16777999: return L"Villager";
-		case 16778099: return L"Villager";
-		case 2118423: return L"Horse";
-		case 2118424: return L"Donkey";
-		case 2118425: return L"Mule";
-		case 2186010: return L"Skeleton Horse";
-		case 2186011: return L"Zombie Horse";
-		case 4194372: return L"Experience Bottle";
-		case 4194380: return L"Shulker Bullet";
-		case 4194383: return L"Dragon Fireball";
-		case 4194385: return L"Snowball";
-		case 4194386: return L"Egg";
-		case 4194389: return L"Fireball";
-		case 4194390: return L"Potion";
-		case 4194391: return L"Ender Pearl";
-		case 4194393: return L"Wither Skull";
-		case 4194395: return L"Wither Skull";
-		case 4194398: return L"Small Fireball";
-		case 4194405: return L"Lingering Potion";
-		case 4194406: return L"Llama Spit";
-		case 4194407: return L"Evocation Fang";
-		case 4194410: return L"Ice Bomb";
-		case 4194445: return L"Breeze Wind Charge";
-		case 4194447: return L"Wind Charge";
-		case 12582985: return L"Trident";
-		case 12582992: return L"Arrow";
-		default:
-			std::wstringstream ss;
-			ss << L"Entity " << id;
-			return ss.str();
-	}
 }
 
 Vec3 WAILA::rayDirectionFromHit(SDK::HitResult *hit) const {
@@ -637,6 +531,7 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult *hit) {
 
 	auto legacy = block->legacyBlock;
 	auto namespacedId = legacy->namespacedId.getString();
+	auto localizationKey = legacy->translateName;
 	std::string nameSource = legacy->name.getString();
 	if (nameSource.empty()) {
 		nameSource = "block";
@@ -669,7 +564,7 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult *hit) {
 	if (std::get<BoolValue>(showHarvest).value) {
 		return TargetInfo {
 			.type = TargetType::Block,
-			.title = titleCaseIdentifier(nameSource),
+			.title = getBlockDisplayName(*block, localizationKey, nameSource),
 			.detail = detail,
 			.block = block,
 			.toolItemIds = findPreferredToolItemIds(
@@ -680,7 +575,7 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult *hit) {
 
 	return TargetInfo {
 		.type = TargetType::Block,
-		.title = titleCaseIdentifier(nameSource),
+		.title = getBlockDisplayName(*block, localizationKey, nameSource),
 		.detail = detail,
 		.block = block,
 		.health = -1.f,
@@ -738,9 +633,16 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor *actor, float d
 
 	TargetInfo info {
 		.type = TargetType::Entity,
-		.title = entityNameFromType(typeComponent->type),
 		.actor = actor,
 	};
+
+	auto localizationKey = actor->getEntityLocalizationKey();
+	if (auto localizedName = getLocalizedMinecraftName(localizationKey)) {
+		info.title = *localizedName;
+	} else {
+		auto typeName = actor->getEntityTypeName();
+		info.title = titleCaseIdentifier(typeName.empty() ? "entity" : typeName);
+	}
 
 	if (actor->isPlayer()) {
 		auto player = static_cast<SDK::Player *>(actor);
@@ -765,8 +667,11 @@ std::optional<WAILA::TargetInfo> WAILA::getEntityInfo(SDK::Actor *actor, float d
 	}
 
 	if (std::get<BoolValue>(showNamespace).value) {
-		// italicize namespace
-		info.detail = L"\u00A7oMinecraft\u00A7r";
+		auto entityNamespace = actor->getEntityNamespace();
+		if (!entityNamespace.empty()) {
+			// italicize namespace
+			info.detail = L"\u00A7o" + titleCaseIdentifier(entityNamespace) + L"\u00A7r";
+		}
 	}
 	if (std::get<BoolValue>(showDistance).value) {
 		if (!info.detail.empty()) info.detail += L"  ";
