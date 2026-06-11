@@ -946,7 +946,7 @@ void WAILA::drawTargetIcon(DrawUtil &ctxGeneric, TargetInfo const &target, d2d::
 
 		if (target.itemStack->itemCount > 1) {
 			dc.drawText(icon, std::to_wstring(target.itemStack->itemCount), d2d::Colors::WHITE,
-			            Renderer::FontSelection::PrimaryRegular, 24.f, DWRITE_TEXT_ALIGNMENT_TRAILING,
+			            Renderer::FontSelection::PrimaryRegular, 21.f, DWRITE_TEXT_ALIGNMENT_TRAILING,
 			            DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 		}
 	} else if (target.type == TargetType::Block && target.block &&
