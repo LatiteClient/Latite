@@ -11,40 +11,40 @@
 #include "mc/common/world/level/block/Block.h"
 #include "client/misc/PlayerHeadCache.h"
 
-WAILA::WAILA() : HUDModule("WAILA", L"WAILA", L"Shows the block or entity you are looking at.", HUD) {
+WAILA::WAILA() : HUDModule("WAILA", LocalizeString::get("client.hudmodule.waila.name"), LocalizeString::get("client.hudmodule.waila.desc"), HUD) {
 	showPreview = false;
 
-	addSetting("showBlocks", L"Blocks", L"Show block information.", showBlocks);
-	addSetting("showEntities", L"Entities", L"Show entity information.", showEntities);
-	addSetting("showNamespace", L"Namespace", L"Show the source namespace or mod id.", showNamespace);
-	addSetting("showItemId", L"Item ID", L"Show the full namespaced block or item id.", showItemId,
+	addSetting("showBlocks", LocalizeString::get("client.hudmodule.waila.showBlocks.name"), LocalizeString::get("client.hudmodule.waila.showBlocks.desc"), showBlocks);
+	addSetting("showEntities", LocalizeString::get("client.hudmodule.waila.showEntities.name"), LocalizeString::get("client.hudmodule.waila.showEntities.desc"), showEntities);
+	addSetting("showNamespace", LocalizeString::get("client.hudmodule.waila.showNamespace.name"), LocalizeString::get("client.hudmodule.waila.showNamespace.desc"), showNamespace);
+	addSetting("showItemId", LocalizeString::get("client.hudmodule.waila.showItemId.name"), LocalizeString::get("client.hudmodule.waila.showItemId.desc"), showItemId,
 	           "showNamespace"_istrue);
-	addSetting("showCoordinates", L"Coordinates", L"Show target block coordinates.", showCoordinates,
+	addSetting("showCoordinates", LocalizeString::get("client.hudmodule.waila.showCoordinates.name"), LocalizeString::get("client.hudmodule.waila.showCoordinates.desc"), showCoordinates,
 	           "showBlocks"_istrue);
-	addSetting("showDistance", L"Distance", L"Show distance to the target.", showDistance);
-	addSetting("showHarvest", L"Tool Info", L"Show the preferred tool for the targeted block.",
+	addSetting("showDistance", LocalizeString::get("client.hudmodule.waila.showDistance.name"), LocalizeString::get("client.hudmodule.waila.showDistance.desc"), showDistance);
+	addSetting("showHarvest", LocalizeString::get("client.hudmodule.waila.showHarvest.name"), LocalizeString::get("client.hudmodule.waila.showHarvest.desc"),
 	           showHarvest, "showBlocks"_istrue);
 	toolMode.addEntry(EnumEntry {
-		static_cast<int>(ToolMode::HighestTier), L"Highest Tier",
-		L"Show the highest-tier effective tool for breaking a block."
+		static_cast<int>(ToolMode::HighestTier), LocalizeString::get("client.hudmodule.waila.toolModeHighestTier.name"),
+		LocalizeString::get("client.hudmodule.waila.toolModeHighestTier.desc")
 	});
 	toolMode.addEntry(EnumEntry {
-		static_cast<int>(ToolMode::MinimumTier), L"Minimum Tier",
-		L"Show the lowest-tier effective tool that can correctly harvest the block."
+		static_cast<int>(ToolMode::MinimumTier), LocalizeString::get("client.hudmodule.waila.toolModeMinimumTier.name"),
+		LocalizeString::get("client.hudmodule.waila.toolModeMinimumTier.desc")
 	});
 	toolMode.addEntry(EnumEntry {
-		static_cast<int>(ToolMode::Fastest), L"Fastest",
-		L"Show the tool with the highest native destroy speed."
+		static_cast<int>(ToolMode::Fastest), LocalizeString::get("client.hudmodule.waila.toolModeFastest.name"),
+		LocalizeString::get("client.hudmodule.waila.toolModeFastest.desc")
 	});
-	addEnumSetting("toolMode", L"Tool Mode", L"How the preferred mining tool is selected.", toolMode,
+	addEnumSetting("toolMode", LocalizeString::get("client.hudmodule.waila.toolMode.name"), LocalizeString::get("client.hudmodule.waila.toolMode.desc"), toolMode,
 	               "showHarvest"_istrue);
-	addSetting("showHealth", L"Health", L"Show health pips for living entities.", showHealth, "showEntities"_istrue);
-	addSliderSetting("entityDistance", L"Entity Distance", L"Maximum entity inspection distance.", entityDistance,
+	addSetting("showHealth", LocalizeString::get("client.hudmodule.waila.showHealth.name"), LocalizeString::get("client.hudmodule.waila.showHealth.desc"), showHealth, "showEntities"_istrue);
+	addSliderSetting("entityDistance", LocalizeString::get("client.hudmodule.waila.entityDistance.name"), LocalizeString::get("client.hudmodule.waila.entityDistance.desc"), entityDistance,
 	                 FloatValue(2.f), FloatValue(12.f), FloatValue(0.5f), "showEntities"_istrue);
-	addSliderSetting("textSize", L"Text Size", L"Text size for the inspector.", textSize,
+	addSliderSetting("textSize", LocalizeString::get("client.hudmodule.waila.textSize.name"), LocalizeString::get("client.hudmodule.waila.textSize.desc"), textSize,
 	                 FloatValue(20.f), FloatValue(44.f), FloatValue(1.f));
-	addSetting("titleColor", L"Title", L"Inspector title color.", titleColor);
-	addSetting("detailColor", L"Detail", L"Inspector detail color.", detailColor);
+	addSetting("titleColor", LocalizeString::get("client.hudmodule.waila.titleColor.name"), LocalizeString::get("client.hudmodule.waila.titleColor.desc"), titleColor);
+	addSetting("detailColor", LocalizeString::get("client.hudmodule.waila.detailColor.name"), LocalizeString::get("client.hudmodule.waila.detailColor.desc"), detailColor);
 
 	rect = { 0.f, 0.f, panelLayout.defaultWidth, panelLayout.defaultHeight };
 }
@@ -312,8 +312,8 @@ std::wstring WAILA::titleCaseIdentifier(std::string id) const {
 		newWord = false;
 	}
 
-	if (out == L"Tnt") return L"TNT";
-	if (out.empty()) return L"Unknown";
+	if (out == L"Tnt") return LocalizeString::get("client.hudmodule.waila.tnt.name");
+	if (out.empty()) return LocalizeString::get("client.hudmodule.waila.unknown.name");
 	return out;
 }
 
@@ -504,7 +504,7 @@ std::optional<WAILA::TargetInfo> WAILA::getTargetInfo(bool preview) {
 		bool itemIdEnabled = std::get<BoolValue>(showItemId).value;
 		return TargetInfo {
 			.type = TargetType::Block,
-			.title = L"Stone",
+			.title = LocalizeString::get("client.hudmodule.waila.stone.name"),
 			.detail = namespaceEnabled
 				          ? (itemIdEnabled ? L"\u00A7ominecraft:stone\u00A7r" : L"\u00A7oMinecraft\u00A7r") // italicize namespace
 				          : L"",
