@@ -20,6 +20,7 @@ private:
 	};
 
 	enum class ToolMode : int {
+		HighestTier,
 		MinimumTier,
 		Fastest,
 	};
@@ -87,6 +88,7 @@ private:
 
 	std::unordered_map<SDK::Block const*, std::vector<std::string>> minimumTierToolCache;
 	std::unordered_map<SDK::Block const*, std::vector<std::string>> fastestToolCache;
+	std::unordered_map<SDK::Block const*, std::vector<std::string>> highestTierToolCache;
 
 	std::optional<TargetInfo> getTargetInfo(bool preview);
 	std::optional<TargetInfo> getBlockTarget(SDK::HitResult* hit);
@@ -94,7 +96,7 @@ private:
 	std::optional<TargetInfo> getEntityInfo(SDK::Actor* actor, float distance);
 
 	SDK::ItemTier const* getToolTier(SDK::Item* item, std::string_view itemId) const;
-	std::vector<std::string> findPreferredToolItemIds(SDK::Block const& block, bool minimumTier);
+	std::vector<std::string> findPreferredToolItemIds(SDK::Block const& block, ToolMode toolMode);
 	std::optional<std::wstring> getLocalizedMinecraftName(std::string const& key) const;
 	std::wstring getBlockDisplayName(
 		SDK::Block const& block, std::string const& localizationKey, std::string const& fallbackName) const;

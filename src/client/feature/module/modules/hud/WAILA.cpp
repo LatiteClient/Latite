@@ -25,6 +25,10 @@ WAILA::WAILA() : HUDModule("WAILA", L"WAILA", L"Shows the block or entity you ar
 	addSetting("showHarvest", L"Tool Info", L"Show the preferred tool for the targeted block.",
 	           showHarvest, "showBlocks"_istrue);
 	toolMode.addEntry(EnumEntry {
+		static_cast<int>(ToolMode::HighestTier), L"Highest Tier",
+		L"Show the highest-tier effective tool for breaking a block."
+	});
+	toolMode.addEntry(EnumEntry {
 		static_cast<int>(ToolMode::MinimumTier), L"Minimum Tier",
 		L"Show the lowest-tier effective tool that can correctly harvest the block."
 	});
@@ -56,8 +60,9 @@ SDK::ItemTier const *WAILA::getToolTier(SDK::Item *item, std::string_view itemId
 	return nullptr;
 }
 
-std::vector<std::string> WAILA::findPreferredToolItemIds(SDK::Block const &block, bool minimumTier) {
-	auto &cache = minimumTier ? minimumTierToolCache : fastestToolCache;
+std::vector<std::string> WAILA::findPreferredToolItemIds(SDK::Block const &block, ToolMode mode) {
+	auto &cache = mode == ToolMode::MinimumTier ? minimumTierToolCache :
+	              mode == ToolMode::HighestTier ? highestTierToolCache : fastestToolCache;
 	if (auto cached = cache.find(&block); cached != cache.end()) return cached->second;
 
 	if (!Signatures::ItemStack_ItemStackBlock.result || !Signatures::ItemStackBase_destructor.result) return {};
@@ -87,7 +92,7 @@ std::vector<std::string> WAILA::findPreferredToolItemIds(SDK::Block const &block
 		float destroySpeed;
 		std::string itemId;
 	};
-	std::vector<ToolFamilyCandidate> minimumTierCandidates;
+	std::vector<ToolFamilyCandidate> tierCandidates;
 
 	for (auto current = itemCounters[0]; current < itemCounters[1]; ++current) {
 		auto counter = *current;
@@ -105,24 +110,36 @@ std::vector<std::string> WAILA::findPreferredToolItemIds(SDK::Block const &block
 		std::string itemId = item->namespacedId.getString();
 		if (itemId.empty()) continue;
 
-		if (minimumTier) {
+		if (mode == ToolMode::MinimumTier || mode == ToolMode::HighestTier) {
 			if (!item->canDestroySpecial(&block)) continue;
 
 			auto vtable = *reinterpret_cast<void ***>(item);
 			auto tier = getToolTier(item, itemId);
-			auto family = std::ranges::find(minimumTierCandidates, vtable, &ToolFamilyCandidate::vtable);
-			if (family == minimumTierCandidates.end()) {
-				minimumTierCandidates.push_back({ vtable, tier, destroySpeed, std::move(itemId) });
+			auto family = std::ranges::find(tierCandidates, vtable, &ToolFamilyCandidate::vtable);
+			if (family == tierCandidates.end()) {
+				tierCandidates.push_back({ vtable, tier, destroySpeed, std::move(itemId) });
 			} else {
-				bool lowerTier = tier && (!family->tier ||
-				                          tier->level < family->tier->level ||
-				                          (tier->level == family->tier->level &&
-				                           tier->speed < family->tier->speed - toolLayout.speedEpsilon));
+				bool replaceTier = false;
+				if (mode == ToolMode::MinimumTier) {
+					replaceTier = tier && (!family->tier ||
+					                       tier->level < family->tier->level ||
+					                       (tier->level == family->tier->level &&
+					                        tier->speed < family->tier->speed - toolLayout.speedEpsilon));
+				} else {
+					replaceTier = tier && (!family->tier ||
+					                       tier->level > family->tier->level ||
+					                       (tier->level == family->tier->level &&
+					                        tier->speed > family->tier->speed + toolLayout.speedEpsilon));
+				}
 				bool sameTier = (!tier && !family->tier) ||
 				                (tier && family->tier && tier->level == family->tier->level &&
 				                 std::abs(tier->speed - family->tier->speed) <= toolLayout.speedEpsilon);
-				if (lowerTier ||
-				    (sameTier && destroySpeed < family->destroySpeed - toolLayout.speedEpsilon)) {
+				
+				bool replaceSpeed = mode == ToolMode::MinimumTier
+					? destroySpeed < family->destroySpeed - toolLayout.speedEpsilon
+					: destroySpeed > family->destroySpeed + toolLayout.speedEpsilon;
+
+				if (replaceTier || (sameTier && replaceSpeed)) {
 					family->tier = tier;
 					family->destroySpeed = destroySpeed;
 					family->itemId = std::move(itemId);
@@ -141,9 +158,9 @@ std::vector<std::string> WAILA::findPreferredToolItemIds(SDK::Block const &block
 		}
 	}
 
-	if (minimumTier) {
-		bestItemIds.reserve(minimumTierCandidates.size());
-		for (auto &candidate: minimumTierCandidates) {
+	if (mode == ToolMode::MinimumTier || mode == ToolMode::HighestTier) {
+		bestItemIds.reserve(tierCandidates.size());
+		for (auto &candidate: tierCandidates) {
 			bestItemIds.push_back(std::move(candidate.itemId));
 		}
 	}
@@ -568,7 +585,7 @@ std::optional<WAILA::TargetInfo> WAILA::getBlockTarget(SDK::HitResult *hit) {
 			.detail = detail,
 			.block = block,
 			.toolItemIds = findPreferredToolItemIds(
-				*block, toolMode.getSelectedKey() == static_cast<int>(ToolMode::MinimumTier)),
+				*block, static_cast<ToolMode>(toolMode.getSelectedKey())),
 			.health = -1.f,
 		};
 	}
