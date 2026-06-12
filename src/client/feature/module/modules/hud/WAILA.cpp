@@ -69,9 +69,11 @@ std::vector<std::string> WAILA::findPreferredToolItemIds(SDK::Block const &block
 
 	auto clientInstance = SDK::ClientInstance::get();
 	auto level = clientInstance && clientInstance->minecraft ? clientInstance->minecraft->getLevel() : nullptr;
-	auto registry = level
-		                ? *reinterpret_cast<void **>(reinterpret_cast<uintptr_t>(level) + 0x198)
-		                : nullptr;
+	
+	void *registry = nullptr;
+	if (level) {
+		registry = *reinterpret_cast<void **>(reinterpret_cast<uintptr_t>(level) + 0x198);
+	}
 	if (!registry) return {};
 
 	auto itemCounters = reinterpret_cast<void ***>(reinterpret_cast<uintptr_t>(registry) + 0x30);
@@ -93,6 +95,27 @@ std::vector<std::string> WAILA::findPreferredToolItemIds(SDK::Block const &block
 		std::string itemId;
 	};
 	std::vector<ToolFamilyCandidate> tierCandidates;
+
+	auto shouldReplaceCandidate = [&](SDK::ItemTier const *tier, float destroySpeed, ToolFamilyCandidate const &family) {
+		if (tier && !family.tier) return true;
+		if (!tier && family.tier) return false;
+
+		bool sameTier = (!tier && !family.tier) || (tier->level == family.tier->level && std::abs(tier->speed - family.tier->speed) <= toolLayout.speedEpsilon);
+
+		if (!sameTier) {
+			if (mode == ToolMode::MinimumTier) {
+				return tier->level < family.tier->level || (tier->level == family.tier->level && tier->speed < family.tier->speed - toolLayout.speedEpsilon);
+			} else {
+				return tier->level > family.tier->level || (tier->level == family.tier->level && tier->speed > family.tier->speed + toolLayout.speedEpsilon);
+			}
+		}
+
+		if (mode == ToolMode::MinimumTier) {
+			return destroySpeed < family.destroySpeed - toolLayout.speedEpsilon;
+		} else {
+			return destroySpeed > family.destroySpeed + toolLayout.speedEpsilon;
+		}
+	};
 
 	for (auto current = itemCounters[0]; current < itemCounters[1]; ++current) {
 		auto counter = *current;
@@ -118,32 +141,10 @@ std::vector<std::string> WAILA::findPreferredToolItemIds(SDK::Block const &block
 			auto family = std::ranges::find(tierCandidates, vtable, &ToolFamilyCandidate::vtable);
 			if (family == tierCandidates.end()) {
 				tierCandidates.push_back({ vtable, tier, destroySpeed, std::move(itemId) });
-			} else {
-				bool replaceTier = false;
-				if (mode == ToolMode::MinimumTier) {
-					replaceTier = tier && (!family->tier ||
-					                       tier->level < family->tier->level ||
-					                       (tier->level == family->tier->level &&
-					                        tier->speed < family->tier->speed - toolLayout.speedEpsilon));
-				} else {
-					replaceTier = tier && (!family->tier ||
-					                       tier->level > family->tier->level ||
-					                       (tier->level == family->tier->level &&
-					                        tier->speed > family->tier->speed + toolLayout.speedEpsilon));
-				}
-				bool sameTier = (!tier && !family->tier) ||
-				                (tier && family->tier && tier->level == family->tier->level &&
-				                 std::abs(tier->speed - family->tier->speed) <= toolLayout.speedEpsilon);
-				
-				bool replaceSpeed = mode == ToolMode::MinimumTier
-					? destroySpeed < family->destroySpeed - toolLayout.speedEpsilon
-					: destroySpeed > family->destroySpeed + toolLayout.speedEpsilon;
-
-				if (replaceTier || (sameTier && replaceSpeed)) {
-					family->tier = tier;
-					family->destroySpeed = destroySpeed;
-					family->itemId = std::move(itemId);
-				}
+			} else if (shouldReplaceCandidate(tier, destroySpeed, *family)) {
+				family->tier = tier;
+				family->destroySpeed = destroySpeed;
+				family->itemId = std::move(itemId);
 			}
 			continue;
 		}
@@ -440,9 +441,11 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 	    Signatures::ItemStackBase_destructor.result) {
 		auto clientInstance = SDK::ClientInstance::get();
 		auto level = clientInstance && clientInstance->minecraft ? clientInstance->minecraft->getLevel() : nullptr;
-		auto registry = level
-			                ? *reinterpret_cast<void **>(reinterpret_cast<uintptr_t>(level) + 0x198)
-			                : nullptr;
+		
+		void *registry = nullptr;
+		if (level) {
+			registry = *reinterpret_cast<void **>(reinterpret_cast<uintptr_t>(level) + 0x198);
+		}
 		std::vector<void *> toolCounters(target->toolItemIds.size());
 		bool hasToolCounter = false;
 		if (registry) {
