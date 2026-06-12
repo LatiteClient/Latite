@@ -26,6 +26,14 @@ namespace SDK {
 			return memory::callVirtual<int>(this, 0x24);
 		}
 
+		bool canDestroySpecial(class Block const* block) {
+			return memory::callVirtual<bool>(this, 0x21, block);
+		}
+
+		float getDestroySpeed(class ItemStackBase const* item, class Block const* block) {
+			return memory::callVirtual<float>(this, 0x58, item, block);
+		}
+
 		short getDamageValue(class CompoundTag* tag) {
 			// TODO: fix this
 			return reinterpret_cast<short(*)(Item*, CompoundTag*)>(Signatures::ItemStackBase_getDamageValue.result)(this, tag);

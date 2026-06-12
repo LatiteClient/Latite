@@ -135,7 +135,7 @@ JsValueRef JsEntityClass::entityGetHealth(JsValueRef callee, bool isConstructor,
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
 		if (ent->level != JsEntity::AccessLevel::Restricted) {
-			return Chakra::MakeDouble(static_cast<float>(ent->getEntity()->getHealth()));
+			return Chakra::MakeDouble(ent->getEntity()->getHealth().value_or(20.f));
 		}
 		else {
 			Chakra::ThrowError(L"Access denied, cannot use getHealth");
@@ -151,7 +151,7 @@ JsValueRef JsEntityClass::entityGetHunger(JsValueRef callee, bool isConstructor,
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent && ent->validate()) {
 		if (ent->level != JsEntity::AccessLevel::Restricted) {
-			return Chakra::MakeDouble(static_cast<float>(ent->getEntity()->getHunger()));
+			return Chakra::MakeDouble(ent->getEntity()->getHunger().value_or(20.f));
 		}
 		else {
 			Chakra::ThrowError(L"Access denied, cannot use getHunger");
@@ -166,7 +166,7 @@ JsValueRef JsEntityClass::entityGetSaturation(JsValueRef callee, bool isConstruc
 	JsEntity* ent = nullptr;
 	JS::JsGetExternalData(arguments[0], reinterpret_cast<void**>(&ent));
 	if (ent->level != JsEntity::AccessLevel::Restricted) {
-		return Chakra::MakeDouble(static_cast<float>(ent->getEntity()->getSaturation()));
+		return Chakra::MakeDouble(ent->getEntity()->getSaturation().value_or(20.f));
 	}
 	else {
 		Chakra::ThrowError(L"Access denied, cannot use getSaturation");

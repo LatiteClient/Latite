@@ -1,4 +1,7 @@
 #pragma once
+#include <cstddef>
+#include <cstdint>
+
 #include "../TexturePtr.h"
 #include "ScreenContext.h"
 
@@ -44,6 +47,39 @@ namespace SDK {
         bool shouldRender = false;
     };
 
+    struct ImageInfo {
+        Vec2 position;
+        Vec2 size;
+        Vec2 uv;
+        Vec2 uvSize;
+    };
+
+    struct NinesliceInfo {
+        struct MultiSlice {
+            ImageInfo* data = nullptr;
+            std::uint32_t size = 0;
+            std::uint32_t capacity = 0;
+            ImageInfo inlineStorage{};
+
+            void set(ImageInfo const* items, std::size_t count) {
+                data = count > 0 ? const_cast<ImageInfo*>(items) : nullptr;
+                size = static_cast<std::uint32_t>(count);
+                capacity = static_cast<std::uint32_t>(count);
+            }
+        };
+
+        ImageInfo topLeft;
+        ImageInfo topRight;
+        ImageInfo bottomLeft;
+        ImageInfo bottomRight;
+        Vec2 uvScale;
+        MultiSlice left;
+        MultiSlice top;
+        MultiSlice right;
+        MultiSlice bottom;
+        MultiSlice middle;
+    };
+
 
     class MinecraftUIRenderContext {
     public:
@@ -59,6 +95,10 @@ namespace SDK {
                     pos, size, uvPos, uvSize, false);
         }
 
+        void drawNineslice(TexturePtr const& texture, NinesliceInfo const& info) {
+            memory::callVirtual<void, BedrockTextureData const&, NinesliceInfo const&>(this, 8, *texture.textureData, info);
+        }
+
         virtual ~MinecraftUIRenderContext() = 0; // 0x0
         virtual void getLineLength(class Font*,  std::string const&,  float,  bool) = 0; // 0x1
         virtual float getTextAlpha() = 0; // 0x2
@@ -69,8 +109,8 @@ namespace SDK {
     private:
         virtual void flushText_(float) = 0; // 0x6
         virtual void drawImage_(TexturePtr const& texture, Vec2 const& pos, Vec2 const& size, Vec2 const& uvPos, Vec2 const& uvSize) = 0; // 0x7
+        virtual void drawNineslice_(TexturePtr const&, NinesliceInfo const&) = 0; // 0x8
     public:
-        virtual void drawNineslice(TexturePtr const&, void* const&) = 0; // 0x8
         virtual void flushImages(Color const&, float, HashedString const&) = 0; // 0x9
         virtual void beginSharedMeshBatch(void*) = 0; // 0xA
         virtual void endSharedMeshBatch(void*) = 0; // 0xB

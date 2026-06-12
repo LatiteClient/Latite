@@ -15,6 +15,7 @@
 
 #include "config/ConfigManager.h"
 #include "misc/ClientMessageQueue.h"
+#include "misc/TempStorage.h"
 #include "input/Keyboard.h"
 #include "memory/hook/Hooks.h"
 #include "event/Eventing.h"
@@ -121,6 +122,7 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
 
     std::filesystem::create_directory(util::GetLatitePath());
     std::filesystem::create_directory(util::GetLatitePath() / "Assets");
+    LatiteTemp::cleanup();
     Logger::Setup();
 
 #ifdef LATITE_CRASH_REPORTING
@@ -221,6 +223,9 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         MVSIG(ClientInputUpdateSystem_tickBaseInput),
         MVSIG(LocalPlayer_applyTurnDelta),
         MVSIG(ItemStackBase_getHoverName),
+        MVSIG(I18n_getI18n),
+        MVSIG(ItemStack_ItemStackBlock),
+        MVSIG(ItemStackBase_destructor),
         MVSIG(Vtable::Level),
         MVSIG(Tessellator_begin),
         MVSIG(Tessellator_vertex),
@@ -228,8 +233,20 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         MVSIG(MeshHelpers_renderMeshImmediately),
         MVSIG(BaseActorRenderContext_BaseActorRenderContext),
         MVSIG(ItemRenderer_renderGuiItemNew),
+        MVSIG(BlockGraphics_getForBlock),
+        MVSIG(BlockGraphics_getTexture),
+        MVSIG(BlockGraphics_getTextureAtPos),
         MVSIG(UIControl_updateCachedPosition),
         MVSIG(ActorRenderDispatcher_render),
+        MVSIG(ActorRenderDispatcher_renderUI),
+        MVSIG(ActorRenderDispatcher_getRendererById),
+        MVSIG(Actor_setUIRendering),
+        MVSIG(Actor_setYHeadRotations),
+        MVSIG(Actor_setRotationY),
+        MVSIG(Mob_setYBodyRotations),
+        MVSIG(MolangScriptArg_MolangScriptArg),
+        MVSIG(MolangScriptArg_destructor),
+        MVSIG(MolangVariableMap_setMolangVariable),
         MVSIG(LevelRendererPlayer_renderOutlineSelection),
         MVSIG(Dimension_getSkyColor),
         MVSIG(Dimension_getTimeOfDay),
@@ -361,6 +378,7 @@ BOOL WINAPI DllMainImpl(
         Latite::getPluginManager().~PluginManager();
         Latite::getNotifications().~Notifications();
         Latite::get().~Latite();
+        LatiteTemp::cleanup();
 
         MH_Uninitialize();
 

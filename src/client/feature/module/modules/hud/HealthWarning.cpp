@@ -23,7 +23,8 @@ void HealthWarning::onRenderLayer(Event& evG) {
 
 	MCDrawUtil dc{ ev.getUIRenderContext(), SDK::ClientInstance::get()->minecraftGame->minecraftFont };
 
-	if (std::get<FloatValue>(healthPointThreshold) > SDK::ClientInstance::get()->getLocalPlayer()->getHealth() && screenView->visualTree->rootControl->name == "hud_screen") {
+	if (std::get<FloatValue>(healthPointThreshold) > SDK::ClientInstance::get()->getLocalPlayer()->getHealth().
+	    value_or(20.f) && screenView->visualTree->rootControl->name == "hud_screen") {
 		dc.drawVignette({ vignette.r, vignette.g, vignette.b, vignette.a }, std::get<FloatValue>(vignetteFade));
-	} 
+	}
 }

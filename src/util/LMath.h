@@ -3,7 +3,9 @@
 #undef RGB
 #endif
 
+#include <algorithm>
 #include <cmath>
+#include <optional>
 
 static constexpr float pi_f = 3.1415926535f;
 
@@ -75,8 +77,19 @@ struct Vec3 final {
 		return { x * right, y * right, z * right };
 	}
 
-	inline float distance(Vec3& vec) {
-		return static_cast<float>(std::sqrt(std::pow(x - vec.x, 2) + std::pow(y - vec.y, 2) + std::pow(z - vec.z, 2)));
+	[[nodiscard]] float magnitude() const {
+		return static_cast<float>(std::sqrt(x * x + y * y + z * z));
+	}
+
+	[[nodiscard]] float distance(Vec3 const& vec) const {
+		Vec3 diff = *this - vec;
+		return diff.magnitude();
+	}
+
+	[[nodiscard]] Vec3 normalized() const {
+		float len = magnitude();
+		if (len <= 0.0001f) return {};
+		return { x / len, y / len, z / len };
 	}
 };
 
@@ -123,6 +136,41 @@ struct AABB final {
 			std::clamp(to.y, lower.y, higher.y),
 			std::clamp(to.z, lower.z, higher.z),
 		};
+	}
+
+	std::optional<float> intersectsRay(Vec3 const& origin, Vec3 const& direction, float maxDistance,
+		float expand = 0.f) const {
+		AABB box = *this;
+		box.lower.x -= expand;
+		box.lower.y -= expand;
+		box.lower.z -= expand;
+		box.higher.x += expand;
+		box.higher.y += expand;
+		box.higher.z += expand;
+
+		float tMin = 0.f;
+		float tMax = maxDistance;
+
+		auto testAxis = [&](float originAxis, float directionAxis, float minAxis, float maxAxis) -> bool {
+			if (std::fabs(directionAxis) < 0.0001f) {
+				return originAxis >= minAxis && originAxis <= maxAxis;
+			}
+
+			float inv = 1.f / directionAxis;
+			float t1 = (minAxis - originAxis) * inv;
+			float t2 = (maxAxis - originAxis) * inv;
+			if (t1 > t2) std::swap(t1, t2);
+
+			tMin = std::max(tMin, t1);
+			tMax = std::min(tMax, t2);
+			return tMin <= tMax;
+		};
+
+		if (!testAxis(origin.x, direction.x, box.lower.x, box.higher.x)) return std::nullopt;
+		if (!testAxis(origin.y, direction.y, box.lower.y, box.higher.y)) return std::nullopt;
+		if (!testAxis(origin.z, direction.z, box.lower.z, box.higher.z)) return std::nullopt;
+		if (tMax < 0.f || tMin > maxDistance) return std::nullopt;
+		return std::max(0.f, tMin);
 	}
 };
 

@@ -38,16 +38,27 @@ namespace SDK {
 
 		int getCommandPermissionLevel();
 		void setNameTag(std::string* nametag);
+		void setUIRendering(bool value);
+		void setYHeadRotations(float current, float old);
+		void setYBodyRotations(float current, float old);
+		void setRotationY(float value);
 		uint64_t getRuntimeID();
 		uint32_t getEntityTypeID();
+		std::string getEntityLocalizationKey();
+		std::string getEntityTypeName();
+		std::string getEntityNamespace();
+		void const* getActorRendererId();
+		void const* getActorRendererIdOverride();
 		void swing();
 		bool isPlayer();
+		bool isItem();
 
 		struct AttributesComponent* getAttributesComponent();
 		class AttributeInstance* getAttribute(class Attribute& attribute);
-		float getHealth();
-		float getHunger();
-		float getSaturation();
+		std::optional<float> getHealth();
+		std::optional<float> getMaxHealth();
+		std::optional<float> getHunger();
+		std::optional<float> getSaturation();
 		bool isInvisible();
 		class ItemStack* getArmor(int armorSlot);
 

@@ -9,6 +9,7 @@ namespace SDK {
 
 	public:
 		// AttributeInstance::getCurrentValue
+		CLASS_FIELD(float, maxValue, 0x78);
 		CLASS_FIELD(float, value, 0x7C);
 	};
 

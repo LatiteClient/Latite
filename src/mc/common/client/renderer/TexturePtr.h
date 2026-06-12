@@ -1,24 +1,9 @@
 #pragma once
 #include <memory>
-#include <string>
+
+#include "mc/deps/core/resource/ResourceLocation.h"
 
 namespace SDK {
-    class ResourceLocation {
-    public:
-        alignas(8) int type;
-        std::string txt;
-
-        ResourceLocation(std::string const& text, int type) {
-            txt = text;
-            this->type = type;
-        }
-
-        ~ResourceLocation() = default;
-    private:
-        uint64_t mPathHash = 0;
-        uint64_t mFullHash = 0;
-    };
-
     class BedrockTextureData {
     private:
         void* vtable; // I don't think these are owned, so won't free them off the memory

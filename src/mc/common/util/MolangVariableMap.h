@@ -9,5 +9,7 @@ namespace SDK {
 		bool mHasPublicVariables;
 		bool mHasVariablesThatShouldSync;
 		bool mHasVariablesThatShouldSave;
+
+		void setMolangVariable(uint64_t hash, char const* name, float value);
 	};
 }

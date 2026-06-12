@@ -125,6 +125,18 @@ public:
 		"55 41 56 56 57 53 48 83 EC ? 48 8D 6C 24 ? 48 C7 45 ? ? ? ? ? 48 89 D6 48 8D 7D ? 48 89 FA E8 ? ? ? ? 48 89 F9"_sig,
 		"ItemStackBase::getHoverName"};
 
+	inline static SigImpl I18n_getI18n{[](memory::signature_store&, uintptr_t res) { return res; },
+		"55 48 83 EC ? 48 8D 6C 24 ? 48 C7 45 ? ? ? ? ? 8B 05 ? ? ? ? 8B 0D ? ? ? ? 65 48 8B 14 25 ? ? ? ? 48 8B 0C CA 3B 81 ? ? ? ? 7F ? 48 8D 05 ? ? ? ? 48 83 C4 ? 5D C3 48 8D 0D ? ? ? ? E8 ? ? ? ? 83 3D ? ? ? ? ? 75 ? 48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8D 05 ? ? ? ? 48 83 C4 ? 5D C3 66 2E 0F 1F 84 ? ? ? ? ? 48 89 54 24 ? 55 48 83 EC ? 48 8D 6A ? 48 8D 0D ? ? ? ? E8 ? ? ? ? 90 48 83 C4 ? 5D C3 CC CC CC CC CC CC CC CC CC CC CC CC CC CC CC 55 56 57 48 81 EC"_sig,
+		"getI18n"};
+
+	inline static SigImpl ItemStack_ItemStackBlock{[](memory::signature_store&, uintptr_t res) { return res; },
+		"55 56 48 83 EC 38 48 8D 6C 24 30 48 C7 45 00 FE FF FF FF 48 89 CE E8 35 C3 FF FF 48 8D 05 ? ? ? ? 48 89 06 48 89 75 F8 48 8D 8E 80 00 00 00 E8 ? ? ? ? 48 8B 45 F8 48 83 C4 38 5E 5D C3"_sig,
+		"ItemStack::ItemStack(Block const&, int, CompoundTag const*)"};
+
+	inline static SigImpl ItemStackBase_destructor{[](memory::signature_store&, uintptr_t res) { return res; },
+		"56 57 48 83 EC 28 48 89 CE 48 8D 05 ? ? ? ? 48 89 01 48 8B 49 78 48 85 C9 74 11 48 8B 01 48 8B 00 BA 01 00 00 00 FF 15"_sig,
+		"ItemStackBase::~ItemStackBase"};
+
 
 	inline static SigImpl Tessellator_vertex{[](memory::signature_store&, uintptr_t res) { return res; },
 		"56 57 48 83 EC ? 0F 29 7C 24 ? 0F 29 74 24 ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 8B 81"_sig,
@@ -150,6 +162,18 @@ public:
 		"E8 ? ? ? ? 4C 8D 45 ? 4C 8D 8D ? ? ? ? 48 89 F2 E8 ? ? ? ? 80 BF"_sig,
 		"ItemRenderer::renderGuiItemNew"};
 
+	inline static SigImpl BlockGraphics_getForBlock{[](memory::signature_store&, uintptr_t res) { return res; },
+		"56 48 83 EC ? 48 89 CE E8 ? ? ? ? 48 85 C0 74 ? 48 83 C4 ? 5E C3 48 89 F1"_sig,
+		"BlockGraphics::getForBlock"};
+
+	inline static SigImpl BlockGraphics_getTexture{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 48 8B 41 ? 4C 8B 49 ? 49 29 C1 74 ? 49 C1 F9 ? 49 BA ? ? ? ? ? ? ? ? 4D 0F AF D1 49 FF CA 49 39 D2 4C 0F 43 D2 4F 8D 0C 52 49 C1 E1 ? 4A 8B 54 08 ? 4A 8B 44 08 ? 48 29 D0 48 C1 E8 ? 69 C0 ? ? ? ? 85 C0 7E ? 31 C9 41 39 C0 41 0F 42 C8 48 8D 04 49 48 8D 04 C2 EB"_sig,
+		"BlockGraphics::getTexture"};
+
+	inline static SigImpl BlockGraphics_getTextureAtPos{[](memory::signature_store&, uintptr_t res) { return res; },
+		"56 57 48 83 EC ? 48 89 D6 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 48 8B 41 ? 48 8B 51"_sig,
+		"BlockGraphics::getTexture(BlockPos)"};
+
 	inline static SigImpl UIControl_updateCachedPosition{[](memory::signature_store&, uintptr_t res) { return res; },
 		"55 56 57 48 83 EC ? 48 8D 6C 24 ? 0F 29 75 ? 48 C7 45 ? ? ? ? ? 48 89 CE 0F 57 F6 0F 29 75"_sig,
 		"UIControl::updateCachedPosition"};
@@ -157,6 +181,42 @@ public:
 	inline static SigImpl ActorRenderDispatcher_render{[](memory::signature_store&, uintptr_t res) { return res; },
 		"55 41 57 41 56 41 55 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 0F 29 75 ? 48 C7 45 ? ? ? ? ? 4D 89 CE 4C 89 C6 48 89 D7"_sig,
 		"ActorRenderDispatcher::render"}; // "No renderer found - have you set the entity's description:identifier correctly?"
+
+	inline static SigImpl ActorRenderDispatcher_renderUI{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 83 EC ? 48 8B 44 24 ? 44 0F B6 54 24"_sig,
+		"ActorRenderDispatcher::render(BaseActorRenderContext&, Actor&, Vec3 const&, Vec2 const&, bool)"};
+
+	inline static SigImpl ActorRenderDispatcher_getRendererById{[](memory::signature_store&, uintptr_t res) { return res; },
+		"41 57 41 56 41 54 56 57 53 48 83 EC ? 4C 89 C3 48 89 D6 48 89 CF 4C 89 C1"_sig,
+		"ActorRenderDispatcher::getRenderer(HashedString const&)"};
+
+	inline static SigImpl Actor_setUIRendering{[](memory::signature_store&, uintptr_t res) { return res; },
+		"41 89 D0 88 91"_sig,
+		"Actor::setUIRendering"};
+
+	inline static SigImpl Actor_setYHeadRotations{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 8B 51 ? 8B 41 ? 48 8B 4A ? 4C 8B 42 ? 49 29 C8 49 C1 E8 ? 41 FF C8 41 81 E0 ? ? ? ? 4E 8D 0C C1 48 8B 4A ? 0F 1F 84 00 ? ? ? ? 4D 8B 01 49 83 F8 ? 0F 84 ? ? ? ? 49 C1 E0 ? 4E 8D 0C 01 42 81 7C 01 ? ? ? ? ? 75 ? 4C 01 C1 48 39 4A ? 74 ? 48 8B 49 ? 48 85 C9 74 ? 89 C2 81 E2 ? ? ? ? 41 89 D0 41 C1 E8 ? 4C 8B 49 ? 4C 8B 51 ? 4D 29 CA 49 C1 FA ? 4D 39 D0 73 ? 4F 8B 04 C1 4D 85 C0 74 ? 81 E2 ? ? ? ? 25 ? ? ? ? 41 8B 14 90 31 D0 3D ? ? ? ? 77 ? 48 8B 41 ? 89 D1 C1 E9 ? 81 E1 ? ? ? ? 48 8B 04 08 48 85 C0 74 ? 81 E2 ? ? ? ? 83 E2 ? F3 0F 11 0C D0 F3 0F 11 54 D0"_sig,
+		"Actor::setYHeadRotations"};
+
+	inline static SigImpl Actor_setRotationY{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 8B 81 ? ? ? ? F3 0F 11 48 ? C3 CC CC CC 48 8B 81 ? ? ? ? F3 0F 11 48 ? C3 CC CC CC 48 8B 81"_sig,
+		"Actor::setRotationY"};
+
+	inline static SigImpl Mob_setYBodyRotations{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 83 EC ? 48 8B 51 ? 8B 41 ? 48 8B 4A ? 4C 8B 42 ? 49 29 C8 49 C1 E8 ? 41 FF C8 41 81 E0 ? ? ? ? 4E 8D 0C C1 48 8B 4A ? 0F 1F 40 ? 4D 8B 01 49 83 F8 ? 0F 84 ? ? ? ? 49 C1 E0 ? 4E 8D 0C 01 42 81 7C 01 ? ? ? ? ? 75 ? 4C 01 C1 48 39 4A ? 74 ? 48 8B 49 ? 48 85 C9 74 ? 89 C2 81 E2 ? ? ? ? 41 89 D0 41 C1 E8 ? 4C 8B 49 ? 4C 8B 51 ? 4D 29 CA 49 C1 FA ? 4D 39 D0 73 ? 4F 8B 04 C1 4D 85 C0 74 ? 81 E2 ? ? ? ? 25 ? ? ? ? 41 8B 14 90 31 D0 3D ? ? ? ? 77 ? 48 8B 41 ? 89 D1 C1 E9 ? 81 E1 ? ? ? ? 48 8B 04 08 48 85 C0 74 ? 81 E2 ? ? ? ? 83 E2 ? F3 0F 11 0C D0 F3 0F 11 54 D0"_sig,
+		"Mob::setYBodyRotations"};
+
+	inline static SigImpl MolangScriptArg_MolangScriptArg{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 89 C8 C6 41 ? ? C7 01"_sig,
+		"MolangScriptArg::MolangScriptArg(float)"};
+
+	inline static SigImpl MolangScriptArg_destructor{[](memory::signature_store&, uintptr_t res) { return res; },
+		"48 83 EC ? 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 48 0F BE 41 ? 4C 8D 41 ? 48 FF C0 48 8D 54 24 ? 48 89 C1 E8 ? ? ? ? 48 8B 4C 24 ? 48 31 E1 48 3B 0D ? ? ? ? 75 ? 48 83 C4 ? C3 E8 ? ? ? ? CC CC CC CC CC CC CC CC CC 56 57"_sig,
+		"MolangScriptArg::~MolangScriptArg"};
+
+	inline static SigImpl MolangVariableMap_setMolangVariable{[](memory::signature_store&, uintptr_t res) { return res; },
+		"56 57 48 83 EC ? 4C 89 CE 48 89 CF 48 89 D1"_sig,
+		"MolangVariableMap::setMolangVariable"};
 
 	inline static SigImpl LevelRendererPlayer_renderOutlineSelection{[](memory::signature_store&, uintptr_t res) { return res; },
 		"55 41 57 41 56 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 48 C7 45 ? ? ? ? ? 4D 89 CE 4D 89 C7"_sig,

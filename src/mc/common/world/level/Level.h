@@ -1,6 +1,7 @@
 #pragma once
 #include "util/LMath.h"
 #include "../actor/Actor.h"
+#include "mc/common/world/actor/player/PlayerListEntry.h"
 #include <string>
 #include "mc/Util.h"
 #include <unordered_map>
@@ -8,13 +9,6 @@
 #include "LevelData.h"
 
 namespace SDK {
-
-	class PlayerListEntry {
-		char pad[0x2D2]; // constructor
-	public:
-		CLASS_FIELD(std::string, name, 0x18); // constructor
-	};
-
 	class Level {
 	public:
 		void playSoundEvent(std::string const& text, Vec3 const& pos, float vol = 1.f, float pitch = 1.f);

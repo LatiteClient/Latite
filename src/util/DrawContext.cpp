@@ -5,8 +5,14 @@
 #include "mc/common/client/renderer/Tessellator.h"
 #include "mc/common/client/renderer/MeshUtils.h"
 #include "mc/common/client/renderer/MaterialPtr.h"
+#include "mc/common/client/renderer/ActorRenderDispatcher.h"
+#include "mc/common/entity/component/ActorHeadRotationComponent.h"
+#include "mc/common/entity/component/MobBodyRotationComponent.h"
+#include "mc/common/entity/component/RenderRotationComponent.h"
+#include "mc/common/world/actor/Actor.h"
 #include <mc/common/client/renderer/game/BaseActorRenderContext.h>
 #include <mc/common/client/renderer/ItemRenderer.h>
+#include <glm/gtc/matrix_transform.hpp>
 #include <ranges>
 #include <utility>
 
@@ -426,6 +432,11 @@ void MCDrawUtil::drawImage(SDK::TexturePtr& texture, Vec2 const& pos, Vec2 const
 	this->renderCtx->flushImages(flushCol, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
 }
 
+void MCDrawUtil::drawImage(SDK::TexturePtr& texture, Vec2 const& pos, Vec2 const& size, Vec2 const& uvPos, Vec2 const& uvSize, d2d::Color const& flushCol) {
+	this->renderCtx->drawImage(texture, { pos.x * this->guiScale, pos.y * guiScale }, { size.x * guiScale, size.y * guiScale }, uvPos, uvSize);
+	this->renderCtx->flushImages(flushCol, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
+}
+
 d2d::Rect MCDrawUtil::drawItem(SDK::ItemStack* item, Vec2 const& pos, float sizeModifier, float opacity) {
 	SDK::BaseActorRenderContext ctx = SDK::BaseActorRenderContext{this->renderCtx->screenContext, this->renderCtx->cinst, this->renderCtx->cinst->minecraftGame};
 	
@@ -444,6 +455,180 @@ d2d::Rect MCDrawUtil::drawItem(SDK::ItemStack* item, Vec2 const& pos, float size
 		pos.x + ((itemSize) * sizeModifier) / guiScale,
 		pos.y + ((itemSize) * sizeModifier) / guiScale
 	};
+}
+
+bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opacity) {
+	if (!actor || !actor->aabbShape || !actor->stateVector || !renderCtx || !renderCtx->screenContext || !renderCtx->cinst ||
+		!renderCtx->cinst->minecraftGame || !scn || !scn->matrix || !Signatures::ActorRenderDispatcher_renderUI.result) {
+		return false;
+	}
+
+	SDK::BaseActorRenderContext ctx{ renderCtx->screenContext, renderCtx->cinst, renderCtx->cinst->minecraftGame };
+	auto& dispatcher = ctx.entityRenderDispatcher;
+	if (!dispatcher) return false;
+
+	float ownerWidth = bounds.getWidth() * guiScale;
+	float ownerHeight = bounds.getHeight() * guiScale;
+	constexpr float hudBodyYaw = -22.5f;
+	constexpr float hudHeadYaw = -22.5f;
+	constexpr float actorRenderDepth = -50.f;
+
+	auto& matrixStack = scn->matrix->matrixStack;
+	glm::mat4 parentTransform = matrixStack.empty()
+		? glm::mat4{ 1.f }
+		: matrixStack.top();
+
+	auto transformPoint = [](glm::mat4 const& matrix, Vec2 const& point) {
+		glm::vec4 transformed = matrix * glm::vec4(point.x, point.y, 0.f, 1.f);
+		return Vec2{
+			transformed.x,
+			transformed.y,
+		};
+	};
+
+	auto const& box = actor->getBoundingBox();
+	Vec3 actorPos = actor->getPos();
+	Vec3 localLower = box.lower - actorPos;
+	Vec3 localHigher = box.higher - actorPos;
+	Vec3 modelCenter = (localLower + localHigher) * 0.5f;
+	float modelWidth = std::max(0.01f, std::max(localHigher.x - localLower.x, localHigher.z - localLower.z));
+	float modelHeight = std::max(0.01f, localHigher.y - localLower.y);
+	// aabb is gameplay size, so leave some room for hats, held items, and model layers
+	modelWidth *= 1.16f;
+	modelHeight *= 1.16f;
+
+	float scale = std::min((ownerWidth * 0.82f) / modelWidth, (ownerHeight * 0.88f) / modelHeight);
+	scale = std::min(scale, 96.f * guiScale);
+
+	Vec2 frameCenter{
+		(bounds.left * guiScale) + (ownerWidth * 0.5f),
+		(bounds.top * guiScale) + (ownerHeight * 0.5f),
+	};
+	float anchorX = frameCenter.x - (modelCenter.x * scale);
+	float anchorY = frameCenter.y + (modelCenter.y * scale);
+	glm::mat4 localTransform{ 1.f };
+	localTransform = glm::translate(localTransform, glm::vec3(anchorX, anchorY, actorRenderDepth - (modelCenter.z * scale)));
+	localTransform = glm::scale(localTransform, glm::vec3(-scale, scale, scale));
+	localTransform = glm::rotate(localTransform, glm::radians(180.f), glm::vec3(0.f, 0.f, 1.f));
+	if (actor->getStatusFlag(57)) {
+		localTransform = glm::translate(localTransform, glm::vec3(0.f, 0.8f, 0.f));
+	}
+	glm::mat4 transform = parentTransform * localTransform;
+
+	Vec2 clipTopLeft = transformPoint(parentTransform, { bounds.left * guiScale, bounds.top * guiScale });
+	Vec2 clipBottomRight = transformPoint(parentTransform, { bounds.right * guiScale, bounds.bottom * guiScale });
+	SDK::RectangleArea clip{
+		std::min(clipTopLeft.x, clipBottomRight.x),
+		std::min(clipTopLeft.y, clipBottomRight.y),
+		std::max(clipTopLeft.x, clipBottomRight.x),
+		std::max(clipTopLeft.y, clipBottomRight.y),
+	};
+
+	flush();
+	renderCtx->saveCurrentClippingRectangle();
+	renderCtx->setClippingRectangle(clip);
+	matrixStack.push(transform);
+
+	Vec3 cameraTarget{};
+	Vec2 rotation{};
+	struct ScopedActorHudPose {
+		SDK::Actor* actor = nullptr;
+		SDK::ActorRotationComponent* actorRotation = nullptr;
+		SDK::ActorHeadRotationComponent* headRotation = nullptr;
+		SDK::MobBodyRotationComponent* bodyRotation = nullptr;
+		SDK::RenderRotationComponent* renderRotation = nullptr;
+		Vec2 savedRotation{};
+		Vec2 savedRotationOld{};
+		SDK::RenderRotationComponent savedRenderRotation{};
+		float savedHeadYaw = 0.f;
+		float savedHeadYawOld = 0.f;
+		float savedBodyYaw = 0.f;
+		float savedBodyYawOld = 0.f;
+
+		ScopedActorHudPose(SDK::Actor* actor, float forcedBodyYaw, float forcedHeadYaw) : actor(actor) {
+			if (!actor) return;
+
+			actorRotation = actor->actorRotation;
+			bodyRotation = actor->tryGetComponent<SDK::MobBodyRotationComponent>();
+			headRotation = actor->tryGetComponent<SDK::ActorHeadRotationComponent>();
+			renderRotation = actor->tryGetComponent<SDK::RenderRotationComponent>();
+
+			if (actorRotation) {
+				savedRotation = actorRotation->rotation;
+				savedRotationOld = actorRotation->rotationOld;
+				actorRotation->rotation = { 0.f, forcedBodyYaw };
+				actorRotation->rotationOld = { 0.f, forcedBodyYaw };
+			}
+
+			if (renderRotation) {
+				savedRenderRotation = *renderRotation;
+				renderRotation->rotation = { 0.f, forcedBodyYaw };
+			}
+
+			if (bodyRotation) {
+				savedBodyYaw = bodyRotation->yBodyRot;
+				savedBodyYawOld = bodyRotation->yBodyRotOld;
+			}
+
+			if (headRotation) {
+				savedHeadYaw = headRotation->yHeadRot;
+				savedHeadYawOld = headRotation->yHeadRotOld;
+			}
+
+			if (bodyRotation) {
+				actor->setYBodyRotations(forcedBodyYaw, forcedBodyYaw);
+			}
+			actor->setYHeadRotations(forcedHeadYaw, forcedHeadYaw);
+		}
+
+		~ScopedActorHudPose() {
+			if (!actor) return;
+
+			if (bodyRotation) {
+				actor->setYBodyRotations(savedBodyYaw, savedBodyYawOld);
+			}
+			actor->setYHeadRotations(savedHeadYaw, savedHeadYawOld);
+			if (actorRotation) {
+				actorRotation->rotation = savedRotation;
+				actorRotation->rotationOld = savedRotationOld;
+			}
+			if (renderRotation) *renderRotation = savedRenderRotation;
+		}
+	} poseOverride{ actor, hudBodyYaw, hudHeadYaw };
+
+	struct ScopedActorHudMolang {
+		explicit ScopedActorHudMolang(SDK::Actor* actor) {
+			if (!actor) return;
+
+			actor->molangVariableMap.setMolangVariable(0x61917791E3C297E0ull, "variable.player_x_rotation", 0.f);
+			actor->molangVariableMap.setMolangVariable(0xD921ED03129A7263ull, "variable.is_using_vr", 0.f);
+			actor->molangVariableMap.setMolangVariable(0x2739F381184DE4AEull, "variable.is_first_person", 0.f);
+		}
+	} hudMolang{ actor };
+
+	struct ScopedActorUIRendering {
+		SDK::Actor* actor = nullptr;
+		bool changed = false;
+
+		explicit ScopedActorUIRendering(SDK::Actor* actor) : actor(actor) {
+			if (!actor) return;
+
+			actor->setUIRendering(true);
+			changed = true;
+		}
+
+		~ScopedActorUIRendering() {
+			if (changed && actor) {
+				actor->setUIRendering(false);
+			}
+		}
+	} uiRendering{ actor };
+
+	dispatcher->renderUI(&ctx, actor, cameraTarget, rotation, opacity > 0.f);
+
+	matrixStack.pop();
+	renderCtx->restoreSavedClippingRectangle();
+	return true;
 }
 
 void MCDrawUtil::fillPolygon(Vec2 const& center, float radius, int numSides, d2d::Color const& col) {

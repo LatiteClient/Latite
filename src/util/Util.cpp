@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Util.h"
 #include "mc/common/client/game/ClientInstance.h"
+#include "mc/common/resources/ResourcePackManager.h"
 #include "mc/common/world/Minecraft.h"
 #include "mc/common/client/renderer/game/LevelRendererPlayer.h"
 #include "mc/common/client/renderer/game/LevelRenderer.h"
@@ -279,6 +280,97 @@ std::wstring util::WFormat(std::wstring const& s) {
         else out += ch;
     }
     return out;
+}
+
+bool util::IsMinecraftFormattingCode(wchar_t code) {
+    code = NormalizeMinecraftFormattingCode(code);
+    return (code >= L'0' && code <= L'9') ||
+        (code >= L'a' && code <= L'f') ||
+        (code >= L'k' && code <= L'o') ||
+        code == L'r';
+}
+
+wchar_t util::NormalizeMinecraftFormattingCode(wchar_t code) {
+    if (code >= L'A' && code <= L'Z') {
+        return static_cast<wchar_t>(code - L'A' + L'a');
+    }
+    return code;
+}
+
+std::vector<util::MinecraftFormatRun> util::ParseMinecraftFormatting(std::wstring const& text) {
+    std::vector<MinecraftFormatRun> runs;
+    std::wstring currentText;
+    wchar_t currentColor = L'\0';
+
+    auto flush = [&]() {
+        if (!currentText.empty()) {
+            runs.push_back(MinecraftFormatRun{ std::move(currentText), currentColor });
+            currentText.clear();
+        }
+    };
+
+    for (size_t i = 0; i < text.size(); ++i) {
+        if (text[i] == L'\u00A7' && i + 1 < text.size() && IsMinecraftFormattingCode(text[i + 1])) {
+            wchar_t code = NormalizeMinecraftFormattingCode(text[i + 1]);
+            flush();
+
+            if ((code >= L'0' && code <= L'9') || (code >= L'a' && code <= L'f')) {
+                currentColor = code;
+            }
+            else if (code == L'r') {
+                currentColor = L'\0';
+            }
+
+            ++i;
+            continue;
+        }
+
+        currentText.push_back(text[i]);
+    }
+
+    flush();
+    return runs;
+}
+
+std::wstring util::StripMinecraftFormatting(std::wstring const& text) {
+    std::wstring out;
+    out.reserve(text.size());
+
+    for (size_t i = 0; i < text.size(); ++i) {
+        if (text[i] == L'\u00A7' && i + 1 < text.size() && IsMinecraftFormattingCode(text[i + 1])) {
+            ++i;
+            continue;
+        }
+        out.push_back(text[i]);
+    }
+
+    return out;
+}
+
+d2d::Color util::MinecraftFormattingColor(wchar_t code, d2d::Color const& fallback) {
+    auto withAlpha = [&](d2d::Color color) {
+        return color.asAlpha(fallback.a);
+    };
+
+    switch (NormalizeMinecraftFormattingCode(code)) {
+    case L'0': return withAlpha(d2d::Color::RGB(0, 0, 0));
+    case L'1': return withAlpha(d2d::Color::RGB(0, 0, 170));
+    case L'2': return withAlpha(d2d::Color::RGB(0, 170, 0));
+    case L'3': return withAlpha(d2d::Color::RGB(0, 170, 170));
+    case L'4': return withAlpha(d2d::Color::RGB(170, 0, 0));
+    case L'5': return withAlpha(d2d::Color::RGB(170, 0, 170));
+    case L'6': return withAlpha(d2d::Color::RGB(255, 170, 0));
+    case L'7': return withAlpha(d2d::Color::RGB(170, 170, 170));
+    case L'8': return withAlpha(d2d::Color::RGB(85, 85, 85));
+    case L'9': return withAlpha(d2d::Color::RGB(85, 85, 255));
+    case L'a': return withAlpha(d2d::Color::RGB(85, 255, 85));
+    case L'b': return withAlpha(d2d::Color::RGB(85, 255, 255));
+    case L'c': return withAlpha(d2d::Color::RGB(255, 85, 85));
+    case L'd': return withAlpha(d2d::Color::RGB(255, 85, 255));
+    case L'e': return withAlpha(d2d::Color::RGB(255, 255, 85));
+    case L'f': return withAlpha(d2d::Color::RGB(255, 255, 255));
+    default: return fallback;
+    }
 }
 
 std::wstring util::FormatWString(std::wstring const& formatString, std::vector<std::wstring> const& formatArgs) {
@@ -619,4 +711,32 @@ std::string util::GetProcessorInfo() {
 #endif
 
     return model;
+}
+
+bool util::TryGetGameTextureBuffer(std::string const& texturePath, std::string& buffer) {
+    buffer.clear();
+
+    auto clientInstance = SDK::ClientInstance::get();
+    if (!clientInstance) {
+        return false;
+    }
+
+    for (auto fileSystem : { SDK::ResourceFileSystem::UserPackage, SDK::ResourceFileSystem::AppPackage }) {
+        SDK::ResourceLocation location(fileSystem);
+        location.mPath->value = texturePath;
+        buffer.clear();
+
+        if (clientInstance->getResourcePackManager().load(location, buffer)) {
+            return true;
+        }
+    }
+
+    buffer.clear();
+    return false;
+}
+
+std::string util::GetGameTextureBuffer(std::string const& texturePath) {
+    std::string buffer;
+    TryGetGameTextureBuffer(texturePath, buffer);
+    return buffer;
 }
