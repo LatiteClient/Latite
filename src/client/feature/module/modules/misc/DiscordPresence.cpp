@@ -140,6 +140,7 @@ namespace {
 
 	bool isHiveConnectionMessage(std::string_view message) {
 		return message.starts_with("You are connected to internal IP ")
+			|| message.starts_with("You are connected to public IP ")
 			|| message.starts_with("You are connected to server name ")
 			|| message.starts_with("You are connected to server ");
 	}
