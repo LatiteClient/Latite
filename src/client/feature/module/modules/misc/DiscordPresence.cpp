@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "DiscordPresence.h"
 
-#include "client/Latite.h"
 #include "client/event/events/ChatMessageEvent.h"
+#include "client/event/events/PacketReceiveEvent.h"
 #include "client/event/events/SendPacketEvent.h"
 #include "client/event/events/UpdateEvent.h"
 #include "mc/common/network/MinecraftPackets.h"
@@ -10,167 +10,6 @@
 #include "mc/common/network/RakNetConnector.h"
 
 #include <cctype>
-#include <utility>
-
-namespace {
-	struct PresenceDetails {
-		std::string_view address;
-		std::string_view name;
-		std::string_view logoKey;
-		std::string_view logoTooltip;
-	};
-
-	constexpr std::array knownServers = {
-		PresenceDetails{ "hivebedrock.network", "The Hive", "thehive", "The Hive Logo" },
-		PresenceDetails{ "cubecraft.net", "CubeCraft", "cubecraft", "CubeCraft Games Logo" },
-		PresenceDetails{ "play.galaxite.net", "Galaxite", "galaxite", "Galaxite Network Logo" },
-		PresenceDetails{ "zeqa.net", "Zeqa", "zeqa", "Zeqa Practice Logo" },
-		PresenceDetails{ "nethergames.org", "NetherGames", "nethergames", "NetherGames Network Logo" }
-	};
-
-	constexpr std::array hiveGameNames = {
-		std::pair<std::string_view, std::string_view>{ "WARS", "Treasure Wars" },
-		std::pair<std::string_view, std::string_view>{ "DR", "DeathRun" },
-		std::pair<std::string_view, std::string_view>{ "HIDE", "Hide and Seek" },
-		std::pair<std::string_view, std::string_view>{ "SG", "Survival Games" },
-		std::pair<std::string_view, std::string_view>{ "MURDER", "Murder Mystery" },
-		std::pair<std::string_view, std::string_view>{ "SKY", "SkyWars" },
-		std::pair<std::string_view, std::string_view>{ "CTF", "Capture the Flag" },
-		std::pair<std::string_view, std::string_view>{ "DROP", "Block Drop" },
-		std::pair<std::string_view, std::string_view>{ "GROUND", "Ground Wars" },
-		std::pair<std::string_view, std::string_view>{ "BUILD", "Build Battle" },
-		std::pair<std::string_view, std::string_view>{ "PARTY", "Block Party" },
-		std::pair<std::string_view, std::string_view>{ "BRIDGE", "The Bridge" },
-		std::pair<std::string_view, std::string_view>{ "GRAV", "Gravity" },
-		std::pair<std::string_view, std::string_view>{ "BED", "BedWars" }
-	};
-
-	const PresenceDetails* findServerPresence(std::string_view serverAddress) {
-		for (const PresenceDetails& server : knownServers) {
-			if (serverAddress.find(server.address) != std::string_view::npos) {
-				return &server;
-			}
-		}
-
-		return nullptr;
-	}
-
-	std::optional<std::string_view> findHiveGameName(std::string_view gameCode) {
-		for (const auto& game : hiveGameNames) {
-			if (game.first == gameCode) {
-				return game.second;
-			}
-		}
-
-		return std::nullopt;
-	}
-
-	void useMinecraftAssets(DiscordIpcClient::Activity& activity) {
-		activity.largeImageKey = "minecraft";
-		activity.largeImageText = "Minecraft Bedrock Logo";
-		activity.smallImageKey = "latite";
-		activity.smallImageText = "Latite Client Logo";
-	}
-
-	void useLatiteAsset(DiscordIpcClient::Activity& activity) {
-		activity.largeImageKey = "latite";
-		activity.largeImageText = "Latite Client Logo";
-		activity.smallImageKey.clear();
-		activity.smallImageText.clear();
-	}
-
-	std::int64_t nowUnixSeconds() {
-		return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-	}
-
-	std::string stripMinecraftFormatting(std::string_view value) {
-		std::string out;
-		out.reserve(value.size());
-
-		for (size_t i = 0; i < value.size(); i++) {
-			const auto ch = static_cast<unsigned char>(value[i]);
-			if (ch == 0xC2 && i + 2 < value.size() && static_cast<unsigned char>(value[i + 1]) == 0xA7) {
-				i += 2;
-				continue;
-			}
-
-			if (ch == 0xA7 && i + 1 < value.size()) {
-				i++;
-				continue;
-			}
-
-			out.push_back(value[i]);
-		}
-
-		return out;
-	}
-
-	std::string trimWhitespace(std::string_view value) {
-		size_t start = 0;
-		while (start < value.size() && std::isspace(static_cast<unsigned char>(value[start]))) {
-			start++;
-		}
-
-		size_t end = value.size();
-		while (end > start && std::isspace(static_cast<unsigned char>(value[end - 1]))) {
-			end--;
-		}
-
-		return std::string(value.substr(start, end - start));
-	}
-
-	std::optional<std::string> parseHiveGameModeCode(std::string_view message) {
-		constexpr std::string_view prefix = "You are connected to server name ";
-		if (!message.starts_with(prefix)) {
-			return std::nullopt;
-		}
-
-		std::string serverName = trimWhitespace(message.substr(prefix.size()));
-		while (!serverName.empty() && std::isdigit(static_cast<unsigned char>(serverName.back()))) {
-			serverName.pop_back();
-		}
-
-		serverName = trimWhitespace(serverName);
-		if (serverName.empty()) {
-			return std::nullopt;
-		}
-
-		return serverName;
-	}
-
-	bool isHiveConnectionMessage(std::string_view message) {
-		return message.starts_with("You are connected to internal IP ")
-			|| message.starts_with("You are connected to public IP ")
-			|| message.starts_with("You are connected to server name ")
-			|| message.starts_with("You are connected to server ");
-	}
-
-	bool isHiveConnectionCommand(std::string_view command) {
-		return util::ToLower(trimWhitespace(command)) == "/connection";
-	}
-
-	std::string getHivePresenceDetails(std::string_view gameCode) {
-		if (gameCode == "HUB") {
-			return "In the Hub";
-		}
-
-		constexpr std::string_view hubPrefix = "HUB-";
-		if (gameCode.starts_with(hubPrefix)) {
-			const std::string_view hubGameCode = gameCode.substr(hubPrefix.size());
-			if (std::optional<std::string_view> gameName = findHiveGameName(hubGameCode)) {
-				return std::format("In the {} Hub", *gameName);
-			}
-
-			return std::format("In the {} Hub", hubGameCode);
-		}
-
-		if (std::optional<std::string_view> gameName = findHiveGameName(gameCode)) {
-			return std::format("Playing {}", *gameName);
-		}
-
-		return std::format("Playing {}", gameCode);
-	}
-}
 
 DiscordPresence::DiscordPresence() : Module(
 	"DiscordPresence",
@@ -178,29 +17,34 @@ DiscordPresence::DiscordPresence() : Module(
 	LocalizeString::get("client.module.discordPresence.desc"),
 	GAME
 ) {
-	listen<UpdateEvent>(static_cast<EventListenerFunc>(&DiscordPresence::onUpdate));
-	listen<ChatMessageEvent>(static_cast<EventListenerFunc>(&DiscordPresence::onChatMessage), false, 10);
-	listen<SendPacketEvent>(static_cast<EventListenerFunc>(&DiscordPresence::onSendPacket), false, 10);
+	Eventing::get().listen<UpdateEvent, &DiscordPresence::onUpdate>(this);
+	Eventing::get().listen<PacketReceiveEvent, &DiscordPresence::onPacketReceive>(this);
+	Eventing::get().listen<ChatMessageEvent, &DiscordPresence::onChatMessage>(this, 10);
+	Eventing::get().listen<SendPacketEvent, &DiscordPresence::onSendPacket>(this, 10);
 }
 
 DiscordPresence::~DiscordPresence() {
-	DiscordPresence::onDisable();
+	onDisable();
 }
 
 void DiscordPresence::onEnable() {
 	if (sessionStart <= 0) {
-		sessionStart = nowUnixSeconds();
+		sessionStart = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 	}
+
 	lastCheck = {};
 	lastRefresh = {};
-	lastHiveConnectionProbe = {};
-	lastUserHiveConnectionCommand = {};
-	pendingHiveConnectionMessages = 0;
-	sendingHiveConnectionProbe = false;
+	connectionRefreshAt = {};
+	suppressConnectionResponsesUntil = {};
+	sendingConnectionRequest = false;
 	lastSentActivity.reset();
 	hiveGameModeCode.reset();
+	activeServer = nullptr;
+	activeServerAddress.clear();
 	ipcClient.emplace(discordApplicationId);
-	DiscordPresence::publishPresence(true);
+
+	updateConnectionState();
+	publishPresence(true);
 }
 
 void DiscordPresence::onDisable() {
@@ -211,62 +55,158 @@ void DiscordPresence::onDisable() {
 
 	lastSentActivity.reset();
 	hiveGameModeCode.reset();
-	lastHiveConnectionProbe = {};
-	lastUserHiveConnectionCommand = {};
-	pendingHiveConnectionMessages = 0;
-	sendingHiveConnectionProbe = false;
+	activeServer = nullptr;
+	activeServerAddress.clear();
+	connectionRefreshAt = {};
+	suppressConnectionResponsesUntil = {};
+	sendingConnectionRequest = false;
 }
 
-void DiscordPresence::onUpdate(Event&) {
-	DiscordPresence::publishPresence(false);
+void DiscordPresence::onUpdate(UpdateEvent&) {
+	updateConnectionState();
+	publishPresence(false);
 }
 
-void DiscordPresence::onChatMessage(Event& evG) {
-	const bool hiddenProbeResponse = hasPendingHiveConnectionProbe();
-	const bool userConnectionResponse = lastUserHiveConnectionCommand != std::chrono::steady_clock::time_point{}
-		&& std::chrono::steady_clock::now() - lastUserHiveConnectionCommand <= hiveConnectionProbeResponseWindow;
-
-	ChatMessageEvent& ev = reinterpret_cast<ChatMessageEvent&>(evG);
-	const std::string message = trimWhitespace(stripMinecraftFormatting(ev.getMessage()));
-	if (!isHiveConnectionMessage(message)) {
+void DiscordPresence::onPacketReceive(PacketReceiveEvent& ev) {
+	const SDK::PacketID packetId = ev.getPacket()->getID();
+	if (packetId != SDK::PacketID::CHANGE_DIMENSION
+		&& packetId != SDK::PacketID::TRANSFER) {
 		return;
 	}
 
-	if (std::optional<std::string> modeCode = parseHiveGameModeCode(message)) {
-		if (hiveGameModeCode != modeCode) {
-			hiveGameModeCode = std::move(modeCode);
+	hiveGameModeCode.reset();
+	suppressConnectionResponsesUntil = {};
+	connectionRefreshAt = activeServer && activeServer->tracksHiveGame
+		? std::chrono::steady_clock::now() + hiveConnectionRefreshDelay
+		: std::chrono::steady_clock::time_point{};
+	lastSentActivity.reset();
+	lastCheck = {};
+}
+
+void DiscordPresence::onChatMessage(ChatMessageEvent& ev) {
+	std::string message;
+	const std::string rawMessage = ev.getMessage();
+	message.reserve(rawMessage.size());
+
+	for (size_t i = 0; i < rawMessage.size(); i++) {
+		const auto ch = static_cast<unsigned char>(rawMessage[i]);
+		if (ch == 0xC2 && i + 2 < rawMessage.size()
+			&& static_cast<unsigned char>(rawMessage[i + 1]) == 0xA7) {
+			i += 2;
+			continue;
+		}
+		if (ch == 0xA7 && i + 1 < rawMessage.size()) {
+			i++;
+			continue;
+		}
+		message.push_back(rawMessage[i]);
+	}
+
+	while (!message.empty() && std::isspace(static_cast<unsigned char>(message.front()))) {
+		message.erase(message.begin());
+	}
+	while (!message.empty() && std::isspace(static_cast<unsigned char>(message.back()))) {
+		message.pop_back();
+	}
+
+	constexpr std::string_view serverNamePrefix = "You are connected to server name ";
+	const bool isConnectionMessage =
+		message.starts_with("You are connected to internal IP ")
+		|| message.starts_with("You are connected to public IP ")
+		|| message.starts_with(serverNamePrefix)
+		|| message.starts_with("You are connected to server ");
+	if (!isConnectionMessage) {
+		return;
+	}
+
+	if (message.starts_with(serverNamePrefix)) {
+		std::string gameCode = message.substr(serverNamePrefix.size());
+		while (!gameCode.empty() && std::isspace(static_cast<unsigned char>(gameCode.back()))) {
+			gameCode.pop_back();
+		}
+		while (!gameCode.empty() && std::isdigit(static_cast<unsigned char>(gameCode.back()))) {
+			gameCode.pop_back();
+		}
+		while (!gameCode.empty() && std::isspace(static_cast<unsigned char>(gameCode.back()))) {
+			gameCode.pop_back();
+		}
+
+		if (!gameCode.empty() && hiveGameModeCode != gameCode) {
+			hiveGameModeCode = std::move(gameCode);
 			lastSentActivity.reset();
 			lastCheck = {};
 		}
 	}
 
-	if (hiddenProbeResponse) {
-		if (pendingHiveConnectionMessages > 0) {
-			pendingHiveConnectionMessages--;
-		}
-		ev.setCancelled(true);
-	} else if (!userConnectionResponse) {
-		lastUserHiveConnectionCommand = {};
+	if (std::chrono::steady_clock::now() <= suppressConnectionResponsesUntil) {
+		ev.setCancelled();
 	}
 }
 
-void DiscordPresence::onSendPacket(Event& evG) {
-	SendPacketEvent& ev = reinterpret_cast<SendPacketEvent&>(evG);
+void DiscordPresence::onSendPacket(SendPacketEvent& ev) {
 	if (ev.getPacket()->getID() != SDK::PacketID::COMMAND_REQUEST) {
 		return;
 	}
 
-	const SDK::CommandRequestPacket* cmd = reinterpret_cast<SDK::CommandRequestPacket*>(ev.getPacket());
-	if (!isHiveConnectionCommand(cmd->command)) {
+	const auto* command = reinterpret_cast<SDK::CommandRequestPacket*>(ev.getPacket());
+	if (util::ToLower(command->command) != "/connection" || sendingConnectionRequest) {
 		return;
 	}
 
-	if (sendingHiveConnectionProbe) {
+	connectionRefreshAt = {};
+	suppressConnectionResponsesUntil = {};
+}
+
+void DiscordPresence::updateConnectionState() {
+	const auto now = std::chrono::steady_clock::now();
+	SDK::ClientInstance* clientInstance = SDK::ClientInstance::get();
+	SDK::RakNetConnector* connector = SDK::RakNetConnector::get();
+
+	std::string serverAddress;
+	if (clientInstance && clientInstance->minecraft && clientInstance->minecraft->getLevel()
+		&& clientInstance->getLocalPlayer() && connector) {
+		serverAddress = !connector->dns.empty() ? connector->dns : connector->ipAddress;
+	}
+
+	if (serverAddress != activeServerAddress) {
+		activeServerAddress = std::move(serverAddress);
+		activeServer = nullptr;
+		for (const ServerPresence& server : knownServers) {
+			if (activeServerAddress.find(server.address) != std::string::npos) {
+				activeServer = &server;
+				break;
+			}
+		}
+
+		hiveGameModeCode.reset();
+		suppressConnectionResponsesUntil = {};
+		connectionRefreshAt = activeServer && activeServer->tracksHiveGame
+			? now + hiveConnectionRefreshDelay
+			: std::chrono::steady_clock::time_point{};
+		lastSentActivity.reset();
+		lastCheck = {};
+	}
+
+	if (connectionRefreshAt == std::chrono::steady_clock::time_point{} || now < connectionRefreshAt
+		|| !activeServer || !activeServer->tracksHiveGame
+		|| !clientInstance || !clientInstance->getLocalPlayer()
+		|| !clientInstance->getLocalPlayer()->packetSender) {
 		return;
 	}
 
-	pendingHiveConnectionMessages = 0;
-	lastUserHiveConnectionCommand = std::chrono::steady_clock::now();
+	std::shared_ptr<SDK::Packet> packet = SDK::MinecraftPackets::createPacket(SDK::PacketID::COMMAND_REQUEST);
+	if (!packet) {
+		return;
+	}
+
+	auto* command = reinterpret_cast<SDK::CommandRequestPacket*>(packet.get());
+	command->applyCommand("/connection");
+
+	connectionRefreshAt = {};
+	suppressConnectionResponsesUntil = now + hiveConnectionResponseWindow;
+	sendingConnectionRequest = true;
+	clientInstance->getLocalPlayer()->packetSender->sendToServer(packet.get());
+	sendingConnectionRequest = false;
 }
 
 void DiscordPresence::publishPresence(bool force) {
@@ -280,18 +220,9 @@ void DiscordPresence::publishPresence(bool force) {
 	}
 	lastCheck = now;
 
-	const DiscordIpcClient::Activity activity = DiscordPresence::makeActivity();
-	bool shouldRefresh = false;
-
-	if (!lastSentActivity) {
-		shouldRefresh = true;
-	} else if (*lastSentActivity != activity) {
-		shouldRefresh = true;
-	} else if (now - lastRefresh >= presenceRefreshInterval) {
-		shouldRefresh = true;
-	}
-
-	if (!force && !shouldRefresh) {
+	const DiscordIpcClient::Activity activity = makeActivity();
+	if (!force && lastSentActivity && *lastSentActivity == activity
+		&& now - lastRefresh < presenceRefreshInterval) {
 		return;
 	}
 
@@ -301,115 +232,73 @@ void DiscordPresence::publishPresence(bool force) {
 	}
 }
 
-DiscordIpcClient::Activity DiscordPresence::makeActivity() {
+DiscordIpcClient::Activity DiscordPresence::makeActivity() const {
 	DiscordIpcClient::Activity activity;
-	activity.startTimestamp = sessionStart > 0 ? sessionStart : nowUnixSeconds();
+	activity.startTimestamp = sessionStart > 0
+		? sessionStart
+		: std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
 	SDK::ClientInstance* clientInstance = SDK::ClientInstance::get();
-	if (!clientInstance || !clientInstance->minecraft || !clientInstance->minecraft->getLevel() || !clientInstance->getLocalPlayer()) {
-		hiveGameModeCode.reset();
-		lastHiveConnectionProbe = {};
-		pendingHiveConnectionMessages = 0;
+	if (!clientInstance || !clientInstance->minecraft || !clientInstance->minecraft->getLevel()
+		|| !clientInstance->getLocalPlayer()) {
 		activity.details = "Playing Minecraft Bedrock";
 		activity.state = "In menus";
+		return activity;
+	}
 
-		useLatiteAsset(activity);
+	if (activeServer) {
+		activity.details = "Playing Minecraft Bedrock";
+		if (activeServer->tracksHiveGame && hiveGameModeCode) {
+			std::string_view gameName = *hiveGameModeCode;
+			for (const auto& [code, name] : hiveGameNames) {
+				if (code == *hiveGameModeCode) {
+					gameName = name;
+					break;
+				}
+			}
+
+			if (*hiveGameModeCode == "HUB") {
+				activity.details = "In the Hub";
+			} else if (hiveGameModeCode->starts_with("HUB-")) {
+				const std::string_view hubCode = std::string_view(*hiveGameModeCode).substr(4);
+				std::string_view hubName = hubCode;
+				for (const auto& [code, name] : hiveGameNames) {
+					if (code == hubCode) {
+						hubName = name;
+						break;
+					}
+				}
+				activity.details = std::format("In the {} Hub", hubName);
+			} else {
+				activity.details = std::format("Playing {}", gameName);
+			}
+		}
+
+		activity.state = std::string(activeServer->name);
+		activity.largeImageKey = std::string(activeServer->logoKey);
+		activity.largeImageText = std::string(activeServer->logoTooltip);
+		activity.smallImageKey = "latite";
+		activity.smallImageText = "Latite Client Logo";
 		return activity;
 	}
 
 	SDK::RakNetConnector* connector = SDK::RakNetConnector::get();
+	activity.details = "Playing Minecraft Bedrock";
+	activity.state = "Singleplayer";
 	if (connector) {
-		const std::string serverAddress = !connector->dns.empty() ? connector->dns : connector->ipAddress;
-		if (const PresenceDetails* server = findServerPresence(serverAddress)) {
-			activity.details = hiveGameModeCode && server->name == "The Hive"
-				? getHivePresenceDetails(*hiveGameModeCode)
-				: "Playing Minecraft Bedrock";
-			activity.state = std::string(server->name);
-
-			if (server->name == "The Hive") {
-				requestHiveConnectionInfo(std::chrono::steady_clock::now());
-			} else {
-				hiveGameModeCode.reset();
-				lastHiveConnectionProbe = {};
-				pendingHiveConnectionMessages = 0;
+		if (!connector->featuredServer.empty()) {
+			activity.state = connector->featuredServer;
+		} else if (!connector->dns.empty()) {
+			activity.state = connector->dns;
+			if (connector->port != 19132) {
+				activity.state += std::format(":{}", connector->port);
 			}
-
-			activity.largeImageKey = std::string(server->logoKey);
-			activity.largeImageText = std::string(server->logoTooltip);
-			activity.smallImageKey = "latite";
-			activity.smallImageText = "Latite Client Logo";
-			return activity;
 		}
 	}
 
-	hiveGameModeCode.reset();
-	lastHiveConnectionProbe = {};
-	pendingHiveConnectionMessages = 0;
-	activity.details = "Playing Minecraft Bedrock";
-	activity.state = getPresenceState();
-	useMinecraftAssets(activity);
+	activity.largeImageKey = "minecraft";
+	activity.largeImageText = "Minecraft Bedrock Logo";
+	activity.smallImageKey = "latite";
+	activity.smallImageText = "Latite Client Logo";
 	return activity;
-}
-
-std::string DiscordPresence::getPresenceState() const {
-    SDK::RakNetConnector* connector = SDK::RakNetConnector::get();
-	// path for generic servers
-    if (connector) {
-        if (!connector->featuredServer.empty()) {
-            return connector->featuredServer;
-        }
-
-        if (!connector->dns.empty()) {
-            std::string server = connector->dns;
-            if (connector->port != 19132) {
-                server += std::format(":{}", connector->port);
-            }
-            return server;
-        }
-    }
-
-    return "Singleplayer";
-}
-
-void DiscordPresence::requestHiveConnectionInfo(std::chrono::steady_clock::time_point now) {
-	if (hasPendingHiveConnectionProbe()) {
-		return;
-	}
-
-	if (lastUserHiveConnectionCommand != std::chrono::steady_clock::time_point{}
-		&& now - lastUserHiveConnectionCommand < hiveUserConnectionBackoff) {
-		return;
-	}
-
-	if (now - lastHiveConnectionProbe < hiveConnectionProbeInterval) {
-		return;
-	}
-
-	SDK::LocalPlayer* localPlayer = SDK::ClientInstance::get()->getLocalPlayer();
-	if (!localPlayer || !localPlayer->packetSender) {
-		return;
-	}
-
-	std::shared_ptr<SDK::Packet> pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::COMMAND_REQUEST);
-	if (!pkt) {
-		return;
-	}
-
-	SDK::CommandRequestPacket* cmd = reinterpret_cast<SDK::CommandRequestPacket*>(pkt.get());
-	cmd->applyCommand("/connection");
-
-	lastHiveConnectionProbe = now;
-	pendingHiveConnectionMessages = 3;
-	sendingHiveConnectionProbe = true;
-	localPlayer->packetSender->sendToServer(pkt.get());
-	sendingHiveConnectionProbe = false;
-}
-
-bool DiscordPresence::hasPendingHiveConnectionProbe() const {
-	if (lastHiveConnectionProbe == std::chrono::steady_clock::time_point{}) {
-		return false;
-	}
-
-	return pendingHiveConnectionMessages > 0
-		&& std::chrono::steady_clock::now() - lastHiveConnectionProbe <= hiveConnectionProbeResponseWindow;
 }
