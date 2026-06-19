@@ -186,18 +186,18 @@ JsValueRef JsEntityClass::entityGetVariable(JsValueRef callee, bool isConstructo
 	auto str = util::WStrToStr(Chakra::GetString(arguments[1]));
 
 	if (ent && ent->getEntity()) {
-	    // TODO: FIX ME! MolangVariable does not hold a name anymore
-		/*for (auto& var : ent->getEntity()->molangVariableMap.mVariables) {
-			if (var->mName.getString().starts_with("variable.")) {
-				if (var->mName == str) {
-					// create it
-					JsValueRef obj;
-					JS::JsCreateObject(&obj);
-					Chakra::SetProperty(obj, util::StrToWStr("number"), Chakra::MakeDouble(var->mValue.mPOD.mFloat));
-					return obj;
-				}
-			}
-		}*/
+		if (str.rfind("variable.", 0) != 0) {
+			return Chakra::GetNull();
+		}
+
+		auto value = ent->getEntity()->molangVariableMap.getMolangVariableFloat(util::fnv1a_64(str), str.c_str());
+		if (value.has_value()) {
+			JsValueRef obj;
+			JS::JsCreateObject(&obj);
+			Chakra::SetProperty(obj, util::StrToWStr("number"), Chakra::MakeDouble(*value));
+			return obj;
+		}
+
 		return Chakra::GetNull();
 	}
 
@@ -217,17 +217,12 @@ JsValueRef JsEntityClass::entitySetVariable(JsValueRef callee, bool isConstructo
 	auto newVal = Chakra::GetNumber(arguments[2]);
 
 	if (ent && ent->getEntity()) {
-	    // TODO: FIX ME! MolangVariable does not hold a name anymore
-		/*for (auto& var : ent->getEntity()->molangVariableMap.mVariables) {
-			if (var->mName.getString().starts_with("variable.")) {
-				if (var->mName == str) {
-					// create it
-					var->mValue.mPOD.mFloat = static_cast<float>(newVal);
-					return arguments[2];
-				}
-			}
-		}*/
-		return Chakra::GetNull();
+		if (str.rfind("variable.", 0) != 0) {
+			return Chakra::GetNull();
+		}
+
+		ent->getEntity()->molangVariableMap.setMolangVariable(util::fnv1a_64(str), str.c_str(), static_cast<float>(newVal));
+		return arguments[2];
 	}
 
 	Chakra::ThrowError(L"Invalid entity");
