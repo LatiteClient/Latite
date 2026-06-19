@@ -26,8 +26,8 @@ namespace SDK {
 
 	class Attributes {
 	public:
-		inline static Attribute Hunger = Attribute(2, "minecraft:hunger");
-		inline static Attribute Saturation = Attribute(3, "minecraft:saturation");
-		inline static Attribute Health = Attribute(7, "minecraft:health");
+		inline static Attribute Hunger = Attribute(1, "minecraft:hunger");
+		inline static Attribute Saturation = Attribute(2, "minecraft:saturation");
+		inline static Attribute Health = Attribute(6, "minecraft:health");
 	};
 }

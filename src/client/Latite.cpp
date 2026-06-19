@@ -220,11 +220,12 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         MVSIG(MinecraftGame__update),
         MVSIG(GpuInfo),
         MVSIG(RakPeer_GetAveragePing),
-        MVSIG(ClientInputUpdateSystem_tickBaseInput),
+        MVSIG(ClientInputUpdateSystemInternal_tickUpdateClientInput),
         MVSIG(LocalPlayer_applyTurnDelta),
         MVSIG(ItemStackBase_getHoverName),
         MVSIG(I18n_getI18n),
         MVSIG(ItemStack_ItemStackBlock),
+        MVSIG(ItemStackVtable),
         MVSIG(ItemStackBase_destructor),
         MVSIG(Vtable::Level),
         MVSIG(Tessellator_begin),
@@ -233,20 +234,9 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         MVSIG(MeshHelpers_renderMeshImmediately),
         MVSIG(BaseActorRenderContext_BaseActorRenderContext),
         MVSIG(ItemRenderer_renderGuiItemNew),
-        MVSIG(BlockGraphics_getForBlock),
-        MVSIG(BlockGraphics_getTexture),
-        MVSIG(BlockGraphics_getTextureAtPos),
-        MVSIG(UIControl_updateCachedPosition),
         MVSIG(ActorRenderDispatcher_render),
-        MVSIG(ActorRenderDispatcher_renderUI),
-        MVSIG(ActorRenderDispatcher_getRendererById),
-        MVSIG(Actor_setUIRendering),
-        MVSIG(Actor_setYHeadRotations),
-        MVSIG(Actor_setRotationY),
-        MVSIG(Mob_setYBodyRotations),
-        MVSIG(MolangScriptArg_MolangScriptArg),
-        MVSIG(MolangScriptArg_destructor),
-        MVSIG(MolangVariableMap_setMolangVariable),
+        MVSIG(MolangVariable__findOrAddVariableIndex),
+        MVSIG(MolangVariableMap__getOrAddMolangVariable),
         MVSIG(LevelRendererPlayer_renderOutlineSelection),
         MVSIG(Dimension_getSkyColor),
         MVSIG(Dimension_getTimeOfDay),
@@ -496,7 +486,7 @@ void Latite::queueEject() noexcept {
 SDK::Font* Latite::getFont() {
     switch (this->mcRendFont.getSelectedKey()) {
     case 0:
-        return SDK::ClientInstance::get()->minecraftGame->minecraftFont;
+        return SDK::ClientInstance::get()->minecraftGame->getFontRepository()->getMinecraftFont();
     case 1:
         return SDK::ClientInstance::get()->minecraftGame->getFontRepository()->getSmoothFont();
     default:

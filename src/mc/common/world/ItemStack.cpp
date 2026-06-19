@@ -5,7 +5,15 @@ SDK::ItemStack* SDK::ItemStack::constructFromBlock(void* storage, SDK::Block con
 	SDK::CompoundTag const* userData) {
 	using oFunc_t = ItemStack*(__fastcall*)(void*, Block const*, int, CompoundTag const*);
 	auto fn = reinterpret_cast<oFunc_t>(Signatures::ItemStack_ItemStackBlock.result);
-	return fn ? fn(storage, &block, count, userData) : nullptr;
+
+    if (!fn)
+        return nullptr;
+
+    const auto item = fn(storage, &block, count, userData);
+
+    item->vtable = reinterpret_cast<void**>(Signatures::ItemStackVtable.result);
+
+	return item;
 }
 
 void SDK::ItemStack::destruct() {

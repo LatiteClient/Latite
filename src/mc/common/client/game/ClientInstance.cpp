@@ -32,7 +32,7 @@ SDK::GuiData* SDK::ClientInstance::getGuiData() {
 }
 
 SDK::Options* SDK::ClientInstance::getOptions() {
-    return hat::member_at<Options*>(this, 0xC38);
+    return hat::member_at<Options*>(this, 0xC68);
 }
 
 SDK::ResourcePackManager& SDK::ClientInstance::getResourcePackManager() {

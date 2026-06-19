@@ -1,12 +1,11 @@
 #pragma once
-#define visual virtual
 
 namespace SDK {
 	// An implementation of Minecraft's IDataOutput.
 
 	class BasicDataOutput {
 	public:
-		visual ~BasicDataOutput() {};
+		virtual ~BasicDataOutput() {};
 		std::string mStr;
 
 		virtual void writeString(void* gslStringSpan) {

@@ -10,13 +10,11 @@ namespace SDK {
 	public:
 		bool isCursorGrabbed();
 
-		CLASS_FIELD(std::string, xuid, 0x2D8);
-		CLASS_FIELD(GameRenderer*, gameRenderer, 0xFA0);
+		CLASS_FIELD(std::string, xuid, 0x250);
+		CLASS_FIELD(GameRenderer*, gameRenderer, 0xF18);
 	private:
-		CLASS_FIELD(class FontRepository**, fontRepo, 0x1130);
+		CLASS_FIELD(class FontRepository**, fontRepo, 0x700);
 	public:
-		CLASS_FIELD(class Font*, minecraftFont, 0x1138);
-
 		class FontRepository* getFontRepository() {
 			return reinterpret_cast<FontRepository*>(fontRepo);
 		}

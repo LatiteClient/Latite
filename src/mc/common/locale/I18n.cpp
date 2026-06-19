@@ -4,7 +4,7 @@
 SDK::I18n* SDK::I18n::get() {
 	if (!Signatures::I18n_getI18n.result) return nullptr;
 
-	return reinterpret_cast<I18n*(__fastcall*)()>(Signatures::I18n_getI18n.result)();
+	return reinterpret_cast<I18n*>(Signatures::I18n_getI18n.result);
 }
 
 std::string SDK::I18n::get(std::string const& key) {

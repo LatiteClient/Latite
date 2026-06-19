@@ -1,13 +1,15 @@
 #pragma once
 #include <chrono>
 #include "Item.h"
+#include "../nbt/CompoundTag.h"
 
 namespace SDK {
 	class ItemStackBase {
 	public:
 		// ItemStackBase
+	    void** vtable;
 		Item** item; //0x0008 WeakPtr<Item>
-		std::unique_ptr<class CompoundTag> tag;
+		std::unique_ptr<CompoundTag> tag;
 		class Block* block; // 0x0018
 		short aux; // 0x0020
 		uint8_t itemCount;
@@ -32,8 +34,6 @@ namespace SDK {
 			if (!item) return nullptr;
 			return *item;
 		}
-
-		virtual ~ItemStackBase() = 0;
 	};
 
 	static_assert(sizeof(ItemStackBase) == 0x80);

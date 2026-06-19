@@ -8,7 +8,6 @@ namespace SDK {
 
 	class ActorRenderDispatcher {
 	public:
-		std::shared_ptr<ActorRenderer> getRendererById(void const* actorRendererId);
 		void renderUI(class BaseActorRenderContext* baseActorRenderContext, class Actor* actor,
 			Vec3 const& cameraTarget, Vec2 const& rotation, bool uiRendering);
 	};

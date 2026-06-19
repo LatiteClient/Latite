@@ -41,7 +41,6 @@ namespace SDK {
 		void setUIRendering(bool value);
 		void setYHeadRotations(float current, float old);
 		void setYBodyRotations(float current, float old);
-		void setRotationY(float value);
 		uint64_t getRuntimeID();
 		uint32_t getEntityTypeID();
 		std::string getEntityLocalizationKey();
