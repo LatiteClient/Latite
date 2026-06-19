@@ -1,4 +1,5 @@
 #pragma once
+#include "GuiMessage.h"
 #include "mc/Util.h"
 #include "util/LMath.h"
 
@@ -9,6 +10,7 @@ namespace SDK {
 		CLASS_FIELD(Vec2, guiSize, 0x50);
 		CLASS_FIELD(float, guiScale, 0x5C);
 		CLASS_FIELD(float, guiScaleFrac, 0x60);
+	    CLASS_FIELD(std::vector<GuiMessage>, messages, 0x150)
 
 		void updateGuiScale(float newScale) {
 			guiScale = newScale;

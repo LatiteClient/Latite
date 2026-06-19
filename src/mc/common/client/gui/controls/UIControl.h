@@ -43,9 +43,7 @@ namespace SDK {
 		Vec2 position; //0x0010
 		uint64_t flags; //0x0018
 		std::string name; //0x0020
-	private:
-		char pad_0040[8]; //0x0040
-	public:
+	        Vec2 parentRelativePosition; // 0x0040
 		Vec2 bounds; //0x0048
 	private:
 		char pad_0050[32]; //0x0050

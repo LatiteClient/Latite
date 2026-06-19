@@ -186,7 +186,8 @@ JsValueRef JsEntityClass::entityGetVariable(JsValueRef callee, bool isConstructo
 	auto str = util::WStrToStr(Chakra::GetString(arguments[1]));
 
 	if (ent && ent->getEntity()) {
-		for (auto& var : ent->getEntity()->molangVariableMap.mVariables) {
+	    // TODO: FIX ME! MolangVariable does not hold a name anymore
+		/*for (auto& var : ent->getEntity()->molangVariableMap.mVariables) {
 			if (var->mName.getString().starts_with("variable.")) {
 				if (var->mName == str) {
 					// create it
@@ -196,7 +197,7 @@ JsValueRef JsEntityClass::entityGetVariable(JsValueRef callee, bool isConstructo
 					return obj;
 				}
 			}
-		}
+		}*/
 		return Chakra::GetNull();
 	}
 
@@ -216,7 +217,8 @@ JsValueRef JsEntityClass::entitySetVariable(JsValueRef callee, bool isConstructo
 	auto newVal = Chakra::GetNumber(arguments[2]);
 
 	if (ent && ent->getEntity()) {
-		for (auto& var : ent->getEntity()->molangVariableMap.mVariables) {
+	    // TODO: FIX ME! MolangVariable does not hold a name anymore
+		/*for (auto& var : ent->getEntity()->molangVariableMap.mVariables) {
 			if (var->mName.getString().starts_with("variable.")) {
 				if (var->mName == str) {
 					// create it
@@ -224,7 +226,7 @@ JsValueRef JsEntityClass::entitySetVariable(JsValueRef callee, bool isConstructo
 					return arguments[2];
 				}
 			}
-		}
+		}*/
 		return Chakra::GetNull();
 	}
 

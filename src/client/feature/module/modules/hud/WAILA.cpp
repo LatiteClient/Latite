@@ -76,7 +76,7 @@ std::vector<std::string> WAILA::findPreferredToolItemIds(SDK::Block const &block
 	}
 	if (!registry) return {};
 
-	auto itemCounters = reinterpret_cast<void ***>(reinterpret_cast<uintptr_t>(registry) + 0x30);
+	auto itemCounters = reinterpret_cast<void ***>(reinterpret_cast<uintptr_t>(registry) + 0x38);
 	if (!itemCounters[0] || !itemCounters[1]) return {};
 
 	alignas(SDK::ItemStack) char storage[sizeof(SDK::ItemStack)] = {};
@@ -449,7 +449,7 @@ void WAILA::render(DrawUtil &dc, bool isDefault, bool inEditor) {
 		std::vector<void *> toolCounters(target->toolItemIds.size());
 		bool hasToolCounter = false;
 		if (registry) {
-			auto itemCounters = reinterpret_cast<void ***>(reinterpret_cast<uintptr_t>(registry) + 0x30);
+			auto itemCounters = reinterpret_cast<void ***>(reinterpret_cast<uintptr_t>(registry) + 0x38);
 			for (auto current = itemCounters[0]; current && current < itemCounters[1]; ++current) {
 				auto counter = *current;
 				auto item = counter ? *reinterpret_cast<SDK::Item **>(counter) : nullptr;

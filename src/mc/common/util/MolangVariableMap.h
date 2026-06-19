@@ -10,6 +10,7 @@ namespace SDK {
 		bool mHasVariablesThatShouldSync;
 		bool mHasVariablesThatShouldSave;
 
+	    MolangVariable* _getOrAddMolangVariable(uint16_t index);
 		void setMolangVariable(uint64_t hash, char const* name, float value);
 	};
 }

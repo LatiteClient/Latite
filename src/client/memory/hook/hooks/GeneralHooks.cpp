@@ -215,10 +215,8 @@ void __fastcall GenericHooks::LocalPlayer_applyTurnDelta(void* obj, Vec2& rot) {
 	TurnDeltaHook->oFunc<decltype(&LocalPlayer_applyTurnDelta)>()(obj, rot);
 }
 
-void GenericHooks::ClientInputUpdateSystem_tickBaseInput(uintptr_t** a1, void* a2, uintptr_t* a3, uintptr_t a4, uintptr_t a5, uintptr_t a6, uintptr_t a7, uintptr_t a8, uintptr_t a9, uintptr_t a10, uintptr_t a11,
-	char a12,
-	char a13,
-	char a14) {
+void GenericHooks::ClientInputUpdateSystemInternal_tickUpdateClientInput(uintptr_t** a1, void* a2, uintptr_t* a3, uintptr_t a4, uintptr_t a5, uintptr_t a6, uintptr_t a7, uintptr_t a8, uintptr_t a9, uintptr_t a10, uintptr_t a11,
+	uintptr_t a12, uintptr_t a13, uintptr_t a14, uintptr_t a15, uintptr_t a16, uintptr_t a17, uintptr_t a18) {
 
 	SDK::MoveInputComponent* hand = SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent();
 	{
@@ -234,7 +232,7 @@ void GenericHooks::ClientInputUpdateSystem_tickBaseInput(uintptr_t** a1, void* a
 		if (Eventing::get().dispatch(ev)) return;
 	}
 
-	ClientInputUpdateSystem_tickBaseInputHook->oFunc<decltype(&ClientInputUpdateSystem_tickBaseInput)>()(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14);
+	ClientInputUpdateSystem_tickBaseInputHook->oFunc<decltype(&ClientInputUpdateSystemInternal_tickUpdateClientInput)>()(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18);
 	{
 		AfterMoveEvent ev{ hand };
 		Eventing::get().dispatch(ev);
@@ -278,14 +276,14 @@ void* GenericHooks::Level_startLeaveGame(SDK::Level* obj) {
 }
 
 void* GenericHooks::ActorRenderDispatcher_render(void* obj, SDK::BaseActorRenderContext* barc, SDK::Actor* entity,
-	Vec3& pos3, Vec3 const& pos2, void* unk, bool affectedByLighting) {
+	Vec3& cameraTargetPos, Vec3 const& pos, const Vec2& rot, bool affectedByLighting) {
 
 	if (entity) {
-		AfterRenderEntityEvent ev{ entity, pos3 };
+		AfterRenderEntityEvent ev{ entity, cameraTargetPos };
 		Eventing::get().dispatch(ev);
 	}
 
-	return RenderEntityHook->oFunc<decltype(&ActorRenderDispatcher_render)>()(obj, barc, entity, pos3, pos2, unk, affectedByLighting);
+	return RenderEntityHook->oFunc<decltype(&ActorRenderDispatcher_render)>()(obj, barc, entity, cameraTargetPos, pos, rot, affectedByLighting);
 }
 
 void GenericHooks::LevelRendererPlayer_renderOutlineSelection(SDK::LevelRendererPlayer* obj, SDK::ScreenContext* scn, void* block, void* region, BlockPos pos) {
@@ -335,16 +333,16 @@ Color* GenericHooks::hkGetFogColor(SDK::Dimension* obj, Color* out, SDK::Actor* 
 	return out;
 }
 
-void GenericHooks::hkAddMessage(SDK::GuiData* obj, void* msg, uint32_t profanityContext) {
+SDK::GuiMessage& GenericHooks::hkAddMessage(void* obj, SDK::GuiMessage& msg) {
 	// MessageContext
-	std::string& str = hat::member_at<std::string>(msg, 0x8);
+	std::string& str = msg.message;
 
 	ChatMessageEvent ev{ str };
 	if (Eventing::get().dispatch(ev)) {
-		return;
+		return *(SDK::ClientInstance::get()->getGuiData()->messages.end() - 1);
 	}
 
-	AddMessageHook->oFunc<decltype(&hkAddMessage)>()(obj, msg, profanityContext);
+	return AddMessageHook->oFunc<decltype(&hkAddMessage)>()(obj, msg);
 }
 
 void GenericHooks::hkUpdatePlayer(SDK::CameraComponent* obj, void* a, void* b) {
@@ -434,7 +432,7 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 
 	TurnDeltaHook = addHook(Signatures::LocalPlayer_applyTurnDelta.result, LocalPlayer_applyTurnDelta, "LocalPlayer::applyTurnDelta");
 
-	ClientInputUpdateSystem_tickBaseInputHook = addHook(Signatures::ClientInputUpdateSystem_tickBaseInput.result, ClientInputUpdateSystem_tickBaseInput, "ClientInputUpdateSystem::tickBaseInput");
+	ClientInputUpdateSystem_tickBaseInputHook = addHook(Signatures::ClientInputUpdateSystemInternal_tickUpdateClientInput.result, ClientInputUpdateSystemInternal_tickUpdateClientInput, "ClientInputUpdateSystem::tickBaseInput");
 
 	//ViewBobHook = addHook(Signatures::CameraViewBob.result, CameraViewBob, "`anonymous namespace'::_bobMovement");
 	if (Signatures::Vtable::Level.result) {

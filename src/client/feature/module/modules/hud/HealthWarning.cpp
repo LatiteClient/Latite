@@ -1,8 +1,9 @@
-#include "pch.h"
 #include "HealthWarning.h"
 #include "client/event/events/RenderLayerEvent.h"
-#include "mc/common/client/gui/controls/VisualTree.h"
+#include "mc/common/client/game/FontRepository.h"
 #include "mc/common/client/gui/controls/UIControl.h"
+#include "mc/common/client/gui/controls/VisualTree.h"
+#include "pch.h"
 #include "util/WorldToScreen.h"
 
 HealthWarning::HealthWarning() : Module("HealthWarning", LocalizeString::get("client.hudmodule.healthWarning.name"), LocalizeString::get("client.hudmodule.healthWarning.desc"), HUD, nokeybind) {
@@ -21,7 +22,7 @@ void HealthWarning::onRenderLayer(Event& evG) {
 
 	StoredColor vignette = std::get<ColorValue>(vignetteColor).getMainColor();
 
-	MCDrawUtil dc{ ev.getUIRenderContext(), SDK::ClientInstance::get()->minecraftGame->minecraftFont };
+	MCDrawUtil dc{ ev.getUIRenderContext(), SDK::ClientInstance::get()->minecraftGame->getFontRepository()->getMinecraftFont() };
 
 	if (std::get<FloatValue>(healthPointThreshold) > SDK::ClientInstance::get()->getLocalPlayer()->getHealth().
 	    value_or(20.f) && screenView->visualTree->rootControl->name == "hud_screen") {

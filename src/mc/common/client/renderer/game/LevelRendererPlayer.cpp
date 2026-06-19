@@ -4,13 +4,13 @@
 #include "util/LMath.h"
 
 Vec3& SDK::LevelRendererPlayer::getOrigin() {
-    return hat::member_at<Vec3>(this, 0x710);
+    return hat::member_at<Vec3>(this, 0x660);
 }
 
 float& SDK::LevelRendererPlayer::getFovX() {
-    return hat::member_at<float>(this, 0xFF0);
+    return hat::member_at<float>(this, 0xF58);
 }
 
 float& SDK::LevelRendererPlayer::getFovY() {
-    return hat::member_at<float>(this, 0x1004);
+    return hat::member_at<float>(this, 0xF6C);
 }

@@ -3,7 +3,17 @@
 #include <cstddef>
 
 namespace SDK {
-	using MolangScriptArgType = int32_t;
+    enum class MolangScriptArgType : int {
+        Unset                  = -1,
+        Float                  = 0,
+        HashType64             = 1,
+        MolangLoopBreak        = 2,
+        MolangLoopContinue     = 3,
+        MolangActorPtr         = 4,
+        MolangActorIdPtr       = 5,
+        MolangItemStackBasePtr = 6,
+        Variant                = 7,
+    };
 
 	struct MolangLoopBreak {};
 	struct MolangLoopContinue {};
@@ -33,10 +43,11 @@ namespace SDK {
 	};
 
 	struct MolangVariable {
-		HashedString mName;
 		MolangScriptArg mValue;
-		MolangScriptArg mPublicValue;
+		std::unique_ptr<MolangScriptArg> mPublicValue;
 		MolangVariableSettings mSettings;
+
+	    static uint16_t _findOrAddVariableIndex(uint64_t hash, const char* name, bool allowSpecialCharacters);
 	};
 
 }

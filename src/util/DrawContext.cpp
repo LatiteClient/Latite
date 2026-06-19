@@ -459,7 +459,7 @@ d2d::Rect MCDrawUtil::drawItem(SDK::ItemStack* item, Vec2 const& pos, float size
 
 bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opacity) {
 	if (!actor || !actor->aabbShape || !actor->stateVector || !renderCtx || !renderCtx->screenContext || !renderCtx->cinst ||
-		!renderCtx->cinst->minecraftGame || !scn || !scn->matrix || !Signatures::ActorRenderDispatcher_renderUI.result) {
+		!renderCtx->cinst->minecraftGame || !scn || !scn->matrix || !Signatures::ActorRenderDispatcher_render.result) {
 		return false;
 	}
 
