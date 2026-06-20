@@ -4,6 +4,7 @@ namespace SDK {
 		NONE = 0,
 		LOGIN = 0x1,
 		TEXT = 0x9,
+		ADD_PLAYER = 0xC,
 		ACTOR_EVENT = 0x1B,
 		SET_ENTITY_DATA = 0x27,
 		CHANGE_DIMENSION = 0x3D,

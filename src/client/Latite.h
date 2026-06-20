@@ -6,6 +6,7 @@
 #include <optional>
 #include "misc/Timings.h"
 #include "misc/Notifications.h"
+#include "misc/NameTagCache.h"
 #include "localization/LocalizeData.h"
 
 namespace ui {
@@ -36,6 +37,7 @@ public:
 
 	[[nodiscard]] LocalizeData& getL10nData() noexcept { return *l10nData; }
 	[[nodiscard]] Timings& getTimings() noexcept { return timings; }
+	[[nodiscard]] NameTagCache& getNameTagCache() noexcept { return nameTagCache; }
 	[[nodiscard]] std::string getCommandPrefix() { return util::WStrToStr(std::get<TextValue>(commandPrefix).str); }
 	[[nodiscard]] int getSelectedLanguage();
 
@@ -157,6 +159,7 @@ private:
 	std::queue<std::function<void()>> clientThreadQueue;
 
 	Timings timings{};
+	NameTagCache nameTagCache;
 	inline static std::optional<std::thread::id> gameThreadId;
 
 	ValueType commandPrefix = TextValue(L".");
