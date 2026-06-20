@@ -4,14 +4,57 @@
 #include "client/event/events/RenderNameTagEvent.h"
 #include "client/event/events/RenderLayerEvent.h"
 #include "client/event/events/TickEvent.h"
+#include "client/misc/PlayerHeadCache.h"
+#include "client/misc/NameTagCache.h"
 #include "mc/common/client/gui/controls/UIControl.h"
 #include "mc/common/client/gui/controls/VisualTree.h"
+#include "mc/common/world/actor/player/SerializedSkinRef.h"
 #include "mc/common/world/level/Level.h"
 #include "util/Logger.h"
 #include "util/DrawContext.h"
 #include <algorithm>
 #include <unordered_set>
 #include <vector>
+
+TabList::TabList() : Module("PlayerList", LocalizeString::get("client.module.tabList.name"),
+                            LocalizeString::get("client.module.tabList.desc"), HUD, VK_TAB) {
+    addSetting("textColor", LocalizeString::get("client.module.tabList.textColor.name"),
+               LocalizeString::get("client.module.tabList.textColor.desc"), textCol);
+    addSetting("bgColor", LocalizeString::get("client.module.tabList.bgColor.name"),
+               LocalizeString::get("client.module.tabList.bgColor.desc"), bgCol);
+	addSliderSetting("textSize", LocalizeString::get("client.textmodule.props.textSize.name"), L"", textSizeS,
+		FloatValue(2.f), FloatValue(100.f), FloatValue(2.f));
+    listen<RenderLayerEvent>(static_cast<EventListenerFunc>(&TabList::onRenderLayer));
+	listen<RenderNameTagEvent>(static_cast<EventListenerFunc>(&TabList::onRenderNameTag));
+	listen<TickEvent>(static_cast<EventListenerFunc>(&TabList::onTick));
+}
+
+bool TabList::skinKeyMatches(PlayerHeadSkinKey const& key, SDK::SerializedSkinRef const& skin, SDK::SkinImage const& image) const {
+	auto id = skin.getId();
+
+	if (id && key.id != *id) return false;
+	if (!id && !key.id.empty()) return false;
+
+	if (key.width != image.width) return false;
+	if (key.height != image.height) return false;
+
+	if (key.bytes != reinterpret_cast<uintptr_t>(image.bytes.data())) return false;
+	if (key.byteCount != image.bytes.size()) return false;
+
+	return true;
+}
+
+TabList::PlayerHeadSkinKey TabList::makeSkinKey(SDK::SerializedSkinRef const& skin, SDK::SkinImage const& image) const {
+	PlayerHeadSkinKey key {};
+	if (auto id = skin.getId(); id) {
+		key.id = *id;
+	}
+	key.width = image.width;
+	key.height = image.height;
+	key.bytes = reinterpret_cast<uintptr_t>(image.bytes.data());
+	key.byteCount = image.bytes.size();
+	return key;
+}
 
 std::string TabList::getRowName(SDK::PlayerListEntry& entry) const {
 	if (auto formattedName = Latite::get().getNameTagCache().getFormattedPlayerName(entry.name)) return *formattedName;
@@ -51,6 +94,31 @@ std::vector<SDK::PlayerListEntry*> TabList::getSortedPlayerListRows(SDK::Level* 
 	return rows;
 }
 
+void TabList::drawPlayerHead(MCDrawUtil& dc, SDK::PlayerListEntry& entry, d2d::Rect const& bounds) const {
+	if (!dc.renderCtx) return;
+
+	auto image = entry.skin.getSkinImage();
+	if (!image) return;
+
+	auto& cachedHead = cachedHeadTextures[entry.name];
+	if (!cachedHead.hasSkinKey || !skinKeyMatches(cachedHead.skinKey, entry.skin, *image)) {
+		cachedHead = {};
+		cachedHead.skinKey = makeSkinKey(entry.skin, *image);
+		cachedHead.hasSkinKey = true;
+		cachedHead.texturePath = PlayerHeadCache::getTexturePath(entry.skin);
+	}
+
+	if (cachedHead.texturePath.empty()) return;
+
+	if (!cachedHead.texture.textureData) {
+		dc.renderCtx->getTexture(&cachedHead.texture,
+			SDK::ResourceLocation(cachedHead.texturePath, SDK::ResourceFileSystem::Raw), true);
+		if (!cachedHead.texture.textureData) return;
+	}
+
+	dc.drawImage(cachedHead.texture, bounds.getPos(), bounds.getSize(), d2d::Colors::WHITE);
+}
+
 ColorValue TabList::getColorOrDefault(ValueType const& value, ColorValue const& fallback) const {
 	if (!std::holds_alternative<ColorValue>(value)) return fallback;
 	return std::get<ColorValue>(value);
@@ -61,32 +129,18 @@ float TabList::getFloatOrDefault(ValueType const& value, float fallback) const {
 	return std::get<FloatValue>(value).value;
 }
 
-TabList::TabList() : Module("PlayerList", LocalizeString::get("client.module.tabList.name"),
-                            LocalizeString::get("client.module.tabList.desc"), HUD, VK_TAB) {
-    addSetting("textColor", LocalizeString::get("client.module.tabList.textColor.name"),
-               LocalizeString::get("client.module.tabList.textColor.desc"), textCol);
-    addSetting("bgColor", LocalizeString::get("client.module.tabList.bgColor.name"),
-               LocalizeString::get("client.module.tabList.bgColor.desc"), bgCol);
-	addSliderSetting("textSize", LocalizeString::get("client.textmodule.props.textSize.name"), L"", textSizeS,
-		FloatValue(2.f), FloatValue(100.f), FloatValue(2.f));
-    listen<RenderLayerEvent>(static_cast<EventListenerFunc>(&TabList::onRenderLayer));
-	listen<RenderNameTagEvent>(static_cast<EventListenerFunc>(&TabList::onRenderNameTag), true);
-	listen<TickEvent>(static_cast<EventListenerFunc>(&TabList::onTick));
-}
-
 void TabList::onRenderNameTag(Event& evG) {
-	auto& ev = static_cast<RenderNameTagEvent&>(evG);
-	auto* tag = ev.getNametag();
-	auto& nameTags = Latite::get().getNameTagCache();
-	if (!tag || !nameTags.hasFormatCode(*tag)) return;
+	RenderNameTagEvent& ev = static_cast<RenderNameTagEvent&>(evG);
+	std::string* tag = ev.getNametag();
+	if (!tag || !Latite::get().getNameTagCache().hasFormatCode(*tag)) return;
 
-	auto* client = SDK::ClientInstance::get();
-	if (!client || !client->minecraft) return;
+	SDK::ClientInstance* clientInstance = SDK::ClientInstance::get();
+	if (!clientInstance || !clientInstance->minecraft) return;
 
-	auto* level = client->minecraft->getLevel();
+	SDK::Level* level = clientInstance->minecraft->getLevel();
 	if (!level || !level->getPlayerList()) return;
 
-	nameTags.recordRenderedNameTag(*tag, getActivePlayerNames(level));
+	Latite::get().getNameTagCache().recordRenderedNameTag(*tag, getActivePlayerNames(level));
 }
 
 void TabList::onTick(Event& evG) {
@@ -145,12 +199,16 @@ void TabList::onRenderLayer(Event& evG) {
 	const ColorValue textColor = getColorOrDefault(textCol, ColorValue(1.f, 1.f, 1.f, 1.f));
 	const ColorValue backgroundColor = getColorOrDefault(bgCol, ColorValue(0.f, 0.f, 0.f, 0.5f));
 	float sectionHeight = textP * 1.3f;
+	float headSize = std::max(1.f, std::min(textP, sectionHeight - 4.f));
+	float headGap = std::max(2.f, textP * 0.2f);
+	float headInset = 2.f;
+	float rowTextOffset = headInset + headSize + headGap;
 
 	float longestText = dc.getTextSize(txt, font, textP).x;
 	auto sortedRows = getSortedPlayerListRows(lvl);
 	for (auto* row : sortedRows) {
 		std::string rowName = getRowName(*row);
-		auto w = dc.getTextSize(util::StrToWStr(Latite::get().getNameTagCache().stripFormatCodes(rowName)), font, textP).x + 3.f;
+		auto w = rowTextOffset + dc.getTextSize(util::StrToWStr(Latite::get().getNameTagCache().stripFormatCodes(rowName)), font, textP).x + 3.f;
 		if (w > longestText) longestText = w;
 	}
 
@@ -176,12 +234,23 @@ void TabList::onRenderLayer(Event& evG) {
 	dc.drawRectangle({ offset.x, offset.y, offset.x + calcWidth, offset.y + calcHeight + oY }, d2d::Color(backgroundColor.getMainColor()).asAlpha(1.f), 2.f);
 
 	dc.drawText({ offset.x, offset.y, offset.x + calcWidth, offset.y + oY }, txt, textColor.getMainColor(), font, textP, DWRITE_TEXT_ALIGNMENT_CENTER);
+	dc.flush(false, true);
 
 	for (auto* row : sortedRows) {
 		std::string rowName = getRowName(*row);
 		d2d::Rect rc = { offset.x + x, offset.y + y, offset.x + x + longestText, offset.y + y + sectionHeight };
+		d2d::Rect headRect = {
+			rc.left + headInset,
+			rc.top + ((sectionHeight - headSize) * 0.5f),
+			rc.left + headInset + headSize,
+			rc.top + ((sectionHeight - headSize) * 0.5f) + headSize
+		};
+		drawPlayerHead(dc, *row, headRect);
 
-		dc.drawText(rc, util::StrToWStr(rowName), textColor.getMainColor(), font, textP,
+		d2d::Rect textRect = rc;
+		textRect.left += rowTextOffset;
+
+		dc.drawText(textRect, util::StrToWStr(rowName), textColor.getMainColor(), font, textP,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
 
 		idx++;
@@ -193,5 +262,6 @@ void TabList::onRenderLayer(Event& evG) {
 		y = oY;
 		idx = 0;
 	}
+
 	dc.flush();
 }
