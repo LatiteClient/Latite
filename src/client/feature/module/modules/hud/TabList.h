@@ -32,7 +32,6 @@ private:
 		uint32_t height = 0;
 		uintptr_t bytes = 0;
 		size_t byteCount = 0;
-		uint64_t sampleHash = 0;
 	};
 
 	struct CachedPlayerHeadTexture {
@@ -47,7 +46,6 @@ private:
 	};
 
 	struct CachedPlayerRow {
-		SDK::PlayerListEntry* entry = nullptr;
 		std::string playerName;
 		std::string displayName;
 		std::string strippedName;
@@ -62,11 +60,11 @@ private:
 	void syncNameTagCache(SDK::Level* level);
 	void rebuildRows(SDK::Level* level);
 	void updateLayoutMeasurements(MCDrawUtil& dc, std::wstring const& title, float textSize, float rowTextOffset);
-	void drawPlayerHead(MCDrawUtil& dc, SDK::PlayerListEntry& entry, d2d::Rect const& bounds) const;
+	void drawPlayerHead(MCDrawUtil& dc, SDK::PlayerListEntry& entry, std::string const& cacheKey,
+	                    d2d::Rect const& bounds) const;
 	void pruneHeadTextureCache();
 	bool skinKeyMatches(PlayerHeadSkinKey const& key, SDK::SerializedSkinRef const& skin, SDK::SkinImage const& image) const;
 	PlayerHeadSkinKey makeSkinKey(SDK::SerializedSkinRef const& skin, SDK::SkinImage const& image) const;
-	uint64_t getSkinSampleHash(SDK::SkinImage const& image) const;
 	ColorValue getColorOrDefault(ValueType const& value, ColorValue const& fallback) const;
 	float getFloatOrDefault(ValueType const& value, float fallback) const;
 

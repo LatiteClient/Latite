@@ -14,6 +14,7 @@
 #include "util/DrawContext.h"
 #include <algorithm>
 #include <cmath>
+#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -42,32 +43,8 @@ bool TabList::skinKeyMatches(PlayerHeadSkinKey const& key, SDK::SerializedSkinRe
 
 	if (key.bytes != reinterpret_cast<uintptr_t>(image.bytes.data())) return false;
 	if (key.byteCount != image.bytes.size()) return false;
-	if (key.sampleHash != getSkinSampleHash(image)) return false;
 
 	return true;
-}
-
-uint64_t TabList::getSkinSampleHash(SDK::SkinImage const& image) const {
-	const auto* bytes = image.bytes.data();
-	const size_t byteCount = image.bytes.size();
-	if (!bytes || byteCount == 0) return 0;
-
-	constexpr uint64_t fnvOffsetBasis = 14695981039346656037ull;
-	constexpr uint64_t fnvPrime = 1099511628211ull;
-	uint64_t hash = fnvOffsetBasis;
-
-	auto mix = [&hash](uint8_t byte) {
-		hash ^= byte;
-		hash *= fnvPrime;
-	};
-
-	const size_t sampleCount = std::min<size_t>(byteCount, 4096);
-	for (size_t i = 0; i < sampleCount; ++i) {
-		size_t index = (i * byteCount) / sampleCount;
-		mix(bytes[index]);
-	}
-
-	return hash;
 }
 
 TabList::PlayerHeadSkinKey TabList::makeSkinKey(SDK::SerializedSkinRef const& skin, SDK::SkinImage const& image) const {
@@ -79,7 +56,6 @@ TabList::PlayerHeadSkinKey TabList::makeSkinKey(SDK::SerializedSkinRef const& sk
 	key.height = image.height;
 	key.bytes = reinterpret_cast<uintptr_t>(image.bytes.data());
 	key.byteCount = image.bytes.size();
-	key.sampleHash = getSkinSampleHash(image);
 	return key;
 }
 
@@ -145,7 +121,6 @@ void TabList::rebuildRows(SDK::Level* level) {
 	cachedRows.reserve(level->getPlayerList()->size());
 	for (auto& ent : *level->getPlayerList()) {
 		CachedPlayerRow row {};
-		row.entry = &ent.second;
 		row.playerName = ent.second.name;
 		row.displayName = getRowName(ent.second);
 		row.strippedName = nameTags.stripFormatCodes(row.displayName);
@@ -192,14 +167,15 @@ void TabList::pruneHeadTextureCache() {
 	}
 }
 
-void TabList::drawPlayerHead(MCDrawUtil& dc, SDK::PlayerListEntry& entry, d2d::Rect const& bounds) const {
+void TabList::drawPlayerHead(MCDrawUtil& dc, SDK::PlayerListEntry& entry, std::string const& cacheKey,
+                             d2d::Rect const& bounds) const {
 	if (!dc.renderCtx) return;
 
 	auto image = entry.skin.getSkinImage();
 	if (!image) return;
 
 	auto now = std::chrono::steady_clock::now();
-	auto& cachedHead = cachedHeadTextures[entry.name];
+	auto& cachedHead = cachedHeadTextures[cacheKey];
 	if (!cachedHead.hasSkinKey || !skinKeyMatches(cachedHead.skinKey, entry.skin, *image)) {
 		cachedHead = {};
 		cachedHead.skinKey = makeSkinKey(entry.skin, *image);
@@ -377,9 +353,16 @@ void TabList::onRenderLayer(Event& evG) {
 		return d2d::Rect { offset.x + x, offset.y + y, offset.x + x + sectionSize, offset.y + y + sectionHeight };
 	};
 
+	std::unordered_map<std::string, SDK::PlayerListEntry*> currentEntries;
+	currentEntries.reserve(lvl->getPlayerList()->size());
+	for (auto& ent : *lvl->getPlayerList()) {
+		currentEntries.emplace(ent.second.name, &ent.second);
+	}
+
 	for (size_t rowIndex = 0; rowIndex < cachedRows.size(); ++rowIndex) {
 		auto& row = cachedRows[rowIndex];
-		if (!row.entry) continue;
+		auto entry = currentEntries.find(row.playerName);
+		if (entry == currentEntries.end() || !entry->second) continue;
 
 		d2d::Rect rc = rowRect(rowIndex);
 		d2d::Rect headRect = {
@@ -388,7 +371,7 @@ void TabList::onRenderLayer(Event& evG) {
 			rc.left + headInset + headSize,
 			rc.top + ((sectionHeight - headSize) * 0.5f) + headSize
 		};
-		drawPlayerHead(dc, *row.entry, headRect);
+		drawPlayerHead(dc, *entry->second, row.playerName, headRect);
 	}
 
 	for (size_t rowIndex = 0; rowIndex < cachedRows.size(); ++rowIndex) {
