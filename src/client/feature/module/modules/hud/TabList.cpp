@@ -13,7 +13,9 @@
 #include "util/Logger.h"
 #include "util/DrawContext.h"
 #include <algorithm>
+#include <cmath>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 TabList::TabList() : Module("PlayerList", LocalizeString::get("client.module.tabList.name"),
@@ -40,8 +42,32 @@ bool TabList::skinKeyMatches(PlayerHeadSkinKey const& key, SDK::SerializedSkinRe
 
 	if (key.bytes != reinterpret_cast<uintptr_t>(image.bytes.data())) return false;
 	if (key.byteCount != image.bytes.size()) return false;
+	if (key.sampleHash != getSkinSampleHash(image)) return false;
 
 	return true;
+}
+
+uint64_t TabList::getSkinSampleHash(SDK::SkinImage const& image) const {
+	const auto* bytes = image.bytes.data();
+	const size_t byteCount = image.bytes.size();
+	if (!bytes || byteCount == 0) return 0;
+
+	constexpr uint64_t fnvOffsetBasis = 14695981039346656037ull;
+	constexpr uint64_t fnvPrime = 1099511628211ull;
+	uint64_t hash = fnvOffsetBasis;
+
+	auto mix = [&hash](uint8_t byte) {
+		hash ^= byte;
+		hash *= fnvPrime;
+	};
+
+	const size_t sampleCount = std::min<size_t>(byteCount, 4096);
+	for (size_t i = 0; i < sampleCount; ++i) {
+		size_t index = (i * byteCount) / sampleCount;
+		mix(bytes[index]);
+	}
+
+	return hash;
 }
 
 TabList::PlayerHeadSkinKey TabList::makeSkinKey(SDK::SerializedSkinRef const& skin, SDK::SkinImage const& image) const {
@@ -53,6 +79,7 @@ TabList::PlayerHeadSkinKey TabList::makeSkinKey(SDK::SerializedSkinRef const& sk
 	key.height = image.height;
 	key.bytes = reinterpret_cast<uintptr_t>(image.bytes.data());
 	key.byteCount = image.bytes.size();
+	key.sampleHash = getSkinSampleHash(image);
 	return key;
 }
 
@@ -61,37 +88,108 @@ std::string TabList::getRowName(SDK::PlayerListEntry& entry) const {
 	return entry.name;
 }
 
-std::unordered_set<std::string> TabList::getActivePlayerNames(SDK::Level* level) const {
+bool TabList::refreshActivePlayerNames(SDK::Level* level) {
 	std::unordered_set<std::string> players;
-	if (!level || !level->getPlayerList()) return players;
-
-	players.reserve(level->getPlayerList()->size());
-	for (auto& ent : *level->getPlayerList()) {
-		players.insert(ent.second.name);
+	if (level && level->getPlayerList()) {
+		players.reserve(level->getPlayerList()->size());
+		for (auto& ent : *level->getPlayerList()) {
+			players.insert(ent.second.name);
+		}
 	}
-	return players;
+
+	bool changed = players.size() != cachedActivePlayerNames.size();
+	if (!changed) {
+		for (auto const& playerName : players) {
+			if (!cachedActivePlayerNames.contains(playerName)) {
+				changed = true;
+				break;
+			}
+		}
+	}
+
+	if (changed) {
+		cachedActivePlayerNames = std::move(players);
+		rowsDirty = true;
+		pruneHeadTextureCache();
+	}
+
+	return changed;
 }
 
-std::vector<SDK::PlayerListEntry*> TabList::getSortedPlayerListRows(SDK::Level* level) const {
-	std::vector<SDK::PlayerListEntry*> rows;
-	if (!level || !level->getPlayerList()) return rows;
+void TabList::syncNameTagCache(SDK::Level* level) {
+	auto& nameTags = Latite::get().getNameTagCache();
+	bool playersChanged = refreshActivePlayerNames(level);
+	uint64_t networkRevision = nameTags.getNetworkNameTagsRevision();
+	bool networkChanged = cachedNetworkNameTagsRevision != networkRevision;
 
-	rows.reserve(level->getPlayerList()->size());
-	for (auto& ent : *level->getPlayerList()) {
-		rows.push_back(&ent.second);
+	if (playersChanged || networkChanged) {
+		if (networkChanged) {
+			rowsDirty = true;
+		}
+		if (nameTags.updateFormattedPlayerNames(cachedActivePlayerNames)) {
+			rowsDirty = true;
+		}
+		cachedNetworkNameTagsRevision = networkRevision;
+	}
+}
+
+void TabList::rebuildRows(SDK::Level* level) {
+	cachedRows.clear();
+	if (!level || !level->getPlayerList()) {
+		rowsDirty = false;
+		layoutDirty = true;
+		return;
 	}
 
-	std::stable_sort(rows.begin(), rows.end(), [this](auto* a, auto* b) {
-		std::string aName = getRowName(*a);
-		std::string bName = getRowName(*b);
-		auto& nameTags = Latite::get().getNameTagCache();
-		const int aColor = nameTags.getFirstColorSortIndex(aName);
-		const int bColor = nameTags.getFirstColorSortIndex(bName);
-		if (aColor != bColor) return aColor < bColor;
-		return nameTags.stripFormatCodes(aName) < nameTags.stripFormatCodes(bName);
+	auto& nameTags = Latite::get().getNameTagCache();
+	cachedRows.reserve(level->getPlayerList()->size());
+	for (auto& ent : *level->getPlayerList()) {
+		CachedPlayerRow row {};
+		row.entry = &ent.second;
+		row.playerName = ent.second.name;
+		row.displayName = getRowName(ent.second);
+		row.strippedName = nameTags.stripFormatCodes(row.displayName);
+		row.displayNameWide = util::StrToWStr(row.displayName);
+		row.strippedNameWide = util::StrToWStr(row.strippedName);
+		row.colorSortIndex = nameTags.getFirstColorSortIndex(row.displayName);
+		cachedRows.push_back(std::move(row));
+	}
+
+	std::stable_sort(cachedRows.begin(), cachedRows.end(), [](CachedPlayerRow const& a, CachedPlayerRow const& b) {
+		if (a.colorSortIndex != b.colorSortIndex) return a.colorSortIndex < b.colorSortIndex;
+		return a.strippedName < b.strippedName;
 	});
 
-	return rows;
+	rowsDirty = false;
+	layoutDirty = true;
+}
+
+void TabList::updateLayoutMeasurements(MCDrawUtil& dc, std::wstring const& title, float textSize, float rowTextOffset) {
+	if (!layoutDirty && cachedLayoutTitle == title && cachedLayoutTextSize == textSize
+		&& cachedLayoutRowTextOffset == rowTextOffset) {
+		return;
+	}
+
+	constexpr auto font = Renderer::FontSelection::PrimaryRegular;
+
+	float longestText = dc.getTextSize(title, font, textSize).x;
+	for (auto& row : cachedRows) {
+		row.measuredWidth = rowTextOffset + dc.getTextSize(row.strippedNameWide, font, textSize).x + 3.f;
+		if (row.measuredWidth > longestText) longestText = row.measuredWidth;
+	}
+
+	cachedLayoutTitle = title;
+	cachedLayoutTextSize = textSize;
+	cachedLayoutRowTextOffset = rowTextOffset;
+	cachedLongestText = longestText;
+	layoutDirty = false;
+}
+
+void TabList::pruneHeadTextureCache() {
+	for (auto it = cachedHeadTextures.begin(); it != cachedHeadTextures.end();) {
+		if (cachedActivePlayerNames.contains(it->first)) ++it;
+		else it = cachedHeadTextures.erase(it);
+	}
 }
 
 void TabList::drawPlayerHead(MCDrawUtil& dc, SDK::PlayerListEntry& entry, d2d::Rect const& bounds) const {
@@ -100,23 +198,62 @@ void TabList::drawPlayerHead(MCDrawUtil& dc, SDK::PlayerListEntry& entry, d2d::R
 	auto image = entry.skin.getSkinImage();
 	if (!image) return;
 
+	auto now = std::chrono::steady_clock::now();
 	auto& cachedHead = cachedHeadTextures[entry.name];
 	if (!cachedHead.hasSkinKey || !skinKeyMatches(cachedHead.skinKey, entry.skin, *image)) {
 		cachedHead = {};
 		cachedHead.skinKey = makeSkinKey(entry.skin, *image);
 		cachedHead.hasSkinKey = true;
-		cachedHead.texturePath = PlayerHeadCache::getTexturePath(entry.skin);
 	}
 
+	if (cachedHead.texturePath.empty()
+		&& (cachedHead.nextPathResolveAttempt == std::chrono::steady_clock::time_point{}
+			|| now >= cachedHead.nextPathResolveAttempt)) {
+		cachedHead.texturePath = PlayerHeadCache::getTexturePath(entry.skin);
+		if (cachedHead.texturePath.empty()) {
+			cachedHead.pathResolveAttempts++;
+			std::chrono::milliseconds delay =
+				cachedHead.pathResolveAttempts <= 1 ? std::chrono::milliseconds(500) :
+				cachedHead.pathResolveAttempts == 2 ? std::chrono::milliseconds(1000) :
+				cachedHead.pathResolveAttempts == 3 ? std::chrono::milliseconds(2000) :
+				std::chrono::milliseconds(10000);
+			cachedHead.nextPathResolveAttempt = now + delay;
+		}
+		else {
+			cachedHead.pathResolveAttempts = 0;
+			cachedHead.nextPathResolveAttempt = {};
+		}
+	}
 	if (cachedHead.texturePath.empty()) return;
 
-	if (!cachedHead.texture.textureData) {
+	if (!cachedHead.texture.textureData
+		&& (cachedHead.nextTextureLoadAttempt == std::chrono::steady_clock::time_point{}
+			|| now >= cachedHead.nextTextureLoadAttempt)) {
 		dc.renderCtx->getTexture(&cachedHead.texture,
 			SDK::ResourceLocation(cachedHead.texturePath, SDK::ResourceFileSystem::Raw), true);
-		if (!cachedHead.texture.textureData) return;
+		if (!cachedHead.texture.textureData) {
+			cachedHead.textureLoadAttempts++;
+			std::chrono::milliseconds delay =
+				cachedHead.textureLoadAttempts <= 1 ? std::chrono::milliseconds(500) :
+				cachedHead.textureLoadAttempts == 2 ? std::chrono::milliseconds(1000) :
+				cachedHead.textureLoadAttempts == 3 ? std::chrono::milliseconds(2000) :
+				std::chrono::milliseconds(10000);
+			cachedHead.nextTextureLoadAttempt = now + delay;
+		}
+		else {
+			cachedHead.textureLoadAttempts = 0;
+			cachedHead.nextTextureLoadAttempt = {};
+		}
 	}
 
-	dc.drawImage(cachedHead.texture, bounds.getPos(), bounds.getSize(), d2d::Colors::WHITE);
+	if (!cachedHead.texture.textureData) return;
+
+	dc.renderCtx->drawImage(cachedHead.texture,
+		{ bounds.left * dc.guiScale, bounds.top * dc.guiScale },
+		{ bounds.getWidth() * dc.guiScale, bounds.getHeight() * dc.guiScale },
+		{ 0.f, 0.f },
+		{ 1.f, 1.f });
+	dc.renderCtx->flushImages(d2d::Colors::WHITE, 1.f, SDK::HashedString("ui_textured_and_glcolor_sprite"));
 }
 
 ColorValue TabList::getColorOrDefault(ValueType const& value, ColorValue const& fallback) const {
@@ -140,18 +277,18 @@ void TabList::onRenderNameTag(Event& evG) {
 	SDK::Level* level = clientInstance->minecraft->getLevel();
 	if (!level || !level->getPlayerList()) return;
 
-	Latite::get().getNameTagCache().recordRenderedNameTag(*tag, getActivePlayerNames(level));
+	if (cachedActivePlayerNames.empty()) {
+		refreshActivePlayerNames(level);
+	}
+	if (Latite::get().getNameTagCache().recordRenderedNameTag(*tag, cachedActivePlayerNames)) {
+		rowsDirty = true;
+	}
 }
 
 void TabList::onTick(Event& evG) {
 	auto& ev = static_cast<TickEvent&>(evG);
 	auto* level = ev.getLevel();
-	if (!level || !level->getPlayerList()) {
-		Latite::get().getNameTagCache().updateFormattedPlayerNames({});
-		return;
-	}
-
-	Latite::get().getNameTagCache().updateFormattedPlayerNames(getActivePlayerNames(level));
+	syncNameTagCache(level);
 }
 
 void TabList::afterLoadConfig() {
@@ -184,6 +321,13 @@ void TabList::onRenderLayer(Event& evG) {
 	if (!lvl || !lvl->getPlayerList()) return;
 
 	size_t size = lvl->getPlayerList()->size();
+	if (cachedRows.size() != size || cachedActivePlayerNames.empty()) {
+		syncNameTagCache(lvl);
+	}
+	if (rowsDirty) {
+		rebuildRows(lvl);
+	}
+	size = cachedRows.size();
 
 	float textP = getFloatOrDefault(textSizeS, 20.f);
 
@@ -204,25 +348,14 @@ void TabList::onRenderLayer(Event& evG) {
 	float headInset = 2.f;
 	float rowTextOffset = headInset + headSize + headGap;
 
-	float longestText = dc.getTextSize(txt, font, textP).x;
-	auto sortedRows = getSortedPlayerListRows(lvl);
-	for (auto* row : sortedRows) {
-		std::string rowName = getRowName(*row);
-		auto w = rowTextOffset + dc.getTextSize(util::StrToWStr(Latite::get().getNameTagCache().stripFormatCodes(rowName)), font, textP).x + 3.f;
-		if (w > longestText) longestText = w;
-	}
+	updateLayoutMeasurements(dc, txt, textP, rowTextOffset);
 
-	float sectionSize = longestText;
+	float sectionSize = std::max(1.f, cachedLongestText);
 
 	size_t maxPerTab = 16;
-	int numTabs = static_cast<int>(std::ceil(static_cast<float>(size) / static_cast<float>(maxPerTab)));
+	int numTabs = std::max(1, static_cast<int>(std::ceil(static_cast<float>(size) / static_cast<float>(maxPerTab))));
 
 	float oY = sectionHeight;
-
-	float x = 0.f;
-	float y = oY;
-
-	size_t idx = 0;
 
 	float calcWidth = sectionSize * static_cast<float>(numTabs);
 	float calcHeight = sectionHeight * ((static_cast<float>(size) > maxPerTab) ? maxPerTab : static_cast<float>(size));
@@ -236,31 +369,37 @@ void TabList::onRenderLayer(Event& evG) {
 	dc.drawText({ offset.x, offset.y, offset.x + calcWidth, offset.y + oY }, txt, textColor.getMainColor(), font, textP, DWRITE_TEXT_ALIGNMENT_CENTER);
 	dc.flush(false, true);
 
-	for (auto* row : sortedRows) {
-		std::string rowName = getRowName(*row);
-		d2d::Rect rc = { offset.x + x, offset.y + y, offset.x + x + longestText, offset.y + y + sectionHeight };
+	auto rowRect = [&](size_t rowIndex) {
+		size_t column = rowIndex / maxPerTab;
+		size_t rowInColumn = rowIndex % maxPerTab;
+		float x = sectionSize * static_cast<float>(column);
+		float y = oY + sectionHeight * static_cast<float>(rowInColumn);
+		return d2d::Rect { offset.x + x, offset.y + y, offset.x + x + sectionSize, offset.y + y + sectionHeight };
+	};
+
+	for (size_t rowIndex = 0; rowIndex < cachedRows.size(); ++rowIndex) {
+		auto& row = cachedRows[rowIndex];
+		if (!row.entry) continue;
+
+		d2d::Rect rc = rowRect(rowIndex);
 		d2d::Rect headRect = {
 			rc.left + headInset,
 			rc.top + ((sectionHeight - headSize) * 0.5f),
 			rc.left + headInset + headSize,
 			rc.top + ((sectionHeight - headSize) * 0.5f) + headSize
 		};
-		drawPlayerHead(dc, *row, headRect);
+		drawPlayerHead(dc, *row.entry, headRect);
+	}
+
+	for (size_t rowIndex = 0; rowIndex < cachedRows.size(); ++rowIndex) {
+		auto& row = cachedRows[rowIndex];
+		d2d::Rect rc = rowRect(rowIndex);
 
 		d2d::Rect textRect = rc;
 		textRect.left += rowTextOffset;
 
-		dc.drawText(textRect, util::StrToWStr(rowName), textColor.getMainColor(), font, textP,
+		dc.drawText(textRect, row.displayNameWide, textColor.getMainColor(), font, textP,
 			DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
-
-		idx++;
-		if (idx < maxPerTab) {
-			y += sectionHeight;
-			continue;
-		}
-		x += longestText;
-		y = oY;
-		idx = 0;
 	}
 
 	dc.flush();
