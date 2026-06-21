@@ -578,7 +578,9 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 			if (bodyRotation) {
 				actor->setYBodyRotations(forcedBodyYaw, forcedBodyYaw);
 			}
-			actor->setYHeadRotations(forcedHeadYaw, forcedHeadYaw);
+			if (headRotation) {
+				actor->setYHeadRotations(forcedHeadYaw, forcedHeadYaw);
+			}
 		}
 
 		~ScopedActorHudPose() {
@@ -587,7 +589,9 @@ bool MCDrawUtil::drawActor(SDK::Actor* actor, d2d::Rect const& bounds, float opa
 			if (bodyRotation) {
 				actor->setYBodyRotations(savedBodyYaw, savedBodyYawOld);
 			}
-			actor->setYHeadRotations(savedHeadYaw, savedHeadYawOld);
+			if (headRotation) {
+				actor->setYHeadRotations(savedHeadYaw, savedHeadYawOld);
+			}
 			if (actorRotation) {
 				actorRotation->rotation = savedRotation;
 				actorRotation->rotationOld = savedRotationOld;

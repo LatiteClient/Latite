@@ -74,6 +74,9 @@ void SDK::Actor::setUIRendering(bool value) {
 
 void SDK::Actor::setYHeadRotations(float current, float old) {
     const auto headRotationComponent = this->tryGetComponent<ActorHeadRotationComponent>();
+    if (!headRotationComponent) {
+        return;
+    }
 
     headRotationComponent->yHeadRot = current;
     headRotationComponent->yHeadRotOld = old;
@@ -81,6 +84,9 @@ void SDK::Actor::setYHeadRotations(float current, float old) {
 
 void SDK::Actor::setYBodyRotations(float current, float old) {
     const auto bodyRotationComponent = this->tryGetComponent<MobBodyRotationComponent>();
+    if (!bodyRotationComponent) {
+        return;
+    }
 
     bodyRotationComponent->yBodyRot = current;
     bodyRotationComponent->yBodyRotOld = old;
