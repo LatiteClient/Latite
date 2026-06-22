@@ -110,7 +110,6 @@ void ClickGUI::onRender(Event&) {
 
 	D2DUtil dc;
 	if (!isActive()) justClicked = { false, false, false };
-	if (isActive()) SDK::ClientInstance::get()->releaseCursor();
 	dc.ctx->SetAntialiasMode(D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
 	Vec2& cursorPos = SDK::ClientInstance::get()->cursorPos;

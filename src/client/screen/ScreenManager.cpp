@@ -10,10 +10,15 @@ ScreenManager::ScreenManager() {
 	Eventing::get().listen<FocusLostEvent, &ScreenManager::onFocusLost>(this);
 }
 
+void ScreenManager::activateScreen(Screen& screen, bool ignoreAnims) {
+	this->activeScreen = screen;
+	screen.setActive(true, ignoreAnims);
+	SDK::ClientInstance::get()->releaseCursor();
+}
+
 void ScreenManager::exitCurrentScreen() {
 	if (this->activeScreen) {
 		this->activeScreen->get().setActive(false);
-		this->activeScreen->get().onDisable();
 		this->activeScreen = std::nullopt;
 		SDK::ClientInstance::get()->grabCursor();
 	}
@@ -36,9 +41,7 @@ void ScreenManager::onKey(KeyUpdateEvent& ev) {
 		if (getActiveScreen())
 			exitCurrentScreen();
 		else {
-			this->activeScreen = associatedScreen;
-			associatedScreen->get().setActive(true);
-			associatedScreen->get().onEnable(false);
+			activateScreen(associatedScreen->get());
 		}
 		ev.setCancelled(true);
 		return;

@@ -82,6 +82,18 @@ void* GenericHooks::GameRenderer_renderCurrentFrame(void* rend) {
 }
 
 LRESULT GenericHooks::MainWindow__windowProcCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) { // Name from China
+	if (msg == WM_SETCURSOR) {
+		std::optional<std::reference_wrapper<Screen>> activeScreen = Latite::get().getScreenManager().getActiveScreen();
+		SDK::GameCore* gameCore = SDK::GameCore::get();
+		constexpr uintptr_t mouseGrabbedOffset = 0x778; // GameCore::mMouseGrabbed, set by GDK grab/release mouse.
+		const bool gameMouseGrabbed = gameCore && *reinterpret_cast<uint8_t*>(reinterpret_cast<uintptr_t>(gameCore) + mouseGrabbedOffset);
+
+		if (!activeScreen && gameMouseGrabbed) {
+			SetCursor(nullptr);
+			return TRUE;
+		}
+	}
+
 	if (msg == WM_KEYDOWN || msg == WM_KEYUP) {
 		const int key = wParam & 0xFF;
 		const bool isDown = msg == WM_KEYDOWN;
@@ -406,6 +418,8 @@ void GenericHooks::hkBaseActorRenderer_renderText(void* screenContext, void* vie
 void GenericHooks::hkAppPlatformGDK_releaseMouse(void* _this) {
 	AppPlatformGDK_releaseMouseHook->oFunc<decltype(&hkAppPlatformGDK_releaseMouse)>()(_this);
 
+	SetCursor(LoadCursorW(nullptr, IDC_ARROW));
+
 	MouseReleaseEvent ev{};
 	Eventing::get().dispatch(ev);
 }
@@ -455,4 +469,3 @@ GenericHooks::GenericHooks() : HookGroup("General") {
 	BaseActorRenderer_renderTextHook = addHook(Signatures::BaseActorRenderer_renderText.result, hkBaseActorRenderer_renderText, "BaseActorRenderer::renderText");
 	AppPlatformGDK_releaseMouseHook = addHook(Signatures::AppPlatformGDK_releaseMouse.result, hkAppPlatformGDK_releaseMouse, "AppPlatform::releaseMouse");
 }
-

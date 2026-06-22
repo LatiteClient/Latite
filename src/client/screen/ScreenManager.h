@@ -19,8 +19,7 @@ public:
 	void showScreen(bool ignoreAnims = false) {
 		auto& scr = std::get<T>(items);
 
-		this->activeScreen = scr;
-		scr.setActive(true, ignoreAnims);
+		activateScreen(scr, ignoreAnims);
 	}
 
 	bool registerScriptScreen(JsScreen* jsScn) {
@@ -69,5 +68,6 @@ public:
 	void onKey(KeyUpdateEvent& ev);
 	void onFocusLost(FocusLostEvent& ev);
 private:
+	void activateScreen(Screen& screen, bool ignoreAnims = false);
 	std::optional<std::reference_wrapper<Screen>> activeScreen;
 };

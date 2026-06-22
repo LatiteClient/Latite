@@ -6,7 +6,6 @@
 #include "client/event/events/ClickEvent.h"
 #include "client/event/events/RenderOverlayEvent.h"
 #include "client/event/events/UpdateEvent.h"
-#include "mc/common/client/game/ClientInstance.h"
 
 Screen::Screen() {
 	/*
@@ -35,7 +34,6 @@ void Screen::onUpdate(Event& ev) {
 		break;
 	}
 	*/
-	SDK::ClientInstance::get()->releaseCursor();
 }
 
 void Screen::close() {

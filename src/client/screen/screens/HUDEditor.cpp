@@ -679,10 +679,8 @@ void HUDEditor::onEnable(bool ignoreAnims) {
 	mouseButtons = {};
 	activeMouseButtons = {};
 	justClicked = {};
-	SDK::ClientInstance::get()->releaseCursor();
 }
 
 void HUDEditor::onDisable() {
-	SDK::ClientInstance::get()->grabCursor();
 	Latite::getConfigManager().saveCurrentConfig();
 }
