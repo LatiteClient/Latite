@@ -32,6 +32,7 @@ std::shared_ptr<SDK::Packet> PacketHooks::MinecraftPackets_createPacket(SDK::Pac
 
 void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* networkIdentifier, void* netEventCallback, std::shared_ptr<SDK::Packet>& packet) {
 	auto& hook = PacketHookArray[(size_t)packet->getID()];
+	std::shared_ptr<SDK::Packet> setScorePacket;
 
 	if (Latite::isMainThread()) {
 		PacketReceiveEvent ev{ packet.get() };
@@ -61,13 +62,7 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 			}
 		}
 		else if (packetId == SDK::PacketID::SET_SCORE) {
-			auto pkt = std::static_pointer_cast<SDK::SetScorePacket>(packet);
-
-			auto data = PluginManager::Event::Value(L"data");
-			data.val = pkt->serialize();
-
-			PluginManager::Event sEv{ L"set-score", { data }, false };
-			Latite::getPluginManager().dispatchEvent(sEv);
+			setScorePacket = packet;
 		}
 		else if (packetId == SDK::PacketID::MODAL_FORM_REQUEST) {
 			auto pkt = std::static_pointer_cast<SDK::ModalFormRequestPacket>(packet);
@@ -190,6 +185,17 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 		}
 	}
 	hook->oFunc<decltype(&PacketHandlerDispatcherInstance_handle)>()(instance, networkIdentifier, netEventCallback, packet);
+
+	// kind of stupid fix (i think) for nightly (but not debug) crashing
+	if (setScorePacket) {
+		auto pkt = std::static_pointer_cast<SDK::SetScorePacket>(setScorePacket);
+
+		auto data = PluginManager::Event::Value(L"data");
+		data.val = pkt->serialize();
+
+		PluginManager::Event sEv{ L"set-score", { data }, false };
+		Latite::getPluginManager().dispatchEvent(sEv);
+	}
 }
 
 PacketHooks::PacketHooks() {
