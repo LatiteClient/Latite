@@ -86,7 +86,6 @@ jobs:
           name: LatiteNightly-${{ steps.build_timestamp.outputs.timestamp }}
           path: |
             ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteNightly.dll
-            ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteNightly.pdb
           if-no-files-found: error
 
       - name: Recreate nightly release to refresh date
@@ -111,7 +110,9 @@ jobs:
 
             Includes:
             - Nightly build (LatiteNightly.dll)
+            - Debug symbols (LatiteNightly.pdb)
           prerelease: true
           make_latest: true
           files: |
             ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteNightly.dll
+            ${{ github.workspace }}/${{ env.BUILD_DIR }}/LatiteNightly.pdb
