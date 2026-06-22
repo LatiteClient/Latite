@@ -46,6 +46,12 @@ JsTexture::JsTexture(std::wstring const& textureNameOrPath, bool gameTexture) {
 		});
 }
 
+JsTexture::~JsTexture() {
+	if (d2dTexture) {
+		Latite::get().deferD2DResourceRelease(d2dTexture.Detach());
+	}
+}
+
 void JsTexture::loadMinecraft() {
 	mcTexture = SDK::TexturePtr{};
 	if (gameTexture) {

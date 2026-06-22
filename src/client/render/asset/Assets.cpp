@@ -31,6 +31,10 @@ Assets::Assets() :
 	allAssets.push_back(&this->document);
 }
 
+Assets::~Assets() {
+	unloadAll();
+}
+
 void Assets::loadAll() {
 	for (auto& asset : allAssets) {
 		asset->load(Latite::getRenderer().getImagingFactory(), Latite::getRenderer().getDeviceContext());

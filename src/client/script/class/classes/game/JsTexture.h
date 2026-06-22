@@ -20,9 +20,7 @@ public:
 
 	std::filesystem::path tryGetRealPath(std::wstring const& oPath);
 
-	~JsTexture() {
-		// should be handled automatically
-	}
+	~JsTexture();
 
 	ID2D1Bitmap* getBitmap() { return d2dTexture.Get(); }
 	SDK::TexturePtr* getTexture() {

@@ -449,8 +449,13 @@ void PluginManager::unloadScript(std::shared_ptr<JsPlugin> ptr) {
 }
 
 void PluginManager::unloadAll() {
-	for (auto& s : this->items | std::views::values) {
-		popScript(s);
+	std::vector<std::shared_ptr<JsPlugin>> scripts;
+	for (auto& script : this->items | std::views::values) {
+		scripts.push_back(script);
+	}
+
+	for (auto& script : scripts) {
+		popScript(script);
 	}
 }
 

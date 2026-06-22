@@ -109,7 +109,10 @@ HRESULT WINAPI DXHooks::CreateSwapChainForHWNDHook(
 
 HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInterval, UINT Flags) {
     auto& renderer = Latite::getRenderer();
-    if (!renderer.isResizeInProgress()) {
+    if (Latite::get().isEjectReadyForRenderThread()) {
+        auto lock = renderer.lock();
+        Latite::get().completeEjectFromRenderThread();
+    } else if (!renderer.isResizeInProgress()) {
         auto lock = renderer.lock();
         if (!renderer.isResizeInProgress()) {
             if (renderer.hasInitialized()) {

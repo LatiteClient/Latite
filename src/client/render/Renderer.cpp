@@ -71,8 +71,7 @@ namespace {
 }
 
 Renderer::~Renderer() {
-    // ...
-	releaseAllResources(false);
+	releaseAllResources(false, true, false);
 }
 
 void Renderer::setCommandQueue(ID3D12CommandQueue* queue) {
@@ -383,6 +382,13 @@ HRESULT Renderer::reinit() {
     return S_OK;
 }
 
+void Renderer::shutdownForEject() {
+	releaseAllResources(true, true);
+	hasInit.store(false, std::memory_order_release);
+	shouldInit.store(false, std::memory_order_release);
+	shouldReinit.store(false, std::memory_order_release);
+}
+
 void Renderer::setShouldReinit() {
 	shouldReinit.store(true, std::memory_order_release);
 }
@@ -449,9 +455,11 @@ void Renderer::render() {
 	this->hasCopiedBitmap = false;
 }
 
-void Renderer::releaseAllResources(bool flush, bool indep) {
-	RendererCleanupEvent ev{};
-	Eventing::get().dispatch(ev);
+void Renderer::releaseAllResources(bool flush, bool indep, bool dispatchCleanup) {
+	if (dispatchCleanup) {
+		RendererCleanupEvent ev{};
+		Eventing::get().dispatch(ev);
+	}
 
 	if (d2dCtx) d2dCtx->SetTarget(nullptr);
 
@@ -468,7 +476,13 @@ void Renderer::releaseAllResources(bool flush, bool indep) {
 	}
 
 	cachedLayouts.clear();
-	gameDevice11 = nullptr;
+
+	releaseDeviceResources();
+
+	for (auto& mb : this->blurBuffers) {
+		SafeRelease(&mb);
+	}
+	this->blurBuffers.clear();
 
 	for (auto& i : renderTargets) {
 		SafeRelease(&i);
@@ -482,6 +496,7 @@ void Renderer::releaseAllResources(bool flush, bool indep) {
 		d3d12Targets.clear();
 	}
 
+	gameDevice11 = nullptr;
 	if (isDX12) gameDevice12 = nullptr;
 	SafeRelease(&swapChain4);
 	d3dDevice = nullptr;
@@ -493,8 +508,6 @@ void Renderer::releaseAllResources(bool flush, bool indep) {
 	}
 	d3d11Targets.clear();
 
-	releaseDeviceResources();
-
 	if (flush && d3dCtx) {
 		d3dCtx->Flush();
 	}
@@ -504,12 +517,6 @@ void Renderer::releaseAllResources(bool flush, bool indep) {
 
 	d3d11On12Device = nullptr;
 	d3dCtx = nullptr;
-
-	for (auto& mb : this->blurBuffers) {
-		SafeRelease(&mb);
-	}
-
-	this->blurBuffers.clear();
 
 	if (indep) releaseDeviceIndependentResources();
 }

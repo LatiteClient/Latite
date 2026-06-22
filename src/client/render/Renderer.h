@@ -14,6 +14,7 @@ public:
 	bool init(IDXGISwapChain* chain);
 	bool hasInitialized() const noexcept { return hasInit.load(std::memory_order_acquire); };
 	HRESULT reinit();
+	void shutdownForEject();
 	void setShouldReinit();
 	void setShouldInit();
 	void beginResize();
@@ -34,7 +35,7 @@ private:
 
 	std::wstring fontFamily = L"Segoe UI";
 	std::wstring fontFamily2 = L"Segoe UI";
-	void releaseAllResources(bool flush, bool indep = true);
+	void releaseAllResources(bool flush, bool indep = true, bool dispatchCleanup = true);
 
 	void createTextFormats();
 	void releaseTextFormats();

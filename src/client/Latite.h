@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include <array>
+#include <atomic>
+#include <mutex>
 #include <string_view>
 #include "client/event/Listener.h"
 #include "client/feature/setting/Setting.h"
@@ -42,6 +44,9 @@ public:
 	[[nodiscard]] int getSelectedLanguage();
 
 	void queueEject() noexcept;
+	[[nodiscard]] bool isEjectQueued() const noexcept;
+	[[nodiscard]] bool isEjectReadyForRenderThread() const noexcept;
+	void completeEjectFromRenderThread() noexcept;
 	void initialize(HINSTANCE hInst);
 
 	void downloadChakraCore();
@@ -52,6 +57,8 @@ public:
 	void queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback);
 	void queueForClientThread(std::function<void()> callback);
 	void queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callback);
+	void deferD2DResourceRelease(IUnknown* resource) noexcept;
+	void releaseDeferredD2DResources() noexcept;
 
 	Latite() = default;
 	~Latite() = default;
@@ -158,6 +165,8 @@ private:
 	std::queue<std::function<void(SDK::MinecraftUIRenderContext* ctx)>> uiRenderQueue;
 	std::queue<std::function<void(ID2D1DeviceContext* ctx)>> dxRenderQueue;
 	std::queue<std::function<void()>> clientThreadQueue;
+	std::mutex deferredD2DReleaseMutex;
+	std::vector<IUnknown*> deferredD2DReleases;
 
 	Timings timings{};
 	NameTagCache nameTagCache;
@@ -216,6 +225,8 @@ private:
 	void onTick(class Event& ev);
 	void onMouseRelease(class Event& ev);
 
-	bool shouldEject = false;
+	std::atomic_bool shouldEject = false;
+	std::atomic_bool mainThreadEjectCleanupComplete = false;
+	std::atomic_bool unloadStarted = false;
 	bool hasInit = false;
 };

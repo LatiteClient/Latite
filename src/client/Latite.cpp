@@ -84,6 +84,11 @@ namespace {
         LPVOID reserved;
     };
 
+    DWORD WINAPI ejectThread(LPVOID module) {
+        std::this_thread::sleep_for(250ms);
+        FreeLibraryAndExitThread(static_cast<HMODULE>(module), 0);
+    }
+
 }
 
 #define MVSIG(...) ([]() -> std::pair<SigImpl*, SigImpl*> {\
@@ -334,7 +339,7 @@ DWORD __stdcall startThread(LPVOID context) {
 BOOL WINAPI DllMainImpl(
     HINSTANCE hinstDLL,  // handle to DLL module
     DWORD fdwReason,     // reason for calling function
-    LPVOID)  // reserved
+    LPVOID reserved)  // reserved
 {
     BEGIN_ERROR_HANDLER
     if (GetModuleHandleA("Minecraft.Windows.exe") != GetModuleHandleA(NULL)) return TRUE;
@@ -346,6 +351,11 @@ BOOL WINAPI DllMainImpl(
         CloseHandle(CreateThread(nullptr, 0, startThread, hinstDLL, 0, nullptr));
     }
     else if (fdwReason == DLL_PROCESS_DETACH) {
+        if (reserved != nullptr) {
+            hasInjected = false;
+            return TRUE;
+        }
+
         // Remove singletons
 
         Latite::getHooks().disable();
@@ -479,8 +489,34 @@ void Latite::queueEject() noexcept {
     //auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     //app.Title(L"");
     SetWindowTextW(SDK::GameCore::get()->hwnd, L"Minecraft");
-    this->shouldEject = true;
-    CloseHandle(CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)FreeLibraryAndExitThread, dllInst, 0, nullptr));
+    if (this->shouldEject.exchange(true, std::memory_order_acq_rel)) {
+        return;
+    }
+}
+
+bool Latite::isEjectQueued() const noexcept {
+    return this->shouldEject.load(std::memory_order_acquire);
+}
+
+bool Latite::isEjectReadyForRenderThread() const noexcept {
+    return this->shouldEject.load(std::memory_order_acquire)
+        && this->mainThreadEjectCleanupComplete.load(std::memory_order_acquire);
+}
+
+void Latite::completeEjectFromRenderThread() noexcept {
+    if (!this->isEjectReadyForRenderThread()) {
+        return;
+    }
+
+    if (Latite::getRenderer().hasInitialized()) {
+        this->releaseDeferredD2DResources();
+        Latite::getAssets().unloadAll();
+        Latite::getRenderer().shutdownForEject();
+    }
+
+    if (!this->unloadStarted.exchange(true, std::memory_order_acq_rel)) {
+        CloseHandle(CreateThread(nullptr, 0, ejectThread, dllInst, 0, nullptr));
+    }
 }
 
 SDK::Font* Latite::getFont() {
@@ -785,6 +821,27 @@ void Latite::queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callb
     this->dxRenderQueue.push(callback);
 }
 
+void Latite::deferD2DResourceRelease(IUnknown* resource) noexcept {
+    if (!resource) {
+        return;
+    }
+
+    std::lock_guard lock(this->deferredD2DReleaseMutex);
+    this->deferredD2DReleases.push_back(resource);
+}
+
+void Latite::releaseDeferredD2DResources() noexcept {
+    std::vector<IUnknown*> resources;
+    {
+        std::lock_guard lock(this->deferredD2DReleaseMutex);
+        resources.swap(this->deferredD2DReleases);
+    }
+
+    for (auto* resource : resources) {
+        resource->Release();
+    }
+}
+
 void Latite::initL10n() {
     l10nData = LocalizeData();
 }
@@ -865,6 +922,19 @@ void Latite::onUpdate(Event& evGeneric) {
         auto& latest = this->clientThreadQueue.front();
         latest();
         this->clientThreadQueue.pop();
+    }
+
+    if (this->shouldEject.load(std::memory_order_acquire)) {
+        if (!this->mainThreadEjectCleanupComplete.load(std::memory_order_acquire)) {
+            Latite::getConfigManager().saveCurrentConfig();
+            Latite::getPluginManager().unloadAll();
+            this->mainThreadEjectCleanupComplete.store(true, std::memory_order_release);
+        }
+
+        if (!Latite::getRenderer().hasInitialized()) {
+            this->completeEjectFromRenderThread();
+        }
+        return;
     }
 
     auto rak = SDK::RakNetConnector::get();
@@ -1011,6 +1081,8 @@ void Latite::onRenderLayer(Event& evG) {
 
 void Latite::onRenderOverlay(Event& evG) {
     auto& ev = reinterpret_cast<RenderOverlayEvent&>(evG);
+
+    this->releaseDeferredD2DResources();
 
     if (getRenderer().getFontFamily2() != std::get<TextValue>(secondaryFont).str) {
         getRenderer().updateSecondaryFont(std::get<TextValue>(secondaryFont).str);
