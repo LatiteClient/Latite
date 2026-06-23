@@ -32,7 +32,6 @@ std::shared_ptr<SDK::Packet> PacketHooks::MinecraftPackets_createPacket(SDK::Pac
 
 void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* networkIdentifier, void* netEventCallback, std::shared_ptr<SDK::Packet>& packet) {
 	auto& hook = PacketHookArray[(size_t)packet->getID()];
-	std::shared_ptr<SDK::Packet> setScorePacket;
 
 	if (Latite::isMainThread()) {
 		PacketReceiveEvent ev{ packet.get() };
@@ -62,17 +61,23 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 			}
 		}
 		else if (packetId == SDK::PacketID::SET_SCORE) {
-			setScorePacket = packet;
+			auto pkt = std::static_pointer_cast<SDK::SetScorePacket>(packet);
+
+			auto data = PluginManager::Event::Value(L"data");
+			data.val = pkt->serialize();
+
+			PluginManager::Event sEv{ L"set-score", { data }, false };
+			Latite::getPluginManager().dispatchEvent(sEv);
 		}
 		else if (packetId == SDK::PacketID::MODAL_FORM_REQUEST) {
 			auto pkt = std::static_pointer_cast<SDK::ModalFormRequestPacket>(packet);
-		
+
 			auto formId = PluginManager::Event::Value(L"formId");
 			formId.val = (double)pkt->mFormId;
-		
+
 			auto formJson = PluginManager::Event::Value(L"formJson");
 			formJson.val = util::StrToWStr(pkt->mFormJSON);
-		
+
 			PluginManager::Event sEv{ L"modal-form-request", { formId, formJson }, false };
 			if (Latite::getPluginManager().dispatchEvent(sEv)) return;
 		}
@@ -185,17 +190,6 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 		}
 	}
 	hook->oFunc<decltype(&PacketHandlerDispatcherInstance_handle)>()(instance, networkIdentifier, netEventCallback, packet);
-
-	// kind of stupid fix (i think) for nightly (but not debug) crashing
-	if (setScorePacket) {
-		auto pkt = std::static_pointer_cast<SDK::SetScorePacket>(setScorePacket);
-
-		auto data = PluginManager::Event::Value(L"data");
-		data.val = pkt->serialize();
-
-		PluginManager::Event sEv{ L"set-score", { data }, false };
-		Latite::getPluginManager().dispatchEvent(sEv);
-	}
 }
 
 PacketHooks::PacketHooks() {
