@@ -72,9 +72,11 @@ public:
 		Eventing::get().listen<Event>(this, (EventListenerFunc)listener, priority, callWhenInactive);
 	}
 
-    virtual void onEnable() {};
-    virtual void onDisable() {};
+	virtual void onEnable() {};
+	virtual void onDisable() {};
     virtual void onInit() {};
+	virtual bool isToggleable() { return true; }
+	virtual bool shouldPersistEnabled() { return true; }
 
     [[nodiscard]] KeyValue getKeybind() { return std::get<KeyValue>(key); }
     [[nodiscard]] bool isEnabled() { return std::get<BoolValue>(enabled); };
@@ -89,7 +91,11 @@ public:
     virtual bool shouldHoldToToggle() { return false; }
 	bool shouldListen() override { return this->isEnabled(); };
 
-    void setEnabled(bool b, bool blockedOverride = false) { if (!blockedOverride && isBlocked()) return; b ? onEnable() : onDisable(); std::get<BoolValue>(enabled) = b; }
+    void setEnabled(bool b, bool blockedOverride = false) {
+		if (!blockedOverride && isBlocked()) return;
+		b ? onEnable() : onDisable();
+		std::get<BoolValue>(enabled) = shouldPersistEnabled() ? b : false;
+	}
     void setBlocked(bool b) {
         if (b) {
             if (isEnabled()) {

@@ -751,6 +751,18 @@ void ClickGUI::onRender(Event&) {
 						}
 
 					}
+					else if (!mod.mod->isToggleable()) {
+						bool selectAction = this->shouldSelect(toggleRect, cursorPos);
+						if (selectAction && justClicked[0]) {
+							mod.mod->setEnabled(true);
+							playClickSound();
+						}
+
+						d2d::Color actionColor = selectAction ? accentColor : d2d::Color::RGB(0xD9, 0xD9, 0xD9, 30);
+						dc.fillRoundedRectangle(toggleRect, actionColor, toggleRect.getHeight() * 0.25f);
+						dc.drawSingleLineFitted(toggleRect, L"Open", { 1.f, 1.f, 1.f, 1.f }, Renderer::FontSelection::PrimaryRegular,
+							toggleRect.getHeight() * 0.45f, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+					}
 					else {
 						bool selecToggle = this->shouldSelect(toggleRect, cursorPos);
 						if (selecToggle) {

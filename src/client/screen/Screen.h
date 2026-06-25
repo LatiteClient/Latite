@@ -50,6 +50,8 @@ public:
 		return rc.contains(pt);
 	}
 
+	void resetInputState();
+
 	enum class Cursor {
 		Arrow,
 		Hand,

@@ -37,9 +37,14 @@ void Screen::onUpdate(Event& ev) {
 }
 
 void Screen::close() {
+	resetInputState();
+	Latite::getScreenManager().exitCurrentScreen();
+}
+
+void Screen::resetInputState() {
 	this->activeMouseButtons = { false, false, false };
 	this->mouseButtons = { false, false, false };
-	Latite::getScreenManager().exitCurrentScreen();
+	this->justClicked = { false, false, false };
 }
 
 void Screen::playClickSound() {

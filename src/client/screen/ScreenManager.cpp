@@ -8,9 +8,19 @@
 ScreenManager::ScreenManager() {
 	Eventing::get().listen<KeyUpdateEvent, &ScreenManager::onKey>(this);
 	Eventing::get().listen<FocusLostEvent, &ScreenManager::onFocusLost>(this);
+	Eventing::get().listen<UpdateEvent, &ScreenManager::onUpdate>(this);
 }
 
 void ScreenManager::activateScreen(Screen& screen, bool ignoreAnims) {
+	if (this->activeScreen && &this->activeScreen->get() == &screen) {
+		SDK::ClientInstance::get()->releaseCursor();
+		return;
+	}
+
+	if (this->activeScreen) {
+		this->activeScreen->get().setActive(false);
+	}
+
 	this->activeScreen = screen;
 	screen.setActive(true, ignoreAnims);
 	SDK::ClientInstance::get()->releaseCursor();
@@ -50,6 +60,17 @@ void ScreenManager::onKey(KeyUpdateEvent& ev) {
 
 void ScreenManager::onFocusLost(FocusLostEvent& ev) {
 	if (getActiveScreen()) {
+		getActiveScreen()->get().resetInputState();
+		if (auto client = SDK::ClientInstance::get()) {
+			client->releaseCursor();
+		}
 		ev.setCancelled(true);
+	}
+}
+
+void ScreenManager::onUpdate(UpdateEvent&) {
+	auto client = SDK::ClientInstance::get();
+	if (getActiveScreen() && client && client->minecraftGame && client->minecraftGame->isCursorGrabbed()) {
+		client->releaseCursor();
 	}
 }

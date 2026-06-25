@@ -1,9 +1,11 @@
 #pragma once
 #include "screens/ClickGUI.h"
 #include "screens/HUDEditor.h"
+#include "screens/SkinStealerScreen.h"
 
 #include "client/manager/StaticManager.h"
 #include "client/event/Listener.h"
+#include "client/event/events/UpdateEvent.h"
 #include "Screen.h"
 
 #include "util/Util.h"
@@ -11,7 +13,8 @@
 
 class ScreenManager : public Listener, public StaticManager<Screen,
 	ClickGUI,
-	HUDEditor> {
+	HUDEditor,
+	SkinStealerScreen> {
 public:
 	ScreenManager();
 
@@ -51,15 +54,14 @@ public:
 
 	template <typename T>
 	bool tryToggleScreen() {
-		if (activeScreen) {
-			showScreen<T>();
-			return true;
-		}
-		if (activeScreen->get().getName() == std::get<T>(items).getName()) {
+		auto& screen = std::get<T>(items);
+		if (activeScreen && activeScreen->get().getName() == screen.getName()) {
 			this->exitCurrentScreen();
 			return true;
 		}
-		return false;
+
+		showScreen<T>();
+		return true;
 	}
 	void exitCurrentScreen();
 
@@ -67,6 +69,7 @@ public:
 
 	void onKey(KeyUpdateEvent& ev);
 	void onFocusLost(FocusLostEvent& ev);
+	void onUpdate(UpdateEvent& ev);
 private:
 	void activateScreen(Screen& screen, bool ignoreAnims = false);
 	std::optional<std::reference_wrapper<Screen>> activeScreen;
