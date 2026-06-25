@@ -643,13 +643,13 @@ void SkinStealerScreen::onClick(Event &evGeneric) {
 	if (!listRect.contains(cursorPos)) return;
 
 	SDK::Level* level = SDK::ClientInstance::get()->minecraft->getLevel();
-	PlayerList* playerList = level ? level->getPlayerList() : nullptr;
+	auto playerList = level ? level->getPlayerList() : nullptr;
 	if (!playerList) return;
 
 	for (PlayerRow &row: rows) {
 		if (!row.getButtonRect.contains(cursorPos)) continue;
 
-		for (PlayerListItem &item: *playerList) {
+		for (auto &item: *playerList) {
 			if (item.second.name != row.playerName) continue;
 			if (std::optional<std::filesystem::path> savedPath = saveSkin(item.second)) {
 				row.status = std::format(L"Saved: {}", savedPath->filename().wstring());
