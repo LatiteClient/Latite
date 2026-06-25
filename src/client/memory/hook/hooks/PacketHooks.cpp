@@ -4,6 +4,9 @@
 #include <mc/common/network/MinecraftPackets.h>
 #include <mc/common/network/packet/AddPlayerPacket.h>
 #include <mc/common/network/packet/SetActorDataPacket.h>
+#include <limits>
+#include <type_traits>
+#include <unordered_map>
 
 namespace {
 	std::shared_ptr<Hook> SetTitlePacketRead;
@@ -11,33 +14,18 @@ namespace {
 	std::shared_ptr<Hook> SendToServerHook;
 	std::shared_ptr<Hook> CreatePacketHook;
 
-	std::array<std::shared_ptr<Hook>, (size_t)SDK::PacketID::COUNT> PacketHookArray;
-}
+	using PacketIdUnderlying = std::underlying_type_t<SDK::PacketID>;
+	constexpr size_t PacketHookArraySize = static_cast<size_t>(std::numeric_limits<PacketIdUnderlying>::max()) + 1;
 
-void PacketHooks::PacketSender_sendToServer(SDK::PacketSender* sender, SDK::Packet* packet) {
-	SendPacketEvent ev{ packet };
+	std::array<std::shared_ptr<Hook>, PacketHookArraySize> PacketHookArray;
+	std::unordered_map<uintptr_t, std::shared_ptr<Hook>> PacketHooksByVtableSlot;
 
-	if (Eventing::get().dispatch(ev)) {
-		return;
+	size_t packetIndex(SDK::PacketID packetId) {
+		return static_cast<size_t>(static_cast<PacketIdUnderlying>(packetId));
 	}
 
-	SendToServerHook->oFunc<decltype(&PacketSender_sendToServer)>()(sender, packet);
-}
-
-std::shared_ptr<SDK::Packet> PacketHooks::MinecraftPackets_createPacket(SDK::PacketID packetId) {
-	auto genPacket = CreatePacketHook->oFunc<decltype(&MinecraftPackets_createPacket)>()(packetId);
-	
-	return genPacket;
-}
-
-void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* networkIdentifier, void* netEventCallback, std::shared_ptr<SDK::Packet>& packet) {
-	auto& hook = PacketHookArray[(size_t)packet->getID()];
-
-	if (Latite::isMainThread()) {
-		PacketReceiveEvent ev{ packet.get() };
-		Eventing::get().dispatch(ev);
-
-		auto packetId = packet->getID();
+	void dispatchPostVanillaPacketEvents(SDK::PacketID packetId, std::shared_ptr<SDK::Packet> const& packet) {
+		if (!packet) return;
 
 		if (packetId == SDK::PacketID::CHANGE_DIMENSION) {
 			Latite::get().getNameTagCache().clearNetworkNameTags();
@@ -69,7 +57,51 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 			PluginManager::Event sEv{ L"set-score", { data }, false };
 			Latite::getPluginManager().dispatchEvent(sEv);
 		}
-		else if (packetId == SDK::PacketID::MODAL_FORM_REQUEST) {
+		else if (packetId == SDK::PacketID::TRANSFER) {
+			PluginManager::Event sEv{ L"transfer", {}, false };
+			Latite::getPluginManager().dispatchEvent(sEv);
+		}
+	}
+}
+
+void PacketHooks::PacketSender_sendToServer(SDK::PacketSender* sender, SDK::Packet* packet) {
+	SendPacketEvent ev{ packet };
+
+	if (Eventing::get().dispatch(ev)) {
+		return;
+	}
+
+	SendToServerHook->oFunc<decltype(&PacketSender_sendToServer)>()(sender, packet);
+}
+
+std::shared_ptr<SDK::Packet> PacketHooks::MinecraftPackets_createPacket(SDK::PacketID packetId) {
+	auto genPacket = CreatePacketHook->oFunc<decltype(&MinecraftPackets_createPacket)>()(packetId);
+
+	return genPacket;
+}
+
+void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* networkIdentifier, void* netEventCallback, std::shared_ptr<SDK::Packet>& packet) {
+	if (!packet) return;
+
+	auto packetId = packet->getID();
+	auto hook = PacketHookArray[packetIndex(packetId)];
+	if (!hook && instance) {
+		auto** vft = *reinterpret_cast<void***>(instance);
+		auto hookIt = PacketHooksByVtableSlot.find(reinterpret_cast<uintptr_t>(vft + 1));
+		if (hookIt != PacketHooksByVtableSlot.end()) {
+			hook = hookIt->second;
+		}
+	}
+	if (!hook) return;
+
+	const bool isMainThread = Latite::isMainThread();
+	std::shared_ptr<SDK::Packet> postVanillaPacket = isMainThread ? packet : nullptr;
+
+	if (isMainThread) {
+		PacketReceiveEvent ev{ packet.get() };
+		Eventing::get().dispatch(ev);
+
+		if (packetId == SDK::PacketID::MODAL_FORM_REQUEST) {
 			auto pkt = std::static_pointer_cast<SDK::ModalFormRequestPacket>(packet);
 
 			auto formId = PluginManager::Event::Value(L"formId");
@@ -81,10 +113,7 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 			PluginManager::Event sEv{ L"modal-form-request", { formId, formJson }, false };
 			if (Latite::getPluginManager().dispatchEvent(sEv)) return;
 		}
-		else if (packetId == SDK::PacketID::TRANSFER) {
-			PluginManager::Event sEv{ L"transfer", {}, false };
-			Latite::getPluginManager().dispatchEvent(sEv);
-		} else if (packetId == SDK::PacketID::SET_TITLE) {
+		else if (packetId == SDK::PacketID::SET_TITLE) {
 			auto pkt = std::static_pointer_cast<SDK::SetTitlePacket>(packet);
 			auto v1 = PluginManager::Event::Value(L"type");
 
@@ -190,6 +219,7 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
 		}
 	}
 	hook->oFunc<decltype(&PacketHandlerDispatcherInstance_handle)>()(instance, networkIdentifier, netEventCallback, packet);
+	dispatchPostVanillaPacketEvents(packetId, postVanillaPacket);
 }
 
 PacketHooks::PacketHooks() {
@@ -197,11 +227,16 @@ PacketHooks::PacketHooks() {
 	//    MinecraftPackets_createPacket,
 	//    "MinecraftPackets::createPacket");
 
-	for (uint8_t i = 1; i < (uint8_t)SDK::PacketID::COUNT; i++) {
-		auto pkt = SDK::MinecraftPackets::createPacket((SDK::PacketID)i);
+	for (size_t i = 1; i < PacketHookArray.size(); i++) {
+		auto pkt = SDK::MinecraftPackets::createPacket(static_cast<SDK::PacketID>(static_cast<PacketIdUnderlying>(i)));
 		if (pkt) {
 			auto vft = *pkt->handler;
-			PacketHookArray[i] = addTableSwapHook((uintptr_t)(vft + 1), &PacketHandlerDispatcherInstance_handle, "Packet Hook");
+			auto const vtableSlot = reinterpret_cast<uintptr_t>(vft + 1);
+			auto [hookIt, inserted] = PacketHooksByVtableSlot.try_emplace(vtableSlot);
+			if (inserted) {
+				hookIt->second = addTableSwapHook(vtableSlot, &PacketHandlerDispatcherInstance_handle, "Packet Hook");
+			}
+			PacketHookArray[i] = hookIt->second;
 		}
 	}
 }
