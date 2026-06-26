@@ -4,8 +4,8 @@
 #include "client/screen/ScreenManager.h"
 #include "client/screen/screens/SkinStealerScreen.h"
 
-SkinStealer::SkinStealer() : Module("SkinStealer", L"Skin Stealer",
-                                    L"Opens a menu for saving player skins from the current player list.",
+SkinStealer::SkinStealer() : Module("SkinStealer", LocalizeString::get("client.module.skinStealer.name"),
+                                    LocalizeString::get("client.module.skinStealer.desc"),
                                     GAME, nokeybind) {
 }
 

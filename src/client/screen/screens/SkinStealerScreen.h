@@ -33,6 +33,7 @@ private:
 		std::string skinKey;
 		d2d::Rect getButtonRect = {};
 		std::chrono::steady_clock::time_point feedbackUntil = {};
+		bool statusSuccess = false;
 	};
 
 	struct HeadBitmap {

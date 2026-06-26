@@ -7,6 +7,7 @@
 #include "client/event/events/RendererCleanupEvent.h"
 #include "client/event/events/RenderOverlayEvent.h"
 #include "client/Latite.h"
+#include "client/localization/LocalizeString.h"
 #include "client/render/asset/Assets.h"
 #include "mc/common/world/actor/player/PlayerListEntry.h"
 #include "mc/common/world/actor/player/SerializedSkinRef.h"
@@ -444,19 +445,21 @@ void SkinStealerScreen::onRender(Event &) {
 
 	float titleTop = panelRect.top + 19.f * scale;
 	dc.drawText({ panelRect.left + pad, titleTop, folderButtonRect.left - 16.f * scale, titleTop + 31.f * scale },
-	            L"Skin Stealer", d2d::Colors::WHITE, Renderer::FontSelection::PrimaryLight, titleSize,
+	            LocalizeString::get("client.module.skinStealer.name"), d2d::Colors::WHITE, Renderer::FontSelection::PrimaryLight, titleSize,
 	            DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, false);
 	dc.drawText({
 		            panelRect.left + pad + 1.f * scale, titleTop + 30.f * scale, folderButtonRect.left - 16.f * scale,
 		            titleTop + 54.f * scale
 	            },
-	            std::format(L"{} player{} found", rows.size(), rows.size() == 1 ? L"" : L"s"),
+	            util::FormatWString(LocalizeString::get(rows.size() == 1
+		            ? "client.screen.skinStealer.playerCount.one"
+		            : "client.screen.skinStealer.playerCount.many"), { std::to_wstring(rows.size()) }),
 	            d2d::Color::RGB(0xD2, 0xD2, 0xD2).asAlpha(0.72f), Renderer::FontSelection::PrimaryRegular, subSize);
 
 	bool folderHovered = folderButtonRect.contains(cursorPos);
 	dc.fillRoundedRectangle(folderButtonRect, folderHovered ? accent : d2d::Color::RGB(0x38, 0x38, 0x38).asAlpha(0.88f),
 	                        folderButtonRect.getHeight() * 0.23f);
-	dc.drawText(folderButtonRect, L"Open Folder", d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular,
+	dc.drawText(folderButtonRect, LocalizeString::get("client.screen.skinStealer.openFolder.name"), d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular,
 	            15.f * scale,
 	            DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 
@@ -478,7 +481,7 @@ void SkinStealerScreen::onRender(Event &) {
 	if (std::abs(lerpScroll - scroll) < 0.1f) lerpScroll = scroll;
 
 	if (rows.empty()) {
-		dc.drawText(listRect, L"No stealable player skins found.", d2d::Color::RGB(0xA8, 0xB4, 0xC8),
+		dc.drawText(listRect, LocalizeString::get("client.screen.skinStealer.empty.name"), d2d::Color::RGB(0xA8, 0xB4, 0xC8),
 		            Renderer::FontSelection::PrimaryRegular, 18.f * scale, DWRITE_TEXT_ALIGNMENT_CENTER,
 		            DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 		return;
@@ -553,7 +556,7 @@ void SkinStealerScreen::onRender(Event &) {
 
 		d2d::Color buttonColor = d2d::Color::RGB(0x38, 0x38, 0x38).asAlpha(0.88f);
 		if (showingFeedback) {
-			buttonColor = row.status.starts_with(L"Saved")
+			buttonColor = row.statusSuccess
 				              ? d2d::Color::RGB(0x4C, 0xAF, 0x50)
 				              : d2d::Color::RGB(0xF4, 0x43, 0x36);
 		} else if (buttonHovered) {
@@ -561,7 +564,7 @@ void SkinStealerScreen::onRender(Event &) {
 		}
 
 		dc.fillRoundedRectangle(row.getButtonRect, buttonColor, row.getButtonRect.getHeight() * 0.23f);
-		dc.drawText(row.getButtonRect, L"Get", d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular,
+		dc.drawText(row.getButtonRect, LocalizeString::get("client.screen.skinStealer.get.name"), d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular,
 		            16.f * scale,
 		            DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
 	}
@@ -652,11 +655,14 @@ void SkinStealerScreen::onClick(Event &evGeneric) {
 		for (auto &item: *playerList) {
 			if (item.second.name != row.playerName) continue;
 			if (std::optional<std::filesystem::path> savedPath = saveSkin(item.second)) {
-				row.status = std::format(L"Saved: {}", savedPath->filename().wstring());
+				row.status = util::FormatWString(LocalizeString::get("client.screen.skinStealer.saved.name"),
+					{ savedPath->filename().wstring() });
+				row.statusSuccess = true;
 				row.feedbackUntil = std::chrono::steady_clock::now() + feedbackDuration;
 				playClickSound();
 			} else {
-				row.status = L"Could not save skin";
+				row.status = LocalizeString::get("client.screen.skinStealer.saveError.name");
+				row.statusSuccess = false;
 				row.feedbackUntil = std::chrono::steady_clock::now() + feedbackDuration;
 			}
 			return;
