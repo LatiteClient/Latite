@@ -1,0 +1,126 @@
+name: Clang Format
+
+on:
+  push:
+    branches: ["master"]
+    paths:
+      - ".clang-format"
+      - ".github/workflows/clang-format.yml"
+      - "src/**"
+      - "tools/**"
+  pull_request:
+    branches: ["master"]
+    paths:
+      - ".clang-format"
+      - ".github/workflows/clang-format.yml"
+      - "src/**"
+      - "tools/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  clang-format:
+    runs-on: windows-latest
+
+    steps:
+      - name: Configure Git line endings
+        run: git config --global core.autocrlf true
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install clang-format
+        shell: pwsh
+        run: |
+          python -m pip install --disable-pip-version-check clang-format==21.1.0
+
+          $scriptsPath = python -c "import sysconfig; print(sysconfig.get_path('scripts'))"
+          $clangFormat = Join-Path $scriptsPath "clang-format.exe"
+          if (-not (Test-Path -LiteralPath $clangFormat)) {
+              $command = Get-Command clang-format -ErrorAction SilentlyContinue
+              if ($null -eq $command) {
+                  throw "clang-format was installed, but clang-format.exe was not found in '$scriptsPath' or PATH."
+              }
+
+              $clangFormat = $command.Source
+          }
+
+          $scriptsPath | Out-File -FilePath $env:GITHUB_PATH -Append
+          "CLANG_FORMAT=$clangFormat" | Out-File -FilePath $env:GITHUB_ENV -Append
+          & $clangFormat --version
+
+      - name: Check formatting
+        shell: pwsh
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $extensions = @(".c", ".cc", ".cxx", ".cpp", ".h", ".hpp")
+
+          if (-not $env:CLANG_FORMAT -or -not (Test-Path -LiteralPath $env:CLANG_FORMAT)) {
+              $command = Get-Command clang-format -ErrorAction SilentlyContinue
+              if ($null -eq $command) {
+                  throw "clang-format was not found. The install step did not expose a usable executable."
+              }
+
+              $env:CLANG_FORMAT = $command.Source
+          }
+
+          function Get-TrackedSourceFiles {
+              git ls-files src tools |
+                  Where-Object { $extensions -contains [IO.Path]::GetExtension($_).ToLowerInvariant() }
+          }
+
+          if ($env:EVENT_NAME -eq "pull_request") {
+              $changedFiles = git diff --name-only --diff-filter=ACMR "$env:BASE_SHA...HEAD"
+          } elseif ($env:EVENT_NAME -eq "push" -and $env:BEFORE_SHA -and $env:BEFORE_SHA -notmatch "^0+$") {
+              $changedFiles = git diff --name-only --diff-filter=ACMR "$env:BEFORE_SHA..$env:CURRENT_SHA"
+          } else {
+              $changedFiles = @(".clang-format")
+          }
+
+          if ($changedFiles -contains ".clang-format") {
+              $files = @(Get-TrackedSourceFiles)
+          } else {
+              $files = @(
+                  $changedFiles |
+                      Where-Object { $_ -match "^(src|tools)/" } |
+                      Where-Object { $extensions -contains [IO.Path]::GetExtension($_).ToLowerInvariant() } |
+                      Where-Object { Test-Path -LiteralPath $_ }
+              )
+          }
+
+          if (-not $files) {
+              Write-Host "No changed C/C++ source files to check."
+              exit 0
+          }
+
+          Write-Host "Checking clang-format on $($files.Count) file(s):"
+          $files | ForEach-Object { Write-Host "  $_" }
+
+          $failed = $false
+          foreach ($file in $files) {
+              & $env:CLANG_FORMAT --dry-run --Werror $file
+              if ($LASTEXITCODE -ne 0) {
+                  $failed = $true
+              }
+          }
+
+          if ($failed) {
+              Write-Host ""
+              Write-Host "clang-format found files that need formatting."
+              Write-Host "Format them locally with:"
+              Write-Host "  clang-format -i path\to\file.cpp"
+              exit 1
+          }
