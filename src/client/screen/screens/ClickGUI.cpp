@@ -47,6 +47,20 @@ ClickGUI::ClickGUI() {
     Eventing::get().listen<ClickEvent>(this, (EventListenerFunc)&ClickGUI::onClick, 1);
 }
 
+void ClickGUI::updateScrollbarDrag(Vec2 const& mouse) {
+    if (!draggingScrollbar) return;
+    if (!mouseButtons[0] || scrollMax <= 0.f || scrollbarTrackRect.getHeight() <= scrollbarThumbRect.getHeight()) {
+        draggingScrollbar = false;
+        return;
+    }
+
+    float availableTrack = scrollbarTrackRect.getHeight() - scrollbarThumbRect.getHeight();
+    float thumbTop = std::clamp(mouse.y - scrollbarDragOffset, scrollbarTrackRect.top,
+                                scrollbarTrackRect.bottom - scrollbarThumbRect.getHeight());
+    float normalized = (thumbTop - scrollbarTrackRect.top) / availableTrack;
+    scroll = std::clamp(normalized * scrollMax, 0.f, scrollMax);
+}
+
 void ClickGUI::onRender(Event&) {
     static std::vector<ModuleLike> mods = {};
 
@@ -114,6 +128,8 @@ void ClickGUI::onRender(Event&) {
 
     Vec2& cursorPos = SDK::ClientInstance::get()->cursorPos;
     auto accentColor = d2d::Color(Latite::get().getAccentColor().getMainColor());
+    updateScrollbarDrag(cursorPos);
+    if (!mouseButtons[0]) draggingScrollbar = false;
 
     // auto& ev = reinterpret_cast<RenderOverlayEvent&>(evGeneric);
     auto& rend = Latite::getRenderer();
@@ -952,6 +968,40 @@ void ClickGUI::onRender(Event&) {
         }
 
         dc.ctx->PopAxisAlignedClip();
+
+        if (scrollMax > 0.f) {
+            float trackWidth = 4.f * adaptedScale;
+            d2d::Rect visibleListRect { rect.left, modStartTop, rect.right, rect.bottom };
+            float trackX = rtl ? rect.left + (modulePad * 0.5f) - trackWidth : rect.right - (modulePad * 0.5f);
+            d2d::Rect track { trackX, visibleListRect.top, trackX + trackWidth, visibleListRect.bottom };
+            float thumbHeight = std::max(24.f * adaptedScale,
+                                         visibleListRect.getHeight() *
+                                             (visibleListRect.getHeight() / (visibleListRect.getHeight() + scrollMax)));
+            float thumbY = track.top + ((track.getHeight() - thumbHeight) * (scroll / scrollMax));
+            scrollbarTrackRect = track;
+            scrollbarThumbRect = { track.left, thumbY, track.right, thumbY + thumbHeight };
+            if (!colorPicker.setting && justClicked[0] && scrollbarTrackRect.contains(cursorPos)) {
+                draggingScrollbar = true;
+                if (scrollbarThumbRect.contains(cursorPos)) {
+                    scrollbarDragOffset = cursorPos.y - scrollbarThumbRect.top;
+                } else {
+                    scrollbarDragOffset = scrollbarThumbRect.getHeight() * 0.5f;
+                    updateScrollbarDrag(cursorPos);
+                    thumbY = track.top + ((track.getHeight() - thumbHeight) * (scroll / scrollMax));
+                    scrollbarThumbRect = { track.left, thumbY, track.right, thumbY + thumbHeight };
+                }
+            }
+            dc.fillRoundedRectangle(scrollbarTrackRect, d2d::Color::RGB(0x55, 0x55, 0x55).asAlpha(0.28f),
+                                    trackWidth * 0.5f);
+            dc.fillRoundedRectangle(scrollbarThumbRect,
+                                    (draggingScrollbar || scrollbarThumbRect.contains(cursorPos))
+                                        ? accentColor
+                                        : d2d::Color::RGB(0xD2, 0xD2, 0xD2).asAlpha(0.78f),
+                                    trackWidth * 0.5f);
+        } else {
+            scrollbarTrackRect = {};
+            scrollbarThumbRect = {};
+        }
     }
 
     dc.ctx->SetTransform(oTransform);
@@ -1045,11 +1095,14 @@ void ClickGUI::onClick(Event& evGeneric) {
         ev.setCancelled(true);
     }
 
-    if (ev.getMouseButton() == 4) {
+    if (ev.getClickType() == ClickEvent::ClickType::Wheel) {
         // scroll
         this->scroll = std::max(std::min(scroll - static_cast<float>(ev.getWheelDelta()) / 3.f, scrollMax), 0.f);
         ev.setCancelled(true);
+        return;
     }
+
+    if (ev.getClickType() != ClickEvent::ClickType::Left) return;
 }
 
 namespace {
@@ -2004,6 +2057,7 @@ void ClickGUI::onEnable(bool ignoreAnims) {
     lerpScroll = 0.f;
     mouseButtons = {};
     justClicked = {};
+    draggingScrollbar = false;
     dropdownSetting = nullptr;
     dropdownAnimations.clear();
     this->tab = MODULES;
@@ -2013,6 +2067,7 @@ void ClickGUI::onDisable() {
     capturedKey = 0;
     activeSetting = nullptr;
     dropdownSetting = nullptr;
+    draggingScrollbar = false;
     dropdownAnimations.clear();
     searchTextBox.reset();
     searchTextBox.setSelected(false);

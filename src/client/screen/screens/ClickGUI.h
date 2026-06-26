@@ -40,6 +40,8 @@ protected:
     void onDisable() override;
 
 private:
+    void updateScrollbarDrag(Vec2 const& mouse);
+
     struct ColorPicker {
         Setting* setting = nullptr;
         StoredColor* selectedColor = nullptr;
@@ -121,6 +123,8 @@ private:
 
     d2d::Rect rect = {};
     d2d::Rect cPickerRect = {};
+    d2d::Rect scrollbarTrackRect = {};
+    d2d::Rect scrollbarThumbRect = {};
 
     Setting* activeSetting = nullptr;
     Setting* dropdownSetting = nullptr;
@@ -130,7 +134,9 @@ private:
     float scrollMax = 0.f;
     float scroll = 0.f;
     float lerpScroll = 0.f;
+    float scrollbarDragOffset = 0.f;
     bool shouldRebuildModLikes = false;
+    bool draggingScrollbar = false;
 
     std::optional<std::string> jumpModule;
     ComPtr<ID2D1Effect> compositeEffect;
