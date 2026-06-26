@@ -2,10 +2,20 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$BinaryPath,
 
-    [string]$Timestamp = ""
+    [AllowEmptyString()]
+    [string]$Timestamp = "",
+
+    [AllowEmptyString()]
+    [string]$Configuration = ""
 )
 
 $ErrorActionPreference = "Stop"
+
+if (-not [string]::IsNullOrWhiteSpace($Configuration) -and
+    $Configuration -notin @("Debug", "Nightly")) {
+    Write-Host "Skipping Latite UTC build timestamp stamp for $Configuration configuration"
+    return
+}
 
 if ([string]::IsNullOrWhiteSpace($Timestamp)) {
     $Timestamp = [DateTime]::UtcNow.ToString("yyyy-MM-dd_HH-mm-ss'Z'")
