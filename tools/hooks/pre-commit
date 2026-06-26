@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+hook_dir="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+
+if command -v bash >/dev/null 2>&1; then
+    exec bash "$hook_dir/pre-commit.sh"
+fi
+
+if command -v pwsh >/dev/null 2>&1; then
+    exec pwsh -NoProfile -ExecutionPolicy Bypass -File "$hook_dir/pre-commit.ps1"
+fi
+
+exec powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$hook_dir/pre-commit.ps1"

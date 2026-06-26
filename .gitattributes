@@ -3,6 +3,9 @@
 ###############################################################################
 * text=auto
 
+# Git hook wrappers are shell scripts and must keep LF line endings.
+tools/hooks/* text eol=lf
+
 ###############################################################################
 # Set default behavior for command prompt diff.
 #

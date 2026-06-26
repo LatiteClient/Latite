@@ -59,6 +59,7 @@ Install the following before cloning the repository:
 - [Git](https://git-scm.com/download/win)
 - [Visual Studio 2022 or Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) with the **Desktop development with C++** workload. Make sure the MSVC x64/x86 build tools, a Windows SDK, CMake, and Ninja are selected in the Visual Studio Installer.
 - [MinGW-w64](https://www.mingw-w64.org/). Latite uses MinGW's `ld.exe` to embed the files in `assets/` into the DLL. MinGW's `bin` directory, such as `C:\Program Files\mingw64\bin`, must be in your system's PATH.
+- `clang-format`. Install it through Visual Studio, LLVM, or another package manager, then make sure `clang-format` is available in your PATH.
 
 ### Build From the Command Line
 
@@ -133,6 +134,51 @@ cmake --build out/build/x64-debug
 ## Contributing
 
 We welcome people to contribute code via making a PR (Pull Request) to the Client or [Launcher](https://github.com/LatiteClient/Launcher). Just make sure to ping us in our [Discord Server](https://discord.gg/GpV3w5tyBs) if we don't get to reviewing your PR in a timely manner :)
+
+### Formatting
+
+Latite uses `clang-format` for C++ formatting. Run formatting commands from the repository root so `clang-format` can find `.clang-format`.
+
+All commits should be formatted using `clang-format`. Therefore, it's highly recommended to install the repository Git hook that checks staged C++ files before committing:
+
+```powershell
+git config core.hooksPath tools/hooks
+```
+#### Useful clang-format commands:
+
+Format one file:
+
+```powershell
+clang-format -i src\client\Latite.h
+```
+
+Format all Latite source files:
+
+```powershell
+Get-ChildItem src -Recurse -Include *.h,*.hpp,*.cpp,*.cxx,*.cc |
+    ForEach-Object { clang-format -i $_.FullName }
+```
+
+Or from Git Bash:
+
+```bash
+find src -type f \( -name '*.h' -o -name '*.hpp' -o -name '*.cpp' -o -name '*.cxx' -o -name '*.cc' \) -print0 |
+    xargs -0 clang-format -i
+```
+
+Check formatting without modifying files:
+
+```powershell
+Get-ChildItem src -Recurse -Include *.h,*.hpp,*.cpp,*.cxx,*.cc |
+    ForEach-Object { clang-format --dry-run --Werror $_.FullName }
+```
+
+Or from Git Bash:
+
+```bash
+find src -type f \( -name '*.h' -o -name '*.hpp' -o -name '*.cpp' -o -name '*.cxx' -o -name '*.cc' \) -print0 |
+    xargs -0 clang-format --dry-run --Werror
+```
 
 ## FAQ
 
