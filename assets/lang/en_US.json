@@ -3,6 +3,7 @@
     "translations": {
         "client.intro.welcome": "Welcome to Latite Client!",
         "client.intro.menubutton": "Press {} in a world or server to open the mod menu.",
+        "client.modules.blockedOnServer.name": "{} will be blocked on this server.",
         "client.ui.hudEditor.modSettings.name": "Mod Settings",
         "client.ui.clickGui.search.name": "Search",
         "client.ui.clickGui.searchSettings.name": "Search Settings",

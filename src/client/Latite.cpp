@@ -607,9 +607,8 @@ static void blockModules(std::string_view moduleName, std::string_view serverNam
                 str += L", ";
             }
         }
-        str += L" will be blocked on this server.";
-
-        Latite::getNotifications().push(str);
+        Latite::getNotifications().push(
+            util::FormatWString(LocalizeString::get("client.modules.blockedOnServer.name"), { str }));
     }
 }
 
