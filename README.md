@@ -57,13 +57,13 @@ Enhance your experience with community-made plugins:
 Install the following before cloning the repository:
 
 - [Git](https://git-scm.com/download/win)
-- [Visual Studio 2022 or Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/) with the **Desktop development with C++** workload. Make sure the MSVC x64/x86 build tools, a Windows SDK, CMake, and Ninja are selected in the Visual Studio Installer.
+- [Visual Studio 2026 or Build Tools for Visual Studio 2026](https://visualstudio.microsoft.com/downloads/) with the **Desktop development with C++** workload. Make sure the MSVC x64/x86 build tools, a Windows SDK, CMake, and Ninja are selected in the Visual Studio Installer.
 - [MinGW-w64](https://www.mingw-w64.org/). Latite uses MinGW's `ld.exe` to embed the files in `assets/` into the DLL. MinGW's `bin` directory, such as `C:\Program Files\mingw64\bin`, must be in your system's PATH.
 - `clang-format`. Install it through Visual Studio, LLVM, or another package manager, then make sure `clang-format` is available in your PATH.
 
 ### Build From the Command Line
 
-1. Open **x64 Native Tools Command Prompt for VS 2022** or **Developer PowerShell for VS 2022**. A normal terminal will only work if the MSVC developer environment has already been initialized.
+1. Open **x64 Native Tools Command Prompt for VS 2026** or **Developer PowerShell for VS 2026**. A normal terminal will only work if the MSVC developer environment has already been initialized.
 2. Confirm that the required tools are available:
 
 ```powershell
