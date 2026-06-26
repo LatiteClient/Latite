@@ -5,13 +5,13 @@
 
 class TickEvent : public Event {
 public:
-	static const uint32_t hash = TOHASH(TickEvent);
-	
-	[[nodiscard]] SDK::Level* getLevel() { return level; }
+    static const uint32_t hash = TOHASH(TickEvent);
 
-	TickEvent(SDK::Level* lvl) : level(lvl) {
-	}
+    [[nodiscard]] SDK::Level* getLevel() { return level; }
+
+    TickEvent(SDK::Level* lvl)
+        : level(lvl) {}
 
 protected:
-	SDK::Level* level;
+    SDK::Level* level;
 };

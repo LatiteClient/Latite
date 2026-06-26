@@ -4,18 +4,14 @@
 
 class WeatherEvent : public Event {
 public:
-	static const uint32_t hash = TOHASH(WeatherEvent);
+    static const uint32_t hash = TOHASH(WeatherEvent);
 
-	WeatherEvent() {
-	}
+    WeatherEvent() {}
 
-	void setShowWeather(bool showWeather) {
-		this->showWeather = showWeather;
-	}
+    void setShowWeather(bool showWeather) { this->showWeather = showWeather; }
 
-	bool shouldShowWeather() {
-		return showWeather;
-	}
+    bool shouldShowWeather() { return showWeather; }
+
 protected:
-	bool showWeather = true;
+    bool showWeather = true;
 };

@@ -3,11 +3,11 @@
 
 class HiveTranslate : public Module {
 public:
-	HiveTranslate();
-	virtual ~HiveTranslate() {};
+    HiveTranslate();
+    virtual ~HiveTranslate() {};
 
-	void onText(Event&);
+    void onText(Event&);
 
 private:
-	ValueType targetLanguage = TextValue(L"en");
+    ValueType targetLanguage = TextValue(L"en");
 };

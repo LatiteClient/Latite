@@ -13,459 +13,491 @@
 #include "mc/common/client/game/MouseDevice.h"
 
 namespace {
-	std::shared_ptr<Hook> MultiPlayerLevel__subTickHook;
-	std::shared_ptr<Hook> ChatScreenController_sendChatMesageHook;
-	std::shared_ptr<Hook> GameRenderer_renderCurrentFrameHook;
-	//std::shared_ptr<Hook> Keyboard_feedHook;
-	std::shared_ptr<Hook> MainWindow__windowProcCallbackHook;
-	std::shared_ptr<Hook> GameCore_handleMouseInputHook;
-	std::shared_ptr<Hook> LoadLibraryWHook;
-	std::shared_ptr<Hook> LoadLibraryAHook;
-	std::shared_ptr<Hook> AveragePingHook;
-	std::shared_ptr<Hook> TurnDeltaHook;
-	std::shared_ptr<Hook> ClientInputUpdateSystem_tickBaseInputHook;
-	std::shared_ptr<Hook> ViewBobHook;
-	std::shared_ptr<Hook> Level_initializeHook;
-	std::shared_ptr<Hook> Level_startLeaveGameHook;
-	std::shared_ptr<Hook> RenderEntityHook;
-	std::shared_ptr<Hook> OutlineSelectionHook;
-	std::shared_ptr<Hook> RenderGuiItemNewHook;
-	std::shared_ptr<Hook> GetTimeOfDayHook;
-	std::shared_ptr<Hook> DimensionHook;
-	std::shared_ptr<Hook> FogColorHook;
-	std::shared_ptr<Hook> AddMessageHook;
-	std::shared_ptr<Hook> UpdatePlayerHook;
-	std::shared_ptr<Hook> OnUriHook;
-	std::shared_ptr<Hook> GrabCursorHook;
-	std::shared_ptr<Hook> BaseActorRenderer_renderTextHook;
-	std::shared_ptr<Hook> AppPlatformGDK_releaseMouseHook;
+    std::shared_ptr<Hook> MultiPlayerLevel__subTickHook;
+    std::shared_ptr<Hook> ChatScreenController_sendChatMesageHook;
+    std::shared_ptr<Hook> GameRenderer_renderCurrentFrameHook;
+    // std::shared_ptr<Hook> Keyboard_feedHook;
+    std::shared_ptr<Hook> MainWindow__windowProcCallbackHook;
+    std::shared_ptr<Hook> GameCore_handleMouseInputHook;
+    std::shared_ptr<Hook> LoadLibraryWHook;
+    std::shared_ptr<Hook> LoadLibraryAHook;
+    std::shared_ptr<Hook> AveragePingHook;
+    std::shared_ptr<Hook> TurnDeltaHook;
+    std::shared_ptr<Hook> ClientInputUpdateSystem_tickBaseInputHook;
+    std::shared_ptr<Hook> ViewBobHook;
+    std::shared_ptr<Hook> Level_initializeHook;
+    std::shared_ptr<Hook> Level_startLeaveGameHook;
+    std::shared_ptr<Hook> RenderEntityHook;
+    std::shared_ptr<Hook> OutlineSelectionHook;
+    std::shared_ptr<Hook> RenderGuiItemNewHook;
+    std::shared_ptr<Hook> GetTimeOfDayHook;
+    std::shared_ptr<Hook> DimensionHook;
+    std::shared_ptr<Hook> FogColorHook;
+    std::shared_ptr<Hook> AddMessageHook;
+    std::shared_ptr<Hook> UpdatePlayerHook;
+    std::shared_ptr<Hook> OnUriHook;
+    std::shared_ptr<Hook> GrabCursorHook;
+    std::shared_ptr<Hook> BaseActorRenderer_renderTextHook;
+    std::shared_ptr<Hook> AppPlatformGDK_releaseMouseHook;
 }
 
 void GenericHooks::MultiPlayerLevel__subTick(SDK::Level* level) {
-	TickEvent ev(level);
-	Latite::getEventing().dispatch(ev);
-	Latite::getClientMessageQueue().doPrint(100);
+    TickEvent ev(level);
+    Latite::getEventing().dispatch(ev);
+    Latite::getClientMessageQueue().doPrint(100);
 
-	PluginManager::Event sEv{L"world-tick", {}, false};
-	Latite::getPluginManager().dispatchEvent(sEv);
+    PluginManager::Event sEv { L"world-tick", {}, false };
+    Latite::getPluginManager().dispatchEvent(sEv);
 
-	MultiPlayerLevel__subTickHook->oFunc<decltype(&MultiPlayerLevel__subTick)>()(level);
+    MultiPlayerLevel__subTickHook->oFunc<decltype(&MultiPlayerLevel__subTick)>()(level);
 }
 
 void* GenericHooks::ChatScreenController_sendChatMessage(void* controller, std::string& message) {
-	if (message.starts_with(Latite::getCommandManager().prefix)) {
-		Latite::getCommandManager().runCommand(message);
-		return 0;
-	}
+    if (message.starts_with(Latite::getCommandManager().prefix)) {
+        Latite::getCommandManager().runCommand(message);
+        return 0;
+    }
 
-	ChatEvent ev{ message };
-	if (Eventing::get().dispatch(ev)) return nullptr;
+    ChatEvent ev { message };
+    if (Eventing::get().dispatch(ev)) return nullptr;
 
-	{
-		PluginManager::Event::Value val{L"message"};
-		val.val = util::StrToWStr(message);
-		PluginManager::Event sev{L"send-chat", { val }, true};
-		if (Latite::getPluginManager().dispatchEvent(sev)) return nullptr;
-	}
+    {
+        PluginManager::Event::Value val { L"message" };
+        val.val = util::StrToWStr(message);
+        PluginManager::Event sev { L"send-chat", { val }, true };
+        if (Latite::getPluginManager().dispatchEvent(sev)) return nullptr;
+    }
 
-	return ChatScreenController_sendChatMesageHook->oFunc<decltype(&ChatScreenController_sendChatMessage)>()(controller, message);
+    return ChatScreenController_sendChatMesageHook->oFunc<decltype(&ChatScreenController_sendChatMessage)>()(controller,
+                                                                                                             message);
 }
 
 void* GenericHooks::GameRenderer_renderCurrentFrame(void* rend) {
-	// this causes the jitter bug
-	//{
-	//	RenderGameEvent ev{};
-	//	Eventing::get().dispatchEvent(ev);
-	//}
+    // this causes the jitter bug
+    //{
+    //	RenderGameEvent ev{};
+    //	Eventing::get().dispatchEvent(ev);
+    //}
 
-	return GameRenderer_renderCurrentFrameHook->oFunc<decltype(&GameRenderer_renderCurrentFrame)>()(rend);
+    return GameRenderer_renderCurrentFrameHook->oFunc<decltype(&GameRenderer_renderCurrentFrame)>()(rend);
 }
 
-LRESULT GenericHooks::MainWindow__windowProcCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) { // Name from China
-	if (msg == WM_SETCURSOR) {
-		std::optional<std::reference_wrapper<Screen>> activeScreen = Latite::get().getScreenManager().getActiveScreen();
-		SDK::GameCore* gameCore = SDK::GameCore::get();
-		constexpr uintptr_t mouseGrabbedOffset = 0x778; // GameCore::mMouseGrabbed, set by GDK grab/release mouse.
-		const bool gameMouseGrabbed = gameCore && *reinterpret_cast<uint8_t*>(reinterpret_cast<uintptr_t>(gameCore) + mouseGrabbedOffset);
+LRESULT GenericHooks::MainWindow__windowProcCallback(HWND hwnd, UINT msg, WPARAM wParam,
+                                                     LPARAM lParam) { // Name from China
+    if (msg == WM_SETCURSOR) {
+        std::optional<std::reference_wrapper<Screen>> activeScreen = Latite::get().getScreenManager().getActiveScreen();
+        SDK::GameCore* gameCore = SDK::GameCore::get();
+        constexpr uintptr_t mouseGrabbedOffset = 0x778; // GameCore::mMouseGrabbed, set by GDK grab/release mouse.
+        const bool gameMouseGrabbed =
+            gameCore && *reinterpret_cast<uint8_t*>(reinterpret_cast<uintptr_t>(gameCore) + mouseGrabbedOffset);
 
-		if (!activeScreen && gameMouseGrabbed) {
-			SetCursor(nullptr);
-			return TRUE;
-		}
-	}
+        if (!activeScreen && gameMouseGrabbed) {
+            SetCursor(nullptr);
+            return TRUE;
+        }
+    }
 
-	if (msg == WM_KEYDOWN || msg == WM_KEYUP) {
-		const int key = wParam & 0xFF;
-		const bool isDown = msg == WM_KEYDOWN;
+    if (msg == WM_KEYDOWN || msg == WM_KEYUP) {
+        const int key = wParam & 0xFF;
+        const bool isDown = msg == WM_KEYDOWN;
 
-		{
-			PluginManager::Event::Value val{L"isDown"};
-			val.val = isDown;
+        {
+            PluginManager::Event::Value val { L"isDown" };
+            val.val = isDown;
 
-			PluginManager::Event::Value val3{L"keyCode"};
-			val3.val = static_cast<double>(key);
+            PluginManager::Event::Value val3 { L"keyCode" };
+            val3.val = static_cast<double>(key);
 
-			PluginManager::Event::Value val2{L"keyAsChar"};
+            PluginManager::Event::Value val2 { L"keyAsChar" };
 
-			std::string str = "";
-			if (key > 31 && key < 128) {
-				str = (char)key;
-			}
-			val2.val = util::StrToWStr(str);
+            std::string str = "";
+            if (key > 31 && key < 128) {
+                str = (char)key;
+            }
+            val2.val = util::StrToWStr(str);
 
-			PluginManager::Event sEv{L"key-press", { val, val2, val3 }, true};
-			if (Latite::getPluginManager().dispatchEvent(sEv)) return DefWindowProcW(hwnd, msg, wParam, lParam);
-		}
+            PluginManager::Event sEv { L"key-press", { val, val2, val3 }, true };
+            if (Latite::getPluginManager().dispatchEvent(sEv)) return DefWindowProcW(hwnd, msg, wParam, lParam);
+        }
 
-		KeyUpdateEvent ev{ key, isDown };
-		if (Eventing::get().dispatch(ev)) return DefWindowProcW(hwnd, msg, wParam, lParam);
-	}
+        KeyUpdateEvent ev { key, isDown };
+        if (Eventing::get().dispatch(ev)) return DefWindowProcW(hwnd, msg, wParam, lParam);
+    }
 
-	return MainWindow__windowProcCallbackHook->oFunc<decltype(&MainWindow__windowProcCallback)>()(hwnd, msg, wParam, lParam);
+    return MainWindow__windowProcCallbackHook->oFunc<decltype(&MainWindow__windowProcCallback)>()(hwnd, msg, wParam,
+                                                                                                  lParam);
 }
 
 bool GenericHooks::GameCore_handleMouseInput(void* a1, void* a2, void* a3) { // Made up name
-	const auto res = GameCore_handleMouseInputHook->oFunc<decltype(&GameCore_handleMouseInput)>()(a1, a2, a3);
+    const auto res = GameCore_handleMouseInputHook->oFunc<decltype(&GameCore_handleMouseInput)>()(a1, a2, a3);
 
-	const auto mouse = SDK::MouseDevice::get();
+    const auto mouse = SDK::MouseDevice::get();
 
-	for (size_t i = 0; i < mouse->inputs.size(); i++) { // This method sucks, but gets the job done
-		auto& start = mouse->inputs.at(i);
-		auto it = std::next(mouse->inputs.begin(), i);
+    for (size_t i = 0; i < mouse->inputs.size(); i++) { // This method sucks, but gets the job done
+        auto& start = mouse->inputs.at(i);
+        auto it = std::next(mouse->inputs.begin(), i);
 
-		const auto button = start.action;
-		const auto state = start.data;
+        const auto button = start.action;
+        const auto state = start.data;
 
-		if (button > 0) {
-			Vec2& mousePos = SDK::ClientInstance::get()->cursorPos;
+        if (button > 0) {
+            Vec2& mousePos = SDK::ClientInstance::get()->cursorPos;
 
-			std::vector<PluginManager::Event::Value> values;
+            std::vector<PluginManager::Event::Value> values;
 
-			PluginManager::Event::Value val{L"mouseX"};
-			val.val = static_cast<double>(mousePos.x);
+            PluginManager::Event::Value val { L"mouseX" };
+            val.val = static_cast<double>(mousePos.x);
 
-			PluginManager::Event::Value val2{L"mouseY"};
-			val2.val = static_cast<double>(mousePos.y);
+            PluginManager::Event::Value val2 { L"mouseY" };
+            val2.val = static_cast<double>(mousePos.y);
 
-			PluginManager::Event::Value val3{L"isDown"};
-			val3.val = static_cast<bool>(state);
+            PluginManager::Event::Value val3 { L"isDown" };
+            val3.val = static_cast<bool>(state);
 
-			PluginManager::Event::Value val4{L"button"};
-			val4.val = static_cast<double>(button);
+            PluginManager::Event::Value val4 { L"button" };
+            val4.val = static_cast<double>(button);
 
-			values.push_back(val);
-			values.push_back(val2);
-			values.push_back(val3);
-			values.push_back(val4);
+            values.push_back(val);
+            values.push_back(val2);
+            values.push_back(val3);
+            values.push_back(val4);
 
-			if (button == 4) {
-				PluginManager::Event::Value wheel{ L"wheelDelta" };
-				wheel.val = static_cast<double>(state);
-				values.push_back(wheel);
-			}
+            if (button == 4) {
+                PluginManager::Event::Value wheel { L"wheelDelta" };
+                wheel.val = static_cast<double>(state);
+                values.push_back(wheel);
+            }
 
-			PluginManager::Event ev{L"click", values, true};
-			if (Latite::getPluginManager().dispatchEvent(ev)) {
-				mouse->inputs.erase(it);
-				continue;
-			}
-		}
+            PluginManager::Event ev { L"click", values, true };
+            if (Latite::getPluginManager().dispatchEvent(ev)) {
+                mouse->inputs.erase(it);
+                continue;
+            }
+        }
 
-		ClickEvent ev{ button, static_cast<char>(state) };
-		if (Eventing::get().dispatch(ev))
-			mouse->inputs.erase(it);
-	}
+        ClickEvent ev { button, static_cast<char>(state) };
+        if (Eventing::get().dispatch(ev)) mouse->inputs.erase(it);
+    }
 
-	return res;
+    return res;
 }
 
 BOOL __stdcall GenericHooks::hkLoadLibraryW(LPCWSTR lib) {
-	// prevent double injections
+    // prevent double injections
 #ifdef LATITE_BETA
-	abort();
+    abort();
 #endif
-	return 0;
+    return 0;
 }
 
 int __fastcall GenericHooks::RakPeer_getAveragePing(void* obj, char* guidOrAddy) {
-	int ping = AveragePingHook->oFunc<decltype(&RakPeer_getAveragePing)>()(obj, guidOrAddy);
-	AveragePingEvent ev{ ping };
-	Eventing::get().dispatch(ev);
-	return ping;
+    int ping = AveragePingHook->oFunc<decltype(&RakPeer_getAveragePing)>()(obj, guidOrAddy);
+    AveragePingEvent ev { ping };
+    Eventing::get().dispatch(ev);
+    return ping;
 }
 
 void __fastcall GenericHooks::LocalPlayer_applyTurnDelta(void* obj, Vec2& rot) {
-	float oSens = 1.f;
-	SensitivityEvent sensEv{ oSens };
-	Eventing::get().dispatch(sensEv);
+    float oSens = 1.f;
+    SensitivityEvent sensEv { oSens };
+    Eventing::get().dispatch(sensEv);
 
-	rot.x *= oSens;
-	rot.y *= oSens;
+    rot.x *= oSens;
+    rot.y *= oSens;
 
-	CinematicCameraEvent ev{false};
-	Eventing::get().dispatch(ev);
+    CinematicCameraEvent ev { false };
+    Eventing::get().dispatch(ev);
 
-	float intensity = 60.f;
-	static std::chrono::time_point lastTime = std::chrono::system_clock::now();
-	std::chrono::time_point curTime = std::chrono::system_clock::now();
+    float intensity = 60.f;
+    static std::chrono::time_point lastTime = std::chrono::system_clock::now();
+    std::chrono::time_point curTime = std::chrono::system_clock::now();
 
-	auto diff = curTime - lastTime;
-	lastTime = curTime;
-	float mult = (float)(std::chrono::duration<double, std::milli>(diff).count() / 13.f); // 60ish FPS
-	float integ = intensity / mult;
+    auto diff = curTime - lastTime;
+    lastTime = curTime;
+    float mult = (float)(std::chrono::duration<double, std::milli>(diff).count() / 13.f); // 60ish FPS
+    float integ = intensity / mult;
 
-	static Vec2 lerpRot = { 0, 0 };
-	if (ev.getValue()) {
-		TurnDeltaHook->oFunc<decltype(&LocalPlayer_applyTurnDelta)>()(obj, lerpRot);
-		Vec2 extract = rot / (Vec2(integ, integ));
-		Vec2 integExtract = lerpRot / (Vec2(integ, integ));
-		lerpRot = lerpRot - (integExtract);
-		lerpRot = lerpRot + (extract);
-		return;
-	}
-	lerpRot = { 0, 0 };
-	TurnDeltaHook->oFunc<decltype(&LocalPlayer_applyTurnDelta)>()(obj, rot);
+    static Vec2 lerpRot = { 0, 0 };
+    if (ev.getValue()) {
+        TurnDeltaHook->oFunc<decltype(&LocalPlayer_applyTurnDelta)>()(obj, lerpRot);
+        Vec2 extract = rot / (Vec2(integ, integ));
+        Vec2 integExtract = lerpRot / (Vec2(integ, integ));
+        lerpRot = lerpRot - (integExtract);
+        lerpRot = lerpRot + (extract);
+        return;
+    }
+    lerpRot = { 0, 0 };
+    TurnDeltaHook->oFunc<decltype(&LocalPlayer_applyTurnDelta)>()(obj, rot);
 }
 
-void GenericHooks::ClientInputUpdateSystemInternal_tickUpdateClientInput(uintptr_t** a1, void* a2, uintptr_t* a3, uintptr_t a4, uintptr_t a5, uintptr_t a6, uintptr_t a7, uintptr_t a8, uintptr_t a9, uintptr_t a10, uintptr_t a11,
-	uintptr_t a12, uintptr_t a13, uintptr_t a14, uintptr_t a15, uintptr_t a16, uintptr_t a17, uintptr_t a18) {
+void GenericHooks::ClientInputUpdateSystemInternal_tickUpdateClientInput(uintptr_t** a1, void* a2, uintptr_t* a3,
+                                                                         uintptr_t a4, uintptr_t a5, uintptr_t a6,
+                                                                         uintptr_t a7, uintptr_t a8, uintptr_t a9,
+                                                                         uintptr_t a10, uintptr_t a11, uintptr_t a12,
+                                                                         uintptr_t a13, uintptr_t a14, uintptr_t a15,
+                                                                         uintptr_t a16, uintptr_t a17, uintptr_t a18) {
+    SDK::MoveInputComponent* hand = SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent();
+    {
+        PluginManager::Event ev { L"pre-move", {}, true };
 
-	SDK::MoveInputComponent* hand = SDK::ClientInstance::get()->getLocalPlayer()->getMoveInputComponent();
-	{
-		PluginManager::Event ev{ L"pre-move", {}, true };
+        if (Latite::getPluginManager().dispatchEvent(ev)) {
+            return;
+        }
+    }
 
-		if (Latite::getPluginManager().dispatchEvent(ev)) {
-			return;
-		}
-	}
+    {
+        BeforeMoveEvent ev { hand };
+        if (Eventing::get().dispatch(ev)) return;
+    }
 
-	{
-		BeforeMoveEvent ev{ hand };
-		if (Eventing::get().dispatch(ev)) return;
-	}
+    ClientInputUpdateSystem_tickBaseInputHook
+        ->oFunc<decltype(&ClientInputUpdateSystemInternal_tickUpdateClientInput)>()(
+            a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18);
+    {
+        AfterMoveEvent ev { hand };
+        Eventing::get().dispatch(ev);
+    }
 
-	ClientInputUpdateSystem_tickBaseInputHook->oFunc<decltype(&ClientInputUpdateSystemInternal_tickUpdateClientInput)>()(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15, a16, a17, a18);
-	{
-		AfterMoveEvent ev{ hand };
-		Eventing::get().dispatch(ev);
-	}
+    {
+        PluginManager::Event ev { L"post-move", {}, false };
 
-	{
-		PluginManager::Event ev{ L"post-move", {}, false };
-
-		Latite::getPluginManager().dispatchEvent(ev);
-	}
+        Latite::getPluginManager().dispatchEvent(ev);
+    }
 }
 
 void __fastcall GenericHooks::CameraViewBob(void* a, void* b, void* c) {
-	BobMovementEvent ev{};
-	if (Eventing::get().dispatch(ev)) {
-		return;
-	}
+    BobMovementEvent ev {};
+    if (Eventing::get().dispatch(ev)) {
+        return;
+    }
 
-	return ViewBobHook->oFunc<decltype(&CameraViewBob)>()(a, b, c);
+    return ViewBobHook->oFunc<decltype(&CameraViewBob)>()(a, b, c);
 }
 
-bool GenericHooks::Level_initialize(SDK::Level* obj, void* palette, void* settings, void* tickRange, void* experiments, uint64_t a6) {
-	auto o = Level_initializeHook->oFunc<decltype(&Level_initialize)>()(obj, palette, settings, tickRange, experiments, a6);
-	if (obj->isClientSide()) {
-		PluginManager::Event ev{L"join-game", {}, false};
-		Latite::getPluginManager().dispatchEvent(ev);
-	}
-	return o;
+bool GenericHooks::Level_initialize(SDK::Level* obj, void* palette, void* settings, void* tickRange, void* experiments,
+                                    uint64_t a6) {
+    auto o =
+        Level_initializeHook->oFunc<decltype(&Level_initialize)>()(obj, palette, settings, tickRange, experiments, a6);
+    if (obj->isClientSide()) {
+        PluginManager::Event ev { L"join-game", {}, false };
+        Latite::getPluginManager().dispatchEvent(ev);
+    }
+    return o;
 }
 
 void* GenericHooks::Level_startLeaveGame(SDK::Level* obj) {
-	if (obj->isClientSide()) {
-		PluginManager::Event ev{L"leave-game", {}, false};
-		Latite::getPluginManager().dispatchEvent(ev);
-	}
+    if (obj->isClientSide()) {
+        PluginManager::Event ev { L"leave-game", {}, false };
+        Latite::getPluginManager().dispatchEvent(ev);
+    }
 
-	LeaveGameEvent ev{};
-	Eventing::get().dispatch(ev);
+    LeaveGameEvent ev {};
+    Eventing::get().dispatch(ev);
 
-	return Level_startLeaveGameHook->oFunc<decltype(&Level_startLeaveGame)>()(obj);
+    return Level_startLeaveGameHook->oFunc<decltype(&Level_startLeaveGame)>()(obj);
 }
 
 void* GenericHooks::ActorRenderDispatcher_render(void* obj, SDK::BaseActorRenderContext* barc, SDK::Actor* entity,
-	Vec3& cameraTargetPos, Vec3 const& pos, const Vec2& rot, bool affectedByLighting) {
+                                                 Vec3& cameraTargetPos, Vec3 const& pos, const Vec2& rot,
+                                                 bool affectedByLighting) {
+    if (entity) {
+        AfterRenderEntityEvent ev { entity, cameraTargetPos };
+        Eventing::get().dispatch(ev);
+    }
 
-	if (entity) {
-		AfterRenderEntityEvent ev{ entity, cameraTargetPos };
-		Eventing::get().dispatch(ev);
-	}
-
-	return RenderEntityHook->oFunc<decltype(&ActorRenderDispatcher_render)>()(obj, barc, entity, cameraTargetPos, pos, rot, affectedByLighting);
+    return RenderEntityHook->oFunc<decltype(&ActorRenderDispatcher_render)>()(obj, barc, entity, cameraTargetPos, pos,
+                                                                              rot, affectedByLighting);
 }
 
-void GenericHooks::LevelRendererPlayer_renderOutlineSelection(SDK::LevelRendererPlayer* obj, SDK::ScreenContext* scn, void* block, void* region, BlockPos pos) {
-	OutlineSelectionEvent ev{ pos };
-	if (!Eventing::get().dispatch(ev)) {
-		OutlineSelectionHook->oFunc<decltype(&LevelRendererPlayer_renderOutlineSelection)>()(obj, scn, block, region, pos);
-	}
+void GenericHooks::LevelRendererPlayer_renderOutlineSelection(SDK::LevelRendererPlayer* obj, SDK::ScreenContext* scn,
+                                                              void* block, void* region, BlockPos pos) {
+    OutlineSelectionEvent ev { pos };
+    if (!Eventing::get().dispatch(ev)) {
+        OutlineSelectionHook->oFunc<decltype(&LevelRendererPlayer_renderOutlineSelection)>()(obj, scn, block, region,
+                                                                                             pos);
+    }
 }
 
-void* GenericHooks::hkRenderGuiItemNew(void* obj, SDK::BaseActorRenderContext* baseActorRenderContext, SDK::ItemStack* itemStack, int mode, float x, float y, float opacity, float scale, float a9, bool ench, int unk) {
-	auto retAddy = (void*)(Signatures::ItemRenderer_renderGuiItemNew.scan_result + 5); // JMP + jump location
-	if (_ReturnAddress() == retAddy) {
-		RenderGuiItemEvent ev{ itemStack };
-		if (Eventing::get().dispatch(ev)) {
-			// cancelled
-			return nullptr;
-		}
-	}
-	return RenderGuiItemNewHook->oFunc<decltype(&hkRenderGuiItemNew)>()(obj, baseActorRenderContext, itemStack, mode, x, y, opacity, scale, a9, ench, unk);
+void* GenericHooks::hkRenderGuiItemNew(void* obj, SDK::BaseActorRenderContext* baseActorRenderContext,
+                                       SDK::ItemStack* itemStack, int mode, float x, float y, float opacity,
+                                       float scale, float a9, bool ench, int unk) {
+    auto retAddy = (void*)(Signatures::ItemRenderer_renderGuiItemNew.scan_result + 5); // JMP + jump location
+    if (_ReturnAddress() == retAddy) {
+        RenderGuiItemEvent ev { itemStack };
+        if (Eventing::get().dispatch(ev)) {
+            // cancelled
+            return nullptr;
+        }
+    }
+    return RenderGuiItemNewHook->oFunc<decltype(&hkRenderGuiItemNew)>()(obj, baseActorRenderContext, itemStack, mode, x,
+                                                                        y, opacity, scale, a9, ench, unk);
 }
 
 float GenericHooks::hkGetTimeOfDay(SDK::Dimension* obj, int time, float a) {
-	auto o = GetTimeOfDayHook->oFunc<decltype(&hkGetTimeOfDay)>()(obj, time, a);
-	GetTimeEvent ev{o};
-	Eventing::get().dispatch(ev);
+    auto o = GetTimeOfDayHook->oFunc<decltype(&hkGetTimeOfDay)>()(obj, time, a);
+    GetTimeEvent ev { o };
+    Eventing::get().dispatch(ev);
 
-	return ev.getTime();
+    return ev.getTime();
 }
 
 void GenericHooks::hkDimensionTick(SDK::Dimension* obj) {
-	WeatherEvent ev{};
-	Eventing::get().dispatch(ev);
+    WeatherEvent ev {};
+    Eventing::get().dispatch(ev);
 
-	if (!ev.shouldShowWeather()) {
-		obj->weather->data = SDK::Weather::WeatherData{};
-	}
+    if (!ev.shouldShowWeather()) {
+        obj->weather->data = SDK::Weather::WeatherData {};
+    }
 
-	DimensionHook->oFunc<decltype(&hkDimensionTick)>()(obj);
+    DimensionHook->oFunc<decltype(&hkDimensionTick)>()(obj);
 }
 
 Color* GenericHooks::hkGetFogColor(SDK::Dimension* obj, Color* out, SDK::Actor* ent, float f) {
-	FogColorHook->oFunc<decltype(&hkGetFogColor)>()(obj, out, ent, f);
+    FogColorHook->oFunc<decltype(&hkGetFogColor)>()(obj, out, ent, f);
 
-	FogColorEvent ev{ out };
-	Eventing::get().dispatch(ev);
+    FogColorEvent ev { out };
+    Eventing::get().dispatch(ev);
 
-	return out;
+    return out;
 }
 
 SDK::GuiMessage& GenericHooks::hkAddMessage(void* obj, SDK::GuiMessage& msg) {
-	// MessageContext
-	std::string& str = msg.message;
+    // MessageContext
+    std::string& str = msg.message;
 
-	ChatMessageEvent ev{ str };
-	if (Eventing::get().dispatch(ev)) {
-		return *(SDK::ClientInstance::get()->getGuiData()->messages.end() - 1);
-	}
+    ChatMessageEvent ev { str };
+    if (Eventing::get().dispatch(ev)) {
+        return *(SDK::ClientInstance::get()->getGuiData()->messages.end() - 1);
+    }
 
-	return AddMessageHook->oFunc<decltype(&hkAddMessage)>()(obj, msg);
+    return AddMessageHook->oFunc<decltype(&hkAddMessage)>()(obj, msg);
 }
 
 void GenericHooks::hkUpdatePlayer(SDK::CameraComponent* obj, void* a, void* b) {
-	UpdatePlayerCameraEvent ev{};
-	Eventing::get().dispatch(ev);
+    UpdatePlayerCameraEvent ev {};
+    Eventing::get().dispatch(ev);
 
-	auto oAngles = util::QuaternionToRot(obj->lookAngles);
-	auto origAngles = obj->lookAngles;
+    auto oAngles = util::QuaternionToRot(obj->lookAngles);
+    auto origAngles = obj->lookAngles;
 
-	if (ev.getNewRot()) {
-		obj->lookAngles = util::RotToQuaternion(*ev.getNewRot());
-		UpdatePlayerHook->oFunc<decltype(&hkUpdatePlayer)>()(obj, a, b);
-		obj->lookAngles = origAngles;
-		return;
-	}
-	UpdatePlayerHook->oFunc<decltype(&hkUpdatePlayer)>()(obj, a, b);
-
+    if (ev.getNewRot()) {
+        obj->lookAngles = util::RotToQuaternion(*ev.getNewRot());
+        UpdatePlayerHook->oFunc<decltype(&hkUpdatePlayer)>()(obj, a, b);
+        obj->lookAngles = origAngles;
+        return;
+    }
+    UpdatePlayerHook->oFunc<decltype(&hkUpdatePlayer)>()(obj, a, b);
 }
 
 void GenericHooks::hkOnUri(void* obj, void* pUri) {
-	struct ActivationUri {
-		std::string verb;
-		std::unordered_map<std::string, std::string> arguments;
-	};
+    struct ActivationUri {
+        std::string verb;
+        std::unordered_map<std::string, std::string> arguments;
+    };
 
-	ActivationUri* uri = reinterpret_cast<ActivationUri*>(pUri);
+    ActivationUri* uri = reinterpret_cast<ActivationUri*>(pUri);
 
-	if (uri->verb == "addlatiteplugin") {
-		auto pluginName = uri->arguments.find("id");
+    if (uri->verb == "addlatiteplugin") {
+        auto pluginName = uri->arguments.find("id");
 
-		if (pluginName != uri->arguments.end()) {
-			Latite::getNotifications().push(L"Installing plugin " + util::StrToWStr(pluginName->second));
-			auto result = Latite::getPluginManager().installScript(pluginName->second);
-			if (!result.has_value()) {
-				Latite::getNotifications().push(util::StrToWStr(result.error()));
-			}
-		}
-		return;
-	}
+        if (pluginName != uri->arguments.end()) {
+            Latite::getNotifications().push(L"Installing plugin " + util::StrToWStr(pluginName->second));
+            auto result = Latite::getPluginManager().installScript(pluginName->second);
+            if (!result.has_value()) {
+                Latite::getNotifications().push(util::StrToWStr(result.error()));
+            }
+        }
+        return;
+    }
 
-	OnUriHook->oFunc<decltype(&hkOnUri)>()(obj, pUri);
+    OnUriHook->oFunc<decltype(&hkOnUri)>()(obj, pUri);
 }
 
 void GenericHooks::hkGrabCursor(SDK::ClientInstance* obj) {
-	if (Latite::get().getScreenManager().getActiveScreen()) return;
-	GrabCursorHook->oFunc<decltype(&hkGrabCursor)>()(obj);
+    if (Latite::get().getScreenManager().getActiveScreen()) return;
+    GrabCursorHook->oFunc<decltype(&hkGrabCursor)>()(obj);
 }
 
-void GenericHooks::hkBaseActorRenderer_renderText(void* screenContext, void* viewData, std::string* tagData, void* font, void* mesh) {
-	const auto old = *tagData;
-	std::string buf = *tagData;
-	RenderNameTagEvent ev{&buf};
-	Eventing::get().dispatch(ev);
-	*tagData = buf;
+void GenericHooks::hkBaseActorRenderer_renderText(void* screenContext, void* viewData, std::string* tagData, void* font,
+                                                  void* mesh) {
+    const auto old = *tagData;
+    std::string buf = *tagData;
+    RenderNameTagEvent ev { &buf };
+    Eventing::get().dispatch(ev);
+    *tagData = buf;
 
-	BaseActorRenderer_renderTextHook->oFunc<decltype(&hkBaseActorRenderer_renderText)>()(screenContext, viewData, tagData, font, mesh);
+    BaseActorRenderer_renderTextHook->oFunc<decltype(&hkBaseActorRenderer_renderText)>()(screenContext, viewData,
+                                                                                         tagData, font, mesh);
 
-	*tagData = old;
+    *tagData = old;
 }
 
 void GenericHooks::hkAppPlatformGDK_releaseMouse(void* _this) {
-	AppPlatformGDK_releaseMouseHook->oFunc<decltype(&hkAppPlatformGDK_releaseMouse)>()(_this);
+    AppPlatformGDK_releaseMouseHook->oFunc<decltype(&hkAppPlatformGDK_releaseMouse)>()(_this);
 
-	SetCursor(LoadCursorW(nullptr, IDC_ARROW));
+    SetCursor(LoadCursorW(nullptr, IDC_ARROW));
 
-	MouseReleaseEvent ev{};
-	Eventing::get().dispatch(ev);
+    MouseReleaseEvent ev {};
+    Eventing::get().dispatch(ev);
 }
 
-GenericHooks::GenericHooks() : HookGroup("General") {
-	//LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
-	//LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
+GenericHooks::GenericHooks()
+    : HookGroup("General") {
+    // LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
+    // LoadLibraryWHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryA), hkLoadLibraryW);
 
+    MultiPlayerLevel__subTickHook =
+        addHook(Signatures::MultiPlayerLevel__subTick.result, MultiPlayerLevel__subTick, "Level::tick");
 
-	MultiPlayerLevel__subTickHook = addHook(Signatures::MultiPlayerLevel__subTick.result,
-		MultiPlayerLevel__subTick, "Level::tick");
+    ChatScreenController_sendChatMesageHook =
+        addHook(Signatures::ChatScreenController_sendChatMessage.result, ChatScreenController_sendChatMessage,
+                "ChatScreenController::sendChatMessage");
 
-	ChatScreenController_sendChatMesageHook = addHook(Signatures::ChatScreenController_sendChatMessage.result,
-		ChatScreenController_sendChatMessage, "ChatScreenController::sendChatMessage");
+    // GameRenderer_renderCurrentFrameHook = addHook(Signatures::GameRenderer__renderCurrentFrame.result,
+    //	GameRenderer_renderCurrentFrame, "GameRenderer::_renderCurrentFrame");
 
-	//GameRenderer_renderCurrentFrameHook = addHook(Signatures::GameRenderer__renderCurrentFrame.result,
-	//	GameRenderer_renderCurrentFrame, "GameRenderer::_renderCurrentFrame");
+    MainWindow__windowProcCallbackHook = addHook(Signatures::MainWindow__windowProcCallback.result,
+                                                 MainWindow__windowProcCallback, "MainWindow::_windowProcCallback");
 
-	MainWindow__windowProcCallbackHook = addHook(Signatures::MainWindow__windowProcCallback.result, MainWindow__windowProcCallback, "MainWindow::_windowProcCallback");
+    GameCore_handleMouseInputHook =
+        addHook(Signatures::GameCore_handleMouseInput.result, GameCore_handleMouseInput, "GameCore::handleMouseInput");
 
-	GameCore_handleMouseInputHook = addHook(Signatures::GameCore_handleMouseInput.result, GameCore_handleMouseInput, "GameCore::handleMouseInput");
+    AveragePingHook =
+        addHook(Signatures::RakPeer_GetAveragePing.result, RakPeer_getAveragePing, "RakPeer::GetAveragePing");
 
-	AveragePingHook = addHook(Signatures::RakPeer_GetAveragePing.result, RakPeer_getAveragePing, "RakPeer::GetAveragePing");
+    TurnDeltaHook = addHook(Signatures::LocalPlayer_applyTurnDelta.result, LocalPlayer_applyTurnDelta,
+                            "LocalPlayer::applyTurnDelta");
 
-	TurnDeltaHook = addHook(Signatures::LocalPlayer_applyTurnDelta.result, LocalPlayer_applyTurnDelta, "LocalPlayer::applyTurnDelta");
+    ClientInputUpdateSystem_tickBaseInputHook =
+        addHook(Signatures::ClientInputUpdateSystemInternal_tickUpdateClientInput.result,
+                ClientInputUpdateSystemInternal_tickUpdateClientInput, "ClientInputUpdateSystem::tickBaseInput");
 
-	ClientInputUpdateSystem_tickBaseInputHook = addHook(Signatures::ClientInputUpdateSystemInternal_tickUpdateClientInput.result, ClientInputUpdateSystemInternal_tickUpdateClientInput, "ClientInputUpdateSystem::tickBaseInput");
+    // ViewBobHook = addHook(Signatures::CameraViewBob.result, CameraViewBob, "`anonymous namespace'::_bobMovement");
+    if (Signatures::Vtable::Level.result) {
+        Level_initializeHook = addHook(reinterpret_cast<uintptr_t*>(Signatures::Vtable::Level.result)[1],
+                                       Level_initialize, "Level::initialize");
+        Level_startLeaveGameHook = addHook(reinterpret_cast<uintptr_t*>(Signatures::Vtable::Level.result)[2],
+                                           Level_startLeaveGame, "Level::startLeaveGame");
+    }
 
-	//ViewBobHook = addHook(Signatures::CameraViewBob.result, CameraViewBob, "`anonymous namespace'::_bobMovement");
-	if (Signatures::Vtable::Level.result) {
-		Level_initializeHook = addHook(reinterpret_cast<uintptr_t*>(Signatures::Vtable::Level.result)[1], Level_initialize, "Level::initialize");
-		Level_startLeaveGameHook = addHook(reinterpret_cast<uintptr_t*>(Signatures::Vtable::Level.result)[2], Level_startLeaveGame, "Level::startLeaveGame");
-	}
+    RenderEntityHook = addHook(Signatures::ActorRenderDispatcher_render.result, ActorRenderDispatcher_render,
+                               "ActorRenderDispatcher::render");
+    OutlineSelectionHook =
+        addHook(Signatures::LevelRendererPlayer_renderOutlineSelection.result,
+                LevelRendererPlayer_renderOutlineSelection, "LevelRendererPlayer::renderOutlineSelection");
+    // RenderGuiItemNewHook = addHook(Signatures::ItemRenderer_renderGuiItemNew.result, hkRenderGuiItemNew,
+    // "ItemRenderer::renderGuiItemNew");
 
-	RenderEntityHook = addHook(Signatures::ActorRenderDispatcher_render.result, ActorRenderDispatcher_render, "ActorRenderDispatcher::render");
-	OutlineSelectionHook = addHook(Signatures::LevelRendererPlayer_renderOutlineSelection.result, LevelRendererPlayer_renderOutlineSelection, "LevelRendererPlayer::renderOutlineSelection");
-	//RenderGuiItemNewHook = addHook(Signatures::ItemRenderer_renderGuiItemNew.result, hkRenderGuiItemNew, "ItemRenderer::renderGuiItemNew");
-
-
-	FogColorHook = addHook(Signatures::Dimension_getSkyColor.result, hkGetFogColor, "Dimension::getFogColor");
-	GetTimeOfDayHook = addHook(Signatures::Dimension_getTimeOfDay.result, hkGetTimeOfDay, "Dimension::getTimeOfDay");
-	DimensionHook = addHook(Signatures::Dimension_tick.result, hkDimensionTick, "Dimension::tick");
-	AddMessageHook = addHook(Signatures::GuiData__addMessage.result, hkAddMessage, "GuiData::_addMessage");
-	UpdatePlayerHook = addHook(Signatures::_updatePlayer.result, hkUpdatePlayer, "`anonymous namespace'::_updatePlayer");
-	OnUriHook = addHook(Signatures::GameArguments__onUri.result, hkOnUri, "GameArguments::_onUri");
-	GrabCursorHook = addHook(Signatures::ClientInstance_grabCursor.result, hkGrabCursor, "`ClientInstance::grabCursor");
-	BaseActorRenderer_renderTextHook = addHook(Signatures::BaseActorRenderer_renderText.result, hkBaseActorRenderer_renderText, "BaseActorRenderer::renderText");
-	AppPlatformGDK_releaseMouseHook = addHook(Signatures::AppPlatformGDK_releaseMouse.result, hkAppPlatformGDK_releaseMouse, "AppPlatform::releaseMouse");
+    FogColorHook = addHook(Signatures::Dimension_getSkyColor.result, hkGetFogColor, "Dimension::getFogColor");
+    GetTimeOfDayHook = addHook(Signatures::Dimension_getTimeOfDay.result, hkGetTimeOfDay, "Dimension::getTimeOfDay");
+    DimensionHook = addHook(Signatures::Dimension_tick.result, hkDimensionTick, "Dimension::tick");
+    AddMessageHook = addHook(Signatures::GuiData__addMessage.result, hkAddMessage, "GuiData::_addMessage");
+    UpdatePlayerHook =
+        addHook(Signatures::_updatePlayer.result, hkUpdatePlayer, "`anonymous namespace'::_updatePlayer");
+    OnUriHook = addHook(Signatures::GameArguments__onUri.result, hkOnUri, "GameArguments::_onUri");
+    GrabCursorHook = addHook(Signatures::ClientInstance_grabCursor.result, hkGrabCursor, "`ClientInstance::grabCursor");
+    BaseActorRenderer_renderTextHook = addHook(Signatures::BaseActorRenderer_renderText.result,
+                                               hkBaseActorRenderer_renderText, "BaseActorRenderer::renderText");
+    AppPlatformGDK_releaseMouseHook = addHook(Signatures::AppPlatformGDK_releaseMouse.result,
+                                              hkAppPlatformGDK_releaseMouse, "AppPlatform::releaseMouse");
 }

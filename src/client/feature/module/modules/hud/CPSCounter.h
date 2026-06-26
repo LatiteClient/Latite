@@ -4,9 +4,9 @@
 
 class CPSCounter : public TextModule {
 public:
-	CPSCounter();
+    CPSCounter();
 
-	std::wstringstream text(bool isDefault, bool inEditor) override;
+    std::wstringstream text(bool isDefault, bool inEditor) override;
 
-	EnumData mode;
+    EnumData mode;
 };

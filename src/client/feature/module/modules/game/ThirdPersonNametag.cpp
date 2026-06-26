@@ -19,7 +19,6 @@ void ThirdPersonNametag::onEnable() {
 }
 
 void ThirdPersonNametag::onDisable() {
-
     if (instructionPointer) {
         DWORD protect;
         VirtualProtect(instructionPointer, instructionSize, PAGE_EXECUTE_READWRITE, &protect);

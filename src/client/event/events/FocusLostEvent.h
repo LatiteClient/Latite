@@ -4,7 +4,8 @@
 
 class FocusLostEvent : public Cancellable {
 public:
-	static const uint32_t hash = TOHASH(FocusLostEvent);
-	FocusLostEvent() = default;
+    static const uint32_t hash = TOHASH(FocusLostEvent);
+    FocusLostEvent() = default;
+
 private:
 };

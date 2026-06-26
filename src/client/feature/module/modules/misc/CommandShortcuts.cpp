@@ -2,9 +2,9 @@
 #include "CommandShortcuts.h"
 #include <mc/common/network/packet/CommandRequestPacket.h>
 
-CommandShortcuts::CommandShortcuts() : Module("CommandShortcuts",
-                                              LocalizeString::get("client.module.commandShortcuts.name"),
-                                              LocalizeString::get("client.module.commandShortcuts.desc"), GAME) {
+CommandShortcuts::CommandShortcuts()
+    : Module("CommandShortcuts", LocalizeString::get("client.module.commandShortcuts.name"),
+             LocalizeString::get("client.module.commandShortcuts.desc"), GAME) {
     listen<SendPacketEvent>((EventListenerFunc)&CommandShortcuts::onPacket);
 }
 
@@ -17,14 +17,11 @@ void CommandShortcuts::onPacket(Event& evG) {
 
         if (pkt->command == "/gmsp") {
             pkt->command = "/gamemode spectator";
-        }
-        else if (pkt->command == "/gmc") {
+        } else if (pkt->command == "/gmc") {
             pkt->command = "/gamemode creative";
-        }
-        else if (pkt->command == "/gms") {
+        } else if (pkt->command == "/gms") {
             pkt->command = "/gamemode survival";
-        }
-        else if (pkt->command == "/gma") {
+        } else if (pkt->command == "/gma") {
             pkt->command = "/gamemode adventure";
         }
     }

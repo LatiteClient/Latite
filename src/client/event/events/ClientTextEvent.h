@@ -4,18 +4,14 @@
 
 class ClientTextEvent : public Event {
 public:
-	static const uint32_t hash = TOHASH(ClientTextEvent);
+    static const uint32_t hash = TOHASH(ClientTextEvent);
 
 protected:
-	SDK::TextPacket* textPacket;
+    SDK::TextPacket* textPacket;
+
 public:
+    SDK::TextPacket* getTextPacket() { return textPacket; }
 
-	SDK::TextPacket* getTextPacket() {
-		return textPacket;
-	}
-
-	ClientTextEvent(SDK::TextPacket* textPacket)
-		: textPacket(textPacket)
-	{
-	}
+    ClientTextEvent(SDK::TextPacket* textPacket)
+        : textPacket(textPacket) {}
 };

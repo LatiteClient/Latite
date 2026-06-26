@@ -7,15 +7,16 @@
 // FIXME: is this really cancellable?
 class OverlayColorEvent : public Cancellable {
 public:
-	static const uint32_t hash = TOHASH(OverlayColorEvent);
+    static const uint32_t hash = TOHASH(OverlayColorEvent);
 
-	[[nodiscard]] Color& getColor() { return *color; }
-	[[nodiscard]] SDK::Actor* getActor() { return actor; }
+    [[nodiscard]] Color& getColor() { return *color; }
+    [[nodiscard]] SDK::Actor* getActor() { return actor; }
 
-	OverlayColorEvent(Color& color, SDK::Actor* actor) : color(&color), actor(actor) {
-	}
+    OverlayColorEvent(Color& color, SDK::Actor* actor)
+        : color(&color)
+        , actor(actor) {}
 
 protected:
-	Color* color;
-	SDK::Actor* actor;
+    Color* color;
+    SDK::Actor* actor;
 };

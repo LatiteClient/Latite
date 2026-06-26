@@ -13,8 +13,7 @@ int SDK::RemappingLayout::findValue(std::string const& name) {
     return 0;
 }
 
-int SDK::RemappingLayout::findValueFromOriginal(int val)
-{
+int SDK::RemappingLayout::findValueFromOriginal(int val) {
     std::optional<size_t> idx;
     for (size_t i = 0; i < this->defaultSettings.size(); i++) {
         if (this->defaultSettings[i].getFirstKey() == val) {

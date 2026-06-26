@@ -14,18 +14,18 @@
 
 using namespace std::chrono_literals;
 
-
-LatiteHooks::LatiteHooks() {}
+LatiteHooks::LatiteHooks() {
+}
 
 LatiteHooks::~LatiteHooks() {
-	MH_Uninitialize();
+    MH_Uninitialize();
 }
 
 void LatiteHooks::enable() {
-	MH_EnableHook(MH_ALL_HOOKS);
+    MH_EnableHook(MH_ALL_HOOKS);
 }
 
 void LatiteHooks::disable() {
-	MH_DisableHook(MH_ALL_HOOKS);
-	vh::unhook_all();
+    MH_DisableHook(MH_ALL_HOOKS);
+    vh::unhook_all();
 }

@@ -12,222 +12,202 @@
 #include "localization/LocalizeData.h"
 
 namespace ui {
-	class TextBox;
+    class TextBox;
 }
 
 namespace sdk {
-	class Font;
+    class Font;
 }
 
 class Latite final : public Listener {
 public:
-	[[nodiscard]] static Latite& get() noexcept;
+    [[nodiscard]] static Latite& get() noexcept;
 
-	[[nodiscard]] static class ModuleManager& getModuleManager() noexcept;
-	[[nodiscard]] static class CommandManager& getCommandManager() noexcept;
-	[[nodiscard]] static class ConfigManager& getConfigManager() noexcept;
-	[[nodiscard]] static class ClientMessageQueue& getClientMessageQueue() noexcept;
-	[[nodiscard]] static class SettingGroup& getSettings() noexcept;
-	[[nodiscard]] static class LatiteHooks& getHooks() noexcept;
-	[[nodiscard]] static class Eventing& getEventing() noexcept;
-	[[nodiscard]] static class Renderer& getRenderer() noexcept;
-	[[nodiscard]] static class ScreenManager& getScreenManager() noexcept;
-	[[nodiscard]] static class Assets& getAssets() noexcept;
-	[[nodiscard]] static class PluginManager& getPluginManager() noexcept;
-	[[nodiscard]] static class Keyboard& getKeyboard() noexcept;
-	[[nodiscard]] static class Notifications& getNotifications() noexcept;
+    [[nodiscard]] static class ModuleManager& getModuleManager() noexcept;
+    [[nodiscard]] static class CommandManager& getCommandManager() noexcept;
+    [[nodiscard]] static class ConfigManager& getConfigManager() noexcept;
+    [[nodiscard]] static class ClientMessageQueue& getClientMessageQueue() noexcept;
+    [[nodiscard]] static class SettingGroup& getSettings() noexcept;
+    [[nodiscard]] static class LatiteHooks& getHooks() noexcept;
+    [[nodiscard]] static class Eventing& getEventing() noexcept;
+    [[nodiscard]] static class Renderer& getRenderer() noexcept;
+    [[nodiscard]] static class ScreenManager& getScreenManager() noexcept;
+    [[nodiscard]] static class Assets& getAssets() noexcept;
+    [[nodiscard]] static class PluginManager& getPluginManager() noexcept;
+    [[nodiscard]] static class Keyboard& getKeyboard() noexcept;
+    [[nodiscard]] static class Notifications& getNotifications() noexcept;
 
-	[[nodiscard]] LocalizeData& getL10nData() noexcept { return *l10nData; }
-	[[nodiscard]] Timings& getTimings() noexcept { return timings; }
-	[[nodiscard]] NameTagCache& getNameTagCache() noexcept { return nameTagCache; }
-	[[nodiscard]] std::string getCommandPrefix() { return util::WStrToStr(std::get<TextValue>(commandPrefix).str); }
-	[[nodiscard]] int getSelectedLanguage();
+    [[nodiscard]] LocalizeData& getL10nData() noexcept { return *l10nData; }
+    [[nodiscard]] Timings& getTimings() noexcept { return timings; }
+    [[nodiscard]] NameTagCache& getNameTagCache() noexcept { return nameTagCache; }
+    [[nodiscard]] std::string getCommandPrefix() { return util::WStrToStr(std::get<TextValue>(commandPrefix).str); }
+    [[nodiscard]] int getSelectedLanguage();
 
-	void queueEject() noexcept;
-	[[nodiscard]] bool isEjectQueued() const noexcept;
-	[[nodiscard]] bool isEjectReadyForRenderThread() const noexcept;
-	void completeEjectFromRenderThread() noexcept;
-	void initialize(HINSTANCE hInst);
+    void queueEject() noexcept;
+    [[nodiscard]] bool isEjectQueued() const noexcept;
+    [[nodiscard]] bool isEjectReadyForRenderThread() const noexcept;
+    void completeEjectFromRenderThread() noexcept;
+    void initialize(HINSTANCE hInst);
 
-	void downloadChakraCore();
-	void initLanguageSetting();
-	void initSettings();
-	void onLanguageChanged();
+    void downloadChakraCore();
+    void initLanguageSetting();
+    void initSettings();
+    void onLanguageChanged();
 
-	void queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback);
-	void queueForClientThread(std::function<void()> callback);
-	void queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callback);
-	void deferD2DResourceRelease(IUnknown* resource) noexcept;
-	void releaseDeferredD2DResources() noexcept;
+    void queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback);
+    void queueForClientThread(std::function<void()> callback);
+    void queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callback);
+    void deferD2DResourceRelease(IUnknown* resource) noexcept;
+    void releaseDeferredD2DResources() noexcept;
 
-	Latite() = default;
-	~Latite() = default;
+    Latite() = default;
+    ~Latite() = default;
 
-	static constexpr std::string_view version = "v2.8.0";
-	static constexpr std::array<std::string_view, 3> supportedMinecraftVersions = {
-		"1.26.30",
-		"1.26.31",
-		"1.26.32",
-	};
+    static constexpr std::string_view version = "v2.8.0";
+    static constexpr std::array<std::string_view, 3> supportedMinecraftVersions = {
+        "1.26.30",
+        "1.26.31",
+        "1.26.32",
+    };
 
-	[[nodiscard]] static constexpr bool supportsMinecraftVersion(std::string_view version) noexcept {
-		for (const auto supportedVersion : supportedMinecraftVersions) {
-			if (supportedVersion == version) {
-				return true;
-			}
-		}
-		return false;
-	}
+    [[nodiscard]] static constexpr bool supportsMinecraftVersion(std::string_view version) noexcept {
+        for (const auto supportedVersion : supportedMinecraftVersions) {
+            if (supportedVersion == version) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	HINSTANCE dllInst = NULL;
-	std::string gameVersion;
+    HINSTANCE dllInst = NULL;
+    std::string gameVersion;
 
-	std::optional<float> getMenuBlur();
+    std::optional<float> getMenuBlur();
 
-	void addTextBox(TextBox* box) {
-		textBoxes.push_back(box);
-	}
+    void addTextBox(TextBox* box) { textBoxes.push_back(box); }
 
-	void removeTextBox(TextBox* box) {
-		for (auto it = textBoxes.begin(); it != textBoxes.end(); ++it) {
-			if (*it == box) {
-				textBoxes.erase(it);
-				break;
-			}
-		}
-	}
+    void removeTextBox(TextBox* box) {
+        for (auto it = textBoxes.begin(); it != textBoxes.end(); ++it) {
+            if (*it == box) {
+                textBoxes.erase(it);
+                break;
+            }
+        }
+    }
 
-	std::vector<std::string> getLatiteUsers();
+    std::vector<std::string> getLatiteUsers();
 
-	[[nodiscard]] KeyValue getMenuKey() {
-		return std::get<KeyValue>(menuKey);
-	}
+    [[nodiscard]] KeyValue getMenuKey() { return std::get<KeyValue>(menuKey); }
 
-	[[nodiscard]] ColorValue getAccentColor() {
-		return std::get<ColorValue>(accentColor);
-	}
+    [[nodiscard]] ColorValue getAccentColor() { return std::get<ColorValue>(accentColor); }
 
-	[[nodiscard]] bool shouldForceDX11() {
-		return std::get<BoolValue>(useDX11);
-	}
+    [[nodiscard]] bool shouldForceDX11() { return std::get<BoolValue>(useDX11); }
 
-	[[nodiscard]] bool shouldForceDisableVSync() {
-		return std::get<BoolValue>(forceDisableVSync);
-	}
+    [[nodiscard]] bool shouldForceDisableVSync() { return std::get<BoolValue>(forceDisableVSync); }
 
-	[[nodiscard]] bool shoulBlurHUD() {
-		return std::get<BoolValue>(hudBlur);
-	}
+    [[nodiscard]] bool shoulBlurHUD() { return std::get<BoolValue>(hudBlur); }
 
-	[[nodiscard]] struct ID2D1BitmapBrush1* getHUDBlurBrush() {
-		return hudBlurBrush.Get();
-	}
+    [[nodiscard]] struct ID2D1BitmapBrush1* getHUDBlurBrush() { return hudBlurBrush.Get(); }
 
-	[[nodiscard]] bool useMinecraftRenderer() {
-		return std::get<BoolValue>(minecraftRenderer);
-	}
+    [[nodiscard]] bool useMinecraftRenderer() { return std::get<BoolValue>(minecraftRenderer); }
 
-	[[nodiscard]] bool shouldRenderTextShadows() {
-		return std::get<BoolValue>(textShadow);
-	}
+    [[nodiscard]] bool shouldRenderTextShadows() { return std::get<BoolValue>(textShadow); }
 
 #ifdef LATITE_DEBUG
-	[[nodiscard]] bool shouldRenderDebugTextRects() {
-		return std::get<BoolValue>(debugTextRects);
-	}
+    [[nodiscard]] bool shouldRenderDebugTextRects() { return std::get<BoolValue>(debugTextRects); }
 #endif
 
-	[[nodiscard]] bool getDoSnapLines() {
-		return std::get<BoolValue>(snapLines);
-	}
+    [[nodiscard]] bool getDoSnapLines() { return std::get<BoolValue>(snapLines); }
 
-	[[nodiscard]] SDK::Font* getFont();
+    [[nodiscard]] SDK::Font* getFont();
 
-	void fetchLatiteUsers();
-	std::wstring GetCurrentModuleFilePath(HMODULE hModule);
-	static std::string getBuildTimestamp();
+    void fetchLatiteUsers();
+    std::wstring GetCurrentModuleFilePath(HMODULE hModule);
+    static std::string getBuildTimestamp();
 
-	void writeServerIP();
+    void writeServerIP();
 
-	void initL10n();
+    void initL10n();
 
-	void loadLanguageConfig(std::shared_ptr<Setting> languageSetting);
-	void loadConfig(class SettingGroup& resolvedGroup);
-	float getRGBHue() const { return rgbHue; }
+    void loadLanguageConfig(std::shared_ptr<Setting> languageSetting);
+    void loadConfig(class SettingGroup& resolvedGroup);
+    float getRGBHue() const { return rgbHue; }
 
-	static bool isMainThread() { return std::this_thread::get_id() == gameThreadId; }
+    static bool isMainThread() { return std::this_thread::get_id() == gameThreadId; }
+
 private:
-	std::optional<LocalizeData> l10nData;
+    std::optional<LocalizeData> l10nData;
 
-	bool downloadingAssets = false;
-	std::vector<std::string> latiteUsers;
-	std::vector<std::string> latiteUsersDirty;
+    bool downloadingAssets = false;
+    std::vector<std::string> latiteUsers;
+    std::vector<std::string> latiteUsersDirty;
 
-	std::queue<std::function<void(SDK::MinecraftUIRenderContext* ctx)>> uiRenderQueue;
-	std::queue<std::function<void(ID2D1DeviceContext* ctx)>> dxRenderQueue;
-	std::queue<std::function<void()>> clientThreadQueue;
-	std::mutex deferredD2DReleaseMutex;
-	std::vector<IUnknown*> deferredD2DReleases;
+    std::queue<std::function<void(SDK::MinecraftUIRenderContext* ctx)>> uiRenderQueue;
+    std::queue<std::function<void(ID2D1DeviceContext* ctx)>> dxRenderQueue;
+    std::queue<std::function<void()>> clientThreadQueue;
+    std::mutex deferredD2DReleaseMutex;
+    std::vector<IUnknown*> deferredD2DReleases;
 
-	Timings timings{};
-	NameTagCache nameTagCache;
-	inline static std::optional<std::thread::id> gameThreadId;
+    Timings timings {};
+    NameTagCache nameTagCache;
+    inline static std::optional<std::thread::id> gameThreadId;
 
-	ValueType commandPrefix = TextValue(L".");
-	ValueType menuKey = KeyValue('M');
-	ValueType ejectKey = KeyValue(VK_END);
-	ValueType hudBlur = BoolValue(false);
-	ValueType hudBlurIntensity = FloatValue(10.f);
-	ValueType menuBlurEnabled = BoolValue(true);
-	// TODO: add disabled settings, for people who already only support dx11, gray it out
-	ValueType useDX11 = BoolValue(false);
-	ValueType forceDisableVSync = BoolValue(false);
-	ValueType menuBlur = FloatValue(20.f);
-	ValueType accentColor = ColorValue(static_cast<float>(0x32) / 255.f, static_cast<float>(0x39) / 255.f, static_cast<float>(0x76) / 255.f);
-	ValueType minimalViewBob = BoolValue(false);
-	ValueType minecraftRenderer = BoolValue(false);
-	ValueType textShadow = BoolValue(true);
+    ValueType commandPrefix = TextValue(L".");
+    ValueType menuKey = KeyValue('M');
+    ValueType ejectKey = KeyValue(VK_END);
+    ValueType hudBlur = BoolValue(false);
+    ValueType hudBlurIntensity = FloatValue(10.f);
+    ValueType menuBlurEnabled = BoolValue(true);
+    // TODO: add disabled settings, for people who already only support dx11, gray it out
+    ValueType useDX11 = BoolValue(false);
+    ValueType forceDisableVSync = BoolValue(false);
+    ValueType menuBlur = FloatValue(20.f);
+    ValueType accentColor = ColorValue(static_cast<float>(0x32) / 255.f, static_cast<float>(0x39) / 255.f,
+                                       static_cast<float>(0x76) / 255.f);
+    ValueType minimalViewBob = BoolValue(false);
+    ValueType minecraftRenderer = BoolValue(false);
+    ValueType textShadow = BoolValue(true);
 #ifdef LATITE_DEBUG
-	ValueType debugTextRects = BoolValue(false);
+    ValueType debugTextRects = BoolValue(false);
 #endif
-	ValueType centerCursorMenus = BoolValue(false);
-	ValueType snapLines = BoolValue(true);
-	ValueType secondaryFont = TextValue(L"Segoe UI");
-	ValueType rgbSpeed = FloatValue(1.f);
+    ValueType centerCursorMenus = BoolValue(false);
+    ValueType snapLines = BoolValue(true);
+    ValueType secondaryFont = TextValue(L"Segoe UI");
+    ValueType rgbSpeed = FloatValue(1.f);
 
-	EnumData mcRendFont;
-	EnumData clientLanguage;
+    EnumData mcRendFont;
+    EnumData clientLanguage;
 
-	std::vector<TextBox*> textBoxes;
-	ComPtr<struct ID2D1Bitmap1> hudBlurBitmap;
-	ComPtr<struct ID2D1BitmapBrush1> hudBlurBrush;
-	ComPtr<struct ID2D1Effect> gaussianBlurEffect;
+    std::vector<TextBox*> textBoxes;
+    ComPtr<struct ID2D1Bitmap1> hudBlurBitmap;
+    ComPtr<struct ID2D1BitmapBrush1> hudBlurBrush;
+    ComPtr<struct ID2D1Effect> gaussianBlurEffect;
 
-	float rgbHue = 0.f;
+    float rgbHue = 0.f;
 
-	void threadsafeInit();
-	void patchKey();
+    void threadsafeInit();
+    void patchKey();
 
-	void updateModuleBlocking();
+    void updateModuleBlocking();
 
-	void onUpdate(class Event& ev);
-	void onKey(class Event& ev);
-	void onClick(class Event& ev);
-	void onChar(class Event& ev);
-	void onRendererInit(class Event& ev);
-	void onRendererCleanup(class Event& ev);
-	void onFocusLost(class Event& ev);
-	void onSuspended(class Event& ev);
-	void onBobView(class Event& ev);
-	void onLeaveGame(class Event& ev);
-	void onRenderLayer(class Event& ev);
-	void onRenderOverlay(class Event& ev);
-	void onPacketReceive(class Event& ev);
-	void onTick(class Event& ev);
-	void onMouseRelease(class Event& ev);
+    void onUpdate(class Event& ev);
+    void onKey(class Event& ev);
+    void onClick(class Event& ev);
+    void onChar(class Event& ev);
+    void onRendererInit(class Event& ev);
+    void onRendererCleanup(class Event& ev);
+    void onFocusLost(class Event& ev);
+    void onSuspended(class Event& ev);
+    void onBobView(class Event& ev);
+    void onLeaveGame(class Event& ev);
+    void onRenderLayer(class Event& ev);
+    void onRenderOverlay(class Event& ev);
+    void onPacketReceive(class Event& ev);
+    void onTick(class Event& ev);
+    void onMouseRelease(class Event& ev);
 
-	std::atomic_bool shouldEject = false;
-	std::atomic_bool mainThreadEjectCleanupComplete = false;
-	std::atomic_bool unloadStarted = false;
-	bool hasInit = false;
+    std::atomic_bool shouldEject = false;
+    std::atomic_bool mainThreadEjectCleanupComplete = false;
+    std::atomic_bool unloadStarted = false;
+    bool hasInit = false;
 };

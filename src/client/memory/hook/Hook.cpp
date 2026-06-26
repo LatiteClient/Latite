@@ -5,62 +5,64 @@
 #include "vhook/vtable_hook.h"
 
 Hook::Hook(uintptr_t targetAddress, void* detourFunc, std::string const& hookName, bool tableSwap)
-	: funcPtr(nullptr),
-	  detour(detourFunc),
+    : funcPtr(nullptr)
+    , detour(detourFunc)
+    ,
 #ifdef LATITE_DEBUG
-	  funcName(hookName),
+    funcName(hookName)
+    ,
 #else
-	  funcName(""),
+    funcName("")
+    ,
 #endif
-	  tableSwapHook(tableSwap),
-	  target(targetAddress)
-{
+    tableSwapHook(tableSwap)
+    , target(targetAddress) {
 
-	if (tableSwap) {
-		auto res = vh::hook(reinterpret_cast<LPVOID*>(targetAddress), detourFunc, &this->funcPtr);
-		if (res != 0) {
+    if (tableSwap) {
+        auto res = vh::hook(reinterpret_cast<LPVOID*>(targetAddress), detourFunc, &this->funcPtr);
+        if (res != 0) {
 #ifdef LATITE_DEBUG
-			Logger::Warn("Creation of hook {} failed with status {}", this->funcName, vh::status_to_string(res));
+            Logger::Warn("Creation of hook {} failed with status {}", this->funcName, vh::status_to_string(res));
 #endif
-		}
-		return;
-	}
+        }
+        return;
+    }
 
-	MH_STATUS res = MH_CreateHook(reinterpret_cast<LPVOID>(targetAddress), detourFunc, &this->funcPtr);
-	if (res != MH_OK) {
+    MH_STATUS res = MH_CreateHook(reinterpret_cast<LPVOID>(targetAddress), detourFunc, &this->funcPtr);
+    if (res != MH_OK) {
 #ifdef LATITE_DEBUG
-		Logger::Warn("Creation of hook {} failed with status {}", this->funcName, MH_StatusToString(res));
+        Logger::Warn("Creation of hook {} failed with status {}", this->funcName, MH_StatusToString(res));
 #endif
-	}
+    }
 }
 
-HookGroup::HookGroup(std::string const& groupName) 
+HookGroup::HookGroup(std::string const& groupName)
 #ifdef LATITE_DEBUG
-	: groupName(groupName)
+    : groupName(groupName)
 #else
-	// hopefully the name gets optimized away
-	: groupName("")
+    // hopefully the name gets optimized away
+    : groupName("")
 #endif
 {
 }
 
 std::shared_ptr<Hook> HookGroup::addHook(uintptr_t ptr, func_ptr_t detour, const char* name) {
 #ifdef LATITE_DEBUG
-	auto newHook = std::make_shared<Hook>(ptr, detour, name);
+    auto newHook = std::make_shared<Hook>(ptr, detour, name);
 #else
-	auto newHook = std::make_shared<Hook>(ptr, detour, "");
+    auto newHook = std::make_shared<Hook>(ptr, detour, "");
 #endif
-	hooks.emplace_back(newHook);
-	return newHook;
+    hooks.emplace_back(newHook);
+    return newHook;
 }
 
 std::shared_ptr<Hook> HookGroup::addTableSwapHook(uintptr_t ptr, func_ptr_t detour, const char* name) {
 #ifdef LATITE_DEBUG
-	auto newHook = std::make_shared<Hook>(ptr, detour, name, true);
+    auto newHook = std::make_shared<Hook>(ptr, detour, name, true);
 #else
-	auto newHook = std::make_shared<Hook>(ptr, detour, "", true);
+    auto newHook = std::make_shared<Hook>(ptr, detour, "", true);
 
 #endif
-	hooks.emplace_back(newHook);
-	return newHook;
+    hooks.emplace_back(newHook);
+    return newHook;
 }

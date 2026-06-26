@@ -3,15 +3,15 @@
 
 class TextHotkey : public Module {
 public:
-	TextHotkey();
-	virtual ~TextHotkey() {};
+    TextHotkey();
+    virtual ~TextHotkey() {};
 
-	void onKey(Event&);
+    void onKey(Event&);
 
 private:
-	ValueType textKey = KeyValue('H');
-	ValueType textMessage = TextValue(L"Latite Client On Top");
-	ValueType commandMode = BoolValue(false);
+    ValueType textKey = KeyValue('H');
+    ValueType textMessage = TextValue(L"Latite Client On Top");
+    ValueType commandMode = BoolValue(false);
 
-	std::chrono::system_clock::time_point lastSend;
+    std::chrono::system_clock::time_point lastSend;
 };

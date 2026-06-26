@@ -4,12 +4,12 @@
 
 class BehindYou : public Module {
 public:
-	BehindYou();
-	virtual ~BehindYou() = default;
+    BehindYou();
+    virtual ~BehindYou() = default;
 
 private:
-	EnumData pers;
-	ValueType bind = KeyValue('G');
+    EnumData pers;
+    ValueType bind = KeyValue('G');
 
-	void onPerspective(Event& ev);
+    void onPerspective(Event& ev);
 };

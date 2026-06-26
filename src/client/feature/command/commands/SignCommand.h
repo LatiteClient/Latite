@@ -1,11 +1,9 @@
 #pragma once
 #include "../Command.h"
 
-class SignCommand : public Command
-{
+class SignCommand : public Command {
 public:
-	SignCommand();
+    SignCommand();
 
-	bool execute(std::string const label, std::vector<std::string> args) override;
+    bool execute(std::string const label, std::vector<std::string> args) override;
 };
-

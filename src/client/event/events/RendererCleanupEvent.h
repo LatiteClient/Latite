@@ -5,8 +5,9 @@
 
 class RendererCleanupEvent : public Event {
 public:
-	static const uint32_t hash = TOHASH(RendererCleanupEvent);
+    static const uint32_t hash = TOHASH(RendererCleanupEvent);
 
-	RendererCleanupEvent() {};
+    RendererCleanupEvent() {};
+
 private:
 };

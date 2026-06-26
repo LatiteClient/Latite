@@ -58,84 +58,82 @@
 
 ModuleManager::ModuleManager() {
 #ifdef LATITE_DEBUG
-	this->items.push_back(std::make_shared<TestModule>());
+    this->items.push_back(std::make_shared<TestModule>());
 #endif
-	this->items.push_back(std::make_shared<Zoom>());
-	this->items.push_back(std::make_shared<Fullbright>());
-	this->items.push_back(std::make_shared<MotionBlur>());
-	//this->items.push_back(std::make_shared<HurtColor>());
-	this->items.push_back(std::make_shared<FPSCounter>());
-	this->items.push_back(std::make_shared<CPSCounter>());
-	this->items.push_back(std::make_shared<ServerDisplay>());
-	this->items.push_back(std::make_shared<PingDisplay>());
-	this->items.push_back(std::make_shared<SpeedDisplay>());
-	this->items.push_back(std::make_shared<ToggleSprintSneak>());
-	this->items.push_back(std::make_shared<Clock>());
-	this->items.push_back(std::make_shared<BowIndicator>());
-	this->items.push_back(std::make_shared<GuiscaleChanger>());
-	this->items.push_back(std::make_shared<DebugInfo>());
-	this->items.push_back(std::make_shared<TabList>());
-	this->items.push_back(std::make_shared<Keystrokes>());
-	this->items.push_back(std::make_shared<CinematicCamera>());
-	this->items.push_back(std::make_shared<HealthWarning>());
-	this->items.push_back(std::make_shared<BreakIndicator>());
-	this->items.push_back(std::make_shared<BehindYou>());
-	this->items.push_back(std::make_shared<ChunkBorders>());
-	this->items.push_back(std::make_shared<ArmorHUD>());
-	this->items.push_back(std::make_shared<MovablePaperdoll>());
-	this->items.push_back(std::make_shared<Hitboxes>());
-	this->items.push_back(std::make_shared<BlockOutline>());
-	this->items.push_back(std::make_shared<MovableScoreboard>());
-	this->items.push_back(std::make_shared<Nickname>());
-	this->items.push_back(std::make_shared<ReachDisplay>());
-	this->items.push_back(std::make_shared<MovableBossbar>());
-	this->items.push_back(std::make_shared<ThirdPersonNametag>());
-	this->items.push_back(std::make_shared<EnvironmentChanger>());
-	this->items.push_back(std::make_shared<CommandShortcuts>());
-	this->items.push_back(std::make_shared<DiscordPresence>());
-	this->items.push_back(std::make_shared<ItemCounter>());
-	//this->items.push_back(std::make_shared<Chat>());
-	this->items.push_back(std::make_shared<TextHotkey>());
-	this->items.push_back(std::make_shared<Freelook>());
-	this->items.push_back(std::make_shared<ComboCounter>());
-	this->items.push_back(std::make_shared<CustomCoordinates>());
-	this->items.push_back(std::make_shared<MovableCoordinates>());
-	this->items.push_back(std::make_shared<WAILA>());
-	this->items.push_back(std::make_shared<AutoGG>());
-	this->items.push_back(std::make_shared<HiveTranslate>());
-	this->items.push_back(std::make_shared<FrameTimeDisplay>());
-	this->items.push_back(std::make_shared<BlockGame>());
-	this->items.push_back(std::make_shared<SkinStealer>());
+    this->items.push_back(std::make_shared<Zoom>());
+    this->items.push_back(std::make_shared<Fullbright>());
+    this->items.push_back(std::make_shared<MotionBlur>());
+    // this->items.push_back(std::make_shared<HurtColor>());
+    this->items.push_back(std::make_shared<FPSCounter>());
+    this->items.push_back(std::make_shared<CPSCounter>());
+    this->items.push_back(std::make_shared<ServerDisplay>());
+    this->items.push_back(std::make_shared<PingDisplay>());
+    this->items.push_back(std::make_shared<SpeedDisplay>());
+    this->items.push_back(std::make_shared<ToggleSprintSneak>());
+    this->items.push_back(std::make_shared<Clock>());
+    this->items.push_back(std::make_shared<BowIndicator>());
+    this->items.push_back(std::make_shared<GuiscaleChanger>());
+    this->items.push_back(std::make_shared<DebugInfo>());
+    this->items.push_back(std::make_shared<TabList>());
+    this->items.push_back(std::make_shared<Keystrokes>());
+    this->items.push_back(std::make_shared<CinematicCamera>());
+    this->items.push_back(std::make_shared<HealthWarning>());
+    this->items.push_back(std::make_shared<BreakIndicator>());
+    this->items.push_back(std::make_shared<BehindYou>());
+    this->items.push_back(std::make_shared<ChunkBorders>());
+    this->items.push_back(std::make_shared<ArmorHUD>());
+    this->items.push_back(std::make_shared<MovablePaperdoll>());
+    this->items.push_back(std::make_shared<Hitboxes>());
+    this->items.push_back(std::make_shared<BlockOutline>());
+    this->items.push_back(std::make_shared<MovableScoreboard>());
+    this->items.push_back(std::make_shared<Nickname>());
+    this->items.push_back(std::make_shared<ReachDisplay>());
+    this->items.push_back(std::make_shared<MovableBossbar>());
+    this->items.push_back(std::make_shared<ThirdPersonNametag>());
+    this->items.push_back(std::make_shared<EnvironmentChanger>());
+    this->items.push_back(std::make_shared<CommandShortcuts>());
+    this->items.push_back(std::make_shared<DiscordPresence>());
+    this->items.push_back(std::make_shared<ItemCounter>());
+    // this->items.push_back(std::make_shared<Chat>());
+    this->items.push_back(std::make_shared<TextHotkey>());
+    this->items.push_back(std::make_shared<Freelook>());
+    this->items.push_back(std::make_shared<ComboCounter>());
+    this->items.push_back(std::make_shared<CustomCoordinates>());
+    this->items.push_back(std::make_shared<MovableCoordinates>());
+    this->items.push_back(std::make_shared<WAILA>());
+    this->items.push_back(std::make_shared<AutoGG>());
+    this->items.push_back(std::make_shared<HiveTranslate>());
+    this->items.push_back(std::make_shared<FrameTimeDisplay>());
+    this->items.push_back(std::make_shared<BlockGame>());
+    this->items.push_back(std::make_shared<SkinStealer>());
 
-	for (auto& mod : items) {
-		mod->onInit();
-	}
-	Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc) & ModuleManager::onKey);
+    for (auto& mod : items) {
+        mod->onInit();
+    }
+    Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc)&ModuleManager::onKey);
 }
 
 ModuleManager::~ModuleManager() {
-	for (auto& mod : items) {
-		if (mod->isEnabled()) mod->setEnabled(false);
-	}
+    for (auto& mod : items) {
+        if (mod->isEnabled()) mod->setEnabled(false);
+    }
 }
 
 void ModuleManager::onKey(Event& evGeneric) {
-	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
-	for (auto& mod : items) {
-		if (ev.inUI()) return;
-		if (mod->getKeybind() == ev.getKey()) {
-			if (mod->shouldHoldToToggle()) {
-				if (!mod->isEnabled() && ev.isDown()) {
-					mod->setEnabled(true);
-				}
-				else if (mod->isEnabled() && !ev.isDown()) {
-					mod->setEnabled(false);
-				}
-				continue;
-			}
-			else if (ev.isDown()) {
-				mod->setEnabled(!mod->isEnabled());
-			}
-		}
-	}
+    auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
+    for (auto& mod : items) {
+        if (ev.inUI()) return;
+        if (mod->getKeybind() == ev.getKey()) {
+            if (mod->shouldHoldToToggle()) {
+                if (!mod->isEnabled() && ev.isDown()) {
+                    mod->setEnabled(true);
+                } else if (mod->isEnabled() && !ev.isDown()) {
+                    mod->setEnabled(false);
+                }
+                continue;
+            } else if (ev.isDown()) {
+                mod->setEnabled(!mod->isEnabled());
+            }
+        }
+    }
 }

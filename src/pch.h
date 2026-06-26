@@ -14,7 +14,7 @@
 #include <filesystem>
 #include <string_view>
 #include <memory>
-#include <future> 
+#include <future>
 #include <execution>
 #include <optional>
 #include <chrono>

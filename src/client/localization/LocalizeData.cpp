@@ -14,9 +14,7 @@ namespace {
         normalized.reserve(value.size());
 
         for (char ch : value) {
-            normalized.push_back(ch == '_'
-                ? '-'
-                : static_cast<char>(std::tolower(static_cast<unsigned char>(ch))));
+            normalized.push_back(ch == '_' ? '-' : static_cast<char>(std::tolower(static_cast<unsigned char>(ch))));
         }
 
         return normalized;
@@ -40,7 +38,8 @@ namespace {
 
         for (std::size_t start = 0, subtagIndex = 0; start < view.size(); ++subtagIndex) {
             const auto end = view.find('-', start);
-            const auto subtag = view.substr(start, end == std::string_view::npos ? std::string_view::npos : end - start);
+            const auto subtag =
+                view.substr(start, end == std::string_view::npos ? std::string_view::npos : end - start);
 
             if (subtagIndex > 0 && subtag.size() == 2 && isAsciiAlpha(subtag)) {
                 return std::string(subtag);
@@ -60,7 +59,8 @@ namespace {
 
         for (std::size_t start = 0; start < view.size();) {
             const auto end = view.find('-', start);
-            const auto subtag = view.substr(start, end == std::string_view::npos ? std::string_view::npos : end - start);
+            const auto subtag =
+                view.substr(start, end == std::string_view::npos ? std::string_view::npos : end - start);
             if (subtag == expected) return true;
             if (end == std::string_view::npos) break;
             start = end + 1;
@@ -70,7 +70,7 @@ namespace {
     }
 
     std::optional<std::string> getUserDefaultLocaleName() {
-        WCHAR localeName[LOCALE_NAME_MAX_LENGTH]{};
+        WCHAR localeName[LOCALE_NAME_MAX_LENGTH] {};
         if (GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH) <= 0) {
             return std::nullopt;
         }
@@ -79,7 +79,7 @@ namespace {
     }
 
     std::optional<std::string> getUserDefaultGeoName() {
-        WCHAR geoName[16]{};
+        WCHAR geoName[16] {};
         if (GetUserDefaultGeoName(geoName, static_cast<int>(_countof(geoName))) <= 0) {
             return std::nullopt;
         }
@@ -87,7 +87,8 @@ namespace {
         return normalizeLocaleTag(util::WStrToStr(geoName));
     }
 
-    std::optional<int> findLanguageByExactLocale(const std::vector<std::shared_ptr<LocalizeData::Language>>& languages, std::string_view locale) {
+    std::optional<int> findLanguageByExactLocale(const std::vector<std::shared_ptr<LocalizeData::Language>>& languages,
+                                                 std::string_view locale) {
         const std::string normalized = normalizeLocaleTag(locale);
         if (normalized.empty()) return std::nullopt;
 
@@ -100,7 +101,8 @@ namespace {
         return std::nullopt;
     }
 
-    std::optional<int> findLanguageByRegion(const std::vector<std::shared_ptr<LocalizeData::Language>>& languages, std::string_view region) {
+    std::optional<int> findLanguageByRegion(const std::vector<std::shared_ptr<LocalizeData::Language>>& languages,
+                                            std::string_view region) {
         const std::string normalizedRegion = normalizeLocaleTag(region);
         if (normalizedRegion.empty()) return std::nullopt;
 
@@ -114,7 +116,8 @@ namespace {
         return std::nullopt;
     }
 
-    std::optional<int> findLanguageByScript(const std::vector<std::shared_ptr<LocalizeData::Language>>& languages, std::string_view locale) {
+    std::optional<int> findLanguageByScript(const std::vector<std::shared_ptr<LocalizeData::Language>>& languages,
+                                            std::string_view locale) {
         if (localeLanguage(locale) != "zh") return std::nullopt;
 
         if (localeHasSubtag(locale, "hant")) {
@@ -128,7 +131,8 @@ namespace {
         return std::nullopt;
     }
 
-    std::optional<int> findLanguageByBaseLocale(const std::vector<std::shared_ptr<LocalizeData::Language>>& languages, std::string_view locale) {
+    std::optional<int> findLanguageByBaseLocale(const std::vector<std::shared_ptr<LocalizeData::Language>>& languages,
+                                                std::string_view locale) {
         const std::string language = localeLanguage(locale);
         if (language.empty()) return std::nullopt;
 
@@ -166,8 +170,6 @@ LocalizeData::LocalizeData() {
         loadLanguage(*lang, true);
     }
 }
-
-
 
 void LocalizeData::loadLanguage(Language& lang, bool cache) {
     auto str = std::string(lang.resource.begin(), lang.resource.end());
@@ -213,10 +215,10 @@ int LocalizeData::getSystemDefaultLanguageIndex() const {
 
     std::optional<int> fallbackMatch;
     auto preferNonFallback = [&](std::optional<int> match) {
-        if (!match) return std::optional<int>{};
+        if (!match) return std::optional<int> {};
         if (*match == fallbackLanguageIndex) {
             fallbackMatch = match;
-            return std::optional<int>{};
+            return std::optional<int> {};
         }
         return match;
     };
@@ -255,9 +257,7 @@ bool LocalizeData::isSelectedLanguageRightToLeft() const {
 
 std::wstring LocalizeData::get(const std::string& id) {
     auto& lang = *languages.at(Latite::get().getSelectedLanguage());
-    return tryGetKey(lang, id)
-        .value_or(tryGetKey(*fallbackLanguage, id)
-            .value_or(util::StrToWStr(id)));
+    return tryGetKey(lang, id).value_or(tryGetKey(*fallbackLanguage, id).value_or(util::StrToWStr(id)));
 }
 
 std::optional<std::wstring> LocalizeData::tryGetKey(Language& lang, const std::string& key) {

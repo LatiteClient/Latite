@@ -2,10 +2,9 @@
 #include "FrameTimeDisplay.h"
 #include "client/Latite.h"
 
-FrameTimeDisplay::FrameTimeDisplay() : TextModule("FrameTimeDisplay",
-                                                  LocalizeString::get("client.textmodule.frameTimeDisplay.name"),
-                                                  LocalizeString::get("client.textmodule.frameTimeDisplay.desc"),
-                                                  HUD) {
+FrameTimeDisplay::FrameTimeDisplay()
+    : TextModule("FrameTimeDisplay", LocalizeString::get("client.textmodule.frameTimeDisplay.name"),
+                 LocalizeString::get("client.textmodule.frameTimeDisplay.desc"), HUD) {
     addSliderSetting("interval", LocalizeString::get("client.textmodule.frameTimeDisplay.interval.name"),
                      LocalizeString::get("client.textmodule.frameTimeDisplay.interval.desc"), interval, FloatValue(0.f),
                      FloatValue(1000.f), FloatValue(100.f));

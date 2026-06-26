@@ -18,5 +18,7 @@ SDK::Actor* JsEntity::getEntity() {
     return nullptr;
 }
 
-JsEntity::JsEntity(int64_t runtimeId, AccessLevel level) : runtimeId(runtimeId), level(level) {
+JsEntity::JsEntity(int64_t runtimeId, AccessLevel level)
+    : runtimeId(runtimeId)
+    , level(level) {
 }

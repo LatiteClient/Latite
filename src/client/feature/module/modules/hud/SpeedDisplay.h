@@ -3,14 +3,16 @@
 
 class SpeedDisplay : public TextModule {
 public:
-	SpeedDisplay();
+    SpeedDisplay();
+
 private:
-	void onTick(Event& ev);
+    void onTick(Event& ev);
 
-	ValueType decimals = FloatValue(3.f);
-	ValueType includeY = BoolValue(false);
+    ValueType decimals = FloatValue(3.f);
+    ValueType includeY = BoolValue(false);
 
-	float speed;
+    float speed;
+
 protected:
-	std::wstringstream text(bool isDefault, bool inEditor) override;
+    std::wstringstream text(bool isDefault, bool inEditor) override;
 };

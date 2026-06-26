@@ -4,84 +4,74 @@
 #include "util/Crypto.h"
 
 namespace SDK {
-	class StringHash {
-	public:
-		std::string string;
-		int64_t hash;
-	private:
-	public:
-		StringHash(int64_t hash, std::string text) : hash(hash), string(text.c_str()) {};
+    class StringHash {
+    public:
+        std::string string;
+        int64_t hash;
 
-		bool operator==(int64_t right) {
-			return right == hash;
-		}
+    private:
+    public:
+        StringHash(int64_t hash, std::string text)
+            : hash(hash)
+            , string(text.c_str()) {};
 
-		bool operator==(std::string const& right) {
-			return string == right;
-		}
+        bool operator==(int64_t right) { return right == hash; }
 
-		bool operator!=(int64_t right) {
-			return !operator==(right);
-		}
+        bool operator==(std::string const& right) { return string == right; }
 
-		bool operator!=(std::string const& right) {
-			return !operator==(right);
-		}
+        bool operator!=(int64_t right) { return !operator==(right); }
 
-		std::string getString() {
-			return string;
-		}
-	};
+        bool operator!=(std::string const& right) { return !operator==(right); }
 
-	class HashedString {
-	public:
-		int64_t hash;
-	private:
-		std::string string;
-	private:
-		HashedString* lastCompare;
+        std::string getString() { return string; }
+    };
 
-	public:
-		HashedString(int64_t hash, std::string text) : hash(hash), string(text.c_str()), lastCompare(nullptr) {};
+    class HashedString {
+    public:
+        int64_t hash;
 
-		std::string getString() {
-			return string;
-		}
+    private:
+        std::string string;
 
-		HashedString(std::string const& str) : string(str.c_str()), lastCompare(nullptr) {
-			hash = util::fnv1a_64(str);
-			string = str;
-		}
+    private:
+        HashedString* lastCompare;
 
-		HashedString(HashedString const& that) {
-			this->string = that.string;
-			this->hash = that.hash;
-			this->lastCompare = nullptr;
-		}
+    public:
+        HashedString(int64_t hash, std::string text)
+            : hash(hash)
+            , string(text.c_str())
+            , lastCompare(nullptr) {};
 
-		HashedString& operator=(HashedString const& right) {
-			this->string = right.string;
-			this->hash = right.hash;
-			this->lastCompare = nullptr;
-			return *this;
-		}
+        std::string getString() { return string; }
 
-		HashedString() = default;
+        HashedString(std::string const& str)
+            : string(str.c_str())
+            , lastCompare(nullptr) {
+            hash = util::fnv1a_64(str);
+            string = str;
+        }
 
-		bool operator==(uint64_t right) {
-			return right == hash;
-		}
+        HashedString(HashedString const& that) {
+            this->string = that.string;
+            this->hash = that.hash;
+            this->lastCompare = nullptr;
+        }
 
-		bool operator==(std::string const& right) {
-			return string == right;
-		}
+        HashedString& operator=(HashedString const& right) {
+            this->string = right.string;
+            this->hash = right.hash;
+            this->lastCompare = nullptr;
+            return *this;
+        }
 
-		bool operator!=(uint64_t right) {
-			return !operator==(right);
-		}
+        HashedString() = default;
 
-		bool operator!=(std::string const& right) {
-			return !operator==(right);
-		}
-	};
+        bool operator==(uint64_t right) { return right == hash; }
+
+        bool operator==(std::string const& right) { return string == right; }
+
+        bool operator!=(uint64_t right) { return !operator==(right); }
+
+        bool operator!=(std::string const& right) { return !operator==(right); }
+    };
 }

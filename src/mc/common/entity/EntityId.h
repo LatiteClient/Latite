@@ -5,7 +5,5 @@ struct EntityId {
 
     [[nodiscard]] constexpr bool operator==(const EntityId& other) const = default;
 
-    [[nodiscard]] constexpr operator uint32_t() const {
-        return this->rawId;
-    }
+    [[nodiscard]] constexpr operator uint32_t() const { return this->rawId; }
 };

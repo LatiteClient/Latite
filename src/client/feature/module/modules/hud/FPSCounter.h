@@ -3,7 +3,7 @@
 
 class FPSCounter : public TextModule {
 public:
-	FPSCounter();
+    FPSCounter();
 
-	std::wstringstream text(bool isDefault, bool inEditor) override;
+    std::wstringstream text(bool isDefault, bool inEditor) override;
 };

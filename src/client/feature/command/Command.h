@@ -7,17 +7,19 @@
 
 class ICommand : public Listener, public Feature {
 public:
-    ICommand(std::string const& name, std::wstring const& description, std::string const& usage, std::vector<std::string> aliases = {})
-            : cmdName(name), description(description), usage(usage)
-    {
+    ICommand(std::string const& name, std::wstring const& description, std::string const& usage,
+             std::vector<std::string> aliases = {})
+        : cmdName(name)
+        , description(description)
+        , usage(usage) {
         this->aliases = { name };
         for (auto& a : aliases) {
             this->aliases.push_back(a);
         }
     }
-    ICommand(std::string const& name, LocalizedString const& description, std::string const& usage, std::vector<std::string> aliases = {})
-            : ICommand(name, description.value(), usage, aliases)
-    {
+    ICommand(std::string const& name, LocalizedString const& description, std::string const& usage,
+             std::vector<std::string> aliases = {})
+        : ICommand(name, description.value(), usage, aliases) {
         descriptionKey = description.key();
     }
     ~ICommand() = default;
@@ -40,7 +42,6 @@ public:
         if (descriptionKey) description = LocalizeString::get(*descriptionKey).value();
     }
 
-
 protected:
     std::string cmdName, usage;
     std::wstring description;
@@ -49,19 +50,23 @@ protected:
     bool script = false;
 
     virtual bool execute(std::string const label, std::vector<std::string> args) = 0;
+
 private:
     bool localWorldOnly;
 };
 
 class Command : public ICommand {
 public:
-	~Command() = default;
-	Command(std::string const& name, std::wstring const& description, std::string const& usage, std::vector<std::string> aliases = {})
-		: ICommand(name, description, usage, aliases) {}
-	Command(std::string const& name, LocalizedString const& description, std::string const& usage, std::vector<std::string> aliases = {})
-		: ICommand(name, description, usage, aliases) {}
+    ~Command() = default;
+    Command(std::string const& name, std::wstring const& description, std::string const& usage,
+            std::vector<std::string> aliases = {})
+        : ICommand(name, description, usage, aliases) {}
+    Command(std::string const& name, LocalizedString const& description, std::string const& usage,
+            std::vector<std::string> aliases = {})
+        : ICommand(name, description, usage, aliases) {}
 
-	virtual void message(std::wstring const& str, bool error = false) override;
-	void message(std::string const& str, bool error = false);
+    virtual void message(std::wstring const& str, bool error = false) override;
+    void message(std::string const& str, bool error = false);
+
 protected:
 };

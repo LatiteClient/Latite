@@ -10,7 +10,7 @@ namespace Logger {
         Fatal
     };
 
-	extern void Setup();
+    extern void Setup();
 
     extern std::filesystem::path GetLogPath();
     extern void LogInternal(Level level, std::string str);
@@ -19,7 +19,7 @@ namespace Logger {
     extern inline void Info(std::string_view fmt, Args&&... args) {
         std::string fm = std::vformat(fmt, std::make_format_args(args...));
         LogInternal(Level::Info, fm);
-	}
+    }
 
     template<typename... Args>
     extern inline void Warn(std::string_view fmt, Args&&... args) {

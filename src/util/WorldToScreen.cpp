@@ -20,7 +20,6 @@ namespace WorldToScreen {
         SDK::GameRenderer* gameRenderer = clientInstance->minecraftGame->gameRenderer;
         if (!gameRenderer) return std::nullopt;
 
-
         const auto& screenSize = guiData->screenSize;
         Vec3 origin = levelRendererPlayer->getOrigin();
 

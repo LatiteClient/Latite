@@ -66,9 +66,7 @@ namespace {
         CriticalSectionGuard(CriticalSectionGuard const&) = delete;
         CriticalSectionGuard& operator=(CriticalSectionGuard const&) = delete;
 
-        ~CriticalSectionGuard() {
-            m_leaveFunc();
-        }
+        ~CriticalSectionGuard() { m_leaveFunc(); }
 
     private:
         void (*m_leaveFunc)();
@@ -83,31 +81,15 @@ namespace {
             return {};
         }
 
-        int size = WideCharToMultiByte(
-            CP_UTF8,
-            0,
-            value.c_str(),
-            static_cast<int>(value.size()),
-            nullptr,
-            0,
-            nullptr,
-            nullptr
-        );
+        int size = WideCharToMultiByte(CP_UTF8, 0, value.c_str(), static_cast<int>(value.size()), nullptr, 0, nullptr,
+                                       nullptr);
         if (size <= 0) {
             return {};
         }
 
         std::string result(static_cast<size_t>(size), '\0');
-        WideCharToMultiByte(
-            CP_UTF8,
-            0,
-            value.c_str(),
-            static_cast<int>(value.size()),
-            result.data(),
-            size,
-            nullptr,
-            nullptr
-        );
+        WideCharToMultiByte(CP_UTF8, 0, value.c_str(), static_cast<int>(value.size()), result.data(), size, nullptr,
+                            nullptr);
         return result;
     }
 
@@ -131,8 +113,7 @@ namespace {
         std::ostringstream oss;
         if (fileSafe) {
             oss << std::put_time(&now, "%Y-%m-%d_%H-%M-%S");
-        }
-        else {
+        } else {
             oss << std::put_time(&now, "%Y-%m-%d %H:%M:%S");
         }
 
@@ -199,18 +180,13 @@ namespace {
                 archive << outputText;
                 archive.flush();
             }
-        }
-        catch (...) {
-        }
+        } catch (...) {}
     }
 
     HMODULE GetLatiteModule() {
         HMODULE module = nullptr;
-        GetModuleHandleExW(
-            GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-            reinterpret_cast<LPCWSTR>(&GetLatiteModule),
-            &module
-        );
+        GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                           reinterpret_cast<LPCWSTR>(&GetLatiteModule), &module);
 
         return module;
     }
@@ -270,7 +246,8 @@ namespace {
         }
 
         wchar_t ntAltSymbolPath[32767] = {};
-        if (GetEnvironmentVariableW(L"_NT_ALT_SYMBOL_PATH", ntAltSymbolPath, static_cast<DWORD>(std::size(ntAltSymbolPath)))) {
+        if (GetEnvironmentVariableW(L"_NT_ALT_SYMBOL_PATH", ntAltSymbolPath,
+                                    static_cast<DWORD>(std::size(ntAltSymbolPath)))) {
             AddSymbolPathPart(symbolPath, ntAltSymbolPath);
         }
 
@@ -292,16 +269,8 @@ namespace {
             return;
         }
 
-        SymLoadModuleExW(
-            process,
-            nullptr,
-            modulePath.wstring().c_str(),
-            nullptr,
-            baseAddress,
-            moduleInfo.SizeOfImage,
-            nullptr,
-            0
-        );
+        SymLoadModuleExW(process, nullptr, modulePath.wstring().c_str(), nullptr, baseAddress, moduleInfo.SizeOfImage,
+                         nullptr, 0);
     }
 
     bool EnsureSymbolsLocked() {
@@ -332,11 +301,8 @@ namespace {
             return true;
         }
 
-        AppendRawLog(std::format(
-            "[{}] [FATAL] SymInitialize failed while preparing crash symbols. Error: {}\n",
-            MakeTimestamp(false),
-            LastErrorToString(error)
-        ));
+        AppendRawLog(std::format("[{}] [FATAL] SymInitialize failed while preparing crash symbols. Error: {}\n",
+                                 MakeTimestamp(false), LastErrorToString(error)));
         return false;
     }
 
@@ -354,8 +320,7 @@ namespace {
             std::string moduleName;
             if (*moduleInfo.ImageName) {
                 moduleName = PathToUtf8(std::filesystem::path(moduleInfo.ImageName).filename());
-            }
-            else {
+            } else {
                 moduleName = WideToUtf8(moduleInfo.ModuleName);
             }
 
@@ -384,8 +349,7 @@ namespace {
             if (displacement != 0) {
                 frame << "+0x" << std::hex << std::uppercase << displacement << std::dec;
             }
-        }
-        else {
+        } else {
             frame << FormatModuleOffset(process, address);
         }
 
@@ -425,29 +389,16 @@ namespace {
     std::filesystem::path WriteMiniDump(EXCEPTION_POINTERS* exceptionInfo, std::string const& baseName) {
         try {
             std::filesystem::create_directories(CrashPath());
-        }
-        catch (...) {
-        }
+        } catch (...) {}
 
         auto dumpPath = CrashPath() / (baseName + ".dmp");
         auto tempDumpPath = CrashPath() / (baseName + ".dmp.tmp");
-        HANDLE dumpFile = CreateFileW(
-            tempDumpPath.wstring().c_str(),
-            GENERIC_WRITE,
-            0,
-            nullptr,
-            CREATE_ALWAYS,
-            FILE_ATTRIBUTE_NORMAL,
-            nullptr
-        );
+        HANDLE dumpFile = CreateFileW(tempDumpPath.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS,
+                                      FILE_ATTRIBUTE_NORMAL, nullptr);
 
         if (dumpFile == INVALID_HANDLE_VALUE) {
-            AppendRawLog(std::format(
-                "[{}] [FATAL] Failed to create minidump {}. Error: {}\n",
-                MakeTimestamp(false),
-                PathToUtf8(tempDumpPath),
-                LastErrorToString(GetLastError())
-            ));
+            AppendRawLog(std::format("[{}] [FATAL] Failed to create minidump {}. Error: {}\n", MakeTimestamp(false),
+                                     PathToUtf8(tempDumpPath), LastErrorToString(GetLastError())));
             return {};
         }
 
@@ -459,26 +410,14 @@ namespace {
         // Keep the primary dump conservative. More aggressive flags such as
         // MiniDumpWithIndirectlyReferencedMemory can fault again when the crash
         // was caused by corrupt SDK pointers or invalid offsets.
-        auto dumpType = static_cast<MINIDUMP_TYPE>(
-            MiniDumpNormal |
-            MiniDumpWithDataSegs |
-            MiniDumpWithThreadInfo |
-            MiniDumpWithUnloadedModules |
-            MiniDumpWithFullMemoryInfo
-        );
+        auto dumpType = static_cast<MINIDUMP_TYPE>(MiniDumpNormal | MiniDumpWithDataSegs | MiniDumpWithThreadInfo |
+                                                   MiniDumpWithUnloadedModules | MiniDumpWithFullMemoryInfo);
 
         BOOL wroteDump = FALSE;
         {
             CriticalSectionGuard symbolGuard(EnterSymbolLock, LeaveSymbolLock);
-            wroteDump = MiniDumpWriteDump(
-                GetCurrentProcess(),
-                GetCurrentProcessId(),
-                dumpFile,
-                dumpType,
-                exceptionInfo ? &dumpException : nullptr,
-                nullptr,
-                nullptr
-            );
+            wroteDump = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), dumpFile, dumpType,
+                                          exceptionInfo ? &dumpException : nullptr, nullptr, nullptr);
         }
 
         DWORD error = wroteDump ? ERROR_SUCCESS : GetLastError();
@@ -486,23 +425,15 @@ namespace {
         CloseHandle(dumpFile);
 
         if (!wroteDump) {
-            AppendRawLog(std::format(
-                "[{}] [FATAL] MiniDumpWriteDump failed for {}. Error: {}\n",
-                MakeTimestamp(false),
-                PathToUtf8(tempDumpPath),
-                LastErrorToString(error)
-            ));
+            AppendRawLog(std::format("[{}] [FATAL] MiniDumpWriteDump failed for {}. Error: {}\n", MakeTimestamp(false),
+                                     PathToUtf8(tempDumpPath), LastErrorToString(error)));
             DeleteFileW(tempDumpPath.wstring().c_str());
             return {};
         }
 
         if (!MoveFileExW(tempDumpPath.wstring().c_str(), dumpPath.wstring().c_str(), MOVEFILE_REPLACE_EXISTING)) {
-            AppendRawLog(std::format(
-                "[{}] [FATAL] Failed to finalize minidump {}. Error: {}\n",
-                MakeTimestamp(false),
-                PathToUtf8(dumpPath),
-                LastErrorToString(GetLastError())
-            ));
+            AppendRawLog(std::format("[{}] [FATAL] Failed to finalize minidump {}. Error: {}\n", MakeTimestamp(false),
+                                     PathToUtf8(dumpPath), LastErrorToString(GetLastError())));
             DeleteFileW(tempDumpPath.wstring().c_str());
             return {};
         }
@@ -531,19 +462,16 @@ namespace {
                 hasCurrentException = true;
                 std::rethrow_exception(currentException);
             }
-        }
-        catch (std::exception const& e) {
+        } catch (std::exception const& e) {
             reason = std::format("std::terminate called after C++ exception: {}", e.what());
-        }
-        catch (...) {
+        } catch (...) {
             reason = "std::terminate called after unknown C++ exception";
         }
 
         CONTEXT context = {};
         if (hasCurrentException && g_bHasCxxExceptionContext) {
             context = g_CxxExceptionContext;
-        }
-        else {
+        } else {
             RtlCaptureContext(&context);
         }
 
@@ -576,13 +504,9 @@ namespace {
         }
 
         try {
-            DebugExceptionHandler::WriteCrashReport(
-                exceptionInfo,
-                reason ? reason : "Caught SEH exception at Latite native boundary"
-            );
-        }
-        catch (...) {
-        }
+            DebugExceptionHandler::WriteCrashReport(exceptionInfo,
+                                                    reason ? reason : "Caught SEH exception at Latite native boundary");
+        } catch (...) {}
 
         return EXCEPTION_EXECUTE_HANDLER;
     }
@@ -594,8 +518,7 @@ __declspec(thread) int g_ErrorBoundaryDepth = 0;
 
 LONG WINAPI VectoredExceptionHandler(PEXCEPTION_POINTERS pExceptionInfo) {
     if (pExceptionInfo && pExceptionInfo->ExceptionRecord &&
-        pExceptionInfo->ExceptionRecord->ExceptionCode == cppExceptionCode &&
-        pExceptionInfo->ContextRecord) {
+        pExceptionInfo->ExceptionRecord->ExceptionCode == cppExceptionCode && pExceptionInfo->ContextRecord) {
         g_CxxExceptionContext = *pExceptionInfo->ContextRecord;
         g_bHasCxxExceptionContext = true;
     }
@@ -627,9 +550,7 @@ DebugExceptionHandler::ErrorBoundaryScope::~ErrorBoundaryScope() {
 void DebugExceptionHandler::Install() {
     try {
         std::filesystem::create_directories(CrashPath());
-    }
-    catch (...) {
-    }
+    } catch (...) {}
 
     {
         CriticalSectionGuard handlerGuard(EnterHandlerLock, LeaveHandlerLock);
@@ -690,13 +611,13 @@ bool DebugExceptionHandler::IsHandlingCrash() {
     }
 }
 
-std::uintptr_t DebugExceptionHandler::RunWithSehGuard(SehCallback callback, void* context, char const* reason) noexcept {
+std::uintptr_t DebugExceptionHandler::RunWithSehGuard(SehCallback callback, void* context,
+                                                      char const* reason) noexcept {
     __try {
         if (callback) {
             return callback(context);
         }
-    }
-    __except (HandleSehException(GetExceptionInformation(), reason)) {
+    } __except (HandleSehException(GetExceptionInformation(), reason)) {
         AbortProcess();
     }
 
@@ -708,8 +629,7 @@ void DebugExceptionHandler::RunVoidWithSehGuard(SehVoidCallback callback, void* 
         if (callback) {
             callback(context);
         }
-    }
-    __except (HandleSehException(GetExceptionInformation(), reason)) {
+    } __except (HandleSehException(GetExceptionInformation(), reason)) {
         AbortProcess();
     }
 }
@@ -721,8 +641,7 @@ std::string DebugExceptionHandler::GenerateStackTrace(CONTEXT* contextArg) {
     CONTEXT context = {};
     if (contextArg) {
         context = *contextArg;
-    }
-    else {
+    } else {
         RtlCaptureContext(&context);
     }
 
@@ -737,17 +656,8 @@ std::string DebugExceptionHandler::GenerateStackTrace(CONTEXT* contextArg) {
     bool haveSymbols = EnsureSymbolsLocked();
 
     for (int frameIndex = 0; frameIndex < 128; frameIndex++) {
-        if (!StackWalk64(
-            machineType,
-            process,
-            thread,
-            &stackFrame,
-            &context,
-            nullptr,
-            SymFunctionTableAccess64,
-            SymGetModuleBase64,
-            nullptr
-        )) {
+        if (!StackWalk64(machineType, process, thread, &stackFrame, &context, nullptr, SymFunctionTableAccess64,
+                         SymGetModuleBase64, nullptr)) {
             break;
         }
 
@@ -758,8 +668,7 @@ std::string DebugExceptionHandler::GenerateStackTrace(CONTEXT* contextArg) {
         stackTrace << "#" << frameIndex << " ";
         if (haveSymbols) {
             stackTrace << FormatStackFrame(process, stackFrame.AddrPC.Offset);
-        }
-        else {
+        } else {
             stackTrace << FormatAddress(stackFrame.AddrPC.Offset);
         }
         stackTrace << "\n";
@@ -768,15 +677,17 @@ std::string DebugExceptionHandler::GenerateStackTrace(CONTEXT* contextArg) {
     return stackTrace.str();
 }
 
-std::filesystem::path DebugExceptionHandler::WriteCrashReport(EXCEPTION_POINTERS* exceptionInfo, std::string_view reason) {
+std::filesystem::path DebugExceptionHandler::WriteCrashReport(EXCEPTION_POINTERS* exceptionInfo,
+                                                              std::string_view reason) {
     if (crashHandlerEntered.exchange(1) != 0) {
         std::ostringstream reentryReport;
-        reentryReport << "[" << MakeTimestamp(false) << "] [FATAL] Crash handler re-entered while handling another crash.";
+        reentryReport << "[" << MakeTimestamp(false)
+                      << "] [FATAL] Crash handler re-entered while handling another crash.";
         if (exceptionInfo && exceptionInfo->ExceptionRecord) {
             reentryReport << " Re-entry code: 0x" << std::hex << std::uppercase
-                << exceptionInfo->ExceptionRecord->ExceptionCode;
-            reentryReport << " at " << FormatAddress(reinterpret_cast<DWORD64>(
-                exceptionInfo->ExceptionRecord->ExceptionAddress));
+                          << exceptionInfo->ExceptionRecord->ExceptionCode;
+            reentryReport << " at "
+                          << FormatAddress(reinterpret_cast<DWORD64>(exceptionInfo->ExceptionRecord->ExceptionAddress));
         }
         reentryReport << "\n";
         AppendRawLog(reentryReport.str());
@@ -786,32 +697,19 @@ std::filesystem::path DebugExceptionHandler::WriteCrashReport(EXCEPTION_POINTERS
     CONTEXT context = {};
     if (exceptionInfo && exceptionInfo->ContextRecord) {
         context = *exceptionInfo->ContextRecord;
-    }
-    else {
+    } else {
         RtlCaptureContext(&context);
     }
 
 #if defined(LATITE_NIGHTLY)
-    std::string baseName = std::format(
-        "LatiteNightlyCrash-{}",
-        MakeTimestamp(true),
-        GetCurrentProcessId(),
-        GetCurrentThreadId()
-    );
+    std::string baseName =
+        std::format("LatiteNightlyCrash-{}", MakeTimestamp(true), GetCurrentProcessId(), GetCurrentThreadId());
 #elif defined(LATITE_DEBUG)
-    std::string baseName = std::format(
-        "LatiteDebugCrash-{}",
-        MakeTimestamp(true),
-        GetCurrentProcessId(),
-        GetCurrentThreadId()
-    );
+    std::string baseName =
+        std::format("LatiteDebugCrash-{}", MakeTimestamp(true), GetCurrentProcessId(), GetCurrentThreadId());
 #else
-    std::string baseName = std::format(
-        "LatiteCrash-{}",
-        MakeTimestamp(true),
-        GetCurrentProcessId(),
-        GetCurrentThreadId()
-    );
+    std::string baseName =
+        std::format("LatiteCrash-{}", MakeTimestamp(true), GetCurrentProcessId(), GetCurrentThreadId());
 #endif
 
     auto attemptedDumpPath = CrashPath() / (baseName + ".dmp");
@@ -828,8 +726,10 @@ std::filesystem::path DebugExceptionHandler::WriteCrashReport(EXCEPTION_POINTERS
 
     if (exceptionInfo && exceptionInfo->ExceptionRecord) {
         auto exceptionRecord = exceptionInfo->ExceptionRecord;
-        report << "Exception Code: 0x" << std::hex << std::uppercase << exceptionRecord->ExceptionCode << std::dec << "\n";
-        report << "Exception Address: " << FormatAddress(reinterpret_cast<DWORD64>(exceptionRecord->ExceptionAddress)) << "\n";
+        report << "Exception Code: 0x" << std::hex << std::uppercase << exceptionRecord->ExceptionCode << std::dec
+               << "\n";
+        report << "Exception Address: " << FormatAddress(reinterpret_cast<DWORD64>(exceptionRecord->ExceptionAddress))
+               << "\n";
     }
 
     auto latiteModulePath = GetModuleFilePath(GetLatiteModule());
@@ -840,8 +740,7 @@ std::filesystem::path DebugExceptionHandler::WriteCrashReport(EXCEPTION_POINTERS
     report << "Minidump: attempting " << PathToUtf8(attemptedDumpPath) << "\n";
     if (!dumpPath.empty()) {
         report << "Minidump Result: written " << PathToUtf8(dumpPath) << "\n";
-    }
-    else {
+    } else {
         report << "Minidump Result: unavailable\n";
     }
     report << "\n";
@@ -850,12 +749,10 @@ std::filesystem::path DebugExceptionHandler::WriteCrashReport(EXCEPTION_POINTERS
     std::ostringstream stackReport;
     try {
         stackReport << GenerateStackTrace(&context);
-    }
-    catch (std::exception const& e) {
+    } catch (std::exception const& e) {
         AppendSectionHeading(stackReport, "Stack Trace");
         stackReport << "Stack trace unavailable: " << util::RedactPrivatePaths(e.what()) << "\n";
-    }
-    catch (...) {
+    } catch (...) {
         AppendSectionHeading(stackReport, "Stack Trace");
         stackReport << "Stack trace unavailable due to an unknown error.\n";
     }
@@ -892,8 +789,7 @@ void LogExceptionDetails(const std::exception& e) {
     if (g_bHasCxxExceptionContext) {
         context = g_CxxExceptionContext;
         g_bHasCxxExceptionContext = false;
-    }
-    else {
+    } else {
         RtlCaptureContext(&context);
     }
 
@@ -912,10 +808,8 @@ void LogExceptionDetails(const std::exception& e) {
     g_CxxExceptionContext = {};
     g_bHasCxxExceptionContext = false;
 
-    DebugExceptionHandler::WriteCrashReport(
-        &exceptionInfo,
-        std::format("Caught C++ exception at Latite error boundary: {}", e.what())
-    );
+    DebugExceptionHandler::WriteCrashReport(&exceptionInfo,
+                                            std::format("Caught C++ exception at Latite error boundary: {}", e.what()));
 }
 
 #endif

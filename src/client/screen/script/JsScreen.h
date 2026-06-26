@@ -8,24 +8,25 @@
 #include <optional>
 #include "client/script/JsEvented.h"
 
-
 class JsScreen : public Screen, public JsEvented {
 public:
-	JsScreen(JsValueRef object, std::string name);
+    JsScreen(JsValueRef object, std::string name);
 
-	void onRender(class ::Event& ev);
-	void onKey(::Event& ev);
-	void onClick(::Event& ev);
+    void onRender(class ::Event& ev);
+    void onKey(::Event& ev);
+    void onClick(::Event& ev);
 
-	std::string getName() override { return name; }
+    std::string getName() override { return name; }
 
-	JsValueRef getObject() const { return object; }
+    JsValueRef getObject() const { return object; }
+
 protected:
-	void onEnable(bool ignoreAnims) override;
-	void onDisable() override;
-private:
-	JsValueRef object = JS_INVALID_REFERENCE;
-	JsContextRef ctx = JS_INVALID_REFERENCE;
+    void onEnable(bool ignoreAnims) override;
+    void onDisable() override;
 
-	std::string name;
+private:
+    JsValueRef object = JS_INVALID_REFERENCE;
+    JsContextRef ctx = JS_INVALID_REFERENCE;
+
+    std::string name;
 };

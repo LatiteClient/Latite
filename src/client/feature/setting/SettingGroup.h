@@ -8,37 +8,32 @@
 // A group of settings.
 class SettingGroup : public std::enable_shared_from_this<SettingGroup> {
 public:
-	explicit SettingGroup(std::string const& name) : groupName(name) {}
-	~SettingGroup() = default;
+    explicit SettingGroup(std::string const& name)
+        : groupName(name) {}
+    ~SettingGroup() = default;
 
-	void forEach(std::function<void(std::shared_ptr<Setting> set)> callback) {
-		for (auto& setting : settings) {
-			callback(setting);
-		}
-	}
+    void forEach(std::function<void(std::shared_ptr<Setting> set)> callback) {
+        for (auto& setting : settings) {
+            callback(setting);
+        }
+    }
 
-	[[nodiscard]] size_t size() {
-		return settings.size();
-	}
+    [[nodiscard]] size_t size() { return settings.size(); }
 
-	inline void addSetting(std::shared_ptr<Setting> set) {
-		settings.push_back(set);
-	}
+    inline void addSetting(std::shared_ptr<Setting> set) { settings.push_back(set); }
 
-	void refreshLocalization() {
-		for (auto& setting : settings) {
-			setting->refreshLocalization();
-		}
-	}
+    void refreshLocalization() {
+        for (auto& setting : settings) {
+            setting->refreshLocalization();
+        }
+    }
 
-	[[nodiscard]] std::string name() { return groupName; }
+    [[nodiscard]] std::string name() { return groupName; }
 
-	// TODO: Is this needed?
-	[[nodiscard]] std::shared_ptr<SettingGroup> getShared() {
-		return shared_from_this();
-	}
+    // TODO: Is this needed?
+    [[nodiscard]] std::shared_ptr<SettingGroup> getShared() { return shared_from_this(); }
 
 protected:
-	std::string groupName;
-	std::vector<std::shared_ptr<Setting>> settings;
+    std::string groupName;
+    std::vector<std::shared_ptr<Setting>> settings;
 };

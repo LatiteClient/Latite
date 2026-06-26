@@ -2,5 +2,5 @@
 #include "Tag.h"
 
 namespace SDK {
-	class CompoundTag : public Tag {};
+    class CompoundTag : public Tag {};
 }

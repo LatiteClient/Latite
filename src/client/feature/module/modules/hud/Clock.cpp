@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "Clock.h"
 
-Clock::Clock() : TextModule("Clock", LocalizeString::get("client.textmodule.clock.name"),
-                            LocalizeString::get("client.textmodule.clock.desc"), HUD) {
+Clock::Clock()
+    : TextModule("Clock", LocalizeString::get("client.textmodule.clock.name"),
+                 LocalizeString::get("client.textmodule.clock.desc"), HUD) {
     addSetting("militaryTime", LocalizeString::get("client.textmodule.clock.militaryTime.name"),
                LocalizeString::get("client.textmodule.clock.militaryTime.desc"), this->militaryTime);
     addSetting("showSeconds", LocalizeString::get("client.textmodule.clock.showSeconds.name"),
@@ -25,10 +26,10 @@ std::string Clock::getTimeString() {
         } else {
             time = std::format("{:02}:{:02}", now.tm_hour, now.tm_min);
         }
-    }
-    else {
+    } else {
         if (std::get<BoolValue>(this->showSeconds)) {
-            time = std::format("{}:{:02}:{:02} {}", (now.tm_hour + 11) % 12 + 1, now.tm_min, now.tm_sec, now.tm_hour < 12 ? "AM" : "PM");
+            time = std::format("{}:{:02}:{:02} {}", (now.tm_hour + 11) % 12 + 1, now.tm_min, now.tm_sec,
+                               now.tm_hour < 12 ? "AM" : "PM");
         } else {
             time = std::format("{}:{:02} {}", (now.tm_hour + 11) % 12 + 1, now.tm_min, now.tm_hour < 12 ? "AM" : "PM");
         }
@@ -43,8 +44,7 @@ std::string Clock::getTimeString() {
     return time;
 }
 
-std::wstringstream Clock::text(bool isDefault, bool inEditor)
-{
+std::wstringstream Clock::text(bool isDefault, bool inEditor) {
     std::wstring time = util::StrToWStr(Clock::getTimeString());
     return std::wstringstream(time);
 }

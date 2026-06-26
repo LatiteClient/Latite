@@ -3,16 +3,16 @@
 
 class Freelook : public Module {
 public:
-	Freelook();
-	virtual ~Freelook() {};
+    Freelook();
+    virtual ~Freelook() {};
 
-	void onCameraUpdate(Event&);
-	void onPerspective(Event&);
+    void onCameraUpdate(Event&);
+    void onPerspective(Event&);
 
-	void onEnable() override;
-	void onDisable() override;
+    void onEnable() override;
+    void onDisable() override;
+
 private:
-
-	Vec2 lastRot;
-	bool shouldHoldToToggle() override { return true; }
+    Vec2 lastRot;
+    bool shouldHoldToToggle() override { return true; }
 };

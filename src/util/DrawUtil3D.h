@@ -11,6 +11,7 @@ private:
     SDK::LevelRenderer* levelRenderer;
     SDK::ScreenContext* screenContext;
     SDK::MaterialPtr* material;
+
 public:
     MCDrawUtil3D(SDK::LevelRenderer* renderer, SDK::ScreenContext* ctx, SDK::MaterialPtr* material = nullptr);
 

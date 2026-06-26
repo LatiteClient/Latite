@@ -12,65 +12,59 @@
 
 class Graphics3DScriptingObject : public ScriptingObject {
 public:
+    inline static int objectID = -1;
+    Graphics3DScriptingObject(int id)
+        : ScriptingObject(id, L"graphics3D") {
+        objectID = id;
+        Eventing::get().listen<RenderLevelEvent>(this, (EventListenerFunc)&Graphics3DScriptingObject::onRenderLevel, 0);
+    }
 
-	inline static int objectID = -1;
-	Graphics3DScriptingObject(int id) : ScriptingObject(id, L"graphics3D") {
-		objectID = id;
-		Eventing::get().listen<RenderLevelEvent>(this, (EventListenerFunc)&Graphics3DScriptingObject::onRenderLevel, 0);
-	}
+    ~Graphics3DScriptingObject() { Eventing::get().unlisten(this); }
 
-	~Graphics3DScriptingObject() {
-		Eventing::get().unlisten(this);
-	}
-
-	void initialize(JsContextRef ctx, JsValueRef parentObj) override;
+    void initialize(JsContextRef ctx, JsValueRef parentObj) override;
 
 private:
-	void onRenderLevel(Event& ev);
+    void onRenderLevel(Event& ev);
 
-	
+    struct Vertex {
+        Color color;
+        Vec3 position;
+    };
 
-	struct Vertex {
-		Color color;
-		Vec3 position;
-	};
+    struct DrawCommand {
+        bool renderThrough = false;
+        SDK::Primitive primitive = SDK::Primitive::LineList;
+        std::vector<Vertex> vertexBuffer = {};
 
-	struct DrawCommand {
-		bool renderThrough = false;
-		SDK::Primitive primitive = SDK::Primitive::LineList;
-		std::vector<Vertex> vertexBuffer = {};
+        DrawCommand() { vertexBuffer.reserve(50); }
 
-		DrawCommand() {
-			vertexBuffer.reserve(50);
-		}
+        void reset() {
+            renderThrough = false;
+            primitive = SDK::Primitive::LineList;
+            vertexBuffer.clear();
+        }
+    };
 
-		void reset() {
-			renderThrough = false;
-			primitive = SDK::Primitive::LineList;
-			vertexBuffer.clear();
-		}
-	};
+    SDK::LevelRenderer* levelRenderer = nullptr;
+    SDK::ScreenContext* screenContext = nullptr;
 
-	SDK::LevelRenderer* levelRenderer = nullptr;
-	SDK::ScreenContext* screenContext = nullptr;
+    DrawCommand currentCommand {};
 
-	DrawCommand currentCommand{};
+    std::vector<DrawCommand> commands = {};
 
-	std::vector<DrawCommand> commands = {};
+    std::optional<Color> primaryColor = std::nullopt;
+    std::array<Color, 4> colors = {};
 
-	std::optional<Color> primaryColor = std::nullopt;
-	std::array<Color, 4> colors = {};
-
-	static JsValueRef CALLBACK drawLineCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount, void* callbackState);
-	static JsValueRef CALLBACK drawTriangleCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount, void* callbackState);
-	static JsValueRef CALLBACK drawQuadCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount, void* callbackState);
-	static JsValueRef CALLBACK finishCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount, void* callbackState);
-	static JsValueRef CALLBACK setColorCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount, void* callbackState);
-	static JsValueRef CALLBACK setColorsCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount, void* callbackState);
+    static JsValueRef CALLBACK drawLineCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                                unsigned short argCount, void* callbackState);
+    static JsValueRef CALLBACK drawTriangleCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                                    unsigned short argCount, void* callbackState);
+    static JsValueRef CALLBACK drawQuadCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                                unsigned short argCount, void* callbackState);
+    static JsValueRef CALLBACK finishCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                              unsigned short argCount, void* callbackState);
+    static JsValueRef CALLBACK setColorCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                                unsigned short argCount, void* callbackState);
+    static JsValueRef CALLBACK setColorsCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                                 unsigned short argCount, void* callbackState);
 };

@@ -7,54 +7,49 @@
 #include "client/Latite.h"
 
 namespace {
-	std::shared_ptr<Hook> onDeviceLostHook;
-	std::shared_ptr<Hook> _updateHook;
+    std::shared_ptr<Hook> onDeviceLostHook;
+    std::shared_ptr<Hook> _updateHook;
 
-	void __fastcall updateImpl(SDK::MinecraftGame* game) {
-		BEGIN_ERROR_HANDLER
-		_updateHook->oFunc<decltype(&updateImpl)>()(game);
-		UpdateEvent ev{};
+    void __fastcall updateImpl(SDK::MinecraftGame* game) {
+        BEGIN_ERROR_HANDLER
+        _updateHook->oFunc<decltype(&updateImpl)>()(game);
+        UpdateEvent ev {};
 
-		{
-			PluginManager::Event sev{L"renderDX", {}, false};
-			Latite::getPluginManager().dispatchEvent(sev);
-		}
+        {
+            PluginManager::Event sev { L"renderDX", {}, false };
+            Latite::getPluginManager().dispatchEvent(sev);
+        }
 
-		Eventing::get().dispatch(ev);
-		END_ERROR_HANDLER
-	}
+        Eventing::get().dispatch(ev);
+        END_ERROR_HANDLER
+    }
 
 #ifdef LATITE_CRASH_REPORTING
-	void __cdecl updateSehThunk(void* context) {
-		updateImpl(static_cast<SDK::MinecraftGame*>(context));
-	}
+    void __cdecl updateSehThunk(void* context) {
+        updateImpl(static_cast<SDK::MinecraftGame*>(context));
+    }
 #endif
 }
 
 void MinecraftGameHooks::onDeviceLost(SDK::MinecraftGame* game) {
-	FocusLostEvent ev{};
-	
-	if (Eventing::get().dispatch(ev))
-		return;
-	
-	onDeviceLostHook->oFunc<decltype(&onDeviceLost)>()(game);
+    FocusLostEvent ev {};
+
+    if (Eventing::get().dispatch(ev)) return;
+
+    onDeviceLostHook->oFunc<decltype(&onDeviceLost)>()(game);
 }
 
 void __fastcall MinecraftGameHooks::_update(SDK::MinecraftGame* game) {
 #ifdef LATITE_CRASH_REPORTING
-	DebugExceptionHandler::RunVoidWithSehGuard(
-		updateSehThunk,
-		game,
-		"Caught SEH exception in MinecraftGame::_update hook"
-	);
+    DebugExceptionHandler::RunVoidWithSehGuard(updateSehThunk, game,
+                                               "Caught SEH exception in MinecraftGame::_update hook");
 #else
-	updateImpl(game);
+    updateImpl(game);
 #endif
 }
 
 MinecraftGameHooks::MinecraftGameHooks() {
-	onDeviceLostHook = addHook(Signatures::MinecraftGame_onDeviceLost.result, onDeviceLost,
-		"MinecraftGame::onDeviceLost");
-	_updateHook = addHook(Signatures::MinecraftGame__update.result, _update,
-		"MinecraftGame::_update");
+    onDeviceLostHook =
+        addHook(Signatures::MinecraftGame_onDeviceLost.result, onDeviceLost, "MinecraftGame::onDeviceLost");
+    _updateHook = addHook(Signatures::MinecraftGame__update.result, _update, "MinecraftGame::_update");
 }

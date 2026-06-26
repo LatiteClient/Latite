@@ -1,5 +1,4 @@
 #include "JavaDrop.h"
 
-JavaDrop::JavaDrop()
-{
+JavaDrop::JavaDrop() {
 }

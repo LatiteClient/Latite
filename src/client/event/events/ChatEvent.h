@@ -4,13 +4,13 @@
 
 class ChatEvent : public Cancellable {
 public:
-	static const uint32_t hash = TOHASH(ChatEvent);
+    static const uint32_t hash = TOHASH(ChatEvent);
 
-	[[nodiscard]] std::string& getText() { return *str; }
+    [[nodiscard]] std::string& getText() { return *str; }
 
-	ChatEvent(std::string& str) : str(&str) {
-	}
+    ChatEvent(std::string& str)
+        : str(&str) {}
 
 protected:
-	std::string* str;
+    std::string* str;
 };

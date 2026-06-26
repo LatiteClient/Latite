@@ -4,9 +4,10 @@
 
 class HurtColor : public Module {
 public:
-	HurtColor();
+    HurtColor();
 
-	void onActorOverlay(Event& ev);
+    void onActorOverlay(Event& ev);
+
 private:
-	ValueType color = ColorValue(1.f, 0.f, 0.f, 0.6f);
+    ValueType color = ColorValue(1.f, 0.f, 0.f, 0.6f);
 };

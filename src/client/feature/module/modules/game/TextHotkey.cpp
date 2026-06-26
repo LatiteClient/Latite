@@ -4,8 +4,9 @@
 
 #include "mc/common/network/MinecraftPackets.h"
 
-TextHotkey::TextHotkey() : Module("TextHotkey", LocalizeString::get("client.module.textHotkey.name"),
-                                  LocalizeString::get("client.module.textHotkey.desc"), GAME, nokeybind) {
+TextHotkey::TextHotkey()
+    : Module("TextHotkey", LocalizeString::get("client.module.textHotkey.name"),
+             LocalizeString::get("client.module.textHotkey.desc"), GAME, nokeybind) {
     addSetting("commandMode", LocalizeString::get("client.module.textHotkey.commandMode.name"),
                LocalizeString::get("client.module.textHotkey.commandMode.desc"), this->commandMode);
     addSetting("textKey", LocalizeString::get("client.module.textHotkey.textKey.name"),
@@ -16,34 +17,33 @@ TextHotkey::TextHotkey() : Module("TextHotkey", LocalizeString::get("client.modu
 }
 
 void TextHotkey::onKey(Event& evG) {
-	auto& ev = reinterpret_cast<KeyUpdateEvent&>(evG);
+    auto& ev = reinterpret_cast<KeyUpdateEvent&>(evG);
 
-	if (ev.isDown() && ev.getKey() == std::get<KeyValue>(this->textKey) && !ev.inUI()) {
-		auto now = std::chrono::system_clock::now();
+    if (ev.isDown() && ev.getKey() == std::get<KeyValue>(this->textKey) && !ev.inUI()) {
+        auto now = std::chrono::system_clock::now();
 
-		if (now - lastSend > 2s) {
-			auto msg = util::WStrToStr(std::get<TextValue>(this->textMessage).str);
-			if (msg.size() < 1 || msg.size() > 200) {
-				return;
-			}
+        if (now - lastSend > 2s) {
+            auto msg = util::WStrToStr(std::get<TextValue>(this->textMessage).str);
+            if (msg.size() < 1 || msg.size() > 200) {
+                return;
+            }
 
-			if (std::get<BoolValue>(commandMode)) {
-				auto pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::COMMAND_REQUEST);
-				SDK::CommandRequestPacket* cmd = reinterpret_cast<SDK::CommandRequestPacket*>(pkt.get());
-				cmd->applyCommand("/"+msg);
-				SDK::ClientInstance::get()->getLocalPlayer()->packetSender->sendToServer(pkt.get());
-				lastSend = now;
-			}
-			else {
-				auto pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::TEXT);
-				SDK::TextPacket* tp = reinterpret_cast<SDK::TextPacket*>(pkt.get());
-				
-				tp->chat(msg);
+            if (std::get<BoolValue>(commandMode)) {
+                auto pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::COMMAND_REQUEST);
+                SDK::CommandRequestPacket* cmd = reinterpret_cast<SDK::CommandRequestPacket*>(pkt.get());
+                cmd->applyCommand("/" + msg);
+                SDK::ClientInstance::get()->getLocalPlayer()->packetSender->sendToServer(pkt.get());
+                lastSend = now;
+            } else {
+                auto pkt = SDK::MinecraftPackets::createPacket(SDK::PacketID::TEXT);
+                SDK::TextPacket* tp = reinterpret_cast<SDK::TextPacket*>(pkt.get());
 
-				SDK::ClientInstance::get()->getLocalPlayer()->packetSender->sendToServer(pkt.get());
+                tp->chat(msg);
 
-				lastSend = now;
-			}
-		}
-	}
+                SDK::ClientInstance::get()->getLocalPlayer()->packetSender->sendToServer(pkt.get());
+
+                lastSend = now;
+            }
+        }
+    }
 }

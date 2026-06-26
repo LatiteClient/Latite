@@ -11,21 +11,22 @@ JsValueRef Clipboard::initialize(JsValueRef parent) {
     return obj;
 }
 
-JsValueRef Clipboard::get(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+JsValueRef Clipboard::get(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount,
+                          void* callbackState) {
     return Chakra::MakeString(util::GetClipboardText());
 }
 
-JsValueRef Clipboard::set(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+JsValueRef Clipboard::set(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount,
+                          void* callbackState) {
     if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
-    if (!Chakra::VerifyParameters({ {arguments[1], JsString} })) return JS_INVALID_REFERENCE;
+    if (!Chakra::VerifyParameters({ { arguments[1], JsString } })) return JS_INVALID_REFERENCE;
 
     util::SetClipboardText(Chakra::GetString(arguments[1]));
     return Chakra::GetUndefined();
 }
 
-JsValueRef Clipboard::getBitmap(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
-    
-
+JsValueRef Clipboard::getBitmap(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount,
+                                void* callbackState) {
     if (!OpenClipboard(nullptr)) {
         return Chakra::GetNull();
     }
@@ -56,7 +57,6 @@ JsValueRef Clipboard::getBitmap(JsValueRef callee, bool isConstructor, JsValueRe
 
     // Release the lock
     GlobalUnlock(hData);
-
 
     // Release the clipboard
     CloseClipboard();

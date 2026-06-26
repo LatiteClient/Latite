@@ -5,13 +5,13 @@
 
 class AfterMoveEvent : public Event {
 public:
-	static const uint32_t hash = TOHASH(AfterMoveEvent);
+    static const uint32_t hash = TOHASH(AfterMoveEvent);
 
-	[[nodiscard]] SDK::MoveInputComponent* getMoveInputHandler() { return handler; }
+    [[nodiscard]] SDK::MoveInputComponent* getMoveInputHandler() { return handler; }
 
-	AfterMoveEvent(SDK::MoveInputComponent* handler) : handler(handler) {
-	}
+    AfterMoveEvent(SDK::MoveInputComponent* handler)
+        : handler(handler) {}
 
 protected:
-	SDK::MoveInputComponent* handler;
+    SDK::MoveInputComponent* handler;
 };

@@ -6,10 +6,10 @@
 class Localization;
 
 namespace SDK {
-	class I18n {
-	public:
-		static I18n* get();
+    class I18n {
+    public:
+        static I18n* get();
 
-		std::string get(std::string const& key);
-	};
+        std::string get(std::string const& key);
+    };
 }

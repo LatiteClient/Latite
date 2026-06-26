@@ -5,13 +5,13 @@
 
 class SendPacketEvent : public Cancellable {
 public:
-	static const uint32_t hash = TOHASH(SendPacketEvent);
+    static const uint32_t hash = TOHASH(SendPacketEvent);
 
-	[[nodiscard]] SDK::Packet* getPacket() {
-		return packet;
-	}
+    [[nodiscard]] SDK::Packet* getPacket() { return packet; }
 
-	SendPacketEvent(SDK::Packet* pkt) : packet(pkt) {}
+    SendPacketEvent(SDK::Packet* pkt)
+        : packet(pkt) {}
+
 protected:
-	SDK::Packet* packet;
+    SDK::Packet* packet;
 };

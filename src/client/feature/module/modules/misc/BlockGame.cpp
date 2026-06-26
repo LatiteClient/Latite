@@ -4,34 +4,28 @@
 #include "../../../../render/asset/Assets.h"
 #include "client/input/Keyboard.h"
 
-BlockGame::BlockGame() : Module("BlockGame", LocalizeString::get("client.module.blockGame.name"),
-                                LocalizeString::get("client.module.blockGame.desc"), HUD, nokeybind) {
+BlockGame::BlockGame()
+    : Module("BlockGame", LocalizeString::get("client.module.blockGame.name"),
+             LocalizeString::get("client.module.blockGame.desc"), HUD, nokeybind) {
     listen<RenderOverlayEvent>(static_cast<EventListenerFunc>(&BlockGame::onRenderOverlay));
     listen<KeyUpdateEvent>(static_cast<EventListenerFunc>(&BlockGame::onKey));
     listen<DrawHUDModulesEvent>(static_cast<EventListenerFunc>(&BlockGame::onRenderHUDModules), false, 2);
 
-    addSliderSetting("arrSetting", L"ARR",
-                     LocalizeString::get("client.module.blockGame.arrSetting.desc"),
-                     arrIntervalSetting, FloatValue(0.f),
-                     FloatValue(83.f), FloatValue(1.f));
-    addSliderSetting("dasSetting", L"DAS",
-                     LocalizeString::get("client.module.blockGame.dasSetting.desc"),
-                     dasDelaySetting, FloatValue(17.f),
-                     FloatValue(333.f), FloatValue(1.f));
-    addSliderSetting("dcdSetting", L"DCD",
-                     LocalizeString::get("client.module.blockGame.dcdSetting.desc"),
-                     dcdDelaySetting, FloatValue(0.f),
-                     FloatValue(333.f), FloatValue(1.f));
-    addSliderSetting("sdfSetting", L"SDF",
-                     LocalizeString::get("client.module.blockGame.sdfSetting.desc"),
-                     sdfSetting, FloatValue(5.f), FloatValue(41.f), FloatValue(1.f));
+    addSliderSetting("arrSetting", L"ARR", LocalizeString::get("client.module.blockGame.arrSetting.desc"),
+                     arrIntervalSetting, FloatValue(0.f), FloatValue(83.f), FloatValue(1.f));
+    addSliderSetting("dasSetting", L"DAS", LocalizeString::get("client.module.blockGame.dasSetting.desc"),
+                     dasDelaySetting, FloatValue(17.f), FloatValue(333.f), FloatValue(1.f));
+    addSliderSetting("dcdSetting", L"DCD", LocalizeString::get("client.module.blockGame.dcdSetting.desc"),
+                     dcdDelaySetting, FloatValue(0.f), FloatValue(333.f), FloatValue(1.f));
+    addSliderSetting("sdfSetting", L"SDF", LocalizeString::get("client.module.blockGame.sdfSetting.desc"), sdfSetting,
+                     FloatValue(5.f), FloatValue(41.f), FloatValue(1.f));
 
     addSetting("audioSetting", LocalizeString::get("client.module.blockGame.audioSetting.name"),
                LocalizeString::get("client.module.blockGame.audioSetting.desc"), audio);
     addSetting("drawGridSetting", LocalizeString::get("client.module.blockGame.drawGridSetting.name"),
                LocalizeString::get("client.module.blockGame.drawGridSetting.desc"), drawGrid);
     addSetting("drawGhostPiece", LocalizeString::get("client.module.blockGame.drawGhostPiece.name"),
-        LocalizeString::get("client.module.blockGame.drawGhostPiece.desc"), drawGhostPiece);
+               LocalizeString::get("client.module.blockGame.drawGhostPiece.desc"), drawGhostPiece);
     addSetting("backgroundEnabledSetting", LocalizeString::get("client.module.blockGame.backgroundEnabledSetting.name"),
                LocalizeString::get("client.module.blockGame.backgroundEnabledSetting.desc"), backgroundEnabled);
     addSetting("backgroundColorSetting", LocalizeString::get("client.module.blockGame.backgroundColorSetting.name"),
@@ -76,26 +70,39 @@ void BlockGame::onDisable() {
     paused = true;
 }
 
-
 void BlockGame::updateGameLogic(std::chrono::steady_clock::time_point now) {
     if (gameOver || paused) return;
 
     // subject to change, i dont think i got this perfect yet
     std::chrono::milliseconds baseGravityDelay;
-    if (level <= 1) baseGravityDelay = std::chrono::milliseconds(800);
-    else if (level == 2) baseGravityDelay = std::chrono::milliseconds(717);
-    else if (level == 3) baseGravityDelay = std::chrono::milliseconds(633);
-    else if (level == 4) baseGravityDelay = std::chrono::milliseconds(550);
-    else if (level == 5) baseGravityDelay = std::chrono::milliseconds(467);
-    else if (level == 6) baseGravityDelay = std::chrono::milliseconds(383);
-    else if (level == 7) baseGravityDelay = std::chrono::milliseconds(300);
-    else if (level == 8) baseGravityDelay = std::chrono::milliseconds(217);
-    else if (level == 9) baseGravityDelay = std::chrono::milliseconds(120);
-    else if (level <= 12) baseGravityDelay = std::chrono::milliseconds(84);
-    else if (level <= 15) baseGravityDelay = std::chrono::milliseconds(67);
-    else if (level <= 18) baseGravityDelay = std::chrono::milliseconds(43);
-    else if (level <= 28) baseGravityDelay = std::chrono::milliseconds(20);
-    else baseGravityDelay = std::chrono::milliseconds(7);
+    if (level <= 1)
+        baseGravityDelay = std::chrono::milliseconds(800);
+    else if (level == 2)
+        baseGravityDelay = std::chrono::milliseconds(717);
+    else if (level == 3)
+        baseGravityDelay = std::chrono::milliseconds(633);
+    else if (level == 4)
+        baseGravityDelay = std::chrono::milliseconds(550);
+    else if (level == 5)
+        baseGravityDelay = std::chrono::milliseconds(467);
+    else if (level == 6)
+        baseGravityDelay = std::chrono::milliseconds(383);
+    else if (level == 7)
+        baseGravityDelay = std::chrono::milliseconds(300);
+    else if (level == 8)
+        baseGravityDelay = std::chrono::milliseconds(217);
+    else if (level == 9)
+        baseGravityDelay = std::chrono::milliseconds(120);
+    else if (level <= 12)
+        baseGravityDelay = std::chrono::milliseconds(84);
+    else if (level <= 15)
+        baseGravityDelay = std::chrono::milliseconds(67);
+    else if (level <= 18)
+        baseGravityDelay = std::chrono::milliseconds(43);
+    else if (level <= 28)
+        baseGravityDelay = std::chrono::milliseconds(20);
+    else
+        baseGravityDelay = std::chrono::milliseconds(7);
 
     std::chrono::milliseconds currentGravityInterval = baseGravityDelay;
     float sdfValue = std::get<FloatValue>(sdfSetting);
@@ -278,8 +285,8 @@ void BlockGame::onKey(Event& evG) {
 void BlockGame::onRenderOverlay(Event& evG) {
     RenderOverlayEvent& ev = reinterpret_cast<RenderOverlayEvent&>(evG);
 
-    if (!SDK::ClientInstance::get() || !SDK::ClientInstance::get()->getLocalPlayer() || !SDK::ClientInstance::get()->
-        minecraftGame->isCursorGrabbed()) {
+    if (!SDK::ClientInstance::get() || !SDK::ClientInstance::get()->getLocalPlayer() ||
+        !SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
         if (!gameOver && !paused) {
             paused = true;
         }
@@ -310,13 +317,11 @@ void BlockGame::onRenderOverlay(Event& evG) {
 
     // draw pause/game over text
     if (paused) {
-        dc.drawText({
-                        screenWidth * 0.5f - 150, screenHeight * 0.5f - 50, screenWidth * 0.5f + 150,
-                        screenHeight * 0.5f + 50
-                    },
-                    LocalizeString::get("client.module.blockGame.pausedText.name"),
-                    d2d::Colors::YELLOW, Renderer::FontSelection::PrimaryRegular, 48.0f,
-                    DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+        dc.drawText(
+            { screenWidth * 0.5f - 150, screenHeight * 0.5f - 50, screenWidth * 0.5f + 150, screenHeight * 0.5f + 50 },
+            LocalizeString::get("client.module.blockGame.pausedText.name"), d2d::Colors::YELLOW,
+            Renderer::FontSelection::PrimaryRegular, 48.0f, DWRITE_TEXT_ALIGNMENT_CENTER,
+            DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
         return;
     }
 
@@ -325,9 +330,9 @@ void BlockGame::onRenderOverlay(Event& evG) {
         int remaining = 5 - static_cast<int>(elapsed);
 
         std::wstring statusText = LocalizeString::get("client.module.blockGame.gameOverText.name");
-        std::wstring countdown = util::FormatWString(
-            LocalizeString::get("client.module.blockGame.restartCountdown.name"),
-            { std::to_wstring(std::max(0, remaining)) });
+        std::wstring countdown =
+            util::FormatWString(LocalizeString::get("client.module.blockGame.restartCountdown.name"),
+                                { std::to_wstring(std::max(0, remaining)) });
 
         if (remaining <= 0) {
             playSound("note.snare");
@@ -337,48 +342,41 @@ void BlockGame::onRenderOverlay(Event& evG) {
 
         dc.drawText(
             { screenWidth * 0.5f - 150, screenHeight * 0.5f - 100, screenWidth * 0.5f + 150, screenHeight * 0.5f },
-            statusText, d2d::Colors::RED, Renderer::FontSelection::PrimaryRegular, 48.0f,
+            statusText, d2d::Colors::RED, Renderer::FontSelection::PrimaryRegular, 48.0f, DWRITE_TEXT_ALIGNMENT_CENTER,
+            DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
+        dc.drawText(
+            { screenWidth * 0.5f - 150, screenHeight * 0.5f, screenWidth * 0.5f + 150, screenHeight * 0.5f + 50 },
+            countdown, d2d::Colors::YELLOW, Renderer::FontSelection::PrimaryRegular, 24.0f,
             DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
-        dc.drawText({ screenWidth * 0.5f - 150, screenHeight * 0.5f, screenWidth * 0.5f + 150, screenHeight * 0.5f + 50 },
-                    countdown, d2d::Colors::YELLOW, Renderer::FontSelection::PrimaryRegular, 24.0f,
-                    DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_NEAR);
 
         // display stats below countdown
         std::wstring stats = util::FormatWString(LocalizeString::get("client.module.blockGame.scoreText.name"),
-                                                 { std::to_wstring(score) })
-            + L"\n" + util::FormatWString(LocalizeString::get("client.module.blockGame.levelText.name"),
-                                          { std::to_wstring(level) })
-            + L"\n" + util::FormatWString(LocalizeString::get("client.module.blockGame.linesClearedText.name"),
-                                          { std::to_wstring(linesCleared) });
-        dc.drawText({
-                        screenWidth * 0.5f - 150, screenHeight * 0.5f + 60, screenWidth * 0.5f + 150,
-                        screenHeight * 0.5f + 160
-                    },
-                    stats, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, 20.0f,
-                    DWRITE_TEXT_ALIGNMENT_CENTER);
+                                                 { std::to_wstring(score) }) +
+                             L"\n" +
+                             util::FormatWString(LocalizeString::get("client.module.blockGame.levelText.name"),
+                                                 { std::to_wstring(level) }) +
+                             L"\n" +
+                             util::FormatWString(LocalizeString::get("client.module.blockGame.linesClearedText.name"),
+                                                 { std::to_wstring(linesCleared) });
+        dc.drawText(
+            { screenWidth * 0.5f - 150, screenHeight * 0.5f + 60, screenWidth * 0.5f + 150, screenHeight * 0.5f + 160 },
+            stats, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, 20.0f, DWRITE_TEXT_ALIGNMENT_CENTER);
 
         return;
     }
 
-
     // draw board
     const float borderThickness = 2.0f;
     // draw border slightly outset
-    dc.drawRectangle(
-        {
-            boardLeft - borderThickness, boardTop - borderThickness,
-            boardLeft + boardWidthPixels + borderThickness, boardTop + boardHeightPixels + borderThickness
-        },
-        d2d::Colors::WHITE, borderThickness);
+    dc.drawRectangle({ boardLeft - borderThickness, boardTop - borderThickness,
+                       boardLeft + boardWidthPixels + borderThickness, boardTop + boardHeightPixels + borderThickness },
+                     d2d::Colors::WHITE, borderThickness);
 
     // draw board background
     if (bgColor.a > 0.0f && std::get<BoolValue>(backgroundEnabled)) {
-        d2d::Color backgroundColor = {bgColor.r, bgColor.b,
-            bgColor.g, bgColor.a};
-        dc.fillRectangle(
-            { boardLeft, boardTop, boardLeft + boardWidthPixels, boardTop + boardHeightPixels },
-            backgroundColor
-        );
+        d2d::Color backgroundColor = { bgColor.r, bgColor.b, bgColor.g, bgColor.a };
+        dc.fillRectangle({ boardLeft, boardTop, boardLeft + boardWidthPixels, boardTop + boardHeightPixels },
+                         backgroundColor);
     }
 
     // draw grid lines
@@ -388,17 +386,15 @@ void BlockGame::onRenderOverlay(Event& evG) {
         const float lineThickness = 1.0f;
         for (int x = 1; x < BOARD_WIDTH; ++x) {
             float xPos = boardLeft + x * blockSize;
-            dc.fillRectangle({
-                                 xPos - lineThickness / 2.0f, boardTop, xPos + lineThickness / 2.0f,
-                                 boardTop + boardHeightPixels
-                             }, gridColor);
+            dc.fillRectangle(
+                { xPos - lineThickness / 2.0f, boardTop, xPos + lineThickness / 2.0f, boardTop + boardHeightPixels },
+                gridColor);
         }
         for (int y = 1; y < BOARD_HEIGHT; ++y) {
             float yPos = boardTop + y * blockSize;
-            dc.fillRectangle({
-                                 boardLeft, yPos - lineThickness / 2.0f, boardLeft + boardWidthPixels,
-                                 yPos + lineThickness / 2.0f
-                             }, gridColor);
+            dc.fillRectangle(
+                { boardLeft, yPos - lineThickness / 2.0f, boardLeft + boardWidthPixels, yPos + lineThickness / 2.0f },
+                gridColor);
         }
     }
 
@@ -408,13 +404,9 @@ void BlockGame::onRenderOverlay(Event& evG) {
             int boardY = y + BOARD_BUFFER;
             if (board[boardY][x] != 0) {
                 // 0 represents Empty
-                dc.fillRectangle(
-                    {
-                        boardLeft + x * blockSize, boardTop + y * blockSize,
-                        boardLeft + (x + 1) * blockSize, boardTop + (y + 1) * blockSize
-                    },
-                    tetrominoShapes[board[boardY][x] - 1].color
-                );
+                dc.fillRectangle({ boardLeft + x * blockSize, boardTop + y * blockSize, boardLeft + (x + 1) * blockSize,
+                                   boardTop + (y + 1) * blockSize },
+                                 tetrominoShapes[board[boardY][x] - 1].color);
             }
         }
     }
@@ -433,10 +425,8 @@ void BlockGame::onRenderOverlay(Event& evG) {
                     float drawX = boardLeft + (ghostPosition.x + x) * blockSize;
                     float drawY = boardTop + (ghostPosition.y + y - BOARD_BUFFER) * blockSize;
                     if (ghostPosition.y + y >= BOARD_BUFFER) {
-                        dc.fillRectangle(
-                            {drawX, drawY, drawX + blockSize, drawY + blockSize},
-                            d2d::Color::Hex(ghostPiece.color.getHex(), ghostAlpha)
-                        );
+                        dc.fillRectangle({ drawX, drawY, drawX + blockSize, drawY + blockSize },
+                                         d2d::Color::Hex(ghostPiece.color.getHex(), ghostAlpha));
                     }
                 }
             }
@@ -451,10 +441,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
                 float drawY = boardTop + (piecePosition.y + y - BOARD_BUFFER) * blockSize;
                 // Only draw blocks within the visible board area
                 if (piecePosition.y + y >= BOARD_BUFFER) {
-                    dc.fillRectangle(
-                        { drawX, drawY, drawX + blockSize, drawY + blockSize },
-                        currentTetromino.color
-                    );
+                    dc.fillRectangle({ drawX, drawY, drawX + blockSize, drawY + blockSize }, currentTetromino.color);
                 }
             }
         }
@@ -463,20 +450,15 @@ void BlockGame::onRenderOverlay(Event& evG) {
     // draw hold piece area background
     if (bgColor.a > 0.0f && std::get<BoolValue>(backgroundEnabled)) {
         d2d::Color backgroundColor = { bgColor.r, bgColor.b, bgColor.g, bgColor.a };
-        dc.fillRectangle(
-            {
-                holdPreviewX - 2, holdPreviewY + 35, holdPreviewX + HOLD_SIZE * blockSize + 2,
-                holdPreviewY + 45 + HOLD_SIZE * blockSize
-            },
-            backgroundColor
-        );
+        dc.fillRectangle({ holdPreviewX - 2, holdPreviewY + 35, holdPreviewX + HOLD_SIZE * blockSize + 2,
+                           holdPreviewY + 45 + HOLD_SIZE * blockSize },
+                         backgroundColor);
     }
 
     // draw hold piece
     dc.drawText({ holdPreviewX, holdPreviewY, holdPreviewX + HOLD_SIZE * blockSize, holdPreviewY + 30 },
                 LocalizeString::get("client.module.blockGame.holdPieceText.name"),
-                canHold ? d2d::Colors::WHITE : d2d::Color::Hex("808080"),
-                Renderer::FontSelection::PrimaryRegular);
+                canHold ? d2d::Colors::WHITE : d2d::Color::Hex("808080"), Renderer::FontSelection::PrimaryRegular);
 
     if (hasHold) {
         // Center the hold piece visually in its box
@@ -486,35 +468,27 @@ void BlockGame::onRenderOverlay(Event& evG) {
         for (int y = 0; y < holdTetromino.dimension; ++y) {
             for (int x = 0; x < holdTetromino.dimension; ++x) {
                 if (holdTetromino.shape[y][x] != 0) {
-                    dc.fillRectangle(
-                        {
-                            holdPreviewX + holdOffsetX + x * blockSize, holdPreviewY + 40 + holdOffsetY + y * blockSize,
-                            holdPreviewX + holdOffsetX + (x + 1) * blockSize,
-                            holdPreviewY + 40 + holdOffsetY + (y + 1) * blockSize
-                        },
-                        holdTetromino.color
-                    );
+                    dc.fillRectangle({ holdPreviewX + holdOffsetX + x * blockSize,
+                                       holdPreviewY + 40 + holdOffsetY + y * blockSize,
+                                       holdPreviewX + holdOffsetX + (x + 1) * blockSize,
+                                       holdPreviewY + 40 + holdOffsetY + (y + 1) * blockSize },
+                                     holdTetromino.color);
                 }
             }
         }
     }
 
     // draw hold piece area
-    dc.drawRectangle({
-                         holdPreviewX - 2, holdPreviewY + 35, holdPreviewX + HOLD_SIZE * blockSize + 2,
-                         holdPreviewY + 45 + HOLD_SIZE * blockSize
-                     }, d2d::Colors::WHITE, 1.0f);
+    dc.drawRectangle({ holdPreviewX - 2, holdPreviewY + 35, holdPreviewX + HOLD_SIZE * blockSize + 2,
+                       holdPreviewY + 45 + HOLD_SIZE * blockSize },
+                     d2d::Colors::WHITE, 1.0f);
 
     // draw next piece area background
     if (bgColor.a > 0.0f && std::get<BoolValue>(backgroundEnabled)) {
         d2d::Color backgroundColor = { bgColor.r, bgColor.b, bgColor.g, bgColor.a };
-        dc.fillRectangle(
-            {
-                nextPreviewX - 2, nextPreviewY + 35, nextPreviewX + NEXT_SIZE * blockSize + 2,
-                nextPreviewY + 45 + NEXT_SIZE * blockSize
-            },
-            backgroundColor
-        );
+        dc.fillRectangle({ nextPreviewX - 2, nextPreviewY + 35, nextPreviewX + NEXT_SIZE * blockSize + 2,
+                           nextPreviewY + 45 + NEXT_SIZE * blockSize },
+                         backgroundColor);
     }
 
     // draw next piece
@@ -527,24 +501,19 @@ void BlockGame::onRenderOverlay(Event& evG) {
     for (int y = 0; y < nextTetromino.dimension; ++y) {
         for (int x = 0; x < nextTetromino.dimension; ++x) {
             if (nextTetromino.shape[y][x] != 0) {
-                dc.fillRectangle(
-                    {
-                        nextPreviewX + nextOffsetX + x * blockSize, nextPreviewY + 40 + nextOffsetY + y * blockSize,
-                        nextPreviewX + nextOffsetX + (x + 1) * blockSize,
-                        nextPreviewY + 40 + nextOffsetY + (y + 1) * blockSize
-                    },
-                    nextTetromino.color
-                );
+                dc.fillRectangle({ nextPreviewX + nextOffsetX + x * blockSize,
+                                   nextPreviewY + 40 + nextOffsetY + y * blockSize,
+                                   nextPreviewX + nextOffsetX + (x + 1) * blockSize,
+                                   nextPreviewY + 40 + nextOffsetY + (y + 1) * blockSize },
+                                 nextTetromino.color);
             }
         }
     }
 
     // draw next piece area
-    dc.drawRectangle({
-                         nextPreviewX - 2, nextPreviewY + 35, nextPreviewX + NEXT_SIZE * blockSize + 2,
-                         nextPreviewY + 45 + NEXT_SIZE * blockSize
-                     }, d2d::Colors::WHITE, 1.0f);
-
+    dc.drawRectangle({ nextPreviewX - 2, nextPreviewY + 35, nextPreviewX + NEXT_SIZE * blockSize + 2,
+                       nextPreviewY + 45 + NEXT_SIZE * blockSize },
+                     d2d::Colors::WHITE, 1.0f);
 
     // draw stats
     float mainStatsX = nextPreviewX;
@@ -556,10 +525,10 @@ void BlockGame::onRenderOverlay(Event& evG) {
     float textHeight = 20.0f;
     float lineSpacing = 5.0f;
 
-    std::wstring scoreStr = util::FormatWString(LocalizeString::get("client.module.blockGame.scoreText.name"),
-                                                { std::to_wstring(score) });
-    std::wstring levelStr = util::FormatWString(LocalizeString::get("client.module.blockGame.levelText.name"),
-                                                { std::to_wstring(level) });
+    std::wstring scoreStr =
+        util::FormatWString(LocalizeString::get("client.module.blockGame.scoreText.name"), { std::to_wstring(score) });
+    std::wstring levelStr =
+        util::FormatWString(LocalizeString::get("client.module.blockGame.levelText.name"), { std::to_wstring(level) });
     std::wstring linesStr = util::FormatWString(LocalizeString::get("client.module.blockGame.linesClearedText.name"),
                                                 { std::to_wstring(linesCleared) });
 
@@ -567,8 +536,9 @@ void BlockGame::onRenderOverlay(Event& evG) {
                 Renderer::FontSelection::PrimaryRegular, textHeight);
     dc.drawText({ nextPreviewX, mainStatsY + textHeight + 5, nextPreviewX + 200, mainStatsX + textHeight * 2 + 5 },
                 levelStr, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, textHeight);
-    dc.drawText({ nextPreviewX, mainStatsY + textHeight * 2 + 10, nextPreviewX + 200, mainStatsX + textHeight * 3 + 10 },
-                linesStr, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, textHeight);
+    dc.drawText(
+        { nextPreviewX, mainStatsY + textHeight * 2 + 10, nextPreviewX + 200, mainStatsX + textHeight * 3 + 10 },
+        linesStr, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, textHeight);
 
     if (!tSpinText.empty() && now - tSpinDisplayTime < tSpinDisplayDuration) {
         float tSpinTextSize = textHeight * 1.1f;
@@ -580,7 +550,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
         }
 
         dc.drawText({ nextPreviewX, otherStatsY + textHeight * 2 + 5, nextPreviewX + 200, otherStatsX + tSpinTextSize },
-            tSpinText, tSpinTextColor, Renderer::FontSelection::PrimaryRegular, tSpinTextSize);
+                    tSpinText, tSpinTextColor, Renderer::FontSelection::PrimaryRegular, tSpinTextSize);
         otherStatsY += tSpinTextSize + lineSpacing;
     }
 
@@ -599,7 +569,8 @@ void BlockGame::onRenderOverlay(Event& evG) {
             }
         }
 
-        dc.drawText({ nextPreviewX, otherStatsY + textHeight * 2 + 10, nextPreviewX + 200, otherStatsX + lineClearTextSize },
+        dc.drawText(
+            { nextPreviewX, otherStatsY + textHeight * 2 + 10, nextPreviewX + 200, otherStatsX + lineClearTextSize },
             lineClearText, lineClearTextColor, Renderer::FontSelection::PrimaryRegular, lineClearTextSize);
         otherStatsY += lineClearTextSize + lineSpacing;
     }
@@ -615,7 +586,7 @@ void BlockGame::onRenderOverlay(Event& evG) {
         }
 
         dc.drawText({ nextPreviewX, otherStatsY + textHeight * 2 + 15, nextPreviewX + 200, otherStatsX + b2bSize },
-            b2bText, b2bColor, Renderer::FontSelection::PrimaryRegular, b2bSize);
+                    b2bText, b2bColor, Renderer::FontSelection::PrimaryRegular, b2bSize);
         otherStatsY += b2bSize + lineSpacing;
     }
 
@@ -655,14 +626,15 @@ void BlockGame::handleHold() {
         currentTetromino = tempHold;
         holdTetromino.rotationState = RotationState::STATE_0;
 
-        piecePosition = {static_cast<float>(BOARD_WIDTH / 2 - currentTetromino.dimension / 2), 0.0f};
-        if (currentTetromino.type == TetrominoType::I_PIECE) piecePosition = {3.0f, 0.0f};
-        else if (currentTetromino.type == TetrominoType::O_PIECE) piecePosition = {4.0f, 0.0f};
+        piecePosition = { static_cast<float>(BOARD_WIDTH / 2 - currentTetromino.dimension / 2), 0.0f };
+        if (currentTetromino.type == TetrominoType::I_PIECE)
+            piecePosition = { 3.0f, 0.0f };
+        else if (currentTetromino.type == TetrominoType::O_PIECE)
+            piecePosition = { 4.0f, 0.0f };
 
         while (!isValidPosition(currentTetromino, piecePosition) && piecePosition.y < BOARD_BUFFER) {
             piecePosition.y++;
         }
-
 
         if (!isValidPosition(currentTetromino, piecePosition)) {
             gameOver = true;
@@ -679,40 +651,39 @@ void BlockGame::createTetrominoShapes() {
     // Shapes defined with their rotation=0 state. Values 1-7 correspond to types.
     // Using 4x4 grid internally simplifies rotation logic.
     // I-shape (Type 1, Index 0) - Cyan - Uses 4x4
-    tetrominoShapes[0] = {
-        std::to_array<std::array<int, 4>>({{0, 0, 0, 0}, {1, 1, 1, 1}, {0, 0, 0, 0}, {0, 0, 0, 0}}), d2d::Color::RGB(0, 240, 240), 4, TetrominoType::I_PIECE
-    };
+    tetrominoShapes[0] = { std::to_array<std::array<int, 4>>(
+                               { { 0, 0, 0, 0 }, { 1, 1, 1, 1 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } }),
+                           d2d::Color::RGB(0, 240, 240), 4, TetrominoType::I_PIECE };
     // J-shape (Type 2, Index 1) - Blue - Uses 3x3 (padded to 4x4)
-    tetrominoShapes[1] = {
-        std::to_array<std::array<int, 4>>({{2, 0, 0, 0}, {2, 2, 2, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}), d2d::Color::RGB(0, 0, 240), 3, TetrominoType::J_PIECE
-    };
+    tetrominoShapes[1] = { std::to_array<std::array<int, 4>>(
+                               { { 2, 0, 0, 0 }, { 2, 2, 2, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } }),
+                           d2d::Color::RGB(0, 0, 240), 3, TetrominoType::J_PIECE };
     // L-shape (Type 3, Index 2) - Orange - Uses 3x3
-    tetrominoShapes[2] = {
-        std::to_array<std::array<int, 4>>({{0, 0, 3, 0}, {3, 3, 3, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}), d2d::Color::RGB(240, 160, 0), 3, TetrominoType::L_PIECE
-    };
+    tetrominoShapes[2] = { std::to_array<std::array<int, 4>>(
+                               { { 0, 0, 3, 0 }, { 3, 3, 3, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } }),
+                           d2d::Color::RGB(240, 160, 0), 3, TetrominoType::L_PIECE };
     // O-shape (Type 4, Index 3) - Yellow - Uses 2x2
-    tetrominoShapes[3] = {
-        std::to_array<std::array<int, 4>>({{4, 4, 0, 0}, {4, 4, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}), d2d::Color::RGB(240, 240, 0), 2, TetrominoType::O_PIECE
-    };
+    tetrominoShapes[3] = { std::to_array<std::array<int, 4>>(
+                               { { 4, 4, 0, 0 }, { 4, 4, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } }),
+                           d2d::Color::RGB(240, 240, 0), 2, TetrominoType::O_PIECE };
     // S-shape (Type 5, Index 4) - Green - Uses 3x3
-    tetrominoShapes[4] = {
-        std::to_array<std::array<int, 4>>({{0, 5, 5, 0}, {5, 5, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}), d2d::Color::RGB(0, 240, 0), 3, TetrominoType::S_PIECE
-    };
+    tetrominoShapes[4] = { std::to_array<std::array<int, 4>>(
+                               { { 0, 5, 5, 0 }, { 5, 5, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } }),
+                           d2d::Color::RGB(0, 240, 0), 3, TetrominoType::S_PIECE };
     // T-shape (Type 6, Index 5) - Purple - Uses 3x3
-    tetrominoShapes[5] = {
-        std::to_array<std::array<int, 4>>({{0, 6, 0, 0}, {6, 6, 6, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}), d2d::Color::RGB(160, 0, 240), 3, TetrominoType::T_PIECE
-    };
+    tetrominoShapes[5] = { std::to_array<std::array<int, 4>>(
+                               { { 0, 6, 0, 0 }, { 6, 6, 6, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } }),
+                           d2d::Color::RGB(160, 0, 240), 3, TetrominoType::T_PIECE };
     // Z-shape (Type 7, Index 6) - Red - Uses 3x3
-    tetrominoShapes[6] = {
-        std::to_array<std::array<int, 4>>({{7, 7, 0, 0}, {0, 7, 7, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}}), d2d::Color::RGB(240, 0, 0), 3, TetrominoType::Z_PIECE
-    };
+    tetrominoShapes[6] = { std::to_array<std::array<int, 4>>(
+                               { { 7, 7, 0, 0 }, { 0, 7, 7, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } }),
+                           d2d::Color::RGB(240, 0, 0), 3, TetrominoType::Z_PIECE };
 
     // hopefully resize fixes
     if (tetrominoShapes.empty()) {
         Logger::Fatal("Failed to initialize tetromino shapes");
     }
 }
-
 
 void BlockGame::spawnTetromino(bool firstSpawn) {
     if (tetrominoBag.empty()) {
@@ -741,12 +712,15 @@ void BlockGame::spawnTetromino(bool firstSpawn) {
     }
 
     piecePosition = { static_cast<float>(BOARD_WIDTH / 2 - currentTetromino.dimension / 2), 0.0f };
-    if (currentTetromino.type == TetrominoType::I_PIECE) piecePosition = { 3.0f, 0.0f };
-    else if (currentTetromino.type == TetrominoType::O_PIECE) piecePosition = { 4.0f, 0.0f };
+    if (currentTetromino.type == TetrominoType::I_PIECE)
+        piecePosition = { 3.0f, 0.0f };
+    else if (currentTetromino.type == TetrominoType::O_PIECE)
+        piecePosition = { 4.0f, 0.0f };
 
-    if (currentTetromino.type == TetrominoType::I_PIECE) piecePosition.y = 0;
-    else piecePosition.y = 1;
-
+    if (currentTetromino.type == TetrominoType::I_PIECE)
+        piecePosition.y = 0;
+    else
+        piecePosition.y = 1;
 
     if (!isValidPosition(currentTetromino, piecePosition)) {
         if (isValidPosition(currentTetromino, { piecePosition.x, piecePosition.y - 1 })) {
@@ -821,7 +795,7 @@ bool BlockGame::isValidPosition(const Tetromino& tetro, Vec2 pos) {
 }
 
 bool BlockGame::testMove(int dx, int dy) {
-    return isValidPosition(currentTetromino, piecePosition + Vec2{static_cast<float>(dx), static_cast<float>(dy)});
+    return isValidPosition(currentTetromino, piecePosition + Vec2 { static_cast<float>(dx), static_cast<float>(dy) });
 }
 
 void BlockGame::applyMove(int dx, int dy) {
@@ -863,14 +837,22 @@ bool BlockGame::rotateTetromino(bool clockwise) {
 
     int kickIndex = -1;
     // Map (currentState, newState) to the correct index (0-7) in the KickTable
-    if (currentState == 0 && newState == 1) kickIndex = 0; // 0->R
-    else if (currentState == 1 && newState == 0) kickIndex = 1; // R->0
-    else if (currentState == 1 && newState == 2) kickIndex = 2; // R->2
-    else if (currentState == 2 && newState == 1) kickIndex = 3; // 2->R
-    else if (currentState == 2 && newState == 3) kickIndex = 4; // 2->L
-    else if (currentState == 3 && newState == 2) kickIndex = 5; // L->2
-    else if (currentState == 3 && newState == 0) kickIndex = 6; // L->0
-    else if (currentState == 0 && newState == 3) kickIndex = 7; // 0->L
+    if (currentState == 0 && newState == 1)
+        kickIndex = 0; // 0->R
+    else if (currentState == 1 && newState == 0)
+        kickIndex = 1; // R->0
+    else if (currentState == 1 && newState == 2)
+        kickIndex = 2; // R->2
+    else if (currentState == 2 && newState == 1)
+        kickIndex = 3; // 2->R
+    else if (currentState == 2 && newState == 3)
+        kickIndex = 4; // 2->L
+    else if (currentState == 3 && newState == 2)
+        kickIndex = 5; // L->2
+    else if (currentState == 3 && newState == 0)
+        kickIndex = 6; // L->0
+    else if (currentState == 0 && newState == 3)
+        kickIndex = 7; // 0->L
 
     if (!kicks || kickIndex == -1) {
         Logger::Fatal("Invalid kick state calculated in rotateTetromino");
@@ -879,7 +861,8 @@ bool BlockGame::rotateTetromino(bool clockwise) {
 
     for (const auto& kick : (*kicks)[kickIndex]) {
         // IMPORTANT: SRS kick data is (X, Y) where Y is UP. Our board Y is DOWN.
-        Vec2 testPos = piecePosition + Vec2{static_cast<float>(kick.x), static_cast<float>(-kick.y)}; // Invert Y kick
+        Vec2 testPos =
+            piecePosition + Vec2 { static_cast<float>(kick.x), static_cast<float>(-kick.y) }; // Invert Y kick
 
         if (isValidPosition(rotated, testPos)) {
             piecePosition = testPos;
@@ -926,13 +909,7 @@ bool BlockGame::handle180Rotation() {
 
     Tetromino rotated = get180RotatedTetromino(currentTetromino);
 
-    static constexpr auto kicks180 = std::to_array<Vec2>({
-        { 0, 0 },
-        { 1, 0 },
-        { -1, 0 },
-        { 0, 1 },
-        { 0, -1 }
-        });
+    static constexpr auto kicks180 = std::to_array<Vec2>({ { 0, 0 }, { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } });
 
     for (const auto& kick : kicks180) {
         Vec2 testPos = piecePosition + kick;
@@ -963,7 +940,7 @@ BlockGame::Tetromino BlockGame::get180RotatedTetromino(const Tetromino& original
     Tetromino rotated = original;
     rotated.rotationState = static_cast<RotationState>((original.rotationState + 2) % 4);
 
-    int tempShape[4][4] = {{0}};
+    int tempShape[4][4] = { { 0 } };
     const int size = original.dimension;
 
     for (int y = 0; y < size; ++y) {
@@ -986,7 +963,7 @@ BlockGame::Tetromino BlockGame::get180RotatedTetromino(const Tetromino& original
 void BlockGame::hardDrop() {
     int dropDistance = 0;
     Vec2 testPos = piecePosition;
-    while (isValidPosition(currentTetromino, {testPos.x, testPos.y + 1})) {
+    while (isValidPosition(currentTetromino, { testPos.x, testPos.y + 1 })) {
         testPos.y++;
         dropDistance++;
     }
@@ -1017,7 +994,6 @@ void BlockGame::mergeTetromino() {
         lastMoveWasMiniTSpin = false;
     }
 
-
     for (int y = 0; y < currentTetromino.dimension; ++y) {
         for (int x = 0; x < currentTetromino.dimension; ++x) {
             if (currentTetromino.shape[y][x] != 0) {
@@ -1038,13 +1014,12 @@ void BlockGame::mergeTetromino() {
     lastActionWasRotation = false;
 }
 
-
 bool BlockGame::checkTSpinCorners() {
     Vec2 corners[] = {
         { piecePosition.x + 0, piecePosition.y + 0 }, // Top-left
         { piecePosition.x + 2, piecePosition.y + 0 }, // Top-right
         { piecePosition.x + 0, piecePosition.y + 2 }, // Bottom-left
-        { piecePosition.x + 2, piecePosition.y + 2 } // Bottom-right
+        { piecePosition.x + 2, piecePosition.y + 2 }  // Bottom-right
     };
 
     int occupiedCount = 0;
@@ -1092,17 +1067,22 @@ int BlockGame::clearLinesAndScore(bool tspin, bool miniTspin) {
         int destY = TOTAL_BOARD_HEIGHT - 1;
         for (int srcY = TOTAL_BOARD_HEIGHT - 1; srcY >= 0; --srcY) {
             bool wasCleared = false;
-            for (int cy : clearedLineIndices) if (srcY == cy) {
-                wasCleared = true;
-                break;
-            }
+            for (int cy : clearedLineIndices)
+                if (srcY == cy) {
+                    wasCleared = true;
+                    break;
+                }
             if (!wasCleared) {
-                if (destY != srcY) { for (int x = 0; x < BOARD_WIDTH; ++x) board[destY][x] = board[srcY][x]; }
+                if (destY != srcY) {
+                    for (int x = 0; x < BOARD_WIDTH; ++x)
+                        board[destY][x] = board[srcY][x];
+                }
                 destY--;
             }
         }
         while (destY >= 0) {
-            for (int x = 0; x < BOARD_WIDTH; ++x) board[destY][x] = 0;
+            for (int x = 0; x < BOARD_WIDTH; ++x)
+                board[destY][x] = 0;
             destY--;
         }
     }
@@ -1139,41 +1119,57 @@ int BlockGame::clearLinesAndScore(bool tspin, bool miniTspin) {
         // T-Spin Scores (TETR.IO guideline)
         if (miniTspin) {
             // Mini T-Spin
-            if (linesClearedThisTurn == 0) baseScore = 100;
-            else if (linesClearedThisTurn == 1) baseScore = 200;
-            else if (linesClearedThisTurn == 2) baseScore = 400;
-        }
-        else {
+            if (linesClearedThisTurn == 0)
+                baseScore = 100;
+            else if (linesClearedThisTurn == 1)
+                baseScore = 200;
+            else if (linesClearedThisTurn == 2)
+                baseScore = 400;
+        } else {
             // Regular T-Spin
-            if (linesClearedThisTurn == 0) baseScore = 400;
-            else if (linesClearedThisTurn == 1) baseScore = 800;
-            else if (linesClearedThisTurn == 2) baseScore = 1200;
-            else if (linesClearedThisTurn == 3) baseScore = 1600;
+            if (linesClearedThisTurn == 0)
+                baseScore = 400;
+            else if (linesClearedThisTurn == 1)
+                baseScore = 800;
+            else if (linesClearedThisTurn == 2)
+                baseScore = 1200;
+            else if (linesClearedThisTurn == 3)
+                baseScore = 1600;
         }
         if (miniTspin) {
             tSpinText = L"MINI T-SPIN";
-        }
-        else {
-            if (linesClearedThisTurn == 1) tSpinText = L"T-SPIN SINGLE";
-            else if (linesClearedThisTurn == 2) tSpinText = L"T-SPIN DOUBLE";
-            else if (linesClearedThisTurn == 3) tSpinText = L"T-SPIN TRIPLE";
+        } else {
+            if (linesClearedThisTurn == 1)
+                tSpinText = L"T-SPIN SINGLE";
+            else if (linesClearedThisTurn == 2)
+                tSpinText = L"T-SPIN DOUBLE";
+            else if (linesClearedThisTurn == 3)
+                tSpinText = L"T-SPIN TRIPLE";
         }
         tSpinDisplayTime = std::chrono::steady_clock::now();
-    }
-    else {
+    } else {
         // Standard Line Clears
-        if (linesClearedThisTurn == 1) baseScore = 100; // Single
-        else if (linesClearedThisTurn == 2) baseScore = 300; // Double
-        else if (linesClearedThisTurn == 3) baseScore = 500; // Triple
-        else if (linesClearedThisTurn >= 4) baseScore = 800; // Tetris (4 lines)
+        if (linesClearedThisTurn == 1)
+            baseScore = 100; // Single
+        else if (linesClearedThisTurn == 2)
+            baseScore = 300; // Double
+        else if (linesClearedThisTurn == 3)
+            baseScore = 500; // Triple
+        else if (linesClearedThisTurn >= 4)
+            baseScore = 800; // Tetris (4 lines)
         tSpinText = L"";
     }
 
-    if (linesClearedThisTurn == 1) lineClearText = L"SINGLE";
-    else if (linesClearedThisTurn == 2) lineClearText = L"DOUBLE";
-    else if (linesClearedThisTurn == 3) lineClearText = L"TRIPLE";
-    else if (linesClearedThisTurn >= 4) lineClearText = L"TETRIS";
-    else lineClearText = L"";
+    if (linesClearedThisTurn == 1)
+        lineClearText = L"SINGLE";
+    else if (linesClearedThisTurn == 2)
+        lineClearText = L"DOUBLE";
+    else if (linesClearedThisTurn == 3)
+        lineClearText = L"TRIPLE";
+    else if (linesClearedThisTurn >= 4)
+        lineClearText = L"TETRIS";
+    else
+        lineClearText = L"";
     if (linesClearedThisTurn > 0) lineClearDisplayTime = std::chrono::steady_clock::now();
 
     baseScore *= level;
@@ -1198,7 +1194,6 @@ int BlockGame::clearLinesAndScore(bool tspin, bool miniTspin) {
     if (linesClearedThisTurn > 0 || tspin) {
         lastClearWasDifficult = currentClearIsDifficult;
     }
-
 
     lastMoveWasTSpin = false;
     lastMoveWasMiniTSpin = false;

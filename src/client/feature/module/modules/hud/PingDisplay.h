@@ -3,11 +3,12 @@
 
 class PingDisplay : public TextModule {
 public:
-	PingDisplay();
+    PingDisplay();
 
-	std::wstringstream text(bool isDefault, bool inEditor) override;
+    std::wstringstream text(bool isDefault, bool inEditor) override;
 
-	void onAvgPing(Event& ev);
+    void onAvgPing(Event& ev);
+
 private:
-	int ping = 0;
+    int ping = 0;
 };

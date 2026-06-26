@@ -5,8 +5,9 @@
 
 class RendererInitEvent : public Event {
 public:
-	static const uint32_t hash = TOHASH(RendererInitEvent);
+    static const uint32_t hash = TOHASH(RendererInitEvent);
 
-	RendererInitEvent() {};
+    RendererInitEvent() {};
+
 private:
 };

@@ -28,16 +28,14 @@ struct entt::type_hash<Type> {
         return hash;
     }
 
-    [[nodiscard]] consteval operator id_type() const noexcept {
-        return value();
-    }
+    [[nodiscard]] consteval operator id_type() const noexcept { return value(); }
 };
 
 class EntityRegistry : public std::enable_shared_from_this<EntityRegistry> {
 public:
-	std::string name;
-	entt::basic_registry<EntityId> ownedRegistry;
-	uint32_t id;
+    std::string name;
+    entt::basic_registry<EntityId> ownedRegistry;
+    uint32_t id;
 
     template<typename T>
     T* tryGetGlobalComponent() {
@@ -47,7 +45,7 @@ public:
 
 class EntityContext {
 public:
-	EntityRegistry& registry;
-	entt::basic_registry<EntityId>& enttRegistry;
-	EntityId entity;
+    EntityRegistry& registry;
+    entt::basic_registry<EntityId>& enttRegistry;
+    EntityId entity;
 };

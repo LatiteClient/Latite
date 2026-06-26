@@ -4,11 +4,13 @@
 
 class RenderNameTagEvent : public Event {
 public:
-	static const uint32_t hash = TOHASH(RenderNameTagEvent);
+    static const uint32_t hash = TOHASH(RenderNameTagEvent);
 
-	RenderNameTagEvent(std::string* nametag) : nametag(nametag) {}
+    RenderNameTagEvent(std::string* nametag)
+        : nametag(nametag) {}
 
-	[[nodiscard]] std::string* getNametag() { return nametag; }
+    [[nodiscard]] std::string* getNametag() { return nametag; }
+
 private:
-	std::string* nametag;
+    std::string* nametag;
 };

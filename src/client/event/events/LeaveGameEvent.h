@@ -4,7 +4,7 @@
 
 class LeaveGameEvent : public Event {
 public:
-	LeaveGameEvent() = default;
+    LeaveGameEvent() = default;
 
-	static const uint32_t hash = TOHASH(LeaveGameEvent);
+    static const uint32_t hash = TOHASH(LeaveGameEvent);
 };

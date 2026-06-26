@@ -1,12 +1,11 @@
 #pragma once
 #include "../../Module.h"
 
-class ChunkBorders : public Module
-{
-	ValueType transparent = BoolValue(true);
+class ChunkBorders : public Module {
+    ValueType transparent = BoolValue(true);
+
 public:
-	ChunkBorders();
+    ChunkBorders();
 
-	void onRender3d(Event& evG);
+    void onRender3d(Event& evG);
 };
-

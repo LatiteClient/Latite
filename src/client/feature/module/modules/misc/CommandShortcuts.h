@@ -3,8 +3,8 @@
 
 class CommandShortcuts : public Module {
 public:
-	CommandShortcuts();
-	virtual ~CommandShortcuts() {};
+    CommandShortcuts();
+    virtual ~CommandShortcuts() {};
 
-	void onPacket(Event& evG);
+    void onPacket(Event& evG);
 };

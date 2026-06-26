@@ -1,9 +1,9 @@
 #pragma once
 
 namespace SDK {
-	struct RenderRotationComponent : IEntityComponent {
-		static constexpr uint32_t type_hash = 0xD15944E2;
+    struct RenderRotationComponent : IEntityComponent {
+        static constexpr uint32_t type_hash = 0xD15944E2;
 
-		Vec2 rotation;
-	};
+        Vec2 rotation;
+    };
 }

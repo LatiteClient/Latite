@@ -2,8 +2,9 @@
 #include "ComboCounter.h"
 #include <mc/common/network/packet/ActorEventPacket.h>
 
-ComboCounter::ComboCounter() : TextModule("ComboCounter", LocalizeString::get("client.textmodule.comboCounter.name"),
-                                          LocalizeString::get("client.textmodule.comboCounter.desc"), HUD) {
+ComboCounter::ComboCounter()
+    : TextModule("ComboCounter", LocalizeString::get("client.textmodule.comboCounter.name"),
+                 LocalizeString::get("client.textmodule.comboCounter.desc"), HUD) {
     prefix = TextValue(LocalizeString::get("client.textmodule.comboCounter.count.name"));
 
     listen<AttackEvent>((EventListenerFunc)&ComboCounter::onAttack);
@@ -17,7 +18,7 @@ std::wstringstream ComboCounter::text(bool isDefault, bool inEditor) {
 
 void ComboCounter::onAttack(Event& evG) {
     auto& ev = reinterpret_cast<AttackEvent&>(evG);
-    
+
     auto ent = ev.getActor();
 
     if (ent->getRuntimeID() != lastRuntimeId) {

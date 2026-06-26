@@ -3,12 +3,12 @@
 
 class AutoGG : public Module {
 public:
-	AutoGG();
-	virtual ~AutoGG() {};
+    AutoGG();
+    virtual ~AutoGG() {};
 
-	void onText(Event&);
+    void onText(Event&);
 
 private:
-	ValueType useCustomMessage = BoolValue(false);
-	ValueType customMessage = TextValue(L"ggs!");
+    ValueType useCustomMessage = BoolValue(false);
+    ValueType customMessage = TextValue(L"ggs!");
 };

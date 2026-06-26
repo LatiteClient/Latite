@@ -33,16 +33,11 @@ namespace {
 
         size_t offset = 0;
         while (offset < text.size()) {
-            auto found = std::search(
-                text.begin() + static_cast<std::ptrdiff_t>(offset),
-                text.end(),
-                search.begin(),
-                search.end(),
-                [](char lhs, char rhs) {
-                    return std::tolower(static_cast<unsigned char>(lhs)) ==
-                        std::tolower(static_cast<unsigned char>(rhs));
-                }
-            );
+            auto found = std::search(text.begin() + static_cast<std::ptrdiff_t>(offset), text.end(), search.begin(),
+                                     search.end(), [](char lhs, char rhs) {
+                                         return std::tolower(static_cast<unsigned char>(lhs)) ==
+                                                std::tolower(static_cast<unsigned char>(rhs));
+                                     });
 
             if (found == text.end()) {
                 break;
@@ -54,11 +49,8 @@ namespace {
         }
     }
 
-    void AddPathRedaction(
-        std::vector<std::pair<std::string, std::string>>& redactions,
-        std::string const& path,
-        std::string token
-    ) {
+    void AddPathRedaction(std::vector<std::pair<std::string, std::string>>& redactions, std::string const& path,
+                          std::string token) {
         if (path.empty()) {
             return;
         }
@@ -88,144 +80,144 @@ namespace {
 
 namespace util {
     namespace detail {
-        template <typename T>
+        template<typename T>
         class ListOr : public std::list<T> {
         public:
-            ListOr(T const& item) : std::list<T>({item}) {}
-            ListOr(std::initializer_list<T> list) : std::list<T>(list) {}
+            ListOr(T const& item)
+                : std::list<T>({ item }) {}
+            ListOr(std::initializer_list<T> list)
+                : std::list<T>(list) {}
         };
     }
 
     std::unordered_map<size_t, const char*> KeyNames = {
-        {0, "None"},
-        {0x8, "Backspace"},
-        {0x9, "Tab"},
-        {0xC, "Clear"},
-        {0xD, "Return"},
-        {0x10, "Shift"},
-        {0x11, "Ctrl"},
-        {0x12, "Alt"},
-        {0x13, "Pause"},
-        {0x14, "CapsLock"},
-        {0x15, "Kana"},
-        {0x16, "IME On"},
-        {0x17, "Junja"},
-        {0x18, "Final"},
-        {0x19, "Hanja"},
-        {0x1A, "IME Off"},
-        {0x1B, "Escape"},
-        {0x20, "Space"},
-        {0x21, "PageUp"},
-        {0x22, "PageDown"},
-        {0x23, "End"},
-        {0x24, "Home"},
-        {0x25, "Left"},
-        {0x26, "Up"},
-        {0x27, "Right"},
-        {0x28, "Down"},
-        {0x29, "Select"},
-        {0x2A, "Print"},
-        {0x2B, "Execute"},
-        {0x2C, "PrintScreen"},
-        {0x2D, "Insert"},
-        {0x2E, "Delete"},
-        {0x2F, "Help"},
-        {0x30, "0"},
-        {0x31, "1"},
-        {0x32, "2"},
-        {0x33, "3"},
-        {0x34, "4"},
-        {0x35, "5"},
-        {0x36, "6"},
-        {0x37, "7"},
-        {0x38, "8"},
-        {0x39, "9"},
-        
+        { 0, "None" },
+        { 0x8, "Backspace" },
+        { 0x9, "Tab" },
+        { 0xC, "Clear" },
+        { 0xD, "Return" },
+        { 0x10, "Shift" },
+        { 0x11, "Ctrl" },
+        { 0x12, "Alt" },
+        { 0x13, "Pause" },
+        { 0x14, "CapsLock" },
+        { 0x15, "Kana" },
+        { 0x16, "IME On" },
+        { 0x17, "Junja" },
+        { 0x18, "Final" },
+        { 0x19, "Hanja" },
+        { 0x1A, "IME Off" },
+        { 0x1B, "Escape" },
+        { 0x20, "Space" },
+        { 0x21, "PageUp" },
+        { 0x22, "PageDown" },
+        { 0x23, "End" },
+        { 0x24, "Home" },
+        { 0x25, "Left" },
+        { 0x26, "Up" },
+        { 0x27, "Right" },
+        { 0x28, "Down" },
+        { 0x29, "Select" },
+        { 0x2A, "Print" },
+        { 0x2B, "Execute" },
+        { 0x2C, "PrintScreen" },
+        { 0x2D, "Insert" },
+        { 0x2E, "Delete" },
+        { 0x2F, "Help" },
+        { 0x30, "0" },
+        { 0x31, "1" },
+        { 0x32, "2" },
+        { 0x33, "3" },
+        { 0x34, "4" },
+        { 0x35, "5" },
+        { 0x36, "6" },
+        { 0x37, "7" },
+        { 0x38, "8" },
+        { 0x39, "9" },
+
         // A-Z calculated automatically
 
-        {0x5B, "Windows"},
-        {0x5C, "RightWindows"},
-        {0x5D, "Applications"},
-        {0x5F, "Sleep"},
-        {0x60, "Numpad0"},
-        {0x61, "Numpad1"},
-        {0x62, "Numpad2"},
-        {0x63, "Numpad3"},
-        {0x64, "Numpad4"},
-        {0x65, "Numpad5"},
-        {0x66, "Numpad6"},
-        {0x67, "Numpad7"},
-        {0x68, "Numpad8"},
-        {0x69, "Numpad9"},
-        {0x6A, "Multiply"},
-        {0x6B, "Add"},
-        {0x6C, "Separator"},
-        {0x6D, "Subtract"},
-        {0x6E, "Decimal"},
-        {0x6F, "Divide"},
+        { 0x5B, "Windows" },
+        { 0x5C, "RightWindows" },
+        { 0x5D, "Applications" },
+        { 0x5F, "Sleep" },
+        { 0x60, "Numpad0" },
+        { 0x61, "Numpad1" },
+        { 0x62, "Numpad2" },
+        { 0x63, "Numpad3" },
+        { 0x64, "Numpad4" },
+        { 0x65, "Numpad5" },
+        { 0x66, "Numpad6" },
+        { 0x67, "Numpad7" },
+        { 0x68, "Numpad8" },
+        { 0x69, "Numpad9" },
+        { 0x6A, "Multiply" },
+        { 0x6B, "Add" },
+        { 0x6C, "Separator" },
+        { 0x6D, "Subtract" },
+        { 0x6E, "Decimal" },
+        { 0x6F, "Divide" },
 
-        {0x70, "F1"},
-        {0x71, "F2"},
-        {0x72, "F3"},
-        {0x73, "F4"},
-        {0x74, "F5"},
-        {0x75, "F6"},
-        {0x76, "F7"},
-        {0x77, "F8"},
-        {0x78, "F9"},
-        {0x79, "F10"},
-        {0x7A, "F11"},
-        {0x7B, "F12"},
-        {0x7C, "F13"},
-        {0x7D, "F14"},
-        {0x7E, "F15"},
-        {0x7F, "F16"},
-        {0x80, "F17"},
-        {0x81, "F18"},
-        {0x82, "F19"},
-        {0x83, "F20"},
-        {0x84, "F21"},
-        {0x85, "F22"},
-        {0x86, "F23"},
-        {0x87, "F24"},
+        { 0x70, "F1" },
+        { 0x71, "F2" },
+        { 0x72, "F3" },
+        { 0x73, "F4" },
+        { 0x74, "F5" },
+        { 0x75, "F6" },
+        { 0x76, "F7" },
+        { 0x77, "F8" },
+        { 0x78, "F9" },
+        { 0x79, "F10" },
+        { 0x7A, "F11" },
+        { 0x7B, "F12" },
+        { 0x7C, "F13" },
+        { 0x7D, "F14" },
+        { 0x7E, "F15" },
+        { 0x7F, "F16" },
+        { 0x80, "F17" },
+        { 0x81, "F18" },
+        { 0x82, "F19" },
+        { 0x83, "F20" },
+        { 0x84, "F21" },
+        { 0x85, "F22" },
+        { 0x86, "F23" },
+        { 0x87, "F24" },
 
-        {0x90, "NumLock"},
-        {0x91, "ScrollLock"},
-        {0xA2, "LCtrl"},
-        {0xA3, "RCtrl"},
-        {0xAD, "VolumeMute"},
-        {0xAE, "VolumeDown"},
-        {0xAF, "VolumeUp"},
-        {0xB0, "NextTrack"},
-        {0xB1, "PrevTrack"},
-        {0xB2, "MediaStop"},
-        {0xB3, "PlayPause"},
-        {0xB4, "LaunchMail"},
+        { 0x90, "NumLock" },
+        { 0x91, "ScrollLock" },
+        { 0xA2, "LCtrl" },
+        { 0xA3, "RCtrl" },
+        { 0xAD, "VolumeMute" },
+        { 0xAE, "VolumeDown" },
+        { 0xAF, "VolumeUp" },
+        { 0xB0, "NextTrack" },
+        { 0xB1, "PrevTrack" },
+        { 0xB2, "MediaStop" },
+        { 0xB3, "PlayPause" },
+        { 0xB4, "LaunchMail" },
     };
 }
 
 std::filesystem::path util::GetRootPath() {
-    wchar_t buf[MAX_PATH]{};
+    wchar_t buf[MAX_PATH] {};
     const auto res = GetEnvironmentVariableW(L"LOCALAPPDATA", buf, MAX_PATH);
 
-    if (res > 0)
-        return std::wstring(buf, res);
+    if (res > 0) return std::wstring(buf, res);
 
     return std::wstring();
 }
 
 std::filesystem::path util::GetRoamingPath() {
-    wchar_t buf[MAX_PATH]{};
+    wchar_t buf[MAX_PATH] {};
     const auto res = GetEnvironmentVariableW(L"LOCALAPPDATA", buf, MAX_PATH);
 
-    if (res > 0)
-        return std::wstring(buf, res);
+    if (res > 0) return std::wstring(buf, res);
 
     return std::wstring();
 }
 
 std::filesystem::path util::GetLatitePath() {
-    return GetRoamingPath()/"Latite";
+    return GetRoamingPath() / "Latite";
 }
 
 std::wstring util::StrToWStr(std::string const& s) {
@@ -264,8 +256,8 @@ std::string util::Format(std::string const& s) {
         if (ch == '&') {
             out += (char)0xC2;
             out += (char)0xA7;
-        }
-        else out += ch;
+        } else
+            out += ch;
     }
     return out;
 }
@@ -276,18 +268,16 @@ std::wstring util::WFormat(std::wstring const& s) {
     for (auto& ch : s) {
         if (ch == L'&') {
             out += L'\u00A7';
-        }
-        else out += ch;
+        } else
+            out += ch;
     }
     return out;
 }
 
 bool util::IsMinecraftFormattingCode(wchar_t code) {
     code = NormalizeMinecraftFormattingCode(code);
-    return (code >= L'0' && code <= L'9') ||
-        (code >= L'a' && code <= L'f') ||
-        (code >= L'k' && code <= L'o') ||
-        code == L'r';
+    return (code >= L'0' && code <= L'9') || (code >= L'a' && code <= L'f') || (code >= L'k' && code <= L'o') ||
+           code == L'r';
 }
 
 wchar_t util::NormalizeMinecraftFormattingCode(wchar_t code) {
@@ -304,7 +294,7 @@ std::vector<util::MinecraftFormatRun> util::ParseMinecraftFormatting(std::wstrin
 
     auto flush = [&]() {
         if (!currentText.empty()) {
-            runs.push_back(MinecraftFormatRun{ std::move(currentText), currentColor });
+            runs.push_back(MinecraftFormatRun { std::move(currentText), currentColor });
             currentText.clear();
         }
     };
@@ -316,8 +306,7 @@ std::vector<util::MinecraftFormatRun> util::ParseMinecraftFormatting(std::wstrin
 
             if ((code >= L'0' && code <= L'9') || (code >= L'a' && code <= L'f')) {
                 currentColor = code;
-            }
-            else if (code == L'r') {
+            } else if (code == L'r') {
                 currentColor = L'\0';
             }
 
@@ -353,23 +342,40 @@ d2d::Color util::MinecraftFormattingColor(wchar_t code, d2d::Color const& fallba
     };
 
     switch (NormalizeMinecraftFormattingCode(code)) {
-    case L'0': return withAlpha(d2d::Color::RGB(0, 0, 0));
-    case L'1': return withAlpha(d2d::Color::RGB(0, 0, 170));
-    case L'2': return withAlpha(d2d::Color::RGB(0, 170, 0));
-    case L'3': return withAlpha(d2d::Color::RGB(0, 170, 170));
-    case L'4': return withAlpha(d2d::Color::RGB(170, 0, 0));
-    case L'5': return withAlpha(d2d::Color::RGB(170, 0, 170));
-    case L'6': return withAlpha(d2d::Color::RGB(255, 170, 0));
-    case L'7': return withAlpha(d2d::Color::RGB(170, 170, 170));
-    case L'8': return withAlpha(d2d::Color::RGB(85, 85, 85));
-    case L'9': return withAlpha(d2d::Color::RGB(85, 85, 255));
-    case L'a': return withAlpha(d2d::Color::RGB(85, 255, 85));
-    case L'b': return withAlpha(d2d::Color::RGB(85, 255, 255));
-    case L'c': return withAlpha(d2d::Color::RGB(255, 85, 85));
-    case L'd': return withAlpha(d2d::Color::RGB(255, 85, 255));
-    case L'e': return withAlpha(d2d::Color::RGB(255, 255, 85));
-    case L'f': return withAlpha(d2d::Color::RGB(255, 255, 255));
-    default: return fallback;
+    case L'0':
+        return withAlpha(d2d::Color::RGB(0, 0, 0));
+    case L'1':
+        return withAlpha(d2d::Color::RGB(0, 0, 170));
+    case L'2':
+        return withAlpha(d2d::Color::RGB(0, 170, 0));
+    case L'3':
+        return withAlpha(d2d::Color::RGB(0, 170, 170));
+    case L'4':
+        return withAlpha(d2d::Color::RGB(170, 0, 0));
+    case L'5':
+        return withAlpha(d2d::Color::RGB(170, 0, 170));
+    case L'6':
+        return withAlpha(d2d::Color::RGB(255, 170, 0));
+    case L'7':
+        return withAlpha(d2d::Color::RGB(170, 170, 170));
+    case L'8':
+        return withAlpha(d2d::Color::RGB(85, 85, 85));
+    case L'9':
+        return withAlpha(d2d::Color::RGB(85, 85, 255));
+    case L'a':
+        return withAlpha(d2d::Color::RGB(85, 255, 85));
+    case L'b':
+        return withAlpha(d2d::Color::RGB(85, 255, 255));
+    case L'c':
+        return withAlpha(d2d::Color::RGB(255, 85, 85));
+    case L'd':
+        return withAlpha(d2d::Color::RGB(255, 85, 255));
+    case L'e':
+        return withAlpha(d2d::Color::RGB(255, 255, 85));
+    case L'f':
+        return withAlpha(d2d::Color::RGB(255, 255, 255));
+    default:
+        return fallback;
     }
 }
 
@@ -385,8 +391,7 @@ std::wstring util::FormatWString(std::wstring const& formatString, std::vector<s
             }
             result << formatArgs[argIndex++];
             pos += 2; // Skip over the "{}"
-        }
-        else {
+        } else {
             result << formatString[pos++];
         }
     }
@@ -406,13 +411,11 @@ std::wstring util::GetClipboardText() {
 
     // Get handle of clipboard object for ANSI text
     HANDLE hData = GetClipboardData(CF_UNICODETEXT);
-    if (hData == nullptr)
-        return L"";
+    if (hData == nullptr) return L"";
 
     // Lock the handle to get the actual text pointer
     wchar_t* pszText = static_cast<wchar_t*>(GlobalLock(hData));
-    if (pszText == nullptr)
-        return L"";
+    if (pszText == nullptr) return L"";
 
     // Save text in a string class instance
     std::wstring text(pszText);
@@ -432,8 +435,7 @@ void util::SetClipboardText(std::wstring const& text) {
         HGLOBAL hg = GlobalAlloc(GMEM_MOVEABLE, (text.size() * 2) + 1); // \0
         if (!hg) {
             CloseClipboard();
-        }
-        else {
+        } else {
             memcpy(GlobalLock(hg), text.c_str(), (text.size() * 2) + 1);
             GlobalUnlock(hg);
             SetClipboardData(CF_UNICODETEXT, hg);
@@ -478,7 +480,7 @@ std::string util::ToUpper(std::string const& s) {
     std::string ret = s;
     std::transform(ret.begin(), ret.end(), ret.begin(), [](char c) {
         return c - (char)20;
-        });
+    });
     return ret;
 }
 
@@ -512,7 +514,7 @@ void util::PlaySoundUI(std::string const& sound, float volume, float pitch) {
 
 Color util::LerpColorState(Color const& current, Color const& on, Color const& off, bool state, float speed) {
     Color ret = current;
-    float t = Latite::getRenderer().getDeltaTime()* (speed / 10.f);
+    float t = Latite::getRenderer().getDeltaTime() * (speed / 10.f);
     ret.r = std::lerp(current.r, state ? on.r : off.r, t);
     ret.g = std::lerp(current.g, state ? on.g : off.g, t);
     ret.b = std::lerp(current.b, state ? on.b : off.b, t);
@@ -520,9 +522,8 @@ Color util::LerpColorState(Color const& current, Color const& on, Color const& o
     return ret;
 }
 
-
 HSV util::ColorToHSV(Color const& color) {
-    HSV hsv{ 0.f, 0.f, 0.f };
+    HSV hsv { 0.f, 0.f, 0.f };
 
     float minVal = std::min(color.r, std::min(color.g, color.b));
     float maxVal = std::max(color.r, std::max(color.g, color.b));
@@ -533,17 +534,14 @@ HSV util::ColorToHSV(Color const& color) {
     if (delta == 0) {
         hsv.h = 0;
         hsv.s = 0;
-    }
-    else {
+    } else {
         hsv.s = delta / maxVal;
 
         if (color.r == maxVal) {
             hsv.h = (color.g - color.b) / delta;
-        }
-        else if (color.g == maxVal) {
+        } else if (color.g == maxVal) {
             hsv.h = 2 + (color.b - color.r) / delta;
-        }
-        else {
+        } else {
             hsv.h = 4 + (color.r - color.g) / delta;
         }
 
@@ -561,15 +559,15 @@ Color util::HSVToColor(HSV const& hsv) {
     Color color;
     color.a = 1.f;
     float hue = hsv.h;
-    while (hue >= 360.f) hue -= 360.f;
+    while (hue >= 360.f)
+        hue -= 360.f;
 
     if (hsv.s == 0) {
         // grayscale
         color.r = hsv.v;
         color.g = hsv.v;
         color.b = hsv.v;
-    }
-    else {
+    } else {
         int i = static_cast<int>(std::floor(hue / 60.f));
         float f = hue / 60.f - i;
         float p = hsv.v * (1.f - hsv.s);
@@ -627,7 +625,7 @@ Vec4 util::RotToQuaternion(Vec2 const& rot) {
     float cz = std::cos(roll * 0.5f);
     float sz = std::sin(roll * 0.5f);
 
-    return Vec4{
+    return Vec4 {
         (cx * cy * sz) - (sx * sy * cz), // quat.x
         (cx * cy * cz) + (sx * sy * sz), // quat.y
         (sx * cy * cz) - (cx * sy * sz), // quat.z
@@ -650,9 +648,8 @@ Vec2 util::QuaternionToRot(const Vec4& quat) {
     // pitch (y-axis rotation)
     float sinp = 2.f * (quat.y * quat.w - quat.x * quat.z);
     if (std::abs(sinp) >= 1.f) {
-        pitch = std::copysign(pi_f / 2.f, sinp);  // use 90 degrees if out of range
-    }
-    else {
+        pitch = std::copysign(pi_f / 2.f, sinp); // use 90 degrees if out of range
+    } else {
         pitch = std::asin(sinp);
     }
 
@@ -661,10 +658,7 @@ Vec2 util::QuaternionToRot(const Vec4& quat) {
     float cosy_cosp = 1.f - (2.f * (quat.z * quat.z + quat.w * quat.w));
     yaw = std::atan2(siny_cosp, cosy_cosp);
 
-    return Vec2{
-        pitch * radDegrees,
-        yaw * radDegrees
-    };
+    return Vec2 { pitch * radDegrees, yaw * radDegrees };
 }
 
 void util::KeepInBounds(d2d::Rect& targ, d2d::Rect const& bounds) {
@@ -690,17 +684,14 @@ void util::KeepInBounds(d2d::Rect& targ, d2d::Rect const& bounds) {
 }
 
 std::string util::GetProcessorInfo() {
-    constexpr std::array<int, 3> cpuIds = { static_cast<int>(0x80000002), static_cast<int>(0x80000003), static_cast<int>(0x80000004) };
-    std::array<int, 4 + 1> data{}; // the extra int is to accommodate for the null terminator
+    constexpr std::array<int, 3> cpuIds = { static_cast<int>(0x80000002), static_cast<int>(0x80000003),
+                                            static_cast<int>(0x80000004) };
+    std::array<int, 4 + 1> data {}; // the extra int is to accommodate for the null terminator
     std::string model;
 
 #ifdef __clang__
     for (auto& id : cpuIds) {
-        __asm__ __volatile__ (
-                "cpuid"
-                : "=a" (data[0]), "=b" (data[1]), "=c" (data[2]), "=d" (data[3])
-                : "a" (id)
-                );
+        __asm__ __volatile__("cpuid" : "=a"(data[0]), "=b"(data[1]), "=c"(data[2]), "=d"(data[3]) : "a"(id));
         model += std::string(reinterpret_cast<const char*>(data.data()));
     }
 #else

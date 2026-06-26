@@ -5,10 +5,12 @@
 
 class RenderOverlayEvent : public Event {
 public:
-	static const uint32_t hash = TOHASH(RenderOverlayEvent);
+    static const uint32_t hash = TOHASH(RenderOverlayEvent);
 
-	RenderOverlayEvent(ID2D1DeviceContext* ctx) : ctx(ctx) {};
-	[[nodiscard]] ID2D1DeviceContext* getDeviceContext() noexcept { return ctx; };
+    RenderOverlayEvent(ID2D1DeviceContext* ctx)
+        : ctx(ctx) {};
+    [[nodiscard]] ID2D1DeviceContext* getDeviceContext() noexcept { return ctx; };
+
 private:
-	ID2D1DeviceContext* ctx;
+    ID2D1DeviceContext* ctx;
 };

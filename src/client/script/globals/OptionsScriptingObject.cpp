@@ -2,13 +2,17 @@
 #include "OptionsScriptingObject.h"
 #include <mc/common/client/game/Options.h>
 
-JsValueRef OptionsScriptingObject::getPlayerViewPerspective(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+JsValueRef OptionsScriptingObject::getPlayerViewPerspective(JsValueRef callee, bool isConstructor,
+                                                            JsValueRef* arguments, unsigned short argCount,
+                                                            void* callbackState) {
     return Chakra::MakeInt(SDK::ClientInstance::get()->getOptions()->getPlayerViewPerspective());
 }
 
-JsValueRef OptionsScriptingObject::setPlayerViewPerspective(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount, void* callbackState) {
+JsValueRef OptionsScriptingObject::setPlayerViewPerspective(JsValueRef callee, bool isConstructor,
+                                                            JsValueRef* arguments, unsigned short argCount,
+                                                            void* callbackState) {
     if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
-    if (!Chakra::VerifyParameters({ {arguments[1], JsNumber} })) return JS_INVALID_REFERENCE;
+    if (!Chakra::VerifyParameters({ { arguments[1], JsNumber } })) return JS_INVALID_REFERENCE;
 
     int perspective = Chakra::GetInt(arguments[1]);
 

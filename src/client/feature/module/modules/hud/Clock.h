@@ -3,12 +3,13 @@
 
 class Clock : public TextModule {
 public:
-	Clock();
+    Clock();
 
-	std::wstringstream text(bool isDefault, bool inEditor) override;
-	std::string getTimeString();
+    std::wstringstream text(bool isDefault, bool inEditor) override;
+    std::string getTimeString();
+
 private:
-	ValueType militaryTime = BoolValue(false);
-	ValueType showSeconds = BoolValue(false);
-	ValueType showDate = BoolValue(false);
+    ValueType militaryTime = BoolValue(false);
+    ValueType showSeconds = BoolValue(false);
+    ValueType showDate = BoolValue(false);
 };

@@ -5,21 +5,21 @@
 
 class JsModule : public Module, public JsEvented {
 public:
-	JsModule(std::string const& name, std::wstring const& displayName, 
-		std::wstring const& desc, int key);
+    JsModule(std::string const& name, std::wstring const& displayName, std::wstring const& desc, int key);
 
-	~JsModule() {
-		// FIXME: check if no leak
-		//JS::JsRelease(object, nullptr);
-	}
+    ~JsModule() {
+        // FIXME: check if no leak
+        // JS::JsRelease(object, nullptr);
+    }
 
-	void onEnable() override;
-	void onDisable() override;
-	bool shouldHoldToToggle() override;
-	JsValueRef object = JS_INVALID_REFERENCE;
+    void onEnable() override;
+    void onDisable() override;
+    bool shouldHoldToToggle() override;
+    JsValueRef object = JS_INVALID_REFERENCE;
+
 private:
-	std::string displayName;
+    std::string displayName;
 
-	JsContextRef ctx = JS_INVALID_REFERENCE;
-	bool cacheHoldToToggle = false;
+    JsContextRef ctx = JS_INVALID_REFERENCE;
+    bool cacheHoldToToggle = false;
 };

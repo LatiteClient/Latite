@@ -4,14 +4,15 @@
 
 class MovableCoordinates : public HUDModule {
 public:
-	MovableCoordinates();
+    MovableCoordinates();
 
-	[[nodiscard]] virtual bool forceMinecraftRenderer() override { return true; }
-	virtual void render(DrawUtil& ctx, bool isDefault, bool inEditor);
+    [[nodiscard]] virtual bool forceMinecraftRenderer() override { return true; }
+    virtual void render(DrawUtil& ctx, bool isDefault, bool inEditor);
 
-	void onRenderLayer(Event& ev);
-	void updatePos();
+    void onRenderLayer(Event& ev);
+    void updatePos();
+
 private:
-	SDK::UIControl* vanillaCoordinates = nullptr;
-	ValueType hideVanillaCoordinates = BoolValue(false);
+    SDK::UIControl* vanillaCoordinates = nullptr;
+    ValueType hideVanillaCoordinates = BoolValue(false);
 };

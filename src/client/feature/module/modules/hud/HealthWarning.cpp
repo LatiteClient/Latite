@@ -6,26 +6,33 @@
 #include "pch.h"
 #include "util/WorldToScreen.h"
 
-HealthWarning::HealthWarning() : Module("HealthWarning", LocalizeString::get("client.hudmodule.healthWarning.name"), LocalizeString::get("client.hudmodule.healthWarning.desc"), HUD, nokeybind) {
-	this->listen<RenderLayerEvent>(&HealthWarning::onRenderLayer);
-	addSetting("vignetteColor", LocalizeString::get("client.hudmodule.healthWarning.vignetteColor.name"), L"", vignetteColor);
-	addSliderSetting("healthPointThreshold", LocalizeString::get("client.hudmodule.healthWarning.healthPointThreshold.name"), L"", healthPointThreshold, FloatValue(1.f), FloatValue(19.f), FloatValue(.5f));
-	addSliderSetting("vignetteFade", LocalizeString::get("client.hudmodule.healthWarning.vignetteFade.name"), L"", vignetteFade, FloatValue(0.f), FloatValue(1.f), FloatValue(.1f));
+HealthWarning::HealthWarning()
+    : Module("HealthWarning", LocalizeString::get("client.hudmodule.healthWarning.name"),
+             LocalizeString::get("client.hudmodule.healthWarning.desc"), HUD, nokeybind) {
+    this->listen<RenderLayerEvent>(&HealthWarning::onRenderLayer);
+    addSetting("vignetteColor", LocalizeString::get("client.hudmodule.healthWarning.vignetteColor.name"), L"",
+               vignetteColor);
+    addSliderSetting("healthPointThreshold",
+                     LocalizeString::get("client.hudmodule.healthWarning.healthPointThreshold.name"), L"",
+                     healthPointThreshold, FloatValue(1.f), FloatValue(19.f), FloatValue(.5f));
+    addSliderSetting("vignetteFade", LocalizeString::get("client.hudmodule.healthWarning.vignetteFade.name"), L"",
+                     vignetteFade, FloatValue(0.f), FloatValue(1.f), FloatValue(.1f));
 }
 
-
 void HealthWarning::onRenderLayer(Event& evG) {
-	RenderLayerEvent& ev = reinterpret_cast<RenderLayerEvent&>(evG);
-	SDK::ScreenView* screenView = ev.getScreenView();
+    RenderLayerEvent& ev = reinterpret_cast<RenderLayerEvent&>(evG);
+    SDK::ScreenView* screenView = ev.getScreenView();
 
-	if (!SDK::ClientInstance::get()->getLocalPlayer()) return;
+    if (!SDK::ClientInstance::get()->getLocalPlayer()) return;
 
-	StoredColor vignette = std::get<ColorValue>(vignetteColor).getMainColor();
+    StoredColor vignette = std::get<ColorValue>(vignetteColor).getMainColor();
 
-	MCDrawUtil dc{ ev.getUIRenderContext(), SDK::ClientInstance::get()->minecraftGame->getFontRepository()->getMinecraftFont() };
+    MCDrawUtil dc { ev.getUIRenderContext(),
+                    SDK::ClientInstance::get()->minecraftGame->getFontRepository()->getMinecraftFont() };
 
-	if (std::get<FloatValue>(healthPointThreshold) > SDK::ClientInstance::get()->getLocalPlayer()->getHealth().
-	    value_or(20.f) && screenView->visualTree->rootControl->name == "hud_screen") {
-		dc.drawVignette({ vignette.r, vignette.g, vignette.b, vignette.a }, std::get<FloatValue>(vignetteFade));
-	}
+    if (std::get<FloatValue>(healthPointThreshold) >
+            SDK::ClientInstance::get()->getLocalPlayer()->getHealth().value_or(20.f) &&
+        screenView->visualTree->rootControl->name == "hud_screen") {
+        dc.drawVignette({ vignette.r, vignette.g, vignette.b, vignette.a }, std::get<FloatValue>(vignetteFade));
+    }
 }

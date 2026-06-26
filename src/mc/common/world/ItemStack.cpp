@@ -2,24 +2,23 @@
 #include "ItemStack.h"
 
 SDK::ItemStack* SDK::ItemStack::constructFromBlock(void* storage, SDK::Block const& block, int count,
-	SDK::CompoundTag const* userData) {
-	using oFunc_t = ItemStack*(__fastcall*)(void*, Block const*, int, CompoundTag const*);
-	auto fn = reinterpret_cast<oFunc_t>(Signatures::ItemStack_ItemStackBlock.result);
+                                                   SDK::CompoundTag const* userData) {
+    using oFunc_t = ItemStack*(__fastcall*)(void*, Block const*, int, CompoundTag const*);
+    auto fn = reinterpret_cast<oFunc_t>(Signatures::ItemStack_ItemStackBlock.result);
 
-    if (!fn)
-        return nullptr;
+    if (!fn) return nullptr;
 
     const auto item = fn(storage, &block, count, userData);
 
     item->vtable = reinterpret_cast<void**>(Signatures::ItemStackVtable.result);
 
-	return item;
+    return item;
 }
 
 void SDK::ItemStack::destruct() {
-	using oFunc_t = void(__fastcall*)(ItemStackBase*);
-	auto fn = reinterpret_cast<oFunc_t>(Signatures::ItemStackBase_destructor.result);
-	if (fn) {
-		fn(this);
-	}
+    using oFunc_t = void(__fastcall*)(ItemStackBase*);
+    auto fn = reinterpret_cast<oFunc_t>(Signatures::ItemStackBase_destructor.result);
+    if (fn) {
+        fn(this);
+    }
 }

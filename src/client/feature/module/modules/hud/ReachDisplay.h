@@ -3,15 +3,16 @@
 
 class ReachDisplay : public TextModule {
 public:
-	ReachDisplay();
-	virtual ~ReachDisplay() {}
+    ReachDisplay();
+    virtual ~ReachDisplay() {}
 
-	std::wstringstream text(bool isDefault, bool inEditor) override;
+    std::wstringstream text(bool isDefault, bool inEditor) override;
 
-	void onAttack(Event& ev);
+    void onAttack(Event& ev);
+
 private:
-	float reach = 0.f;
-	ValueType decimals = FloatValue(3.f);
+    float reach = 0.f;
+    ValueType decimals = FloatValue(3.f);
 
-	std::chrono::system_clock::time_point lastAttack{};
+    std::chrono::system_clock::time_point lastAttack {};
 };

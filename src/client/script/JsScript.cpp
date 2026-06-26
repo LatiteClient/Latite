@@ -7,7 +7,6 @@
 #include <winrt/windows.security.cryptography.h>
 #include <winrt/windows.security.cryptography.core.h>
 
-
 #include <winrt/windows.foundation.collections.h>
 #include <winrt/Windows.UI.Core.h>
 #include <winrt/windows.ui.popups.h>
@@ -56,527 +55,508 @@
 using namespace winrt::Windows::Web::Http;
 
 bool JsScript::load() {
-	auto res = JS::JsCreateContext(plugin->getRuntime(), &this->ctx) == JsNoError;
-	if (!res) return false;
+    auto res = JS::JsCreateContext(plugin->getRuntime(), &this->ctx) == JsNoError;
+    if (!res) return false;
 
-	data.name = this->getPlugin()->getName();
-	data.author = this->getPlugin()->getAuthor();
-	data.version = this->getPlugin()->getVersion();
-	data.description = this->getPlugin()->getDescription();
+    data.name = this->getPlugin()->getName();
+    data.author = this->getPlugin()->getAuthor();
+    data.version = this->getPlugin()->getVersion();
+    data.description = this->getPlugin()->getDescription();
 
-	loadScriptObjects();
-	loadJSApi();
+    loadScriptObjects();
+    loadJSApi();
 
-	stream.open(getPath());
-	if (stream.fail()) {
-		Logger::Warn("Could not open script path {}: {}", getPath().string(), errno);
-		return false;
-	}
+    stream.open(getPath());
+    if (stream.fail()) {
+        Logger::Warn("Could not open script path {}: {}", getPath().string(), errno);
+        return false;
+    }
 
-	std::wstringstream buffer;
-	buffer << stream.rdbuf();
-	this->loadedScript = /*L"\"use strict\";" + */buffer.str();
-	this->stream.close();
+    std::wstringstream buffer;
+    buffer << stream.rdbuf();
+    this->loadedScript = /*L"\"use strict\";" + */ buffer.str();
+    this->stream.close();
 
-	this->libraries.push_back(std::make_shared<Filesystem>(this));
-	this->libraries.push_back(std::make_shared<Network>(this));
-	this->libraries.push_back(std::make_shared<Clipboard>(this));
+    this->libraries.push_back(std::make_shared<Filesystem>(this));
+    this->libraries.push_back(std::make_shared<Network>(this));
+    this->libraries.push_back(std::make_shared<Clipboard>(this));
 
-	JS::JsSetContextData(ctx, this);
-	Chakra::SetContext(ctx);
+    JS::JsSetContextData(ctx, this);
+    Chakra::SetContext(ctx);
 
-	if (GetModuleHandleA("Chakra.dll")) {
-		Chakra::pass("JsStartDebugging")();
-	}
+    if (GetModuleHandleA("Chakra.dll")) {
+        Chakra::pass("JsStartDebugging")();
+    }
 
-	return res;
+    return res;
 }
 
 JsValueRef JsScript::getModuleExports() {
+    JsContextRef oCtx;
+    JS::JsGetCurrentContext(&oCtx);
 
-	JsContextRef oCtx;
-	JS::JsGetCurrentContext(&oCtx);
+    Chakra::SetContext(this->ctx);
+    auto global = Chakra::GetGlobalObject();
+    auto objectClass = Chakra::GetProperty(global, L"Object");
+    auto keysFunc = Chakra::GetProperty(objectClass, L"keys");
 
-	Chakra::SetContext(this->ctx);
-	auto global = Chakra::GetGlobalObject();
-	auto objectClass = Chakra::GetProperty(global, L"Object");
-	auto keysFunc = Chakra::GetProperty(objectClass, L"keys");
+    auto exp = Chakra::GetProperty(global, L"exports");
+    Chakra::SetContext(oCtx);
 
-	auto exp = Chakra::GetProperty(global, L"exports");
-	Chakra::SetContext(oCtx);
+    if (exp != JS_INVALID_REFERENCE) {
+        JsValueRef result;
+        JsValueRef args[] = { objectClass, exp };
+        Chakra::CallFunction(keysFunc, args, 2, &result);
 
-	if (exp != JS_INVALID_REFERENCE) {
-		JsValueRef result;
-		JsValueRef args[] = {objectClass, exp};
-		Chakra::CallFunction(keysFunc, args, 2, &result);
+        auto length = Chakra::GetInt(Chakra::GetProperty(result, L"length"));
+        Chakra::Release(result);
 
-		auto length = Chakra::GetInt(Chakra::GetProperty(result, L"length"));
-		Chakra::Release(result);
+        if (length > 0) {
+            return exp;
+        }
+    }
 
-		if (length > 0) {
-			return exp;
-		}
-	}
-
-	auto mod = Chakra::GetProperty(global, L"module");
-	if (mod != JS_INVALID_REFERENCE) {
-		return Chakra::GetProperty(mod, L"exports");
-	}
-	return JS_INVALID_REFERENCE;
+    auto mod = Chakra::GetProperty(global, L"module");
+    if (mod != JS_INVALID_REFERENCE) {
+        return Chakra::GetProperty(mod, L"exports");
+    }
+    return JS_INVALID_REFERENCE;
 }
 
 JsScript::JsScript(JsPlugin* plugin, std::filesystem::path const& path, std::wstring const& relPath)
-	: plugin(plugin), path(path), relPath(relPath) {
-	this->relFolderPath = plugin->getRelFolderPath();
+    : plugin(plugin)
+    , path(path)
+    , relPath(relPath) {
+    this->relFolderPath = plugin->getRelFolderPath();
 }
 
-
 void JsScript::handleAsyncOperations() {
-	Chakra::SetContext(this->ctx);
-	for (size_t i = 0; i < pendingOperations.size();) {
-		auto ptr = pendingOperations[i];
-		if (ptr->flagDone) {
-			ptr->getArgs();
-			ptr->call();
-			if (ptr->shouldRemove) {
-				pendingOperations.erase(pendingOperations.begin() + i);
-				continue;
-			}
-		}
-		++i;
-	}
+    Chakra::SetContext(this->ctx);
+    for (size_t i = 0; i < pendingOperations.size();) {
+        auto ptr = pendingOperations[i];
+        if (ptr->flagDone) {
+            ptr->getArgs();
+            ptr->call();
+            if (ptr->shouldRemove) {
+                pendingOperations.erase(pendingOperations.begin() + i);
+                continue;
+            }
+        }
+        ++i;
+    }
 }
 
 JsErrorCode JsScript::runScript() {
-	Chakra::SetContext(ctx);
-	//this->checkTrusted();
+    Chakra::SetContext(ctx);
+    // this->checkTrusted();
 #if LATITE_DEBUG
-	//Logger::Info("isTrusted = {}", this->isTrusted());
+    // Logger::Info("isTrusted = {}", this->isTrusted());
 #endif
 
-	JsErrorCode code = JsNoError;
-	code = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(this->path.wstring())), this->path.wstring().c_str(), nullptr);
-	return code;
+    JsErrorCode code = JsNoError;
+    code = JS::JsRunScript(loadedScript.c_str(), util::fnv1a_32(util::WStrToStr(this->path.wstring())),
+                           this->path.wstring().c_str(), nullptr);
+    return code;
 }
 
 JsErrorCode JsScript::compileScript() {
-	constexpr size_t cBufSize = 32768;
-	unsigned int bufferSize = cBufSize;
-	BYTE* scriptBuf = new BYTE[cBufSize];
+    constexpr size_t cBufSize = 32768;
+    unsigned int bufferSize = cBufSize;
+    BYTE* scriptBuf = new BYTE[cBufSize];
 
-	auto err = JS::JsSerializeScript(loadedScript.c_str(), scriptBuf, &bufferSize);
+    auto err = JS::JsSerializeScript(loadedScript.c_str(), scriptBuf, &bufferSize);
 
-	auto objFolder = this->getPlugin()->getPath() / "obj";
-	std::filesystem::create_directory(objFolder);
+    auto objFolder = this->getPlugin()->getPath() / "obj";
+    std::filesystem::create_directory(objFolder);
 
-	auto objPath = objFolder / (this->relPath.substr(0, relPath.size() - 3) /*remove .js*/ + L".obj");
+    auto objPath = objFolder / (this->relPath.substr(0, relPath.size() - 3) /*remove .js*/ + L".obj");
 
-	std::ofstream ofs{objPath};
-	for (int i = 0; i < bufferSize; ++i) {
-		ofs << (char)scriptBuf[i];
-	}
+    std::ofstream ofs { objPath };
+    for (int i = 0; i < bufferSize; ++i) {
+        ofs << (char)scriptBuf[i];
+    }
 
-	delete[] scriptBuf;
-	return err;
+    delete[] scriptBuf;
+    return err;
 }
 
 void JsScript::loadJSApi() {
-	Chakra::SetContext(ctx);
-	JsValueRef res;
+    Chakra::SetContext(ctx);
+    JsValueRef res;
 
-	auto resource = GET_RESOURCE(latiteapi_js);
+    auto resource = GET_RESOURCE(latiteapi_js);
 
-	// null-terminate the data because Chakra accepts a null-terminated string only
-	auto ptr = new char[resource.size() + 1];
-	ptr[resource.size()] = 0;
-	memcpy(ptr, resource.data(), resource.size());
+    // null-terminate the data because Chakra accepts a null-terminated string only
+    auto ptr = new char[resource.size() + 1];
+    ptr[resource.size()] = 0;
+    memcpy(ptr, resource.data(), resource.size());
 
-	auto err = JS::JsRunScript(util::StrToWStr(ptr).c_str(), sCtx, L"latiteapi.js", &res);
-	delete[] ptr;
+    auto err = JS::JsRunScript(util::StrToWStr(ptr).c_str(), sCtx, L"latiteapi.js", &res);
+    delete[] ptr;
 
-	Latite::getPluginManager().handleErrors(err);
-	if (!err) {
-		JS::JsRelease(res, nullptr);
-	}
-
+    Latite::getPluginManager().handleErrors(err);
+    if (!err) {
+        JS::JsRelease(res, nullptr);
+    }
 }
 
 JsScript* JsScript::getThis() {
-	JsScript* ret = nullptr;
-	JsContextRef ct;
-	JS::JsGetCurrentContext(&ct);
-	JS::JsGetContextData(ct, reinterpret_cast<void**>(&ret));
-	return ret;
+    JsScript* ret = nullptr;
+    JsContextRef ct;
+    JS::JsGetCurrentContext(&ct);
+    JS::JsGetContextData(ct, reinterpret_cast<void**>(&ret));
+    return ret;
 }
 
-
 namespace {
-	JsValueRef CALLBACK setTimeoutCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState) {
+    JsValueRef CALLBACK setTimeoutCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                           unsigned short argCount, void* callbackState) {
+        if (!Chakra::VerifyArgCount(argCount, 3)) return Chakra::GetUndefined();
+        auto sz = Chakra::VerifyParameters(
+            { { arguments[1], JsValueType::JsFunction }, { arguments[2], JsValueType::JsNumber } });
+        if (!sz) {
+            Chakra::ThrowError(sz.str);
+            return Chakra::GetUndefined();
+        }
 
-		if (!Chakra::VerifyArgCount(argCount, 3)) return Chakra::GetUndefined();
-		auto sz = Chakra::VerifyParameters({ {arguments[1], JsValueType::JsFunction}, {arguments[2], JsValueType::JsNumber} });
-		if (!sz) {
-			Chakra::ThrowError(sz.str);
-			return Chakra::GetUndefined();
-		}
+        auto func = arguments[1];
+        auto num = Chakra::GetNumber(arguments[2]);
 
-		auto func = arguments[1];
-		auto num = Chakra::GetNumber(arguments[2]);
+        JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
 
-		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
+        auto tim = std::make_shared<JsScript::JsTimeout>(static_cast<int>(thi->timeouts.size() + 1),
+                                                         static_cast<long long>(num), func);
+        thi->timeouts.push_back(tim);
 
-		auto tim = std::make_shared<JsScript::JsTimeout>(static_cast<int>(thi->timeouts.size() + 1), static_cast<long long>(num), func);
-		thi->timeouts.push_back(tim);
-		
-		JsValueRef ret;
-		JS::JsIntToNumber(tim->id, &ret);
-		return ret;
-	}
+        JsValueRef ret;
+        JS::JsIntToNumber(tim->id, &ret);
+        return ret;
+    }
 
-	JsValueRef CALLBACK setIntervalCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState) {
-		if (!Chakra::VerifyArgCount(argCount, 3)) return Chakra::GetUndefined();
-		if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsFunction}, {arguments[2], JsValueType::JsNumber} })) return JS_INVALID_REFERENCE;
-		
+    JsValueRef CALLBACK setIntervalCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                            unsigned short argCount, void* callbackState) {
+        if (!Chakra::VerifyArgCount(argCount, 3)) return Chakra::GetUndefined();
+        if (!Chakra::VerifyParameters(
+                { { arguments[1], JsValueType::JsFunction }, { arguments[2], JsValueType::JsNumber } }))
+            return JS_INVALID_REFERENCE;
 
-		auto func = arguments[1];
-		auto num = Chakra::GetNumber(arguments[2]);
+        auto func = arguments[1];
+        auto num = Chakra::GetNumber(arguments[2]);
 
-		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
-		auto tim = std::make_shared<JsScript::JsTimeout>(static_cast<int>(thi->intervals.size() + 1), static_cast<long long>(num), func);
-		thi->timeouts.push_back(tim);
-		
-		JsValueRef ret;
-		JS::JsIntToNumber(tim->id, &ret);
-		return ret;
-	}
+        JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
+        auto tim = std::make_shared<JsScript::JsTimeout>(static_cast<int>(thi->intervals.size() + 1),
+                                                         static_cast<long long>(num), func);
+        thi->timeouts.push_back(tim);
 
-	JsValueRef CALLBACK clearTimeoutCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState) {
+        JsValueRef ret;
+        JS::JsIntToNumber(tim->id, &ret);
+        return ret;
+    }
 
-		if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
-		if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsNumber} })) return JS_INVALID_REFERENCE;
+    JsValueRef CALLBACK clearTimeoutCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                             unsigned short argCount, void* callbackState) {
+        if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
+        if (!Chakra::VerifyParameters({ { arguments[1], JsValueType::JsNumber } })) return JS_INVALID_REFERENCE;
 
-		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
-		
-		std::erase_if(thi->intervals, [&](std::shared_ptr<JsScript::JsTimeout>& obj) -> bool {
-			return obj->id == Chakra::GetInt(arguments[1]);
-			});
+        JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
 
-		return Chakra::GetUndefined();
-	}
+        std::erase_if(thi->intervals, [&](std::shared_ptr<JsScript::JsTimeout>& obj) -> bool {
+            return obj->id == Chakra::GetInt(arguments[1]);
+        });
 
-	JsValueRef CALLBACK clearIntervalCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState) {
+        return Chakra::GetUndefined();
+    }
 
-		if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
-		if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsNumber} })) return JS_INVALID_REFERENCE;
+    JsValueRef CALLBACK clearIntervalCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                              unsigned short argCount, void* callbackState) {
+        if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
+        if (!Chakra::VerifyParameters({ { arguments[1], JsValueType::JsNumber } })) return JS_INVALID_REFERENCE;
 
-		JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
+        JsScript* thi = reinterpret_cast<JsScript*>(callbackState);
 
-		std::erase_if(thi->intervals, [&](std::shared_ptr<JsScript::JsTimeout>& obj) -> bool {
-			return obj->id == Chakra::GetInt(arguments[1]);
-			});
+        std::erase_if(thi->intervals, [&](std::shared_ptr<JsScript::JsTimeout>& obj) -> bool {
+            return obj->id == Chakra::GetInt(arguments[1]);
+        });
 
-		return Chakra::GetUndefined();
-	}
+        return Chakra::GetUndefined();
+    }
 
-	JsValueRef CALLBACK getEnvCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState) {
+    JsValueRef CALLBACK getEnvCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                       unsigned short argCount, void* callbackState) {
+        if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
+        if (!Chakra::VerifyParameters({ { arguments[1], JsValueType::JsString } })) return JS_INVALID_REFERENCE;
 
-		if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
-		if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsString} })) return JS_INVALID_REFERENCE;
+        auto arg = Chakra::GetString(arguments[1]);
 
-		auto arg = Chakra::GetString(arguments[1]);
+        wchar_t* env;
+        size_t size;
+        if (!_wdupenv_s(&env, &size, arg.c_str()) && env) {
+            auto str = std::wstring(env, size - 1);
+            delete env;
+            return Chakra::MakeString(str);
+        }
+        return Chakra::MakeString(L"");
+    }
 
-		wchar_t* env;
-		size_t size;
-		if (!_wdupenv_s(&env, &size, arg.c_str()) && env) {
-			auto str = std::wstring(env, size - 1);
-			delete env;
-			return Chakra::MakeString(str);
-		}
-		return Chakra::MakeString(L"");
+    JsValueRef CALLBACK sleepCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                      unsigned short argCount, void* callbackState) {
+        if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
+        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<long long>(Chakra::GetNumber(arguments[1]))));
+        return Chakra::GetUndefined();
+    }
 
-	}
+    JsValueRef CALLBACK clientMessageCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                              unsigned short argCount, void* callbackState) {
+        JsValueRef undef;
 
-	JsValueRef CALLBACK sleepCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState) {
-		if (!Chakra::VerifyArgCount(argCount, 2)) return Chakra::GetUndefined();
-		std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<long long>(Chakra::GetNumber(arguments[1]))));
-		return Chakra::GetUndefined();
-	}
+        JS::JsGetUndefinedValue(&undef);
 
-	JsValueRef CALLBACK clientMessageCallback(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState) {
+        for (unsigned short arg = 1; arg < argCount; arg++) {
+            auto myRef = arguments[arg];
 
-		JsValueRef undef;
+            JsValueRef myString;
+            JS::JsConvertValueToString(myRef, &myString);
 
-		JS::JsGetUndefinedValue(&undef);
+            const wchar_t* result;
+            size_t len;
+            JS::JsStringToPointer(myString, &result, &len);
 
-		for (unsigned short arg = 1; arg < argCount; arg++) {
-			auto myRef = arguments[arg];
+            std::string fs = util::WStrToStr(result);
+            Latite::getClientMessageQueue().display(fs);
 
-			JsValueRef myString;
-			JS::JsConvertValueToString(myRef, &myString);
+            JS::JsRelease(myString, nullptr);
+        }
 
-			const wchar_t* result;
-			size_t len;
-			JS::JsStringToPointer(myString, &result, &len);
+        return undef;
+    }
 
-			std::string fs = util::WStrToStr(result);
-			Latite::getClientMessageQueue().display(fs);
+    JsValueRef CALLBACK loadModule(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                   unsigned short argCount, void* callbackState) {
+        auto thi = reinterpret_cast<JsScript*>(callbackState);
 
-			JS::JsRelease(myString, nullptr);
-		}
+        JsValueRef undef;
 
-		return undef;
-	}
+        JS::JsGetUndefinedValue(&undef);
 
-	JsValueRef CALLBACK loadModule(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState) {
-		auto thi = reinterpret_cast<JsScript*>(callbackState);
+        if (!Chakra::VerifyArgCount(argCount, 2)) return undef;
+        if (!Chakra::VerifyParameters({ { arguments[1], JsValueType::JsString } })) {
+            return undef;
+        };
 
-		JsValueRef undef;
+        auto wPath = Chakra::GetString(arguments[1]);
 
-		JS::JsGetUndefinedValue(&undef);
+        for (auto& lib : thi->libraries) {
+            if (lib->shouldInclude(wPath)) {
+                JsValueRef global;
+                JS::JsGetGlobalObject(&global);
+                auto jsLib = lib->initialize(global);
+                JS::JsRelease(global, nullptr);
+                return jsLib;
+            }
+        }
 
-		if (!Chakra::VerifyArgCount(argCount, 2)) return undef;
-		if (!Chakra::VerifyParameters({ {arguments[1], JsValueType::JsString} })) { return undef; };
+        // if (wPath.starts_with(L"http") || wPath.starts_with(L"https")) {
+        //	isNet = true;
+        // }
 
-		auto wPath = Chakra::GetString(arguments[1]);
+        if (!wPath.ends_with(L".js")) {
+            wPath += L".js";
+        }
 
-		for (auto& lib : thi->libraries) {
-			if (lib->shouldInclude(wPath)) {
-				JsValueRef global;
-				JS::JsGetGlobalObject(&global);
-				auto jsLib = lib->initialize(global);
-				JS::JsRelease(global, nullptr);
-				return jsLib;
-			}
-		}
+        auto path = thi->getFolderPath() / wPath;
 
-		//if (wPath.starts_with(L"http") || wPath.starts_with(L"https")) {
-		//	isNet = true;
-		//}
+        if (!std::filesystem::exists(path) || std::filesystem::is_directory(path)) {
+            Chakra::ThrowError(L"Invalid filepath '" + path.wstring() + L"'");
+            return undef;
+        }
 
-		if (!wPath.ends_with(L".js")) {
-			wPath += L".js";
-		}
+        auto mod = thi->getPlugin()->loadOrFindModule(thi, wPath);
+        if (!mod) {
+            Chakra::ThrowError(L"Unable to load module " + wPath);
+            Logger::Warn("Terminating plugin {}! This is most likely caused by a circular dependency ({})->({})",
+                         util::WStrToStr(thi->getPlugin()->getName()), thi->getRelativePath().string(),
+                         util::WStrToStr(wPath));
+            thi->getPlugin()->unload();
+            return Chakra::GetUndefined();
+        }
 
-		auto path = thi->getFolderPath() / wPath;
+        return mod->getModuleExports();
+    }
 
-		if (!std::filesystem::exists(path) || std::filesystem::is_directory(path)) {
-			Chakra::ThrowError(L"Invalid filepath '" + path.wstring() + L"'");
-			return undef;
-		}
+    winrt::Windows::Foundation::IAsyncAction doRequestPermission(JsPlugin* plugin, std::wstring const& str,
+                                                                 JsPlugin::UserPermission perm) {
+        winrt::Windows::UI::Popups::UICommand yesCommand;
+        yesCommand.Label(L"Grant permission");
+        auto yesId = yesCommand.Id();
 
-		auto mod = thi->getPlugin()->loadOrFindModule(thi, wPath);
-		if (!mod) {
-			Chakra::ThrowError(L"Unable to load module " + wPath);
-			Logger::Warn("Terminating plugin {}! This is most likely caused by a circular dependency ({})->({})", util::WStrToStr(thi->getPlugin()->getName()), thi->getRelativePath().string(), util::WStrToStr(wPath));
-			thi->getPlugin()->unload();
-			return Chakra::GetUndefined();
-		}
+        winrt::Windows::UI::Popups::UICommand noCommand;
+        noCommand.Label(L"Do not grant permission");
+        auto noId = noCommand.Id();
 
-		return mod->getModuleExports();
-	}
+        winrt::Windows::UI::Popups::MessageDialog dialog(str, L"Permission Request");
+        winrt::Windows::UI::Core::CoreWindow::GetForCurrentThread().Activate();
+        dialog.DefaultCommandIndex(0);
+        dialog.CancelCommandIndex(1);
+        dialog.Commands().Append(noCommand);
+        dialog.Commands().Append(yesCommand);
 
-	winrt::Windows::Foundation::IAsyncAction doRequestPermission(JsPlugin* plugin, std::wstring const& str,
-		JsPlugin::UserPermission perm) {
-		winrt::Windows::UI::Popups::UICommand yesCommand;
-		yesCommand.Label(L"Grant permission");
-		auto yesId = yesCommand.Id();
+        auto res = co_await dialog.ShowAsync();
 
-		winrt::Windows::UI::Popups::UICommand noCommand;
-		noCommand.Label(L"Do not grant permission");
-		auto noId = noCommand.Id();
+        bool hasPlugin = false;
+        Latite::getPluginManager().forEach([plugin, &hasPlugin](std::shared_ptr<JsPlugin> plug) {
+            if (plug.get() == plugin) {
+                hasPlugin = true;
+            }
+        });
 
-		winrt::Windows::UI::Popups::MessageDialog dialog(str, L"Permission Request");
-		winrt::Windows::UI::Core::CoreWindow::GetForCurrentThread().Activate();
-		dialog.DefaultCommandIndex(0);
-		dialog.CancelCommandIndex(1);
-		dialog.Commands().Append(noCommand);
-		dialog.Commands().Append(yesCommand);
+        if (hasPlugin) {
+            auto label = util::WStrToStr(res.Label().c_str());
+            if (label == "Grant permission") {
+                plugin->grantPermission(perm);
+            }
+        }
 
+        co_return;
+    }
 
-		auto res = co_await dialog.ShowAsync();
+    JsValueRef CALLBACK requestPermission(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                          unsigned short argCount, void* callbackState) {
+        auto thi = reinterpret_cast<JsScript*>(callbackState);
+        auto plugin = thi->getPlugin();
 
-		bool hasPlugin = false;
-		Latite::getPluginManager().forEach([plugin, &hasPlugin](std::shared_ptr<JsPlugin> plug) {
-			if (plug.get() == plugin) {
-				hasPlugin = true;
-			}
-			});
+        JsPlugin::UserPermission perm;
 
-		if (hasPlugin) {
-			auto label = util::WStrToStr(res.Label().c_str());
-			if (label == "Grant permission") {
-				plugin->grantPermission(perm);
-			}
-		}
+        std::wstring request = Chakra::GetString(arguments[1]);
+        std::wstring reqMessage = L"Unknown permission.";
 
-		co_return;
-	}
+        static std::wstring permSysAccess = util::StrToWStr("permission.system_access");
+        static std::wstring sysAccessMessage =
+            util::StrToWStr("This script is requesting the System Access permission.\n\nPlease make sure you trust "
+                            "this plugin!\nThis permission will give the plugin access to system functions, like "
+                            "playing system sounds, ejecting the CD drive, and many other things.");
 
-	JsValueRef CALLBACK requestPermission(JsValueRef callee, bool isConstructor,
-		JsValueRef* arguments, unsigned short argCount,
-		void* callbackState) {
-		auto thi = reinterpret_cast<JsScript*>(callbackState);
-		auto plugin = thi->getPlugin();
+        if (request == permSysAccess) {
+            perm = JsPlugin::UserPermission::SYSTEM_ACCESS;
+            reqMessage = sysAccessMessage;
+        } else {
+            Chakra::ThrowError(L"Unknown permission " + request);
+            return Chakra::GetUndefined();
+        }
 
-		JsPlugin::UserPermission perm;
+        if (!plugin->hasPermission(perm)) {
+            doRequestPermission(thi->getPlugin(), reqMessage, perm);
+        }
 
-		std::wstring request = Chakra::GetString(arguments[1]);
-		std::wstring reqMessage = L"Unknown permission.";
-
-		static std::wstring permSysAccess = util::StrToWStr("permission.system_access");
-		static std::wstring sysAccessMessage = util::StrToWStr("This script is requesting the System Access permission.\n\nPlease make sure you trust this plugin!\nThis permission will give the plugin access to system functions, like playing system sounds, ejecting the CD drive, and many other things.");
-
-		if (request == permSysAccess) {
-			perm = JsPlugin::UserPermission::SYSTEM_ACCESS;
-			reqMessage = sysAccessMessage;
-		}
-		else {
-			Chakra::ThrowError(L"Unknown permission " + request);
-			return Chakra::GetUndefined();
-		}
-
-		if (!plugin->hasPermission(perm)) {
-			doRequestPermission(thi->getPlugin(), reqMessage, perm);
-		}
-
-		
-		return Chakra::GetUndefined();
-	}
+        return Chakra::GetUndefined();
+    }
 }
 
 void JsScript::loadScriptObjects() {
-	Chakra::SetContext(ctx);
+    Chakra::SetContext(ctx);
 
-	int i = 0;
-	this->objects.clear();
-	this->objects.push_back(std::make_shared<ClientScriptingObject>(i++));
-	this->objects.push_back(std::make_shared<GameScriptingObject>(i++));
-	this->objects.push_back(std::make_shared<D2DScriptingObject>(i++));
-	this->objects.push_back(std::make_shared<Graphics3DScriptingObject>(i++));
-	this->objects.push_back(std::make_shared<OptionsScriptingObject>(i++));
-	this->objects.push_back(std::make_shared<OSScriptingObject>(i++));
+    int i = 0;
+    this->objects.clear();
+    this->objects.push_back(std::make_shared<ClientScriptingObject>(i++));
+    this->objects.push_back(std::make_shared<GameScriptingObject>(i++));
+    this->objects.push_back(std::make_shared<D2DScriptingObject>(i++));
+    this->objects.push_back(std::make_shared<Graphics3DScriptingObject>(i++));
+    this->objects.push_back(std::make_shared<OptionsScriptingObject>(i++));
+    this->objects.push_back(std::make_shared<OSScriptingObject>(i++));
 
-	this->classes.clear();
-	this->classes.push_back(std::make_shared<JsVec2>(this));
-	this->classes.push_back(std::make_shared<JsVec3>(this));
-	this->classes.push_back(std::make_shared<JsRect>(this));
-	this->classes.push_back(std::make_shared<JsColor>(this));
-	this->classes.push_back(std::make_shared<JsModuleClass>(this));
-	this->classes.push_back(std::make_shared<JsHudModuleClass>(this));
-	this->classes.push_back(std::make_shared<JsTextModuleClass>(this));
-	this->classes.push_back(std::make_shared<JsSettingClass>(this));
-	this->classes.push_back(std::make_shared<JsCommandClass>(this));
-	this->classes.push_back(std::make_shared<JsEntityClass>(this));
-	this->classes.push_back(std::make_shared<JsPlayerClass>(this));
-	this->classes.push_back(std::make_shared<JsLocalPlayerClass>(this));
-	this->classes.push_back(std::make_shared<JsItem>(this));
-	this->classes.push_back(std::make_shared<JsItemStack>(this));
-	this->classes.push_back(std::make_shared<JsTextureClass>(this));
-	this->classes.push_back(std::make_shared<JsNativeModule>(this));
-	this->classes.push_back(std::make_shared<JsBlock>(this));
-	this->classes.push_back(std::make_shared<JsScreenClass>(this));
-	this->classes.push_back(std::make_shared<JsWebSocketClass>(this));
-	JsErrorCode err;
+    this->classes.clear();
+    this->classes.push_back(std::make_shared<JsVec2>(this));
+    this->classes.push_back(std::make_shared<JsVec3>(this));
+    this->classes.push_back(std::make_shared<JsRect>(this));
+    this->classes.push_back(std::make_shared<JsColor>(this));
+    this->classes.push_back(std::make_shared<JsModuleClass>(this));
+    this->classes.push_back(std::make_shared<JsHudModuleClass>(this));
+    this->classes.push_back(std::make_shared<JsTextModuleClass>(this));
+    this->classes.push_back(std::make_shared<JsSettingClass>(this));
+    this->classes.push_back(std::make_shared<JsCommandClass>(this));
+    this->classes.push_back(std::make_shared<JsEntityClass>(this));
+    this->classes.push_back(std::make_shared<JsPlayerClass>(this));
+    this->classes.push_back(std::make_shared<JsLocalPlayerClass>(this));
+    this->classes.push_back(std::make_shared<JsItem>(this));
+    this->classes.push_back(std::make_shared<JsItemStack>(this));
+    this->classes.push_back(std::make_shared<JsTextureClass>(this));
+    this->classes.push_back(std::make_shared<JsNativeModule>(this));
+    this->classes.push_back(std::make_shared<JsBlock>(this));
+    this->classes.push_back(std::make_shared<JsScreenClass>(this));
+    this->classes.push_back(std::make_shared<JsWebSocketClass>(this));
+    JsErrorCode err;
 
-	JsValueRef globalObj = Chakra::GetGlobalObject();
+    JsValueRef globalObj = Chakra::GetGlobalObject();
 
-	// require();
-	{
-		Chakra::DefineFunc(globalObj, loadModule, L"require", this);
-	}
+    // require();
+    { Chakra::DefineFunc(globalObj, loadModule, L"require", this); }
 
-	// sleep()
-	{
-		Chakra::DefineFunc(globalObj, sleepCallback, L"sleep");
-	}
+    // sleep()
+    { Chakra::DefineFunc(globalObj, sleepCallback, L"sleep"); }
 
-	// setTimeout()
-	{
-		Chakra::DefineFunc(globalObj, setTimeoutCallback, L"setTimeout", this);
-	}
+    // setTimeout()
+    { Chakra::DefineFunc(globalObj, setTimeoutCallback, L"setTimeout", this); }
 
-	// setInterval()
-	{
-		Chakra::DefineFunc(globalObj, setIntervalCallback, L"setInterval", this);
-	}
+    // setInterval()
+    { Chakra::DefineFunc(globalObj, setIntervalCallback, L"setInterval", this); }
 
-	// clearTimeout()
-	{
-		Chakra::DefineFunc(globalObj, clearTimeoutCallback, L"clearTimeout", this);
-	}
+    // clearTimeout()
+    { Chakra::DefineFunc(globalObj, clearTimeoutCallback, L"clearTimeout", this); }
 
-	// clearInterval()
-	{
-		Chakra::DefineFunc(globalObj, clearIntervalCallback, L"clearInterval", this);
-	}
+    // clearInterval()
+    { Chakra::DefineFunc(globalObj, clearIntervalCallback, L"clearInterval", this); }
 
-	// Plugin
-	{
-		JsValueRef plugin;
-		JS::JsCreateObject(&plugin);
+    // Plugin
+    {
+        JsValueRef plugin;
+        JS::JsCreateObject(&plugin);
 
-		Chakra::SetPropertyString(plugin, L"name", data.name, true);
-		Chakra::SetPropertyString(plugin, L"author", data.author, true);
-		Chakra::SetPropertyString(plugin, L"description", data.description, true);
-		Chakra::SetPropertyString(plugin, L"version", data.version, true);
+        Chakra::SetPropertyString(plugin, L"name", data.name, true);
+        Chakra::SetPropertyString(plugin, L"author", data.author, true);
+        Chakra::SetPropertyString(plugin, L"description", data.description, true);
+        Chakra::SetPropertyString(plugin, L"version", data.version, true);
 
-		Chakra::DefineFunc(plugin, requestPermission, L"requestPermission", this);
+        Chakra::DefineFunc(plugin, requestPermission, L"requestPermission", this);
 
-		Chakra::SetProperty(globalObj, L"plugin", plugin, true);
-	}
+        Chakra::SetProperty(globalObj, L"plugin", plugin, true);
+    }
 
-	{ // Log Func
-		JsValueRef myPrint;
-		err = JS::JsCreateFunction(clientMessageCallback, nullptr, &myPrint);
+    { // Log Func
+        JsValueRef myPrint;
+        err = JS::JsCreateFunction(clientMessageCallback, nullptr, &myPrint);
 
-		JsPropertyIdRef propId;
-		err = JS::JsGetPropertyIdFromName(L"clientMessage", &propId);
-		err = JS::JsSetProperty(Chakra::GetGlobalObject(), propId, myPrint, false);
+        JsPropertyIdRef propId;
+        err = JS::JsGetPropertyIdFromName(L"clientMessage", &propId);
+        err = JS::JsSetProperty(Chakra::GetGlobalObject(), propId, myPrint, false);
 
-		err = JS::JsRelease(myPrint, nullptr);
-	}
+        err = JS::JsRelease(myPrint, nullptr);
+    }
 
-	{
-		// getEnv
-		Chakra::DefineFunc(globalObj, getEnvCallback, L"getEnvironmentVariable");
-	}
+    {
+        // getEnv
+        Chakra::DefineFunc(globalObj, getEnvCallback, L"getEnvironmentVariable");
+    }
 
-	for (auto& cl : classes) {
-		Chakra::SetPropertyObject(globalObj, cl->getName(), cl->getConstructor());
-		cl->createPrototype();
-		cl->prepareFunctions();
-	}
+    for (auto& cl : classes) {
+        Chakra::SetPropertyObject(globalObj, cl->getName(), cl->getConstructor());
+        cl->createPrototype();
+        cl->prepareFunctions();
+    }
 
-	for (auto& obj : objects) {
-		obj->initialize(ctx, globalObj);
-		JsPropertyIdRef propId;
-		JS::JsGetPropertyIdFromName(obj->objName, &propId);
-		JS::JsSetProperty(globalObj, propId, obj->object, false);
-	}
+    for (auto& obj : objects) {
+        obj->initialize(ctx, globalObj);
+        JsPropertyIdRef propId;
+        JS::JsGetPropertyIdFromName(obj->objName, &propId);
+        JS::JsSetProperty(globalObj, propId, obj->object, false);
+    }
 
-	JS::JsRelease(globalObj, nullptr);
+    JS::JsRelease(globalObj, nullptr);
 }
 
 JsValueRef JsScript::AsyncOperation::call() {
-	Chakra::SetContext(this->ctx);
-	JsValueRef obj;
-	this->args.insert(this->args.begin(), this->callback);
-	Latite::getPluginManager().handleErrors(Chakra::CallFunction(this->callback, this->args.data(), static_cast<unsigned short>(this->args.size()), &obj));
-	return obj;
+    Chakra::SetContext(this->ctx);
+    JsValueRef obj;
+    this->args.insert(this->args.begin(), this->callback);
+    Latite::getPluginManager().handleErrors(
+        Chakra::CallFunction(this->callback, this->args.data(), static_cast<unsigned short>(this->args.size()), &obj));
+    return obj;
 }

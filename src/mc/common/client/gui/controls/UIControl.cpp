@@ -4,11 +4,10 @@
 #include "mc/Addresses.h"
 
 void SDK::UIControl::updatePos() {
-    Vec2 add{};
+    Vec2 add {};
 
     if (this->parent != nullptr) {
-        if (this->parent->flags & 1)
-            this->parent->updatePos();
+        if (this->parent->flags & 1) this->parent->updatePos();
 
         add = this->parent->position;
     }

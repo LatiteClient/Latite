@@ -3,8 +3,8 @@
 
 class DynamicLight : public Module {
 public:
-	DynamicLight();
-	~DynamicLight();
+    DynamicLight();
+    ~DynamicLight();
 
-	void onTick(Event& ev);
+    void onTick(Event& ev);
 };

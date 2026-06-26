@@ -3,7 +3,8 @@
 #include "mc/Addresses.h"
 
 SDK::MolangVariable* SDK::MolangVariableMap::_getOrAddMolangVariable(uint16_t index) {
-    return reinterpret_cast<MolangVariable*(*)(MolangVariableMap*, uint16_t)>(Signatures::MolangVariableMap__getOrAddMolangVariable.result)(this, index);
+    return reinterpret_cast<MolangVariable* (*)(MolangVariableMap*, uint16_t)>(
+        Signatures::MolangVariableMap__getOrAddMolangVariable.result)(this, index);
 }
 
 SDK::MolangVariable* SDK::MolangVariableMap::getMolangVariable(uint64_t hash, char const* name) {

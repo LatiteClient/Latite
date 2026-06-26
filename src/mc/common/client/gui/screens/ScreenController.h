@@ -1,7 +1,6 @@
 #pragma once
 namespace SDK {
-	class ScreenController {
-	public:
-
-	};
+    class ScreenController {
+    public:
+    };
 }

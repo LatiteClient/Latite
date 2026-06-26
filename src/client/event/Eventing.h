@@ -15,16 +15,18 @@
 
 class Eventing final {
 public:
-	Eventing() = default;
-	~Eventing() = default;
+    Eventing() = default;
+    ~Eventing() = default;
 
-    template <typename T>
-    bool dispatch(T&& ev) requires std::derived_from<std::remove_reference_t<T>, Event> {
+    template<typename T>
+    bool dispatch(T&& ev)
+        requires std::derived_from<std::remove_reference_t<T>, Event>
+    {
         using EventType = std::remove_reference_t<T>;
         std::vector<Registration> snapshot;
 
         {
-            std::shared_lock lock{ mutex };
+            std::shared_lock lock { mutex };
             for (auto const& registration : listeners) {
                 if (registration.hash == EventType::hash) {
                     snapshot.push_back(registration);
@@ -34,7 +36,7 @@ public:
 
         for (auto const& registration : snapshot) {
             auto const& state = registration.state;
-            std::lock_guard invocationLock{ state->invocationMutex };
+            std::lock_guard invocationLock { state->invocationMutex };
 
             if (!state->active || !state->listener) {
                 continue;
@@ -55,24 +57,29 @@ public:
     }
 
     // DO NOT USE, use listen<Event, &Listener::func> instead
-    template <typename T>
-    void listen(Listener* ptr, EventListenerFunc listener, int priority = 0, bool callWhileInactive = false) requires std::derived_from<T, Event> {
-        addListener(T::hash, EventListener{ listener, ptr, callWhileInactive, priority });
+    template<typename T>
+    void listen(Listener* ptr, EventListenerFunc listener, int priority = 0, bool callWhileInactive = false)
+        requires std::derived_from<T, Event>
+    {
+        addListener(T::hash, EventListener { listener, ptr, callWhileInactive, priority });
     }
 
-    template <typename T, auto listener>
-    void listen(Listener* ptr, int priority = 0, bool callWhileInactive = false) requires std::derived_from<T, Event> {
+    template<typename T, auto listener>
+    void listen(Listener* ptr, int priority = 0, bool callWhileInactive = false)
+        requires std::derived_from<T, Event>
+    {
         struct MFPtr {
             const EventListenerFunc ptr;
             const ptrdiff_t adj;
         };
 
         if constexpr (sizeof(listener) == sizeof(EventListenerFunc)) {
-            addListener(T::hash, EventListener{ static_cast<EventListenerFunc>(listener), ptr, callWhileInactive, priority });
+            addListener(T::hash,
+                        EventListener { static_cast<EventListenerFunc>(listener), ptr, callWhileInactive, priority });
         } else if constexpr (sizeof(listener) == sizeof(MFPtr)) {
             const MFPtr mfp = std::bit_cast<MFPtr>(listener);
 
-            addListener(T::hash, EventListener{ mfp.ptr, ptr, callWhileInactive, priority });
+            addListener(T::hash, EventListener { mfp.ptr, ptr, callWhileInactive, priority });
         } else {
             static_assert(false, "Unsupported listener function type");
         }
@@ -85,7 +92,7 @@ public:
 
         std::shared_ptr<ListenerState> state;
         {
-            std::unique_lock lock{ mutex };
+            std::unique_lock lock { mutex };
             auto stateIt = listenerStates.find(ptr);
             if (stateIt == listenerStates.end()) {
                 return;
@@ -98,17 +105,18 @@ public:
             });
         }
 
-        std::lock_guard invocationLock{ state->invocationMutex };
+        std::lock_guard invocationLock { state->invocationMutex };
         state->active = false;
         state->listener = nullptr;
     }
 
-	// Substitute for Latite::getEventing
-	[[nodiscard]] static Eventing& get();
+    // Substitute for Latite::getEventing
+    [[nodiscard]] static Eventing& get();
+
 private:
     struct ListenerState {
-        explicit ListenerState(Listener* listener) : listener(listener) {
-        }
+        explicit ListenerState(Listener* listener)
+            : listener(listener) {}
 
         std::recursive_mutex invocationMutex;
         Listener* listener;
@@ -126,15 +134,14 @@ private:
             return;
         }
 
-        std::unique_lock lock{ mutex };
+        std::unique_lock lock { mutex };
         auto [stateIt, inserted] = listenerStates.try_emplace(callback.listener);
         if (inserted) {
             stateIt->second = std::make_shared<ListenerState>(callback.listener);
         }
 
         listeners.push_back({ hash, callback, stateIt->second });
-        std::stable_sort(listeners.begin(), listeners.end(), [](Registration const& left,
-                                                                Registration const& right) {
+        std::stable_sort(listeners.begin(), listeners.end(), [](Registration const& left, Registration const& right) {
             return left.callback.priority > right.callback.priority;
         });
     }

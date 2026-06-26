@@ -4,8 +4,8 @@
 // A basic feature with a name and a description.
 class Feature {
 public:
-	virtual ~Feature() = default;
+    virtual ~Feature() = default;
 
-	virtual std::string name() = 0;
-	virtual std::wstring desc() = 0;
+    virtual std::string name() = 0;
+    virtual std::wstring desc() = 0;
 };

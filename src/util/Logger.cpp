@@ -28,8 +28,8 @@ void Logger::LogInternal(Level level, std::string str) {
     std::string sn = (tms > 9 ? std::string("") : std::string("0")) + std::to_string(tms);
 
     std::stringstream time;
-    time << "[" << (now.tm_mon + 1) << "-" << now.tm_mday << "-" << (now.tm_year + 1900) << ", " << hr << ":" << mn <<
-        ":" << sn << "]";
+    time << "[" << (now.tm_mon + 1) << "-" << now.tm_mday << "-" << (now.tm_year + 1900) << ", " << hr << ":" << mn
+         << ":" << sn << "]";
 
     oss << std::put_time(&now, "%Y-%m-%d");
 

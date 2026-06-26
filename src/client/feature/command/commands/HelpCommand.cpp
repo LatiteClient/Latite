@@ -4,7 +4,8 @@
 #include "client/latite.h"
 #include "client/feature/command/CommandManager.h"
 
-HelpCommand::HelpCommand() : Command("help", LocalizeString::get("client.commands.help.desc"), "{0}", {"?", ""}) {
+HelpCommand::HelpCommand()
+    : Command("help", LocalizeString::get("client.commands.help.desc"), "{0}", { "?", "" }) {
 }
 
 bool HelpCommand::execute(std::string const label, std::vector<std::string> args) {
@@ -25,7 +26,7 @@ bool HelpCommand::execute(std::string const label, std::vector<std::string> args
             }
             ss << ")";
         }*/
-        });
+    });
 
     message(ss.str());
     return true;

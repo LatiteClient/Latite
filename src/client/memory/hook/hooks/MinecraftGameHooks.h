@@ -3,8 +3,9 @@
 #include "mc/common/client/game/MinecraftGame.h"
 
 class MinecraftGameHooks : public HookGroup {
-	static void __fastcall onDeviceLost(SDK::MinecraftGame* game);
-	static void __fastcall _update(SDK::MinecraftGame* game);
+    static void __fastcall onDeviceLost(SDK::MinecraftGame* game);
+    static void __fastcall _update(SDK::MinecraftGame* game);
+
 public:
-	MinecraftGameHooks();
+    MinecraftGameHooks();
 };

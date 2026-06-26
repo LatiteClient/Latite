@@ -3,6 +3,6 @@
 
 /*
 Waypoints::Waypoints() : Module("Waypoints", "Waypoints", "Shows saved locations.", GAME) {
-	
+
 }
 */

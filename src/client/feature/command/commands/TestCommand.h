@@ -3,10 +3,11 @@
 
 class TestCommand final : public Command {
 public:
-	TestCommand();
-	~TestCommand() = default;
+    TestCommand();
+    ~TestCommand() = default;
 
-	bool execute(std::string const label, std::vector<std::string> args) override;
+    bool execute(std::string const label, std::vector<std::string> args) override;
+
 private:
-	void onRenderLayer(Event& evG);
+    void onRenderLayer(Event& evG);
 };

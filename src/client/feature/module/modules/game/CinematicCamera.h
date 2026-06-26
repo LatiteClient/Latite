@@ -3,7 +3,6 @@
 
 class CinematicCamera : public Module {
 public:
-	CinematicCamera();
-	void onCinematicCamera(Event& ev);
+    CinematicCamera();
+    void onCinematicCamera(Event& ev);
 };
-

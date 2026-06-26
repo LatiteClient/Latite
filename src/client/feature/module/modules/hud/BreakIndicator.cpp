@@ -1,10 +1,9 @@
 #include "pch.h"
 #include "BreakIndicator.h"
 
-BreakIndicator::BreakIndicator() : TextModule("BreakProgress",
-                                              LocalizeString::get("client.textmodule.breakIndicator.name"),
-                                              LocalizeString::get("client.textmodule.breakIndicator.desc"), HUD, 400.f,
-                                              0, true) {
+BreakIndicator::BreakIndicator()
+    : TextModule("BreakProgress", LocalizeString::get("client.textmodule.breakIndicator.name"),
+                 LocalizeString::get("client.textmodule.breakIndicator.desc"), HUD, 400.f, 0, true) {
     addSetting("last", LocalizeString::get("client.textmodule.breakIndicator.lastProgress.name"),
                LocalizeString::get("client.textmodule.breakIndicator.lastProgress.desc"), this->last);
     addSetting("visual", LocalizeString::get("client.textmodule.breakIndicator.visual.name"),
@@ -23,8 +22,7 @@ BreakIndicator::BreakIndicator() : TextModule("BreakProgress",
                      FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
     addSliderSetting("width", LocalizeString::get("client.textmodule.breakIndicator.width.name"),
                      LocalizeString::get("client.textmodule.breakIndicator.width.desc"), indicatorWidth,
-                     FloatValue(0.f),
-                     FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
+                     FloatValue(0.f), FloatValue(200.f), FloatValue(2.5f), "visual"_istrue);
     addSliderSetting("rad", LocalizeString::get("client.textmodule.breakIndicator.rad.name"),
                      LocalizeString::get("client.textmodule.breakIndicator.rad.desc"), indicatorRad, FloatValue(0.f),
                      FloatValue(5.f), FloatValue(1.f), "visual"_istrue);
@@ -55,7 +53,7 @@ void BreakIndicator::render(DrawUtil& dc, bool isDefault, bool inEditor) {
     float wid = std::get<FloatValue>(indicatorWidth);
     float siz = std::get<FloatValue>(indicatorSize);
 
-    d2d::Rect rc = {0.f, 0.f, horiz ? siz : wid, horiz ? wid : siz};
+    d2d::Rect rc = { 0.f, 0.f, horiz ? siz : wid, horiz ? wid : siz };
     float rad = std::get<FloatValue>(indicatorRad) / 10.f * (std::min)(rc.getWidth(), rc.getHeight());
 
     rect.right = rect.left + rc.getWidth();
@@ -73,8 +71,7 @@ void BreakIndicator::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 
     if (horiz) {
         fillRc.right = fillRc.left + fillRc.getWidth() * prog;
-    }
-    else {
+    } else {
         fillRc.top = fillRc.bottom - fillRc.getHeight() * prog;
     }
     dc.fillRoundedRectangle(fillRc, std::get<ColorValue>(indicatorCol2).getMainColor(), rad);

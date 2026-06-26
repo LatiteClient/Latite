@@ -5,17 +5,17 @@
 
 class JsEntity {
 public:
-	enum class AccessLevel {
-		Restricted,
-		Operator,
-		LocalPlayer
-	};
+    enum class AccessLevel {
+        Restricted,
+        Operator,
+        LocalPlayer
+    };
 
-	int64_t runtimeId;
-	AccessLevel level;
+    int64_t runtimeId;
+    AccessLevel level;
 
-	bool validate();
-	SDK::Actor* getEntity();
+    bool validate();
+    SDK::Actor* getEntity();
 
-	JsEntity(int64_t runtimeId, AccessLevel level = AccessLevel::Restricted);
+    JsEntity(int64_t runtimeId, AccessLevel level = AccessLevel::Restricted);
 };

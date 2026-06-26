@@ -4,9 +4,10 @@
 
 class Fullbright : public Module {
 public:
-	Fullbright();
+    Fullbright();
 
-	void onGamma(Event& ev);
+    void onGamma(Event& ev);
+
 private:
-	ValueType gamma = FloatValue(25.f);
+    ValueType gamma = FloatValue(25.f);
 };

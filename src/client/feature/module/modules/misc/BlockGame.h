@@ -5,7 +5,6 @@
 #include <random>
 #include <array>
 
-
 class BlockGame : public Module {
 public:
     BlockGame();
@@ -18,8 +17,21 @@ public:
     void restartGame();
 
 private:
-    enum RotationState { STATE_0, STATE_R, STATE_2, STATE_L };
-    enum TetrominoType { I_PIECE, J_PIECE, L_PIECE, O_PIECE, S_PIECE, T_PIECE, Z_PIECE };
+    enum RotationState {
+        STATE_0,
+        STATE_R,
+        STATE_2,
+        STATE_L
+    };
+    enum TetrominoType {
+        I_PIECE,
+        J_PIECE,
+        L_PIECE,
+        O_PIECE,
+        S_PIECE,
+        T_PIECE,
+        Z_PIECE
+    };
 
     struct Tetromino {
         std::array<std::array<int, 4>, 4> shape;
@@ -70,7 +82,11 @@ private:
     bool lastMoveWasMiniTSpin = false;
     bool lastClearWasDifficult = false;
 
-    enum class DasState { IDLE, CHARGING, REPEATING };
+    enum class DasState {
+        IDLE,
+        CHARGING,
+        REPEATING
+    };
 
     DasState dasStateLeft = DasState::IDLE;
     DasState dasStateRight = DasState::IDLE;
@@ -83,15 +99,15 @@ private:
 
     std::chrono::steady_clock::time_point comboUpdateTime;
     std::chrono::steady_clock::time_point b2bUpdateTime;
-    const std::chrono::milliseconds displayFlashDuration{300};
+    const std::chrono::milliseconds displayFlashDuration { 300 };
 
     std::wstring tSpinText;
     std::chrono::steady_clock::time_point tSpinDisplayTime;
-    const std::chrono::milliseconds tSpinDisplayDuration{ 1000 };
+    const std::chrono::milliseconds tSpinDisplayDuration { 1000 };
 
     std::wstring lineClearText;
     std::chrono::steady_clock::time_point lineClearDisplayTime;
-    const std::chrono::milliseconds lineClearDisplayDuration{ 1000 };
+    const std::chrono::milliseconds lineClearDisplayDuration { 1000 };
 
     bool leftKeyHeld = false;
     bool rightKeyHeld = false;
@@ -101,65 +117,53 @@ private:
     using KickSet = std::array<Vec2, 5>;
     using KickTable = std::array<KickSet, 8>;
 
-    const KickTable srsKickDataJLSTZ = {
-        {
-            // 0->R (Clockwise from 0)
-            {{{0, 0}, {-1, 0}, {-1, 1}, {0, -2}, {-1, -2}}},
-            // R->0 (Counter-Clockwise from R)
-            {{{0, 0}, {1, 0}, {1, -1}, {0, 2}, {1, 2}}},
-            // R->2 (Clockwise from R)
-            {{{0, 0}, {1, 0}, {1, -1}, {0, 2}, {1, 2}}},
-            // 2->R (Counter-Clockwise from 2)
-            {{{0, 0}, {-1, 0}, {-1, 1}, {0, -2}, {-1, -2}}},
-            // 2->L (Clockwise from 2)
-            {{{0, 0}, {1, 0}, {1, 1}, {0, -2}, {1, -2}}},
-            // L->2 (Counter-Clockwise from L)
-            {{{0, 0}, {-1, 0}, {-1, -1}, {0, 2}, {-1, 2}}},
-            // L->0 (Clockwise from L)
-            {{{0, 0}, {-1, 0}, {-1, -1}, {0, 2}, {-1, 2}}},
-            // 0->L (Counter-Clockwise from 0)
-            {{{0, 0}, {1, 0}, {1, 1}, {0, -2}, {1, -2}}}
-        }
-    };
+    const KickTable srsKickDataJLSTZ = { { // 0->R (Clockwise from 0)
+                                           { { { 0, 0 }, { -1, 0 }, { -1, 1 }, { 0, -2 }, { -1, -2 } } },
+                                           // R->0 (Counter-Clockwise from R)
+                                           { { { 0, 0 }, { 1, 0 }, { 1, -1 }, { 0, 2 }, { 1, 2 } } },
+                                           // R->2 (Clockwise from R)
+                                           { { { 0, 0 }, { 1, 0 }, { 1, -1 }, { 0, 2 }, { 1, 2 } } },
+                                           // 2->R (Counter-Clockwise from 2)
+                                           { { { 0, 0 }, { -1, 0 }, { -1, 1 }, { 0, -2 }, { -1, -2 } } },
+                                           // 2->L (Clockwise from 2)
+                                           { { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, -2 }, { 1, -2 } } },
+                                           // L->2 (Counter-Clockwise from L)
+                                           { { { 0, 0 }, { -1, 0 }, { -1, -1 }, { 0, 2 }, { -1, 2 } } },
+                                           // L->0 (Clockwise from L)
+                                           { { { 0, 0 }, { -1, 0 }, { -1, -1 }, { 0, 2 }, { -1, 2 } } },
+                                           // 0->L (Counter-Clockwise from 0)
+                                           { { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, -2 }, { 1, -2 } } } } };
 
-    const KickTable srsKickDataI = {
-        {
-            // 0->R
-            { {{0 , 0 }, { -2, 0 }, { 1, 0 }, { -2, -1 }, { 1, 2 } } },
-            // R->0
-            {{{0, 0}, {2, 0}, {-1, 0}, {2, 1}, {-1, -2}}},
-            // R->2
-            {{{0, 0}, {-1, 0}, {2, 0}, {-1, 2}, {2, -1}}},
-            // 2->R
-            {{{0, 0}, {1, 0}, {-2, 0}, {1, -2}, {-2, 1}}},
-            // 2->L
-            {{{0, 0}, {2, 0}, {-1, 0}, {2, 1}, {-1, -2}}},
-            // L->2
-            {{{0, 0}, {-2, 0}, {1, 0}, {-2, -1}, {1, 2}}},
-            // L->0
-            {{{0, 0}, {1, 0}, {-2, 0}, {1, -2}, {-2, 1}}},
-            // 0->L
-            {{{0, 0}, {-1, 0}, {2, 0}, {-1, 2}, {2, -1}}}
-        }
-    };
+    const KickTable srsKickDataI = { { // 0->R
+                                       { { { 0, 0 }, { -2, 0 }, { 1, 0 }, { -2, -1 }, { 1, 2 } } },
+                                       // R->0
+                                       { { { 0, 0 }, { 2, 0 }, { -1, 0 }, { 2, 1 }, { -1, -2 } } },
+                                       // R->2
+                                       { { { 0, 0 }, { -1, 0 }, { 2, 0 }, { -1, 2 }, { 2, -1 } } },
+                                       // 2->R
+                                       { { { 0, 0 }, { 1, 0 }, { -2, 0 }, { 1, -2 }, { -2, 1 } } },
+                                       // 2->L
+                                       { { { 0, 0 }, { 2, 0 }, { -1, 0 }, { 2, 1 }, { -1, -2 } } },
+                                       // L->2
+                                       { { { 0, 0 }, { -2, 0 }, { 1, 0 }, { -2, -1 }, { 1, 2 } } },
+                                       // L->0
+                                       { { { 0, 0 }, { 1, 0 }, { -2, 0 }, { 1, -2 }, { -2, 1 } } },
+                                       // 0->L
+                                       { { { 0, 0 }, { -1, 0 }, { 2, 0 }, { -1, 2 }, { 2, -1 } } } } };
 
     // no kicks for O piece
-    const KickTable srsKickDataO = {
-        {
-            {{{0, 0}}}, {{{0, 0}}}, {{{0, 0}}}, {{{0, 0}}},
-            {{{0, 0}}}, {{{0, 0}}}, {{{0, 0}}}, {{{0, 0}}}
-        }
-    };
+    const KickTable srsKickDataO = { { { { { 0, 0 } } },
+                                       { { { 0, 0 } } },
+                                       { { { 0, 0 } } },
+                                       { { { 0, 0 } } },
+                                       { { { 0, 0 } } },
+                                       { { { 0, 0 } } },
+                                       { { { 0, 0 } } },
+                                       { { { 0, 0 } } } } };
 
     // some basic kicks i stole from somewhere for 180
     const KickTable kicks180 = {
-        {
-            {{{0, 0}}},
-            {{{1, 0}}},
-            {{{-1, 0}}},
-            {{{0, 1}}},
-            {{{0, -1}}}
-        }
+        { { { { 0, 0 } } }, { { { 1, 0 } } }, { { { -1, 0 } } }, { { { 0, 1 } } }, { { { 0, -1 } } } }
     };
 
     void createTetrominoShapes();
@@ -184,7 +188,7 @@ private:
     ValueType backgroundEnabled = BoolValue(false);
     ValueType drawGrid = BoolValue(true);
     ValueType drawGhostPiece = BoolValue(true);
-    ValueType backgroundColor = ColorValue{ 1.f, 0.f, 0.f, 1.f };
+    ValueType backgroundColor = ColorValue { 1.f, 0.f, 0.f, 1.f };
     ValueType leftKey = KeyValue(VK_LEFT);
     ValueType rightKey = KeyValue(VK_RIGHT);
     ValueType hardDropKey = KeyValue(VK_SPACE);

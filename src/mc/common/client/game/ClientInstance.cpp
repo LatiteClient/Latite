@@ -22,7 +22,6 @@ SDK::BlockSource* SDK::ClientInstance::getRegion() {
     return memory::callVirtual<BlockSource*>(this, 0x1E);
 }
 
-
 SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
     return memory::callVirtual<LocalPlayer*>(this, 0x1F);
 }
@@ -43,8 +42,8 @@ void SDK::ClientInstance::grabCursor() {
     reinterpret_cast<void(__fastcall*)(void*)>(Signatures::ClientInstance_grabCursor.result)(this);
 }
 
-//vtable call:
-//48 8b 80 ? ? ? ? 48 8b ce ff 15 ? ? ? ? 84 db
+// vtable call:
+// 48 8b 80 ? ? ? ? 48 8b ce ff 15 ? ? ? ? 84 db
 void SDK::ClientInstance::releaseCursor() {
     reinterpret_cast<void(__fastcall*)(void*)>(Signatures::ClientInstance_releaseCursor.result)(this);
 }

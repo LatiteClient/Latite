@@ -4,28 +4,30 @@
 #include "client/event/events/AveragePingEvent.h"
 #include "client/event/Eventing.h"
 
-PingDisplay::PingDisplay() : TextModule("PingDisplay", LocalizeString::get("client.textmodule.pingDisplay.name"), LocalizeString::get("client.textmodule.pingDisplay.desc"), HUD) {
-	this->suffix = TextValue(L" ms");
+PingDisplay::PingDisplay()
+    : TextModule("PingDisplay", LocalizeString::get("client.textmodule.pingDisplay.name"),
+                 LocalizeString::get("client.textmodule.pingDisplay.desc"), HUD) {
+    this->suffix = TextValue(L" ms");
 
-	listen<AveragePingEvent>((EventListenerFunc)&PingDisplay::onAvgPing, true);
+    listen<AveragePingEvent>((EventListenerFunc)&PingDisplay::onAvgPing, true);
 }
 
 std::wstringstream PingDisplay::text(bool isDefault, bool inEditor) {
-	std::wstringstream wss;
-	int dPing = 0;
+    std::wstringstream wss;
+    int dPing = 0;
 
-	auto inst = SDK::RakNetConnector::get();
-	if (inst) {
-		dPing = ping;
-	}
+    auto inst = SDK::RakNetConnector::get();
+    if (inst) {
+        dPing = ping;
+    }
 
-	wss << dPing;
+    wss << dPing;
 
-	return wss;
+    return wss;
 }
 
 void PingDisplay::onAvgPing(Event& evGeneric) {
-	AveragePingEvent& ev = static_cast<AveragePingEvent&>(evGeneric);
+    AveragePingEvent& ev = static_cast<AveragePingEvent&>(evGeneric);
 
-	ping = ev.getPing();
+    ping = ev.getPing();
 }

@@ -7,16 +7,15 @@ namespace SDK {
     class BedrockTextureData {
     private:
         void* vtable; // I don't think these are owned, so won't free them off the memory
-        //void* idk2;
+        // void* idk2;
 
     public:
-        //std::shared_ptr<ResourceLocation> resource;
+        // std::shared_ptr<ResourceLocation> resource;
 
     private:
         void* empty[10];
 
-        ~BedrockTextureData() {
-        }
+        ~BedrockTextureData() {}
     };
 
     class TexturePtr {
@@ -29,7 +28,6 @@ namespace SDK {
             textureData.reset();
         }
 
-        ~TexturePtr() {
-        }
+        ~TexturePtr() {}
     };
 }

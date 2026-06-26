@@ -4,16 +4,17 @@
 
 class FogColorEvent : public Event {
 public:
-	static const uint32_t hash = TOHASH(FogColorEvent);
+    static const uint32_t hash = TOHASH(FogColorEvent);
 
-	FogColorEvent(Color* color) : color(color) {}
+    FogColorEvent(Color* color)
+        : color(color) {}
 
-	void setColor(float r, float g, float b) {
-		color->r = r;
-		color->g = g;
-		color->b = b;
-	}
+    void setColor(float r, float g, float b) {
+        color->r = r;
+        color->g = g;
+        color->b = b;
+    }
 
 protected:
-	Color* color;
+    Color* color;
 };

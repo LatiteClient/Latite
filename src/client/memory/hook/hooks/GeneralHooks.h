@@ -14,30 +14,21 @@ class GenericHooks : public HookGroup {
     static int __fastcall RakPeer_getAveragePing(void* obj, char* guidOrAddy);
     static void __fastcall LocalPlayer_applyTurnDelta(void* obj, Vec2& vec);
     static void __fastcall ClientInputUpdateSystemInternal_tickUpdateClientInput(
-        uintptr_t** a1,
-        void* a2,
-        uintptr_t* a3,
-        uintptr_t a4,
-        uintptr_t a5,
-        uintptr_t a6,
-        uintptr_t a7,
-        uintptr_t a8,
-        uintptr_t a9,
-        uintptr_t a10,
-        uintptr_t a11,
-        uintptr_t a12,
-        uintptr_t a13,
-        uintptr_t a14,
-        uintptr_t a15,
-        uintptr_t a16,
-        uintptr_t a17,
-        uintptr_t a18);
+        uintptr_t** a1, void* a2, uintptr_t* a3, uintptr_t a4, uintptr_t a5, uintptr_t a6, uintptr_t a7, uintptr_t a8,
+        uintptr_t a9, uintptr_t a10, uintptr_t a11, uintptr_t a12, uintptr_t a13, uintptr_t a14, uintptr_t a15,
+        uintptr_t a16, uintptr_t a17, uintptr_t a18);
     static void __fastcall CameraViewBob(void*, void*, void*);
-    static bool Level_initialize(SDK::Level* obj, void* palette, void* settings, void* tickRange, void* experiments, uint64_t a6);
+    static bool Level_initialize(SDK::Level* obj, void* palette, void* settings, void* tickRange, void* experiments,
+                                 uint64_t a6);
     static void* Level_startLeaveGame(SDK::Level* obj);
-    static void* ActorRenderDispatcher_render(void* obj, SDK::BaseActorRenderContext* barc, SDK::Actor* entity, Vec3& cameraTargetPos, Vec3 const& pos, const Vec2& rot, bool affectedByLighting);
-    static void LevelRendererPlayer_renderOutlineSelection(SDK::LevelRendererPlayer* obj, SDK::ScreenContext* scn, void* block, void* region, BlockPos pos);
-    static void* hkRenderGuiItemNew(void* obj, SDK::BaseActorRenderContext* baseActorRenderContext, SDK::ItemStack* itemStack, int mode, float x, float y, float opacity, float scale, float a9, bool ench, int unk);
+    static void* ActorRenderDispatcher_render(void* obj, SDK::BaseActorRenderContext* barc, SDK::Actor* entity,
+                                              Vec3& cameraTargetPos, Vec3 const& pos, const Vec2& rot,
+                                              bool affectedByLighting);
+    static void LevelRendererPlayer_renderOutlineSelection(SDK::LevelRendererPlayer* obj, SDK::ScreenContext* scn,
+                                                           void* block, void* region, BlockPos pos);
+    static void* hkRenderGuiItemNew(void* obj, SDK::BaseActorRenderContext* baseActorRenderContext,
+                                    SDK::ItemStack* itemStack, int mode, float x, float y, float opacity, float scale,
+                                    float a9, bool ench, int unk);
     static float hkGetTimeOfDay(SDK::Dimension* obj, int time, float a);
     static void hkDimensionTick(SDK::Dimension* obj);
     static Color* hkGetFogColor(SDK::Dimension* obj, Color* out, SDK::Actor* ent, float f);
@@ -45,8 +36,10 @@ class GenericHooks : public HookGroup {
     static void hkUpdatePlayer(SDK::CameraComponent* obj, void* a, void* b);
     static void hkOnUri(void* obj, void* uri);
     static void hkGrabCursor(SDK::ClientInstance* obj);
-    static void hkBaseActorRenderer_renderText(void* screenContext, void* viewData, std::string* tagData, void* font, void* mesh);
+    static void hkBaseActorRenderer_renderText(void* screenContext, void* viewData, std::string* tagData, void* font,
+                                               void* mesh);
     static void hkAppPlatformGDK_releaseMouse(void* _this);
+
 public:
     GenericHooks();
 };

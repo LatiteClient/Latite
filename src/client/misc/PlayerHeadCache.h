@@ -3,5 +3,5 @@
 #include <string>
 
 namespace PlayerHeadCache {
-	std::string getTexturePath(SDK::SerializedSkinRef const& skin);
+    std::string getTexturePath(SDK::SerializedSkinRef const& skin);
 }

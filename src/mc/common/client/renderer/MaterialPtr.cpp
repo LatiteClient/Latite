@@ -12,7 +12,7 @@ SDK::MaterialPtr* SDK::MaterialPtr::getUITextureAndColor() {
     return uiTexturedMaterial;
 }
 
-SDK::MaterialPtr* SDK::MaterialPtr::getSelectionBoxMaterial() { 
+SDK::MaterialPtr* SDK::MaterialPtr::getSelectionBoxMaterial() {
     static auto material = SDK::MaterialPtr::createMaterial(HashedString("selection_box"));
     return material;
 };
@@ -22,7 +22,7 @@ SDK::MaterialPtr* SDK::MaterialPtr::getSelectionOverlayMaterial() {
 };
 
 SDK::MaterialPtr* SDK::MaterialPtr::createMaterial(const SDK::HashedString& name) {
-    static class RenderMaterialGroup* materialGroup = Signatures::RenderMaterialGroup__common.as_ptr<class RenderMaterialGroup>();
+    static class RenderMaterialGroup* materialGroup =
+        Signatures::RenderMaterialGroup__common.as_ptr<class RenderMaterialGroup>();
     return memory::callVirtual<SDK::MaterialPtr*, const SDK::HashedString&>(materialGroup, 1, name);
 }
-

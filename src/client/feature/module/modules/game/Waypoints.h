@@ -4,5 +4,5 @@
 
 class Waypoints : public Module {
 public:
-	Waypoints();
+    Waypoints();
 };

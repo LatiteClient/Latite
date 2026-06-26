@@ -4,30 +4,32 @@
 #include "util/Crypto.h"
 
 namespace SDK {
-	class AttributeInstance {
-		char pad[0x80];
+    class AttributeInstance {
+        char pad[0x80];
 
-	public:
-		// AttributeInstance::getCurrentValue
-		CLASS_FIELD(float, maxValue, 0x78);
-		CLASS_FIELD(float, value, 0x7C);
-	};
+    public:
+        // AttributeInstance::getCurrentValue
+        CLASS_FIELD(float, maxValue, 0x78);
+        CLASS_FIELD(float, value, 0x7C);
+    };
 
-	class Attribute {
-	public:
-		int8_t mRedefinitionNode = 0;
-		bool mSyncable = true;
-		short unk = 0;
-		int mIDValue;
-		HashedString mName;
+    class Attribute {
+    public:
+        int8_t mRedefinitionNode = 0;
+        bool mSyncable = true;
+        short unk = 0;
+        int mIDValue;
+        HashedString mName;
 
-		Attribute(int id, std::string const& name) : mIDValue(id), mName(name) {}
-	};
+        Attribute(int id, std::string const& name)
+            : mIDValue(id)
+            , mName(name) {}
+    };
 
-	class Attributes {
-	public:
-		inline static Attribute Hunger = Attribute(1, "minecraft:hunger");
-		inline static Attribute Saturation = Attribute(2, "minecraft:saturation");
-		inline static Attribute Health = Attribute(6, "minecraft:health");
-	};
+    class Attributes {
+    public:
+        inline static Attribute Hunger = Attribute(1, "minecraft:hunger");
+        inline static Attribute Saturation = Attribute(2, "minecraft:saturation");
+        inline static Attribute Health = Attribute(6, "minecraft:health");
+    };
 }

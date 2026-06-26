@@ -51,7 +51,6 @@ using namespace winrt::Windows::Web::Http::Filters;
 using namespace winrt::Windows::Storage::Streams;
 using namespace winrt::Windows::Storage;
 
-
 #include "render/Renderer.h"
 #include "screen/ScreenManager.h"
 #include "render/asset/Assets.h"
@@ -91,7 +90,8 @@ namespace {
 
 }
 
-#define MVSIG(...) ([]() -> std::pair<SigImpl*, SigImpl*> {\
+#define MVSIG(...) \
+    ([]() -> std::pair<SigImpl*, SigImpl*> {\
 /*if (SDK::internalVers == SDK::VLATEST) */return {&Signatures::__VA_ARGS__, &Signatures::__VA_ARGS__}; }\
 /*if (SDK::internalVers == SDK::V1_20_40) { return {&Signatures_1_20_40::__VA_ARGS__, &Signatures::__VA_ARGS__}; }*/ \
 /*if (SDK::internalVers == SDK::V1_20_30) { return {&Signatures_1_20_30::__VA_ARGS__, &Signatures::__VA_ARGS__}; }*/ \
@@ -142,7 +142,7 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
     Logger::Info("Latite Client {}", Latite::version);
 #endif
 
-    char path[MAX_PATH]{};
+    char path[MAX_PATH] {};
     GetModuleFileNameA(nullptr, path, MAX_PATH);
 
     DWORD handle;
@@ -167,7 +167,7 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
 
         Latite::get().gameVersion = std::format("{}.{}.{}", major, minor, build);
     }
-    
+
     /*winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
     winrt::Windows::ApplicationModel::PackageVersion version = package.Id().Version();
 
@@ -194,11 +194,11 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
 
     if (Latite::supportsMinecraftVersion(Latite::get().gameVersion)) {
         // not needed as it will always just be latest
-        //SDK::internalVers = vers;
-    }
-    else {
+        // SDK::internalVers = vers;
+    } else {
         std::stringstream ss;
-        ss << "Latite Client does not support your version: " << Latite::get().gameVersion << ". Latite only supports the following versions:\n\n";
+        ss << "Latite Client does not support your version: " << Latite::get().gameVersion
+           << ". Latite only supports the following versions:\n\n";
 
         for (const auto key : Latite::supportedMinecraftVersions) {
             ss << key << "\n";
@@ -260,12 +260,11 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         MVSIG(Misc::Platform_GameCore),
         MVSIG(Misc::mouseDevice),
     };
-    
+
     new (configMgrBuf) ConfigManager();
     if (!Latite::getConfigManager().loadMaster()) {
         Logger::Fatal("Could not load master config!");
-    }
-    else {
+    } else {
         Logger::Info("Loaded master config");
     }
     new (mainSettingGroup) SettingGroup("global");
@@ -293,8 +292,7 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
             Logger::Warn("Signature {} failed to resolve!", entry.first->name);
 #endif
             deadCount++;
-        }
-        else {
+        } else {
             entry.second->result = entry.first->result;
             entry.second->scan_result = entry.first->scan_result;
             sigCount++;
@@ -328,18 +326,15 @@ DWORD __stdcall startThread(LPVOID context) {
         [](void* param) -> std::uintptr_t {
             return startThreadImpl(static_cast<HINSTANCE>(param));
         },
-        context,
-        "Caught SEH exception in Latite startup thread"
-    ));
+        context, "Caught SEH exception in Latite startup thread"));
 #else
     return startThreadImpl(static_cast<HINSTANCE>(context));
 #endif
 }
 
-BOOL WINAPI DllMainImpl(
-    HINSTANCE hinstDLL,  // handle to DLL module
-    DWORD fdwReason,     // reason for calling function
-    LPVOID reserved)  // reserved
+BOOL WINAPI DllMainImpl(HINSTANCE hinstDLL, // handle to DLL module
+                        DWORD fdwReason,    // reason for calling function
+                        LPVOID reserved)    // reserved
 {
     BEGIN_ERROR_HANDLER
     if (GetModuleHandleA("Minecraft.Windows.exe") != GetModuleHandleA(NULL)) return TRUE;
@@ -349,8 +344,7 @@ BOOL WINAPI DllMainImpl(
 
         DisableThreadLibraryCalls(hinstDLL);
         CloseHandle(CreateThread(nullptr, 0, startThread, hinstDLL, 0, nullptr));
-    }
-    else if (fdwReason == DLL_PROCESS_DETACH) {
+    } else if (fdwReason == DLL_PROCESS_DETACH) {
         if (reserved != nullptr) {
             hasInjected = false;
             return TRUE;
@@ -389,25 +383,22 @@ BOOL WINAPI DllMainImpl(
         DebugExceptionHandler::Uninstall();
 #endif
     }
-    return TRUE;  // Successful DLL_PROCESS_ATTACH.
+    return TRUE; // Successful DLL_PROCESS_ATTACH.
     END_ERROR_HANDLER
 }
 
-BOOL WINAPI DllMain(
-    HINSTANCE hinstDLL,  // handle to DLL module
-    DWORD fdwReason,     // reason for calling function
-    LPVOID reserved)  // reserved
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, // handle to DLL module
+                    DWORD fdwReason,    // reason for calling function
+                    LPVOID reserved)    // reserved
 {
 #ifdef LATITE_CRASH_REPORTING
-    DllMainCall call{hinstDLL, fdwReason, reserved};
+    DllMainCall call { hinstDLL, fdwReason, reserved };
     return static_cast<BOOL>(DebugExceptionHandler::RunWithSehGuard(
         [](void* context) -> std::uintptr_t {
             auto* call = static_cast<DllMainCall*>(context);
             return DllMainImpl(call->hinstDLL, call->fdwReason, call->reserved);
         },
-        &call,
-        "Caught SEH exception in Latite DllMain"
-    ));
+        &call, "Caught SEH exception in Latite DllMain"));
 #else
     return DllMainImpl(hinstDLL, fdwReason, reserved);
 #endif
@@ -486,8 +477,8 @@ int Latite::getSelectedLanguage() {
 }
 
 void Latite::queueEject() noexcept {
-    //auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
-    //app.Title(L"");
+    // auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
+    // app.Title(L"");
     SetWindowTextW(SDK::GameCore::get()->hwnd, L"Minecraft");
     if (this->shouldEject.exchange(true, std::memory_order_acq_rel)) {
         return;
@@ -499,8 +490,8 @@ bool Latite::isEjectQueued() const noexcept {
 }
 
 bool Latite::isEjectReadyForRenderThread() const noexcept {
-    return this->shouldEject.load(std::memory_order_acquire)
-        && this->mainThreadEjectCleanupComplete.load(std::memory_order_acquire);
+    return this->shouldEject.load(std::memory_order_acquire) &&
+           this->mainThreadEjectCleanupComplete.load(std::memory_order_acquire);
 }
 
 void Latite::completeEjectFromRenderThread() noexcept {
@@ -556,7 +547,7 @@ void Latite::initialize(HINSTANCE hInst) {
     Logger::Info("Enabled Hooks");
 
     // doesn't work, maybe it's stored somewhere else too
-    //if (SDK::internalVers < SDK::V1_20) {
+    // if (SDK::internalVers < SDK::V1_20) {
     //    patchKey();
     //}
 }
@@ -564,12 +555,11 @@ void Latite::initialize(HINSTANCE hInst) {
 void Latite::threadsafeInit() {
     this->gameThreadId = std::this_thread::get_id();
     // TODO: latite beta only
-    //if (SDK::ClientInstance::get()->minecraftGame->xuid.size() > 0) wnd->postXUID();
+    // if (SDK::ClientInstance::get()->minecraftGame->xuid.size() > 0) wnd->postXUID();
 
-
-    //auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
+    // auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     std::string vstr(this->version);
-	
+
 #if defined(LATITE_NIGHTLY)
     auto ws = util::StrToWStr("Latite Client [NIGHTLY] " + gameVersion + " " + vstr + "/" + getBuildTimestamp());
 #elif defined(LATITE_DEBUG)
@@ -578,18 +568,20 @@ void Latite::threadsafeInit() {
     auto ws = util::StrToWStr("Latite Client " + vstr);
 #endif
 
-    //app.Title(ws);
+    // app.Title(ws);
     SetWindowTextW(SDK::GameCore::get()->hwnd, ws.c_str());
     Latite::getPluginManager().loadPrerunScripts();
     Logger::Info("Loaded startup scripts");
-    
+
     Latite::getConfigManager().applyModuleConfig();
 
     Latite::getRenderer().setShouldInit();
 
     Latite::getCommandManager().prefix = Latite::get().getCommandPrefix();
     Latite::getNotifications().push(LocalizeString::get("client.intro.welcome"));
-    Latite::getNotifications().push(util::FormatWString(LocalizeString::get("client.intro.menubutton"), { util::StrToWStr(util::KeyToString(Latite::get().getMenuKey().value)) }));
+    Latite::getNotifications().push(
+        util::FormatWString(LocalizeString::get("client.intro.menubutton"),
+                            { util::StrToWStr(util::KeyToString(Latite::get().getMenuKey().value)) }));
 }
 
 static void blockModules(std::string_view moduleName, std::string_view serverName) {
@@ -604,7 +596,7 @@ static void blockModules(std::string_view moduleName, std::string_view serverNam
                     mod->setBlocked(true);
                 }
             }
-            });
+        });
     }
 
     if (!blockedList.empty()) {
@@ -625,7 +617,6 @@ void Latite::updateModuleBlocking() {
     auto inst = SDK::RakNetConnector::get();
     if (!inst) return;
 
-
     if (inst->dns.size() > 0) {
         // scuffed but we don't have a proper static management system
 
@@ -633,9 +624,7 @@ void Latite::updateModuleBlocking() {
 
         blockModules("Freelook", "hivebedrock");
         blockModules("Freelook", "galaxite");
-    }
-    else {
-        
+    } else {
     }
 }
 
@@ -654,8 +643,7 @@ std::wstring Latite::GetCurrentModuleFilePath(HMODULE hModule) {
 
     if (result > 0 && result < buffer.size()) {
         return std::wstring(buffer.data());
-    }
-    else if (result >= buffer.size()) {
+    } else if (result >= buffer.size()) {
         buffer.resize(result + 1);
         result = GetModuleFileNameW(hModule, buffer.data(), static_cast<DWORD>(buffer.size()));
         if (result > 0 && result < buffer.size()) {
@@ -683,9 +671,9 @@ void Latite::initSettings() {
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("menuBlurEnabled",
-                                             LocalizeString::get("client.settings.menuBlurEnabled.name"),
-                                             LocalizeString::get("client.settings.menuBlurEnabled.desc"));
+        auto set =
+            std::make_shared<Setting>("menuBlurEnabled", LocalizeString::get("client.settings.menuBlurEnabled.name"),
+                                      LocalizeString::get("client.settings.menuBlurEnabled.desc"));
         set->value = &this->menuBlurEnabled;
         this->getSettings().addSetting(set);
     }
@@ -696,8 +684,9 @@ void Latite::initSettings() {
         this->getSettings().addSetting(set);
     }
     {
-        auto set = std::make_shared<Setting>("forceDisableVSync", LocalizeString::get("client.settings.forceDisableVSync.name"),
-            LocalizeString::get("client.settings.forceDisableVSync.desc"));
+        auto set = std::make_shared<Setting>("forceDisableVSync",
+                                             LocalizeString::get("client.settings.forceDisableVSync.name"),
+                                             LocalizeString::get("client.settings.forceDisableVSync.desc"));
         set->value = &this->forceDisableVSync;
         this->getSettings().addSetting(set);
     }
@@ -725,7 +714,8 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("minViewBob", L"Minimal View Bob (UNSTABLE)", L"Only bob the item in hand, not the camera");
+        auto set = std::make_shared<Setting>("minViewBob", L"Minimal View Bob (UNSTABLE)",
+                                             L"Only bob the item in hand, not the camera");
         set->value = &this->minimalViewBob;
         this->getSettings().addSetting(set);
     }
@@ -762,31 +752,29 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("mcRendererFont",
-                                             LocalizeString::get("client.settings.mcRendererFont.name"),
-                                             LocalizeString::get("client.settings.mcRendererFont.desc"));
+        auto set =
+            std::make_shared<Setting>("mcRendererFont", LocalizeString::get("client.settings.mcRendererFont.name"),
+                                      LocalizeString::get("client.settings.mcRendererFont.desc"));
         set->enumData = &this->mcRendFont;
         set->value = set->enumData->getValue();
-        set->enumData->addEntry({
-            0, LocalizeString::get("client.settings.mcRendererFont.default.name"),
-            LocalizeString::get("client.settings.mcRendererFont.default.desc")
-        });
-        set->enumData->addEntry({
-            1, LocalizeString::get("client.settings.mcRendererFont.notoSans.name"),
-            LocalizeString::get("client.settings.mcRendererFont.notoSans.desc")
-        });
+        set->enumData->addEntry({ 0, LocalizeString::get("client.settings.mcRendererFont.default.name"),
+                                  LocalizeString::get("client.settings.mcRendererFont.default.desc") });
+        set->enumData->addEntry({ 1, LocalizeString::get("client.settings.mcRendererFont.notoSans.name"),
+                                  LocalizeString::get("client.settings.mcRendererFont.notoSans.desc") });
         this->getSettings().addSetting(set);
     }
 
     {
-        //auto set = std::make_shared<Setting>("broadcastClientUsage", "Latite Client Presence", "If you leave this on, others with Latite will see that you are using Latite and you will see other people who use Latite.");
-        //set->value = &this->broadcastUsage;
-        //this->getSettings().addSetting(set);
+        // auto set = std::make_shared<Setting>("broadcastClientUsage", "Latite Client Presence", "If you leave this on,
+        // others with Latite will see that you are using Latite and you will see other people who use Latite.");
+        // set->value = &this->broadcastUsage;
+        // this->getSettings().addSetting(set);
     }
 
     {
         auto set = std::make_shared<Setting>(""
-                                             "centerCursor", LocalizeString::get("client.settings.centerCursor.name"),
+                                             "centerCursor",
+                                             LocalizeString::get("client.settings.centerCursor.name"),
                                              LocalizeString::get("client.settings.centerCursor.desc"));
         set->value = &this->centerCursorMenus;
         this->getSettings().addSetting(set);
@@ -852,7 +840,8 @@ namespace {
 
         auto folderPath = util::GetLatitePath() / "Assets";
 
-        winrt::Windows::Foundation::Uri requestUri(util::StrToWStr("https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll"));
+        winrt::Windows::Foundation::Uri requestUri(
+            util::StrToWStr("https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll"));
 
         auto buffer = co_await http.GetBufferAsync(requestUri);
 
@@ -879,21 +868,18 @@ void Latite::downloadChakraCore() {
 
 void Latite::initLanguageSetting() {
     auto set = std::make_shared<Setting>("language", LocalizeString::get("client.settings.language.name"),
-        LocalizeString::get("client.settings.language.desc"));
+                                         LocalizeString::get("client.settings.language.desc"));
     set->enumData = &this->clientLanguage;
     set->value = set->enumData->getValue();
     set->userUpdateCallback = [](Setting&) {
         Latite::get().onLanguageChanged();
-        };
+    };
 
-    set->enumData->addEntry({
-        LocalizeData::systemDefaultLanguageSettingValue, LocalizeString::get("client.settings.language.systemDefault.name")
-        });
+    set->enumData->addEntry({ LocalizeData::systemDefaultLanguageSettingValue,
+                              LocalizeString::get("client.settings.language.systemDefault.name") });
 
-    for (int i = 0; auto & lang : l10nData->getLanguages()) {
-        set->enumData->addEntry({
-            i + 1, util::StrToWStr(lang->name)
-            });
+    for (int i = 0; auto& lang : l10nData->getLanguages()) {
+        set->enumData->addEntry({ i + 1, util::StrToWStr(lang->name) });
         i++;
     }
     this->getSettings().addSetting(set);
@@ -905,7 +891,7 @@ void Latite::onLanguageChanged() {
 
     Latite::getModuleManager().forEach([](std::shared_ptr<Module> mod) {
         mod->refreshLocalization();
-        });
+    });
 
     Latite::getCommandManager().refreshLocalization();
     Latite::getScreenManager().get<ClickGUI>().requestModuleListRebuild();
@@ -940,14 +926,13 @@ void Latite::onUpdate(Event& evGeneric) {
     auto rak = SDK::RakNetConnector::get();
 
     if (!rak || rak->ipAddress.empty()) {
-        //updateModuleBlocking();
+        // updateModuleBlocking();
         getModuleManager().forEach([](std::shared_ptr<Module> mod) {
             mod->setBlocked(false);
-            });
+        });
     }
 
-    if (std::get<BoolValue>(centerCursorMenus) &&
-        SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
+    if (std::get<BoolValue>(centerCursorMenus) && SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
         RECT r = { 0, 0, 0, 0 };
         GetClientRect(SDK::GameCore::get()->hwnd, &r);
         SetCursorPos((r.left + r.right) / 2, (r.top + r.bottom) / 2);
@@ -964,12 +949,10 @@ void Latite::onUpdate(Event& evGeneric) {
 
     static bool lastDX11 = std::get<BoolValue>(this->useDX11);
     if (std::get<BoolValue>(useDX11) != lastDX11) {
-
         if (lastDX11) {
             Latite::getClientMessageQueue().display(
                 util::WFormat(LocalizeString::get("client.settings.dx11EnabledMsg.name")));
-        }
-        else {
+        } else {
             Latite::getRenderer().setShouldReinit();
         }
         lastDX11 = std::get<BoolValue>(useDX11);
@@ -1011,8 +994,7 @@ void Latite::onChar(Event& evGeneric) {
         if (tb->isSelected()) {
             if (ev.isChar()) {
                 tb->onChar(ev.getChar());
-            }
-            else {
+            } else {
                 auto ch = ev.getChar();
                 switch (ch) {
                 case 0x1:
@@ -1041,7 +1023,8 @@ void Latite::onRendererInit(Event&) {
     getRenderer().getDeviceContext()->CreateEffect(CLSID_D2D1GaussianBlur, gaussianBlurEffect.GetAddressOf());
 
     gaussianBlurEffect->SetInput(0, hudBlurBitmap.Get());
-    gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION, std::get<FloatValue>(this->hudBlurIntensity));
+    gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_STANDARD_DEVIATION,
+                                 std::get<FloatValue>(this->hudBlurIntensity));
     gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_BORDER_MODE, D2D1_BORDER_MODE_HARD);
     gaussianBlurEffect->SetValue(D2D1_GAUSSIANBLUR_PROP_OPTIMIZATION, D2D1_GAUSSIANBLUR_OPTIMIZATION_SPEED);
 
@@ -1053,7 +1036,6 @@ void Latite::onRendererCleanup(Event& ev) {
     this->gaussianBlurEffect = nullptr;
     this->hudBlurBrush = nullptr;
 }
-
 
 void Latite::onSuspended(Event& ev) {
     Latite::getConfigManager().saveCurrentConfig();
@@ -1115,23 +1097,27 @@ void Latite::onMouseRelease(Event& ev) {
 void Latite::loadLanguageConfig(std::shared_ptr<Setting> languageSetting) {
     this->getSettings().forEach([&](std::shared_ptr<Setting> set) {
         if (set->name() == languageSetting->name()) {
-            std::visit([&](auto&& obj) {
-                *set->value = obj;
-                set->update();
-                }, languageSetting->resolvedValue);
+            std::visit(
+                [&](auto&& obj) {
+                    *set->value = obj;
+                    set->update();
+                },
+                languageSetting->resolvedValue);
         }
-        });
+    });
 }
 
 void Latite::loadConfig(SettingGroup& gr) {
     gr.forEach([&](std::shared_ptr<Setting> set) {
         this->getSettings().forEach([&](std::shared_ptr<Setting> modSet) {
             if (modSet->name() == set->name()) {
-                std::visit([&](auto&& obj) {
-                    *modSet->value = obj;
-                    modSet->update();
-                    }, set->resolvedValue);
+                std::visit(
+                    [&](auto&& obj) {
+                        *modSet->value = obj;
+                        modSet->update();
+                    },
+                    set->resolvedValue);
             }
-            });
         });
+    });
 }

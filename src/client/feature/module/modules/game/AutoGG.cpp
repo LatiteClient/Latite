@@ -3,12 +3,14 @@
 #include <mc/common/network/packet/CommandRequestPacket.h>
 #include "mc/common/network/MinecraftPackets.h"
 
-AutoGG::AutoGG() : Module("AutoGG", LocalizeString::get("client.module.autoGG.name"),
-                          LocalizeString::get("client.module.autoGG.desc"), GAME, nokeybind) {
+AutoGG::AutoGG()
+    : Module("AutoGG", LocalizeString::get("client.module.autoGG.name"),
+             LocalizeString::get("client.module.autoGG.desc"), GAME, nokeybind) {
     addSetting("useCustomMessage", LocalizeString::get("client.module.autoGG.useCustomMessage.name"),
                LocalizeString::get("client.module.autoGG.useCustomMessage.desc"), useCustomMessage);
     addSetting("customMessage", LocalizeString::get("client.module.autoGG.customMessage.name"),
-               LocalizeString::get("client.module.autoGG.customMessage.desc"), customMessage, "useCustomMessage"_istrue);
+               LocalizeString::get("client.module.autoGG.customMessage.desc"), customMessage,
+               "useCustomMessage"_istrue);
     listen<ChatMessageEvent>(static_cast<EventListenerFunc>(&AutoGG::onText));
 }
 
@@ -25,8 +27,7 @@ void AutoGG::onText(Event& evG) {
 
         if (std::get<BoolValue>(useCustomMessage)) {
             tp->chat(util::WStrToStr(std::get<TextValue>(customMessage).str));
-        }
-        else {
+        } else {
             tp->chat("gg");
         }
         localPlayer->packetSender->sendToServer(pkt.get());

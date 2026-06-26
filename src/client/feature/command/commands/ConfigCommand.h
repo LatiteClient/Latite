@@ -3,8 +3,8 @@
 
 class ConfigCommand final : public Command {
 public:
-	ConfigCommand();
-	~ConfigCommand() = default;
+    ConfigCommand();
+    ~ConfigCommand() = default;
 
-	bool execute(std::string const label, std::vector<std::string> args) override;
+    bool execute(std::string const label, std::vector<std::string> args) override;
 };

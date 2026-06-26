@@ -5,16 +5,17 @@
 
 #include "client/event/events/RendererInitEvent.h"
 
-MotionBlur::MotionBlur() : Module("MotionBlur", LocalizeString::get("client.module.motionBlur.name"),
-                                  LocalizeString::get("client.module.motionBlur.desc"), GAME) {
+MotionBlur::MotionBlur()
+    : Module("MotionBlur", LocalizeString::get("client.module.motionBlur.name"),
+             LocalizeString::get("client.module.motionBlur.desc"), GAME) {
     addSetting("usePixelAverage", LocalizeString::get("client.module.motionBlur.usePixelAverage.name"),
                LocalizeString::get("client.module.motionBlur.usePixelAverage.desc"), usePixelAverage);
     addSliderSetting("intensity", LocalizeString::get("client.module.motionBlur.intensity.name"),
-                     LocalizeString::get("client.module.motionBlur.intensity.desc"), intensity,
-                     FloatValue(0.f), FloatValue(20.f), FloatValue(1.f), "usePixelAverage"_istrue);
+                     LocalizeString::get("client.module.motionBlur.intensity.desc"), intensity, FloatValue(0.f),
+                     FloatValue(20.f), FloatValue(1.f), "usePixelAverage"_istrue);
     addSliderSetting("opacity", LocalizeString::get("client.module.motionBlur.opacity.name"),
-                     LocalizeString::get("client.module.motionBlur.opacity.desc"), opacity,
-                     FloatValue(2.f), FloatValue(16.f), FloatValue(1.f));
+                     LocalizeString::get("client.module.motionBlur.opacity.desc"), opacity, FloatValue(2.f),
+                     FloatValue(16.f), FloatValue(1.f));
 
     listen<RendererCleanupEvent>(&MotionBlur::onCleanup);
     listen<RenderOverlayEvent>(&MotionBlur::onRenderOverlay, true, 100);
@@ -23,7 +24,7 @@ MotionBlur::MotionBlur() : Module("MotionBlur", LocalizeString::get("client.modu
 
 void MotionBlur::clearFrames() {
     SafeRelease(&m_previousFrameBitmap);
-    for (auto &frame: m_frameHistory) {
+    for (auto& frame : m_frameHistory) {
         SafeRelease(&frame);
     }
 
@@ -38,23 +39,23 @@ void MotionBlur::onDisable() {
     clearFrames();
 }
 
-void MotionBlur::onCleanup(Event &) {
+void MotionBlur::onCleanup(Event&) {
     clearFrames();
 }
 
-void MotionBlur::onRendererInit(Event &) {
+void MotionBlur::onRendererInit(Event&) {
     clearFrames();
 }
 
-void MotionBlur::onRenderOverlay(Event &genericEv) {
+void MotionBlur::onRenderOverlay(Event& genericEv) {
     if (!this->isEnabled()) {
         return;
     }
-    if (SDK::ClientInstance *clientInstance = SDK::ClientInstance::get();
-        !clientInstance || !clientInstance->minecraft || !clientInstance->minecraft->getLevel() || !clientInstance->
-        getLocalPlayer()) {
-            return;
-        }
+    if (SDK::ClientInstance* clientInstance = SDK::ClientInstance::get();
+        !clientInstance || !clientInstance->minecraft || !clientInstance->minecraft->getLevel() ||
+        !clientInstance->getLocalPlayer()) {
+        return;
+    }
 
     bool currentModeIsPixelAverage = std::get<BoolValue>(usePixelAverage);
     if (currentModeIsPixelAverage != m_lastModeWasPixelAverage) {
@@ -62,10 +63,10 @@ void MotionBlur::onRenderOverlay(Event &genericEv) {
         m_lastModeWasPixelAverage = currentModeIsPixelAverage;
     }
 
-    RenderOverlayEvent &ev = reinterpret_cast<RenderOverlayEvent &>(genericEv);
+    RenderOverlayEvent& ev = reinterpret_cast<RenderOverlayEvent&>(genericEv);
 
-    ID2D1DeviceContext *ctx = ev.getDeviceContext();
-    Renderer *renderer = &Latite::getRenderer();
+    ID2D1DeviceContext* ctx = ev.getDeviceContext();
+    Renderer* renderer = &Latite::getRenderer();
     D2D1_SIZE_F screenSize = renderer->getScreenSize();
     D2D1_RECT_F rc = D2D1::RectF(0.f, 0.f, screenSize.width, screenSize.height);
     float opacityValue = std::get<FloatValue>(opacity);
@@ -78,7 +79,7 @@ void MotionBlur::onRenderOverlay(Event &genericEv) {
             size_t frameCount = m_frameHistory.size();
 
             for (size_t i = 0; i < frameCount; ++i) {
-                ID2D1Bitmap1 *frame = m_frameHistory[i];
+                ID2D1Bitmap1* frame = m_frameHistory[i];
                 if (frame) {
                     float ageFactor = frameCount > 1 ? static_cast<float>(i) / (frameCount - 1) : 1.f;
                     float finalOpacity = maxOpacity * powf(ageFactor, 3.f);
@@ -88,7 +89,7 @@ void MotionBlur::onRenderOverlay(Event &genericEv) {
             }
         }
 
-        ID2D1Bitmap1 *currentFrame = renderer->copyCurrentBitmap();
+        ID2D1Bitmap1* currentFrame = renderer->copyCurrentBitmap();
         if (currentFrame) {
             m_frameHistory.push_back(currentFrame);
         }

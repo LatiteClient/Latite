@@ -4,7 +4,7 @@
 
 class BobMovementEvent : public Cancellable {
 public:
-	BobMovementEvent() = default;
+    BobMovementEvent() = default;
 
-	static const uint32_t hash = TOHASH(BobMovementEvent);
+    static const uint32_t hash = TOHASH(BobMovementEvent);
 };

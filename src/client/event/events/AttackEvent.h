@@ -4,17 +4,14 @@
 
 class AttackEvent : public Event {
 public:
-	static const uint32_t hash = TOHASH(AttackEvent);
+    static const uint32_t hash = TOHASH(AttackEvent);
+
 private:
-	SDK::Actor* entity;
+    SDK::Actor* entity;
+
 public:
+    SDK::Actor* getActor() { return entity; }
 
-	SDK::Actor* getActor() {
-		return entity;
-	}
-
-	AttackEvent(SDK::Actor* entity)
-		: entity(entity)
-	{
-	}
+    AttackEvent(SDK::Actor* entity)
+        : entity(entity) {}
 };

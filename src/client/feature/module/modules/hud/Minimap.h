@@ -5,15 +5,13 @@
 
 class Minimap : public HUDModule {
 public:
-	Minimap();
+    Minimap();
 
 private:
-	struct IBlock {
+    struct IBlock {};
 
-	};
+    std::unordered_map < BlockPos,
 
-	std::unordered_map<BlockPos, 
-
-	void scanChunks();
-	void onUpdate(Event& ev);
+        void scanChunks();
+    void onUpdate(Event& ev);
 };

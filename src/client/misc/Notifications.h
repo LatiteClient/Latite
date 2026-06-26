@@ -3,22 +3,23 @@
 
 class Notifications : public Listener {
 public:
-	Notifications();
+    Notifications();
 
-	void push(std::wstring message);
+    void push(std::wstring message);
+
 private:
-	void onRender(Event& ev);
+    void onRender(Event& ev);
 
-	struct Toast {
-		std::wstring message;
-		bool init = false;
-		std::chrono::system_clock::time_point createTime;
+    struct Toast {
+        std::wstring message;
+        bool init = false;
+        std::chrono::system_clock::time_point createTime;
 
-		void initialize() {
-			init = true;
-			createTime = std::chrono::system_clock::now();
-		}
-	};
+        void initialize() {
+            init = true;
+            createTime = std::chrono::system_clock::now();
+        }
+    };
 
-	std::queue<Toast> toasts;
+    std::queue<Toast> toasts;
 };

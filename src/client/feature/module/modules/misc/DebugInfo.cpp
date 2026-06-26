@@ -12,8 +12,9 @@
 #include "mc/common/client/gui/controls/VisualTree.h"
 #include <util/DrawContext.h>
 
-DebugInfo::DebugInfo() : Module("DebugInfo", LocalizeString::get("client.module.debugInfo.name"),
-                                LocalizeString::get("client.module.debugInfo.desc"), GAME, VK_F3) {
+DebugInfo::DebugInfo()
+    : Module("DebugInfo", LocalizeString::get("client.module.debugInfo.name"),
+             LocalizeString::get("client.module.debugInfo.desc"), GAME, VK_F3) {
     listen<RenderLayerEvent>(static_cast<EventListenerFunc>(&DebugInfo::onRenderOverlay));
     listen<DrawHUDModulesEvent>(static_cast<EventListenerFunc>(&DebugInfo::onRenderHUDModules), false, 2);
 }
@@ -32,7 +33,8 @@ namespace {
         Vec3 position = SDK::ClientInstance::get()->getLocalPlayer()->getPos();
         std::string ln1 = std::format("XYZ: {:.1f} / {:.1f} / {:.1f}", position.x, position.y, position.z);
         std::string ln2;
-        if (SDK::ClientInstance::get()->getLocalPlayer()->dimension->dimensionName == "Nether") ln2 = std::format("Overworld: {:.1f} / {:.1f} / {:.1f}", position.x * 8.f, position.y, position.z * 8.f);
+        if (SDK::ClientInstance::get()->getLocalPlayer()->dimension->dimensionName == "Nether")
+            ln2 = std::format("Overworld: {:.1f} / {:.1f} / {:.1f}", position.x * 8.f, position.y, position.z * 8.f);
         return ln1 + "\n" + ln2;
     }
     std::string getVelocity() {
@@ -58,7 +60,6 @@ namespace {
     }
     // TODO: block info, tps info, tick speed info, biome info, days ran on server.
 
-
     std::string getMemUsage() {
         // Get the total available memory
         MEMORYSTATUSEX memStatus;
@@ -66,7 +67,8 @@ namespace {
         GlobalMemoryStatusEx(&memStatus);
 
         // Convert memory usage values to GB
-        double usedMemoryGB = static_cast<double>(memStatus.ullTotalPhys - memStatus.ullAvailPhys) / (1024 * 1024 * 1024); // Convert to GB
+        double usedMemoryGB = static_cast<double>(memStatus.ullTotalPhys - memStatus.ullAvailPhys) /
+                              (1024 * 1024 * 1024);                                                // Convert to GB
         double totalMemoryGB = static_cast<double>(memStatus.ullTotalPhys) / (1024 * 1024 * 1024); // Convert to GB
 
         // Calculate the ratio of used memory to total memory
@@ -106,14 +108,16 @@ namespace {
         float d2d = chkVec(d2dPerf, Latite::getRenderer().d2dPerf / 1000.f);
         float d3d = chkVec(d3dPerf, Latite::getRenderer().d3dPerf / 1000.f);
 
-        return std::format("\nAverages:\nAcquireWrappedResources: {:.3f}ms\nLatite Direct2D total: {:.3f}ms \nLatite Direct3D total: {:.3f}ms", arp, d2d, d3d);
+        return std::format("\nAverages:\nAcquireWrappedResources: {:.3f}ms\nLatite Direct2D total: {:.3f}ms \nLatite "
+                           "Direct3D total: {:.3f}ms",
+                           arp, d2d, d3d);
     }
 }
 #undef GETFPS
 
 void DebugInfo::onRenderOverlay(Event& evG) {
     RenderLayerEvent& ev = reinterpret_cast<RenderLayerEvent&>(evG);
-    MCDrawUtil dc{ ev.getUIRenderContext(), Latite::get().getFont() };
+    MCDrawUtil dc { ev.getUIRenderContext(), Latite::get().getFont() };
 
     if (!SDK::ClientInstance::get()->getLocalPlayer()) return;
 
@@ -121,24 +125,18 @@ void DebugInfo::onRenderOverlay(Event& evG) {
         auto [width, height] = SDK::ClientInstance::get()->getGuiData()->screenSize;
         d2d::Rect rect = { 0.f, 0.f, width, height };
 
-        const std::wstring topLeftDebugInfo = util::StrToWStr(std::format("{}\n{}\n\n{}\n{}\n{}\n{}",
-            getMinecraftVersion(),
-            getFPS(),
-            getDimension(),
-            getCoordinates(),
-            //getVelocity(),
-            getRotation(),
-            getLookingAt()));
-        const std::wstring topRightDebugInfo = util::StrToWStr(std::format("{}\n{}\n{}\n",
-            getMemUsage(),
-            getGpuInfo(),
-            getCpuInfo()));
+        const std::wstring topLeftDebugInfo = util::StrToWStr(
+            std::format("{}\n{}\n\n{}\n{}\n{}\n{}", getMinecraftVersion(), getFPS(), getDimension(), getCoordinates(),
+                        // getVelocity(),
+                        getRotation(), getLookingAt()));
+        const std::wstring topRightDebugInfo =
+            util::StrToWStr(std::format("{}\n{}\n{}\n", getMemUsage(), getGpuInfo(), getCpuInfo()));
 
-        dc.drawText(rect, topLeftDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular,
-            28, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
+        dc.drawText(rect, topLeftDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, 28,
+                    DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
 
-        dc.drawText(rect, topRightDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular,
-            28, DWRITE_TEXT_ALIGNMENT_TRAILING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
+        dc.drawText(rect, topRightDebugInfo, d2d::Colors::WHITE, Renderer::FontSelection::PrimaryRegular, 28,
+                    DWRITE_TEXT_ALIGNMENT_TRAILING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR, false);
 
         dc.flush(true, false);
     }

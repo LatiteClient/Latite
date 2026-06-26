@@ -3,8 +3,8 @@
 
 class SetPrefixCommand final : public Command {
 public:
-	SetPrefixCommand();
-	~SetPrefixCommand() = default;
+    SetPrefixCommand();
+    ~SetPrefixCommand() = default;
 
-	bool execute(std::string const label, std::vector<std::string> args) override;
+    bool execute(std::string const label, std::vector<std::string> args) override;
 };

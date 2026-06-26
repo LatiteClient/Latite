@@ -7,12 +7,12 @@
 
 static SDK::UIControl* bossbar = nullptr;
 
-TestCommand::TestCommand() : Command("test", L"A command for testing", "$ [...]", {"tc"}) {
-	Eventing::get().listen<RenderLayerEvent>(this, (EventListenerFunc)&TestCommand::onRenderLayer);
+TestCommand::TestCommand()
+    : Command("test", L"A command for testing", "$ [...]", { "tc" }) {
+    Eventing::get().listen<RenderLayerEvent>(this, (EventListenerFunc)&TestCommand::onRenderLayer);
 }
 
 bool TestCommand::execute(std::string const label, std::vector<std::string> args) {
-
 #if 0
 	winrt::hstring Title = L"title";
 	winrt::hstring Content = L"djfiadhswfahsd9fasdf";
@@ -50,31 +50,29 @@ bool TestCommand::execute(std::string const label, std::vector<std::string> args
 		});
 #endif
 
-	auto lp = SDK::ClientInstance::get()->getLocalPlayer();
-	if (!lp) return true;
-	//Logger::Info("{} {} {}", lp->getHealth(), lp->getHunger(), lp->getSaturation());
-	
-	//if (args.size() < 1) return false;
+    auto lp = SDK::ClientInstance::get()->getLocalPlayer();
+    if (!lp) return true;
+    // Logger::Info("{} {} {}", lp->getHealth(), lp->getHunger(), lp->getSaturation());
 
+    // if (args.size() < 1) return false;
 
-	auto selec = lp->supplies->inventory->getItem(lp->supplies->selectedSlot);
+    auto selec = lp->supplies->inventory->getItem(lp->supplies->selectedSlot);
 
-	if (selec && selec->tag) {
-		SDK::BasicPrintStream ps{};
-		SDK::BasicDataOutput psx{};
-		selec->tag->print("prefix", ps);
-		selec->tag->write(psx);
+    if (selec && selec->tag) {
+        SDK::BasicPrintStream ps {};
+        SDK::BasicDataOutput psx {};
+        selec->tag->print("prefix", ps);
+        selec->tag->write(psx);
 
-		message(ps.mStr);
-	}
-	//SDK::LevelRendererPlayer::selecOffset = std::stoull(args.at(0), 0, 16);
+        message(ps.mStr);
+    }
+    // SDK::LevelRendererPlayer::selecOffset = std::stoull(args.at(0), 0, 16);
 
-
-
-	return true;
+    return true;
 }
 
 void TestCommand::onRenderLayer(Event& evG) {
-	//auto& ev = reinterpret_cast<RenderLayerEvent&>(evG);
-	//if (!bossbar) bossbar = ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName("boss_health_grid");
+    // auto& ev = reinterpret_cast<RenderLayerEvent&>(evG);
+    // if (!bossbar) bossbar =
+    // ev.getScreenView()->visualTree->rootControl->findFirstDescendantWithName("boss_health_grid");
 }

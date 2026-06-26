@@ -5,7 +5,7 @@ static std::shared_ptr<Hook> ActorAttackHook;
 
 void* PlayerHooks::hkActorAttack(SDK::Actor* obj, void* ret, SDK::Actor* target, void* cause, void* a4) {
     if (obj == SDK::ClientInstance::get()->getLocalPlayer()) {
-        AttackEvent ev{ target };
+        AttackEvent ev { target };
         Eventing::get().dispatch(ev);
     }
 

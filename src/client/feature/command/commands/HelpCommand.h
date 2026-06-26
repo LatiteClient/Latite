@@ -3,8 +3,8 @@
 
 class HelpCommand final : public Command {
 public:
-	HelpCommand();
-	~HelpCommand() = default;
+    HelpCommand();
+    ~HelpCommand() = default;
 
-	bool execute(std::string const label, std::vector<std::string> args) override;
+    bool execute(std::string const label, std::vector<std::string> args) override;
 };
