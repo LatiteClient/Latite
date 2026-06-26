@@ -274,27 +274,30 @@ bool SkinStealerScreen::writeRgbaPng(std::filesystem::path const &path, SDK::Ski
 	tempPath += ".tmp";
 	std::filesystem::remove(tempPath, ec);
 
-	ComPtr<IWICStream> stream;
-	if (FAILED(factory->CreateStream(stream.GetAddressOf()))) return false;
-	if (FAILED(stream->InitializeFromFilename(tempPath.wstring().c_str(), GENERIC_WRITE))) return false;
+	// Keep WIC COM wrappers scoped so their file handles are released before we rename the temp file.
+	bool encoded = [&]() -> bool {
+		ComPtr<IWICStream> stream;
+		if (FAILED(factory->CreateStream(stream.GetAddressOf()))) return false;
+		if (FAILED(stream->InitializeFromFilename(tempPath.wstring().c_str(), GENERIC_WRITE))) return false;
 
-	ComPtr<IWICBitmapEncoder> encoder;
-	if (FAILED(factory->CreateEncoder(GUID_ContainerFormatPng, nullptr, encoder.GetAddressOf()))) return false;
-	if (FAILED(encoder->Initialize(stream.Get(), WICBitmapEncoderNoCache))) return false;
+		ComPtr<IWICBitmapEncoder> encoder;
+		if (FAILED(factory->CreateEncoder(GUID_ContainerFormatPng, nullptr, encoder.GetAddressOf()))) return false;
+		if (FAILED(encoder->Initialize(stream.Get(), WICBitmapEncoderNoCache))) return false;
 
-	ComPtr<IWICBitmapFrameEncode> frame;
-	ComPtr<IPropertyBag2> properties;
-	if (FAILED(encoder->CreateNewFrame(frame.GetAddressOf(), properties.GetAddressOf()))) return false;
-	if (FAILED(frame->Initialize(properties.Get()))) return false;
-	if (FAILED(frame->SetSize(width, height))) return false;
+		ComPtr<IWICBitmapFrameEncode> frame;
+		ComPtr<IPropertyBag2> properties;
+		if (FAILED(encoder->CreateNewFrame(frame.GetAddressOf(), properties.GetAddressOf()))) return false;
+		if (FAILED(frame->Initialize(properties.Get()))) return false;
+		if (FAILED(frame->SetSize(width, height))) return false;
 
-	WICPixelFormatGUID format = GUID_WICPixelFormat32bppBGRA;
-	if (FAILED(frame->SetPixelFormat(&format)) || !IsEqualGUID(format, GUID_WICPixelFormat32bppBGRA)) return false;
+		WICPixelFormatGUID format = GUID_WICPixelFormat32bppBGRA;
+		if (FAILED(frame->SetPixelFormat(&format)) || !IsEqualGUID(format, GUID_WICPixelFormat32bppBGRA)) return false;
 
-	unsigned stride = width * 4u;
-	if (FAILED(frame->WritePixels(height, stride, static_cast<UINT>(bgra.size()), bgra.data()))) return false;
-	if (FAILED(frame->Commit())) return false;
-	bool encoded = SUCCEEDED(encoder->Commit());
+		unsigned stride = width * 4u;
+		if (FAILED(frame->WritePixels(height, stride, static_cast<UINT>(bgra.size()), bgra.data()))) return false;
+		if (FAILED(frame->Commit())) return false;
+		return SUCCEEDED(encoder->Commit());
+	}();
 
 	uintmax_t tempSize = std::filesystem::file_size(tempPath, ec);
 	if (!encoded || ec || tempSize == 0) {
