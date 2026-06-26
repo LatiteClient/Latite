@@ -21,9 +21,10 @@ Screen::Screen() {
 }
 
 void Screen::onUpdate(Event& ev) {
+    // clang-format off
     /*
-	switch (cursor) {
-	case Cursor::Arrow:
+    switch (cursor) {
+    case Cursor::Arrow:
         SetCursor(arrow);
         break;
     case Cursor::Hand:
@@ -33,7 +34,8 @@ void Screen::onUpdate(Event& ev) {
         SetCursor(ibeam);
         break;
     }
-	*/
+    */
+    // clang-format on
 }
 
 void Screen::close() {

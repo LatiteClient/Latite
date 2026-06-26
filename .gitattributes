@@ -3,6 +3,14 @@
 ###############################################################################
 * text=auto
 
+# clang-format is configured with LineEnding: CRLF for C/C++ sources.
+*.c text eol=crlf
+*.cc text eol=crlf
+*.cxx text eol=crlf
+*.cpp text eol=crlf
+*.h text eol=crlf
+*.hpp text eol=crlf
+
 # Git hook wrappers are shell scripts and must keep LF line endings.
 tools/hooks/* text eol=lf
 
