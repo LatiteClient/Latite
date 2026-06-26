@@ -169,7 +169,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <LatiteBuildTimestamp>$([System.DateTime]::UtcNow.ToString(&quot;yyyy-MM-dd_HH-mm-ss'Z'&quot;))</LatiteBuildTimestamp>
+    <LatiteBuildTimestamp>0000-00-00_00-00-00Z</LatiteBuildTimestamp>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(ProjectDir);$(ProjectDir)src;$(ProjectDir)deps\include;$(IncludePath)</IncludePath>
@@ -294,6 +294,9 @@
       <StripPrivateSymbols>
       </StripPrivateSymbols>
     </Link>
+    <PostBuildEvent>
+      <Command>powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(ProjectDir)cmake\StampBuildTimestamp.ps1" -BinaryPath "$(TargetPath)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -322,6 +325,9 @@
       <AdditionalDependencies>winmm.lib;Dbghelp.lib;MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;dxguid.lib;SHCore.lib;version.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
+    <PostBuildEvent>
+      <Command>powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(ProjectDir)cmake\StampBuildTimestamp.ps1" -BinaryPath "$(TargetPath)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Nightly|x64'">
     <ClCompile>
@@ -351,6 +357,9 @@
       <AdditionalDependencies>winmm.lib;Dbghelp.lib;MinHook.lib;runtimeobject.lib;windowsapp.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;dxguid.lib;SHCore.lib;version.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
+    <PostBuildEvent>
+      <Command>powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(ProjectDir)cmake\StampBuildTimestamp.ps1" -BinaryPath "$(TargetPath)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Beta|x64'">
     <ClCompile>
@@ -379,6 +388,9 @@
       <AdditionalDependencies>Dbghelp.lib;MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;dxguid.lib;SHCore.lib;version.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
+    <PostBuildEvent>
+      <Command>powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(ProjectDir)cmake\StampBuildTimestamp.ps1" -BinaryPath "$(TargetPath)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLegacy|x64'">
     <ClCompile>
@@ -405,6 +417,9 @@
       <AdditionalDependencies>MinHook.lib;d3d11.lib;d3d12.lib;d2d1.lib;dwrite.lib;dxgi.lib;dxguid.lib;SHCore.lib;version.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Link>
+    <PostBuildEvent>
+      <Command>powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(ProjectDir)cmake\StampBuildTimestamp.ps1" -BinaryPath "$(TargetPath)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="assets\lang\en_US.json" />

@@ -2,11 +2,7 @@ if (NOT DEFINED OUTPUT_FILE OR OUTPUT_FILE STREQUAL "")
     message(FATAL_ERROR "OUTPUT_FILE is required")
 endif ()
 
-if (DEFINED LATITE_BUILD_TIMESTAMP AND NOT LATITE_BUILD_TIMESTAMP STREQUAL "")
-    set(build_timestamp "${LATITE_BUILD_TIMESTAMP}")
-else ()
-    string(TIMESTAMP build_timestamp "%Y-%m-%d_%H-%M-%SZ" UTC)
-endif ()
+set(build_timestamp "0000-00-00_00-00-00Z")
 
 if (NOT build_timestamp MATCHES
         "^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]_[0-9][0-9]-[0-9][0-9]-[0-9][0-9]Z$")
