@@ -92,21 +92,6 @@ add_library(Latite SHARED
 )
 add_dependencies(Latite LatiteBuildTimestampGenerator)
 
-set(LATITE_STAMP_TIMESTAMP_ARGS)
-if (NOT LATITE_BUILD_TIMESTAMP STREQUAL "")
-    list(APPEND LATITE_STAMP_TIMESTAMP_ARGS -Timestamp "${LATITE_BUILD_TIMESTAMP}")
-endif ()
-
-add_custom_command(TARGET Latite POST_BUILD
-        COMMAND powershell.exe -NoProfile -ExecutionPolicy Bypass
-        -File "${CMAKE_CURRENT_SOURCE_DIR}/cmake/StampBuildTimestamp.ps1"
-        -BinaryPath "$<TARGET_FILE:Latite>"
-        ${LATITE_STAMP_TIMESTAMP_ARGS}
-        -Configuration "$<CONFIG>"
-        COMMENT "Stamping Latite UTC build timestamp"
-        VERBATIM
-)
-
 # Final artifact names. Keep these in CMake so the DLL CodeView record and
 # linker-generated PDB name agree, **do not rename the DLL/PDB after linking!!**
 set_target_properties(Latite PROPERTIES
