@@ -787,7 +787,8 @@ void Latite::initSettings() {
     }
 
     {
-        auto set = std::make_shared<Setting>("rgbSpeed", L"RGB Speed", L"How fast the RGB color cycles");
+        auto set = std::make_shared<Setting>("rgbSpeed", LocalizeString::get("client.settings.rgbSpeed.name"),
+                                             LocalizeString::get("client.settings.rgbSpeed.desc"));
         set->value = &this->rgbSpeed;
         set->min = FloatValue(0.f);
         set->max = FloatValue(3.f);
