@@ -584,11 +584,14 @@ void Latite::threadsafeInit() {
                             { util::StrToWStr(util::KeyToString(Latite::get().getMenuKey().value)) }));
 }
 
-static void blockModules(std::string_view moduleName, std::string_view serverName) {
+static void blockModules(std::string_view moduleName, std::string_view serverName,
+                         std::string_view featuredServerName = {}) {
     auto inst = SDK::RakNetConnector::get();
 
     std::vector<std::wstring> blockedList;
-    if (inst->dns.find(serverName) != std::string::npos) {
+    if (inst &&
+        (inst->dns.find(serverName) != std::string::npos || inst->ipAddress.find(serverName) != std::string::npos ||
+         (!featuredServerName.empty() && inst->featuredServer == featuredServerName))) {
         Latite::getModuleManager().forEach([&](std::shared_ptr<Module> mod) {
             if (!mod->isBlocked()) {
                 if (mod->name() == moduleName) {
@@ -616,12 +619,12 @@ void Latite::updateModuleBlocking() {
     auto inst = SDK::RakNetConnector::get();
     if (!inst) return;
 
-    if (inst->dns.size() > 0) {
+    if (!inst->dns.empty() || !inst->ipAddress.empty() || !inst->featuredServer.empty()) {
         // scuffed but we don't have a proper static management system
 
         static_assert(std::is_base_of_v<Module, Freelook>);
 
-        blockModules("Freelook", "hivebedrock");
+        blockModules("Freelook", "hivebedrock", "The Hive");
         blockModules("Freelook", "galaxite");
     } else {
     }

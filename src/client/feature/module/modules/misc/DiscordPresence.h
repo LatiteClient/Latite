@@ -26,6 +26,7 @@ public:
 private:
     struct ServerPresence {
         std::string_view address;
+        std::string_view featuredServer;
         std::string_view name;
         std::string_view logoKey;
         std::string_view logoTooltip;
@@ -33,11 +34,11 @@ private:
     };
 
     const std::array<ServerPresence, 5> knownServers = {
-        ServerPresence { "hivebedrock.network", "The Hive", "thehive", "The Hive Logo", true },
-        ServerPresence { "cubecraft.net", "CubeCraft", "cubecraft", "CubeCraft Games Logo" },
-        ServerPresence { "play.galaxite.net", "Galaxite", "galaxite", "Galaxite Network Logo" },
-        ServerPresence { "zeqa.net", "Zeqa", "zeqa", "Zeqa Practice Logo" },
-        ServerPresence { "nethergames.org", "NetherGames", "nethergames", "NetherGames Network Logo" },
+        ServerPresence { "hivebedrock.network", "The Hive", "The Hive", "thehive", "The Hive Logo", true },
+        ServerPresence { "cubecraft.net", {}, "CubeCraft", "cubecraft", "CubeCraft Games Logo" },
+        ServerPresence { "play.galaxite.net", {}, "Galaxite", "galaxite", "Galaxite Network Logo" },
+        ServerPresence { "zeqa.net", {}, "Zeqa", "zeqa", "Zeqa Practice Logo" },
+        ServerPresence { "nethergames.org", {}, "NetherGames", "nethergames", "NetherGames Network Logo" },
     };
 
     const std::array<std::pair<std::string_view, std::string_view>, 14> hiveGameNames = {

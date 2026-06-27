@@ -159,14 +159,16 @@ void DiscordPresence::updateConnectionState() {
     std::string serverAddress;
     if (clientInstance && clientInstance->minecraft && clientInstance->minecraft->getLevel() &&
         clientInstance->getLocalPlayer() && connector) {
-        serverAddress = !connector->dns.empty() ? connector->dns : connector->ipAddress;
+        serverAddress = connector->dns + '\n' + connector->ipAddress + '\n' + connector->featuredServer;
     }
 
     if (serverAddress != activeServerAddress) {
         activeServerAddress = std::move(serverAddress);
         activeServer = nullptr;
         for (const ServerPresence& server : knownServers) {
-            if (activeServerAddress.find(server.address) != std::string::npos) {
+            if (connector && (connector->dns.find(server.address) != std::string::npos ||
+                              connector->ipAddress.find(server.address) != std::string::npos ||
+                              (!server.featuredServer.empty() && connector->featuredServer == server.featuredServer))) {
                 activeServer = &server;
                 break;
             }
