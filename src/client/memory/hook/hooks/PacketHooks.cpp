@@ -14,50 +14,11 @@ namespace {
     std::shared_ptr<Hook> SendToServerHook;
     std::shared_ptr<Hook> CreatePacketHook;
 
-    using PacketIdUnderlying = std::underlying_type_t<SDK::PacketID>;
-    constexpr size_t PacketHookArraySize = static_cast<size_t>(std::numeric_limits<PacketIdUnderlying>::max()) + 1;
+    constexpr size_t PacketHookArraySize =
+        static_cast<size_t>(std::numeric_limits<std::underlying_type_t<SDK::PacketID>>::max()) + 1;
 
     std::array<std::shared_ptr<Hook>, PacketHookArraySize> PacketHookArray;
     std::unordered_map<uintptr_t, std::shared_ptr<Hook>> PacketHooksByVtableSlot;
-
-    size_t packetIndex(SDK::PacketID packetId) {
-        return static_cast<size_t>(static_cast<PacketIdUnderlying>(packetId));
-    }
-
-    void dispatchPostVanillaPacketEvents(SDK::PacketID packetId, std::shared_ptr<SDK::Packet> const& packet) {
-        if (!packet) return;
-
-        if (packetId == SDK::PacketID::CHANGE_DIMENSION) {
-            Latite::get().getNameTagCache().clearNetworkNameTags();
-            PluginManager::Event sEv { L"change-dimension", {}, false };
-            Latite::getPluginManager().dispatchEvent(sEv);
-        } else if (packetId == SDK::PacketID::ADD_PLAYER) {
-            auto* addPlayer = static_cast<SDK::AddPlayerPacket*>(packet.get());
-            uint64_t runtimeId = 0;
-            std::string nameTag;
-            if (addPlayer->tryGetNameTag(&runtimeId, &nameTag)) {
-                Latite::get().getNameTagCache().recordNetworkNameTag(runtimeId, nameTag);
-            }
-        } else if (packetId == SDK::PacketID::SET_ENTITY_DATA) {
-            auto* setActorData = static_cast<SDK::SetActorDataPacket*>(packet.get());
-            uint64_t runtimeId = 0;
-            std::string nameTag;
-            if (setActorData->tryGetNameTag(&runtimeId, &nameTag)) {
-                Latite::get().getNameTagCache().recordNetworkNameTag(runtimeId, nameTag);
-            }
-        } else if (packetId == SDK::PacketID::SET_SCORE) {
-            auto pkt = std::static_pointer_cast<SDK::SetScorePacket>(packet);
-
-            auto data = PluginManager::Event::Value(L"data");
-            data.val = pkt->serialize();
-
-            PluginManager::Event sEv { L"set-score", { data }, false };
-            Latite::getPluginManager().dispatchEvent(sEv);
-        } else if (packetId == SDK::PacketID::TRANSFER) {
-            PluginManager::Event sEv { L"transfer", {}, false };
-            Latite::getPluginManager().dispatchEvent(sEv);
-        }
-    }
 }
 
 void PacketHooks::PacketSender_sendToServer(SDK::PacketSender* sender, SDK::Packet* packet) {
@@ -81,7 +42,7 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
     if (!packet) return;
 
     auto packetId = packet->getID();
-    auto hook = PacketHookArray[packetIndex(packetId)];
+    auto hook = PacketHookArray[static_cast<size_t>(static_cast<std::underlying_type_t<SDK::PacketID>>(packetId))];
     if (!hook && instance) {
         auto** vft = *reinterpret_cast<void***>(instance);
         auto hookIt = PacketHooksByVtableSlot.find(reinterpret_cast<uintptr_t>(vft + 1));
@@ -217,7 +178,36 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
     }
     hook->oFunc<decltype(&PacketHandlerDispatcherInstance_handle)>()(instance, networkIdentifier, netEventCallback,
                                                                      packet);
-    dispatchPostVanillaPacketEvents(packetId, postVanillaPacket);
+    if (packetId == SDK::PacketID::CHANGE_DIMENSION) {
+        Latite::get().getNameTagCache().clearNetworkNameTags();
+        PluginManager::Event sEv { L"change-dimension", {}, false };
+        Latite::getPluginManager().dispatchEvent(sEv);
+    } else if (packetId == SDK::PacketID::ADD_PLAYER) {
+        auto* addPlayer = static_cast<SDK::AddPlayerPacket*>(packet.get());
+        uint64_t runtimeId = 0;
+        std::string nameTag;
+        if (addPlayer->tryGetNameTag(&runtimeId, &nameTag)) {
+            Latite::get().getNameTagCache().recordNetworkNameTag(runtimeId, nameTag);
+        }
+    } else if (packetId == SDK::PacketID::SET_ENTITY_DATA) {
+        auto* setActorData = static_cast<SDK::SetActorDataPacket*>(packet.get());
+        uint64_t runtimeId = 0;
+        std::string nameTag;
+        if (setActorData->tryGetNameTag(&runtimeId, &nameTag)) {
+            Latite::get().getNameTagCache().recordNetworkNameTag(runtimeId, nameTag);
+        }
+    } else if (packetId == SDK::PacketID::SET_SCORE) {
+        auto pkt = std::static_pointer_cast<SDK::SetScorePacket>(packet);
+
+        auto data = PluginManager::Event::Value(L"data");
+        data.val = pkt->serialize();
+
+        PluginManager::Event sEv { L"set-score", { data }, false };
+        Latite::getPluginManager().dispatchEvent(sEv);
+    } else if (packetId == SDK::PacketID::TRANSFER) {
+        PluginManager::Event sEv { L"transfer", {}, false };
+        Latite::getPluginManager().dispatchEvent(sEv);
+    }
 }
 
 PacketHooks::PacketHooks() {
@@ -226,7 +216,8 @@ PacketHooks::PacketHooks() {
     //     "MinecraftPackets::createPacket");
 
     for (size_t i = 1; i < PacketHookArray.size(); i++) {
-        auto pkt = SDK::MinecraftPackets::createPacket(static_cast<SDK::PacketID>(static_cast<PacketIdUnderlying>(i)));
+        auto pkt = SDK::MinecraftPackets::createPacket(
+            static_cast<SDK::PacketID>(static_cast<std::underlying_type_t<SDK::PacketID>>(i)));
         if (pkt) {
             auto vft = *pkt->handler;
             auto const vtableSlot = reinterpret_cast<uintptr_t>(vft + 1);
