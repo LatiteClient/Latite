@@ -12,8 +12,9 @@ namespace SDK {
         SYSTEM_MESSAGE,
         WHISPER,
         ANNOUNCEMENT,
+        OBJECT_WHISPER,
         TEXT_OBJECT,
-        OBJECT_WHISPER
+        TEXT_OBJECT_ANNOUNCEMENT
     };
 
     class TextPacket : public Packet {
@@ -28,6 +29,11 @@ namespace SDK {
 
         TextPacket() = default;
 
+        uint8_t getBodyVariant() const;
+        std::string* getMessage();
+        const std::string* getMessage() const;
+        std::string* getAuthor();
+        const std::string* getAuthor() const;
         void chat(std::string const& message);
     };
 }

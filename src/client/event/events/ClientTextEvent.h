@@ -1,8 +1,9 @@
+#pragma once
 #include "client/event/Event.h"
 #include "util/Crypto.h"
 #include <mc/common/network/packet/TextPacket.h>
 
-class ClientTextEvent : public Event {
+class ClientTextEvent : public Cancellable {
 public:
     static const uint32_t hash = TOHASH(ClientTextEvent);
 

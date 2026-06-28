@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "DiscordPresence.h"
 
-#include "client/event/events/ChatMessageEvent.h"
+#include "client/event/events/ClientTextEvent.h"
 #include "client/event/events/PacketReceiveEvent.h"
 #include "client/event/events/SendPacketEvent.h"
 #include "client/event/events/UpdateEvent.h"
@@ -16,7 +16,7 @@ DiscordPresence::DiscordPresence()
              LocalizeString::get("client.module.discordPresence.desc"), GAME) {
     Eventing::get().listen<UpdateEvent, &DiscordPresence::onUpdate>(this);
     Eventing::get().listen<PacketReceiveEvent, &DiscordPresence::onPacketReceive>(this);
-    Eventing::get().listen<ChatMessageEvent, &DiscordPresence::onChatMessage>(this, 10);
+    Eventing::get().listen<ClientTextEvent, &DiscordPresence::onClientText>(this, 10);
     Eventing::get().listen<SendPacketEvent, &DiscordPresence::onSendPacket>(this, 10);
 }
 
@@ -79,9 +79,15 @@ void DiscordPresence::onPacketReceive(PacketReceiveEvent& ev) {
     lastCheck = {};
 }
 
-void DiscordPresence::onChatMessage(ChatMessageEvent& ev) {
+void DiscordPresence::onClientText(ClientTextEvent& ev) {
+    SDK::TextPacket* textPacket = ev.getTextPacket();
+    std::string* rawMessagePtr = textPacket ? textPacket->getMessage() : nullptr;
+    if (!rawMessagePtr) {
+        return;
+    }
+
     std::string message;
-    const std::string rawMessage = ev.getMessage();
+    const std::string& rawMessage = *rawMessagePtr;
     message.reserve(rawMessage.size());
 
     for (size_t i = 0; i < rawMessage.size(); i++) {

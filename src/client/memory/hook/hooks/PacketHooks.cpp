@@ -143,20 +143,24 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
             case SDK::TextPacketType::ANNOUNCEMENT:
                 typ.val = L"announcement";
                 break;
+            case SDK::TextPacketType::OBJECT_WHISPER:
+                typ.val = L"object_whisper";
+                break;
             case SDK::TextPacketType::TEXT_OBJECT:
                 typ.val = L"text_object";
                 break;
-            case SDK::TextPacketType::OBJECT_WHISPER:
-                typ.val = L"object_whisper";
+            case SDK::TextPacketType::TEXT_OBJECT_ANNOUNCEMENT:
+                typ.val = L"text_object_announcement";
                 break;
             }
 
             PluginManager::Event::Value val { L"message" };
-            val.val = util::StrToWStr(std::holds_alternative<std::string>(pkt->data) ? std::get<std::string>(pkt->data)
-                                                                                     : pkt->str);
+            std::string* message = pkt->getMessage();
+            val.val = util::StrToWStr(message ? *message : "");
 
             PluginManager::Event::Value val2 { L"sender" };
-            val2.val = util::StrToWStr(std::holds_alternative<std::string>(pkt->data) ? pkt->str : "");
+            std::string* sender = pkt->getAuthor();
+            val2.val = util::StrToWStr(sender ? *sender : "");
 
             PluginManager::Event::Value val3 { L"xuid" };
             val3.val = util::StrToWStr(pkt->xboxUserId);
@@ -165,7 +169,8 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
             isChat.val =
                 (pkt->type == SDK::TextPacketType::CHAT || pkt->type == SDK::TextPacketType::RAW ||
                  pkt->type == SDK::TextPacketType::SYSTEM_MESSAGE || pkt->type == SDK::TextPacketType::WHISPER ||
-                 pkt->type == SDK::TextPacketType::OBJECT_WHISPER || pkt->type == SDK::TextPacketType::ANNOUNCEMENT);
+                 pkt->type == SDK::TextPacketType::OBJECT_WHISPER || pkt->type == SDK::TextPacketType::ANNOUNCEMENT ||
+                 pkt->type == SDK::TextPacketType::TEXT_OBJECT_ANNOUNCEMENT);
 
             PluginManager::Event sEv { L"receive-chat", { typ, val, val2, val3, isChat }, true };
             if (Latite::getPluginManager().dispatchEvent(sEv)) {
@@ -173,41 +178,43 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
             }
 
             ClientTextEvent ev { pkt };
-            Eventing::get().dispatch(ev);
+            if (Eventing::get().dispatch(ev)) {
+                return;
+            }
+        } else if (packetId == SDK::PacketID::CHANGE_DIMENSION) {
+            Latite::get().getNameTagCache().clearNetworkNameTags();
+            PluginManager::Event sEv { L"change-dimension", {}, false };
+            Latite::getPluginManager().dispatchEvent(sEv);
+        } else if (packetId == SDK::PacketID::ADD_PLAYER) {
+            SDK::AddPlayerPacket* addPlayer = static_cast<SDK::AddPlayerPacket*>(packet.get());
+            uint64_t runtimeId = 0;
+            std::string nameTag;
+            if (addPlayer->tryGetNameTag(&runtimeId, &nameTag)) {
+                Latite::get().getNameTagCache().recordNetworkNameTag(runtimeId, nameTag);
+            }
+        } else if (packetId == SDK::PacketID::SET_ENTITY_DATA) {
+            SDK::SetActorDataPacket* setActorData = static_cast<SDK::SetActorDataPacket*>(packet.get());
+            uint64_t runtimeId = 0;
+            std::string nameTag;
+            if (setActorData->tryGetNameTag(&runtimeId, &nameTag)) {
+                Latite::get().getNameTagCache().recordNetworkNameTag(runtimeId, nameTag);
+            }
+        } else if (packetId == SDK::PacketID::SET_SCORE) {
+            std::shared_ptr<SDK::SetScorePacket> pkt = std::static_pointer_cast<SDK::SetScorePacket>(packet);
+
+            PluginManager::Event::Value data { L"data" };
+            data.val = pkt->serialize();
+
+            PluginManager::Event sEv { L"set-score", { data }, false };
+            Latite::getPluginManager().dispatchEvent(sEv);
+        } else if (packetId == SDK::PacketID::TRANSFER) {
+            PluginManager::Event sEv { L"transfer", {}, false };
+            Latite::getPluginManager().dispatchEvent(sEv);
         }
     }
+
     hook->oFunc<decltype(&PacketHandlerDispatcherInstance_handle)>()(instance, networkIdentifier, netEventCallback,
                                                                      packet);
-    if (packetId == SDK::PacketID::CHANGE_DIMENSION) {
-        Latite::get().getNameTagCache().clearNetworkNameTags();
-        PluginManager::Event sEv { L"change-dimension", {}, false };
-        Latite::getPluginManager().dispatchEvent(sEv);
-    } else if (packetId == SDK::PacketID::ADD_PLAYER) {
-        auto* addPlayer = static_cast<SDK::AddPlayerPacket*>(packet.get());
-        uint64_t runtimeId = 0;
-        std::string nameTag;
-        if (addPlayer->tryGetNameTag(&runtimeId, &nameTag)) {
-            Latite::get().getNameTagCache().recordNetworkNameTag(runtimeId, nameTag);
-        }
-    } else if (packetId == SDK::PacketID::SET_ENTITY_DATA) {
-        auto* setActorData = static_cast<SDK::SetActorDataPacket*>(packet.get());
-        uint64_t runtimeId = 0;
-        std::string nameTag;
-        if (setActorData->tryGetNameTag(&runtimeId, &nameTag)) {
-            Latite::get().getNameTagCache().recordNetworkNameTag(runtimeId, nameTag);
-        }
-    } else if (packetId == SDK::PacketID::SET_SCORE) {
-        auto pkt = std::static_pointer_cast<SDK::SetScorePacket>(packet);
-
-        auto data = PluginManager::Event::Value(L"data");
-        data.val = pkt->serialize();
-
-        PluginManager::Event sEv { L"set-score", { data }, false };
-        Latite::getPluginManager().dispatchEvent(sEv);
-    } else if (packetId == SDK::PacketID::TRANSFER) {
-        PluginManager::Event sEv { L"transfer", {}, false };
-        Latite::getPluginManager().dispatchEvent(sEv);
-    }
 }
 
 PacketHooks::PacketHooks() {

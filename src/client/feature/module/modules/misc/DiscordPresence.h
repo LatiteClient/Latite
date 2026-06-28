@@ -10,7 +10,7 @@
 #include <string_view>
 #include <utility>
 
-class ChatMessageEvent;
+class ClientTextEvent;
 class PacketReceiveEvent;
 class SendPacketEvent;
 class UpdateEvent;
@@ -66,7 +66,7 @@ private:
 
     void onUpdate(UpdateEvent& ev);
     void onPacketReceive(PacketReceiveEvent& ev);
-    void onChatMessage(ChatMessageEvent& ev);
+    void onClientText(ClientTextEvent& ev);
     void onSendPacket(SendPacketEvent& ev);
     void updateConnectionState();
     void publishPresence(bool force);

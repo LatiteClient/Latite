@@ -12,11 +12,9 @@ Nickname::Nickname()
 }
 
 void Nickname::onClientTextPacket(Event& evG) {
-    auto textPacket = reinterpret_cast<ClientTextEvent&>(evG).getTextPacket();
+    SDK::TextPacket* textPacket = reinterpret_cast<ClientTextEvent&>(evG).getTextPacket();
 
     if (!SDK::ClientInstance::get()->getLocalPlayer()) return;
-
-    auto str = textPacket->str;
 
     auto replaceAll = [](std::string& s, std::string from, std::string to) {
         if (!from.empty())
@@ -26,15 +24,12 @@ void Nickname::onClientTextPacket(Event& evG) {
     };
 
     std::string newName = util::WStrToStr(std::get<TextValue>(this->nickname).str);
-    auto& currentPlayerName = SDK::ClientInstance::get()->getLocalPlayer()->playerName;
-    replaceAll(str, currentPlayerName, newName);
-
-    textPacket->str = str;
-
-    if (std::holds_alternative<std::string>(textPacket->data)) {
-        auto data = std::get<std::string>(textPacket->data);
-        replaceAll(data, currentPlayerName, newName);
-        textPacket->data = data;
+    std::string& currentPlayerName = SDK::ClientInstance::get()->getLocalPlayer()->playerName;
+    if (std::string* author = textPacket->getAuthor()) {
+        replaceAll(*author, currentPlayerName, newName);
+    }
+    if (std::string* message = textPacket->getMessage()) {
+        replaceAll(*message, currentPlayerName, newName);
     }
 }
 
