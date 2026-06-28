@@ -18,6 +18,7 @@
 #include "../ScreenManager.h"
 
 #include <type_traits>
+#include <cwctype>
 
 #ifdef min
 #undef min
@@ -35,6 +36,33 @@ float calcAnim = 0.f;
 
 namespace {
     static constexpr float setting_height_relative = 0.0168f; // 0.0168
+
+    std::wstring lowercase(std::wstring text) {
+        std::ranges::transform(text, text.begin(), [](wchar_t ch) {
+            return static_cast<wchar_t>(std::towlower(ch));
+        });
+        return text;
+    }
+
+    bool containsSearch(std::wstring text, std::wstring const& search) {
+        return lowercase(std::move(text)).find(search) != std::wstring::npos;
+    }
+
+    bool settingMatchesSearch(Setting* set, std::wstring const& search) {
+        if (search.empty()) return true;
+        if (containsSearch(set->getDisplayName(), search)) return true;
+        if (containsSearch(set->desc(), search)) return true;
+        if (containsSearch(util::StrToWStr(set->name()), search)) return true;
+
+        if (set->enumData) {
+            for (auto& entry : *set->enumData->getEntries()) {
+                if (containsSearch(entry.name(), search)) return true;
+                if (containsSearch(entry.desc(), search)) return true;
+            }
+        }
+
+        return false;
+    }
 }
 
 ClickGUI::ClickGUI() {
@@ -396,6 +424,7 @@ void ClickGUI::onRender(Event&) {
         if (tab == SETTINGS) {
             // actual settings
             auto& settings = Latite::getSettings();
+            std::wstring settingSearch = lowercase(searchTextBox.getText());
 
             float settingWidth = rect.getWidth() / 3.f;
             float padToSettings = 0.04787f * rect.getHeight();
@@ -411,7 +440,8 @@ void ClickGUI::onRender(Event&) {
                 // go through all float settings
                 settings.forEach([&](std::shared_ptr<Setting> set) {
                     if (hasSettingRoom(setPos)) {
-                        if (set->visible && set->shouldRender(settings) &&
+                        if (set->visible && settingMatchesSearch(set.get(), settingSearch) &&
+                            set->shouldRender(settings) &&
                             set->value->index() ==
                                 (size_t)Setting::Type::Float /* || set->value->index() == Setting::Type::Int*/) {
                             setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth, 0.35f) +
@@ -427,7 +457,8 @@ void ClickGUI::onRender(Event&) {
                 // go through all enum settings
                 settings.forEach([&](std::shared_ptr<Setting> set) {
                     if (hasSettingRoom(setPos)) {
-                        if (set->visible && set->shouldRender(settings) &&
+                        if (set->visible && settingMatchesSearch(set.get(), settingSearch) &&
+                            set->shouldRender(settings) &&
                             (set->value->index() == (size_t)Setting::Type::Key ||
                              set->value->index() == (size_t)Setting::Type::Enum ||
                              set->value->index() == (size_t)Setting::Type::Color ||
@@ -446,7 +477,8 @@ void ClickGUI::onRender(Event&) {
                 // go through all bool settings
                 settings.forEach([&](std::shared_ptr<Setting> set) {
                     if (hasSettingRoom(setPos)) {
-                        if (set->visible && set->shouldRender(settings) &&
+                        if (set->visible && settingMatchesSearch(set.get(), settingSearch) &&
+                            set->shouldRender(settings) &&
                             set->value->index() ==
                                 (size_t)Setting::Type::Bool /* || set->value->index() == Setting::Type::Enum*/) {
                             setPos.y = drawSetting(set.get(), &settings, setPos, dc, settingWidth) +
