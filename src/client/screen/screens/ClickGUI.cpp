@@ -1597,8 +1597,12 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
                                    valuePadX * 2.f;
         float valueWidth = std::min(std::max(measuredValueWidth, checkboxSize * 2.f), size * 0.35f);
         float gapToValue = checkboxSize * 0.35f;
-        RectF rightRect = rtl ? RectF { pos.x, sliderTop, pos.x + valueWidth, sliderTop + sliderHeight }
-                              : RectF { pos.x + size - valueWidth, sliderTop, pos.x + size, sliderTop + sliderHeight };
+        float valueTextHeight =
+            std::max(sliderHeight, dc.getTextLineHeight(Renderer::FontSelection::PrimarySemilight, valueTextSize));
+        float valueTextTop = sliderTop + (sliderHeight - valueTextHeight) * 0.5f;
+        RectF rightRect = rtl ? RectF { pos.x, valueTextTop, pos.x + valueWidth, valueTextTop + valueTextHeight }
+                              : RectF { pos.x + size - valueWidth, valueTextTop, pos.x + size,
+                                        valueTextTop + valueTextHeight };
         RectF sliderRect =
             rtl ? RectF { rightRect.right + gapToValue, sliderTop, pos.x + size, sliderTop + sliderHeight }
                 : RectF { pos.x, sliderTop, rightRect.left - gapToValue, sliderTop + sliderHeight };
@@ -1682,7 +1686,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
         dc.ctx->FillEllipse(D2D1::Ellipse({ rtl ? innerSliderRect.left : innerSliderRect.right, sliderRect.centerY() },
                                           sliderRect.getHeight() * 0.6f, sliderRect.getHeight() * 0.6f),
                             dc.brush);
-        return sliderRect.bottom;
+        return std::max(sliderRect.bottom, rightRect.bottom);
     } break;
     default:
         return pos.y;
