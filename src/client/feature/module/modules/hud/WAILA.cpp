@@ -20,6 +20,8 @@ WAILA::WAILA()
                LocalizeString::get("client.hudmodule.waila.showBlocks.desc"), showBlocks);
     addSetting("showEntities", LocalizeString::get("client.hudmodule.waila.showEntities.name"),
                LocalizeString::get("client.hudmodule.waila.showEntities.desc"), showEntities);
+    addSetting("showHealth", LocalizeString::get("client.hudmodule.waila.showHealth.name"),
+               LocalizeString::get("client.hudmodule.waila.showHealth.desc"), showHealth, "showEntities"_istrue);
     addSetting("showNamespace", LocalizeString::get("client.hudmodule.waila.showNamespace.name"),
                LocalizeString::get("client.hudmodule.waila.showNamespace.desc"), showNamespace);
     addSetting("showItemId", LocalizeString::get("client.hudmodule.waila.showItemId.name"),
@@ -42,8 +44,6 @@ WAILA::WAILA()
                                   LocalizeString::get("client.hudmodule.waila.toolModeFastest.desc") });
     addEnumSetting("toolMode", LocalizeString::get("client.hudmodule.waila.toolMode.name"),
                    LocalizeString::get("client.hudmodule.waila.toolMode.desc"), toolMode, "showHarvest"_istrue);
-    addSetting("showHealth", LocalizeString::get("client.hudmodule.waila.showHealth.name"),
-               LocalizeString::get("client.hudmodule.waila.showHealth.desc"), showHealth, "showEntities"_istrue);
     addSliderSetting("entityDistance", LocalizeString::get("client.hudmodule.waila.entityDistance.name"),
                      LocalizeString::get("client.hudmodule.waila.entityDistance.desc"), entityDistance, FloatValue(2.f),
                      FloatValue(12.f), FloatValue(0.5f), "showEntities"_istrue);
