@@ -1600,9 +1600,9 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
         float valueTextHeight =
             std::max(sliderHeight, dc.getTextLineHeight(Renderer::FontSelection::PrimarySemilight, valueTextSize));
         float valueTextTop = sliderTop + (sliderHeight - valueTextHeight) * 0.5f;
-        RectF rightRect = rtl ? RectF { pos.x, valueTextTop, pos.x + valueWidth, valueTextTop + valueTextHeight }
-                              : RectF { pos.x + size - valueWidth, valueTextTop, pos.x + size,
-                                        valueTextTop + valueTextHeight };
+        RectF rightRect =
+            rtl ? RectF { pos.x, valueTextTop, pos.x + valueWidth, valueTextTop + valueTextHeight }
+                : RectF { pos.x + size - valueWidth, valueTextTop, pos.x + size, valueTextTop + valueTextHeight };
         RectF sliderRect =
             rtl ? RectF { rightRect.right + gapToValue, sliderTop, pos.x + size, sliderTop + sliderHeight }
                 : RectF { pos.x, sliderTop, rightRect.left - gapToValue, sliderTop + sliderHeight };
