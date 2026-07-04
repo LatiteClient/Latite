@@ -272,7 +272,7 @@
     "client.hudmodule.keystrokes.unpressedCol.desc": "لون الزر عندما يكون غير مضغوط",
     "client.hudmodule.keystrokes.ptCol.desc": "لون نَص الزر عندما يكون مضغوط",
     "client.hudmodule.keystrokes.uptCol.desc": "لون نَص الزر عندما يكون غير مضغوط",
-    "client.hudmodule.waila.name": "ي.إ.م.أ",
+    "client.hudmodule.waila.name": "WAILA",
     "client.hudmodule.waila.desc": "يا إلهي ماذا أرى: يعرض لك معلومات عن البلوكة او الكائن الذي تنظر إليه. مستوحاة من WTHIT، المطور بواسطة deirn",
     "client.hudmodule.waila.showBlocks.name": "بلوكات",
     "client.hudmodule.waila.showBlocks.desc": "يعرض معلومات البلوكات.",
