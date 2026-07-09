@@ -18,7 +18,7 @@ namespace SDK {
 
     class ActorEventPacket : public Packet {
     public:
-        int64_t runtimeID;
+        uint64_t runtimeID;
         ActorEventID eventID;
         int data;
     };
