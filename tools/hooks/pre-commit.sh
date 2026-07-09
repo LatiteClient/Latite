@@ -10,6 +10,14 @@ fi
 
 failed=0
 found=0
+tmp_files=()
+
+cleanup() {
+    if [[ "${#tmp_files[@]}" -gt 0 ]]; then
+        rm -f "${tmp_files[@]}"
+    fi
+}
+trap cleanup EXIT
 
 while IFS= read -r -d '' file; do
     case "$file" in
@@ -20,12 +28,23 @@ while IFS= read -r -d '' file; do
             ;;
     esac
 
-    if [[ ! -f "$file" ]]; then
+    found=1
+    if ! checkout_output="$(git checkout-index --temp -- "$file")"; then
+        echo "Unable to read staged contents for $file."
+        failed=1
         continue
     fi
 
-    found=1
-    if ! clang-format --dry-run --Werror "$file"; then
+    tmp_file="${checkout_output%%$'\t'*}"
+    if [[ -z "$tmp_file" || ! -f "$tmp_file" ]]; then
+        echo "Unable to read staged contents for $file."
+        failed=1
+        continue
+    fi
+
+    tmp_files+=("$tmp_file")
+
+    if ! clang-format --dry-run --Werror --assume-filename="$file" "$tmp_file"; then
         failed=1
     fi
 done < <(git diff --cached --name-only --diff-filter=ACMR -z)
@@ -36,15 +55,18 @@ fi
 
 if [[ "$failed" -ne 0 ]]; then
     echo
-    echo "clang-format found staged C++ files that need formatting."
+    echo "clang-format found staged C++ contents that need formatting."
     echo "Format individual files with:"
     echo "  clang-format -i path/to/file.cpp"
+    echo "  git add path/to/file.cpp"
     echo
     echo "Or format all Latite sources from PowerShell with:"
     echo "  Get-ChildItem src -Recurse -Include *.h,*.hpp,*.cpp,*.cxx,*.cc | ForEach-Object { clang-format -i \$_.FullName }"
+    echo "  git add src"
     echo
     echo "Or from Git Bash with:"
     echo "  find src -type f \\( -name '*.h' -o -name '*.hpp' -o -name '*.cpp' -o -name '*.cxx' -o -name '*.cc' \\) -print0 | xargs -0 clang-format -i"
+    echo "  git add src"
     echo
     exit 1
 fi
