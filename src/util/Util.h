@@ -42,6 +42,7 @@ namespace util {
     extern std::string ToUpper(std::string const& s);
     extern std::vector<std::string> SplitString(std::string const& s, char delim);
     extern void PlaySoundUI(std::string const& sound, float volume = 1.f, float pitch = 1.f);
+    [[nodiscard]] extern bool IsPlayingLatiteSound() noexcept;
 
     extern Color LerpColorState(Color const& current, ::Color const& on, Color const& off, bool state,
                                 float speed = 3.f);

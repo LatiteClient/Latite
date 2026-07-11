@@ -393,6 +393,14 @@ public:
         "GuiData::displayClientMessage"
     };
 
+    inline static SigImpl ClientInstanceScreenModel_forwardSoundSubtitle {
+        [](memory::signature_store&, uintptr_t res) {
+            return res;
+        },
+        "55 41 56 56 57 53 48 83 EC ? 48 8D 6C 24 ? 48 C7 45 ? ? ? ? ? 44 89 CB 44 89 C6 48 89 D7 49 89 CE 48 83 79 ? ? 75"_sig,
+        "ClientInstanceScreenModel::forwardSoundSubtitle"
+    };
+
     inline static SigImpl BaseActorRenderer_renderText { [](memory::signature_store& store, uintptr_t) {
                                                             return store.deref(1);
                                                         },

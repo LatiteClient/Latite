@@ -255,6 +255,7 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         MVSIG(GameArguments__onUri),
         MVSIG(RenderMaterialGroup__common),
         MVSIG(GuiData_displayClientMessage),
+        MVSIG(ClientInstanceScreenModel_forwardSoundSubtitle),
         MVSIG(BaseActorRenderer_renderText),
         MVSIG(AppPlatformGDK_releaseMouse),
         MVSIG(Misc::Platform_GameCore),

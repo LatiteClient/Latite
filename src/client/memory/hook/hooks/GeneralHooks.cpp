@@ -39,6 +39,7 @@ namespace {
     std::shared_ptr<Hook> GrabCursorHook;
     std::shared_ptr<Hook> BaseActorRenderer_renderTextHook;
     std::shared_ptr<Hook> AppPlatformGDK_releaseMouseHook;
+    std::shared_ptr<Hook> ForwardSoundSubtitleHook;
 }
 
 void GenericHooks::MultiPlayerLevel__subTick(SDK::Level* level) {
@@ -441,6 +442,13 @@ void GenericHooks::hkAppPlatformGDK_releaseMouse(void* _this) {
     Eventing::get().dispatch(ev);
 }
 
+void GenericHooks::hkForwardSoundSubtitle(void* screenModel, std::string const& subtitle, unsigned int direction,
+                                          unsigned int isOwnSound) {
+    if (util::IsPlayingLatiteSound()) return;
+
+    ForwardSoundSubtitleHook->oFunc<decltype(&hkForwardSoundSubtitle)>()(screenModel, subtitle, direction, isOwnSound);
+}
+
 GenericHooks::GenericHooks()
     : HookGroup("General") {
     // LoadLibraryAHook = addHook(reinterpret_cast<uintptr_t>(&::LoadLibraryW), hkLoadLibraryW);
@@ -500,4 +508,6 @@ GenericHooks::GenericHooks()
                                                hkBaseActorRenderer_renderText, "BaseActorRenderer::renderText");
     AppPlatformGDK_releaseMouseHook = addHook(Signatures::AppPlatformGDK_releaseMouse.result,
                                               hkAppPlatformGDK_releaseMouse, "AppPlatform::releaseMouse");
+    ForwardSoundSubtitleHook = addHook(Signatures::ClientInstanceScreenModel_forwardSoundSubtitle.result,
+                                       hkForwardSoundSubtitle, "ClientInstanceScreenModel::forwardSoundSubtitle");
 }

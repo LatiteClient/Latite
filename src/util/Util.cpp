@@ -16,6 +16,13 @@
 #endif
 
 namespace {
+    thread_local unsigned int latiteSoundDepth = 0;
+
+    struct LatiteSoundScope {
+        LatiteSoundScope() { ++latiteSoundDepth; }
+        ~LatiteSoundScope() { --latiteSoundDepth; }
+    };
+
     std::string GetEnvironmentVariableUtf8(wchar_t const* name) {
         wchar_t buffer[32767] = {};
         auto length = GetEnvironmentVariableW(name, buffer, static_cast<DWORD>(std::size(buffer)));
@@ -508,8 +515,13 @@ void util::PlaySoundUI(std::string const& sound, float volume, float pitch) {
     auto cInst = SDK::ClientInstance::get();
     auto lr = cInst->levelRenderer;
     if (lr) {
+        LatiteSoundScope scope;
         cInst->minecraft->getLevel()->playSoundEvent(sound, lr->getLevelRendererPlayer()->getOrigin(), volume, pitch);
     } // TODO: make it work outside world
+}
+
+bool util::IsPlayingLatiteSound() noexcept {
+    return latiteSoundDepth != 0;
 }
 
 Color util::LerpColorState(Color const& current, Color const& on, Color const& off, bool state, float speed) {

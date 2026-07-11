@@ -39,6 +39,8 @@ class GenericHooks : public HookGroup {
     static void hkBaseActorRenderer_renderText(void* screenContext, void* viewData, std::string* tagData, void* font,
                                                void* mesh);
     static void hkAppPlatformGDK_releaseMouse(void* _this);
+    static void hkForwardSoundSubtitle(void* screenModel, std::string const& subtitle, unsigned int direction,
+                                       unsigned int isOwnSound);
 
 public:
     GenericHooks();
