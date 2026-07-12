@@ -58,15 +58,12 @@ if [[ "$failed" -ne 0 ]]; then
     echo "clang-format found staged C++ contents that need formatting."
     echo "Format individual files with:"
     echo "  clang-format -i path/to/file.cpp"
-    echo "  git add path/to/file.cpp"
     echo
     echo "Or format all Latite sources from PowerShell with:"
     echo "  Get-ChildItem src -Recurse -Include *.h,*.hpp,*.cpp,*.cxx,*.cc | ForEach-Object { clang-format -i \$_.FullName }"
-    echo "  git add src"
     echo
     echo "Or from Git Bash with:"
     echo "  find src -type f \\( -name '*.h' -o -name '*.hpp' -o -name '*.cpp' -o -name '*.cxx' -o -name '*.cc' \\) -print0 | xargs -0 clang-format -i"
-    echo "  git add src"
     echo
     exit 1
 fi
