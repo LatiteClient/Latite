@@ -64,15 +64,33 @@ public:
     ~Latite() = default;
 
     static constexpr std::string_view version = "v2.8.0";
-    static constexpr std::array<std::string_view, 3> supportedMinecraftVersions = {
-        "1.26.30",
-        "1.26.31",
-        "1.26.32",
+    static constexpr std::array<std::string_view, 1> supportedMinecraftVersions = {
+        "1.26.3x",
     };
 
     [[nodiscard]] static constexpr bool supportsMinecraftVersion(std::string_view version) noexcept {
         for (const auto supportedVersion : supportedMinecraftVersions) {
-            if (supportedVersion == version) {
+            if (supportedVersion.size() != version.size()) {
+                continue;
+            }
+
+            bool matches = true;
+            for (std::size_t i = 0; i < supportedVersion.size(); ++i) {
+                const auto patternCharacter = supportedVersion[i];
+                const auto versionCharacter = version[i];
+
+                if ((patternCharacter == 'x' || patternCharacter == 'X') && versionCharacter >= '0' &&
+                    versionCharacter <= '9') {
+                    continue;
+                }
+
+                if (patternCharacter != versionCharacter) {
+                    matches = false;
+                    break;
+                }
+            }
+
+            if (matches) {
                 return true;
             }
         }
