@@ -63,7 +63,7 @@ public:
     Latite() = default;
     ~Latite() = default;
 
-    static constexpr std::string_view version = "v2.8.0";
+    static constexpr std::string_view version = "v2.8.1";
     static constexpr std::array<std::string_view, 1> supportedMinecraftVersions = {
         "1.26.3x",
     };
