@@ -11,9 +11,9 @@ private:
     static HRESULT __stdcall SwapChain_Present(IDXGISwapChain* chain, UINT SyncInterval, UINT Flags);
     static HRESULT __stdcall SwapChain_ResizeBuffers(IDXGISwapChain* chain, UINT BufferCount, UINT Width, UINT Height,
                                                      DXGI_FORMAT NewFormat, UINT SwapChainFlags);
-    static HRESULT __stdcall SwapChain3_ResizeBuffers(IDXGISwapChain* chain, UINT BufferCount, UINT Width, UINT Height,
-                                                      DXGI_FORMAT NewFormat, UINT SwapChainFlags,
-                                                      const UINT* pCreationNodeMask, IUnknown* const* ppPresentQueue);
+    static HRESULT __stdcall SwapChain3_ResizeBuffers1(IDXGISwapChain3* chain, UINT BufferCount, UINT Width,
+                                                       UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags,
+                                                       const UINT* pCreationNodeMask, IUnknown* const* ppPresentQueue);
     static HRESULT __stdcall CommandQueue_ExecuteCommandLists(ID3D12CommandQueue* queue, UINT NumCommandLists,
                                                               ID3D12CommandList* const* ppCommandLists);
 

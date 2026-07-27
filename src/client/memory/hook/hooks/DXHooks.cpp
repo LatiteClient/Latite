@@ -1,8 +1,6 @@
 #include "DXHooks.h"
 #include "client/Latite.h"
 #include "client/render/Renderer.h"
-#include "mc/common/client/game/GameCore.h"
-#include "mc/common/client/game/Options.h"
 #include "pch.h"
 
 namespace {
@@ -17,60 +15,47 @@ namespace {
     std::shared_ptr<Hook> ResizeBuffers3Hook;
     std::shared_ptr<Hook> ExecuteCommandListsHook;
 
-    // TODO: temporary, remove this
-    bool isGfxVsyncDisabled() {
-        wchar_t appdata[MAX_PATH];
-        DWORD pathLen = GetEnvironmentVariableW(L"APPDATA", appdata, MAX_PATH);
-        if (pathLen == 0 || pathLen >= MAX_PATH) {
-            return true;
+    constexpr UINT TearingPresentFlag = static_cast<UINT>(DXGI_PRESENT_ALLOW_TEARING);
+
+    bool isFlipModel(DXGI_SWAP_EFFECT swapEffect) {
+        return swapEffect == DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL || swapEffect == DXGI_SWAP_EFFECT_FLIP_DISCARD;
+    }
+
+    bool canPresentWithTearing(IDXGISwapChain* chain, UINT existingPresentFlags) {
+        if (!tearingSupported || !chain) return false;
+
+        // Minecraft normally presents with either no flags or DXGI_PRESENT_RESTART. Avoid combining tearing with
+        // unrelated presentation modes; support for those combinations varies between DXGI implementations.
+        if ((existingPresentFlags & ~TearingPresentFlag) != 0) return false;
+
+        DXGI_SWAP_CHAIN_DESC desc {};
+        if (FAILED(chain->GetDesc(&desc)) || (desc.Flags & DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING) == 0 ||
+            !isFlipModel(desc.SwapEffect)) {
+            return false;
         }
 
-        std::wstring optionsPath;
-
-        if (SDK::GameCore::get() != nullptr)
-            optionsPath = util::StrToWStr(SDK::GameCore::get()->dataPath) + L"\\minecraftpe\\options.txt";
-
-        if (optionsPath.empty() || !std::filesystem::exists(optionsPath))
-            optionsPath = std::wstring(appdata) +
-                          L"\\Minecraft Bedrock\\Users\\Shared\\games\\com.mojang\\minecraftpe\\options.txt";
-
-        std::ifstream file(optionsPath.c_str());
-        if (!file.is_open()) {
-            return true;
-        }
-
-        std::string line;
-        while (std::getline(file, line)) {
-            std::erase(line, '\r');
-            if (line.find("gfx_vsync:") == 0) {
-                return line != "gfx_vsync:0";
-            }
-        }
-
-        // default to enabled
-        return true;
+        BOOL isFullscreen = FALSE;
+        return SUCCEEDED(chain->GetFullscreenState(&isFullscreen, nullptr)) && !isFullscreen;
     }
 }
 
 void DXHooks::CheckForceDisableVSync() {
-    if (Latite::get().shouldForceDisableVSync()) {
-        isForceDisableVSync = true;
-    } else {
-        isForceDisableVSync = false;
-    }
+    isForceDisableVSync = Latite::get().shouldForceDisableVSync();
 }
 
 void DXHooks::CheckTearingSupport() {
+    tearingSupported = false;
+
+    ComPtr<IDXGIFactory4> factory4;
+    if (FAILED(CreateDXGIFactory1(IID_PPV_ARGS(&factory4)))) return;
+
     ComPtr<IDXGIFactory5> factory5;
-    if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory5)))) {
-        BOOL allowTearing = FALSE;
-        if (SUCCEEDED(factory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing,
-                                                    sizeof(allowTearing)))) {
-            if (allowTearing && !isGfxVsyncDisabled()) {
-                tearingSupported = true;
-            }
-        }
-    }
+    if (FAILED(factory4.As(&factory5))) return;
+
+    BOOL allowTearing = FALSE;
+    tearingSupported = SUCCEEDED(factory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing,
+                                                               sizeof(allowTearing))) &&
+                       allowTearing;
 }
 
 CreateSwapChainForHWND_t origCreateSwapChain = nullptr;
@@ -87,16 +72,12 @@ HRESULT WINAPI DXHooks::CreateSwapChainForHWNDHook(IDXGIFactory2* factory, IUnkn
         }
     }
 
-    DXGI_SWAP_CHAIN_DESC1 modifiedDesc = *desc;
-    if (tearingSupported && isForceDisableVSync) {
-        modifiedDesc.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-    }
-
-    return origCreateSwapChain(factory, device, hwnd, &modifiedDesc, pFullscreenDesc, output, swapChain);
+    return origCreateSwapChain(factory, device, hwnd, desc, pFullscreenDesc, output, swapChain);
 }
 
 HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInterval, UINT Flags) {
     auto& renderer = Latite::getRenderer();
+    bool isGameSwapChain = false;
     if (Latite::get().isEjectReadyForRenderThread()) {
         auto lock = renderer.lock();
         Latite::get().completeEjectFromRenderThread();
@@ -108,6 +89,8 @@ HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInt
             } else {
                 renderer.init(chain);
             }
+
+            isGameSwapChain = renderer.isGameSwapChain(chain);
         }
     }
 
@@ -119,41 +102,45 @@ HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInt
     //	hasKilled = true;
     // }
 
-    UINT presentFlags = Flags;
-    UINT syncInterval = SyncInterval;
-    if (tearingSupported && isForceDisableVSync) {
-        syncInterval = 0;
-        presentFlags |= DXGI_PRESENT_ALLOW_TEARING;
+    auto originalPresent = PresentHook->oFunc<decltype(&SwapChain_Present)>();
+    if (!isForceDisableVSync || !isGameSwapChain || (Flags & DXGI_PRESENT_TEST) != 0) {
+        return originalPresent(chain, SyncInterval, Flags);
     }
 
-    return PresentHook->oFunc<decltype(&SwapChain_Present)>()(chain, syncInterval, presentFlags);
+    UINT presentFlags = Flags & ~TearingPresentFlag;
+    if (canPresentWithTearing(chain, Flags)) {
+        presentFlags |= TearingPresentFlag;
+    }
+
+    HRESULT result = originalPresent(chain, 0, presentFlags);
+    if (result != DXGI_ERROR_INVALID_CALL || (SyncInterval == 0 && presentFlags == Flags)) {
+        return result;
+    }
+
+    if ((presentFlags & TearingPresentFlag) != 0) {
+        presentFlags &= ~TearingPresentFlag;
+        result = originalPresent(chain, 0, presentFlags);
+        if (result != DXGI_ERROR_INVALID_CALL) return result;
+    }
+
+    return originalPresent(chain, SyncInterval, Flags);
 }
 
 HRESULT __stdcall DXHooks::SwapChain_ResizeBuffers(IDXGISwapChain* chain, UINT BufferCount, UINT Width, UINT Height,
                                                    DXGI_FORMAT NewFormat, UINT SwapChainFlags) {
     Latite::getRenderer().beginResize();
-    UINT newFlags = SwapChainFlags;
-    if (tearingSupported && isForceDisableVSync) {
-        newFlags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-    }
-
-    const HRESULT result = ResizeBuffersHook->oFunc<decltype(&SwapChain_ResizeBuffers)>()(chain, BufferCount, Width,
-                                                                                          Height, NewFormat, newFlags);
+    const HRESULT result = ResizeBuffersHook->oFunc<decltype(&SwapChain_ResizeBuffers)>()(
+        chain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
     Latite::getRenderer().endResize();
     return result;
 }
 
-HRESULT __stdcall DXHooks::SwapChain3_ResizeBuffers(IDXGISwapChain* chain, UINT BufferCount, UINT Width, UINT Height,
-                                                    DXGI_FORMAT NewFormat, UINT SwapChainFlags,
-                                                    const UINT* pCreationNodeMask, IUnknown* const* ppPresentQueue) {
+HRESULT __stdcall DXHooks::SwapChain3_ResizeBuffers1(IDXGISwapChain3* chain, UINT BufferCount, UINT Width, UINT Height,
+                                                     DXGI_FORMAT NewFormat, UINT SwapChainFlags,
+                                                     const UINT* pCreationNodeMask, IUnknown* const* ppPresentQueue) {
     Latite::getRenderer().beginResize();
-    UINT newFlags = SwapChainFlags;
-    if (tearingSupported && isForceDisableVSync) {
-        newFlags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
-    }
-
-    const HRESULT result = ResizeBuffers3Hook->oFunc<decltype(&SwapChain3_ResizeBuffers)>()(
-        chain, BufferCount, Width, Height, NewFormat, newFlags, pCreationNodeMask, ppPresentQueue);
+    const HRESULT result = ResizeBuffers3Hook->oFunc<decltype(&SwapChain3_ResizeBuffers1)>()(
+        chain, BufferCount, Width, Height, NewFormat, SwapChainFlags, pCreationNodeMask, ppPresentQueue);
     Latite::getRenderer().endResize();
     return result;
 }
@@ -254,9 +241,9 @@ DXHooks::DXHooks()
     PresentHook = addHook(vftable[8], SwapChain_Present, "IDXGISwapChain::Present");
 
     // We need both ResizeBuffers hooks as DX11 uses IDXGISwapChain::ResizeBuffers and DX12 uses
-    // IDXGISwapChain3::ResizeBuffers
+    // IDXGISwapChain3::ResizeBuffers1
     ResizeBuffersHook = addHook(vftable[13], SwapChain_ResizeBuffers, "IDXGISwapChain::ResizeBuffers");
-    ResizeBuffers3Hook = addHook(vftable[39], SwapChain3_ResizeBuffers, "IDXGISwapChain3::ResizeBuffers");
+    ResizeBuffers3Hook = addHook(vftable[39], SwapChain3_ResizeBuffers1, "IDXGISwapChain3::ResizeBuffers1");
 
     // Needed for D3D11On12 for DX12
     if (cqueueVftable)

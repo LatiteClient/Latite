@@ -135,6 +135,8 @@ public:
 
     void setSwapChain(IDXGISwapChain* chain) noexcept { gameSwapChain = chain; }
 
+    [[nodiscard]] bool isGameSwapChain(IDXGISwapChain* chain) const noexcept { return gameSwapChain == chain; }
+
     void clearTextCache() { this->cachedLayouts.clear(); }
 
     [[nodiscard]] std::wstring getFontFamily() { return this->fontFamily; }
