@@ -5,6 +5,7 @@
 #include "client/localization/LocalizeString.h"
 #include "client/feature/setting/Setting.h"
 #include "client/feature/setting/SettingGroup.h"
+#include <functional>
 #include <optional>
 
 class Module : public Listener, public Feature, public std::enable_shared_from_this<Module> {
@@ -162,6 +163,8 @@ public:
     std::shared_ptr<Setting> addSliderSetting(std::string const& internalName, LocalizedString const& displayName,
                                               LocalizedString const& desc, ValueType& val, ValueType min, ValueType max,
                                               ValueType interval, Setting::Condition condition = Setting::Condition());
+    std::shared_ptr<Setting> addActionSetting(std::string const& internalName, LocalizedString const& displayName,
+                                              LocalizedString const& desc, std::function<void()> action);
 
     std::shared_ptr<SettingGroup> settings;
 

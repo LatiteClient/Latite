@@ -1277,6 +1277,36 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
             if (contains || shouldSelect(textRect, cursorPos)) setTooltip(desc);
         return pos.y + rowHeight;
     } break;
+    case Setting::Type::Action: {
+        float buttonWidth = std::min(size * 0.46f, checkboxSize * 7.f);
+        RectF actionRect = d2d::controlAtStart(pos, size, buttonWidth, checkboxSize, rtl);
+        bool contains = bypassClickThrough ? actionRect.contains(cursorPos) : this->shouldSelect(actionRect, cursorPos);
+
+        auto colOff = d2d::Color::RGB(0xD9, 0xD9, 0xD9).asAlpha(0.11f);
+        if (!set->rendererInfo.init) {
+            set->rendererInfo.init = true;
+            set->rendererInfo.col[0] = colOff.r;
+            set->rendererInfo.col[1] = colOff.g;
+            set->rendererInfo.col[2] = colOff.b;
+            set->rendererInfo.col[3] = colOff.a;
+        }
+        auto lerpedColor = util::LerpColorState(set->rendererInfo.col, accentColor.asAlpha(0.35f), colOff, contains);
+        set->rendererInfo.col[0] = lerpedColor.r;
+        set->rendererInfo.col[1] = lerpedColor.g;
+        set->rendererInfo.col[2] = lerpedColor.b;
+        set->rendererInfo.col[3] = lerpedColor.a;
+
+        if (contains && justClicked[0]) {
+            if (set->action) set->action.value()();
+            playClickSound();
+        }
+
+        dc.fillRoundedRectangle(actionRect, Color(set->rendererInfo.col), round);
+        dc.drawSingleLineFitted(actionRect, set->getDisplayName(), d2d::Colors::WHITE, FontSelection::PrimarySemilight,
+                                textSize, DWRITE_TEXT_ALIGNMENT_CENTER, DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+        if (contains && !set->desc().empty()) setTooltip(set->desc());
+        return actionRect.bottom;
+    } break;
     case Setting::Type::Key: {
         RectF keyRect = d2d::controlAtStart(pos, size, checkboxSize * 2.f, checkboxSize, rtl);
         std::wstring text = util::StrToWStr(util::KeyToString(std::get<KeyValue>(*set->value)));

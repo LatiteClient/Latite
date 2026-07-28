@@ -37,6 +37,16 @@
 
 [Watch Installation Tutorial](https://youtu.be/h3v849ayuZY)
 
+### Gyro Controller Support
+
+The Gyro module uses Microsoft's GameInput sensor API for Windows motion sensors and compatible USB or Bluetooth controllers. Install the latest GameInput redistributable from an elevated PowerShell window before using controller gyro:
+
+```powershell
+winget install Microsoft.GameInput
+```
+
+Microsoft currently documents the PlayStation 5 DualSense as the only motion-enabled controller supported by GameInput. Windows sensor-stack gyroscopes, such as sensors built into compatible tablets and handhelds, are supported separately. See Microsoft's [GameInput PC setup](https://learn.microsoft.com/en-us/gaming/gdk/docs/features/common/input/overviews/input-nuget) and [motion-controller sample notes](https://github.com/microsoft/Xbox-GDK-Samples/blob/main/Samples/System/Gamepad/readme_en-us.md).
+
 ## Plugins
 
 Enhance your experience with community-made plugins:

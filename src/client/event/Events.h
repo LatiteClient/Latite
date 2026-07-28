@@ -35,6 +35,7 @@
 #include "events/SendPacketEvent.h"
 #include "events/SensitivityEvent.h"
 #include "events/TickEvent.h"
+#include "events/TurnDeltaEvent.h"
 #include "events/UpdateEvent.h"
 #include "events/UpdatePlayerCameraEvent.h"
 #include "events/WeatherEvent.h"

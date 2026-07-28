@@ -2,6 +2,9 @@
 #include "client/feature/Feature.h"
 #include "client/localization/LocalizeString.h"
 #include <nlohmann/json.hpp>
+#include <algorithm>
+#include <functional>
+#include <memory>
 #include <optional>
 #include <variant>
 
@@ -262,8 +265,13 @@ struct SnapValue {
     int getInt() { return 0; }
 };
 
-using ValueType =
-    std::variant<BoolValue, FloatValue, IntValue, KeyValue, ColorValue, Vec2Value, EnumValue, TextValue, SnapValue>;
+struct ActionValue {
+    void store(nlohmann::json& jout) { jout = nullptr; }
+    int getInt() { return 0; }
+};
+
+using ValueType = std::variant<BoolValue, FloatValue, IntValue, KeyValue, ColorValue, Vec2Value, EnumValue, TextValue,
+                               SnapValue, ActionValue>;
 
 class EnumEntry /*: Feature*/ {
     std::wstring entryName;
@@ -305,11 +313,20 @@ class EnumData {
 public:
     void addEntry(EnumEntry const& ent) { entries.push_back(ent); }
 
+    void replaceEntries(std::vector<EnumEntry> newEntries, int selectedIndex) {
+        entries = std::move(newEntries);
+        if (entries.empty()) {
+            std::get<EnumValue>(selectedIdx).val = 0;
+            return;
+        }
+        std::get<EnumValue>(selectedIdx).val = std::clamp(selectedIndex, 0, static_cast<int>(entries.size()) - 1);
+    }
+
     [[nodiscard]] ValueType* getValue() { return &selectedIdx; }
 
     [[nodiscard]] std::vector<EnumEntry>* getEntries() { return &entries; }
 
-    [[nodiscard]] int getSelectedKey() { return std::get<EnumValue>(selectedIdx); }
+    [[nodiscard]] int getSelectedKey() const { return std::get<EnumValue>(selectedIdx).val; }
 
     [[nodiscard]] std::wstring getSelectedName() { return entries[std::get<EnumValue>(selectedIdx)].name(); }
 
@@ -360,7 +377,8 @@ public:
         Vec2,
         Enum,
         Text,
-        Snap
+        Snap,
+        Action
     };
 
     Setting(std::string const& internalName, std::wstring const& displayName, std::wstring const& description,
@@ -405,6 +423,7 @@ public:
 
     std::optional<std::function<void(Setting&)>> callback;
     std::optional<std::function<void(Setting&)>> userUpdateCallback;
+    std::optional<std::function<void()>> action;
 
     void update() {
         if (callback) callback.value()(*this);
@@ -416,6 +435,7 @@ public:
 
     EnumData* enumData = nullptr;
     ValueType* value = nullptr;
+    std::unique_ptr<ValueType> ownedValue;
 
     ValueType resolvedValue;
     ValueType defaultValue;

@@ -89,6 +89,8 @@ void Config::addSetting(SettingGroup& group, nlohmann::json& obj) {
     case Setting::Type::Snap:
         set->resolvedValue = SnapValue(jVal);
         break;
+    case Setting::Type::Action:
+        return;
     default:
         return;
     }
@@ -117,6 +119,7 @@ void Config::saveGroup(SettingGroup& group, json& j) {
     j["name"] = group.name();
     j["settings"] = json::array();
     group.forEach([&](std::shared_ptr<Setting> set) {
+        if (set->value->index() == static_cast<std::size_t>(Setting::Type::Action)) return;
         json jset;
         saveSetting(set, jset);
         j["settings"].push_back(jset);

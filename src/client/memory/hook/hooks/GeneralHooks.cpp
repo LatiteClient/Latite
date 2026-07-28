@@ -199,6 +199,9 @@ int __fastcall GenericHooks::RakPeer_getAveragePing(void* obj, char* guidOrAddy)
 }
 
 void __fastcall GenericHooks::LocalPlayer_applyTurnDelta(void* obj, Vec2& rot) {
+    TurnDeltaEvent turnEvent { rot };
+    Eventing::get().dispatch(turnEvent);
+
     float oSens = 1.f;
     SensitivityEvent sensEv { oSens };
     Eventing::get().dispatch(sensEv);

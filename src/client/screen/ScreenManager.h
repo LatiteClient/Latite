@@ -1,5 +1,6 @@
 #pragma once
 #include "screens/ClickGUI.h"
+#include "screens/GyroCalibrationScreen.h"
 #include "screens/HUDEditor.h"
 #include "screens/SkinStealerScreen.h"
 
@@ -11,7 +12,8 @@
 #include "util/Util.h"
 #include "script/JsScreen.h"
 
-class ScreenManager : public Listener, public StaticManager<Screen, ClickGUI, HUDEditor, SkinStealerScreen> {
+class ScreenManager : public Listener,
+                      public StaticManager<Screen, ClickGUI, HUDEditor, SkinStealerScreen, GyroCalibrationScreen> {
 public:
     ScreenManager();
 
