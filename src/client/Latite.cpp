@@ -526,6 +526,10 @@ SDK::Font* Latite::getFont() {
 void Latite::initialize(HINSTANCE hInst) {
     this->dllInst = hInst;
 
+    if (!controllerInput.start()) {
+        Logger::Warn("Controller keybind input could not be initialized.");
+    }
+
     Latite::getPluginManager().init();
     Logger::Info("Script manager initialized.");
 
@@ -948,6 +952,7 @@ void Latite::onUpdate(Event& evGeneric) {
         threadsafeInit();
         hasInit = true;
     }
+    controllerInput.update();
     getKeyboard().findTextInput();
     Latite::getPluginManager().runScriptingOperations();
 

@@ -10,6 +10,7 @@
 #include "misc/Notifications.h"
 #include "misc/NameTagCache.h"
 #include "localization/LocalizeData.h"
+#include "input/ControllerInput.h"
 
 namespace ui {
     class TextBox;
@@ -36,6 +37,7 @@ public:
     [[nodiscard]] static class PluginManager& getPluginManager() noexcept;
     [[nodiscard]] static class Keyboard& getKeyboard() noexcept;
     [[nodiscard]] static class Notifications& getNotifications() noexcept;
+    [[nodiscard]] ControllerInput& getControllerInput() noexcept { return controllerInput; }
 
     [[nodiscard]] LocalizeData& getL10nData() noexcept { return *l10nData; }
     [[nodiscard]] Timings& getTimings() noexcept { return timings; }
@@ -168,6 +170,7 @@ private:
 
     Timings timings {};
     NameTagCache nameTagCache;
+    ControllerInput controllerInput;
     inline static std::optional<std::thread::id> gameThreadId;
 
     ValueType commandPrefix = TextValue(L".");

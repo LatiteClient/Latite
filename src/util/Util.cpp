@@ -6,6 +6,7 @@
 #include "mc/common/client/renderer/game/LevelRendererPlayer.h"
 #include "mc/common/client/renderer/game/LevelRenderer.h"
 #include "client/Latite.h"
+#include "client/input/ControllerInput.h"
 #include "client/render/Renderer.h"
 
 #include <cctype>
@@ -453,6 +454,10 @@ void util::SetClipboardText(std::wstring const& text) {
 }
 
 std::string util::KeyToString(int key) {
+    if (controller_input::isButton(key)) {
+        return std::string(controller_input::buttonName(key));
+    }
+
     if (key > 0x40 && key < 0x5B) {
         return std::string(1, (char)key);
     }
@@ -467,6 +472,9 @@ std::string util::KeyToString(int key) {
 
 int util::StringToKey(std::string const& s) {
     if (s.empty()) return 0;
+    if (int controllerButton = controller_input::buttonFromName(s); controllerButton != 0) {
+        return controllerButton;
+    }
     if (s[0] > 0x40 && s[0] < 0x5B) {
         return (int)s[0];
     }

@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include "client/input/gyro/SdlGamepadGyroscope.h"
+#include "client/input/ControllerInput.h"
 #include "util/LMath.h"
 
 class WindowsGyroscope final {
@@ -85,15 +85,14 @@ private:
     void handleSystemSensorDevice(IGameInputDevice* device, GameInput::v3::GameInputDeviceStatus currentStatus);
     void handleSdlGyro(std::string const& deviceId, Vec3 const& angularVelocity, int64_t timestampNanos);
     void handleSdlAccelerometer(std::string const& deviceId, Vec3 const& acceleration, int64_t timestampNanos);
-    void handleSdlDevices(std::vector<SdlGamepadGyroscope::DeviceState> const& states);
+    void handleSdlDevices(std::vector<ControllerInput::SensorDeviceState> const& states);
     void selectActiveDeviceLocked();
 
     mutable std::mutex mutex;
-    SdlGamepadGyroscope sdlGamepads;
     Microsoft::WRL::ComPtr<IGameInput> systemSensorInput;
     std::vector<SystemSensorEntry> systemSensors;
     Microsoft::WRL::ComPtr<IGameInputDevice> activeSystemSensor;
-    std::vector<SdlGamepadGyroscope::DeviceState> sdlDevices;
+    std::vector<ControllerInput::SensorDeviceState> sdlDevices;
     std::string requestedDeviceId;
     std::string selectedDeviceId;
     std::wstring activeName;

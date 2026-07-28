@@ -292,8 +292,8 @@ JsValueRef GameScriptingObject::isKeyDown(JsValueRef callee, bool isConstructor,
     if (!Chakra::VerifyParameters({ { arguments[1], JsNumber } })) return JS_INVALID_REFERENCE;
 
     int vKey = Chakra::GetInt(arguments[1]);
-    if (vKey > 255 || vKey < 0) {
-        Chakra::ThrowError(L"Virtual key code out of bounds [0-255]");
+    if (vKey < 0 || (vKey > 255 && !controller_input::isButton(vKey))) {
+        Chakra::ThrowError(L"Key code is not a keyboard key or controller button");
         return JS_INVALID_REFERENCE;
     }
 

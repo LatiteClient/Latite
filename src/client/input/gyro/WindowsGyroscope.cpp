@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "WindowsGyroscope.h"
 
+#include "client/Latite.h"
+
 #include <algorithm>
 #include <cmath>
 #include <utility>
@@ -37,14 +39,14 @@ WindowsGyroscope::StartResult WindowsGyroscope::start(RequestedSource source, Gy
     }
 
     bool sdlAvailable;
-    sdlAvailable = sdlGamepads.start(
+    sdlAvailable = Latite::get().getControllerInput().startSensors(
         [this](std::string const& id, Vec3 const& value, int64_t timestamp) {
             handleSdlGyro(id, value, timestamp);
         },
         [this](std::string const& id, Vec3 const& value, int64_t timestamp) {
             handleSdlAccelerometer(id, value, timestamp);
         },
-        [this](std::vector<SdlGamepadGyroscope::DeviceState> const& states) {
+        [this](std::vector<ControllerInput::SensorDeviceState> const& states) {
             handleSdlDevices(states);
         });
     HRESULT systemSensorResult = startSystemSensorInput();
@@ -108,7 +110,7 @@ void WindowsGyroscope::stop() {
         hadDevices = !sdlDevices.empty() || !systemSensors.empty();
     }
 
-    sdlGamepads.stop();
+    Latite::get().getControllerInput().stopSensors();
     stopSystemSensorInput();
 
     {
@@ -210,7 +212,7 @@ int64_t WindowsGyroscope::currentTimestampNanos() const {
         input = systemSensorInput;
     }
 
-    if (source == ActiveSource::Controller) return sdlGamepads.currentTimestampNanos(id);
+    if (source == ActiveSource::Controller) return Latite::get().getControllerInput().currentSensorTimestampNanos(id);
     if (source != ActiveSource::SystemSensor || !input) return 0;
     return static_cast<int64_t>(input->GetCurrentTimestamp()) * NANOSECONDS_PER_GAMEINPUT_MICROSECOND;
 }
@@ -294,7 +296,7 @@ void WindowsGyroscope::handleSdlAccelerometer(std::string const& deviceId, Vec3 
     if (accelerometerHandler) accelerometerHandler(acceleration, timestampNanos);
 }
 
-void WindowsGyroscope::handleSdlDevices(std::vector<SdlGamepadGyroscope::DeviceState> const& states) {
+void WindowsGyroscope::handleSdlDevices(std::vector<ControllerInput::SensorDeviceState> const& states) {
     std::scoped_lock lock { mutex };
     if (!running.load(std::memory_order_relaxed)) return;
 
@@ -382,7 +384,7 @@ void WindowsGyroscope::selectActiveDeviceLocked() {
     ActiveSource previousSource = selectedSource;
     bool previousHasAccelerometer = selectedHasAccelerometer;
 
-    SdlGamepadGyroscope::DeviceState const* selectedSdl = nullptr;
+    ControllerInput::SensorDeviceState const* selectedSdl = nullptr;
     SystemSensorEntry const* selectedSystemSensor = nullptr;
     bool controllerAllowed = requestedSource != RequestedSource::SystemSensor;
     bool systemSensorAllowed = requestedSource != RequestedSource::Controller;

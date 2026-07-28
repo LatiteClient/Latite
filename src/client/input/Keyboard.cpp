@@ -73,11 +73,20 @@ void Keyboard::findTextInput() {
 }
 
 bool Keyboard::isKeyDown(int vKey) {
+    if (controller_input::isButton(vKey)) {
+        return controllerButtonMap[vKey - controller_input::KEY_BASE];
+    }
+    if (vKey < 0 || vKey >= 0x100) return false;
     return keyMap[vKey];
 }
 
 int Keyboard::getMappedKey(std::string const& name) {
     return SDK::ClientInstance::get()->inputHandler->mappingFactory->defaultKeyboardLayout->findValue(name);
+}
+
+void Keyboard::setControllerButtonState(int key, bool isDown) {
+    if (!controller_input::isButton(key)) return;
+    controllerButtonMap[key - controller_input::KEY_BASE] = isDown;
 }
 
 void Keyboard::onChar(wchar_t ch, bool isChar) {
@@ -97,5 +106,10 @@ void Keyboard::onChar(wchar_t ch, bool isChar) {
 
 void Keyboard::onKey(Event& evGeneric) {
     auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
+    if (controller_input::isButton(ev.getKey())) {
+        setControllerButtonState(ev.getKey(), ev.isDown());
+        return;
+    }
+    if (ev.getKey() < 0 || ev.getKey() >= 0x100) return;
     this->keyMapAdjusted[ev.getKey()] = ev.isDown();
 }
