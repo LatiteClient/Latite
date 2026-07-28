@@ -37,7 +37,8 @@ public:
     TextBox()
         : startTime(std::chrono::high_resolution_clock::now()) {};
 
-    void render(DrawUtil& dc, float rounding, d2d::Color backgroundColor, d2d::Color textColor);
+    void render(DrawUtil& dc, float rounding, d2d::Color backgroundColor, d2d::Color textColor,
+                DWRITE_TEXT_ALIGNMENT textAlignment = DWRITE_TEXT_ALIGNMENT_LEADING);
 
     [[nodiscard]] int getCaretLocation() { return place; }
     void setCaretLocation(int loc) { place = loc; }

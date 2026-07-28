@@ -19,6 +19,7 @@
 
 #include <type_traits>
 #include <cwctype>
+#include <cmath>
 
 #ifdef min
 #undef min
@@ -62,6 +63,25 @@ namespace {
         }
 
         return false;
+    }
+
+    std::optional<float> parseSliderValue(std::wstring const& text) {
+        if (text.empty() || std::ranges::any_of(text, [](wchar_t character) {
+                return std::iswspace(character) != 0;
+            })) {
+            return std::nullopt;
+        }
+
+        try {
+            size_t parsedCharacters = 0;
+            float value = std::stof(text, &parsedCharacters);
+            if (parsedCharacters != text.size() || !std::isfinite(value)) return std::nullopt;
+            return value;
+        } catch (std::invalid_argument const&) {
+            return std::nullopt;
+        } catch (std::out_of_range const&) {
+            return std::nullopt;
+        }
     }
 }
 
@@ -1640,8 +1660,13 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
         std::wstringstream namew;
         namew << set->getDisplayName();
 
-        std::wstringstream valuew;
-        valuew << std::get<FloatValue>(*set->value);
+        std::wstringstream valueStream;
+        valueStream << std::get<FloatValue>(*set->value);
+        std::wstring formattedValue = valueStream.str();
+        auto valueBoxIt = settingBoxes.find(set);
+        std::wstring measuredValue = valueBoxIt != settingBoxes.end() && valueBoxIt->second->isSelected()
+                                         ? valueBoxIt->second->getText()
+                                         : formattedValue;
 
         RectF textRect = { pos.x, pos.y, pos.x + size, pos.y + checkboxSize };
         textRect.bottom = textRect.top +
@@ -1653,7 +1678,7 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
         float sliderTop = textRect.bottom + sliderPadTop;
         float valueTextSize = sliderHeight * 1.4f;
         float valuePadX = checkboxSize * 0.35f;
-        float measuredValueWidth = dc.getTextSize(valuew.str(), Renderer::FontSelection::PrimarySemilight,
+        float measuredValueWidth = dc.getTextSize(measuredValue, Renderer::FontSelection::PrimarySemilight,
                                                   valueTextSize, false, false, Vec2 { 10000.f, 10000.f })
                                        .x +
                                    valuePadX * 2.f;
@@ -1679,15 +1704,57 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
         RectF innerSliderRect = { sliderRect.left + innerPad, sliderRect.top + innerPad, sliderRect.right - innerPad,
                                   sliderRect.bottom - innerPad };
 
-        dc.drawSingleLineFitted(rightRect, valuew.str(), d2d::Color(1.f, 1.f, 1.f, 1.f),
-                                Renderer::FontSelection::PrimarySemilight, valueTextSize, DWRITE_TEXT_ALIGNMENT_CENTER,
-                                DWRITE_PARAGRAPH_ALIGNMENT_CENTER, false);
-
         float min = std::get<FloatValue>(set->min);
         float max = std::get<FloatValue>(set->max);
         float interval = std::get<FloatValue>(set->interval);
 
-        if (!set->desc().empty() && (shouldSelect(textRect, cursorPos) || shouldSelect(sliderRect, cursorPos))) {
+        if (valueBoxIt == settingBoxes.end()) {
+            auto valueBox = std::make_shared<TextBox>(rightRect);
+            valueBox->setText(formattedValue);
+            valueBox->setCaretLocation(static_cast<int>(formattedValue.size()));
+            valueBoxIt = settingBoxes.emplace(set, std::move(valueBox)).first;
+            Latite::get().addTextBox(valueBoxIt->second.get());
+        }
+
+        auto& valueBox = *valueBoxIt->second;
+        valueBox.setRect(rightRect);
+        if (valueBox.isSelected()) {
+            if (auto typedValue = parseSliderValue(valueBox.getText())) {
+                float newValue = std::clamp(*typedValue, min, max);
+                if (std::isfinite(interval) && interval > 0.f) {
+                    newValue = std::round(newValue / interval) * interval;
+                }
+                newValue = std::clamp(newValue, min, max);
+                auto& currentValue = std::get<FloatValue>(*set->value).value;
+                if (newValue != currentValue) {
+                    currentValue = newValue;
+                    set->update();
+                    set->userUpdate();
+                }
+            }
+        } else {
+            valueStream.str(L"");
+            valueStream.clear();
+            valueStream << std::get<FloatValue>(*set->value);
+            formattedValue = valueStream.str();
+            valueBox.setText(formattedValue);
+            valueBox.setCaretLocation(static_cast<int>(formattedValue.size()));
+        }
+
+        auto valueBoxColor = d2d::Color::RGB(0x8D, 0x8D, 0x8D).asAlpha(0.11f);
+        valueBox.render(dc, round, valueBoxColor, D2D1::ColorF::White, DWRITE_TEXT_ALIGNMENT_CENTER);
+        if (valueBox.isSelected()) {
+            dc.drawRoundedRectangle(rightRect, D2D1::ColorF::White, round, 1.f);
+        }
+
+        if (justClicked[0]) {
+            bool selectValueBox = shouldSelect(rightRect, cursorPos);
+            if (selectValueBox && !valueBox.isSelected()) playClickSound();
+            valueBox.setSelected(selectValueBox);
+        }
+
+        if (!set->desc().empty() && (shouldSelect(textRect, cursorPos) || shouldSelect(sliderRect, cursorPos) ||
+                                     shouldSelect(rightRect, cursorPos))) {
             setTooltip(set->desc());
         }
 
@@ -1709,11 +1776,10 @@ float ClickGUI::drawSetting(Setting* set, SettingGroup*, Vec2 const& pos, D2DUti
                 newVal += min;
 
                 newVal = std::clamp(newVal, min, max);
-
-                // Find a good value to set to ("latch to nearest")
-                newVal /= interval;
-                newVal = std::round(newVal);
-                newVal *= interval;
+                if (std::isfinite(interval) && interval > 0.f) {
+                    newVal = std::round(newVal / interval) * interval;
+                }
+                newVal = std::clamp(newVal, min, max);
 
                 std::get<FloatValue>(*set->value) = newVal;
                 set->update();

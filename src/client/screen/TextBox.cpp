@@ -65,7 +65,8 @@ d2d::Rect TextBox::getRect() {
     return this->rect;
 }
 
-void TextBox::render(DrawUtil& dc, float rounding, d2d::Color backgroundColor, d2d::Color textColor) {
+void TextBox::render(DrawUtil& dc, float rounding, d2d::Color backgroundColor, d2d::Color textColor,
+                     DWRITE_TEXT_ALIGNMENT textAlignment) {
     if (rounding == 0.f) {
         dc.fillRectangle(rect, backgroundColor);
     } else {
@@ -74,13 +75,19 @@ void TextBox::render(DrawUtil& dc, float rounding, d2d::Color backgroundColor, d
 
     // draw text
     float textSize = rect.getHeight() * 0.7f;
-    dc.drawText(rect, getText(), textColor, Renderer::FontSelection::PrimaryRegular, textSize,
-                DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_CENTER, false); // Don't cache
+    dc.drawText(rect, getText(), textColor, Renderer::FontSelection::PrimaryRegular, textSize, textAlignment,
+                DWRITE_PARAGRAPH_ALIGNMENT_CENTER, false); // Don't cache
 
     // draw blinker
     Vec2 ts = dc.getTextSize(text.substr(0, this->place), Renderer::FontSelection::PrimaryRegular, textSize);
     const bool rtl = isRightToLeftText();
-    float blinkerX = rtl ? rect.right - ts.x - 2.f : rect.left + ts.x;
+    float blinkerX = 0.f;
+    if (textAlignment == DWRITE_TEXT_ALIGNMENT_CENTER) {
+        float fullTextWidth = dc.getTextSize(text, Renderer::FontSelection::PrimaryRegular, textSize).x;
+        blinkerX = rect.centerX() - (fullTextWidth / 2.f) + ts.x;
+    } else {
+        blinkerX = rtl ? rect.right - ts.x - 2.f : rect.left + ts.x;
+    }
     d2d::Rect blinkerRect = { blinkerX, rect.top + 2.f, blinkerX + 2.f, rect.bottom - 2.f };
     if (isSelected() && shouldBlink()) dc.fillRectangle(blinkerRect, textColor);
 }
