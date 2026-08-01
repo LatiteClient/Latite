@@ -258,6 +258,7 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         MVSIG(ClientInstanceScreenModel_forwardSoundSubtitle),
         MVSIG(BaseActorRenderer_renderText),
         MVSIG(AppPlatformGDK_releaseMouse),
+        MVSIG(AppPlatform_GameCorePC_pickImage),
         MVSIG(Misc::Platform_GameCore),
         MVSIG(Misc::mouseDevice),
     };

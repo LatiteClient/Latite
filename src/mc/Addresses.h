@@ -160,6 +160,14 @@ public:
                                                   "E8 ? ? ? ? 48 8B 8F ? ? ? ? BA ? ? ? ? E8 ? ? ? ? 48 8B 9F"_sig,
                                                   "MinecraftGame::_update" };
 
+    inline static SigImpl AppPlatform_GameCorePC_pickImage {
+        [](memory::signature_store&, uintptr_t res) {
+            return res;
+        },
+        "55 41 56 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 0F 29 75 ? 48 C7 45 ? FE FF FF FF 48 89 55 ? 48 89 CE 48 8B 0D ? ? ? ? 48 8B 01 48 8B 40 ? BA 58 01 00 00"_sig,
+        "AppPlatform_GameCorePC::pickImage"
+    };
+
     // ref: your GPU ("AMD Radeon RX 5500")
     inline static SigImpl GpuInfo { [](memory::signature_store& store, uintptr_t) {
                                        return store.deref(3);

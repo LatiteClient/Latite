@@ -155,6 +155,9 @@ target_link_libraries(Latite PRIVATE
         WindowsApp.lib
         Shlwapi.lib
 
+        # Windows 10 fallback file picker
+        Comdlg32.lib
+
         # Needed for getting app version
         Version.lib
 
