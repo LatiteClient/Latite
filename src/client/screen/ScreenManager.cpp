@@ -28,10 +28,16 @@ void ScreenManager::activateScreen(Screen& screen, bool ignoreAnims) {
 
 void ScreenManager::exitCurrentScreen() {
     if (this->activeScreen) {
+        this->activeScreen->get().resetInputState();
         this->activeScreen->get().setActive(false);
         this->activeScreen = std::nullopt;
         SDK::ClientInstance::get()->grabCursor();
     }
+}
+
+void ScreenManager::shutdownForEject() {
+    if (shuttingDown.exchange(true, std::memory_order_acq_rel)) return;
+    exitCurrentScreen();
 }
 
 void ScreenManager::onKey(KeyUpdateEvent& ev) {

@@ -4,11 +4,15 @@
 #include "client/event/Listener.h"
 #include "Module.h"
 #include "script/JsModule.h"
+#include <atomic>
 
 class ModuleManager final : public Listener, public Manager<Module> {
 public:
     ModuleManager();
     ~ModuleManager();
+
+    void shutdownForEject();
+    [[nodiscard]] bool shouldListen() override { return !shuttingDown.load(std::memory_order_acquire); }
 
     bool registerScriptModule(JsModule* mod) {
         for (auto& mod_ : items) {
@@ -55,4 +59,7 @@ public:
     [[nodiscard]] size_t size() const { return items.size(); }
 
     void onKey(Event& ev);
+
+private:
+    std::atomic_bool shuttingDown = false;
 };

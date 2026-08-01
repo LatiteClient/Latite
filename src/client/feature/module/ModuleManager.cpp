@@ -118,6 +118,12 @@ ModuleManager::ModuleManager() {
 }
 
 ModuleManager::~ModuleManager() {
+    shutdownForEject();
+}
+
+void ModuleManager::shutdownForEject() {
+    if (shuttingDown.exchange(true, std::memory_order_acq_rel)) return;
+
     for (auto& mod : items) {
         if (mod->isEnabled()) mod->setEnabled(false);
     }

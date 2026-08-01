@@ -11,6 +11,7 @@
 
 #include "util/Util.h"
 #include "script/JsScreen.h"
+#include <atomic>
 
 class ScreenManager : public Listener,
                       public StaticManager<Screen, ClickGUI, HUDEditor, SkinStealerScreen, GyroCalibrationScreen> {
@@ -63,8 +64,10 @@ public:
         return true;
     }
     void exitCurrentScreen();
+    void shutdownForEject();
 
     [[nodiscard]] std::optional<std::reference_wrapper<Screen>> getActiveScreen() { return activeScreen; };
+    [[nodiscard]] bool shouldListen() override { return !shuttingDown.load(std::memory_order_acquire); }
 
     void onKey(KeyUpdateEvent& ev);
     void onFocusLost(FocusLostEvent& ev);
@@ -73,4 +76,5 @@ public:
 private:
     void activateScreen(Screen& screen, bool ignoreAnims = false);
     std::optional<std::reference_wrapper<Screen>> activeScreen;
+    std::atomic_bool shuttingDown = false;
 };

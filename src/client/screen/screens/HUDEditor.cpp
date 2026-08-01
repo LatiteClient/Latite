@@ -676,5 +676,9 @@ void HUDEditor::onEnable(bool ignoreAnims) {
 }
 
 void HUDEditor::onDisable() {
-    Latite::getConfigManager().saveCurrentConfig();
+    dragMod = nullptr;
+    clearLayers();
+    if (!Latite::get().isEjectQueued()) {
+        Latite::getConfigManager().saveCurrentConfig();
+    }
 }

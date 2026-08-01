@@ -81,7 +81,7 @@ HRESULT __stdcall DXHooks::SwapChain_Present(IDXGISwapChain* chain, UINT SyncInt
     if (Latite::get().isEjectReadyForRenderThread()) {
         auto lock = renderer.lock();
         Latite::get().completeEjectFromRenderThread();
-    } else if (!renderer.isResizeInProgress()) {
+    } else if (!Latite::get().isEjectQueued() && !renderer.isResizeInProgress()) {
         auto lock = renderer.lock();
         if (!renderer.isResizeInProgress()) {
             if (renderer.hasInitialized()) {

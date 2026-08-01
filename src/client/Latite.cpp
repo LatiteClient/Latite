@@ -359,7 +359,9 @@ BOOL WINAPI DllMainImpl(HINSTANCE hinstDLL, // handle to DLL module
         // Wait for all running hooks accross different threads to stop executing
         std::this_thread::sleep_for(200ms);
 
-        Latite::getConfigManager().saveCurrentConfig();
+        if (!Latite::get().isEjectReadyForRenderThread()) {
+            Latite::getConfigManager().saveCurrentConfig();
+        }
 
         Latite::getKeyboard().~Keyboard();
         Latite::getModuleManager().~ModuleManager();
@@ -506,6 +508,8 @@ void Latite::completeEjectFromRenderThread() noexcept {
         Latite::getAssets().unloadAll();
         Latite::getRenderer().shutdownForEject();
     }
+
+    Latite::getHooks().disable();
 
     if (!this->unloadStarted.exchange(true, std::memory_order_acq_rel)) {
         CloseHandle(CreateThread(nullptr, 0, ejectThread, dllInst, 0, nullptr));
@@ -807,14 +811,17 @@ void Latite::initSettings() {
 }
 
 void Latite::queueForUIRender(std::function<void(SDK::MinecraftUIRenderContext* ctx)> callback) {
+    if (isEjectQueued()) return;
     this->uiRenderQueue.push(callback);
 }
 
 void Latite::queueForClientThread(std::function<void()> callback) {
+    if (isEjectQueued()) return;
     this->clientThreadQueue.push(callback);
 }
 
 void Latite::queueForDXRender(std::function<void(ID2D1DeviceContext* ctx)> callback) {
+    if (isEjectQueued()) return;
     this->dxRenderQueue.push(callback);
 }
 
@@ -913,16 +920,13 @@ void Latite::onUpdate(Event& evGeneric) {
     auto now = std::chrono::system_clock::now();
     static auto lastSend = now;
 
-    while (!this->clientThreadQueue.empty()) {
-        auto& latest = this->clientThreadQueue.front();
-        latest();
-        this->clientThreadQueue.pop();
-    }
-
     if (this->shouldEject.load(std::memory_order_acquire)) {
         if (!this->mainThreadEjectCleanupComplete.load(std::memory_order_acquire)) {
+            Latite::getScreenManager().shutdownForEject();
             Latite::getConfigManager().saveCurrentConfig();
+            Latite::getModuleManager().shutdownForEject();
             Latite::getPluginManager().unloadAll();
+            this->controllerInput.stop();
             this->mainThreadEjectCleanupComplete.store(true, std::memory_order_release);
         }
 
@@ -930,6 +934,12 @@ void Latite::onUpdate(Event& evGeneric) {
             this->completeEjectFromRenderThread();
         }
         return;
+    }
+
+    while (!this->clientThreadQueue.empty()) {
+        auto& latest = this->clientThreadQueue.front();
+        latest();
+        this->clientThreadQueue.pop();
     }
 
     auto rak = SDK::RakNetConnector::get();
@@ -1063,6 +1073,8 @@ void Latite::onLeaveGame(Event& ev) {
 }
 
 void Latite::onRenderLayer(Event& evG) {
+    if (isEjectQueued()) return;
+
     auto& ev = reinterpret_cast<RenderLayerEvent&>(evG);
     while (!this->uiRenderQueue.empty()) {
         auto& latest = this->uiRenderQueue.front();
@@ -1072,6 +1084,8 @@ void Latite::onRenderLayer(Event& evG) {
 }
 
 void Latite::onRenderOverlay(Event& evG) {
+    if (isEjectQueued()) return;
+
     auto& ev = reinterpret_cast<RenderOverlayEvent&>(evG);
 
     this->releaseDeferredD2DResources();
