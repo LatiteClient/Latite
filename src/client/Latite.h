@@ -67,7 +67,7 @@ public:
 
     static constexpr std::string_view version = "v2.8.1";
     static constexpr std::array<std::string_view, 1> supportedMinecraftVersions = {
-        "1.26.3x",
+        "1.26.4x",
     };
 
     [[nodiscard]] static constexpr bool supportsMinecraftVersion(std::string_view version) noexcept {

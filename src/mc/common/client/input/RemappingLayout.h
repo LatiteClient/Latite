@@ -17,7 +17,7 @@ namespace SDK {
 
     public:
         std::vector<InputMapping> inputSettings;   // 0x0008
-        std::vector<InputMapping> defaultSettings; // 0x0010
+        std::vector<InputMapping> defaultSettings; // 0x0020
         char pad[0x10];
 
         int findValue(std::string const& name);

@@ -37,6 +37,7 @@ namespace SDK {
         Vec3& getPosOld();
 
         int getCommandPermissionLevel();
+        std::string const& getNameTag() const;
         void setNameTag(std::string* nametag);
         void setUIRendering(bool value);
         void setYHeadRotations(float current, float old);

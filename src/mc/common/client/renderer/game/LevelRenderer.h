@@ -4,7 +4,7 @@
 
 namespace SDK {
     class LevelRenderer {
-        CLASS_FIELD(LevelRendererPlayer*, levelRendererPlayer, 0x478);
+        CLASS_FIELD(LevelRendererPlayer*, levelRendererPlayer, 0x468);
 
     public:
         LevelRendererPlayer* getLevelRendererPlayer() { return levelRendererPlayer; }

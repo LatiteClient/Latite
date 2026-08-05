@@ -58,6 +58,10 @@ int SDK::Actor::getCommandPermissionLevel() {
     return memory::callVirtual<int>(this, 0x66);
 }
 
+std::string const& SDK::Actor::getNameTag() const {
+    return reinterpret_cast<std::string const&(__fastcall*)(Actor const*)>(Signatures::Actor_getNameTag.result)(this);
+}
+
 void SDK::Actor::setNameTag(std::string* nametag) {
     reinterpret_cast<void(__fastcall*)(Actor*, std::string*)>(Signatures::Actor_setNameTag.result)(this, nametag);
 }

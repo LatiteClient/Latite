@@ -80,6 +80,12 @@ public:
         "Options::getPerspective"
     };
 
+    inline static SigImpl Options_setPerspective { [](memory::signature_store&, uintptr_t res) {
+                                                      return res;
+                                                  },
+                                                   "56 57 48 83 EC ? 89 D6 48 89 CF 48 8B 81"_sig,
+                                                   "Options::setPerspective" };
+
     inline static SigImpl Options_getHideHand {
         [](memory::signature_store&, uintptr_t res) {
             return res;
@@ -123,7 +129,7 @@ public:
         [](memory::signature_store&, uintptr_t res) {
             return res;
         },
-        "55 41 57 41 56 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 48 C7 45 ? ? ? ? ? 48 89 CF 48 8D B1 ? ? ? ? 48 8B 81"_sig,
+        "55 41 57 41 56 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 48 C7 45 ? ? ? ? ? 48 89 CF 48 8D 71"_sig,
         "MinecraftGame::onDeviceLost"
     };
 
@@ -225,7 +231,7 @@ public:
     inline static SigImpl ItemStackVtable { [](memory::signature_store& store, uintptr_t) {
                                                return store.deref(3);
                                            },
-                                            "48 8D 1D ? ? ? ? 48 89 5D ? 48 89 F9"_sig, "ItemStackVtable" };
+                                            "48 8D 1D ? ? ? ? 48 89 5D ? 48 8D 4D ? 48 89 F2"_sig, "ItemStackVtable" };
 
     inline static SigImpl ItemStackBase_destructor {
         [](memory::signature_store&, uintptr_t res) {
@@ -239,7 +245,7 @@ public:
         [](memory::signature_store&, uintptr_t res) {
             return res;
         },
-        "41 57 41 56 41 55 41 54 56 57 55 53 48 81 EC ? ? ? ? 44 0F 29 8C 24 ? ? ? ? 44 0F 29 44 24 ? 0F 29 7C 24 ? 0F 29 74 24 ? 8B 81"_sig,
+        "55 41 57 41 56 41 55 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 44 0F 29 4D ? 44 0F 29 45 ? 0F 29 7D ? 0F 29 75 ? 48 C7 45 ? ? ? ? ? 0F 28 F3 0F 28 FA 44 0F 28 C1 48 89 CE 48 8B 0D"_sig,
         "Tessellator::vertex"
     };
 
@@ -354,19 +360,26 @@ public:
         "Actor::attack"
     };
 
-    inline static SigImpl GuiData__addMessage { [](memory::signature_store& store, uintptr_t) {
-                                                   return store.deref(1);
-                                               },
-                                                "E8 ? ? ? ? 4C 8B B6 ? ? ? ? 48 8B BE ? ? ? ? 48 89 F8"_sig,
-                                                "GuiData::_addMessage(MessageContext*, UIProfanityContext)" };
+    inline static SigImpl Actor_getNameTag {
+        [](memory::signature_store&, uintptr_t res) {
+            return res;
+        },
+        "56 48 83 EC ? 48 8B 81 ? ? ? ? 48 85 C0 74 ? 8B 50 ? 48 8B 08 29 CA 81 E2 ? ? ? ? 48 8D 05"_sig,
+        "Actor::getNameTag"
+    };
 
     inline static SigImpl Actor_setNameTag {
         [](memory::signature_store&, uintptr_t res) {
             return res;
         },
-        "55 56 57 53 48 83 EC ? 48 8D 6C 24 ? 48 C7 45 ? ? ? ? ? 48 89 D7 48 89 CE 48 81 C1 ? ? ? ? 48 8D 55"_sig,
-        "Actor::setNameTag"
+        "56 57 48 83 EC ? 48 89 CE 48 8B 89 ? ? ? ? 48 85 C9 0F 84 ? ? ? ? 48 89 D7"_sig, "Actor::setNameTag"
     };
+
+    inline static SigImpl GuiMessageVector_emplaceBack { [](memory::signature_store&, uintptr_t res) {
+                                                            return res;
+                                                        },
+                                                         "49 89 D0 48 8B 51 ? 48 3B 51 ? 0F 84 ? ? ? ? 41 8B 00"_sig,
+                                                         "std::vector<GuiMessage>::emplace_back" };
 
     inline static SigImpl _updatePlayer {
         [](memory::signature_store&, uintptr_t res) {

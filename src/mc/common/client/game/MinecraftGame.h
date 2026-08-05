@@ -11,7 +11,7 @@ namespace SDK {
         bool isCursorGrabbed();
 
         CLASS_FIELD(std::string, xuid, 0x250);
-        CLASS_FIELD(GameRenderer*, gameRenderer, 0xF18);
+        CLASS_FIELD(GameRenderer*, gameRenderer, 0x1318);
 
     private:
         CLASS_FIELD(class FontRepository**, fontRepo, 0x700);

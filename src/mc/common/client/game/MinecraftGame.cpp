@@ -7,6 +7,7 @@ bool SDK::MinecraftGame::isCursorGrabbed() {
 }
 
 SDK::ClientInstance* SDK::MinecraftGame::getPrimaryClientInstance() {
-    const auto map = hat::member_at<std::map<uint8_t, std::shared_ptr<ClientInstance>>>(this, 0x908);
-    return map.at(0).get();
+    const auto& map = hat::member_at<std::map<uint8_t, std::shared_ptr<ClientInstance>>>(this, 0x938);
+    const auto primary = map.find(0);
+    return primary != map.end() ? primary->second.get() : nullptr;
 }
