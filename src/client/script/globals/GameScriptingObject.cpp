@@ -373,11 +373,11 @@ JsValueRef GameScriptingObject::getLocalPlayerCallback(JsValueRef callee, bool i
 
 JsValueRef GameScriptingObject::getConnectedServerCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
                                                            unsigned short argCount, void* callbackState) {
-    auto rak = SDK::RakNetConnector::get();
-    if (!rak) return Chakra::GetNull();
-    if (rak->ipAddress.size() == 0) return Chakra::GetNull();
+    auto* connectionInfo = SDK::RemoteConnectorComposite::getConnectionInfo();
+    if (!connectionInfo) return Chakra::GetNull();
+    if (connectionInfo->hostIpAddress.empty()) return Chakra::GetNull();
 
-    std::wstring conn = util::StrToWStr(rak->ipAddress);
+    std::wstring conn = util::StrToWStr(connectionInfo->hostIpAddress);
     JsValueRef ret;
     JS::JsPointerToString(conn.c_str(), conn.size(), &ret);
     return ret;
@@ -386,11 +386,11 @@ JsValueRef GameScriptingObject::getConnectedServerCallback(JsValueRef callee, bo
 JsValueRef GameScriptingObject::getConnectedFeaturedServerCallback(JsValueRef callee, bool isConstructor,
                                                                    JsValueRef* arguments, unsigned short argCount,
                                                                    void* callbackState) {
-    auto rak = SDK::RakNetConnector::get();
-    if (!rak) return Chakra::GetNull();
-    if (rak->featuredServer.size() == 0) return Chakra::GetNull();
+    auto* connectionInfo = SDK::RemoteConnectorComposite::getConnectionInfo();
+    if (!connectionInfo) return Chakra::GetNull();
+    if (connectionInfo->thirdPartyServerInfo.creatorName.empty()) return Chakra::GetNull();
 
-    std::wstring conn = util::StrToWStr(rak->featuredServer);
+    std::wstring conn = util::StrToWStr(connectionInfo->thirdPartyServerInfo.creatorName);
     JsValueRef ret;
     JS::JsPointerToString(conn.c_str(), conn.size(), &ret);
     return ret;
@@ -398,8 +398,8 @@ JsValueRef GameScriptingObject::getConnectedFeaturedServerCallback(JsValueRef ca
 
 JsValueRef GameScriptingObject::getPortCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
                                                 unsigned short argCount, void* callbackState) {
-    auto rak = SDK::RakNetConnector::get();
-    if (!rak) return Chakra::MakeInt(0);
+    auto* connectionInfo = SDK::RemoteConnectorComposite::getConnectionInfo();
+    if (!connectionInfo) return Chakra::MakeInt(0);
 
-    return Chakra::MakeInt(rak->port);
+    return Chakra::MakeInt(connectionInfo->port);
 }

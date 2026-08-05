@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "ServerDisplay.h"
-#include "mc/common/network/RakNetConnector.h"
+#include "mc/common/network/RemoteConnectorComposite.h"
 ServerDisplay::ServerDisplay()
     : TextModule("ServerDisplay", LocalizeString::get("client.textmodule.serverDisplay.name"),
                  LocalizeString::get("client.textmodule.serverDisplay.desc"), HUD, 400.f, 0, true) {
@@ -15,15 +15,17 @@ ServerDisplay::ServerDisplay()
 
 std::wstringstream ServerDisplay::text(bool isDefault, bool inEditor) {
     std::wstringstream wss;
-    auto connector = SDK::RakNetConnector::get();
-    if (connector && connector->ipAddress.size() > 0) {
-        if (!connector->featuredServer.empty() && std::get<BoolValue>(showServerName)) {
-            wss << util::StrToWStr(connector->featuredServer);
+    auto* connectionInfo = SDK::RemoteConnectorComposite::getConnectionInfo();
+    if (connectionInfo && !connectionInfo->hostIpAddress.empty()) {
+        if (!connectionInfo->thirdPartyServerInfo.creatorName.empty() && std::get<BoolValue>(showServerName)) {
+            wss << util::StrToWStr(connectionInfo->thirdPartyServerInfo.creatorName);
         } else {
-            wss << util::StrToWStr(connector->dns);
+            const auto& address =
+                connectionInfo->unresolvedUrl.empty() ? connectionInfo->hostIpAddress : connectionInfo->unresolvedUrl;
+            wss << util::StrToWStr(address);
             if (port.getSelectedKey() == port_constant ||
-                (port.getSelectedKey() == port_mixed && connector->port != 19132)) {
-                wss << L":" << connector->port;
+                (port.getSelectedKey() == port_mixed && connectionInfo->port != 19132)) {
+                wss << L":" << connectionInfo->port;
             }
         }
     } else

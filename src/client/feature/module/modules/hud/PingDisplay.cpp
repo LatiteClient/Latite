@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "PingDisplay.h"
-#include "mc/common/network/RakNetConnector.h"
+#include "mc/common/network/RemoteConnectorComposite.h"
 #include "client/event/events/AveragePingEvent.h"
 #include "client/event/Eventing.h"
 
@@ -16,8 +16,8 @@ std::wstringstream PingDisplay::text(bool isDefault, bool inEditor) {
     std::wstringstream wss;
     int dPing = 0;
 
-    auto inst = SDK::RakNetConnector::get();
-    if (inst) {
+    auto* connectionInfo = SDK::RemoteConnectorComposite::getConnectionInfo();
+    if (connectionInfo && !connectionInfo->hostIpAddress.empty()) {
         dPing = ping;
     }
 

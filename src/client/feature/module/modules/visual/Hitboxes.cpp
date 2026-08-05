@@ -31,6 +31,7 @@ void Hitboxes::onRenderLevel(RenderLevelEvent& event) {
 
     auto lp = SDK::ClientInstance::get()->getLocalPlayer();
     auto level = SDK::ClientInstance::get()->minecraft->getLevel();
+    auto* connectionInfo = SDK::RemoteConnectorComposite::getConnectionInfo();
 
     if (level == nullptr) return;
 
@@ -51,10 +52,8 @@ void Hitboxes::onRenderLevel(RenderLevelEvent& event) {
             newPos.operator-({ 0.f, eyeOffset, 0.f }).operator+({ 0.f, (bb.higher.y - bb.lower.y) / 2.f, 0.f });
         bb.rebase(rebasePos);
 
-        bool willShowLine =
-            std::get<BoolValue>(showLine) &&
-            (!entt->isPlayer() || (!SDK::RakNetConnector::get() || SDK::RakNetConnector::get()->ipAddress.empty()) ||
-             entt == lp);
+        bool willShowLine = std::get<BoolValue>(showLine) && (!entt->isPlayer() || !connectionInfo ||
+                                                              connectionInfo->hostIpAddress.empty() || entt == lp);
 
         auto boxCol = std::get<ColorValue>(boxColor).getMainColor();
         auto lineCol = std::get<ColorValue>(lineColor).getMainColor();

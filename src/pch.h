@@ -61,7 +61,7 @@ using nlohmann::json;
 #include "mc/common/world/level/Dimension.h"
 #include "mc/Addresses.h"
 #include "mc/common/client/gui/GuiData.h"
-#include "mc/common/network/RakNetConnector.h"
+#include "mc/common/network/RemoteConnectorComposite.h"
 
 // Client
 #include "client/memory/hook/Hook.h"

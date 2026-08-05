@@ -307,8 +307,9 @@ void TabList::onRenderLayer(Event& evG) {
     float textP = getFloatOrDefault(textSizeS, 20.f);
 
     std::wstring txt;
-    if (SDK::RakNetConnector::get() && SDK::RakNetConnector::get()->featuredServer.size() > 0) {
-        txt = util::StrToWStr(SDK::RakNetConnector::get()->featuredServer);
+    auto* connectionInfo = SDK::RemoteConnectorComposite::getConnectionInfo();
+    if (connectionInfo && !connectionInfo->thirdPartyServerInfo.creatorName.empty()) {
+        txt = util::StrToWStr(connectionInfo->thirdPartyServerInfo.creatorName);
     } else {
         txt = util::StrToWStr(lvl->getLevelName());
     }

@@ -1,5 +1,7 @@
 #include "RakNetConnector.h"
+#include "RemoteConnectorComposite.h"
 
 SDK::RakNetConnector* SDK::RakNetConnector::get() {
-    return ClientInstance::get()->packetSender->networkSystem->remoteConnector->rakNetConnector;
+    auto* composite = RemoteConnectorComposite::get();
+    return composite ? composite->rakNetConnector : nullptr;
 }

@@ -7,7 +7,7 @@
 #include "client/event/events/UpdateEvent.h"
 #include "mc/common/network/MinecraftPackets.h"
 #include "mc/common/network/packet/CommandRequestPacket.h"
-#include "mc/common/network/RakNetConnector.h"
+#include "mc/common/network/RemoteConnectorComposite.h"
 
 #include <cctype>
 
@@ -160,21 +160,23 @@ void DiscordPresence::onSendPacket(SendPacketEvent& ev) {
 void DiscordPresence::updateConnectionState() {
     const auto now = std::chrono::steady_clock::now();
     SDK::ClientInstance* clientInstance = SDK::ClientInstance::get();
-    SDK::RakNetConnector* connector = SDK::RakNetConnector::get();
+    SDK::Social::GameConnectionInfo* connectionInfo = SDK::RemoteConnectorComposite::getConnectionInfo();
 
     std::string serverAddress;
     if (clientInstance && clientInstance->minecraft && clientInstance->minecraft->getLevel() &&
-        clientInstance->getLocalPlayer() && connector) {
-        serverAddress = connector->dns + '\n' + connector->ipAddress + '\n' + connector->featuredServer;
+        clientInstance->getLocalPlayer() && connectionInfo) {
+        serverAddress = connectionInfo->unresolvedUrl + '\n' + connectionInfo->hostIpAddress + '\n' +
+                        connectionInfo->thirdPartyServerInfo.creatorName;
     }
 
     if (serverAddress != activeServerAddress) {
         activeServerAddress = std::move(serverAddress);
         activeServer = nullptr;
         for (const ServerPresence& server : knownServers) {
-            if (connector && (connector->dns.find(server.address) != std::string::npos ||
-                              connector->ipAddress.find(server.address) != std::string::npos ||
-                              (!server.featuredServer.empty() && connector->featuredServer == server.featuredServer))) {
+            if (connectionInfo && (connectionInfo->unresolvedUrl.find(server.address) != std::string::npos ||
+                                   connectionInfo->hostIpAddress.find(server.address) != std::string::npos ||
+                                   (!server.featuredServer.empty() &&
+                                    connectionInfo->thirdPartyServerInfo.creatorName == server.featuredServer))) {
                 activeServer = &server;
                 break;
             }
@@ -280,16 +282,17 @@ DiscordIpcClient::Activity DiscordPresence::makeActivity() const {
         return activity;
     }
 
-    SDK::RakNetConnector* connector = SDK::RakNetConnector::get();
+    SDK::Social::GameConnectionInfo* connectionInfo = SDK::RemoteConnectorComposite::getConnectionInfo();
     activity.details = "Playing Minecraft Bedrock";
     activity.state = "Singleplayer";
-    if (connector) {
-        if (!connector->featuredServer.empty()) {
-            activity.state = connector->featuredServer;
-        } else if (!connector->dns.empty()) {
-            activity.state = connector->dns;
-            if (connector->port != 19132) {
-                activity.state += std::format(":{}", connector->port);
+    if (connectionInfo) {
+        if (!connectionInfo->thirdPartyServerInfo.creatorName.empty()) {
+            activity.state = connectionInfo->thirdPartyServerInfo.creatorName;
+        } else if (!connectionInfo->hostIpAddress.empty()) {
+            activity.state =
+                connectionInfo->unresolvedUrl.empty() ? connectionInfo->hostIpAddress : connectionInfo->unresolvedUrl;
+            if (connectionInfo->port != 19132) {
+                activity.state += std::format(":{}", connectionInfo->port);
             }
         }
     }
