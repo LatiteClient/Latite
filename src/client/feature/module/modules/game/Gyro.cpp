@@ -59,12 +59,14 @@ Gyro::Gyro()
     };
     addSetting("activationKey", LocalizeString::get("client.module.gyro.activationKey.name"),
                LocalizeString::get("client.module.gyro.activationKey.desc"), activationKey);
-    addSliderSetting("sensitivity", LocalizeString::get("client.module.gyro.sensitivity.name"),
-                     LocalizeString::get("client.module.gyro.sensitivity.desc"), sensitivity, FloatValue(0.f),
-                     FloatValue(40.f), FloatValue(0.05f));
-    addSliderSetting("verticalRatio", LocalizeString::get("client.module.gyro.verticalRatio.name"),
-                     LocalizeString::get("client.module.gyro.verticalRatio.desc"), verticalRatio, FloatValue(0.1f),
-                     FloatValue(2.f), FloatValue(0.05f));
+    addSliderSetting("sensitivity", LocalizeString::get("client.module.gyro.horizontalSensitivity.name"),
+                     LocalizeString::get("client.module.gyro.horizontalSensitivity.desc"), horizontalSensitivity,
+                     FloatValue(0.f), FloatValue(40.f), FloatValue(0.05f));
+    addSliderSetting("verticalSensitivity", LocalizeString::get("client.module.gyro.verticalSensitivity.name"),
+                     LocalizeString::get("client.module.gyro.verticalSensitivity.desc"), verticalSensitivity,
+                     FloatValue(0.f), FloatValue(40.f), FloatValue(0.05f));
+    addSetting("disableCameraStickYAxis", LocalizeString::get("client.module.gyro.disableCameraStickYAxis.name"),
+               LocalizeString::get("client.module.gyro.disableCameraStickYAxis.desc"), disableCameraStickYAxis);
     addSetting("dynamicSensitivity", LocalizeString::get("client.module.gyro.dynamicSensitivity.name"),
                LocalizeString::get("client.module.gyro.dynamicSensitivity.desc"), dynamicSensitivity);
     addSliderSetting("fastSensitivity", LocalizeString::get("client.module.gyro.fastSensitivity.name"),
@@ -251,6 +253,7 @@ void Gyro::onTurnDelta(Event& event) {
     beginAcceptingSamples();
     auto& turnEvent = reinterpret_cast<TurnDeltaEvent&>(event);
     Vec2 gyroDelta = consumeCameraDelta();
+    if (std::get<FloatValue>(verticalSensitivity).value <= 0.f) gyroDelta.x = 0.f;
     if (std::get<BoolValue>(flickStick).value && !isFlickStickBlocked()) {
         // P.S. for now, flick stick is intended to be the only source of pitch
         // while it is enabled
@@ -258,7 +261,9 @@ void Gyro::onTurnDelta(Event& event) {
         turnEvent.setDelta(gyroDelta);
     } else {
         resetFlickStick();
-        turnEvent.setDelta(turnEvent.getDelta() + gyroDelta);
+        Vec2 cameraStickDelta = turnEvent.getDelta();
+        if (std::get<BoolValue>(disableCameraStickYAxis).value) cameraStickDelta.x = 0.f;
+        turnEvent.setDelta(cameraStickDelta + gyroDelta);
     }
 }
 
@@ -451,8 +456,8 @@ Vec2 Gyro::consumeCameraDelta() {
     SampleBatch batch = drainSamples();
     if (batch.discontinuity) processor.reset();
     GyroProcessor::Settings currentSettings {
-        .sensitivity = std::get<FloatValue>(sensitivity).value,
-        .verticalRatio = std::get<FloatValue>(verticalRatio).value,
+        .horizontalSensitivity = std::get<FloatValue>(horizontalSensitivity).value,
+        .verticalSensitivity = std::get<FloatValue>(verticalSensitivity).value,
         .fastSensitivity = std::get<FloatValue>(fastSensitivity).value,
         .accelerationStartSpeed = std::get<FloatValue>(accelerationStartSpeed).value,
         .accelerationFullSpeed = std::get<FloatValue>(accelerationFullSpeed).value,

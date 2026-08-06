@@ -13,8 +13,8 @@ struct GyroSample final {
 class GyroProcessor final {
 public:
     struct Settings final {
-        float sensitivity = 1.f;
-        float verticalRatio = 1.f;
+        float horizontalSensitivity = 1.f;
+        float verticalSensitivity = 1.f;
         float fastSensitivity = 1.f;
         float accelerationStartSpeed = 20.f;
         float accelerationFullSpeed = 120.f;

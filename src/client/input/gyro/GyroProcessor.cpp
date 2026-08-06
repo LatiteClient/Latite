@@ -25,15 +25,15 @@ namespace {
     }
 
     float sensitivityForSpeed(float speed, GyroProcessor::Settings const& settings) {
-        if (!settings.dynamicSensitivity || settings.fastSensitivity == settings.sensitivity)
-            return settings.sensitivity;
+        if (!settings.dynamicSensitivity || settings.fastSensitivity == settings.horizontalSensitivity)
+            return settings.horizontalSensitivity;
 
         float startSpeed = nonNegativeFinite(settings.accelerationStartSpeed);
         float fullSpeed = nonNegativeFinite(settings.accelerationFullSpeed);
-        if (fullSpeed <= startSpeed) return settings.sensitivity;
+        if (fullSpeed <= startSpeed) return settings.horizontalSensitivity;
 
         float progress = std::clamp((speed - startSpeed) / (fullSpeed - startSpeed), 0.f, 1.f);
-        return std::lerp(settings.sensitivity, settings.fastSensitivity, progress);
+        return std::lerp(settings.horizontalSensitivity, settings.fastSensitivity, progress);
     }
 
     Vec2 applySoftRadialDeadzone(Vec2 aimRate, float configuredCutoff, float configuredRecoveryWidth) {
@@ -111,9 +111,16 @@ Vec2 GyroProcessor::process(std::span<GyroSample const> samples, Settings const&
         float physicalAimSpeed = aimRate.magnitude();
         aimRate = applySoftRadialDeadzone(aimRate, settings.deadzoneCutoff, settings.deadzoneRecoveryWidth);
 
-        float sensitivity = sensitivityForSpeed(physicalAimSpeed, settings);
-        float pitch = aimRate.x * sensitivity * settings.verticalRatio * deltaSeconds;
-        float yaw = aimRate.y * sensitivity * deltaSeconds;
+        float horizontalSensitivity = sensitivityForSpeed(physicalAimSpeed, settings);
+        float pitch = 0.f;
+        if (settings.verticalSensitivity > 0.f) {
+            float verticalSensitivity = settings.verticalSensitivity;
+            if (settings.dynamicSensitivity && settings.horizontalSensitivity > 0.f) {
+                verticalSensitivity *= horizontalSensitivity / settings.horizontalSensitivity;
+            }
+            pitch = aimRate.x * verticalSensitivity * deltaSeconds;
+        }
+        float yaw = aimRate.y * horizontalSensitivity * deltaSeconds;
         if (settings.invertVertical) pitch = -pitch;
         if (settings.invertHorizontal) yaw = -yaw;
         cameraDelta = cameraDelta + Vec2 { pitch, yaw };

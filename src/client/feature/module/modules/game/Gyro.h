@@ -113,8 +113,9 @@ private:
     int pendingDeviceIndex = -1;
     EnumData activationModeData;
     ValueType activationKey = KeyValue('G');
-    ValueType sensitivity = FloatValue(1.f);
-    ValueType verticalRatio = FloatValue(1.f);
+    ValueType horizontalSensitivity = FloatValue(1.f);
+    ValueType verticalSensitivity = FloatValue(1.f);
+    ValueType disableCameraStickYAxis = BoolValue(false);
     ValueType dynamicSensitivity = BoolValue(false);
     ValueType fastSensitivity = FloatValue(1.f);
     ValueType accelerationStartSpeed = FloatValue(20.f);
