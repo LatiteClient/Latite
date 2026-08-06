@@ -8,20 +8,20 @@
 
 class NameTagCache {
 public:
-    void recordNetworkNameTag(uint64_t runtimeId, std::string const& nameTag);
+    void recordActorNameTag(uint64_t runtimeId, std::string const& nameTag);
     bool recordRenderedNameTag(std::string const& nameTag, std::unordered_set<std::string> const& playerNames);
     std::optional<std::string> getFormattedPlayerName(std::string const& playerName) const;
     bool updateFormattedPlayerNames(std::unordered_set<std::string> const& playerNames);
-    void clearNetworkNameTags();
-    uint64_t getNetworkNameTagsRevision() const noexcept { return networkNameTagsRevision; }
+    void clearActorNameTags();
+    uint64_t getActorNameTagsRevision() const noexcept { return actorNameTagsRevision; }
     int getFirstColorSortIndex(std::string const& text) const;
     bool hasFormatCode(std::string const& text) const;
     std::string stripFormatCodes(std::string const& text) const;
 
 private:
-    std::unordered_map<uint64_t, std::string> networkNameTags;
+    std::unordered_map<uint64_t, std::string> actorNameTags;
     std::unordered_map<std::string, std::string> formattedPlayerNames;
-    uint64_t networkNameTagsRevision = 0;
+    uint64_t actorNameTagsRevision = 0;
 
     bool readFormatCode(std::string const& text, size_t index, char& code, size_t& codeSize) const;
     bool isColorCode(char code) const;

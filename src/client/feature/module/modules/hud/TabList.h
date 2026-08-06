@@ -77,7 +77,7 @@ private:
     float cachedLongestText = 0.f;
     float cachedLayoutTextSize = 0.f;
     float cachedLayoutRowTextOffset = 0.f;
-    uint64_t cachedNetworkNameTagsRevision = 0;
+    uint64_t cachedActorNameTagsRevision = 0;
     bool rowsDirty = true;
     bool layoutDirty = true;
 

@@ -96,18 +96,25 @@ bool TabList::refreshActivePlayerNames(SDK::Level* level) {
 
 void TabList::syncNameTagCache(SDK::Level* level) {
     auto& nameTags = Latite::get().getNameTagCache();
-    bool playersChanged = refreshActivePlayerNames(level);
-    uint64_t networkRevision = nameTags.getNetworkNameTagsRevision();
-    bool networkChanged = cachedNetworkNameTagsRevision != networkRevision;
+    if (level) {
+        for (auto* actor : level->getRuntimeActorList()) {
+            if (!actor || !actor->isPlayer()) continue;
+            nameTags.recordActorNameTag(actor->getRuntimeID(), actor->getNameTag());
+        }
+    }
 
-    if (playersChanged || networkChanged) {
-        if (networkChanged) {
+    bool playersChanged = refreshActivePlayerNames(level);
+    uint64_t actorNameTagsRevision = nameTags.getActorNameTagsRevision();
+    bool actorNameTagsChanged = cachedActorNameTagsRevision != actorNameTagsRevision;
+
+    if (playersChanged || actorNameTagsChanged) {
+        if (actorNameTagsChanged) {
             rowsDirty = true;
         }
         if (nameTags.updateFormattedPlayerNames(cachedActivePlayerNames)) {
             rowsDirty = true;
         }
-        cachedNetworkNameTagsRevision = networkRevision;
+        cachedActorNameTagsRevision = actorNameTagsRevision;
     }
 }
 

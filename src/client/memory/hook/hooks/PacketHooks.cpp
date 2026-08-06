@@ -2,8 +2,6 @@
 #include "PacketHooks.h"
 #include "client/script/PluginManager.h"
 #include <mc/common/network/MinecraftPackets.h>
-#include <mc/common/network/packet/AddPlayerPacket.h>
-#include <mc/common/network/packet/SetActorDataPacket.h>
 #include <limits>
 #include <type_traits>
 #include <unordered_map>
@@ -182,23 +180,9 @@ void PacketHooks::PacketHandlerDispatcherInstance_handle(void* instance, void* n
                 return;
             }
         } else if (packetId == SDK::PacketID::CHANGE_DIMENSION) {
-            Latite::get().getNameTagCache().clearNetworkNameTags();
+            Latite::get().getNameTagCache().clearActorNameTags();
             PluginManager::Event sEv { L"change-dimension", {}, false };
             Latite::getPluginManager().dispatchEvent(sEv);
-        } else if (packetId == SDK::PacketID::ADD_PLAYER) {
-            SDK::AddPlayerPacket* addPlayer = static_cast<SDK::AddPlayerPacket*>(packet.get());
-            uint64_t runtimeId = 0;
-            std::string nameTag;
-            if (addPlayer->tryGetNameTag(&runtimeId, &nameTag)) {
-                Latite::get().getNameTagCache().recordNetworkNameTag(runtimeId, nameTag);
-            }
-        } else if (packetId == SDK::PacketID::SET_ENTITY_DATA) {
-            SDK::SetActorDataPacket* setActorData = static_cast<SDK::SetActorDataPacket*>(packet.get());
-            uint64_t runtimeId = 0;
-            std::string nameTag;
-            if (setActorData->tryGetNameTag(&runtimeId, &nameTag)) {
-                Latite::get().getNameTagCache().recordNetworkNameTag(runtimeId, nameTag);
-            }
         } else if (packetId == SDK::PacketID::SET_SCORE) {
             std::shared_ptr<SDK::SetScorePacket> pkt = std::static_pointer_cast<SDK::SetScorePacket>(packet);
 

@@ -106,27 +106,27 @@ std::string NameTagCache::colorizedPlayerNameAt(std::string const& playerName, s
 }
 
 std::optional<std::string> NameTagCache::formattedNameFromCachedTags(std::string const& playerName) const {
-    for (auto const& [_, nameTag] : networkNameTags) {
+    for (auto const& [_, nameTag] : actorNameTags) {
         std::string rowName = colorizedPlayerName(playerName, nameTag);
         if (hasFormatCode(rowName)) return rowName;
     }
     return std::nullopt;
 }
 
-void NameTagCache::recordNetworkNameTag(uint64_t runtimeId, std::string const& nameTag) {
+void NameTagCache::recordActorNameTag(uint64_t runtimeId, std::string const& nameTag) {
     if (runtimeId == 0) return;
     if (nameTag.empty()) {
-        if (networkNameTags.erase(runtimeId) > 0) {
-            networkNameTagsRevision++;
+        if (actorNameTags.erase(runtimeId) > 0) {
+            actorNameTagsRevision++;
         }
         return;
     }
 
-    auto found = networkNameTags.find(runtimeId);
-    if (found != networkNameTags.end() && found->second == nameTag) return;
+    auto found = actorNameTags.find(runtimeId);
+    if (found != actorNameTags.end() && found->second == nameTag) return;
 
-    networkNameTags[runtimeId] = nameTag;
-    networkNameTagsRevision++;
+    actorNameTags[runtimeId] = nameTag;
+    actorNameTagsRevision++;
 }
 
 bool NameTagCache::recordRenderedNameTag(std::string const& nameTag,
@@ -185,10 +185,10 @@ bool NameTagCache::updateFormattedPlayerNames(std::unordered_set<std::string> co
     return changed;
 }
 
-void NameTagCache::clearNetworkNameTags() {
-    if (!networkNameTags.empty() || !formattedPlayerNames.empty()) {
-        networkNameTagsRevision++;
+void NameTagCache::clearActorNameTags() {
+    if (!actorNameTags.empty() || !formattedPlayerNames.empty()) {
+        actorNameTagsRevision++;
     }
-    networkNameTags.clear();
+    actorNameTags.clear();
     formattedPlayerNames.clear();
 }
