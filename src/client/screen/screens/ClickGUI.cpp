@@ -600,8 +600,16 @@ void ClickGUI::onRender(Event&) {
 
         // filter what mods get actually displayed (search box / selected category tab), put them in displayedModLikes
 
+        auto moduleSearch = lowercase(searchTextBox.getText());
+        if (moduleSearch != lastModuleSearch) {
+            lastModuleSearch = moduleSearch;
+            scroll = 0.f;
+            lerpScroll = 0.f;
+            draggingScrollbar = false;
+        }
+
         for (auto& mod : mods) {
-            if (searchTextBox.getText().empty()) {
+            if (moduleSearch.empty()) {
                 if (modTab == ALL) {
                     if (!mod.mod) continue;
                 } else if (modTab == GAME) {
@@ -612,32 +620,17 @@ void ClickGUI::onRender(Event&) {
                     if (!mod.isMarketScript) continue;
                 }
             } else {
-                std::wstring lower = mod.name;
-                std::ranges::transform(lower, lower.begin(), tolower);
-                std::wstring lowerSearch = searchTextBox.getText();
-                std::ranges::transform(lowerSearch, lowerSearch.begin(), tolower);
-
-                if (lower.rfind(lowerSearch) == std::string::npos) continue;
+                bool matches = containsSearch(mod.name, moduleSearch) ||
+                               containsSearch(mod.description, moduleSearch) ||
+                               containsSearch(mod.pluginAuthor, moduleSearch);
+                if (mod.mod) matches = matches || containsSearch(util::StrToWStr(mod.mod->name()), moduleSearch);
+                if (!matches) continue;
             }
 
             displayedModLikes.emplace_back(mod);
         }
 
         std::ranges::sort(displayedModLikes, ModuleLike::isLess);
-
-        for (auto& modLikeRef : displayedModLikes) {
-            auto& mod = modLikeRef.get();
-
-            if (this->searchTextBox.getText().size() > 0) {
-                mod.shouldRender = false;
-                std::wstring lower = mod.name;
-                std::ranges::transform(lower, lower.begin(), tolower);
-                std::wstring lowerSearch = searchTextBox.getText();
-                std::ranges::transform(lowerSearch, lowerSearch.begin(), tolower);
-
-                if (lower.rfind(lowerSearch) != std::string::npos) mod.shouldRender = true;
-            }
-        }
 
         int i = 0;
         int row = 1;
@@ -651,7 +644,6 @@ void ClickGUI::onRender(Event&) {
         for (auto& modLikeRef : displayedModLikes) {
             auto& mod = modLikeRef.get();
 
-            if (!mod.shouldRender) continue;
             Vec2 pos = { x, y + columnOffs[i] };
             RectF modRect = { pos.x, pos.y, pos.x + modWidth, pos.y + modHeight };
 

@@ -96,7 +96,6 @@ private:
         std::string pluginId;
         std::wstring pluginAuthor;
         std::shared_ptr<Module> mod;
-        bool shouldRender = true;
         bool isExtended = false;
         bool isMarketScript = false;
         bool pluginInstalled = false;
@@ -137,6 +136,7 @@ private:
     float scrollbarDragOffset = 0.f;
     bool shouldRebuildModLikes = false;
     bool draggingScrollbar = false;
+    std::wstring lastModuleSearch;
 
     std::optional<std::string> jumpModule;
     ComPtr<ID2D1Effect> compositeEffect;
