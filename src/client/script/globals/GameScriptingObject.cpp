@@ -353,11 +353,7 @@ JsValueRef GameScriptingObject::playSoundUI(JsValueRef callee, bool isConstructo
     float volume = static_cast<float>(Chakra::GetNumber(arguments[2]));
     float pitch = static_cast<float>(Chakra::GetNumber(arguments[3]));
 
-    auto lvl = SDK::ClientInstance::get()->minecraft->getLevel();
-    if (lvl && SDK::ClientInstance::get()->levelRenderer) {
-        lvl->playSoundEvent(soundName, SDK::ClientInstance::get()->levelRenderer->getLevelRendererPlayer()->getOrigin(),
-                            volume, pitch);
-    }
+    util::PlaySoundUI(soundName, volume, pitch);
     return Chakra::GetUndefined();
 }
 

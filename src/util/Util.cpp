@@ -1,10 +1,8 @@
 #include "pch.h"
 #include "Util.h"
 #include "mc/common/client/game/ClientInstance.h"
+#include "mc/common/client/sound/SoundPlayerInterface.h"
 #include "mc/common/resources/ResourcePackManager.h"
-#include "mc/common/world/Minecraft.h"
-#include "mc/common/client/renderer/game/LevelRendererPlayer.h"
-#include "mc/common/client/renderer/game/LevelRenderer.h"
 #include "client/Latite.h"
 #include "client/input/ControllerInput.h"
 #include "client/render/Renderer.h"
@@ -520,12 +518,15 @@ std::vector<std::string> util::SplitString(std::string const& s, char delim) {
 }
 
 void util::PlaySoundUI(std::string const& sound, float volume, float pitch) {
-    auto cInst = SDK::ClientInstance::get();
-    auto lr = cInst->levelRenderer;
-    if (lr) {
-        LatiteSoundScope scope;
-        cInst->minecraft->getLevel()->playSoundEvent(sound, lr->getLevelRendererPlayer()->getOrigin(), volume, pitch);
-    } // TODO: make it work outside world
+    auto clientInstance = SDK::ClientInstance::get();
+    if (!clientInstance) return;
+
+    auto soundPlayer = clientInstance->getSoundPlayer();
+    auto* soundPlayerInterface = soundPlayer.get();
+    if (!soundPlayerInterface) return;
+
+    LatiteSoundScope scope;
+    soundPlayerInterface->playUI(sound, volume, pitch);
 }
 
 bool util::IsPlayingLatiteSound() noexcept {

@@ -38,6 +38,13 @@ SDK::Options* SDK::ClientInstance::getOptions() {
     return hat::member_at<Options*>(this, 0xD78);
 }
 
+SDK::NonOwnerPointer<SDK::SoundPlayerInterface> SDK::ClientInstance::getSoundPlayer() {
+    NonOwnerPointer<SoundPlayerInterface> soundPlayer;
+
+    memory::callVirtual<void, NonOwnerPointer<SoundPlayerInterface>&>(this, 0x13B, soundPlayer);
+    return soundPlayer;
+}
+
 SDK::ResourcePackManager& SDK::ClientInstance::getResourcePackManager() {
     return *memory::callVirtual<ResourcePackManager*>(this, 0x60);
 }

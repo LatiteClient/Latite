@@ -1,5 +1,6 @@
 #pragma once
 #include "mc/Util.h"
+#include "mc/common/utility/NonOwnerPointer.h"
 #include "util/LMath.h"
 
 namespace SDK {
@@ -17,6 +18,7 @@ namespace SDK {
         class LocalPlayer* getLocalPlayer();
         class GuiData* getGuiData();
         class Options* getOptions();
+        NonOwnerPointer<class SoundPlayerInterface> getSoundPlayer();
         class ResourcePackManager& getResourcePackManager();
         // class ClientHMDState* getClientHMDState(); Removed in 1.21.111
 
