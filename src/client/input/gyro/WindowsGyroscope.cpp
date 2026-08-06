@@ -252,8 +252,7 @@ void WindowsGyroscope::handleSystemSensorReading(IGameInputReading* reading) {
     if (!reading->GetSensorsState(&state)) return;
 
     int64_t timestampNanos = static_cast<int64_t>(reading->GetTimestamp()) * NANOSECONDS_PER_GAMEINPUT_MICROSECOND;
-    // GameInput reports clockwise yaw as negative Y. Bedrock consumes positive yaw for a right turn.
-    Vec3 angularVelocity { state.angularVelocityInRadPerSecX, -state.angularVelocityInRadPerSecY,
+    Vec3 angularVelocity { state.angularVelocityInRadPerSecX, state.angularVelocityInRadPerSecY,
                            state.angularVelocityInRadPerSecZ };
     if (gyroHandler && std::isfinite(angularVelocity.x) && std::isfinite(angularVelocity.y) &&
         std::isfinite(angularVelocity.z)) {

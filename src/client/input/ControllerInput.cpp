@@ -347,7 +347,7 @@ struct ControllerInput::Impl {
         if (!subscription->active) return;
 
         if (event.gsensor.sensor == SDL_SENSOR_GYRO && subscription->onGyro) {
-            Vec3 angularVelocity { event.gsensor.data[0], -event.gsensor.data[1], event.gsensor.data[2] };
+            Vec3 angularVelocity { event.gsensor.data[0], event.gsensor.data[1], event.gsensor.data[2] };
             if (std::isfinite(angularVelocity.x) && std::isfinite(angularVelocity.y) &&
                 std::isfinite(angularVelocity.z)) {
                 subscription->onGyro(id, angularVelocity, timestampNanos);
