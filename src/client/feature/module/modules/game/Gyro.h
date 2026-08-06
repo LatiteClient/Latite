@@ -66,6 +66,7 @@ private:
     Vec2 consumeCameraDelta();
     float consumeFlickStickDelta();
     void resetFlickStick();
+    [[nodiscard]] bool isFlickStickBlocked() const;
 
     void setGyroActive(bool active);
     void resetActivationState();
@@ -131,6 +132,7 @@ private:
     ValueType invertFlickStick = BoolValue(false);
     bool gyroActive = false;
     bool activationKeyDown = false;
+    bool flickStickBlocked = false;
     bool flickStickEngaged = false;
     float previousFlickStickAngle = 0.f;
     float flickAnimationTarget = 0.f;

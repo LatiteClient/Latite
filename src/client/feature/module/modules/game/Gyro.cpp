@@ -8,6 +8,7 @@
 #include "client/misc/Notifications.h"
 #include "client/screen/ScreenManager.h"
 #include "client/screen/screens/GyroCalibrationScreen.h"
+#include "mc/common/network/RemoteConnectorComposite.h"
 
 #include <algorithm>
 #include <cmath>
@@ -250,12 +251,13 @@ void Gyro::onTurnDelta(Event& event) {
     beginAcceptingSamples();
     auto& turnEvent = reinterpret_cast<TurnDeltaEvent&>(event);
     Vec2 gyroDelta = consumeCameraDelta();
-    if (std::get<BoolValue>(flickStick).value) {
+    if (std::get<BoolValue>(flickStick).value && !isFlickStickBlocked()) {
         // P.S. for now, flick stick is intended to be the only source of pitch
         // while it is enabled
         gyroDelta.y += consumeFlickStickDelta();
         turnEvent.setDelta(gyroDelta);
     } else {
+        resetFlickStick();
         turnEvent.setDelta(turnEvent.getDelta() + gyroDelta);
     }
 }
@@ -302,6 +304,13 @@ void Gyro::onFocusLost(Event&) {
 }
 
 void Gyro::onUpdate(Event&) {
+    bool blocked = isFlickStickBlocked();
+    if (blocked && !flickStickBlocked && std::get<BoolValue>(flickStick).value) {
+        Latite::getNotifications().push(LocalizeString::get("client.module.gyro.flickStick.blockedOnGalaxite"));
+    }
+    if (blocked != flickStickBlocked) resetFlickStick();
+    flickStickBlocked = blocked;
+
     uint64_t deviceGeneration = sensor.deviceGeneration();
     if (deviceGeneration != observedDeviceGeneration) {
         observedDeviceGeneration = deviceGeneration;
@@ -527,6 +536,11 @@ void Gyro::resetFlickStick() {
     flickAnimationTarget = 0.f;
     flickAnimationApplied = 0.f;
     flickAnimationStart = {};
+}
+
+bool Gyro::isFlickStickBlocked() const {
+    auto* connectionInfo = SDK::RemoteConnectorComposite::getConnectionInfo();
+    return connectionInfo && connectionInfo->thirdPartyServerInfo.creatorName == "Galaxite";
 }
 
 void Gyro::setGyroActive(bool active) {

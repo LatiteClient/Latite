@@ -548,6 +548,7 @@
         "client.module.gyro.sweepSensitivity.desc": "Horizontal turn multiplier while rotating the right stick around its edge.",
         "client.module.gyro.invertFlickStick.name": "Invert Flick Stick",
         "client.module.gyro.invertFlickStick.desc": "Reverse flick-stick horizontal directions.",
+        "client.module.gyro.flickStick.blockedOnGalaxite": "Gyro's flick stick setting is disabled on Galaxite",
         "client.module.gyro.inputUnavailable": "Controller and Windows system-sensor input could not be initialized.",
         "client.module.gyro.connected": "Gyro connected: ",
         "client.module.gyro.unavailable": "No Windows motion sensor is available.",
