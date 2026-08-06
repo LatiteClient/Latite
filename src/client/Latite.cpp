@@ -603,8 +603,8 @@ static void blockModules(std::string_view moduleName, std::string_view serverNam
 
     std::vector<std::wstring> blockedList;
     if (connectionInfo &&
-        (connectionInfo->unresolvedUrl.find(serverName) != std::string::npos ||
-         connectionInfo->hostIpAddress.find(serverName) != std::string::npos ||
+        ((!serverName.empty() && (connectionInfo->unresolvedUrl.find(serverName) != std::string::npos ||
+                                  connectionInfo->hostIpAddress.find(serverName) != std::string::npos)) ||
          (!featuredServerName.empty() && connectionInfo->thirdPartyServerInfo.creatorName == featuredServerName))) {
         Latite::getModuleManager().forEach([&](std::shared_ptr<Module> mod) {
             if (!mod->isBlocked()) {
@@ -641,6 +641,7 @@ void Latite::updateModuleBlocking() {
 
         blockModules("Freelook", "hivebedrock", "The Hive");
         blockModules("Freelook", "galaxite");
+        blockModules("Gyro", "", "CubeCraft Games");
     } else {
     }
 }
