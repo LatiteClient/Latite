@@ -169,6 +169,11 @@ WindowsGyroscope::ActiveSource WindowsGyroscope::activeSource() const {
     return selectedSource;
 }
 
+std::string WindowsGyroscope::activeDeviceId() const {
+    std::scoped_lock lock { mutex };
+    return selectedDeviceId;
+}
+
 std::wstring WindowsGyroscope::activeDeviceName() const {
     std::scoped_lock lock { mutex };
     return activeName;

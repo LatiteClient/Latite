@@ -85,6 +85,10 @@ namespace {
         std::string fallbackName = name && *name != '\0' ? name : "controller";
         return "sdl:session:" + fallbackName + ":" + std::to_string(instanceId);
     }
+
+    float normalizedAxis(Sint16 value) {
+        return value >= 0 ? static_cast<float>(value) / 32767.f : static_cast<float>(value) / 32768.f;
+    }
 }
 
 std::string_view controller_input::buttonName(int key) {
@@ -116,6 +120,7 @@ struct ControllerInput::Impl {
         SDL_JoystickID instanceId = 0;
         SensorDeviceState sensorState;
         uint32_t buttons = 0;
+        Vec2 rightStick;
         int64_t lastTimestampNanos = 0;
         int64_t lastAccelerometerTimestampNanos = 0;
         bool buttonStateInitialized = false;
@@ -306,6 +311,18 @@ struct ControllerInput::Impl {
         return device == devices.end() ? 0 : device->lastTimestampNanos;
     }
 
+    std::optional<Vec2> rightStick(std::string const& id) const {
+        std::scoped_lock lock { mutex };
+        if (devices.empty()) return std::nullopt;
+        if (id.empty()) return devices.front().rightStick;
+
+        auto device = std::find_if(devices.begin(), devices.end(), [&id](DeviceEntry const& entry) {
+            return entry.sensorState.id == id;
+        });
+        if (device == devices.end()) return std::nullopt;
+        return device->rightStick;
+    }
+
     void handleEvent(SDL_Event const& event) {
         if (!running.load(std::memory_order_acquire)) return;
 
@@ -399,35 +416,46 @@ struct ControllerInput::Impl {
     }
 
     void refreshButtonStates() {
-        std::vector<std::pair<SDL_Gamepad*, uint32_t>> states;
+        struct InputState {
+            SDL_Gamepad* gamepad = nullptr;
+            uint32_t buttons = 0;
+            Vec2 rightStick;
+        };
+
+        std::vector<InputState> states;
         {
             std::scoped_lock lock { mutex };
             states.reserve(devices.size());
             for (auto const& device : devices) {
-                states.emplace_back(device.gamepad, 0);
+                states.push_back({ .gamepad = device.gamepad });
             }
         }
 
-        for (auto& [gamepad, buttons] : states) {
+        for (auto& state : states) {
             for (int button = 0; button < SDL_GAMEPAD_BUTTON_COUNT; ++button) {
-                if (SDL_GetGamepadButton(gamepad, static_cast<SDL_GamepadButton>(button))) {
-                    buttons |= uint32_t { 1 } << button;
+                if (SDL_GetGamepadButton(state.gamepad, static_cast<SDL_GamepadButton>(button))) {
+                    state.buttons |= uint32_t { 1 } << button;
                 }
             }
-            if (SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > TRIGGER_BUTTON_THRESHOLD) {
-                buttons |= uint32_t { 1 } << LEFT_TRIGGER_BUTTON;
+            if (SDL_GetGamepadAxis(state.gamepad, SDL_GAMEPAD_AXIS_LEFT_TRIGGER) > TRIGGER_BUTTON_THRESHOLD) {
+                state.buttons |= uint32_t { 1 } << LEFT_TRIGGER_BUTTON;
             }
-            if (SDL_GetGamepadAxis(gamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > TRIGGER_BUTTON_THRESHOLD) {
-                buttons |= uint32_t { 1 } << RIGHT_TRIGGER_BUTTON;
+            if (SDL_GetGamepadAxis(state.gamepad, SDL_GAMEPAD_AXIS_RIGHT_TRIGGER) > TRIGGER_BUTTON_THRESHOLD) {
+                state.buttons |= uint32_t { 1 } << RIGHT_TRIGGER_BUTTON;
             }
+            state.rightStick = { normalizedAxis(SDL_GetGamepadAxis(state.gamepad, SDL_GAMEPAD_AXIS_RIGHTX)),
+                                 normalizedAxis(SDL_GetGamepadAxis(state.gamepad, SDL_GAMEPAD_AXIS_RIGHTY)) };
         }
 
         std::scoped_lock lock { mutex };
         for (auto& device : devices) {
-            auto state = std::ranges::find_if(states, [&device](auto const& entry) {
-                return entry.first == device.gamepad;
+            auto state = std::ranges::find_if(states, [&device](InputState const& entry) {
+                return entry.gamepad == device.gamepad;
             });
-            if (state != states.end()) device.buttons = state->second;
+            if (state != states.end()) {
+                device.buttons = state->buttons;
+                device.rightStick = state->rightStick;
+            }
         }
     }
 
@@ -654,4 +682,8 @@ void ControllerInput::stopSensors() {
 
 int64_t ControllerInput::currentSensorTimestampNanos(std::string const& deviceId) const {
     return impl ? impl->currentSensorTimestampNanos(deviceId) : 0;
+}
+
+std::optional<Vec2> ControllerInput::rightStick(std::string const& deviceId) const {
+    return impl ? impl->rightStick(deviceId) : std::nullopt;
 }

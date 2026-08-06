@@ -53,6 +53,7 @@ public:
     void setRequestedDevice(std::string deviceId);
 
     [[nodiscard]] ActiveSource activeSource() const;
+    [[nodiscard]] std::string activeDeviceId() const;
     [[nodiscard]] std::wstring activeDeviceName() const;
     [[nodiscard]] bool activeDeviceHasAccelerometer() const;
     [[nodiscard]] std::vector<DeviceInfo> availableDevices() const;

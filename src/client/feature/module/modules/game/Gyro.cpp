@@ -13,57 +13,6 @@
 #include <cmath>
 #include <span>
 
-namespace {
-    constexpr auto MAX_PENDING_SAMPLE_AGE = std::chrono::milliseconds(250);
-    constexpr auto CALIBRATION_TIMEOUT_GRACE = std::chrono::milliseconds(2500);
-    constexpr float MAXIMUM_VERIFICATION_BIAS_DELTA = LatiteMath::deg2rad(0.05f);
-    constexpr float DEGREES_PER_RADIAN = 180.f / pi_f;
-
-    Vec3 radiansToDegrees(Vec3 const& value) {
-        return value * DEGREES_PER_RADIAN;
-    }
-
-    float maximumAbsoluteComponent(Vec3 const& value) {
-        return std::max({ std::abs(value.x), std::abs(value.y), std::abs(value.z) });
-    }
-
-    Vec3 weightedBias(GyroCalibration::Result const& initial, GyroCalibration::Result const& verification) {
-        double totalDuration = initial.measurementDurationSeconds + verification.measurementDurationSeconds;
-        if (totalDuration <= 0.0) return verification.bias;
-        return initial.bias * static_cast<float>(initial.measurementDurationSeconds / totalDuration) +
-               verification.bias * static_cast<float>(verification.measurementDurationSeconds / totalDuration);
-    }
-
-    char const* calibrationFailureKey(GyroCalibration::FailureReason reason, bool verification) {
-        if (verification) {
-            switch (reason) {
-            case GyroCalibration::FailureReason::InsufficientSamples:
-                return "client.module.gyro.calibration.verificationFailedSamples";
-            case GyroCalibration::FailureReason::InsufficientAccelerometerSamples:
-                return "client.module.gyro.calibration.verificationFailedAccelerometerSamples";
-            case GyroCalibration::FailureReason::BiasUnstable:
-                return "client.module.gyro.calibration.verificationFailedStability";
-            case GyroCalibration::FailureReason::MotionDetected:
-            case GyroCalibration::FailureReason::None:
-                return "client.module.gyro.calibration.verificationFailedMotion";
-            }
-        }
-
-        switch (reason) {
-        case GyroCalibration::FailureReason::InsufficientSamples:
-            return "client.module.gyro.calibration.failedSamples";
-        case GyroCalibration::FailureReason::InsufficientAccelerometerSamples:
-            return "client.module.gyro.calibration.failedAccelerometerSamples";
-        case GyroCalibration::FailureReason::BiasUnstable:
-            return "client.module.gyro.calibration.failedStability";
-        case GyroCalibration::FailureReason::MotionDetected:
-        case GyroCalibration::FailureReason::None:
-            return "client.module.gyro.calibration.failedMotion";
-        }
-        return "client.module.gyro.calibration.failedMotion";
-    }
-}
-
 Gyro::Gyro()
     : Module("Gyro", LocalizeString::get("client.module.gyro.name"), LocalizeString::get("client.module.gyro.desc"),
              GAME, nokeybind) {
@@ -152,6 +101,27 @@ Gyro::Gyro()
     addSliderSetting("smoothingBypassSpeed", LocalizeString::get("client.module.gyro.smoothingBypassSpeed.name"),
                      LocalizeString::get("client.module.gyro.smoothingBypassSpeed.desc"), smoothingBypassSpeed,
                      FloatValue(0.f), FloatValue(100.f), FloatValue(1.f));
+    addSetting("invertHorizontal", LocalizeString::get("client.module.gyro.invertHorizontal.name"),
+               LocalizeString::get("client.module.gyro.invertHorizontal.desc"), invertHorizontal);
+    addSetting("invertVertical", LocalizeString::get("client.module.gyro.invertVertical.name"),
+               LocalizeString::get("client.module.gyro.invertVertical.desc"), invertVertical);
+    std::shared_ptr<Setting> flickStickSetting;
+    flickStickSetting = addSetting("flickStick", LocalizeString::get("client.module.gyro.flickStick.name"),
+                                   LocalizeString::get("client.module.gyro.flickStick.desc"), flickStick);
+    flickStickSetting->callback = [this](Setting&) {
+        resetFlickStick();
+    };
+    addSliderSetting("flickStickDeadzone", LocalizeString::get("client.module.gyro.flickStickDeadzone.name"),
+                     LocalizeString::get("client.module.gyro.flickStickDeadzone.desc"), flickStickDeadzone,
+                     FloatValue(0.1f), FloatValue(0.95f), FloatValue(0.01f), "flickStick"_istrue);
+    addSliderSetting("flickDuration", LocalizeString::get("client.module.gyro.flickDuration.name"),
+                     LocalizeString::get("client.module.gyro.flickDuration.desc"), flickDuration, FloatValue(0.f),
+                     FloatValue(500.f), FloatValue(5.f), "flickStick"_istrue);
+    addSliderSetting("sweepSensitivity", LocalizeString::get("client.module.gyro.sweepSensitivity.name"),
+                     LocalizeString::get("client.module.gyro.sweepSensitivity.desc"), sweepSensitivity, FloatValue(0.f),
+                     FloatValue(2.f), FloatValue(0.05f), "flickStick"_istrue);
+    addSetting("invertFlickStick", LocalizeString::get("client.module.gyro.invertFlickStick.name"),
+               LocalizeString::get("client.module.gyro.invertFlickStick.desc"), invertFlickStick, "flickStick"_istrue);
     std::shared_ptr<Setting> activationSetting;
     activationSetting =
         addEnumSetting("activationMode", LocalizeString::get("client.module.gyro.activationMode.name"),
@@ -167,15 +137,64 @@ Gyro::Gyro()
                      LocalizeString::get("client.module.gyro.diagnostics.desc"), [this] {
                          showCalibrationScreen(CalibrationPurpose::MeasureNoise);
                      });
-    addSetting("invertHorizontal", LocalizeString::get("client.module.gyro.invertHorizontal.name"),
-               LocalizeString::get("client.module.gyro.invertHorizontal.desc"), invertHorizontal);
-    addSetting("invertVertical", LocalizeString::get("client.module.gyro.invertVertical.name"),
-               LocalizeString::get("client.module.gyro.invertVertical.desc"), invertVertical);
 
     listen<TurnDeltaEvent>(static_cast<EventListenerFunc>(&Gyro::onTurnDelta));
     listen<KeyUpdateEvent>(static_cast<EventListenerFunc>(&Gyro::onKeyUpdate));
     listen<FocusLostEvent>(static_cast<EventListenerFunc>(&Gyro::onFocusLost));
     listen<UpdateEvent>(static_cast<EventListenerFunc>(&Gyro::onUpdate));
+}
+
+namespace {
+    constexpr float MAXIMUM_VERIFICATION_BIAS_DELTA = LatiteMath::deg2rad(0.05f);
+    constexpr float DEGREES_PER_RADIAN = 180.f / pi_f;
+
+    float wrapDegrees(float angle) {
+        return std::remainder(angle, 360.f);
+    }
+
+    Vec3 radiansToDegrees(Vec3 const& value) {
+        return value * DEGREES_PER_RADIAN;
+    }
+
+    float maximumAbsoluteComponent(Vec3 const& value) {
+        return std::max({ std::abs(value.x), std::abs(value.y), std::abs(value.z) });
+    }
+
+    Vec3 weightedBias(GyroCalibration::Result const& initial, GyroCalibration::Result const& verification) {
+        double totalDuration = initial.measurementDurationSeconds + verification.measurementDurationSeconds;
+        if (totalDuration <= 0.0) return verification.bias;
+        return initial.bias * static_cast<float>(initial.measurementDurationSeconds / totalDuration) +
+               verification.bias * static_cast<float>(verification.measurementDurationSeconds / totalDuration);
+    }
+
+    char const* calibrationFailureKey(GyroCalibration::FailureReason reason, bool verification) {
+        if (verification) {
+            switch (reason) {
+            case GyroCalibration::FailureReason::InsufficientSamples:
+                return "client.module.gyro.calibration.verificationFailedSamples";
+            case GyroCalibration::FailureReason::InsufficientAccelerometerSamples:
+                return "client.module.gyro.calibration.verificationFailedAccelerometerSamples";
+            case GyroCalibration::FailureReason::BiasUnstable:
+                return "client.module.gyro.calibration.verificationFailedStability";
+            case GyroCalibration::FailureReason::MotionDetected:
+            case GyroCalibration::FailureReason::None:
+                return "client.module.gyro.calibration.verificationFailedMotion";
+            }
+        }
+
+        switch (reason) {
+        case GyroCalibration::FailureReason::InsufficientSamples:
+            return "client.module.gyro.calibration.failedSamples";
+        case GyroCalibration::FailureReason::InsufficientAccelerometerSamples:
+            return "client.module.gyro.calibration.failedAccelerometerSamples";
+        case GyroCalibration::FailureReason::BiasUnstable:
+            return "client.module.gyro.calibration.failedStability";
+        case GyroCalibration::FailureReason::MotionDetected:
+        case GyroCalibration::FailureReason::None:
+            return "client.module.gyro.calibration.failedMotion";
+        }
+        return "client.module.gyro.calibration.failedMotion";
+    }
 }
 
 Gyro::~Gyro() {
@@ -230,7 +249,15 @@ void Gyro::onTurnDelta(Event& event) {
 
     beginAcceptingSamples();
     auto& turnEvent = reinterpret_cast<TurnDeltaEvent&>(event);
-    turnEvent.setDelta(turnEvent.getDelta() + consumeCameraDelta());
+    Vec2 gyroDelta = consumeCameraDelta();
+    if (std::get<BoolValue>(flickStick).value) {
+        // P.S. for now, flick stick is intended to be the only source of pitch
+        // while it is enabled
+        gyroDelta.y += consumeFlickStickDelta();
+        turnEvent.setDelta(gyroDelta);
+    } else {
+        turnEvent.setDelta(turnEvent.getDelta() + gyroDelta);
+    }
 }
 
 void Gyro::onKeyUpdate(Event& event) {
@@ -341,7 +368,7 @@ void Gyro::addSample(Vec3 const& angularVelocity, int64_t timestampNanos) {
     if (!acceptingSamples.load(std::memory_order_relaxed) ||
         timestampNanos <= activationCutoffNanos.load(std::memory_order_relaxed))
         return;
-    if (now - lastConsume > MAX_PENDING_SAMPLE_AGE) {
+    if (now - lastConsume > std::chrono::milliseconds(250)) {
         sampleQueueStart = sampleQueueSize = 0;
         sampleDiscontinuity = true;
         return;
@@ -384,6 +411,7 @@ void Gyro::beginAcceptingSamples() {
 }
 
 void Gyro::resetInput() {
+    resetFlickStick();
     if (!inputActive && !acceptingSamples.load(std::memory_order_relaxed)) return;
     acceptingSamples.store(false, std::memory_order_release);
     activationCutoffNanos.store(sensor.currentTimestampNanos(), std::memory_order_release);
@@ -428,6 +456,77 @@ Vec2 Gyro::consumeCameraDelta() {
         .invertVertical = std::get<BoolValue>(invertVertical).value
     };
     return processor.process(std::span<GyroSample const> { batch.samples.data(), batch.size }, currentSettings);
+}
+
+float Gyro::consumeFlickStickDelta() {
+    auto now = std::chrono::steady_clock::now();
+    float yawDelta = 0.f;
+
+    if (flickAnimationStart != std::chrono::steady_clock::time_point {}) {
+        float durationMs = std::max(std::get<FloatValue>(flickDuration).value, 0.f);
+        float progress = 1.f;
+        if (durationMs > 0.f) {
+            float elapsedMs = std::chrono::duration<float, std::milli>(now - flickAnimationStart).count();
+            progress = std::clamp(elapsedMs / durationMs, 0.f, 1.f);
+        }
+        float easedProgress = progress * progress * (3.f - 2.f * progress);
+        float desiredApplied = flickAnimationTarget * easedProgress;
+        yawDelta += desiredApplied - flickAnimationApplied;
+        flickAnimationApplied = desiredApplied;
+        if (progress >= 1.f) {
+            flickAnimationStart = {};
+            flickAnimationTarget = 0.f;
+            flickAnimationApplied = 0.f;
+        }
+    }
+
+    std::string controllerId;
+    if (sensor.activeSource() == WindowsGyroscope::ActiveSource::Controller) controllerId = sensor.activeDeviceId();
+    std::optional<Vec2> stick = Latite::get().getControllerInput().rightStick(controllerId);
+    if (!stick) {
+        flickStickEngaged = false;
+        return yawDelta;
+    }
+
+    if (std::get<BoolValue>(invertFlickStick).value) stick->x = -stick->x;
+    float magnitude = stick->magnitude();
+    float deadzone = std::clamp(std::get<FloatValue>(flickStickDeadzone).value, 0.1f, 0.95f);
+    float releaseThreshold = deadzone * 0.75f;
+
+    if (flickStickEngaged && magnitude < releaseThreshold) flickStickEngaged = false;
+    if (magnitude < deadzone && !flickStickEngaged) return yawDelta;
+
+    float angle = std::atan2(stick->x, -stick->y) * DEGREES_PER_RADIAN;
+    if (!flickStickEngaged) {
+        // Preserve any unfinished turn when a second flick begins quickly.
+        float remainingAnimation = flickAnimationTarget - flickAnimationApplied;
+        flickAnimationTarget = remainingAnimation + angle;
+        flickAnimationApplied = 0.f;
+        flickAnimationStart = now;
+        previousFlickStickAngle = angle;
+        flickStickEngaged = true;
+
+        if (std::get<FloatValue>(flickDuration).value <= 0.f) {
+            yawDelta += flickAnimationTarget;
+            flickAnimationStart = {};
+            flickAnimationTarget = 0.f;
+            flickAnimationApplied = 0.f;
+        }
+        return yawDelta;
+    }
+
+    float sweepDelta = wrapDegrees(angle - previousFlickStickAngle);
+    previousFlickStickAngle = angle;
+    yawDelta += sweepDelta * std::get<FloatValue>(sweepSensitivity).value;
+    return yawDelta;
+}
+
+void Gyro::resetFlickStick() {
+    flickStickEngaged = false;
+    previousFlickStickAngle = 0.f;
+    flickAnimationTarget = 0.f;
+    flickAnimationApplied = 0.f;
+    flickAnimationStart = {};
 }
 
 void Gyro::setGyroActive(bool active) {
@@ -619,7 +718,7 @@ void Gyro::beginCalibration(CalibrationPurpose purpose) {
     }
 
     calibrationSamplesReceived.store(0, std::memory_order_release);
-    calibrationDeadline = std::chrono::steady_clock::now() + expectedDuration + CALIBRATION_TIMEOUT_GRACE;
+    calibrationDeadline = std::chrono::steady_clock::now() + expectedDuration + std::chrono::milliseconds(2500);
     calibrationActive.store(true, std::memory_order_release);
 
     auto& screenManager = Latite::getScreenManager();

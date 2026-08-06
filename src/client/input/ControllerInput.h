@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -53,6 +54,7 @@ public:
                                     SensorDeviceCallback deviceCallback);
     void stopSensors();
     [[nodiscard]] int64_t currentSensorTimestampNanos(std::string const& deviceId) const;
+    [[nodiscard]] std::optional<Vec2> rightStick(std::string const& deviceId = {}) const;
 
 private:
     struct Impl;

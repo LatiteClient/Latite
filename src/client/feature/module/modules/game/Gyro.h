@@ -64,6 +64,8 @@ private:
     void resetInput();
     SampleBatch drainSamples();
     Vec2 consumeCameraDelta();
+    float consumeFlickStickDelta();
+    void resetFlickStick();
 
     void setGyroActive(bool active);
     void resetActivationState();
@@ -122,6 +124,16 @@ private:
     ValueType smoothingBypassSpeed = FloatValue(0.f);
     ValueType invertHorizontal = BoolValue(false);
     ValueType invertVertical = BoolValue(false);
+    ValueType flickStick = BoolValue(false);
+    ValueType flickStickDeadzone = FloatValue(0.8f);
+    ValueType flickDuration = FloatValue(80.f);
+    ValueType sweepSensitivity = FloatValue(1.f);
+    ValueType invertFlickStick = BoolValue(false);
     bool gyroActive = false;
     bool activationKeyDown = false;
+    bool flickStickEngaged = false;
+    float previousFlickStickAngle = 0.f;
+    float flickAnimationTarget = 0.f;
+    float flickAnimationApplied = 0.f;
+    std::chrono::steady_clock::time_point flickAnimationStart = {};
 };
