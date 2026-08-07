@@ -11,6 +11,11 @@ public:
     ~Zoom() = default;
 
 private:
+    enum class ActivationMode {
+        HoldToEnable,
+        Toggle
+    };
+
     void onRenderLevel(Event& ev);
     void onKeyUpdate(Event& ev);
     void onClickUpdate(Event& ev);
@@ -25,9 +30,11 @@ private:
     ValueType cinematicCam = BoolValue(true);
     ValueType hideHand = BoolValue(true);
     ValueType dpiAdjust = BoolValue(true);
+    EnumData activationMode;
 
     float zoomModifier = 0.f;
     float activeModifier = 1.f;
     float modifyTo = 1.f;
     bool shouldZoom = false;
+    bool zoomKeyDown = false;
 };

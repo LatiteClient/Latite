@@ -6,8 +6,15 @@
 Zoom::Zoom()
     : Module("Zoom", LocalizeString::get("client.module.zoom.name"), LocalizeString::get("client.module.zoom.desc"),
              GAME, nokeybind) {
+    activationMode.addEntry({ static_cast<int>(ActivationMode::HoldToEnable),
+                              LocalizeString::get("client.module.zoom.activationMode.holdEnable.name") });
+    activationMode.addEntry({ static_cast<int>(ActivationMode::Toggle),
+                              LocalizeString::get("client.module.zoom.activationMode.toggle.name") });
+
     addSetting("zoomKey", LocalizeString::get("client.module.zoom.zoomKey.name"),
                LocalizeString::get("client.module.zoom.zoomKey.desc"), this->zoomKey);
+    addEnumSetting("activationMode", LocalizeString::get("client.module.zoom.activationMode.name"),
+                   LocalizeString::get("client.module.zoom.activationMode.desc"), activationMode);
     addSliderSetting("modifier", LocalizeString::get("client.module.zoom.modifier.name"),
                      LocalizeString::get("client.module.zoom.modifier.desc"), this->modifier, FloatValue(1.f),
                      FloatValue(50.f), FloatValue(1.f));
@@ -53,9 +60,20 @@ void Zoom::onRenderLevel(Event& evGeneric) {
 
 void Zoom::onKeyUpdate(Event& evGeneric) {
     auto& ev = reinterpret_cast<KeyUpdateEvent&>(evGeneric);
-    if (ev.inUI()) return;
     if (ev.getKey() == std::get<KeyValue>(this->zoomKey)) {
-        this->shouldZoom = ev.isDown();
+        bool pressed = ev.isDown() && !zoomKeyDown;
+        zoomKeyDown = ev.isDown();
+
+        auto mode = static_cast<ActivationMode>(activationMode.getSelectedKey());
+        if (ev.inUI()) {
+            if (mode == ActivationMode::HoldToEnable) shouldZoom = false;
+            return;
+        }
+
+        if (mode == ActivationMode::HoldToEnable)
+            shouldZoom = ev.isDown();
+        else if (pressed)
+            shouldZoom = !shouldZoom;
     }
 }
 
