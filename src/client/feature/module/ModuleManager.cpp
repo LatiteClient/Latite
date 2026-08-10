@@ -21,7 +21,7 @@
 #include "modules/game/AutoGG.h"
 #include "modules/game/HiveTranslate.h"
 #include "modules/game/KillNotification.h"
-// #include "modules/game/Gyro.h"
+#include "modules/game/Gyro.h"
 
 #include "modules/visual/Fullbright.h"
 #include "modules/visual/MotionBlur.h"
@@ -63,7 +63,7 @@ ModuleManager::ModuleManager() {
     this->items.push_back(std::make_shared<TestModule>());
 #endif
     this->items.push_back(std::make_shared<Zoom>());
-    // this->items.push_back(std::make_shared<Gyro>());
+    this->items.push_back(std::make_shared<Gyro>());
     this->items.push_back(std::make_shared<Fullbright>());
     this->items.push_back(std::make_shared<MotionBlur>());
     // this->items.push_back(std::make_shared<HurtColor>());
