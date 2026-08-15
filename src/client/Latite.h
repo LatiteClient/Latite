@@ -102,7 +102,8 @@ public:
     HINSTANCE dllInst = NULL;
     std::string gameVersion;
 
-    bool tmp2640Is4240{}; // TODO: REMOVE ME IN THE NEXT UPDATE! MOJANG FUCKED UP BIG WITH A HOTIFX
+    // TODO(1.26.50): Remove this flag and all pre-1.26.44 compatibility paths guarded by it.
+    bool tmp2640Is4240 {};
 
     std::optional<float> getMenuBlur();
 

@@ -97,7 +97,9 @@ void __fastcall CustomSkinPickerHooks::pickImage(void* appPlatform,
 
 CustomSkinPickerHooks::CustomSkinPickerHooks()
     : HookGroup("Windows 10 custom-skin picker workaround") {
-    if (!isWindows10() || !Latite::supportsMinecraftVersion(Latite::get().gameVersion) ||
+    // TODO(1.26.50): Remove this hook and the legacy picker implementation entirely.
+    if (!Latite::get().tmp2640Is4240 || !isWindows10() ||
+        !Latite::supportsMinecraftVersion(Latite::get().gameVersion) ||
         !Signatures::AppPlatform_GameCorePC_pickImage.result) {
         return;
     }

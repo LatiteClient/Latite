@@ -22,6 +22,7 @@ SDK::MaterialPtr* SDK::MaterialPtr::getSelectionOverlayMaterial() {
 };
 
 // TODO: Replace SDK::MaterialPtr* return value with std::shared_ptr<SDK::MaterialPtr> in the next update
+// TODO(1.26.50): Remove the pre-1.26.44 branch.
 SDK::MaterialPtr* SDK::MaterialPtr::createMaterial(const SDK::HashedString& name) {
     static class RenderMaterialGroup* materialGroup =
         Signatures::RenderMaterialGroup__common.as_ptr<class RenderMaterialGroup>();
@@ -29,7 +30,8 @@ SDK::MaterialPtr* SDK::MaterialPtr::createMaterial(const SDK::HashedString& name
     if (Latite::get().tmp2640Is4240)
         return memory::callVirtual<SDK::MaterialPtr*, const SDK::HashedString&>(materialGroup, 1, name);
 
-    std::shared_ptr<SDK::MaterialPtr> buf{};
-    memory::callVirtual<void, std::shared_ptr<SDK::MaterialPtr>&, const SDK::HashedString&>(materialGroup, 1, buf, name);
+    std::shared_ptr<SDK::MaterialPtr> buf {};
+    memory::callVirtual<void, std::shared_ptr<SDK::MaterialPtr>&, const SDK::HashedString&>(materialGroup, 1, buf,
+                                                                                            name);
     return buf.get();
 }

@@ -165,8 +165,8 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         const auto minor = LOWORD(fileInfo->dwFileVersionMS);
         const auto build = HIWORD(fileInfo->dwFileVersionLS);
 
-        if (build < 44)
-            Latite::get().tmp2640Is4240 = true;
+        // TODO(1.26.50): Remove the pre-1.26.44 compatibility flag and its guarded workarounds.
+        if (build < 44) Latite::get().tmp2640Is4240 = true;
 
         Latite::get().gameVersion = std::format("{}.{}.{}", major, minor, build);
     }
@@ -264,10 +264,14 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         MVSIG(ClientInstanceScreenModel_forwardSoundSubtitle),
         MVSIG(BaseActorRenderer_renderText),
         MVSIG(AppPlatformGDK_releaseMouse),
-        MVSIG(AppPlatform_GameCorePC_pickImage),
         MVSIG(Misc::Platform_GameCore),
         MVSIG(Misc::mouseDevice),
     };
+
+    // TODO(1.26.50): Remove the custom Windows 10 picker signature along with its compatibility hook.
+    if (Latite::get().tmp2640Is4240) {
+        sigList.push_back(MVSIG(AppPlatform_GameCorePC_pickImage));
+    }
 
     new (configMgrBuf) ConfigManager();
     if (!Latite::getConfigManager().loadMaster()) {
