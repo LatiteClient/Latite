@@ -165,6 +165,9 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         const auto minor = LOWORD(fileInfo->dwFileVersionMS);
         const auto build = HIWORD(fileInfo->dwFileVersionLS);
 
+        if (build < 44)
+            Latite::get().tmp2640Is4240 = true;
+
         Latite::get().gameVersion = std::format("{}.{}.{}", major, minor, build);
     }
 

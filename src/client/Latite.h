@@ -102,6 +102,8 @@ public:
     HINSTANCE dllInst = NULL;
     std::string gameVersion;
 
+    bool tmp2640Is4240{}; // TODO: REMOVE ME IN THE NEXT UPDATE! MOJANG FUCKED UP BIG WITH A HOTIFX
+
     std::optional<float> getMenuBlur();
 
     void addTextBox(TextBox* box) { textBoxes.push_back(box); }
