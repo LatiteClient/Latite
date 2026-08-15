@@ -6,6 +6,7 @@
 #include "client/event/events/TurnDeltaEvent.h"
 #include "client/event/events/UpdateEvent.h"
 #include "client/misc/Notifications.h"
+#include "client/misc/ServerDetection.h"
 #include "client/screen/ScreenManager.h"
 #include "client/screen/screens/GyroCalibrationScreen.h"
 #include "mc/common/network/RemoteConnectorComposite.h"
@@ -545,7 +546,7 @@ void Gyro::resetFlickStick() {
 
 bool Gyro::isFlickStickBlocked() const {
     auto* connectionInfo = SDK::RemoteConnectorComposite::getConnectionInfo();
-    return connectionInfo && connectionInfo->thirdPartyServerInfo.creatorName == "Galaxite";
+    return ServerDetection::matches(connectionInfo, ServerDetection::ServerId::Galaxite);
 }
 
 void Gyro::setGyroActive(bool active) {

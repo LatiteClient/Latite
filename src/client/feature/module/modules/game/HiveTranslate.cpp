@@ -3,6 +3,7 @@
 #include "util/Logger.h"
 #include "HiveTranslate.h"
 #include "client/Latite.h"
+#include "client/misc/ServerDetection.h"
 
 #include <regex>
 #include <winrt/base.h>
@@ -31,6 +32,11 @@ HiveTranslate::HiveTranslate()
 }
 
 void HiveTranslate::onText(Event& evG) {
+    if (!ServerDetection::matches(SDK::RemoteConnectorComposite::getConnectionInfo(),
+                                  ServerDetection::ServerId::Hive)) {
+        return;
+    }
+
     std::string targetLang = util::WStrToStr(std::get<TextValue>(this->targetLanguage).str);
     if (targetLang == "") targetLang = "en";
 

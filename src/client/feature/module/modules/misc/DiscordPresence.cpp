@@ -172,13 +172,12 @@ void DiscordPresence::updateConnectionState() {
     if (serverAddress != activeServerAddress) {
         activeServerAddress = std::move(serverAddress);
         activeServer = nullptr;
-        for (const ServerPresence& server : knownServers) {
-            if (connectionInfo && (connectionInfo->unresolvedUrl.find(server.address) != std::string::npos ||
-                                   connectionInfo->hostIpAddress.find(server.address) != std::string::npos ||
-                                   (!server.featuredServer.empty() &&
-                                    connectionInfo->thirdPartyServerInfo.creatorName == server.featuredServer))) {
-                activeServer = &server;
-                break;
+        if (const auto* detectedServer = ServerDetection::identify(connectionInfo)) {
+            for (const ServerPresence& server : knownServers) {
+                if (server.server == detectedServer->id) {
+                    activeServer = &server;
+                    break;
+                }
             }
         }
 

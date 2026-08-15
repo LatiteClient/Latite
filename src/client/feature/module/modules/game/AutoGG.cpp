@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "AutoGG.h"
+#include "client/misc/ServerDetection.h"
 #include <mc/common/network/packet/CommandRequestPacket.h>
 #include "mc/common/network/MinecraftPackets.h"
 
@@ -15,6 +16,11 @@ AutoGG::AutoGG()
 }
 
 void AutoGG::onText(Event& evG) {
+    if (!ServerDetection::matches(SDK::RemoteConnectorComposite::getConnectionInfo(),
+                                  ServerDetection::ServerId::Hive)) {
+        return;
+    }
+
     ChatMessageEvent& ev = reinterpret_cast<ChatMessageEvent&>(evG);
 
     std::wstring chatMessage = util::StrToWStr(ev.getMessage());

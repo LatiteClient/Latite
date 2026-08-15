@@ -1,6 +1,7 @@
 #pragma once
 #include "../../Module.h"
 #include "client/misc/DiscordIpcClient.h"
+#include "client/misc/ServerDetection.h"
 
 #include <array>
 #include <chrono>
@@ -25,20 +26,18 @@ public:
 
 private:
     struct ServerPresence {
-        std::string_view address;
-        std::string_view featuredServer;
+        ServerDetection::ServerId server;
         std::string_view name;
         std::string_view logoKey;
         std::string_view logoTooltip;
         bool tracksHiveGame = false;
     };
 
-    const std::array<ServerPresence, 5> knownServers = {
-        ServerPresence { "hivebedrock.network", "The Hive", "The Hive", "thehive", "The Hive Logo", true },
-        ServerPresence { "cubecraft.net", {}, "CubeCraft", "cubecraft", "CubeCraft Games Logo" },
-        ServerPresence { "play.galaxite.net", {}, "Galaxite", "galaxite", "Galaxite Network Logo" },
-        ServerPresence { "zeqa.net", {}, "Zeqa", "zeqa", "Zeqa Practice Logo" },
-        ServerPresence { "nethergames.org", {}, "NetherGames", "nethergames", "NetherGames Network Logo" },
+    const std::array<ServerPresence, 4> knownServers = {
+        ServerPresence { ServerDetection::ServerId::Hive, "The Hive", "thehive", "The Hive Logo", true },
+        ServerPresence { ServerDetection::ServerId::CubeCraft, "CubeCraft", "cubecraft", "CubeCraft Games Logo" },
+        ServerPresence { ServerDetection::ServerId::Galaxite, "Galaxite", "galaxite", "Galaxite Network Logo" },
+        ServerPresence { ServerDetection::ServerId::Zeqa, "Zeqa", "zeqa", "Zeqa Practice Logo" },
     };
 
     const std::array<std::pair<std::string_view, std::string_view>, 14> hiveGameNames = {
