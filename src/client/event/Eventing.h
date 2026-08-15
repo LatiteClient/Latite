@@ -42,7 +42,8 @@ public:
                 continue;
             }
 
-            if (registration.callback.callWhileInactive || state->listener->shouldListen()) {
+            if ((registration.callback.callWhileInactive || state->listener->shouldListen()) &&
+                state->listener->shouldListenToEvent(EventType::hash)) {
                 const bool isCancel = ev.isCancellable();
                 (state->listener->*registration.callback.fptr)(ev);
                 if (isCancel) {

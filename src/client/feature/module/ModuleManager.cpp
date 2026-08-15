@@ -77,7 +77,9 @@ ModuleManager::ModuleManager() {
     this->items.push_back(std::make_shared<BowIndicator>());
     this->items.push_back(std::make_shared<GuiscaleChanger>());
     this->items.push_back(std::make_shared<DebugInfo>());
-    this->items.push_back(std::make_shared<TabList>());
+    auto tabListModule = std::make_shared<TabList>();
+    this->tabList = tabListModule.get();
+    this->items.push_back(std::move(tabListModule));
     this->items.push_back(std::make_shared<Keystrokes>());
     this->items.push_back(std::make_shared<CinematicCamera>());
     this->items.push_back(std::make_shared<HealthWarning>());
@@ -119,6 +121,10 @@ ModuleManager::ModuleManager() {
 
 ModuleManager::~ModuleManager() {
     shutdownForEject();
+}
+
+bool ModuleManager::shouldHideModulesForTabList() const noexcept {
+    return tabList && tabList->isEnabled() && tabList->shouldHideModules();
 }
 
 void ModuleManager::shutdownForEject() {

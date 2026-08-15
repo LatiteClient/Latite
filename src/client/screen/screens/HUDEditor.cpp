@@ -31,6 +31,10 @@ HUDEditor::HUDEditor()
 }
 
 void HUDEditor::onRender(Event& ev) {
+    if (!isActive() && Latite::getModuleManager().shouldHideModulesForTabList()) {
+        return;
+    }
+
     D2DUtil dc;
     bool mcRenderer = Latite::get().useMinecraftRenderer();
 
@@ -143,6 +147,10 @@ void HUDEditor::onClick(Event& evGeneric) {
 }
 
 void HUDEditor::onRenderLayer(Event& evGeneric) {
+    if (!isActive() && Latite::getModuleManager().shouldHideModulesForTabList()) {
+        return;
+    }
+
     auto& ev = static_cast<RenderLayerEvent&>(evGeneric);
     bool mcRenderer = Latite::get().useMinecraftRenderer();
 
@@ -264,6 +272,10 @@ void HUDEditor::onKey(Event& evGeneric) {
 }
 
 void HUDEditor::renderModules(SDK::MinecraftUIRenderContext* ctx, bool forceMinecraftOnly) {
+    if (!isActive() && Latite::getModuleManager().shouldHideModulesForTabList()) {
+        return;
+    }
+
     if (!isActive()) {
         DrawHUDModulesEvent ev {};
         if (Eventing::get().dispatch(ev)) return; // if cancelled

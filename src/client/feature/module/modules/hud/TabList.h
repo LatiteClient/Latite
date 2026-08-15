@@ -25,6 +25,11 @@ public:
     void onTick(Event&);
     void afterLoadConfig() override;
     bool shouldHoldToToggle() override { return true; }
+    bool shouldRenderWithTabList() const override { return true; }
+    [[nodiscard]] bool shouldHideModules() const noexcept {
+        const auto* setting = std::get_if<BoolValue>(&hideModules);
+        return !setting || setting->value;
+    }
 
 private:
     struct PlayerHeadSkinKey {
@@ -84,4 +89,5 @@ private:
     ValueType textSizeS = FloatValue(20.f);
     ValueType textCol = ColorValue(1.f, 1.f, 1.f, 1.f);
     ValueType bgCol = ColorValue(0.f, 0.f, 0.f, 0.5f);
+    ValueType hideModules = BoolValue(true);
 };

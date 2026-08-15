@@ -6,6 +6,8 @@
 #include "script/JsModule.h"
 #include <atomic>
 
+class TabList;
+
 class ModuleManager final : public Listener, public Manager<Module> {
 public:
     ModuleManager();
@@ -13,6 +15,7 @@ public:
 
     void shutdownForEject();
     [[nodiscard]] bool shouldListen() override { return !shuttingDown.load(std::memory_order_acquire); }
+    [[nodiscard]] bool shouldHideModulesForTabList() const noexcept;
 
     bool registerScriptModule(JsModule* mod) {
         for (auto& mod_ : items) {
@@ -62,4 +65,5 @@ public:
 
 private:
     std::atomic_bool shuttingDown = false;
+    TabList* tabList = nullptr;
 };

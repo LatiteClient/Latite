@@ -86,6 +86,7 @@ public:
     virtual void onInit() {};
     virtual bool isToggleable() { return true; }
     virtual bool shouldPersistEnabled() { return true; }
+    virtual bool shouldRenderWithTabList() const { return false; }
 
     [[nodiscard]] KeyValue getKeybind() { return std::get<KeyValue>(key); }
     [[nodiscard]] bool isEnabled() { return std::get<BoolValue>(enabled); };
@@ -99,6 +100,7 @@ public:
     virtual void loadConfig(SettingGroup& resolvedGroup);
     virtual bool shouldHoldToToggle() { return false; }
     bool shouldListen() override { return this->isEnabled(); };
+    bool shouldListenToEvent(uint32_t eventHash) override;
 
     void setEnabled(bool b, bool blockedOverride = false) {
         if (!blockedOverride && isBlocked()) return;

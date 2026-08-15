@@ -1,6 +1,14 @@
 #include "pch.h"
 #include "Module.h"
 
+#include "client/event/events/RenderLayerEvent.h"
+#include "client/event/events/RenderOverlayEvent.h"
+
+bool Module::shouldListenToEvent(uint32_t eventHash) {
+    const bool isRenderEvent = eventHash == RenderLayerEvent::hash || eventHash == RenderOverlayEvent::hash;
+    return !isRenderEvent || shouldRenderWithTabList() || !Latite::getModuleManager().shouldHideModulesForTabList();
+}
+
 void Module::loadConfig(SettingGroup& resolvedGroup) {
     resolvedGroup.forEach([&](std::shared_ptr<Setting> set) {
         this->settings->forEach([&](std::shared_ptr<Setting> modSet) {

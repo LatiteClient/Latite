@@ -26,6 +26,8 @@ TabList::TabList()
                LocalizeString::get("client.module.tabList.textColor.desc"), textCol);
     addSetting("bgColor", LocalizeString::get("client.module.tabList.bgColor.name"),
                LocalizeString::get("client.module.tabList.bgColor.desc"), bgCol);
+    addSetting("hideModules", LocalizeString::get("client.module.tabList.hideModules.name"),
+               LocalizeString::get("client.module.tabList.hideModules.desc"), hideModules);
     addSliderSetting("textSize", LocalizeString::get("client.textmodule.props.textSize.name"), L"", textSizeS,
                      FloatValue(2.f), FloatValue(100.f), FloatValue(2.f));
     listen<RenderLayerEvent>(static_cast<EventListenerFunc>(&TabList::onRenderLayer));
