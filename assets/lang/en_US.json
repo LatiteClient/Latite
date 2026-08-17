@@ -512,6 +512,8 @@
         "client.module.gyro.horizontalSensitivity.desc": "Base horizontal gyro aiming sensitivity.",
         "client.module.gyro.verticalSensitivity.name": "Vertical Sensitivity",
         "client.module.gyro.verticalSensitivity.desc": "Base vertical gyro aiming sensitivity.",
+        "client.module.gyro.disableCameraStickXAxis.name": "Disable Camera Stick X-Axis",
+        "client.module.gyro.disableCameraStickXAxis.desc": "Ignore horizontal camera-stick input while gyro aiming is active.",
         "client.module.gyro.disableCameraStickYAxis.name": "Disable Camera Stick Y-Axis",
         "client.module.gyro.disableCameraStickYAxis.desc": "Ignore vertical camera-stick input while gyro aiming is active.",
         "client.module.gyro.dynamicSensitivity.name": "Dynamic Sensitivity",

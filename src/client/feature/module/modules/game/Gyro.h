@@ -115,6 +115,7 @@ private:
     ValueType activationKey = KeyValue('G');
     ValueType horizontalSensitivity = FloatValue(1.f);
     ValueType verticalSensitivity = FloatValue(1.f);
+    ValueType disableCameraStickXAxis = BoolValue(false);
     ValueType disableCameraStickYAxis = BoolValue(false);
     ValueType dynamicSensitivity = BoolValue(false);
     ValueType fastSensitivity = FloatValue(1.f);

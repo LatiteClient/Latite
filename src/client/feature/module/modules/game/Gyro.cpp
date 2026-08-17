@@ -66,6 +66,8 @@ Gyro::Gyro()
     addSliderSetting("verticalSensitivity", LocalizeString::get("client.module.gyro.verticalSensitivity.name"),
                      LocalizeString::get("client.module.gyro.verticalSensitivity.desc"), verticalSensitivity,
                      FloatValue(0.f), FloatValue(40.f), FloatValue(0.05f));
+    addSetting("disableCameraStickXAxis", LocalizeString::get("client.module.gyro.disableCameraStickXAxis.name"),
+               LocalizeString::get("client.module.gyro.disableCameraStickXAxis.desc"), disableCameraStickXAxis);
     addSetting("disableCameraStickYAxis", LocalizeString::get("client.module.gyro.disableCameraStickYAxis.name"),
                LocalizeString::get("client.module.gyro.disableCameraStickYAxis.desc"), disableCameraStickYAxis);
     addSetting("dynamicSensitivity", LocalizeString::get("client.module.gyro.dynamicSensitivity.name"),
@@ -263,6 +265,7 @@ void Gyro::onTurnDelta(Event& event) {
     } else {
         resetFlickStick();
         Vec2 cameraStickDelta = turnEvent.getDelta();
+        if (std::get<BoolValue>(disableCameraStickXAxis).value) cameraStickDelta.y = 0.f;
         if (std::get<BoolValue>(disableCameraStickYAxis).value) cameraStickDelta.x = 0.f;
         turnEvent.setDelta(cameraStickDelta + gyroDelta);
     }
