@@ -55,6 +55,7 @@
 #include "modules/hud/MovableCoordinates.h"
 #include "modules/hud/FrameTimeDisplay.h"
 #include "modules/hud/WAILA.h"
+#include "modules/hud/DirectionHud.h"
 
 #include "client/event/events/KeyUpdateEvent.h"
 
@@ -106,6 +107,7 @@ ModuleManager::ModuleManager() {
     this->items.push_back(std::make_shared<CustomCoordinates>());
     this->items.push_back(std::make_shared<MovableCoordinates>());
     this->items.push_back(std::make_shared<WAILA>());
+    this->items.push_back(std::make_shared<DirectionHud>());
     this->items.push_back(std::make_shared<AutoGG>());
     this->items.push_back(std::make_shared<HiveTranslate>());
     this->items.push_back(std::make_shared<FrameTimeDisplay>());
