@@ -53,16 +53,6 @@ private:
     EnumData labelPos;
     EnumData degPos;
 
-    static constexpr float MIN_W = 140.f;
-    static constexpr float MAX_W = 700.f;
-    static constexpr float MIN_H = 26.f;
-    static constexpr float MAX_H = 140.f;
-    static constexpr float LABEL_AREA_W = 44.f;
-    static constexpr int MAJOR_INTERVAL = 45;
-    static constexpr float FADE_START = 0.55f;
-    static constexpr float OFFSET_MIN = -200.f;
-    static constexpr float OFFSET_MAX = 200.f;
-
     float fadedAlpha(float delta, float halfSpan);
     static void zoneRect(int anchor, float h, float& top, float& bot);
     static float wrapDegrees(float angle);

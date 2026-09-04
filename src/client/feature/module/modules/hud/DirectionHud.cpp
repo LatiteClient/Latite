@@ -4,6 +4,18 @@
 #include "DirectionHud.h"
 #include "client/Latite.h"
 
+namespace {
+    constexpr float MIN_W = 140.f;
+    constexpr float MAX_W = 700.f;
+    constexpr float MIN_H = 26.f;
+    constexpr float MAX_H = 140.f;
+    constexpr float LABEL_AREA_W = 44.f;
+    constexpr int MAJOR_INTERVAL = 45;
+    constexpr float FADE_START = 0.55f;
+    constexpr float OFFSET_MIN = -200.f;
+    constexpr float OFFSET_MAX = 200.f;
+}
+
 DirectionHud::DirectionHud()
     : HUDModule("Direction", LocalizeString::get("client.hudmodule.direction.name"),
                 LocalizeString::get("client.hudmodule.direction.desc"), HUD) {
