@@ -4,6 +4,8 @@
 
 namespace SDK {
 
+class InteractionResult;
+
 class GameMode {
 public:
     class Player* plr;
