@@ -1,10 +1,13 @@
 #pragma once
-
 #include "util/LMath.h"
 
 namespace SDK {
 
-class InteractionResult;
+class InteractionResult {
+public:
+    bool mSuccess : 1;
+    bool mSwing : 1;
+};
 
 class GameMode {
 public:
@@ -62,7 +65,6 @@ public:
     virtual void tick() = 0;
 
     virtual float getPickRange(
-        /* InputMode const& */
         void*
     ) = 0;
 
