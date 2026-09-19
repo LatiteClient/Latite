@@ -1,20 +1,55 @@
 #include "pch.h"
 #include "SetScorePacket.h"
 
+#include <type_traits>
+
 std::wstring SDK::SetScorePacket::serialize() const {
     nlohmann::json serialized;
 
-    serialized["type"] = static_cast<int>(type);
+    const auto packetType = !scoreInfo.empty() && std::holds_alternative<RemoveScore>(scoreInfo.front())
+                                ? PacketType::Remove
+                                : PacketType::Change;
+    serialized["type"] = static_cast<int>(packetType);
 
     for (const auto& info : scoreInfo) {
         nlohmann::json score;
-        score["scoreboardId"] = info.scoreboardId.rawId;
-        score["objectiveName"] = info.objectiveName;
-        score["scoreValue"] = info.scoreValue;
-        score["identityType"] = static_cast<unsigned char>(info.identityType);
-        score["playerId"] = info.playerId;
-        score["entityId"] = info.entityId;
-        score["fakePlayerName"] = info.fakePlayerName;
+
+        std::visit(
+            [&score](const auto& entry) {
+                using Entry = std::remove_cvref_t<decltype(entry)>;
+
+                score["scoreboardId"] = entry.scoreboardId.rawId;
+
+                if constexpr (std::is_same_v<Entry, RemoveScore>) {
+                    score["objectiveName"] = entry.objectiveName.value_or("");
+                    score["scoreValue"] = 0;
+                    score["identityType"] = static_cast<uint8_t>(IdentityType::Invalid);
+                    score["playerId"] = 0;
+                    score["entityId"] = 0;
+                    score["fakePlayerName"] = "";
+                } else {
+                    score["objectiveName"] = entry.objectiveName;
+                    score["scoreValue"] = entry.scoreValue;
+
+                    if constexpr (std::is_same_v<Entry, ChangePlayerScore>) {
+                        score["identityType"] = static_cast<uint8_t>(IdentityType::Player);
+                        score["playerId"] = entry.playerId;
+                        score["entityId"] = 0;
+                        score["fakePlayerName"] = "";
+                    } else if constexpr (std::is_same_v<Entry, ChangeEntityScore>) {
+                        score["identityType"] = static_cast<uint8_t>(IdentityType::Entity);
+                        score["playerId"] = 0;
+                        score["entityId"] = entry.entityId;
+                        score["fakePlayerName"] = "";
+                    } else {
+                        score["identityType"] = static_cast<uint8_t>(IdentityType::FakePlayer);
+                        score["playerId"] = 0;
+                        score["entityId"] = 0;
+                        score["fakePlayerName"] = entry.fakePlayerName;
+                    }
+                }
+            },
+            info);
 
         serialized["scoreInfo"].push_back(score);
     }

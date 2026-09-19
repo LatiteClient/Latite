@@ -5,7 +5,7 @@ namespace SDK {
 
     class ModalFormRequestPacket : public Packet {
     public:
-        uint8_t mFormId;
+        uint32_t mFormId;
         std::string mFormJSON;
     };
 }

@@ -11,11 +11,10 @@
 #include "hooks/ScreenViewHooks.h"
 #include "hooks/PacketHooks.h"
 #include "hooks/PlayerHooks.h"
-#include "hooks/CustomSkinPickerHooks.h"
 
-class LatiteHooks final : public StaticManager<HookGroup, GenericHooks, LevelRendererHooks, OptionHooks, DXHooks,
-                                               PlayerHooks, MinecraftGameHooks, RenderControllerHooks, ScreenViewHooks,
-                                               PacketHooks, CustomSkinPickerHooks> {
+class LatiteHooks final
+    : public StaticManager<HookGroup, GenericHooks, LevelRendererHooks, OptionHooks, DXHooks, PlayerHooks,
+                           MinecraftGameHooks, RenderControllerHooks, ScreenViewHooks, PacketHooks> {
 public:
     LatiteHooks();
     ~LatiteHooks();

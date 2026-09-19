@@ -40,6 +40,7 @@ namespace SDK {
     public:
         std::string command;
         CommandOriginData origin;
+        int32_t version;
         bool InternalSource;
 
         void applyCommand(std::string const& command);

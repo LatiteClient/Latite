@@ -5,13 +5,12 @@
 
 class Keyboard final : public Listener {
 public:
-    Keyboard(int* gameKeyMap);
+    Keyboard();
     Keyboard(Keyboard&) = delete;
     Keyboard(Keyboard&&) = delete;
 
     ~Keyboard() = default;
 
-    int* keyMap;
     int keyMapAdjusted[0x100] = {};
     int keyMapOld[0x100] = {};
     BYTE winKeyMap[0x100] = {};

@@ -67,7 +67,7 @@ public:
 
     static constexpr std::string_view version = "v2.9.1";
     static constexpr std::array<std::string_view, 1> supportedMinecraftVersions = {
-        "1.26.4x",
+        "1.26.5x",
     };
 
     [[nodiscard]] static constexpr bool supportsMinecraftVersion(std::string_view version) noexcept {
@@ -101,9 +101,6 @@ public:
 
     HINSTANCE dllInst = NULL;
     std::string gameVersion;
-
-    // TODO(1.26.50): Remove this flag and all pre-1.26.44 compatibility paths guarded by it.
-    bool tmp2640Is4240 {};
 
     std::optional<float> getMenuBlur();
 

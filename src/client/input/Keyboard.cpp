@@ -6,8 +6,7 @@
 #include <chrono>
 #include <client/Latite.h>
 
-Keyboard::Keyboard(int* gameKeyMap)
-    : keyMap(gameKeyMap) {
+Keyboard::Keyboard() {
     Eventing::get().listen<KeyUpdateEvent>(this, (EventListenerFunc)&Keyboard::onKey, 4);
 }
 
@@ -77,7 +76,7 @@ bool Keyboard::isKeyDown(int vKey) {
         return controllerButtonMap[vKey - controller_input::KEY_BASE];
     }
     if (vKey < 0 || vKey >= 0x100) return false;
-    return keyMap[vKey];
+    return keyMapAdjusted[vKey];
 }
 
 int Keyboard::getMappedKey(std::string const& name) {

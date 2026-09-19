@@ -1,7 +1,8 @@
 #include "Platform_GameCore.h"
 
 SDK::MinecraftGame* SDK::Platform_GameCore::getMinecraftGame() {
-    return hat::member_at<MinecraftGame*>(this, 0x18);
+    const auto gameHolder = hat::member_at<void*>(this, 0x118);
+    return gameHolder ? hat::member_at<MinecraftGame*>(gameHolder, 0x48) : nullptr;
 }
 
 SDK::GameCore* SDK::Platform_GameCore::getGameCore() {

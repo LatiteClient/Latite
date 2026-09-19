@@ -68,7 +68,7 @@ public:
         [](memory::signature_store&, uintptr_t res) {
             return res;
         },
-        "48 83 EC 38 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 48 8B 01 48 8B 40 08 48 8D 54 24 ? 41 B8 35 00 00 00"_sig,
+        "48 83 EC 38 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 48 8B 01 48 8B 40 08 48 8D 54 24 ? 41 B8 32 00 00 00"_sig,
         "Options::getGamma"
     };
 
@@ -90,7 +90,7 @@ public:
         [](memory::signature_store&, uintptr_t res) {
             return res;
         },
-        "48 83 EC 38 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 48 8B 01 48 8B 40 08 48 8D 54 24 ? 41 B8 AB 01 00 00"_sig, // Will probably die every update from now on, but a good sig would be thousands of bytes long
+        "48 83 EC 38 48 8B 05 ? ? ? ? 48 31 E0 48 89 44 24 ? 48 8B 01 48 8B 40 08 48 8D 54 24 ? 41 B8 A6 01 00 00"_sig, // Will probably die every update from now on, but a good sig would be thousands of bytes long
         "Options::getHideHand"
     };
 
@@ -114,7 +114,8 @@ public:
         [](memory::signature_store&, uintptr_t res) {
             return res;
         },
-        "55 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 44 0F 29 6D"_sig, "MultiPlayerLevel::_subTick"
+        "55 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 44 0F 29 6D ? 44 0F 29 65 ? 44 0F 29 5D ? 44 0F 29 55 ? 66 44 0F 7F 4D"_sig,
+        "MultiPlayerLevel::_subTick"
     };
 
     inline static SigImpl ChatScreenController_sendChatMessage {
@@ -129,7 +130,7 @@ public:
         [](memory::signature_store&, uintptr_t res) {
             return res;
         },
-        "55 41 57 41 56 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 48 C7 45 ? ? ? ? ? 48 89 CF 48 8D 71"_sig,
+        "55 56 57 53 48 83 EC ? 48 8D 6C 24 ? 48 C7 45 ? ? ? ? ? 48 89 CE 48 8D 4D ? 66 BA ? ? 66 41 B8 ? ? E8 ? ? ? ? 48 8D 0D ? ? ? ? E8 ? ? ? ? 85 C0 0F 85 ? ? ? ? 81 3D ? ? ? ? ? ? ? ? 0F 84 ? ? ? ? 48 8B 05 ? ? ? ? 48 85 C0 74 ? 8B 88 ? ? ? ? FF C1 89 88 ? ? ? ? 81 E1 ? ? ? ? 48 8D 0C 49 8B 55 ? 89 94 88 ? ? ? ? 48 8B 55 ? 48 89 94 88 ? ? ? ? 48 8D 0D ? ? ? ? E8 ? ? ? ? 48 8B 46 ? 80 B8 ? ? ? ? ? 75 ? 48 8D 4D ? E8 ? ? ? ? F2 48 0F 2A 45 ? F2 0F 5E 05 ? ? ? ? 48 8B 46 ? 66 0F 28 C8"_sig,
         "MinecraftGame::onDeviceLost"
     };
 
@@ -155,24 +156,11 @@ public:
         "ScreenView::setupAndRender"
     };
 
-    inline static SigImpl KeyMap { [](memory::signature_store& store, uintptr_t) {
-                                      return store.deref(3);
-                                  },
-                                   "48 8D 3D ? ? ? ? C7 04 B7"_sig, "KeyMap" };
-
     inline static SigImpl MinecraftGame__update { [](memory::signature_store& store, uintptr_t) {
                                                      return store.deref(1);
                                                  },
                                                   "E8 ? ? ? ? 48 8B 8F ? ? ? ? BA ? ? ? ? E8 ? ? ? ? 48 8B 9F"_sig,
                                                   "MinecraftGame::_update" };
-
-    inline static SigImpl AppPlatform_GameCorePC_pickImage {
-        [](memory::signature_store&, uintptr_t res) {
-            return res;
-        },
-        "55 41 56 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 0F 29 75 ? 48 C7 45 ? FE FF FF FF 48 89 55 ? 48 89 CE 48 8B 0D ? ? ? ? 48 8B 01 48 8B 40 ? BA 58 01 00 00"_sig,
-        "AppPlatform_GameCorePC::pickImage"
-    };
 
     // ref: your GPU ("AMD Radeon RX 5500")
     inline static SigImpl GpuInfo { [](memory::signature_store& store, uintptr_t) {
@@ -211,7 +199,7 @@ public:
         [](memory::signature_store&, uintptr_t res) {
             return res;
         },
-        "55 41 57 41 56 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 48 C7 45 ? ? ? ? ? 48 89 D6 48 8D 55"_sig,
+        "55 41 57 41 56 41 54 56 57 53 48 83 EC ? 48 8D 6C 24 ? 48 C7 45 ? ? ? ? ? 48 89 D6 48 8D 55"_sig,
         "ItemStackBase::getHoverName"
     };
 
@@ -224,7 +212,7 @@ public:
         [](memory::signature_store&, uintptr_t res) {
             return res;
         },
-        "55 56 57 48 83 EC ? 48 8D 6C 24 ? 48 C7 45 ? ? ? ? ? 4C 89 CE 48 8D 05"_sig,
+        "55 56 48 83 EC ? 48 8D 6C 24 ? 48 C7 45 ? ? ? ? ? 4C 89 CE 48 8D 05"_sig,
         "ItemStackBase::ItemStackBase(Block const&, int, CompoundTag const*)"
     };
 
@@ -314,7 +302,7 @@ public:
         [](memory::signature_store&, uintptr_t res) {
             return res;
         },
-        "55 41 57 41 56 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 44 0F 29 95 ? ? ? ? 44 0F 29 8D ? ? ? ? 44 0F 29 85 ? ? ? ? 0F 29 BD ? ? ? ? 0F 29 B5 ? ? ? ? 48 C7 85 ? ? ? ? ? ? ? ? 4C 89 CB 4D 89 C7"_sig,
+        "55 41 57 41 56 41 55 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 44 0F 29 95 ? ? ? ? 44 0F 29 8D ? ? ? ? 44 0F 29 85 ? ? ? ? 0F 29 BD ? ? ? ? 0F 29 B5 ? ? ? ? 48 C7 85 ? ? ? ? ? ? ? ? 4C 89 CB 4D 89 C7"_sig,
         "LevelRendererPlayer::renderOutlineSelection"
     };
 
@@ -375,11 +363,13 @@ public:
         "56 57 48 83 EC ? 48 89 CE 48 8B 89 ? ? ? ? 48 85 C9 0F 84 ? ? ? ? 48 89 D7"_sig, "Actor::setNameTag"
     };
 
-    inline static SigImpl GuiMessageVector_emplaceBack { [](memory::signature_store&, uintptr_t res) {
-                                                            return res;
-                                                        },
-                                                         "49 89 D0 48 8B 51 ? 48 3B 51 ? 0F 84 ? ? ? ? 41 8B 00"_sig,
-                                                         "std::vector<GuiMessage>::emplace_back" };
+    inline static SigImpl GuiMessageVector_emplaceBack {
+        [](memory::signature_store&, uintptr_t res) {
+            return res;
+        },
+        "49 89 D0 48 8B 51 ? 48 3B 51 ? 0F 84 ? ? ? ? 41 8B 00 89 02 0F 57 C0 0F 11 42 ? 0F 11 42 ? 41 0F 10 48 ? 41 0F 10 50 ? 0F 11 52 ? 0F 11 4A ? 49 C7 40 ? ? ? ? ? 49 C7 40 ? ? ? ? ? 41 C6 40 ? ? C6 42"_sig,
+        "std::vector<GuiMessage>::emplace_back"
+    };
 
     inline static SigImpl _updatePlayer {
         [](memory::signature_store&, uintptr_t res) {
@@ -394,7 +384,7 @@ public:
         [](memory::signature_store&, uintptr_t res) {
             return res;
         },
-        "55 41 57 41 56 41 55 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 0F 29 B5 ? ? ? ? 48 C7 85 ? ? ? ? ? ? ? ? 49 89 D4 49 89 CD"_sig,
+        "55 41 57 41 56 41 55 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 0F 29 B5 ? ? ? ? 48 C7 85 ? ? ? ? ? ? ? ? 48 89 8D ? ? ? ? 48 8B 7A ? 66 0F EF C0"_sig,
         "GameArguments::_onUri"
     };
 

@@ -31,11 +31,11 @@ SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
 }
 
 SDK::GuiData* SDK::ClientInstance::getGuiData() {
-    return hat::member_at<GuiData*>(this, 0x648);
+    return hat::member_at<GuiData*>(this, 0x650);
 }
 
 SDK::Options* SDK::ClientInstance::getOptions() {
-    return hat::member_at<Options*>(this, 0xD78);
+    return hat::member_at<Options*>(this, 0xE10);
 }
 
 SDK::NonOwnerPointer<SDK::SoundPlayerInterface> SDK::ClientInstance::getSoundPlayer() {

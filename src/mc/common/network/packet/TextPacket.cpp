@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "TextPacket.h"
 #include "mc/common/client/game/ClientInstance.h"
-#include "mc/common/client/game/MinecraftGame.h"
 #include "mc/common/client/player/LocalPlayer.h"
 #include "mc/Addresses.h"
 #include "util/memory.h"
@@ -37,6 +36,6 @@ const std::string* SDK::TextPacket::getAuthor() const {
 void SDK::TextPacket::chat(std::string const& message) {
     this->data = message;
     this->str = SDK::ClientInstance::get()->getLocalPlayer()->playerName;
-    this->xboxUserId = SDK::ClientInstance::get()->minecraftGame->xuid;
+    this->xboxUserId.clear();
     this->type = TextPacketType::CHAT;
 }
