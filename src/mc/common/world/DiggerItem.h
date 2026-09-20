@@ -6,6 +6,6 @@
 namespace SDK {
     class DiggerItem : public Item {
     public:
-        CLASS_FIELD(ItemTier const*, tier, 0x210);
+        CLASS_FIELD(ItemTier const*, tier, 0x218);
     };
 }

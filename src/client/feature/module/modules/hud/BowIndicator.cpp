@@ -39,9 +39,13 @@ void BowIndicator::render(DrawUtil& dc, bool isDefault, bool inEditor) {
         TextModule::render(dc, isDefault, inEditor);
         return;
     }
-    auto plr = SDK::ClientInstance::get()->getLocalPlayer();
-    if (!plr) return;
-    auto slot = plr->supplies->inventory->getItem(plr->supplies->selectedSlot);
+    auto* clientInstance = SDK::ClientInstance::get();
+    if (!clientInstance) return;
+
+    auto* player = clientInstance->getLocalPlayer();
+    if (!player || !player->supplies || !player->supplies->inventory) return;
+
+    auto* slot = player->supplies->inventory->getItem(player->supplies->selectedSlot);
 
     bool horiz = std::get<BoolValue>(horizontal);
     float wid = std::get<FloatValue>(indicatorWidth);
@@ -78,35 +82,49 @@ void BowIndicator::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 }
 
 std::wstringstream BowIndicator::text(bool, bool) {
-    auto plr = SDK::ClientInstance::get()->getLocalPlayer();
-    auto slot = plr->supplies->inventory->getItem(plr->supplies->selectedSlot);
-    auto charge = getBowCharge(slot);
-
     std::wstringstream wss;
-    if (!plr) return wss;
+    auto* clientInstance = SDK::ClientInstance::get();
+    if (!clientInstance) return wss;
+
+    auto* player = clientInstance->getLocalPlayer();
+    if (!player || !player->supplies || !player->supplies->inventory) return wss;
+
+    auto* slot = player->supplies->inventory->getItem(player->supplies->selectedSlot);
+    const auto charge = getBowCharge(slot);
     wss << std::round(charge.value_or(0.f) * 100.f) << "%";
     return wss;
 }
 
 std::optional<float> BowIndicator::getBowCharge(SDK::ItemStack* slot) {
-    if (!slot->item) return std::nullopt;
-    auto item = *slot->item;
+    if (!slot || !slot->item) return std::nullopt;
 
-    if (item->id.hash == "bow"_fnv64 /*bow*/ || item->id.hash == "crossbow"_fnv64 /*crossbow*/ ||
-        item->id.hash == "trident"_fnv64) {
-        int useDur = SDK::ClientInstance::get()->getLocalPlayer()->getItemUseDuration();
-        if (useDur) {
-            auto mxu = item->getMaxUseDuration(slot);
-            float chargeTickSpeed = 20.f;
-            if (item->id.hash == "crossbow"_fnv64) {
-                // FIXME: Account for Quick Charge enchantment
-                chargeTickSpeed = 20;
-            } else if (item->id.hash == "trident"_fnv64) {
-                chargeTickSpeed = 10;
-            }
-            float diff = static_cast<float>(item->getMaxUseDuration(slot) - useDur);
-            return (std::min)((std::max)(diff / chargeTickSpeed, 0.f), 1.f);
-        }
+    auto* item = *slot->item;
+    if (!item) return std::nullopt;
+
+    const auto itemId = item->id.hash;
+
+    const bool isSupportedItem = itemId == "bow"_fnv64 || itemId == "crossbow"_fnv64 || itemId == "trident"_fnv64;
+    if (!isSupportedItem) return std::nullopt;
+
+    auto* clientInstance = SDK::ClientInstance::get();
+    if (!clientInstance) return std::nullopt;
+
+    auto* player = clientInstance->getLocalPlayer();
+    if (!player) return std::nullopt;
+
+    const int remainingUseTicks = player->getItemUseDuration();
+    if (remainingUseTicks == 0) return std::nullopt;
+
+    const int maxUseTicks = item->getMaxUseDuration(slot);
+
+    float fullChargeTicks = 20.f;
+    if (itemId == "crossbow"_fnv64) {
+        // CrossbowItem accounts for the Quick Charge level in its max-use duration.
+        fullChargeTicks = static_cast<float>(maxUseTicks);
+    } else if (itemId == "trident"_fnv64) {
+        fullChargeTicks = 10.f;
     }
-    return std::nullopt;
+
+    const float elapsedUseTicks = static_cast<float>(maxUseTicks - remainingUseTicks);
+    return std::clamp(elapsedUseTicks / fullChargeTicks, 0.f, 1.f);
 }

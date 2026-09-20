@@ -6,7 +6,7 @@ SDK::MinecraftGame* SDK::Platform_GameCore::getMinecraftGame() {
 }
 
 SDK::GameCore* SDK::Platform_GameCore::getGameCore() {
-    return hat::member_at<GameCore*>(this, 0xB0);
+    return hat::member_at<GameCore*>(this, 0x78);
 }
 
 SDK::Platform_GameCore* SDK::Platform_GameCore::get() {

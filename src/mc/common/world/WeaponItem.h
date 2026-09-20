@@ -6,6 +6,6 @@
 namespace SDK {
     class WeaponItem : public Item {
     public:
-        CLASS_FIELD(ItemTier const*, tier, 0x218);
+        CLASS_FIELD(ItemTier const*, tier, 0x220);
     };
 }

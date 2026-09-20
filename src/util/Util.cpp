@@ -521,12 +521,12 @@ void util::PlaySoundUI(std::string const& sound, float volume, float pitch) {
     auto clientInstance = SDK::ClientInstance::get();
     if (!clientInstance) return;
 
-    auto soundPlayer = clientInstance->getSoundPlayer();
-    auto* soundPlayerInterface = soundPlayer.get();
-    if (!soundPlayerInterface) return;
+    auto soundEngine = clientInstance->getSoundEngine();
+    auto* soundEngineInterface = soundEngine.get();
+    if (!soundEngineInterface) return;
 
     LatiteSoundScope scope;
-    soundPlayerInterface->playUI(sound, volume, pitch);
+    soundEngineInterface->playUI(sound, volume, pitch);
 }
 
 bool util::IsPlayingLatiteSound() noexcept {

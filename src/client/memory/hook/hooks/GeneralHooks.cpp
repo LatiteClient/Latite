@@ -88,7 +88,7 @@ LRESULT GenericHooks::MainWindow__windowProcCallback(HWND hwnd, UINT msg, WPARAM
     if (msg == WM_SETCURSOR) {
         std::optional<std::reference_wrapper<Screen>> activeScreen = Latite::get().getScreenManager().getActiveScreen();
         SDK::GameCore* gameCore = SDK::GameCore::get();
-        constexpr uintptr_t mouseGrabbedOffset = 0x7D8; // AppPlatform_GameCore::mMouseCapture.
+        constexpr uintptr_t mouseGrabbedOffset = 0x398; // AppPlatform_GameCore::mMouseCapture.
         const bool gameMouseGrabbed =
             gameCore && *reinterpret_cast<uint8_t*>(reinterpret_cast<uintptr_t>(gameCore) + mouseGrabbedOffset);
 

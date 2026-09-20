@@ -89,6 +89,22 @@ namespace {
         FreeLibraryAndExitThread(static_cast<HMODULE>(module), 0);
     }
 
+    void centerCursorInGameWindow() {
+        auto* gameCore = SDK::GameCore::get();
+        if (!gameCore || !gameCore->hwnd) return;
+
+        RECT clientRect {};
+        if (!GetClientRect(gameCore->hwnd, &clientRect)) return;
+
+        POINT center {
+            (clientRect.left + clientRect.right) / 2,
+            (clientRect.top + clientRect.bottom) / 2,
+        };
+        if (!ClientToScreen(gameCore->hwnd, &center)) return;
+
+        SetCursorPos(center.x, center.y);
+    }
+
 }
 
 #define MVSIG(...) \
@@ -946,9 +962,7 @@ void Latite::onUpdate(Event& evGeneric) {
     }
 
     if (std::get<BoolValue>(centerCursorMenus) && SDK::ClientInstance::get()->minecraftGame->isCursorGrabbed()) {
-        RECT r = { 0, 0, 0, 0 };
-        GetClientRect(SDK::GameCore::get()->hwnd, &r);
-        SetCursorPos((r.left + r.right) / 2, (r.top + r.bottom) / 2);
+        centerCursorInGameWindow();
     }
 
     latiteUsers = latiteUsersDirty;
@@ -1106,9 +1120,7 @@ void Latite::onTick(Event& ev) {
 
 void Latite::onMouseRelease(Event& ev) {
     if (std::get<BoolValue>(centerCursorMenus)) {
-        RECT r = { 0, 0, 0, 0 };
-        GetClientRect(SDK::GameCore::get()->hwnd, &r);
-        SetCursorPos((r.left + r.right) / 2, (r.top + r.bottom) / 2);
+        centerCursorInGameWindow();
     }
 }
 

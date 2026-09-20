@@ -18,7 +18,7 @@ namespace SDK {
         class LocalPlayer* getLocalPlayer();
         class GuiData* getGuiData();
         class Options* getOptions();
-        NonOwnerPointer<class SoundPlayerInterface> getSoundPlayer();
+        NonOwnerPointer<class SoundPlayerInterface> getSoundEngine();
         class ResourcePackManager& getResourcePackManager();
         // class ClientHMDState* getClientHMDState(); Removed in 1.21.111
 

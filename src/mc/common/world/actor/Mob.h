@@ -7,6 +7,6 @@ namespace SDK {
     public:
         void setSprinting(bool b) { memory::callVirtual<void>(this, 0x8B, b); }
 
-        int getItemUseDuration() { return memory::callVirtual<int>(this, 0x94); }
+        int getItemUseDuration() { return memory::callVirtual<int>(this, 0x93); }
     };
 }
