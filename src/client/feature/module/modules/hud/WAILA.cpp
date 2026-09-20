@@ -75,7 +75,7 @@ std::vector<std::string> WAILA::findPreferredToolItemIds(SDK::Block const& block
                                                   : fastestToolCache;
     if (auto cached = cache.find(&block); cached != cache.end()) return cached->second;
 
-    if (!Signatures::ItemStack_ItemStackBlock.result || !Signatures::ItemStackBase_destructor.result) return {};
+    if (!Signatures::ItemStackVtable.result || !Signatures::ItemStackBase_destructor.result) return {};
 
     auto clientInstance = SDK::ClientInstance::get();
     auto level = clientInstance && clientInstance->minecraft ? clientInstance->minecraft->getLevel() : nullptr;
@@ -90,7 +90,7 @@ std::vector<std::string> WAILA::findPreferredToolItemIds(SDK::Block const& block
     if (!itemCounters[0] || !itemCounters[1]) return {};
 
     alignas(SDK::ItemStack) char storage[sizeof(SDK::ItemStack)] = {};
-    auto candidateStack = SDK::ItemStack::constructFromBlock(storage, block, 1, nullptr);
+    auto candidateStack = SDK::ItemStack::constructBlockItem(storage, block);
     if (!candidateStack) return {};
 
     auto originalItem = candidateStack->item;
@@ -204,12 +204,16 @@ std::optional<std::wstring> WAILA::getLocalizedMinecraftName(std::string const& 
 
 std::wstring WAILA::getBlockDisplayName(SDK::Block const& block, std::string const& localizationKey,
                                         std::string const& fallbackName) const {
-    if (Signatures::ItemStackBase_getHoverName.result && Signatures::ItemStack_ItemStackBlock.result &&
+    if (Signatures::ItemStackBase_getHoverName.result && Signatures::ItemStackVtable.result &&
         Signatures::ItemStackBase_destructor.result) {
         alignas(SDK::ItemStack) char storage[sizeof(SDK::ItemStack)] = {};
-        auto itemStack = SDK::ItemStack::constructFromBlock(storage, block, 1, nullptr);
+        auto itemStack = SDK::ItemStack::constructBlockItem(storage, block);
         if (itemStack) {
-            auto hoverName = itemStack->getHoverName();
+            std::string hoverName;
+            if (itemStack->getItem()) {
+                hoverName = itemStack->getHoverName();
+            }
+
             itemStack->destruct();
             if (!hoverName.empty()) {
                 return util::StrToWStr(hoverName);
@@ -434,7 +438,7 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
                     DWRITE_PARAGRAPH_ALIGNMENT_NEAR, cacheText);
     }
 
-    if (showToolIcons && dc.isMinecraft() && Signatures::ItemStack_ItemStackBlock.result &&
+    if (showToolIcons && dc.isMinecraft() && Signatures::ItemStackVtable.result &&
         Signatures::ItemStackBase_destructor.result) {
         auto clientInstance = SDK::ClientInstance::get();
         auto level = clientInstance && clientInstance->minecraft ? clientInstance->minecraft->getLevel() : nullptr;
@@ -463,7 +467,7 @@ void WAILA::render(DrawUtil& dc, bool isDefault, bool inEditor) {
 
         if (target->block && hasToolCounter) {
             alignas(SDK::ItemStack) char storage[sizeof(SDK::ItemStack)] = {};
-            auto toolStack = SDK::ItemStack::constructFromBlock(storage, *target->block, 1, nullptr);
+            auto toolStack = SDK::ItemStack::constructBlockItem(storage, *target->block);
             if (toolStack) {
                 auto originalItem = toolStack->item;
                 auto originalBlock = toolStack->block;
@@ -861,10 +865,10 @@ void WAILA::drawTargetIcon(DrawUtil& ctxGeneric, TargetInfo const& target, d2d::
                         Renderer::FontSelection::PrimaryRegular, 21.f, DWRITE_TEXT_ALIGNMENT_TRAILING,
                         DWRITE_PARAGRAPH_ALIGNMENT_FAR);
         }
-    } else if (target.type == TargetType::Block && target.block && Signatures::ItemStack_ItemStackBlock.result &&
+    } else if (target.type == TargetType::Block && target.block && Signatures::ItemStackVtable.result &&
                Signatures::ItemStackBase_destructor.result) {
         alignas(SDK::ItemStack) char storage[sizeof(SDK::ItemStack)] = {};
-        SDK::ItemStack* itemStack = SDK::ItemStack::constructFromBlock(storage, *target.block, 1, nullptr);
+        SDK::ItemStack* itemStack = SDK::ItemStack::constructBlockItem(storage, *target.block);
         if (itemStack) {
             itemStack->showPickUp = false;
             itemStack->wasPickedUp = false;

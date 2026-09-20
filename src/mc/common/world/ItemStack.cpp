@@ -1,18 +1,30 @@
 #include "pch.h"
+
+#include <cstring>
+
 #include "ItemStack.h"
+#include "mc/common/world/level/block/Block.h"
 
-SDK::ItemStack* SDK::ItemStack::constructFromBlock(void* storage, SDK::Block const& block, int count,
-                                                   SDK::CompoundTag const* userData) {
-    using oFunc_t = ItemStack*(__fastcall*)(void*, Block const*, int, CompoundTag const*);
-    auto fn = reinterpret_cast<oFunc_t>(Signatures::ItemStack_ItemStackBlock.result);
+namespace {
+    constexpr std::size_t BlockTypeAsItemInstanceVtableIndex = 0x4D; // BlockType::asItemInstance in 26.50
+}
 
-    if (!fn) return nullptr;
+SDK::ItemStack* SDK::ItemStack::constructBlockItem(void* storage, SDK::Block const& block) {
+    auto blockType = block.getBlockType();
+    if (!storage || !blockType || !Signatures::ItemStackVtable.result) return nullptr;
 
-    const auto item = fn(storage, &block, count, userData);
+    using AsItemInstance =
+        ItemStackBase*(__fastcall*)(BlockLegacy const*, ItemStackBase*, Block const*, BlockActor const*);
+    auto blockTypeVtable = *reinterpret_cast<void***>(blockType);
+    auto asItemInstance = reinterpret_cast<AsItemInstance>(blockTypeVtable[BlockTypeAsItemInstanceVtableIndex]);
+
+    std::memset(storage, 0, sizeof(ItemStack));
+    auto item = asItemInstance(blockType, static_cast<ItemStackBase*>(storage), &block, nullptr);
+    if (!item) return nullptr;
 
     item->vtable = reinterpret_cast<void**>(Signatures::ItemStackVtable.result);
 
-    return item;
+    return reinterpret_cast<ItemStack*>(item);
 }
 
 void SDK::ItemStack::destruct() {

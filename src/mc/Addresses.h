@@ -162,6 +162,14 @@ public:
                                                   "E8 ? ? ? ? 48 8B 8F ? ? ? ? BA ? ? ? ? E8 ? ? ? ? 48 8B 9F"_sig,
                                                   "MinecraftGame::_update" };
 
+    inline static SigImpl AppPlatform_GameCorePC_pickImage {
+        [](memory::signature_store&, uintptr_t res) {
+            return res;
+        },
+        "55 41 56 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 0F 29 75 ? 48 C7 45 ? ? ? ? ? 48 89 55 ? 48 89 CE 48 8B 0D"_sig,
+        "AppPlatform_GameCorePC::pickImage"
+    };
+
     // ref: your GPU ("AMD Radeon RX 5500")
     inline static SigImpl GpuInfo { [](memory::signature_store& store, uintptr_t) {
                                        return store.deref(3);
@@ -207,14 +215,6 @@ public:
                                             return store.deref(3);
                                         },
                                          "48 8D 0D ? ? ? ? 48 8D B5 ? ? ? ? 48 89 F2 4C 8D 85"_sig, "I18n::sI18n" };
-
-    inline static SigImpl ItemStack_ItemStackBlock {
-        [](memory::signature_store&, uintptr_t res) {
-            return res;
-        },
-        "55 56 48 83 EC ? 48 8D 6C 24 ? 48 C7 45 ? ? ? ? ? 4C 89 CE 48 8D 05"_sig,
-        "ItemStackBase::ItemStackBase(Block const&, int, CompoundTag const*)"
-    };
 
     inline static SigImpl ItemStackVtable { [](memory::signature_store& store, uintptr_t) {
                                                return store.deref(3);

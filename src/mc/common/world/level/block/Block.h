@@ -7,6 +7,8 @@ namespace SDK {
     public:
         CLASS_FIELD(BlockLegacy*, legacyBlock, 0x68);
 
+        BlockLegacy* getBlockType() const { return hat::member_at<BlockLegacy*>(const_cast<Block*>(this), 0x68); }
+
         virtual ~Block() = 0;
         virtual int getRenderLayer() const = 0;
     };
