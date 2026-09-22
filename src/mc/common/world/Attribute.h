@@ -5,7 +5,7 @@
 
 namespace SDK {
     class AttributeInstance {
-        char pad[0x80];
+        char pad[0x88];
 
     public:
         // AttributeInstance::getCurrentValue

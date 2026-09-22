@@ -17,10 +17,23 @@ namespace SDK {
 
     public:
         AttributeInstance* getInstance(unsigned int id) {
-            if (this->ids.size() != this->instances.size()) return nullptr;
+            if (this->ids.size() == this->instances.size()) {
+                for (size_t i = 0; i < this->ids.size(); ++i) {
+                    if (this->ids[i] == id) return &this->instances[i];
+                }
+            }
 
-            for (size_t i = 0; i < this->ids.size(); i++) {
-                if (this->ids[i] == id) return &this->instances[i];
+            for (size_t i = 0; i < this->instances.size(); ++i) {
+                auto* inst = &this->instances[i];
+                auto* attr = *reinterpret_cast<Attribute* const*>(reinterpret_cast<uintptr_t>(inst) + 8);
+                if (attr) {
+                    if (attr->mIDValue == id) return inst;
+                    constexpr uint64_t healthHash = 0xB1A77EE7B920668EULL;
+                    if (attr->mName.hash == healthHash) {
+                        Attributes::Health.mIDValue = attr->mIDValue;
+                        return inst;
+                    }
+                }
             }
 
             return nullptr;
