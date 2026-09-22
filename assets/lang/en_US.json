@@ -93,6 +93,8 @@
         "client.textmodule.fpsCounter.desc": "Shows your framerate (FPS).",
         "client.textmodule.pingDisplay.name": "Ping Display",
         "client.textmodule.pingDisplay.desc": "Displays the average upstream ping of the connected server.",
+        "client.textmodule.jitterDisplay.name": "Jitter Display",
+        "client.textmodule.jitterDisplay.desc": "Displays network packet jitter in milliseconds.",
         "client.textmodule.comboCounter.name": "Combo Counter",
         "client.textmodule.comboCounter.desc": "Shows how many combos you have.",
         "client.textmodule.comboCounter.count.name": "Combo: ",
