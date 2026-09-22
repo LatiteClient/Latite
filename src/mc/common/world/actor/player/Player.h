@@ -24,7 +24,7 @@ namespace SDK {
         // @dump-wbds Player::getGameMode, 3
         CLASS_FIELD(GameMode*, gameMode, 0xAA0); // xref: getGameMode
         // @dump-wbds Player::getName, 3
-        CLASS_FIELD(std::string, playerName, 0xBC0); // xref: getName
+        CLASS_FIELD(std::string, playerName, 0xB68); // xref: getName
         // @dump-wbds ServerPlayer::sendNetworkPacket, 18
         CLASS_FIELD(PacketSender*, packetSender, 0x7F8); // xref: Player::Player a3
     };

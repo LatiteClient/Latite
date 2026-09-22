@@ -18,10 +18,14 @@ namespace SDK {
         virtual bool destroyBlock(BlockPos const&, uint8_t) = 0;
         virtual bool continueDestroyBlock(BlockPos const&, uint8_t, bool&) = 0;
         virtual void stopDestroyBlock(BlockPos const&) = 0;
-        virtual void startBuildBlock(BlockPos const&, uint8_t) = 0;
-        virtual bool buildBlock(BlockPos const&, uint8_t) = 0;
-        virtual void continueBuildBlock(BlockPos const&, uint8_t) = 0;
+        virtual void startBuildBlock(BlockPos const&, uint8_t, uint8_t = 0) = 0;
+        virtual bool buildBlock(BlockPos const&, uint8_t, uint8_t, bool) = 0;
+        virtual void continueBuildBlock(BlockPos const&, uint8_t, uint8_t = 0) = 0;
         virtual void stopBuildBlock(void) = 0;
+
+        bool buildBlock(BlockPos const& pos, uint8_t face, bool isFirstEvent = true) {
+            return buildBlock(pos, face, 0, isFirstEvent);
+        }
         virtual void tick(void) = 0;
         virtual void getPickRange(void*, bool) = 0;
         virtual void useItem(class ItemStack*) = 0;
