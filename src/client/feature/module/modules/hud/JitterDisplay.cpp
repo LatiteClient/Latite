@@ -20,8 +20,7 @@ std::wstringstream JitterDisplay::text(bool isDefault, bool inEditor) {
 
     if (inEditor) {
         dJitter = 3;
-    }
-    else {
+    } else {
         auto* connectionInfo = SDK::RemoteConnectorComposite::getConnectionInfo();
         if (connectionInfo && !connectionInfo->hostIpAddress.empty()) {
             auto now = std::chrono::steady_clock::now();
