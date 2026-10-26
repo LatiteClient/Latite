@@ -12,19 +12,10 @@
 #include "util/Logger.h"
 #include <memory>
 
-#include <winrt/base.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Web.Http.h>
-#include <winrt/windows.foundation.collections.h>
-#include <winrt/Windows.Web.Http.Headers.h>
-#include <winrt/windows.storage.streams.h>
 #include <expected>
+#include "util/HttpClient.h"
 
 #include "JsPlugin.h"
-
-using namespace winrt::Windows::Storage::Streams;
-using namespace winrt::Windows::Web::Http;
-using namespace winrt::Windows::Web::Http::Filters;
 
 PluginManager::PluginManager() {
 }
@@ -215,37 +206,31 @@ void PluginManager::runScriptingOperations() {
 
 std::expected<void, std::string> PluginManager::installScript(std::string const& inName) {
     std::wstring registry = L"https://raw.githubusercontent.com/LatiteScripting/Scripts/master/Plugins";
-    std::wstring jsonPath = registry + L"/plugins.json";
-    nlohmann::json scriptsJson;
-
-    auto http = HttpClient();
-    {
-        // get JSON
-        winrt::Windows::Foundation::Uri requestUri(jsonPath);
-
-        HttpRequestMessage request(HttpMethod::Get(), requestUri);
-
-        try {
-            auto operation = http.SendRequestAsync(request);
-            auto response = operation.get();
-            auto cont = response.Content();
-            auto strs = cont.ReadAsStringAsync().get();
-
-            if (response.IsSuccessStatusCode()) {
-                try {
-                    scriptsJson = nlohmann::json::parse(std::wstring(strs.c_str()));
-                } catch (nlohmann::json::parse_error& e) {
-                    return std::unexpected("JSON parse error while installing plugin: " + std::string(e.what()));
-                }
-            } else {
-                return std::unexpected("Could not fetch the plugin list. Are you connected to the internet?");
-            }
-        } catch (winrt::hresult_error const& err) {
-            return std::unexpected(util::WStrToStr(err.message().c_str()));
-        }
+    auto index = http::request(L"GET", registry + L"/plugins.json");
+    if (!index) return std::unexpected(index.error());
+    if (index->status != 200) {
+        return std::unexpected("Could not fetch the plugin list (HTTP " + std::to_string(index->status) + ")");
     }
+
+    nlohmann::json scriptsJson;
+    try {
+        scriptsJson = nlohmann::json::parse(index->body);
+    } catch (nlohmann::json::exception const& error) {
+        return std::unexpected("JSON parse error while installing plugin: " + std::string(error.what()));
+    }
+
+    if (!scriptsJson.is_object() || !scriptsJson.contains("plugins") ||
+        !scriptsJson["plugins"].is_array()) {
+        return std::unexpected("The plugin index is invalid");
+    }
+
     auto& arr = scriptsJson["plugins"];
     for (auto& js : arr) {
+        if (!js.is_object() || !js.contains("name") || !js["name"].is_string() ||
+            !js.contains("files") || !js["files"].is_array()) {
+            continue;
+        }
+
         auto name = js["name"].get<std::string>();
         auto oName = js["name"].get<std::string>();
         auto woName = util::StrToWStr(oName);
@@ -256,19 +241,15 @@ std::expected<void, std::string> PluginManager::installScript(std::string const&
             std::filesystem::path path = getPrerunPluginsDir() / woName;
             std::filesystem::create_directories(path);
             for (auto& fil : js["files"]) {
+                if (!fil.is_string()) return std::unexpected("Invalid plugin file entry");
+
                 auto fws = util::StrToWStr(fil.get<std::string>());
-                winrt::Windows::Foundation::Uri requestUri(registry + L"/" + woName + L"/" + fws);
-                HttpRequestMessage request(HttpMethod::Get(), requestUri);
-                auto operation = http.SendRequestAsync(request);
-                auto response = operation.get();
-                auto cont = response.Content();
-                auto buffer = cont.ReadAsBufferAsync().get();
-
-                // convert winrt IBuffer to something we can pass to std::ofstream
-                auto reader = DataReader::FromBuffer(buffer);
-
-                std::vector<uint8_t> bytes(buffer.Length());
-                reader.ReadBytes(bytes);
+                auto download = http::request(L"GET", registry + L"/" + woName + L"/" + fws);
+                if (!download) return std::unexpected(download.error());
+                if (download->status != 200) {
+                    return std::unexpected("Could not download plugin file (HTTP " +
+                                           std::to_string(download->status) + ")");
+                }
 
                 auto downloadPath = path / fws;
 
@@ -280,7 +261,8 @@ std::expected<void, std::string> PluginManager::installScript(std::string const&
                 if (ofs.fail()) {
                     return std::unexpected("Error opening file: " + std::to_string(*_errno()));
                 }
-                ofs.write(reinterpret_cast<char*>(bytes.data()), bytes.size());
+                ofs.write(reinterpret_cast<char const*>(download->body.data()), download->body.size());
+                if (!ofs) return std::unexpected("Error writing plugin file");
                 ofs.close();
             }
             return {};
@@ -293,65 +275,52 @@ std::vector<PluginManager::PluginInfo> PluginManager::fetchPluginsFromMarket() {
     std::vector<PluginInfo> list = {};
 
     std::wstring registry = L"https://raw.githubusercontent.com/LatiteScripting/Scripts/master/Plugins";
-    std::wstring jsonPath = registry + L"/plugins.json";
-    nlohmann::json scriptsJson;
-
-    auto http = HttpClient();
-    {
-        // get JSON
-        winrt::Windows::Foundation::Uri requestUri(jsonPath);
-
-        HttpRequestMessage request(HttpMethod::Get(), requestUri);
-
-        try {
-            auto operation = http.SendRequestAsync(request);
-            auto response = operation.get();
-            auto cont = response.Content();
-            auto strs = cont.ReadAsStringAsync().get();
-
-            if (response.IsSuccessStatusCode()) {
-                try {
-                    scriptsJson = nlohmann::json::parse(std::wstring(strs.c_str()));
-                } catch (nlohmann::json::parse_error&) {
-                    return list;
-                }
-            } else {
-                return list;
-            }
-        } catch (winrt::hresult_error const& err) {
-            Latite::getClientMessageQueue().push(util::WStrToStr(err.message().c_str()));
-            return list;
-        }
+    auto index = http::request(L"GET", registry + L"/plugins.json");
+    if (!index) {
+        Latite::getClientMessageQueue().push(index.error());
+        return list;
     }
+    if (index->status != 200) return list;
+
+    nlohmann::json scriptsJson;
+    try {
+        scriptsJson = nlohmann::json::parse(index->body);
+    } catch (nlohmann::json::exception const&) {
+        return list;
+    }
+
+    if (!scriptsJson.is_object() || !scriptsJson.contains("plugins") ||
+        !scriptsJson["plugins"].is_array()) {
+        Logger::Warn("The plugin index is invalid");
+        return list;
+    }
+
     auto& arr = scriptsJson["plugins"];
 
     for (auto& plug : arr) {
+        if (!plug.is_object() || !plug.contains("name") || !plug["name"].is_string()) continue;
+
         std::string id = plug["name"].get<std::string>();
         auto pluginFolder = registry + L"/" + util::StrToWStr(id);
 
-        winrt::Windows::Foundation::Uri requestUri(pluginFolder + L"/plugin.json");
-        HttpRequestMessage request(HttpMethod::Get(), requestUri);
+        auto manifest = http::request(L"GET", pluginFolder + L"/plugin.json");
+        if (!manifest || manifest->status != 200) continue;
 
         json pluginJson;
-
         try {
-            auto operation = http.SendRequestAsync(request);
-            auto response = operation.get();
-            auto cont = response.Content();
-            auto strs = cont.ReadAsStringAsync().get();
-            if (response.IsSuccessStatusCode()) {
-                try {
-                    pluginJson = nlohmann::json::parse(std::wstring(strs.c_str()));
-                } catch (nlohmann::json::parse_error&) {
-                    continue;
-                }
-            }
-        } catch (winrt::hresult_error const& err) {
+            pluginJson = nlohmann::json::parse(manifest->body);
+        } catch (nlohmann::json::exception const&) {
             continue;
         }
 
-        if (pluginJson["name"].is_string() && pluginJson["author"].is_string() && pluginJson["version"].is_string() &&
-            pluginJson["description"].is_string()) {
+        if (!pluginJson.is_object()) continue;
+
+        bool hasName = pluginJson.contains("name") && pluginJson["name"].is_string();
+        bool hasAuthor = pluginJson.contains("author") && pluginJson["author"].is_string();
+        bool hasVersion = pluginJson.contains("version") && pluginJson["version"].is_string();
+        bool hasDescription = pluginJson.contains("description") && pluginJson["description"].is_string();
+
+        if (hasName && hasAuthor && hasVersion && hasDescription) {
             list.emplace_back(PluginInfo { id, util::StrToWStr(pluginJson["name"].get<std::string>()),
                                            util::StrToWStr(pluginJson["author"].get<std::string>()),
                                            util::StrToWStr(pluginJson["version"].get<std::string>()),

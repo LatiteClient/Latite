@@ -36,8 +36,7 @@
 #include "mc/common/client/game/ClientInstance.h"
 #include "mc/common/client/game/MinecraftGame.h"
 #include "mc/common/client/game/FontRepository.h"
-#include <winrt/windows.ui.viewmanagement.h>
-#include <winrt/windows.storage.streams.h>
+#include "util/HttpClient.h"
 
 #include <mc/common/client/gui/ScreenView.h>
 #include <mc/common/client/gui/controls/VisualTree.h>
@@ -45,12 +44,6 @@
 
 #include "event/events/MouseReleaseEvent.h"
 #include "mc/common/client/game/GameCore.h"
-
-using namespace winrt;
-using namespace winrt::Windows::Web::Http;
-using namespace winrt::Windows::Web::Http::Filters;
-using namespace winrt::Windows::Storage::Streams;
-using namespace winrt::Windows::Storage;
 
 #include "render/Renderer.h"
 #include "screen/ScreenManager.h"
@@ -185,18 +178,6 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         Latite::get().gameVersion = std::format("{}.{}.{}", major, minor, build);
     }
 
-    /*winrt::Windows::ApplicationModel::Package package = winrt::Windows::ApplicationModel::Package::Current();
-    winrt::Windows::ApplicationModel::PackageVersion version = package.Id().Version();
-
-    {
-        std::string rev = std::to_string(version.Build);
-        std::string rem = rev.substr(0, rev.size() - 2); // remove 2 digits from end
-
-        int ps = std::stoi(rem);
-        std::stringstream ss;
-        ss << version.Major << "." << version.Minor << "." << ps;// hacky
-        Latite::get().gameVersion = ss.str();
-    }*/
     Logger::Info("Minecraft {}", Latite::get().gameVersion);
 
     Logger::Info("Loading assets");
@@ -499,8 +480,6 @@ int Latite::getSelectedLanguage() {
 }
 
 void Latite::queueEject() noexcept {
-    // auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
-    // app.Title(L"");
     SetWindowTextW(SDK::GameCore::get()->hwnd, L"Minecraft");
     if (this->shouldEject.exchange(true, std::memory_order_acq_rel)) {
         return;
@@ -585,7 +564,6 @@ void Latite::threadsafeInit() {
     // TODO: latite beta only
     // if (SDK::ClientInstance::get()->minecraftGame->xuid.size() > 0) wnd->postXUID();
 
-    // auto app = winrt::Windows::UI::ViewManagement::ApplicationView::GetForCurrentView();
     std::string vstr(this->version);
 
 #if defined(LATITE_NIGHTLY)
@@ -596,7 +574,6 @@ void Latite::threadsafeInit() {
     auto ws = util::StrToWStr("Latite Client " + vstr);
 #endif
 
-    // app.Title(ws);
     SetWindowTextW(SDK::GameCore::get()->hwnd, ws.c_str());
     Latite::getPluginManager().loadPrerunScripts();
     Logger::Info("Loaded startup scripts");
@@ -860,35 +837,29 @@ void Latite::initL10n() {
 }
 
 namespace {
-    winrt::Windows::Foundation::IAsyncAction doDownloadAssets() {
-        auto http = HttpClient();
-
-        auto folderPath = util::GetLatitePath() / "Assets";
-
-        winrt::Windows::Foundation::Uri requestUri(
-            util::StrToWStr("https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll"));
-
-        auto buffer = co_await http.GetBufferAsync(requestUri);
-
-        std::filesystem::create_directories(folderPath);
-
-        auto folder = co_await StorageFolder::GetFolderFromPathAsync(folderPath.wstring());
-        auto file = co_await folder.CreateFileAsync(L"ChakraCore.dll", CreationCollisionOption::OpenIfExists);
-        IRandomAccessStream stream = co_await file.OpenAsync(FileAccessMode::ReadWrite);
-
-        DataWriter writer(stream);
-        writer.WriteBuffer(buffer);
-        writer.StoreAsync().get();
-        writer.FlushAsync().get();
-        co_return;
-    }
+    constexpr auto chakraCoreUrl =
+        L"https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll";
 }
 
 void Latite::downloadChakraCore() {
-    if (!downloadingAssets) {
-        this->downloadingAssets = true;
-        doDownloadAssets();
+    if (downloadingAssets) return;
+    downloadingAssets = true;
+
+    auto download = http::request(L"GET", chakraCoreUrl);
+    if (!download || download->status != 200) {
+        Logger::Warn("Could not download ChakraCore: {}",
+                     download ? std::format("HTTP {}", download->status) : download.error());
+        downloadingAssets = false;
+        return;
     }
+
+    auto assetPath = util::GetLatitePath() / "Assets" / "ChakraCore.dll";
+    std::filesystem::create_directories(assetPath.parent_path());
+    std::ofstream output(assetPath, std::ios::binary);
+    output.write(reinterpret_cast<char const*>(download->body.data()), download->body.size());
+    if (!output) Logger::Warn("Could not write ChakraCore.dll to {}", assetPath.string());
+
+    downloadingAssets = false;
 }
 
 void Latite::initLanguageSetting() {

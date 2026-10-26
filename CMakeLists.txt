@@ -1,6 +1,28 @@
 ﻿cmake_minimum_required(VERSION 3.22)
 
+if (POLICY CMP0141)
+    cmake_policy(SET CMP0141 NEW)
+    if (DEFINED ENV{WINEPREFIX})
+        set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug>:Embedded>$<$<CONFIG:RelWithDebInfo,Nightly>:ProgramDatabase>")
+    else ()
+        set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug>:EditAndContinue>$<$<CONFIG:RelWithDebInfo,Nightly>:ProgramDatabase>")
+    endif ()
+endif ()
+
 project(Latite)
+
+if (MSVC AND DEFINED ENV{WINEPREFIX} AND CMAKE_GENERATOR MATCHES "Ninja")
+    set(CMAKE_NINJA_FORCE_RESPONSE_FILE ON CACHE INTERNAL "")
+    set(CMAKE_CXX_USE_RESPONSE_FILE_FOR_LIBRARIES OFF)
+    set(CMAKE_C_COMPILE_OPTIONS_USE_PCH
+            -Yuz:<PCH_HEADER> -Fpz:<PCH_FILE> -FIz:<PCH_HEADER>)
+    set(CMAKE_C_COMPILE_OPTIONS_CREATE_PCH
+            -Ycz:<PCH_HEADER> -Fpz:<PCH_FILE> -FIz:<PCH_HEADER>)
+    set(CMAKE_CXX_COMPILE_OPTIONS_USE_PCH
+            -Yuz:<PCH_HEADER> -Fpz:<PCH_FILE> -FIz:<PCH_HEADER>)
+    set(CMAKE_CXX_COMPILE_OPTIONS_CREATE_PCH
+            -Ycz:<PCH_HEADER> -Fpz:<PCH_FILE> -FIz:<PCH_HEADER>)
+endif ()
 
 set(LATITE_BUILD_TIMESTAMP "" CACHE STRING
         "Optional fixed Latite build timestamp in YYYY-MM-DD_HH-mm-ssZ UTC format")
@@ -22,12 +44,6 @@ set(CMAKE_SHARED_LINKER_FLAGS_NIGHTLY "${CMAKE_SHARED_LINKER_FLAGS_RELEASE}" CAC
 if (NOT MSVC)
     message(FATAL_ERROR "Compiler unsupported, must use MSVC")
 endif()
-
-# Enable Hot Reload / debug info format for supported MSVC generators
-if (POLICY CMP0141)
-    cmake_policy(SET CMP0141 NEW)
-    set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug>:EditAndContinue>$<$<CONFIG:RelWithDebInfo,Nightly>:ProgramDatabase>")
-endif ()
 
 # MSVC runtime
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
@@ -151,8 +167,10 @@ target_include_directories(Latite PRIVATE
 
 # Link libraries
 target_link_libraries(Latite PRIVATE
-        # WinRT
-        WindowsApp.lib
+        # Native networking, hashing, and URI launching
+        Winhttp.lib
+        Bcrypt.lib
+        Shell32.lib
         Shlwapi.lib
 
         # Windows 10 fallback file picker
