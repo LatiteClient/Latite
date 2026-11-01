@@ -16,16 +16,16 @@ namespace SDK {
         std::string getXUID();
 
         SerializedSkinRef* getSkin() const {
-            return *reinterpret_cast<SerializedSkinRef* const*>(reinterpret_cast<uintptr_t>(this) + 0xAB0);
+            return *reinterpret_cast<SerializedSkinRef* const*>(reinterpret_cast<uintptr_t>(this) + 0xAD8);
         }
 
         // @dump-wbds Player::getSupplies, 3
-        CLASS_FIELD(PlayerInventory*, supplies, 0x5B8); // xref: getSupplies
+        CLASS_FIELD(PlayerInventory*, supplies, 0x5E0); // xref: getSupplies
         // @dump-wbds Player::getGameMode, 3
-        CLASS_FIELD(GameMode*, gameMode, 0xAA0); // xref: getGameMode
+        CLASS_FIELD(GameMode*, gameMode, 0xAC8); // xref: getGameMode
         // @dump-wbds Player::getName, 3
-        CLASS_FIELD(std::string, playerName, 0xBC0); // xref: getName
+        CLASS_FIELD(std::string, playerName, 0xBE8); // xref: getName
         // @dump-wbds ServerPlayer::sendNetworkPacket, 18
-        CLASS_FIELD(PacketSender*, packetSender, 0x7F8); // xref: Player::Player a3
+        CLASS_FIELD(PacketSender*, packetSender, 0x820); // xref: Player::Player a3
     };
 }

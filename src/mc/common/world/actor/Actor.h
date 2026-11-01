@@ -15,15 +15,15 @@ namespace SDK {
         Actor() = delete;
 
         CLASS_FIELD(EntityContext, entityContext, 0x8);
-        CLASS_FIELD(int32_t, ticksExisted, 0x198);
-        CLASS_FIELD(int32_t, invulnerableTime, 0x19C); // Mob::hurtEffects
+        CLASS_FIELD(int32_t, ticksExisted, 0x1C0);
+        CLASS_FIELD(int32_t, invulnerableTime, 0x1C4); // Mob::hurtEffects
         // @dump-wbds Actor::getDimensionConst, 9, -8
-        CLASS_FIELD(std::shared_ptr<class Dimension>, dimension, 0x1C8);
-        CLASS_FIELD(StateVectorComponent*, stateVector, 0x218);
-        CLASS_FIELD(AABBShapeComponent*, aabbShape, 0x220);
-        CLASS_FIELD(ActorRotationComponent*, actorRotation, 0x228);
+        CLASS_FIELD(std::shared_ptr<class Dimension>, dimension, 0x1F0);
+        CLASS_FIELD(StateVectorComponent*, stateVector, 0x240);
+        CLASS_FIELD(AABBShapeComponent*, aabbShape, 0x248);
+        CLASS_FIELD(ActorRotationComponent*, actorRotation, 0x250);
         // @dump-wbds Actor::getMolangVariables, 3
-        CLASS_FIELD(MolangVariableMap, molangVariableMap, 0x370);
+        CLASS_FIELD(MolangVariableMap, molangVariableMap, 0x390);
 
         ActorDataFlagComponent* getActorDataFlagsComponent();
 
