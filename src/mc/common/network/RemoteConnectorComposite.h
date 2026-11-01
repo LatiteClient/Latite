@@ -11,7 +11,7 @@ namespace SDK {
 
         RemoteConnector* getActiveConnector();
 
-        CLASS_FIELD(NetherNetConnector*, netherNetConnector, 0x68);
-        CLASS_FIELD(RakNetConnector*, rakNetConnector, 0x70);
+        CLASS_FIELD(NetherNetConnector*, netherNetConnector, 0x90);
+        CLASS_FIELD(RakNetConnector*, rakNetConnector, 0x98);
     };
 }

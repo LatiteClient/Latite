@@ -12,8 +12,8 @@ SDK::RemoteConnectorComposite* SDK::RemoteConnectorComposite::get() {
 }
 
 SDK::RemoteConnector* SDK::RemoteConnectorComposite::getActiveConnector() {
-    auto* ownerControlBlock = hat::member_at<uint8_t*>(this, 0x50);
-    auto* networkSessionOwner = hat::member_at<void*>(this, 0x60);
+    auto* ownerControlBlock = hat::member_at<uint8_t*>(this, 0x78);
+    auto* networkSessionOwner = hat::member_at<void*>(this, 0x88);
     if (!ownerControlBlock || !*ownerControlBlock || !networkSessionOwner) {
         return nullptr;
     }

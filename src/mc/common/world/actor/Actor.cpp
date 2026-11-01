@@ -67,7 +67,7 @@ void SDK::Actor::setNameTag(std::string* nametag) {
 }
 
 void SDK::Actor::setUIRendering(bool value) {
-    hat::member_at<bool>(this, 0x355) = value;
+    hat::member_at<bool>(this, 0x37D) = value;
 
     const auto dataFlagComp = this->tryGetComponent<ActorDataFlagComponent>();
     const auto dirtyDataFlagComp = this->tryGetComponent<ActorDataDirtyFlagsComponent>();

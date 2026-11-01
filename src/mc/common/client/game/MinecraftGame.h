@@ -10,7 +10,7 @@ namespace SDK {
     public:
         bool isCursorGrabbed();
 
-        CLASS_FIELD(GameRenderer*, gameRenderer, 0x1440);
+        CLASS_FIELD(GameRenderer*, gameRenderer, 0x1628);
 
         class FontRepository* getFontRepository();
 

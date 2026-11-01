@@ -252,7 +252,6 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         MVSIG(Vtable::Level),
         MVSIG(Tessellator_begin),
         MVSIG(Tessellator_vertex),
-        MVSIG(Tessellator_color),
         MVSIG(MeshHelpers_renderMeshImmediately),
         MVSIG(BaseActorRenderContext_BaseActorRenderContext),
         MVSIG(ItemRenderer_renderGuiItemNew),

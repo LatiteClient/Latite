@@ -6,7 +6,7 @@
 #include "mc/common/world/level/block/Block.h"
 
 namespace {
-    constexpr std::size_t BlockTypeAsItemInstanceVtableIndex = 0x4D; // BlockType::asItemInstance in 26.50
+    constexpr std::size_t BlockTypeAsItemInstanceVtableIndex = 0x4E; // BlockType::asItemInstance in 26.60
 }
 
 SDK::ItemStack* SDK::ItemStack::constructBlockItem(void* storage, SDK::Block const& block) {

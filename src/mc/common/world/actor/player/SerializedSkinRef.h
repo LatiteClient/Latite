@@ -46,14 +46,14 @@ namespace SDK {
             auto wrapper = *reinterpret_cast<uintptr_t const*>(this);
             if (!wrapper) return nullptr;
 
-            return reinterpret_cast<std::string const*>(wrapper + 0x40);
+            return reinterpret_cast<std::string const*>(wrapper + 0x20);
         }
 
         SkinImage const* getSkinImage() const {
             auto wrapper = *reinterpret_cast<uintptr_t const*>(this);
             if (!wrapper) return nullptr;
 
-            return reinterpret_cast<SkinImage const*>(wrapper + 0xA0);
+            return reinterpret_cast<SkinImage const*>(wrapper + 0x80);
         }
 
         bool isValid() const {
