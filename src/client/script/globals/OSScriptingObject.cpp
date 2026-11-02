@@ -1,11 +1,7 @@
 #include "OSScriptingObject.h"
 
-#include <winrt/base.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/windows.system.h>
-#include <winrt/Windows.UI.Core.h>
-#include <winrt/Windows.ApplicationModel.Core.h>
 #include <WinUser.h>
+#include <shellapi.h>
 
 #include <Windows.h>
 #include <Mmsystem.h>
@@ -15,8 +11,12 @@ JsValueRef OSScriptingObject::openUri(JsValueRef callee, bool isConstructor, JsV
     if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
     if (!Chakra::VerifyParameters({ { arguments[1], JsString } })) return JS_INVALID_REFERENCE;
 
-    auto uri = winrt::Windows::Foundation::Uri(Chakra::GetString(arguments[1]));
-    winrt::Windows::System::Launcher::LaunchUriAsync(uri);
+    auto uri = Chakra::GetString(arguments[1]);
+    auto result = ShellExecuteW(nullptr, L"open", uri.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+    if (reinterpret_cast<INT_PTR>(result) <= 32) {
+        Chakra::ThrowError(L"Could not open URI");
+    }
+
     return Chakra::GetUndefined();
 }
 

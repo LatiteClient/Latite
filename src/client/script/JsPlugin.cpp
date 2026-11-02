@@ -5,10 +5,9 @@
 #include "util/Util.h"
 #include "PluginManager.h"
 #include "util/Logger.h"
-
-using namespace winrt::Windows::Storage::Streams;
-using namespace winrt::Windows::Web::Http;
-using namespace winrt::Windows::Web::Http::Filters;
+#include "util/HttpClient.h"
+#include <bcrypt.h>
+#include <limits>
 
 void JsPlugin::checkTrusted() {
 #ifdef LATITE_DEBUG
@@ -17,25 +16,28 @@ void JsPlugin::checkTrusted() {
 #else
 
     trusted = false;
-    std::string url = "https://raw.githubusercontent.com/Imrglop/Latite-Releases/refs/heads/main/script_hashes.txt";
-    HttpClient client;
-    winrt::Windows::Foundation::Uri uri(winrt::to_hstring(url));
-
-    HttpRequestMessage request(HttpMethod::Get(), uri);
-    request.Headers().Insert(winrt::to_hstring("User-Agent"), winrt::to_hstring("WinRTApp"));
-
-    HttpResponseMessage response = client.SendRequestAsync(request).get();
-    if (response.StatusCode() != HttpStatusCode::Ok) {
-        Logger::Info("Plugin trust check request failed: {}", static_cast<int>(response.StatusCode()));
+    auto response = http::request(
+        L"GET", L"https://raw.githubusercontent.com/Imrglop/Latite-Releases/refs/heads/main/script_hashes.txt");
+    if (!response) {
+        Logger::Warn("Plugin trust check request failed: {}", response.error());
+        return;
+    }
+    if (response->status != 200) {
+        Logger::Warn("Plugin trust check request failed: HTTP {}", response->status);
         return;
     }
 
-    std::string stringResponse = to_string(response.Content().ReadAsStringAsync().get());
+    std::string stringResponse(response->body.begin(), response->body.end());
     std::optional<std::wstring> currentHash = getHash(this->getPath());
 
     std::istringstream stream(stringResponse);
     std::string hash;
     std::getline(stream, hash);
+
+    if (!hash.empty() && hash.back() == '\r') hash.pop_back();
+    std::transform(hash.begin(), hash.end(), hash.begin(), [](unsigned char digit) {
+        return static_cast<char>(std::tolower(digit));
+    });
 
     if (currentHash == util::StrToWStr(hash)) {
         trusted = true;
@@ -206,10 +208,6 @@ std::wstring JsPlugin::getCertificate() {
 }
 
 std::optional<std::wstring> JsPlugin::getHash(std::filesystem::path const& main) {
-    using winrt::Windows::Security::Cryptography::BinaryStringEncoding;
-    using winrt::Windows::Security::Cryptography::CryptographicBuffer;
-    using winrt::Windows::Security::Cryptography::Core::HashAlgorithmProvider;
-
     std::vector<std::filesystem::path> jsFiles;
 
     std::function<void(std::filesystem::path const&)> iterate = [&jsFiles,
@@ -246,15 +244,30 @@ std::optional<std::wstring> JsPlugin::getHash(std::filesystem::path const& main)
 
     // iterate(std::filesystem::path(indexPath).parent_path());
     if (hasRead) {
-        auto str = toHash.str();
-        auto input = CryptographicBuffer::ConvertStringToBinary(str, BinaryStringEncoding::Utf8);
-        auto hasher = HashAlgorithmProvider::OpenAlgorithm(
-            winrt::Windows::Security::Cryptography::Core::HashAlgorithmNames::Sha256());
-        auto hashed = hasher.HashData(input);
+        auto input = util::WStrToStr(toHash.str());
+        if (input.size() > std::numeric_limits<ULONG>::max()) return std::nullopt;
 
-        auto htostr = CryptographicBuffer::EncodeToHexString(hashed);
+        BCRYPT_ALG_HANDLE algorithm = nullptr;
+        if (BCryptOpenAlgorithmProvider(&algorithm, BCRYPT_SHA256_ALGORITHM, nullptr, 0) < 0) {
+            return std::nullopt;
+        }
 
-        return htostr.c_str();
+        std::array<unsigned char, 32> digest {};
+        auto status = BCryptHash(algorithm, nullptr, 0,
+                                 reinterpret_cast<unsigned char*>(input.data()),
+                                 static_cast<ULONG>(input.size()), digest.data(),
+                                 static_cast<ULONG>(digest.size()));
+        BCryptCloseAlgorithmProvider(algorithm, 0);
+        if (status < 0) return std::nullopt;
+
+        constexpr wchar_t hex[] = L"0123456789abcdef";
+        std::wstring result;
+        result.reserve(digest.size() * 2);
+        for (auto byte : digest) {
+            result += hex[byte >> 4];
+            result += hex[byte & 0x0f];
+        }
+        return result;
     }
     return std::nullopt;
 }

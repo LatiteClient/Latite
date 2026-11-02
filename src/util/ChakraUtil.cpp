@@ -5,16 +5,6 @@
 #include "Logger.h"
 #include <filesystem>
 
-#include <winrt/Windows.Web.Http.h>
-#include <winrt/windows.storage.h>
-#include <winrt/windows.storage.streams.h>
-
-using namespace winrt;
-using namespace winrt::Windows::Web::Http;
-using namespace winrt::Windows::Web::Http::Filters;
-using namespace winrt::Windows::Storage::Streams;
-using namespace winrt::Windows::Storage;
-
 FARPROC Chakra::pass(const char* name) {
     if (GetModuleHandleA(0) != GetModuleHandleA("Minecraft.Windows.exe")) return 0;
 

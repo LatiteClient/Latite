@@ -9,7 +9,7 @@ class GenericHooks : public HookGroup {
     static void* __fastcall ChatScreenController_sendChatMessage(void* controller, std::string& message);
     static void* __fastcall GameRenderer_renderCurrentFrame(void* rend);
     static LRESULT __fastcall MainWindow__windowProcCallback(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    static bool __fastcall GameCore_handleMouseInput(void* a1, void* a2, void* a3);
+    static bool __fastcall Mouse_processInputQueue(void* a1, void* a2, void* a3);
     static BOOL __stdcall hkLoadLibraryW(LPCWSTR lib);
     static int __fastcall RakPeer_getAveragePing(void* obj, char* guidOrAddy);
     static void __fastcall LocalPlayer_applyTurnDelta(void* obj, Vec2& vec);

@@ -2,11 +2,7 @@
 #include "../JsLibrary.h"
 #include "../JsPlugin.h"
 
-#include <winrt/windows.storage.streams.h>
-#include <winrt/base.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Web.Http.h>
-#include <winrt/windows.web.http.headers.h>
+#include "util/HttpClient.h"
 
 class Network : public JsLibrary {
 public:
@@ -19,21 +15,19 @@ public:
     public:
         std::wstring url = L"";
 
-        int err = 0;
-        std::optional<winrt::Windows::Storage::Streams::IBuffer> data = std::nullopt;
-        std::optional<std::wstring> winrtErr = std::nullopt;
+        int status = 0;
+        std::optional<std::vector<std::uint8_t>> body;
+        std::optional<std::wstring> error;
+        http::Headers headers;
 
         virtual void getArgs() override;
 
         NetAsyncOperation(JsValueRef callback, decltype(initFunc) initFunc, void* param)
             : JsScript::AsyncOperation(true, callback, initFunc, param)
-            , err(0)
-            , data(std::nullopt) {}
+            , status(0) {}
     };
 
 private:
-    static void deserializeHeaders(winrt::Windows::Web::Http::IHttpContent& content, JsValueRef jsArray);
-
     virtual bool shouldInclude(std::wstring const& str) override {
         // deprecated name
         if (str == L"network") {
@@ -49,8 +43,6 @@ private:
     static JsValueRef CALLBACK getSync(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
                                        unsigned short argCount, void* callbackState);
 
-    static JsValueRef CALLBACK post(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
-                                    unsigned short argCount, void* callbackState);
 
     static JsValueRef CALLBACK postSync(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
                                         unsigned short argCount, void* callbackState);
