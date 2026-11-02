@@ -1,7 +1,7 @@
 #pragma once
 namespace SDK {
     enum class OptionID {
-        Vsync = 56,
+        Vsync = 52,
     };
 
     class Option {

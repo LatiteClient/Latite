@@ -7,7 +7,7 @@
 namespace SDK {
     class ItemActor : public Actor {
     public:
-        CLASS_FIELD(ItemStack, itemStack, 0x3B0);
+        CLASS_FIELD(ItemStack, itemStack, 0x3D0);
 
         ItemStack* getItemStack() { return &itemStack; }
     };

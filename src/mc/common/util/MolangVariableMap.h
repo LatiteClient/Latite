@@ -8,8 +8,6 @@ namespace SDK {
         std::vector<short> mMapFromVariableIndexToVariableArrayOffset;
         std::vector<std::unique_ptr<MolangVariable>> mVariables;
         bool mHasPublicVariables;
-        bool mHasVariablesThatShouldSync;
-        bool mHasVariablesThatShouldSave;
 
         MolangVariable* _getOrAddMolangVariable(uint16_t index);
         MolangVariable* getMolangVariable(uint64_t hash, char const* name);
