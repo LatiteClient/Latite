@@ -50,6 +50,7 @@
 #include "render/asset/Assets.h"
 #include "resource/Resource.h"
 #include "feature/module/modules/game/Freelook.h"
+#include "util/GameAllocator.h"
 
 using namespace std;
 
@@ -179,6 +180,7 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
     }
 
     Logger::Info("Minecraft {}", Latite::get().gameVersion);
+    Logger::Info("Using {} memory allocator", GameAllocator::backendName());
 
     Logger::Info("Loading assets");
     Latite::get().dllInst = dll;
