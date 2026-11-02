@@ -2,7 +2,7 @@
 
 if (POLICY CMP0141)
     cmake_policy(SET CMP0141 NEW)
-    if (DEFINED ENV{WINEPREFIX})
+    if (CMAKE_HOST_UNIX)
         set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug>:Embedded>$<$<CONFIG:RelWithDebInfo,Nightly>:ProgramDatabase>")
     else ()
         set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug>:EditAndContinue>$<$<CONFIG:RelWithDebInfo,Nightly>:ProgramDatabase>")
@@ -11,7 +11,7 @@ endif ()
 
 project(Latite)
 
-if (MSVC AND DEFINED ENV{WINEPREFIX} AND CMAKE_GENERATOR MATCHES "Ninja")
+if (MSVC AND CMAKE_HOST_UNIX AND CMAKE_GENERATOR MATCHES "Ninja")
     set(CMAKE_NINJA_FORCE_RESPONSE_FILE ON CACHE INTERNAL "")
     set(CMAKE_CXX_USE_RESPONSE_FILE_FOR_LIBRARIES OFF)
     set(CMAKE_C_COMPILE_OPTIONS_USE_PCH

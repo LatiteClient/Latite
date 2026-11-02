@@ -216,7 +216,7 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
         MVSIG(ClientInstance_releaseCursor),
         MVSIG(MultiPlayerLevel__subTick),
         MVSIG(ChatScreenController_sendChatMessage),
-        MVSIG(GameCore_handleMouseInput),
+        MVSIG(Mouse_processInputQueue),
         MVSIG(MinecraftGame_onDeviceLost),
         MVSIG(RenderController_getOverlayColor),
         MVSIG(ScreenView_setupAndRender),
