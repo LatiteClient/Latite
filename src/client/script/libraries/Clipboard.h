@@ -3,7 +3,6 @@
 #include <functional>
 #include <thread>
 #include "../JsPlugin.h"
-#include <winrt/windows.storage.streams.h>
 
 class Clipboard : public JsLibrary {
 public:

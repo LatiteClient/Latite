@@ -134,12 +134,12 @@ public:
         "MinecraftGame::onDeviceLost"
     };
 
-    inline static SigImpl GameCore_handleMouseInput {
+    inline static SigImpl Mouse_processInputQueue {
         [](memory::signature_store&, uintptr_t res) {
             return res;
         },
-        "55 41 57 41 56 41 55 41 54 56 57 53 48 81 EC ? ? ? ? 48 8D AC 24 ? ? ? ? 44 0F 29 AD ? ? ? ? 44 0F 29 A5 ? ? ? ? 44 0F 29 9D ? ? ? ? 44 0F 29 95 ? ? ? ? 44 0F 29 8D ? ? ? ? 44 0F 29 85 ? ? ? ? 0F 29 BD ? ? ? ? 0F 29 B5 ? ? ? ? 48 C7 85 ? ? ? ? ? ? ? ? 48 89 CE 8B 05"_sig,
-        "GameCore::handleMouseInput"
+        "41 57 41 56 41 55 41 54 56 57 55 53 48 83 EC ? 44 0F 29 44 24 ? 0F 29 7C 24 ? 0F 29 74 24 ? 49 89 CE C7 05 ? ? ? ? FF FF FF FF 48 8B 0D ? ? ? ? 48 8B 05 ? ? ? ? 48 29 C1 48 C1 E9 02 69 C9 CD CC CC CC 89 4C 24 ? 85 C9"_sig,
+        "Mouse::processInputQueue"
     };
 
     inline static SigImpl RenderController_getOverlayColor { [](memory::signature_store& store, uintptr_t) {

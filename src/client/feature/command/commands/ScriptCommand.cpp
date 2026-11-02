@@ -7,9 +7,6 @@
 #include "client/Latite.h"
 #include <client/script/JsPlugin.h>
 
-using namespace winrt::Windows::Storage::Streams;
-using namespace winrt::Windows::Web::Http;
-using namespace winrt::Windows::Web::Http::Filters;
 
 ScriptCommand::ScriptCommand()
     : Command("plugin", LocalizeString::get("client.commands.plugin.desc"),

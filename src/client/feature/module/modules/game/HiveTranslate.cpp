@@ -4,17 +4,10 @@
 #include "HiveTranslate.h"
 #include "client/Latite.h"
 #include "client/misc/ServerDetection.h"
+#include "util/HttpClient.h"
 
 #include <regex>
-#include <winrt/base.h>
 #include <nlohmann/json.hpp>
-#include <winrt/Windows.Web.Http.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/windows.storage.streams.h>
-
-using namespace winrt;
-using namespace winrt::Windows::Web::Http;
-using namespace winrt::Windows::Foundation;
 
 auto urlEncode = [](const std::string& str) {
     std::string encoded = str;
@@ -51,48 +44,27 @@ void HiveTranslate::onText(Event& evG) {
     std::string url =
         "https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=auto&tl=" + targetLang + "&q=" + query;
 
-    try {
-        winrt::Windows::Foundation::Uri requestUri(std::wstring(url.begin(), url.end()));
-        HttpRequestMessage request(HttpMethod::Get(), requestUri);
+    std::thread([url = util::StrToWStr(url), targetLang] {
+        auto response = http::request(L"GET", url);
+        if (!response) {
+            Logger::Warn("HiveTranslate: HTTP request failed: {}", response.error());
+            return;
+        }
+        if (response->status != 200) return;
 
-        auto http = HttpClient();
+        try {
+            auto translation = nlohmann::json::parse(response->body);
+            std::string originLang = translation[0][1].get<std::string>();
+            if (originLang == targetLang) return;
 
-        http.SendRequestAsync(request).Completed([this, targetLang](const auto& op, auto status) {
-            try {
-                if (status != AsyncStatus::Completed) return;
+            std::string formattedMsg =
+                "\u00c2\u00a77" +
+                util::WStrToStr(LocalizeString::get("client.module.hiveTranslate.translatedFrom")) + " " +
+                originLang + ": " + translation[0][0].get<std::string>();
 
-                auto response = op.GetResults();
-
-                if ((int)response.StatusCode() != 200) return;
-
-                auto buffer = response.Content().ReadAsBufferAsync().get();
-                std::string responseBody(reinterpret_cast<char*>(buffer.data()), buffer.Length());
-                auto json = nlohmann::json::parse(responseBody);
-
-                std::string originLang = json[0][1].get<std::string>();
-                if (originLang == targetLang) return;
-
-                std::string formattedMsg =
-                    "\u00c2\u00a77" +
-                    util::WStrToStr(LocalizeString::get("client.module.hiveTranslate.translatedFrom")) + " " +
-                    originLang + ": " + json[0][0].get<std::string>();
-
-                Latite::get().getClientMessageQueue().push(formattedMsg);
-
-            } catch (nlohmann::json::exception const& err) {
-                std::string msg = "HiveTranslate: HTTP request failed: " + std::string(err.what());
-                Logger::Warn(msg);
-                Latite::getClientMessageQueue().push(msg);
-            } catch (winrt::hresult_error const& err) {
-                std::string msg = "HiveTranslate: HTTP request failed: " + winrt::to_string(err.message());
-                Logger::Warn(msg);
-                Latite::getClientMessageQueue().push(msg);
-            }
-        });
-
-    } catch (winrt::hresult_error const& err) {
-        std::string msg = "HiveTranslate: HTTP request failed: " + winrt::to_string(err.message());
-        Logger::Warn(msg);
-        Latite::getClientMessageQueue().push(msg);
-    }
+            Latite::getClientMessageQueue().push(formattedMsg);
+        } catch (nlohmann::json::exception const& error) {
+            Logger::Warn("HiveTranslate: Invalid response: {}", error.what());
+        }
+    }).detach();
 }

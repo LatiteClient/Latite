@@ -18,7 +18,7 @@ namespace {
     std::shared_ptr<Hook> GameRenderer_renderCurrentFrameHook;
     // std::shared_ptr<Hook> Keyboard_feedHook;
     std::shared_ptr<Hook> MainWindow__windowProcCallbackHook;
-    std::shared_ptr<Hook> GameCore_handleMouseInputHook;
+    std::shared_ptr<Hook> Mouse_processInputQueueHook;
     std::shared_ptr<Hook> LoadLibraryWHook;
     std::shared_ptr<Hook> LoadLibraryAHook;
     std::shared_ptr<Hook> AveragePingHook;
@@ -129,17 +129,13 @@ LRESULT GenericHooks::MainWindow__windowProcCallback(HWND hwnd, UINT msg, WPARAM
                                                                                                   lParam);
 }
 
-bool GenericHooks::GameCore_handleMouseInput(void* a1, void* a2, void* a3) { // Made up name
-    const auto res = GameCore_handleMouseInputHook->oFunc<decltype(&GameCore_handleMouseInput)>()(a1, a2, a3);
-
+bool GenericHooks::Mouse_processInputQueue(void* a1, void* a2, void* a3) {
+    // The original consumes the queued inputs, so filter them before it runs
     const auto mouse = SDK::MouseDevice::get();
 
-    for (size_t i = 0; i < mouse->inputs.size(); i++) { // This method sucks, but gets the job done
-        auto& start = mouse->inputs.at(i);
-        auto it = std::next(mouse->inputs.begin(), i);
-
-        const auto button = start.action;
-        const auto state = start.data;
+    for (auto it = mouse->inputs.begin(); it != mouse->inputs.end();) {
+        const auto button = it->action;
+        const auto state = it->data;
 
         if (button > 0) {
             Vec2& mousePos = SDK::ClientInstance::get()->cursorPos;
@@ -171,16 +167,20 @@ bool GenericHooks::GameCore_handleMouseInput(void* a1, void* a2, void* a3) { // 
 
             PluginManager::Event ev { L"click", values, true };
             if (Latite::getPluginManager().dispatchEvent(ev)) {
-                mouse->inputs.erase(it);
+                it = mouse->inputs.erase(it);
                 continue;
             }
         }
 
         ClickEvent ev { button, static_cast<char>(state) };
-        if (Eventing::get().dispatch(ev)) mouse->inputs.erase(it);
+        if (Eventing::get().dispatch(ev)) {
+            it = mouse->inputs.erase(it);
+            continue;
+        }
+        ++it;
     }
 
-    return res;
+    return Mouse_processInputQueueHook->oFunc<decltype(&Mouse_processInputQueue)>()(a1, a2, a3);
 }
 
 BOOL __stdcall GenericHooks::hkLoadLibraryW(LPCWSTR lib) {
@@ -470,8 +470,8 @@ GenericHooks::GenericHooks()
     MainWindow__windowProcCallbackHook = addHook(Signatures::MainWindow__windowProcCallback.result,
                                                  MainWindow__windowProcCallback, "MainWindow::_windowProcCallback");
 
-    GameCore_handleMouseInputHook =
-        addHook(Signatures::GameCore_handleMouseInput.result, GameCore_handleMouseInput, "GameCore::handleMouseInput");
+    Mouse_processInputQueueHook =
+        addHook(Signatures::Mouse_processInputQueue.result, Mouse_processInputQueue, "Mouse::processInputQueue");
 
     AveragePingHook =
         addHook(Signatures::RakPeer_GetAveragePing.result, RakPeer_getAveragePing, "RakPeer::GetAveragePing");
