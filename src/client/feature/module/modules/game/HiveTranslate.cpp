@@ -58,9 +58,8 @@ void HiveTranslate::onText(Event& evG) {
             if (originLang == targetLang) return;
 
             std::string formattedMsg =
-                "\u00c2\u00a77" +
-                util::WStrToStr(LocalizeString::get("client.module.hiveTranslate.translatedFrom")) + " " +
-                originLang + ": " + translation[0][0].get<std::string>();
+                "\u00c2\u00a77" + util::WStrToStr(LocalizeString::get("client.module.hiveTranslate.translatedFrom")) +
+                " " + originLang + ": " + translation[0][0].get<std::string>();
 
             Latite::getClientMessageQueue().push(formattedMsg);
         } catch (nlohmann::json::exception const& error) {

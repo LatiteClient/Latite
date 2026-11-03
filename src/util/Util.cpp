@@ -706,8 +706,7 @@ void util::KeepInBounds(d2d::Rect& targ, d2d::Rect const& bounds) {
 
 bool util::IsRunningUnderWine() {
     static const bool underWine = [] {
-        if (const auto ntdll = GetModuleHandleW(L"ntdll.dll");
-            ntdll && GetProcAddress(ntdll, "wine_get_version")) {
+        if (const auto ntdll = GetModuleHandleW(L"ntdll.dll"); ntdll && GetProcAddress(ntdll, "wine_get_version")) {
             return true;
         }
 

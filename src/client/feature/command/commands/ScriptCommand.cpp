@@ -7,7 +7,6 @@
 #include "client/Latite.h"
 #include <client/script/JsPlugin.h>
 
-
 ScriptCommand::ScriptCommand()
     : Command("plugin", LocalizeString::get("client.commands.plugin.desc"),
               "\n$ load <folderPath>\n$ install <pluginName>\n$ unload \"<pluginName>\"\n$ startup <folderPath>\n$ "

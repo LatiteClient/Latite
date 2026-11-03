@@ -21,16 +21,14 @@ std::wstringstream PingDisplay::text(bool isDefault, bool inEditor) {
         bool found = false;
 
         for (const auto& connection : SDK::ClientInstance::get()->packetSender->networkSystem->getConnections()) {
-            if (connection == nullptr || connection->shouldSkip || connection->networkPeer == nullptr)
-                continue;
+            if (connection == nullptr || connection->shouldSkip || connection->networkPeer == nullptr) continue;
 
             dPing = static_cast<int>(connection->networkPeer->getNetworkStatus().currentPing);
             found = true;
             break;
         }
 
-        if (!found)
-            dPing = ping;
+        if (!found) dPing = ping;
     }
 
     wss << dPing;

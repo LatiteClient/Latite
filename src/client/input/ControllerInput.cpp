@@ -151,8 +151,7 @@ struct ControllerInput::Impl {
         // GameInput support, so it does not need to be included if user is on Linux
         // Furthermore, SDL's GameInput backend causes some weird race condition which kills mouse support
         // when under Wine, so this needs to be disabled on Wine anyway.
-        SDL_SetHintWithPriority(SDL_HINT_JOYSTICK_GAMEINPUT, util::IsRunningUnderWine() ? "0" : "1",
-                                SDL_HINT_OVERRIDE);
+        SDL_SetHintWithPriority(SDL_HINT_JOYSTICK_GAMEINPUT, util::IsRunningUnderWine() ? "0" : "1", SDL_HINT_OVERRIDE);
         SDL_SetHintWithPriority(SDL_HINT_JOYSTICK_ENHANCED_REPORTS, "auto", SDL_HINT_OVERRIDE);
         SDL_SetHintWithPriority(SDL_HINT_JOYSTICK_HIDAPI_SWITCH_PLAYER_LED, "0", SDL_HINT_OVERRIDE);
 

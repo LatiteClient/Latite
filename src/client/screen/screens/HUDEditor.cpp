@@ -238,27 +238,33 @@ void HUDEditor::onRenderLayer(Event& evGeneric) {
     /*if (paperdoll) {
         d2d::Rect rec = paperdoll->getRect();
         rec.bottom += rec.getHeight();
-        //rec.bottom = 0.f;
-        if (((sdk::CustomRenderComponent*)paperdoll->uiComponents[4])->rend->timeToClose > 0.05f) {
+
+     * //rec.bottom = 0.f;
+        if (((sdk::CustomRenderComponent*)paperdoll->uiComponents[4])->rend->timeToClose >
+     * 0.05f) {
 
             rec.left *= uiscale;
             rec.right *= uiscale;
             rec.top *= uiscale;
-            rec.bottom *= uiscale;
+
+     * rec.bottom *= uiscale;
             controls.push_back(rec);
         }
     }
 
     if (playerPos) {
-        d2d::Rect rec = playerPos->getRect();
+ d2d::Rect rec
+     * = playerPos->getRect();
         //rec.bottom = 0.f;
         rec.right = rec.left + (rec.getWidth());
 
-        rec.left *= uiscale;
+ rec.left
+     * *= uiscale;
         rec.right *= uiscale;
         rec.top *= uiscale;
         rec.bottom *= uiscale;
-        controls.push_back(rec);
+
+     * controls.push_back(rec);
     }*/
     //}
 }

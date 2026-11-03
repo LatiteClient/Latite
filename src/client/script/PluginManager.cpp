@@ -219,15 +219,14 @@ std::expected<void, std::string> PluginManager::installScript(std::string const&
         return std::unexpected("JSON parse error while installing plugin: " + std::string(error.what()));
     }
 
-    if (!scriptsJson.is_object() || !scriptsJson.contains("plugins") ||
-        !scriptsJson["plugins"].is_array()) {
+    if (!scriptsJson.is_object() || !scriptsJson.contains("plugins") || !scriptsJson["plugins"].is_array()) {
         return std::unexpected("The plugin index is invalid");
     }
 
     auto& arr = scriptsJson["plugins"];
     for (auto& js : arr) {
-        if (!js.is_object() || !js.contains("name") || !js["name"].is_string() ||
-            !js.contains("files") || !js["files"].is_array()) {
+        if (!js.is_object() || !js.contains("name") || !js["name"].is_string() || !js.contains("files") ||
+            !js["files"].is_array()) {
             continue;
         }
 
@@ -247,8 +246,8 @@ std::expected<void, std::string> PluginManager::installScript(std::string const&
                 auto download = http::request(L"GET", registry + L"/" + woName + L"/" + fws);
                 if (!download) return std::unexpected(download.error());
                 if (download->status != 200) {
-                    return std::unexpected("Could not download plugin file (HTTP " +
-                                           std::to_string(download->status) + ")");
+                    return std::unexpected("Could not download plugin file (HTTP " + std::to_string(download->status) +
+                                           ")");
                 }
 
                 auto downloadPath = path / fws;
@@ -289,8 +288,7 @@ std::vector<PluginManager::PluginInfo> PluginManager::fetchPluginsFromMarket() {
         return list;
     }
 
-    if (!scriptsJson.is_object() || !scriptsJson.contains("plugins") ||
-        !scriptsJson["plugins"].is_array()) {
+    if (!scriptsJson.is_object() || !scriptsJson.contains("plugins") || !scriptsJson["plugins"].is_array()) {
         Logger::Warn("The plugin index is invalid");
         return list;
     }

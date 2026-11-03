@@ -13,7 +13,7 @@ namespace SDK {
     class NetworkPeer {
     public:
         NetworkStatus getNetworkStatus() {
-            NetworkStatus status{};
+            NetworkStatus status {};
             memory::callVirtual<void, NetworkStatus&>(this, 2, status);
             return status;
         }

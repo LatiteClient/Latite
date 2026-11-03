@@ -36,8 +36,8 @@ class JsWebSocketClass final : public JsWrapperClass<WebSocketHolder> {
                                     unsigned short argCount, void* callbackState);
     static JsValueRef CALLBACK close(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
                                      unsigned short argCount, void* callbackState);
-    static JsValueRef CALLBACK on(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
-                                  unsigned short argCount, void* callbackState);
+    static JsValueRef CALLBACK on(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount,
+                                  void* callbackState);
     static JsValueRef CALLBACK toStringCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
                                                 unsigned short argCount, void* callbackState) {
         return Chakra::MakeString(L"[object WebSocket]");
@@ -46,7 +46,8 @@ class JsWebSocketClass final : public JsWrapperClass<WebSocketHolder> {
 public:
     inline static const wchar_t* class_name = L"WebSocket";
 
-    JsWebSocketClass(JsScript* owner) : JsWrapperClass(owner, class_name) {
+    JsWebSocketClass(JsScript* owner)
+        : JsWrapperClass(owner, class_name) {
         createConstructor(jsConstructor, this);
     }
 

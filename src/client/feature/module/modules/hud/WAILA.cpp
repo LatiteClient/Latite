@@ -761,17 +761,13 @@ void WAILA::drawHealthHearts(DrawUtil& dc, float x, float y, float health, float
         SDK::TexturePtr backgroundTexture {};
         SDK::TexturePtr heartTexture {};
         SDK::TexturePtr halfHeartTexture {};
-        mc.renderCtx->getTexture(&backgroundTexture,
-                                 SDK::ResourceLocation("textures/ui/heart_background",
-                                                       SDK::ResourceFileSystem::UserPackage),
-                                 false);
         mc.renderCtx->getTexture(
-            &heartTexture,
-            SDK::ResourceLocation("textures/ui/heart", SDK::ResourceFileSystem::UserPackage),
-            false);
+            &backgroundTexture,
+            SDK::ResourceLocation("textures/ui/heart_background", SDK::ResourceFileSystem::UserPackage), false);
+        mc.renderCtx->getTexture(
+            &heartTexture, SDK::ResourceLocation("textures/ui/heart", SDK::ResourceFileSystem::UserPackage), false);
         mc.renderCtx->getTexture(&halfHeartTexture,
-                                 SDK::ResourceLocation("textures/ui/heart_half",
-                                                       SDK::ResourceFileSystem::UserPackage),
+                                 SDK::ResourceLocation("textures/ui/heart_half", SDK::ResourceFileSystem::UserPackage),
                                  false);
 
         if (backgroundTexture.textureData && heartTexture.textureData && halfHeartTexture.textureData) {

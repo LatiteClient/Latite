@@ -43,7 +43,6 @@ private:
     static JsValueRef CALLBACK getSync(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
                                        unsigned short argCount, void* callbackState);
 
-
     static JsValueRef CALLBACK postSync(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
                                         unsigned short argCount, void* callbackState);
 };

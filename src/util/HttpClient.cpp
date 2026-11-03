@@ -5,27 +5,28 @@
 #include <winhttp.h>
 
 namespace {
-struct InternetHandle {
-    HINTERNET value = nullptr;
+    struct InternetHandle {
+        HINTERNET value = nullptr;
 
-    explicit InternetHandle(HINTERNET handle) : value(handle) {}
+        explicit InternetHandle(HINTERNET handle)
+            : value(handle) {}
 
-    ~InternetHandle() {
-        if (value) WinHttpCloseHandle(value);
-    }
+        ~InternetHandle() {
+            if (value) WinHttpCloseHandle(value);
+        }
 
-    InternetHandle(InternetHandle const&) = delete;
-    InternetHandle& operator=(InternetHandle const&) = delete;
-};
+        InternetHandle(InternetHandle const&) = delete;
+        InternetHandle& operator=(InternetHandle const&) = delete;
+    };
 }
 
 std::string http::errorMessage(char const* operation, unsigned long error) {
     return std::format("{} failed (Win32 error {})", operation, error);
 }
 
-std::expected<http::Response, std::string> http::request(
-    std::wstring const& method, std::wstring const& url,
-    std::vector<std::uint8_t> const& body, Headers const& headers) {
+std::expected<http::Response, std::string> http::request(std::wstring const& method, std::wstring const& url,
+                                                         std::vector<std::uint8_t> const& body,
+                                                         Headers const& headers) {
     URL_COMPONENTS parts {};
     parts.dwStructSize = sizeof(parts);
     parts.dwSchemeLength = static_cast<DWORD>(-1);
@@ -54,8 +55,8 @@ std::expected<http::Response, std::string> http::request(
     }
     if (path.empty()) path = L"/";
 
-    InternetHandle session(WinHttpOpen(L"Latite Client/2.9", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
-                                       WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0));
+    InternetHandle session(WinHttpOpen(L"Latite Client/2.9", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME,
+                                       WINHTTP_NO_PROXY_BYPASS, 0));
     if (!session.value) {
         return std::unexpected(errorMessage("WinHttpOpen", GetLastError()));
     }
@@ -77,8 +78,7 @@ std::expected<http::Response, std::string> http::request(
     }
 
     for (auto const& [name, value] : headers) {
-        if (name.find_first_of(L"\r\n:") != std::wstring::npos ||
-            value.find_first_of(L"\r\n") != std::wstring::npos) {
+        if (name.find_first_of(L"\r\n:") != std::wstring::npos || value.find_first_of(L"\r\n") != std::wstring::npos) {
             return std::unexpected("Invalid HTTP header");
         }
 
@@ -91,8 +91,8 @@ std::expected<http::Response, std::string> http::request(
 
     auto length = static_cast<DWORD>(body.size());
     if (!WinHttpSendRequest(handle.value, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
-                            length ? const_cast<std::uint8_t*>(body.data()) : WINHTTP_NO_REQUEST_DATA,
-                            length, length, 0)) {
+                            length ? const_cast<std::uint8_t*>(body.data()) : WINHTTP_NO_REQUEST_DATA, length, length,
+                            0)) {
         return std::unexpected(errorMessage("WinHttpSendRequest", GetLastError()));
     }
 
@@ -103,8 +103,7 @@ std::expected<http::Response, std::string> http::request(
     Response response;
     DWORD statusSize = sizeof(response.status);
     if (!WinHttpQueryHeaders(handle.value, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER,
-                             WINHTTP_HEADER_NAME_BY_INDEX, &response.status, &statusSize,
-                             WINHTTP_NO_HEADER_INDEX)) {
+                             WINHTTP_HEADER_NAME_BY_INDEX, &response.status, &statusSize, WINHTTP_NO_HEADER_INDEX)) {
         return std::unexpected(errorMessage("WinHttpQueryHeaders", GetLastError()));
     }
 

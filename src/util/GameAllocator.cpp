@@ -25,12 +25,15 @@ namespace {
     // mov rcx, [rip+gAllocator] <- +8, disp32 at +0xB, next instruction at +0xF
     // mov rax, [rcx]
     constexpr int16_t operatorNewSig[] = {
-        0x56, 0x48, 0x83, 0xEC, -1,   0x48, 0x89, 0xCE, 0x48,
-        0x8B, 0x0D, -1,   -1,   -1,   -1,   0x48, 0x8B, 0x01,
+        0x56, 0x48, 0x83, 0xEC, -1, 0x48, 0x89, 0xCE, 0x48, 0x8B, 0x0D, -1, -1, -1, -1, 0x48, 0x8B, 0x01,
     };
     constexpr size_t allocatorRefOffset = 8;
 
-    enum class Backend { Game, MallocRedirect, Crt };
+    enum class Backend {
+        Game,
+        MallocRedirect,
+        Crt
+    };
 
     struct State {
         Backend backend = Backend::Crt;
@@ -60,8 +63,7 @@ namespace {
             const auto* last = begin + size - sigLen;
 
             for (const auto* p = begin; p <= last; p++) {
-                p = static_cast<const uint8_t*>(
-                    std::memchr(p, operatorNewSig[0], static_cast<size_t>(last - p) + 1));
+                p = static_cast<const uint8_t*>(std::memchr(p, operatorNewSig[0], static_cast<size_t>(last - p) + 1));
                 if (!p) break;
 
                 bool match = true;
@@ -78,7 +80,7 @@ namespace {
     }
 
     State resolve() {
-        State s{};
+        State s {};
 
         if (const auto op = findOperatorNew(GetModuleHandleW(nullptr))) {
             const auto ref = op + allocatorRefOffset;
@@ -105,7 +107,7 @@ namespace {
         }
 
         // Not running in a game that uses a custom allocator.
-        return State{};
+        return State {};
     }
 
     const State& state() {
@@ -172,12 +174,12 @@ namespace {
 
     void* allocOrThrow(size_t size) {
         if (auto* p = allocRaw(size)) return p;
-        throw std::bad_alloc{};
+        throw std::bad_alloc {};
     }
 
     void* alignedAllocOrThrow(size_t size, std::align_val_t align) {
         if (auto* p = alignedAllocRaw(size, align)) return p;
-        throw std::bad_alloc{};
+        throw std::bad_alloc {};
     }
 }
 
@@ -192,20 +194,44 @@ const char* GameAllocator::backendName() {
     }
 }
 
-void* operator new(size_t size) { return allocOrThrow(size); }
-void* operator new[](size_t size) { return allocOrThrow(size); }
-void* operator new(size_t size, const std::nothrow_t&) noexcept { return allocRaw(size); }
-void* operator new[](size_t size, const std::nothrow_t&) noexcept { return allocRaw(size); }
+void* operator new(size_t size) {
+    return allocOrThrow(size);
+}
+void* operator new[](size_t size) {
+    return allocOrThrow(size);
+}
+void* operator new(size_t size, const std::nothrow_t&) noexcept {
+    return allocRaw(size);
+}
+void* operator new[](size_t size, const std::nothrow_t&) noexcept {
+    return allocRaw(size);
+}
 
-void operator delete(void* ptr) noexcept { freeRaw(ptr); }
-void operator delete[](void* ptr) noexcept { freeRaw(ptr); }
-void operator delete(void* ptr, size_t) noexcept { freeRaw(ptr); }
-void operator delete[](void* ptr, size_t) noexcept { freeRaw(ptr); }
-void operator delete(void* ptr, const std::nothrow_t&) noexcept { freeRaw(ptr); }
-void operator delete[](void* ptr, const std::nothrow_t&) noexcept { freeRaw(ptr); }
+void operator delete(void* ptr) noexcept {
+    freeRaw(ptr);
+}
+void operator delete[](void* ptr) noexcept {
+    freeRaw(ptr);
+}
+void operator delete(void* ptr, size_t) noexcept {
+    freeRaw(ptr);
+}
+void operator delete[](void* ptr, size_t) noexcept {
+    freeRaw(ptr);
+}
+void operator delete(void* ptr, const std::nothrow_t&) noexcept {
+    freeRaw(ptr);
+}
+void operator delete[](void* ptr, const std::nothrow_t&) noexcept {
+    freeRaw(ptr);
+}
 
-void* operator new(size_t size, std::align_val_t align) { return alignedAllocOrThrow(size, align); }
-void* operator new[](size_t size, std::align_val_t align) { return alignedAllocOrThrow(size, align); }
+void* operator new(size_t size, std::align_val_t align) {
+    return alignedAllocOrThrow(size, align);
+}
+void* operator new[](size_t size, std::align_val_t align) {
+    return alignedAllocOrThrow(size, align);
+}
 void* operator new(size_t size, std::align_val_t align, const std::nothrow_t&) noexcept {
     return alignedAllocRaw(size, align);
 }
@@ -213,9 +239,21 @@ void* operator new[](size_t size, std::align_val_t align, const std::nothrow_t&)
     return alignedAllocRaw(size, align);
 }
 
-void operator delete(void* ptr, std::align_val_t) noexcept { alignedFreeRaw(ptr); }
-void operator delete[](void* ptr, std::align_val_t) noexcept { alignedFreeRaw(ptr); }
-void operator delete(void* ptr, size_t, std::align_val_t) noexcept { alignedFreeRaw(ptr); }
-void operator delete[](void* ptr, size_t, std::align_val_t) noexcept { alignedFreeRaw(ptr); }
-void operator delete(void* ptr, std::align_val_t, const std::nothrow_t&) noexcept { alignedFreeRaw(ptr); }
-void operator delete[](void* ptr, std::align_val_t, const std::nothrow_t&) noexcept { alignedFreeRaw(ptr); }
+void operator delete(void* ptr, std::align_val_t) noexcept {
+    alignedFreeRaw(ptr);
+}
+void operator delete[](void* ptr, std::align_val_t) noexcept {
+    alignedFreeRaw(ptr);
+}
+void operator delete(void* ptr, size_t, std::align_val_t) noexcept {
+    alignedFreeRaw(ptr);
+}
+void operator delete[](void* ptr, size_t, std::align_val_t) noexcept {
+    alignedFreeRaw(ptr);
+}
+void operator delete(void* ptr, std::align_val_t, const std::nothrow_t&) noexcept {
+    alignedFreeRaw(ptr);
+}
+void operator delete[](void* ptr, std::align_val_t, const std::nothrow_t&) noexcept {
+    alignedFreeRaw(ptr);
+}

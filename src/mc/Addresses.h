@@ -83,8 +83,7 @@ public:
     inline static SigImpl Options_setPerspective { [](memory::signature_store&, uintptr_t res) {
                                                       return res;
                                                   },
-                                                   "56 57 48 83 EC ? 89 D6 48 8B 81"_sig,
-                                                   "Options::setPerspective" };
+                                                   "56 57 48 83 EC ? 89 D6 48 8B 81"_sig, "Options::setPerspective" };
 
     inline static SigImpl Options_getHideHand {
         [](memory::signature_store&, uintptr_t res) {
@@ -156,11 +155,12 @@ public:
         "ScreenView::setupAndRender"
     };
 
-    inline static SigImpl MinecraftGame__update { [](memory::signature_store& store, uintptr_t) {
-                                                     return store.deref(1);
-                                                 },
-                                                  "E8 ? ? ? ? 90 48 8B 8F ? ? ? ? BA ? ? ? ? E8 ? ? ? ? 90 48 8B 9F"_sig,
-                                                  "MinecraftGame::_update" };
+    inline static SigImpl MinecraftGame__update {
+        [](memory::signature_store& store, uintptr_t) {
+            return store.deref(1);
+        },
+        "E8 ? ? ? ? 90 48 8B 8F ? ? ? ? BA ? ? ? ? E8 ? ? ? ? 90 48 8B 9F"_sig, "MinecraftGame::_update"
+    };
 
     inline static SigImpl AppPlatform_GameCorePC_pickImage {
         [](memory::signature_store&, uintptr_t res) {
@@ -357,13 +357,11 @@ public:
         "56 57 48 83 EC ? 48 89 CE 48 8B 89 ? ? ? ? 48 85 C9 0F 84 ? ? ? ? 48 89 D7"_sig, "Actor::setNameTag"
     };
 
-    inline static SigImpl GuiMessageVector_emplaceBack {
-        [](memory::signature_store& store, uintptr_t) {
-            return store.deref(1);
-        },
-        "E8 ? ? ? ? 90 4C 8B B6 ? ? ? ? 48 8B 9E ? ? ? ? 48 89 D8"_sig,
-        "std::vector<GuiMessage>::emplace_back"
-    };
+    inline static SigImpl GuiMessageVector_emplaceBack { [](memory::signature_store& store, uintptr_t) {
+                                                            return store.deref(1);
+                                                        },
+                                                         "E8 ? ? ? ? 90 4C 8B B6 ? ? ? ? 48 8B 9E ? ? ? ? 48 89 D8"_sig,
+                                                         "std::vector<GuiMessage>::emplace_back" };
 
     inline static SigImpl _updatePlayer {
         [](memory::signature_store&, uintptr_t res) {

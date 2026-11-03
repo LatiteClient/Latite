@@ -253,10 +253,8 @@ std::optional<std::wstring> JsPlugin::getHash(std::filesystem::path const& main)
         }
 
         std::array<unsigned char, 32> digest {};
-        auto status = BCryptHash(algorithm, nullptr, 0,
-                                 reinterpret_cast<unsigned char*>(input.data()),
-                                 static_cast<ULONG>(input.size()), digest.data(),
-                                 static_cast<ULONG>(digest.size()));
+        auto status = BCryptHash(algorithm, nullptr, 0, reinterpret_cast<unsigned char*>(input.data()),
+                                 static_cast<ULONG>(input.size()), digest.data(), static_cast<ULONG>(digest.size()));
         BCryptCloseAlgorithmProvider(algorithm, 0);
         if (status < 0) return std::nullopt;
 

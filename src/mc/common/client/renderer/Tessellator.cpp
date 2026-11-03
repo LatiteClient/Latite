@@ -27,17 +27,16 @@ void SDK::Tessellator::begin(Primitive fmt, int numVertices) {
 }
 
 void SDK::Tessellator::color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    if (isNoColor())
-        return;
+    if (isNoColor()) return;
 
     getNextColor() = a << 24 | b << 16 | g << 8 | r;
 
-    if (!isFormatFixed())
-        this->getEnabledFields()[1] = true;
+    if (!isFormatFixed()) this->getEnabledFields()[1] = true;
 }
 
 void SDK::Tessellator::color(float r, float g, float b, float a) {
-    color(static_cast<uint8_t>(r * 255.f), static_cast<uint8_t>(g * 255.f), static_cast<uint8_t>(b * 255.f), static_cast<uint8_t>(a * 255.f));
+    color(static_cast<uint8_t>(r * 255.f), static_cast<uint8_t>(g * 255.f), static_cast<uint8_t>(b * 255.f),
+          static_cast<uint8_t>(a * 255.f));
 }
 
 void SDK::Tessellator::color(Color const& col) {

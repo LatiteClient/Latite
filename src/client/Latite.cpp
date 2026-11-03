@@ -839,8 +839,7 @@ void Latite::initL10n() {
 }
 
 namespace {
-    constexpr auto chakraCoreUrl =
-        L"https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll";
+    constexpr auto chakraCoreUrl = L"https://raw.githubusercontent.com/Imrglop/Latite-Releases/main/bin/ChakraCore.dll";
 }
 
 void Latite::downloadChakraCore() {

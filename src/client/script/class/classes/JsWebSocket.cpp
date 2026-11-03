@@ -22,7 +22,8 @@ WebSocketState::~WebSocketState() {
 }
 
 WebSocketHolder::WebSocketHolder(std::shared_ptr<WebSocketState> socketState, bool binaryMessages)
-    : state(std::move(socketState)), binary(binaryMessages) {
+    : state(std::move(socketState))
+    , binary(binaryMessages) {
     eventListeners[receiveEventId] = {};
     eventListeners[closeEventId] = {};
 }
@@ -38,9 +39,8 @@ std::shared_ptr<WebSocketHolder> JsWebSocketClass::getHolder(JsValueRef object) 
     return *owner;
 }
 
-JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor,
-                                           JsValueRef* arguments, unsigned short argCount,
-                                           void* callbackState) {
+JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
+                                           unsigned short argCount, void* callbackState) {
     if (!Chakra::VerifyArgCount(argCount, 3)) return JS_INVALID_REFERENCE;
     if (!Chakra::VerifyParameters({ { arguments[1], JsString }, { arguments[2], JsNumber } })) {
         return JS_INVALID_REFERENCE;
@@ -81,8 +81,8 @@ JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor
     if (path.empty()) path = L"/";
 
     auto state = std::make_shared<WebSocketState>();
-    state->session = WinHttpOpen(L"Latite Client/2.9", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
-                                 WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
+    state->session = WinHttpOpen(L"Latite Client/2.9", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME,
+                                 WINHTTP_NO_PROXY_BYPASS, 0);
     if (!state->session) {
         Chakra::ThrowError(L"Could not open WebSocket session");
         return JS_INVALID_REFERENCE;
@@ -95,8 +95,8 @@ JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor
     }
 
     DWORD flags = parts.nScheme == INTERNET_SCHEME_HTTPS ? WINHTTP_FLAG_SECURE : 0;
-    HINTERNET request = WinHttpOpenRequest(state->connection, L"GET", path.c_str(), nullptr,
-                                            WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, flags);
+    HINTERNET request = WinHttpOpenRequest(state->connection, L"GET", path.c_str(), nullptr, WINHTTP_NO_REFERER,
+                                           WINHTTP_DEFAULT_ACCEPT_TYPES, flags);
     if (!request) {
         Chakra::ThrowError(L"Could not create WebSocket request");
         return JS_INVALID_REFERENCE;
@@ -108,8 +108,7 @@ JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor
         return JS_INVALID_REFERENCE;
     }
 
-    if (!WinHttpSendRequest(request, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
-                            WINHTTP_NO_REQUEST_DATA, 0, 0, 0)) {
+    if (!WinHttpSendRequest(request, WINHTTP_NO_ADDITIONAL_HEADERS, 0, WINHTTP_NO_REQUEST_DATA, 0, 0, 0)) {
         WinHttpCloseHandle(request);
         Chakra::ThrowError(L"Could not send WebSocket handshake");
         return JS_INVALID_REFERENCE;
@@ -140,8 +139,8 @@ JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor
         while (state->socket.load() == socket) {
             DWORD received = 0;
             WINHTTP_WEB_SOCKET_BUFFER_TYPE type;
-            DWORD error = WinHttpWebSocketReceive(socket, buffer.data(),
-                                                   static_cast<DWORD>(buffer.size()), &received, &type);
+            DWORD error =
+                WinHttpWebSocketReceive(socket, buffer.data(), static_cast<DWORD>(buffer.size()), &received, &type);
             if (error != ERROR_SUCCESS) break;
             if (type == WINHTTP_WEB_SOCKET_CLOSE_BUFFER_TYPE) {
                 WinHttpWebSocketClose(socket, WINHTTP_WEB_SOCKET_SUCCESS_CLOSE_STATUS, nullptr, 0);
@@ -195,8 +194,8 @@ JsValueRef JsWebSocketClass::jsConstructor(JsValueRef callee, bool isConstructor
     return client->construct(holder);
 }
 
-JsValueRef JsWebSocketClass::send(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
-                                  unsigned short argCount, void* callbackState) {
+JsValueRef JsWebSocketClass::send(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount,
+                                  void* callbackState) {
     if (!Chakra::VerifyArgCount(argCount, 2)) return JS_INVALID_REFERENCE;
 
     auto holder = getHolder(arguments[0]);
@@ -228,16 +227,15 @@ JsValueRef JsWebSocketClass::send(JsValueRef callee, bool isConstructor, JsValue
         return JS_INVALID_REFERENCE;
     }
 
-    auto bufferType = holder->binary ? WINHTTP_WEB_SOCKET_BINARY_MESSAGE_BUFFER_TYPE
-                                     : WINHTTP_WEB_SOCKET_UTF8_MESSAGE_BUFFER_TYPE;
+    auto bufferType =
+        holder->binary ? WINHTTP_WEB_SOCKET_BINARY_MESSAGE_BUFFER_TYPE : WINHTTP_WEB_SOCKET_UTF8_MESSAGE_BUFFER_TYPE;
     HINTERNET socket = holder->state->socket.load();
     if (!socket) {
         Chakra::ThrowError(L"WebSocket is closed");
         return JS_INVALID_REFERENCE;
     }
 
-    DWORD error = WinHttpWebSocketSend(socket, bufferType,
-                                       bytes.empty() ? nullptr : bytes.data(),
+    DWORD error = WinHttpWebSocketSend(socket, bufferType, bytes.empty() ? nullptr : bytes.data(),
                                        static_cast<DWORD>(bytes.size()));
     if (error != ERROR_SUCCESS) {
         Chakra::ThrowError(util::StrToWStr(http::errorMessage("WinHttpWebSocketSend", error)));
@@ -287,9 +285,8 @@ JsValueRef JsWebSocketClass::close(JsValueRef callee, bool isConstructor, JsValu
 
     HINTERNET socket = holder->state->socket.load();
     if (socket) {
-        WinHttpWebSocketShutdown(socket, static_cast<USHORT>(code),
-                                  utf8Reason.empty() ? nullptr : utf8Reason.data(),
-                                  static_cast<DWORD>(utf8Reason.size()));
+        WinHttpWebSocketShutdown(socket, static_cast<USHORT>(code), utf8Reason.empty() ? nullptr : utf8Reason.data(),
+                                 static_cast<DWORD>(utf8Reason.size()));
         holder->state->close();
     }
 
@@ -299,15 +296,18 @@ JsValueRef JsWebSocketClass::close(JsValueRef callee, bool isConstructor, JsValu
 JsValueRef JsWebSocketClass::construct(std::shared_ptr<WebSocketHolder> holder) {
     JsValueRef object;
     auto externalData = new std::shared_ptr<WebSocketHolder>(std::move(holder));
-    JS::JsCreateExternalObject(externalData, [](void* data) {
-        delete static_cast<std::shared_ptr<WebSocketHolder>*>(data);
-    }, &object);
+    JS::JsCreateExternalObject(
+        externalData,
+        [](void* data) {
+            delete static_cast<std::shared_ptr<WebSocketHolder>*>(data);
+        },
+        &object);
     JS::JsSetPrototype(object, getPrototype());
     return object;
 }
 
-JsValueRef JsWebSocketClass::on(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
-                                unsigned short argCount, void* callbackState) {
+JsValueRef JsWebSocketClass::on(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount,
+                                void* callbackState) {
     if (!Chakra::VerifyArgCount(argCount, 3)) return Chakra::GetUndefined();
     if (!Chakra::VerifyParameters({ { arguments[1], JsString }, { arguments[2], JsFunction } })) {
         return JS_INVALID_REFERENCE;
