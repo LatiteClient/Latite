@@ -61,6 +61,7 @@ void JitterDisplay::onPacketReceive(Event& evGeneric) {
     // A gap longer than 1000ms likely indicates dimension change, pause, or severe freeze; reset baseline
     if (dt > 1000.0) {
         lastInterval = -1.0;
+        jitterMs = 0.0;
         return;
     }
 

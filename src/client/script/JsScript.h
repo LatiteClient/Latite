@@ -1,4 +1,5 @@
 #pragma once
+#include <atomic>
 #include <memory>
 #include <functional>
 #include <exception>
@@ -45,7 +46,7 @@ public:
 
     class AsyncOperation {
     public:
-        bool flagDone = false;
+        std::atomic<bool> flagDone = false;
         bool hasCleared = false;
         bool shouldRemove = false;
         JsContextRef ctx = JS_INVALID_REFERENCE;

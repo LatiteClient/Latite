@@ -1,17 +1,6 @@
 #include "pch.h"
 #include "JsScript.h"
 
-#include <winrt/base.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Web.Http.h>
-#include <winrt/windows.security.cryptography.h>
-#include <winrt/windows.security.cryptography.core.h>
-
-#include <winrt/windows.foundation.collections.h>
-#include <winrt/Windows.UI.Core.h>
-#include <winrt/windows.ui.popups.h>
-#include <winrt/Windows.ApplicationModel.Core.h>
-
 #include "libraries/Filesystem.h"
 #include "libraries/Network.h"
 #include "libraries/Clipboard.h"
@@ -20,6 +9,7 @@
 
 #include "client/Latite.h"
 #include "client/misc/ClientMessageQueue.h"
+#include "mc/common/client/game/GameCore.h"
 
 #include "class/classes/JsVec2.h"
 #include "class/classes/JsVec3.h"
@@ -51,8 +41,6 @@
 #include "globals/OptionsScriptingObject.h"
 #include "client/resource/Resource.h"
 #include "client/resource/InitResources.h"
-
-using namespace winrt::Windows::Web::Http;
 
 bool JsScript::load() {
     auto res = JS::JsCreateContext(plugin->getRuntime(), &this->ctx) == JsNoError;
@@ -383,40 +371,22 @@ namespace {
         return mod->getModuleExports();
     }
 
-    winrt::Windows::Foundation::IAsyncAction doRequestPermission(JsPlugin* plugin, std::wstring const& str,
-                                                                 JsPlugin::UserPermission perm) {
-        winrt::Windows::UI::Popups::UICommand yesCommand;
-        yesCommand.Label(L"Grant permission");
-        auto yesId = yesCommand.Id();
+    void doRequestPermission(JsPlugin* plugin, std::wstring message, JsPlugin::UserPermission permission) {
+        auto gameWindow = SDK::GameCore::get()->hwnd;
+        std::thread([plugin, message = std::move(message), permission, gameWindow] {
+            int answer = MessageBoxW(gameWindow, message.c_str(), L"Permission Request",
+                                     MB_YESNO | MB_ICONWARNING | MB_DEFBUTTON2 | MB_SETFOREGROUND);
+            if (answer != IDYES) return;
 
-        winrt::Windows::UI::Popups::UICommand noCommand;
-        noCommand.Label(L"Do not grant permission");
-        auto noId = noCommand.Id();
+            Latite::get().queueForClientThread([plugin, permission] {
+                bool pluginIsLoaded = false;
+                Latite::getPluginManager().forEach([plugin, &pluginIsLoaded](std::shared_ptr<JsPlugin> loaded) {
+                    if (loaded.get() == plugin) pluginIsLoaded = true;
+                });
 
-        winrt::Windows::UI::Popups::MessageDialog dialog(str, L"Permission Request");
-        winrt::Windows::UI::Core::CoreWindow::GetForCurrentThread().Activate();
-        dialog.DefaultCommandIndex(0);
-        dialog.CancelCommandIndex(1);
-        dialog.Commands().Append(noCommand);
-        dialog.Commands().Append(yesCommand);
-
-        auto res = co_await dialog.ShowAsync();
-
-        bool hasPlugin = false;
-        Latite::getPluginManager().forEach([plugin, &hasPlugin](std::shared_ptr<JsPlugin> plug) {
-            if (plug.get() == plugin) {
-                hasPlugin = true;
-            }
-        });
-
-        if (hasPlugin) {
-            auto label = util::WStrToStr(res.Label().c_str());
-            if (label == "Grant permission") {
-                plugin->grantPermission(perm);
-            }
-        }
-
-        co_return;
+                if (pluginIsLoaded) plugin->grantPermission(permission);
+            });
+        }).detach();
     }
 
     JsValueRef CALLBACK requestPermission(JsValueRef callee, bool isConstructor, JsValueRef* arguments,

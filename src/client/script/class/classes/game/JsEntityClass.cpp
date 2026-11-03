@@ -110,7 +110,7 @@ JsValueRef JsEntityClass::entityAttack(JsValueRef callee, bool isConstructor, Js
         SDK::ClientInstance::get()->getLocalPlayer()->getCommandPermissionLevel() > 1) {
         auto actor = ent->getEntity();
         SDK::ClientInstance::get()->getLocalPlayer()->swing();
-        SDK::ClientInstance::get()->getLocalPlayer()->gameMode->attack(actor);
+        SDK::ClientInstance::get()->getLocalPlayer()->gameMode->attack(*actor, actor->getPos());
         return Chakra::GetUndefined();
     }
     Chakra::ThrowError(L"Invalid entity");

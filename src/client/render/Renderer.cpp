@@ -313,7 +313,6 @@ bool Renderer::init(IDXGISwapChain* chain) {
         auto ss = d2dCtx->GetPixelSize();
 
         ThrowIfFailed(d3d11Targets[i]->QueryInterface(surf.GetAddressOf()));
-        // auto info = winrt::Windows::Graphics::Display::DisplayInformation::GetForCurrentView(); // crashes
         float dpiX = 0; // info.LogicalDpi();
         float dpiY = 0; // info.LogicalDpi();
 #pragma warning(push)

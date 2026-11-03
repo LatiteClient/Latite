@@ -23,30 +23,30 @@ SDK::ClientInstance* SDK::ClientInstance::get() {
 }
 
 SDK::BlockSource* SDK::ClientInstance::getRegion() {
-    return memory::callVirtual<BlockSource*>(this, 0x1E);
+    return memory::callVirtual<BlockSource*>(this, 0x1D);
 }
 
 SDK::LocalPlayer* SDK::ClientInstance::getLocalPlayer() {
-    return memory::callVirtual<LocalPlayer*>(this, 0x1F);
+    return memory::callVirtual<LocalPlayer*>(this, 0x1E);
 }
 
 SDK::GuiData* SDK::ClientInstance::getGuiData() {
-    return hat::member_at<GuiData*>(this, 0x650);
+    return hat::member_at<GuiData*>(this, 0x668);
 }
 
 SDK::Options* SDK::ClientInstance::getOptions() {
-    return hat::member_at<Options*>(this, 0xE10);
+    return hat::member_at<Options*>(this, 0xE00);
 }
 
 SDK::NonOwnerPointer<SDK::SoundPlayerInterface> SDK::ClientInstance::getSoundEngine() {
     NonOwnerPointer<SoundPlayerInterface> soundEngine;
 
-    memory::callVirtual<void, NonOwnerPointer<SoundPlayerInterface>&>(this, 0x13C, soundEngine);
+    memory::callVirtual<void, NonOwnerPointer<SoundPlayerInterface>&>(this, 0x13A, soundEngine);
     return soundEngine;
 }
 
 SDK::ResourcePackManager& SDK::ClientInstance::getResourcePackManager() {
-    return *memory::callVirtual<ResourcePackManager*>(this, 0x60);
+    return *memory::callVirtual<ResourcePackManager*>(this, 0x5F);
 }
 
 void SDK::ClientInstance::grabCursor() {

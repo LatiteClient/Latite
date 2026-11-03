@@ -18,7 +18,17 @@ std::wstringstream PingDisplay::text(bool isDefault, bool inEditor) {
 
     auto* connectionInfo = SDK::RemoteConnectorComposite::getConnectionInfo();
     if (connectionInfo && !connectionInfo->hostIpAddress.empty()) {
-        dPing = ping;
+        bool found = false;
+
+        for (const auto& connection : SDK::ClientInstance::get()->packetSender->networkSystem->getConnections()) {
+            if (connection == nullptr || connection->shouldSkip || connection->networkPeer == nullptr) continue;
+
+            dPing = static_cast<int>(connection->networkPeer->getNetworkStatus().currentPing);
+            found = true;
+            break;
+        }
+
+        if (!found) dPing = ping;
     }
 
     wss << dPing;

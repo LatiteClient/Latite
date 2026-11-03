@@ -1,70 +1,62 @@
 #pragma once
+
 #include "../JsWrapperClass.h"
+#include "client/script/JsEvented.h"
 
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Foundation.Collections.h>
-#include <winrt/Windows.Networking.Sockets.h>
-#include <winrt/Windows.Storage.Streams.h>
+#include <atomic>
+#include <memory>
+#include <winhttp.h>
 
-using namespace std::string_view_literals;
+struct WebSocketState {
+    HINTERNET session = nullptr;
+    HINTERNET connection = nullptr;
+    std::atomic<HINTERNET> socket = nullptr;
 
-using winrt::Windows::Networking::Sockets::MessageWebSocket;
-using winrt::Windows::Storage::Streams::DataWriter;
+    void close();
+    ~WebSocketState();
+};
 
-struct WebSocketHolder : public JsEvented {
-    inline static std::wstring_view receiveEventId = L"receive"sv;
-    inline static std::wstring_view closeEventId = L"close"sv;
+struct WebSocketHolder : JsEvented {
+    inline static std::wstring_view receiveEventId = L"receive";
+    inline static std::wstring_view closeEventId = L"close";
 
-    MessageWebSocket socket;
-    DataWriter writer { nullptr };
+    std::shared_ptr<WebSocketState> state;
+    bool binary = false;
 
-    WebSocketHolder(MessageWebSocket&& ptr)
-        : socket(ptr) {
-        this->eventListeners[receiveEventId] = {};
-        this->eventListeners[closeEventId] = {};
-        writer = DataWriter(socket.OutputStream());
-    }
+    WebSocketHolder(std::shared_ptr<WebSocketState> socketState, bool binaryMessages);
+    ~WebSocketHolder();
 };
 
 class JsWebSocketClass final : public JsWrapperClass<WebSocketHolder> {
-protected:
+    static std::shared_ptr<WebSocketHolder> getHolder(JsValueRef object);
+
     static JsValueRef CALLBACK jsConstructor(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
                                              unsigned short argCount, void* callbackState);
-
     static JsValueRef CALLBACK send(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
                                     unsigned short argCount, void* callbackState);
-
     static JsValueRef CALLBACK close(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
                                      unsigned short argCount, void* callbackState);
-
     static JsValueRef CALLBACK on(JsValueRef callee, bool isConstructor, JsValueRef* arguments, unsigned short argCount,
                                   void* callbackState);
-
     static JsValueRef CALLBACK toStringCallback(JsValueRef callee, bool isConstructor, JsValueRef* arguments,
                                                 unsigned short argCount, void* callbackState) {
-        return Chakra::MakeString(L"[object " + std::wstring(reinterpret_cast<JsWebSocketClass*>(callbackState)->name) +
-                                  L"]");
+        return Chakra::MakeString(L"[object WebSocket]");
     }
 
 public:
     inline static const wchar_t* class_name = L"WebSocket";
 
-    JsWebSocketClass(class JsScript* owner)
+    JsWebSocketClass(JsScript* owner)
         : JsWrapperClass(owner, class_name) {
         createConstructor(jsConstructor, this);
     }
 
-    virtual JsValueRef construct(WebSocketHolder*, bool del);
+    JsValueRef construct(std::shared_ptr<WebSocketHolder> holder);
 
     void prepareFunctions() override {
-        // Static functions
-        // Member functions
         Chakra::DefineFunc(prototype, send, L"send", this);
         Chakra::DefineFunc(prototype, close, L"close", this);
         Chakra::DefineFunc(prototype, on, L"on", this);
         Chakra::DefineFunc(prototype, toStringCallback, L"toString", this);
-    };
-
-private:
-    winrt::Windows::Networking::Sockets::MessageWebSocket webSocket;
+    }
 };

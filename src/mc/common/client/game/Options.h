@@ -25,7 +25,7 @@ namespace SDK {
 
     private:
         void* unknown;
-        std::array<std::unique_ptr<class Option>, 776> options;
+        std::array<std::unique_ptr<class Option>, 825> options;
 
         virtual ~Options() = 0;
     };

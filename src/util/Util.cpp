@@ -704,6 +704,24 @@ void util::KeepInBounds(d2d::Rect& targ, d2d::Rect const& bounds) {
     }
 }
 
+bool util::IsRunningUnderWine() {
+    static const bool underWine = [] {
+        if (const auto ntdll = GetModuleHandleW(L"ntdll.dll"); ntdll && GetProcAddress(ntdll, "wine_get_version")) {
+            return true;
+        }
+
+        // fallback: some wine builds can hide their ntdll exports,
+        // but every wineprefix SHOULD have this key hopefully
+        HKEY key = nullptr;
+        if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"Software\\Wine", 0, KEY_READ, &key) == ERROR_SUCCESS) {
+            RegCloseKey(key);
+            return true;
+        }
+        return false;
+    }();
+    return underWine;
+}
+
 std::string util::GetProcessorInfo() {
     constexpr std::array<int, 3> cpuIds = { static_cast<int>(0x80000002), static_cast<int>(0x80000003),
                                             static_cast<int>(0x80000004) };

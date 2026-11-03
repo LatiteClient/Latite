@@ -42,17 +42,6 @@ using nlohmann::json;
 #include <d3d11on12.h>
 #include <d3d12.h>
 
-// WinRT
-
-#include <winrt/base.h>
-#include <winrt/Windows.Foundation.h>
-#include <winrt/Windows.Web.Http.h>
-#include <winrt/windows.foundation.collections.h>
-#include <winrt/Windows.Web.Http.Headers.h>
-#include <winrt/windows.system.h>
-#include <winrt/windows.security.cryptography.h>
-#include <winrt/windows.security.cryptography.core.h>
-
 // SDK
 #include "mc/common/client/game/ClientInstance.h"
 #include "mc/common/client/game/MinecraftGame.h"
