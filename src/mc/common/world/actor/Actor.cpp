@@ -142,8 +142,8 @@ void const* SDK::Actor::getActorRendererIdOverride() {
 }
 
 void SDK::Actor::swing() {
-    // @dump-wbds vtable Actor, swing
-    return memory::callVirtual<void>(this, 0x6E);
+    // 1.26.60.5: native attack input uses swing(source=4, force=false), slot 109.
+    return memory::callVirtual<void>(this, 0x6D, uint8_t { 4 }, false);
 }
 
 bool SDK::Actor::isPlayer() {
@@ -159,7 +159,9 @@ SDK::AttributesComponent* SDK::Actor::getAttributesComponent() {
 }
 
 SDK::AttributeInstance* SDK::Actor::getAttribute(SDK::Attribute& attribute) {
-    return getAttributesComponent()->baseAttributes.getInstance(attribute.mIDValue);
+    auto* comp = getAttributesComponent();
+    if (!comp) return nullptr;
+    return comp->baseAttributes.getInstance(attribute);
 }
 
 std::optional<float> SDK::Actor::getHealth() {

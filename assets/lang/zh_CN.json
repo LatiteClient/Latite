@@ -93,6 +93,8 @@
     "client.textmodule.fpsCounter.desc": "显示你的帧率 (FPS)。",
     "client.textmodule.pingDisplay.name": "延迟显示",
     "client.textmodule.pingDisplay.desc": "显示连接服务器的平均上行延迟。",
+    "client.textmodule.jitterDisplay.name": "抖动显示",
+    "client.textmodule.jitterDisplay.desc": "显示网络收包抖动（毫秒）。",
     "client.textmodule.comboCounter.name": "Combo 计数器",
     "client.textmodule.comboCounter.desc": "显示你的连击数。",
     "client.textmodule.comboCounter.count.name": "连击：",

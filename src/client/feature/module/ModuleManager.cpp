@@ -35,6 +35,7 @@
 #include "modules/hud/CPSCounter.h"
 #include "modules/hud/ServerDisplay.h"
 #include "modules/hud/PingDisplay.h"
+#include "modules/hud/JitterDisplay.h"
 #include "modules/hud/SpeedDisplay.h"
 #include "modules/hud/Clock.h"
 #include "modules/hud/BowIndicator.h"
@@ -72,6 +73,7 @@ ModuleManager::ModuleManager() {
     this->items.push_back(std::make_shared<CPSCounter>());
     this->items.push_back(std::make_shared<ServerDisplay>());
     this->items.push_back(std::make_shared<PingDisplay>());
+    this->items.push_back(std::make_shared<JitterDisplay>());
     this->items.push_back(std::make_shared<SpeedDisplay>());
     this->items.push_back(std::make_shared<ToggleSprintSneak>());
     this->items.push_back(std::make_shared<Clock>());
