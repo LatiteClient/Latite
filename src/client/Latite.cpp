@@ -181,6 +181,7 @@ DWORD __stdcall startThreadImpl(HINSTANCE dll) {
 
     Logger::Info("Minecraft {}", Latite::get().gameVersion);
     Logger::Info("Using {} memory allocator", GameAllocator::backendName());
+    if (util::IsRunningUnderWine()) Logger::Info("Running under Wine");
 
     Logger::Info("Loading assets");
     Latite::get().dllInst = dll;
