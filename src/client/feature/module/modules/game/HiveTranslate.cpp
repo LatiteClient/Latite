@@ -38,9 +38,17 @@ void HiveTranslate::onText(Event& evG) {
     static const std::regex pattern("\u00c2\u00a77\u00c2\u00a7l\u00c2\u00bb \u00c2\u00a7r");
 
     std::smatch match;
-    if (!std::regex_search(message, match, pattern) && match.position() == 0) return;
+    if (!std::regex_search(message, match, pattern)) {
+        return;
+    }
 
-    std::string query = urlEncode(message.substr(match.position() + match.length()));
+    auto pos = match.position();
+    auto len = match.length();
+    if (pos < 0 || static_cast<size_t>(pos) + len > message.size()) {
+        return;
+    }
+
+    std::string query = urlEncode(message.substr(static_cast<size_t>(pos) + len));
     std::string url =
         "https://clients5.google.com/translate_a/t?client=dict-chrome-ex&sl=auto&tl=" + targetLang + "&q=" + query;
 
